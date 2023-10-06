@@ -95,6 +95,7 @@ std::map<std::string, int64_t> default_keys{
     {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
     {"toggle_grid", OL_KEY_CTRL | OL_KEY_SHIFT | 'G'},
     {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
+    {"toggle_entityinfo", OL_KEY_CTRL | OL_KEY_SHIFT | 'E'},
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
@@ -327,6 +328,7 @@ std::map<std::string, bool> options = {
     {"disable_pause", false},
     {"draw_grid", false},
     {"draw_hitboxes", false},
+    {"draw_entityinfo", false},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
     {"warp_transition", false},
@@ -2812,6 +2814,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["draw_hitboxes"] = !options["draw_hitboxes"];
     }
+    else if (pressed("toggle_entityinfo", wParam))
+    {
+        options["draw_entityinfo"] = !options["draw_entityinfo"];
+    }
     else if (pressed("toggle_grid", wParam))
     {
         options["draw_grid"] = !options["draw_grid"];
@@ -4192,6 +4198,45 @@ void render_path()
     draw_list->PathStroke(color, 0, thick);
 }
 
+std::string entity_tooltip(Entity* hovered)
+{
+    std::string coords;
+    coords += fmt::format("{}, {} ({:.2f}, {:.2f})", hovered->uid, entity_names[hovered->type->id], hovered->abs_x == -FLT_MAX ? hovered->x : hovered->abs_x, hovered->abs_y == -FLT_MAX ? hovered->y : hovered->abs_y);
+    if (hovered->type->id == to_id("ENT_TYPE_ITEM_POT") && hovered->as<Pot>()->inside > 0)
+        coords += fmt::format(" ({})", entity_names[hovered->as<Pot>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_PRESENT") || hovered->type->id == to_id("ENT_TYPE_ITEM_GHIST_PRESENT"))
+        coords += fmt::format(" ({})", entity_names[hovered->as<Present>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_COFFIN"))
+        coords += fmt::format(" ({})", entity_names[hovered->as<Coffin>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_CRATE") || hovered->type->id == to_id("ENT_TYPE_ITEM_DMCRATE") || hovered->type->id == to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"))
+        coords += fmt::format(" ({})", entity_names[hovered->as<Container>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_CHEST"))
+    {
+        auto chest = hovered->as<Chest>();
+        if (chest->bomb)
+            coords += " (BOMB)";
+        if (chest->leprechaun)
+            coords += " (LEPRECHAUN)";
+    }
+    else if (hovered->type->search_flags & 7)
+    {
+        auto ent = hovered->as<Movable>();
+        coords += fmt::format(" ({} HP)", ent->health);
+    }
+    if (hovered->overlay)
+    {
+        coords += fmt::format("\nON: {}, {} ({:.2f}, {:.2f})", hovered->overlay->uid, entity_names[hovered->overlay->type->id], hovered->overlay->abs_x == -FLT_MAX ? hovered->overlay->x : hovered->overlay->abs_x, hovered->overlay->abs_y == -FLT_MAX ? hovered->overlay->y : hovered->overlay->abs_y);
+    }
+    if (hovered->type->search_flags & 15 && hovered->as<Movable>()->last_owner_uid > -1)
+    {
+        auto ent = hovered->as<Movable>();
+        auto owner = get_entity_ptr(ent->last_owner_uid);
+        if (owner)
+            coords += fmt::format("\nOWNER: {}, {} ({:.2f}, {:.2f})", owner->uid, entity_names[owner->type->id], owner->abs_x == -FLT_MAX ? owner->x : owner->abs_x, owner->abs_y == -FLT_MAX ? owner->y : owner->abs_y);
+    }
+    return coords;
+}
+
 void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, bool rounded = false)
 {
     const auto type = ent->type->id;
@@ -4238,6 +4283,9 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
         draw_list->AddRectFilled(fix_pos(sboxa), fix_pos(sboxb), color, rounded ? 5.0f : 0.0f);
     else
         draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, rounded ? 5.0f : 0.0f, 0, 2.0f);
+
+    if (options["draw_entityinfo"] && !cross && !filled)
+        draw_list->AddText(fix_pos(ImVec2(sboxa.x, sboxb.y)), ImColor(1.0f, 1.0f, 1.0f, 0.8f), entity_tooltip(ent).c_str());
 
     if ((g_hitbox_mask & 0x8000) == 0)
         return;
@@ -4528,7 +4576,8 @@ void render_clickhandler()
             if (!UI::has_active_render(ent) && (ent->type->search_flags & 0x7000) == 0)
                 continue;
 
-            render_hitbox(ent, false, ImColor(0, 255, 255, 150));
+            if ((ent->type->search_flags & 1) == 0 || ent->as<Player>()->ai)
+                render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
         if ((g_hitbox_mask & 0x1) != 0)
         {
@@ -4606,7 +4655,7 @@ void render_clickhandler()
             if (hovered != nullptr)
             {
                 render_hitbox(hovered, true, ImColor(50, 50, 255, 200));
-                coords += fmt::format("\n{}, {}", hovered->uid, entity_names[hovered->type->id]);
+                coords += "\n" + entity_tooltip(hovered);
             }
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
@@ -4625,7 +4674,7 @@ void render_clickhandler()
         auto ent = get_entity_ptr(entity);
         if (ent)
         {
-            if (ent->layer == g_state->camera_layer)
+            if (ent->layer == (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))
                 render_hitbox(ent, false, front_col, true);
             else
                 render_hitbox(ent, false, back_col, true);
@@ -5445,10 +5494,12 @@ void render_options()
         ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
         tooltip("Add decorations to spawned floor.");
         ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
-        tooltip("Draw hitboxes for all movable and hovered entities.", "toggle_hitboxes");
+        tooltip("Draw hitboxes for all movable and hovered entities. Also mouse tooltips.", "toggle_hitboxes");
         ImGui::SameLine();
         ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
         tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
+        ImGui::Checkbox("Draw entity info##DrawEntityInfo", &options["draw_entityinfo"]);
+        tooltip("Draw entity names, uids and some random stuff next to the hitboxes.", "toggle_entityinfo");
         ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
         tooltip("Smooth camera movement when dragging, unless paused.");
         ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
