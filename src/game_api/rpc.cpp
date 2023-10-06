@@ -1341,7 +1341,7 @@ bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE 
 
 std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 {
-    for (size_t i = 0; i < ent_types.size(); i++)
+    for (size_t i = 0; i < ent_types.size(); ++i)
     {
         if (ent_types[i] >= (uint32_t)CUSTOM_TYPE::ACIDBUBBLE)
         {
@@ -1353,8 +1353,8 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
             else if (!extra_types.empty())
             {
                 auto it = ent_types.begin() + i;
-                it = ent_types.erase(it);
-                ent_types.insert(it, extra_types.begin(), extra_types.end());
+                *it = extra_types[0];
+                ent_types.insert(++it, extra_types.begin() + 1, extra_types.end());
                 i += extra_types.size() - 1;
             }
         }
