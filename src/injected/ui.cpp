@@ -6927,6 +6927,20 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::SameLine();
             ImGui::Text("%s", theme_name(target->theme));
         }
+        else if (entity_type == to_id("ENT_TYPE_LOGICAL_DOOR"))
+        {
+            auto door = entity->as<LogicalDoor>();
+            ImGui::Text("Door type:");
+            ImGui::InputInt("##LogicalDoorDoor", (int*)&door->door_type, 1, 10);
+            ImGui::SameLine();
+            ImGui::Text("%s", entity_names[door->door_type].c_str());
+            ImGui::Text("Platform type:");
+            ImGui::InputInt("##LogicalDoorPlatform", (int*)&door->platform_type, 1, 10);
+            ImGui::SameLine();
+            ImGui::Text("%s", entity_names[door->platform_type].c_str());
+            ImGui::Checkbox("Door spawned##LogicalDoorSpawned", &door->not_hidden);
+            ImGui::Checkbox("Platform spawned##LogicalDoorPlatformSpawned", &door->platform_spawned);
+        }
         else if (entity->type->search_flags & 0x7) // PLYAER, MOUNT, MONSTER
         {
             auto entity_pow = entity->as<PowerupCapable>();
