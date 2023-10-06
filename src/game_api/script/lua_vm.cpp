@@ -2042,6 +2042,18 @@ end
     /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
     lua["update_state"] = update_state;
 
+    /// Set engine target frametime (1/framerate, default 1/60). Set to 0 to go as fast as possible. Call without arguments to reset.
+    lua["set_frametime"] = set_frametime;
+
+    /// Get engine target frametime (1/framerate, default 1/60).
+    lua["get_frametime"] = get_frametime;
+
+    /// Set engine target frametime when game is unfocused (1/framerate, default 1/33). Set to 0 to go as fast as possible. Call without arguments to reset.
+    lua["set_frametime_unfocused"] = set_frametime_inactive;
+
+    /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+    lua["get_frametime_unfocused"] = get_frametime_inactive;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
