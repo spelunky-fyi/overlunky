@@ -266,7 +266,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, pause_updates = true;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -352,6 +352,9 @@ std::map<std::string, bool> options = {
     {"borders", false},
     {"console_alt_keys", false},
     {"vsync", true}};
+
+double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
+double fps_min = 0, fps_max = 600.0;
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -2088,12 +2091,55 @@ void force_kits()
     }
 }
 
+bool toggle_pause()
+{
+    g_pause_at = -1;
+    g_pause_time = -1;
+    if (g_pause_type & 0x40)
+    {
+        if (!paused)
+        {
+            g_pause_time = g_state->time_startup;
+            pause_updates = true;
+            paused = true;
+        }
+        else
+        {
+            g_pause_time = -1;
+            pause_updates = false;
+            paused = false;
+        }
+        g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+    }
+    else
+    {
+        if (g_state->pause == 0)
+        {
+            g_state->pause = (uint8_t)g_pause_type;
+            paused = true;
+        }
+        else
+        {
+            g_state->pause = 0;
+            paused = false;
+        }
+    }
+    return paused;
+}
+
 void frame_advance()
 {
-    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
+    if (g_pause_type & 0x40)
     {
-        g_state->pause = (uint8_t)g_pause_type;
-        g_pause_at = -1;
+        g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+    }
+    else
+    {
+        if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
+        {
+            g_state->pause = (uint8_t)g_pause_type;
+            g_pause_at = -1;
+        }
     }
 }
 
@@ -2836,17 +2882,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("toggle_pause", wParam))
     {
-        g_pause_at = -1;
-        if (g_state->pause == 0)
-        {
-            g_state->pause = (uint8_t)g_pause_type;
-            paused = true;
-        }
-        else
-        {
-            g_state->pause = 0;
-            paused = false;
-        }
+        toggle_pause();
     }
     else if (pressed("toggle_hud", wParam))
     {
@@ -2858,10 +2894,21 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_state->pause == (uint8_t)g_pause_type)
+        if (g_pause_type & 0x40)
         {
-            g_pause_at = UI::get_frame_count() + 1;
-            g_state->pause = 0;
+            if (pause_updates)
+            {
+                g_pause_time = g_state->time_startup + 1;
+                g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+            }
+        }
+        else
+        {
+            if (g_state->pause == (uint8_t)g_pause_type)
+            {
+                g_pause_at = UI::get_frame_count() + 1;
+                g_state->pause = 0;
+            }
         }
     }
     else if (pressed("toggle_disable_pause", wParam))
@@ -5446,6 +5493,7 @@ void render_options()
                 hook_savegame();
         }
         tooltip("Enable this if you want to keep your\nsave game unaffected by tomfoolery.");
+
         if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
         {
             if (should_speedhack())
@@ -5455,6 +5503,27 @@ void render_options()
         tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+
+        if (ImGui::SliderScalar("Engine FPS##EngineFPS", ImGuiDataType_Double, &g_engine_fps, &fps_min, &fps_max, "%f"))
+            g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps));
+        tooltip("Set target engine FPS. Always capped by max GPU FPS.\n0 = as fast as it can go.");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetFPS"))
+        {
+            g_engine_fps = 60.0;
+            g_Console.get()->execute("set_frametime()");
+        }
+
+        if (ImGui::SliderScalar("Unfocused FPS##UnfocusedFPS", ImGuiDataType_Double, &g_unfocused_fps, &fps_min, &fps_max, "%f"))
+            g_Console.get()->execute(fmt::format("return set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_engine_fps));
+        tooltip("Set target unfocused FPS. Always capped by max Engine FPS.\n0 = as fast as it can go.");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetUnfocusedFPS"))
+        {
+            g_unfocused_fps = 33.0;
+            g_Console.get()->execute("set_frametime_unfocused()");
+        }
+
         bool void_mode = g_ui_scripts["void"]->is_enabled();
         if (ImGui::Checkbox("Void sandbox mode", &void_mode))
         {
@@ -5585,7 +5654,7 @@ void render_options()
     if (submenu("Frame advance / Engine pause type"))
     {
         ImGui::PushID("PauseType");
-        for (int i = 1; i < 6; i++)
+        for (int i = 1; i < 7; i++)
         {
             ImGui::CheckboxFlags(pause_types[i], &g_pause_type, (int)std::pow(2, i));
         }
@@ -7609,12 +7678,7 @@ void render_game_props()
             gamestate += "Pause ";
         ImGui::LabelText("Game state", "%s", gamestate.c_str());
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
-        {
-            if (paused)
-                g_state->pause = (uint8_t)g_pause_type;
-            else
-                g_state->pause = 0;
-        }
+            toggle_pause();
         tooltip("Pause time while still being able to teleport, spawn and move entities", "toggle_pause");
         endmenu();
     }
@@ -8329,13 +8393,27 @@ AABB player_hud_position(int p = 0)
 
 void render_prohud()
 {
+    static float engine_fps = 0;
+    static std::chrono::time_point<std::chrono::system_clock> last_time;
+    static uint32_t last_frame;
+    auto this_frame = UI::get_frame_count();
+    auto frame_delta = this_frame - last_frame;
+    auto this_time = std::chrono::system_clock::now();
+    auto time_delta = std::chrono::duration<float>(this_time - last_time);
+    if (time_delta.count() > 1.0f)
+    {
+        engine_fps = static_cast<float>(frame_delta) / time_delta.count();
+        last_frame = this_frame;
+        last_time = this_time;
+    }
+
     auto io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
     ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("TIMER:{}/{} FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", format_time(g_state->time_level), format_time(g_state->time_total), UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
+    std::string buf = fmt::format("TIMER:{}/{} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -8344,7 +8422,7 @@ void render_prohud()
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     auto type = spawned_type();
-    buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
+    buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}{}", type, options["snap_to_grid"] ? " SNAP" : "")));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -8453,6 +8531,18 @@ void imgui_init(ImGuiContext*)
     windows["tool_texture"] = new Window({"Texture viewer", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
     // windows["tool_sound"] = new Window({"Sound player", is_tab_detached("tool_sound"), is_tab_open("tool_sound")});
 
+    if (g_ui_scripts.find("pause") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            R"(
+set_callback(function() return pause_at and pause_at ~= -1 and state.time_startup >= pause_at end, ON.PRE_UPDATE)
+            )",
+            "pause",
+            g_SoundManager.get(),
+            g_Console.get(),
+            true);
+        g_ui_scripts["pause"] = std::unique_ptr<SpelunkyScript>(script);
+    }
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
         SpelunkyScript* script = new SpelunkyScript(

@@ -44,4 +44,7 @@ class ScriptImpl : public LockableLuaBackend<ScriptImpl>
     virtual const char* get_path() const override;
     virtual const char* get_root() const override;
     virtual const std::filesystem::path& get_root_path() const override;
+
+    std::string execute(std::string str);
+    std::string execute_raw(std::string str);
 };

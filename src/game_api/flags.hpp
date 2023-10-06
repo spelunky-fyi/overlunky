@@ -754,4 +754,5 @@ const char* pause_types[]{
     "8: ?",
     "16: ?",
     "32: Ankh (smooth camera, janky audio)",
+    "Freeze on PRE_UPDATE",
 };
