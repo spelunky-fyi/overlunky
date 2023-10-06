@@ -464,6 +464,11 @@ function move_entity(uid, x, y, vx, vy, layer) end
 ---@param layer LAYER
 ---@return nil
 function move_grid_entity(uid, x, y, layer) end
+---Destroy the grid entity, and its item entities, removing them from the grid without dropping particles or gold.
+---Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
+---@param uid integer
+---@return nil
+function destroy_grid_entity(uid) end
 ---Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
 ---@param uid integer
 ---@param w integer

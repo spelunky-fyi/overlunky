@@ -459,6 +459,16 @@ Change [ENT_TYPE](#ENT_TYPE)'s spawned when [Waddler](#Waddler) dies, by default
 Max 255 types.
 Use empty table as argument to reset to the game default
 
+### destroy_grid_entity
+
+
+> Search script examples for [destroy_grid_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_grid_entity)
+
+#### nil destroy_grid_entity(int uid)
+
+Destroy the grid entity, and its item entities, removing them from the grid without dropping particles or gold.
+Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes [MASK](#MASK).PLAYER to prevent crashes
+
 ### drop
 
 

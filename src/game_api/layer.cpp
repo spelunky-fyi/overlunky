@@ -215,3 +215,35 @@ void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_la
         }
     }
 }
+
+void Layer::destroy_grid_entity(Entity* ent)
+{
+    if (ent)
+    {
+        auto items = ent->items.entities();
+        for (auto ptr = items.cend(); ptr != items.cbegin();)
+        {
+            ptr--;
+            Entity* item_ent = *ptr;
+            if (item_ent->type->search_flags & ~1) // if not player
+            {
+                destroy_grid_entity(item_ent);
+            }
+        }
+
+        const auto pos = ent->position();
+        const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.first));
+        const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.second));
+        if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
+        {
+            if (grid_entities[current_grid_y][current_grid_x] == ent)
+            {
+                grid_entities[current_grid_y][current_grid_x] = nullptr;
+                update_liquid_collision_at(pos.first, pos.second, false);
+            }
+        }
+
+        ent->flags |= 1U << (29 - 1); // set DEAD flag to prevent certain stuff like gold nuggets drop or particles from entities such as spikes
+        ent->destroy();
+    }
+}
