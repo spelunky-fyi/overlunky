@@ -1426,7 +1426,7 @@ Type | Name | Description
 [LogicUnderwaterBubbles](#LogicUnderwaterBubbles) | [water_bubbles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=water_bubbles) | Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
 [LogicOlmecCutscene](#LogicOlmecCutscene) | [olmec_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) | 
 [LogicTiamatCutscene](#LogicTiamatCutscene) | [tiamat_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) | 
-[LogicApepTrigger](#LogicApepTrigger) | [apep_spawner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apep_spawner) | Works only if the level has at least one room [ROOM_TEMPLATE](#ROOM_TEMPLATE).APEP, and it still spawns apep at hardcoded positions
+[LogicApepTrigger](#LogicApepTrigger) | [apep_spawner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apep_spawner) | Triggers and spawns Apep only in rooms set as [ROOM_TEMPLATE](#ROOM_TEMPLATE).APEP
 [LogicCOGAnkhSacrifice](#LogicCOGAnkhSacrifice) | [city_of_gold_ankh_sacrifice](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=city_of_gold_ankh_sacrifice) | All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
 [Logic](#Logic) | [duat_bosses_spawner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=duat_bosses_spawner) | 
 [LogicTiamatBubbles](#LogicTiamatBubbles) | [bubbler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bubbler) | Spawn rising bubbles at [Tiamat](#Tiamat) (position hardcoded)

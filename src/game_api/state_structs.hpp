@@ -402,7 +402,7 @@ enum class LOGIC : uint32_t
     MOON_CHALLENGE,
     STAR_CHALLENGE,
     SUN_CHALLENGE,
-    MAGMAN_SPAWN,
+    MAGMAMAN_SPAWN,
     WATER_BUBBLES,
     OLMEC_CUTSCENE,
     TIAMAT_CUTSCENE,
@@ -695,7 +695,7 @@ struct LogicList
             LogicUnderwaterBubbles* water_bubbles;
             LogicOlmecCutscene* olmec_cutscene;
             LogicTiamatCutscene* tiamat_cutscene;
-            /// Works only if the level has at least one room ROOM_TEMPLATE.APEP, and it still spawns apep at hardcoded positions
+            /// Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
             LogicApepTrigger* apep_spawner;
             /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
             LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;

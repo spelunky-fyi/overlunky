@@ -851,7 +851,7 @@ Logic* LogicList::start_logic(LOGIC idx)
         size = sizeof(LogicTuskPleasurePalace);
         break;
     }
-    case LOGIC::MAGMAN_SPAWN:
+    case LOGIC::MAGMAMAN_SPAWN:
     {
         offset = VTABLE_OFFSET::LOGIC_VOLCANA_RELATED;
         size = sizeof(LogicMagmamanSpawn);

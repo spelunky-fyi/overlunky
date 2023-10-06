@@ -41,8 +41,8 @@ void register_usertypes(sol::state& lua)
                            LOGIC::STAR_CHALLENGE,
                            "SUN_CHALLENGE",
                            LOGIC::SUN_CHALLENGE,
-                           "MAGMAN_SPAWN",
-                           LOGIC::MAGMAN_SPAWN,
+                           "MAGMAMAN_SPAWN",
+                           LOGIC::MAGMAMAN_SPAWN,
                            "WATER_BUBBLES",
                            LOGIC::WATER_BUBBLES,
                            "OLMEC_CUTSCENE",
@@ -99,7 +99,7 @@ void register_usertypes(sol::state& lua)
             return sol::make_object(lua, (LogicStarChallenge*)return_logic);
         case LOGIC::SUN_CHALLENGE:
             return sol::make_object(lua, (LogicSunChallenge*)return_logic);
-        case LOGIC::MAGMAN_SPAWN:
+        case LOGIC::MAGMAMAN_SPAWN:
             return sol::make_object(lua, (LogicMagmamanSpawn*)return_logic);
         case LOGIC::WATER_BUBBLES:
             return sol::make_object(lua, (LogicUnderwaterBubbles*)return_logic);

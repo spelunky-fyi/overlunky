@@ -5893,7 +5893,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field water_bubbles LogicUnderwaterBubbles @Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
     ---@field olmec_cutscene LogicOlmecCutscene
     ---@field tiamat_cutscene LogicTiamatCutscene
-    ---@field apep_spawner LogicApepTrigger @Works only if the level has at least one room ROOM_TEMPLATE.APEP, and it still spawns apep at hardcoded positions
+    ---@field apep_spawner LogicApepTrigger @Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
     ---@field city_of_gold_ankh_sacrifice LogicCOGAnkhSacrifice @All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
     ---@field duat_bosses_spawner Logic
     ---@field bubbler LogicTiamatBubbles @Spawn rising bubbles at Tiamat (position hardcoded)

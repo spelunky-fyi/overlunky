@@ -662,7 +662,7 @@ Name | Data | Description
 [MOON_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MOON_CHALLENGE) | LOGIC::MOON_CHALLENGE | 
 [STAR_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.STAR_CHALLENGE) | LOGIC::STAR_CHALLENGE | 
 [SUN_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.SUN_CHALLENGE) | LOGIC::SUN_CHALLENGE | 
-[MAGMAN_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MAGMAN_SPAWN) | LOGIC::MAGMAN_SPAWN | 
+[MAGMAMAN_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MAGMAMAN_SPAWN) | LOGIC::MAGMAMAN_SPAWN | 
 [WATER_BUBBLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.WATER_BUBBLES) | LOGIC::WATER_BUBBLES | 
 [OLMEC_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.OLMEC_CUTSCENE) | LOGIC::OLMEC_CUTSCENE | 
 [TIAMAT_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TIAMAT_CUTSCENE) | LOGIC::TIAMAT_CUTSCENE | 
