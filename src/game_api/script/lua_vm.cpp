@@ -2014,24 +2014,24 @@ end
         return AABB(ax + index * w + 0.02f * f, ay, ax + index * w + w - 0.02f * f, ay - h);
     };
 
+    /// Olmec cutscene moves Olmec and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and Olmec will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with Olmec in the hole.
     lua["set_olmec_cutscene_enabled"] = set_olmec_cutscene_enabled;
 
-    /// Tiamat cutscene is also responsible for locking the exit door
-    /// So you may need to close it yourself if you still want to be required to kill Tiamat
+    /// Tiamat cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want Tiamat kill to be required
     lua["set_tiamat_cutscene_enabled"] = set_tiamat_cutscene_enabled;
 
     /// Activate custom variables for position used for detecting the player (normally hardcoded)
-    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending `set_post_entity_spawn`
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending set_post_entity_spawn
     /// default game values are: attack_x = 17.5 attack_y = 62.5
     lua["activate_tiamat_position_hack"] = activate_tiamat_position_hack;
 
     /// Activate custom variables for speed and y coordinate limit for crushing elevator
-    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending `set_post_entity_spawn`
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending set_post_entity_spawn
     /// default game values are: speed = 0.0125, y_limit = 98.5
     lua["activate_crush_elevator_hack"] = activate_crush_elevator_hack;
 
     /// Activate custom variables for y coordinate limit for hundun and spawn of it's heads
-    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending set_post_entity_spawn
     /// default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
     lua["activate_hundun_hack"] = activate_hundun_hack;
 
@@ -2039,7 +2039,7 @@ end
     /// This will also prevent game crashing when there is no exit door when they are in level
     lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
 
-    /// Run state update manually, i.e. simulate one logic frame
+    /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
     lua["update_state"] = update_state;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
