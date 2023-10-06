@@ -14,6 +14,7 @@
 #include "constants.hpp"                    // for no_return_str
 #include "entities_chars.hpp"               // for Player
 #include "entity.hpp"                       // for Entity, get_entity_ptr
+#include "entity_lookup.hpp"                //
 #include "handle_lua_function.hpp"          // for handle_function
 #include "items.hpp"                        // for Inventory
 #include "level_api.hpp"                    // for LevelGenData, LevelGenSy...

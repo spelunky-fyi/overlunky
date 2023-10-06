@@ -1198,6 +1198,10 @@ function activate_hundun_hack(activate) end
 ---@param enable boolean
 ---@return nil
 function set_boss_door_control_enabled(enable) end
+---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+---@param types ENT_TYPE[]
+---@return ENT_TYPE
+function add_custom_type(types) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean

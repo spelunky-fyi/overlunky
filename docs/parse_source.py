@@ -14,6 +14,7 @@ if not os.path.exists(".db"):
 header_files = [
     "../src/game_api/math.hpp",
     "../src/game_api/rpc.hpp",
+    "../src/game_api/entity_lookup.hpp",
     "../src/game_api/drops.hpp",
     "../src/game_api/spawn_api.hpp",
     "../src/game_api/script.hpp",

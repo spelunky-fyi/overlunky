@@ -1157,6 +1157,15 @@ Activate custom variables for y coordinate limit for hundun and spawn of it's he
 note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Hundun](#Hundun) entity, recommending `set_post_entity_spawn`
 default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
 
+### add_custom_type
+
+
+> Search script examples for [add_custom_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_custom_type)
+
+#### [ENT_TYPE](#ENT_TYPE) add_custom_type(array<[ENT_TYPE](#ENT_TYPE)> types)
+
+Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+
 ### change_poison_timer
 
 

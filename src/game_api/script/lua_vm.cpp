@@ -35,6 +35,7 @@
 #include "entities_chars.hpp"                      // for Player
 #include "entities_items.hpp"                      // for Container, Player...
 #include "entity.hpp"                              // for get_entity_ptr
+#include "entity_lookup.hpp"                       //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
 #include "items.hpp"                               // for Inventory

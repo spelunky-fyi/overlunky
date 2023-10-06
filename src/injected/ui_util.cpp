@@ -13,6 +13,7 @@
 #include "entities_items.hpp"        // for Torch
 #include "entities_mounts.hpp"       // for Mount
 #include "entity.hpp"                // for to_id, Entity, get_entity_ptr
+#include "entity_lookup.hpp"         //
 #include "game_manager.hpp"          // for get_game_manager, GameManager
 #include "items.hpp"                 // for Items
 #include "layer.hpp"                 // for Layer, EntityList::Range, Entit...
