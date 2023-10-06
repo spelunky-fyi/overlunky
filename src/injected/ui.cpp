@@ -1306,6 +1306,11 @@ std::string spawned_type()
 
 int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
 {
+    static const ENT_TYPE also_snap[] = {
+        to_id("ENT_TYPE_LOGICAL_DOOR"),
+        to_id("ENT_TYPE_LOGICAL_BLACKMARKET_DOOR"),
+        to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"),
+    };
     bool flip = g_vx < -0.04f;
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
@@ -1332,7 +1337,11 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
     {
         bool snap = options["snap_to_grid"];
-        if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
+        if (std::find(std::begin(also_snap), std::end(also_snap), to_spawn.id) != std::end(also_snap))
+        {
+            snap = true;
+        }
+        else if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
         {
             snap = true;
             g_vx = 0;
@@ -1383,11 +1392,17 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                 callbacks.push_back(cb);
             }
         }
-        else if (flip)
+        if (flip)
         {
             auto ent = get_entity_ptr(spawned);
             if (ent)
                 ent->flags |= (1U << 16);
+        }
+        if (to_spawn.id == also_snap[0])
+        {
+            auto ent = get_entity_ptr(spawned)->as<LogicalDoor>();
+            ent->door_type = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
+            ent->platform_type = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
         }
         if (!lock_entity && set_last)
             g_last_id = spawned;
