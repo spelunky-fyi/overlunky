@@ -212,6 +212,7 @@ std::map<std::string, int64_t> default_keys{
     {"speedhack_normal", OL_KEY_CTRL | OL_KEY_SHIFT | '0'},
     {"speedhack_turbo", VK_PRIOR},
     {"speedhack_slow", VK_NEXT},
+    {"toggle_uncapped_fps", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
     //{ "", 0x },
 };
 
@@ -351,7 +352,8 @@ std::map<std::string, bool> options = {
     {"inverted", false},
     {"borders", false},
     {"console_alt_keys", false},
-    {"vsync", true}};
+    {"vsync", true},
+    {"uncap_unfocused_fps", true}};
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
 double fps_min = 0, fps_max = 600.0;
@@ -810,6 +812,12 @@ void autorun_scripts()
     }
 }
 
+void update_frametimes()
+{
+    g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps));
+    g_Console.get()->execute(fmt::format("set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_unfocused_fps));
+}
+
 void save_config(std::string file)
 {
     std::ofstream writeData(file);
@@ -1049,6 +1057,11 @@ void load_config(std::string file)
     ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
     g_Console->set_alt_keys(options["console_alt_keys"]);
     imgui_vsync(options["vsync"]);
+    if (options["uncap_unfocused_fps"])
+    {
+        g_unfocused_fps = 0;
+        update_frametimes();
+    }
     save_config(file);
 }
 
@@ -2837,6 +2850,14 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         g_zoom = 0.0f;
         set_zoom();
+    }
+    else if (pressed("toggle_uncapped_fps", wParam))
+    {
+        if (g_engine_fps != 60.0)
+            g_engine_fps = 60.0;
+        else
+            g_engine_fps = 0;
+        update_frametimes();
     }
     else if (pressed("toggle_godmode", wParam))
     {
@@ -5494,36 +5515,6 @@ void render_options()
         }
         tooltip("Enable this if you want to keep your\nsave game unaffected by tomfoolery.");
 
-        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
-        {
-            if (should_speedhack())
-                options["speedhack"] = false;
-            speedhack();
-        }
-        tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
-        ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
-        tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
-
-        if (ImGui::SliderScalar("Engine FPS##EngineFPS", ImGuiDataType_Double, &g_engine_fps, &fps_min, &fps_max, "%f"))
-            g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps));
-        tooltip("Set target engine FPS. Always capped by max GPU FPS.\n0 = as fast as it can go.");
-        ImGui::SameLine();
-        if (ImGui::Button("Reset##ResetFPS"))
-        {
-            g_engine_fps = 60.0;
-            g_Console.get()->execute("set_frametime()");
-        }
-
-        if (ImGui::SliderScalar("Unfocused FPS##UnfocusedFPS", ImGuiDataType_Double, &g_unfocused_fps, &fps_min, &fps_max, "%f"))
-            g_Console.get()->execute(fmt::format("return set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_engine_fps));
-        tooltip("Set target unfocused FPS. Always capped by max Engine FPS.\n0 = as fast as it can go.");
-        ImGui::SameLine();
-        if (ImGui::Button("Reset##ResetUnfocusedFPS"))
-        {
-            g_unfocused_fps = 33.0;
-            g_Console.get()->execute("set_frametime_unfocused()");
-        }
-
         bool void_mode = g_ui_scripts["void"]->is_enabled();
         if (ImGui::Checkbox("Void sandbox mode", &void_mode))
         {
@@ -5546,6 +5537,45 @@ void render_options()
                 force_level_size();
             if (ImGui::SliderInt("Height##ForceHeight", &g_force_level_height, 1, 15, "%d", ImGuiSliderFlags_AlwaysClamp))
                 force_level_size();
+        }
+
+        ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
+        tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+
+        ImGui::Checkbox("Uncap unfocused FPS on start", &options["uncap_unfocused_fps"]);
+        tooltip("Sets the unfocused FPS to unlimited automatically.");
+
+        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 10.f, "%.2fx"))
+        {
+            if (should_speedhack())
+                options["speedhack"] = false;
+            speedhack();
+        }
+        tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetSpeedhack"))
+        {
+            g_speedhack_multiplier = 1.0f;
+            speedhack();
+        }
+        if (ImGui::SliderScalar("Engine FPS##EngineFPS", ImGuiDataType_Double, &g_engine_fps, &fps_min, &fps_max, "%f"))
+            update_frametimes();
+        tooltip("Set target engine FPS. Always capped by max GPU FPS.\n0 = as fast as it can go.");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetFPS"))
+        {
+            g_engine_fps = 60.0;
+            update_frametimes();
+        }
+
+        if (ImGui::SliderScalar("Unfocused FPS##UnfocusedFPS", ImGuiDataType_Double, &g_unfocused_fps, &fps_min, &fps_max, "%f"))
+            update_frametimes();
+        tooltip("Set target unfocused FPS. Always capped by max Engine FPS.\n0 = as fast as it can go.");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetUnfocusedFPS"))
+        {
+            g_unfocused_fps = 33.0;
+            update_frametimes();
         }
         endmenu();
     }
@@ -8417,7 +8447,7 @@ void render_prohud()
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{:.2f} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{:.2f}x ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
