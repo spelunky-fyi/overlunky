@@ -754,5 +754,5 @@ const char* pause_types[]{
     "8: ?",
     "16: ?",
     "32: Ankh (smooth camera, janky audio)",
-    "Freeze on PRE_UPDATE",
+    "Freeze on PRE_UPDATE", // this is not a real state.pause flag, it's only used by ui.cpp for magic
 };
