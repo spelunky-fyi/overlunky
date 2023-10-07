@@ -479,7 +479,7 @@ void Movable::set_position(float to_x, float to_y)
 }
 
 template <typename F>
-void recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode, F func)
+bool recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode, F func)
 {
     auto acutal_mask = [](uint32_t m) -> uint32_t // for the MASK.ANY
     { return m == 0 ? 0xFFFF : m; };
@@ -487,20 +487,20 @@ void recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> 
     if (rec_mode == RECURSIVE_MODE::EXCLUSIVE)
     {
         if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) != 0)
-            return;
+            return false;
 
         if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) != ent_types.end())
-            return;
+            return false;
     }
     else if (rec_mode == RECURSIVE_MODE::INCLUSIVE)
     {
         if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) == 0)
         {
             if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) == ent_types.end())
-                return;
+                return false;
         }
         else if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) == ent_types.end())
-            return;
+            return false;
     }
     const std::vector<Entity*> items{ent->items.entities().begin(), ent->items.entities().end()};
     for (auto entity : items)
@@ -533,6 +533,7 @@ void recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> 
         }
     }
     func(ent);
+    return true;
 }
 
 void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
@@ -541,7 +542,8 @@ void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optio
     {
         ent->kill(destroy_corpse, responsible);
     };
-    recursive(this, mask, ent_types, rec_mode, kill_func);
+    if (!recursive(this, mask, ent_types, rec_mode, kill_func))
+        kill(destroy_corpse, responsible);
 }
 
 void Entity::destroy_recursive(std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
@@ -550,5 +552,6 @@ void Entity::destroy_recursive(std::optional<uint32_t> mask, const std::vector<E
     {
         ent->destroy();
     };
-    recursive(this, mask, ent_types, rec_mode, destroy_func);
+    if (!recursive(this, mask, ent_types, rec_mode, destroy_func))
+        destroy();
 }
