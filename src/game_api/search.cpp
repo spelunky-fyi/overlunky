@@ -1841,6 +1841,19 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        /* it's a static double, just find something that reads it
+           this+0x08 is clearly some kind of framerate related double, cause it's 60, but don't know what it does
+           this+0x10 is hopefully unfocused frametime for the other function, but maybe it needs own pattern
+        22d12248 00 00 00        double     0.01666666753590107
+                 20 11 11
+                 91 3f */
+        "engine_frametime"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("48 8d 04 0a 48 85 d2 48 0f 44 c2 48 85 c9 48 0f 44 c1 66 0f 28 c8"_gh)
+            .decode_pc(4)
+            .at_exe(),
+    },
+    {
         // Borrowed from Playlunky logger.cpp
         "game_log_function"sv,
         PatternCommandBuffer{}

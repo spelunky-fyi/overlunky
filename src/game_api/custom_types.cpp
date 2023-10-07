@@ -551,7 +551,8 @@ std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
             "ENT_TYPE_ITEM_DMCRATE",
             "ENT_TYPE_ITEM_PRESENT",
             "ENT_TYPE_ITEM_GHIST_PRESENT",
-            "ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE");
+            "ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE",
+            "ENT_TYPE_ITEM_POT");
     case CUSTOM_TYPE::CONVEYORBELT:
         return make_custom_entity_type_list<CUSTOM_TYPE::CONVEYORBELT>(
             "ENT_TYPE_FLOOR_CONVEYORBELT_LEFT",

@@ -99,7 +99,7 @@ void attach_stdout(DWORD pid)
     freopen_s(&stream, "CONOUT$", "w", stdout);
     freopen_s(&stream, "CONOUT$", "w", stderr);
     // freopen_s(&stream, "CONIN$", "r", stdin);
-    INFO("Press Ctrl+C to detach this window from the process.");
+    INFO("Do not close this window or the game will also die. Press Ctrl+C to detach this window from the game process.");
 }
 
 void run()
