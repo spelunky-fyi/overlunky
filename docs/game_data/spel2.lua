@@ -1157,9 +1157,13 @@ function get_local_state() end
 ---@return nil
 function get_local_players() end
 ---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
----@param dir string
+---@param dir string?
 ---@return nil
 function list_dir(dir) end
+---List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.
+---@param dir string?
+---@return nil
+function list_data_dir(dir) end
 ---List all char.png files recursively from Mods/Packs. Returns table of file paths.
 ---@return nil
 function list_char_mods() end

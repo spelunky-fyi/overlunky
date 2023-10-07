@@ -325,6 +325,12 @@
             <a href="#Lua-libraries" class="toc-h1 toc-link" data-title="Lua libraries">Lua libraries</a>
               <ul class="toc-list-h2">
                   <li>
+                    <a href="#io" class="toc-h2 toc-link" data-title="io">io</a>
+                  </li>
+                  <li>
+                    <a href="#os" class="toc-h2 toc-link" data-title="os">os</a>
+                  </li>
+                  <li>
                     <a href="#math" class="toc-h2 toc-link" data-title="math">math</a>
                   </li>
                   <li>
@@ -787,6 +793,9 @@
                           </li>
                           <li>
                             <a href="#list_char_mods" class="toc-h3 toc-link" data-title="list_char_mods">list_char_mods</a>
+                          </li>
+                          <li>
+                            <a href="#list_data_dir" class="toc-h3 toc-link" data-title="list_data_dir">list_data_dir</a>
                           </li>
                           <li>
                             <a href="#list_dir" class="toc-h3 toc-link" data-title="list_dir">list_dir</a>
@@ -3611,6 +3620,49 @@
 <p>If you use a text editor/IDE that has a Lua linter available you can download <a href="https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua">spel2.lua</a>, place it in a folder of your choice and specify that folder as a &quot;external function library&quot;. For example <a href="https://code.visualstudio.com/">VSCode</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=sumneko.lua">Lua Extension</a> offers this feature. This will allow you to get auto-completion of API functions along with linting</p>
 <h1 id='Lua-libraries'>Lua libraries</h1>
 <p>The following Lua libraries and their functions are available. You can read more about them in the <a href="https://www.lua.org/manual/5.4/manual.html#6">Lua documentation</a>. We&#39;re using Lua 5.4 with the <a href="https://sol2.readthedocs.io/en/latest/">Sol C++ binding</a>.</p>
+<h2 id='io'>io</h2><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Write a data file</span>
+<span class="c1">-- Data will be written to Mods/Data/[scriptname.lua or Mod Name]/timestamp.txt</span>
+<span class="kd">local</span> <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">open_data</span><span class="p">(</span><span class="nb">tostring</span><span class="p">(</span><span class="nb">os.time</span><span class="p">())</span> <span class="o">..</span> <span class="s2">".txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">f</span> <span class="k">then</span>
+    <span class="n">f</span><span class="p">:</span><span class="n">write</span><span class="p">(</span><span class="s2">"hello world at "</span> <span class="o">..</span> <span class="nb">os.date</span><span class="p">())</span>
+    <span class="n">f</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="c1">-- List all files in data dir and read them out</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="k">in</span> <span class="nb">pairs</span><span class="p">(</span><span class="n">list_data_dir</span><span class="p">())</span> <span class="k">do</span>
+    <span class="kd">local</span> <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">open_data</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">f</span> <span class="k">then</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">v</span> <span class="o">..</span> <span class="s2">": "</span> <span class="o">..</span> <span class="n">f</span><span class="p">:</span><span class="n">read</span><span class="p">(</span><span class="s2">"a"</span><span class="p">))</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+</code></pre></div>
+<p><code>meta.unsafe</code> exposes all <a href="https://www.lua.org/manual/5.4/manual.html#6.8">standard library functions</a> and removes basedir restrictions from the custom functions.</p>
+
+<p>In safe mode (default) the following standard and custom functions are available:</p>
+
+<ul>
+<li><code>io.type</code></li>
+<li><code>io.open_data</code>: like <code>io.open</code> but restricted to base directory <code>Mods/Data/modname</code></li>
+<li><code>io.open_mod</code>: like <code>io.open</code> but restricted to the mod directory</li>
+</ul>
+
+<p>Safely opened files can be used normally through the <code>file:</code> handle. Files and folders opened in write mode are automatically created.</p>
+
+<p>Also see <a href="#list_dir">list_dir</a> and <a href="#list_data_dir">list_data_dir</a>.</p>
+<h2 id='os'>os</h2>
+<p><code>meta.unsafe</code> exposes all <a href="https://www.lua.org/manual/5.4/manual.html#6.9">standard library functions</a> and removes basedir restrictions from the custom functions.</p>
+
+<p>In safe mode (default) the following standard and custom functions are available:</p>
+
+<ul>
+<li><code>os.clock</code></li>
+<li><code>os.date</code></li>
+<li><code>os.difftime</code></li>
+<li><code>os.time</code></li>
+<li><code>os.remove_data</code>: like <code>os.remove</code> but restricted to base directory <code>Mods/Data/modname</code></li>
+<li><code>os.remove_mod</code>: like <code>os.remove</code> but restricted to the mod directory</li>
+</ul>
 <h2 id='math'>math</h2><h2 id='base'>base</h2><h2 id='string'>string</h2><h2 id='table'>table</h2><h2 id='coroutine'>coroutine</h2><h2 id='package'>package</h2><h2 id='json'>json</h2>
 <p>To save data in your mod it makes a lot of sense to use <code>json</code> to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:</p>
 <div class="highlight"><pre class="highlight lua tab-lua"><code><span class="kd">local</span> <span class="n">some_mod_data_that_should_be_saved</span> <span class="o">=</span> <span class="p">{{</span>
@@ -3662,7 +3714,7 @@
     <span class="n">message</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre></div><h1 id='Unsafe-mode'>Unsafe mode</h1>
-<p>Setting <code>meta.unsafe = true</code> enables the rest of the standard Lua libraries like <code>io</code> and <code>os</code>, loading dlls with require and <code>package.loadlib</code>. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.</p>
+<p>Setting <code>meta.unsafe = true</code> enables the rest of the standard Lua libraries like unrestricted <code>io</code> and <code>os</code>, loading dlls with require and <code>package.loadlib</code>. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.</p>
 <h1 id='Modules'>Modules</h1>
 <p>You can load modules with <code>require &quot;mymod&quot;</code> or <code>require &quot;mydir.mymod&quot;</code>, just put <code>mymod.lua</code> in the same directory the script is, or in <code>mydir/</code> to keep things organized.</p>
 
@@ -4666,11 +4718,17 @@ The callback signature is nil on_data(string response, string error)</p>
 </blockquote>
 <h4 id='nil-list_char_mods'>nil list_char_mods()</h4>
 <p>List all char.png files recursively from Mods/Packs. Returns table of file paths.</p>
+<h3 id='list_data_dir'>list_data_dir</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_data_dir">list_data_dir</a></p>
+</blockquote>
+<h4 id='nil-list_data_dir-optional-dir'>nil list_data_dir(optional<string> dir)</h4>
+<p>List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.</p>
 <h3 id='list_dir'>list_dir</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_dir">list_dir</a></p>
 </blockquote>
-<h4 id='nil-list_dir-string-dir'>nil list_dir(string dir)</h4>
+<h4 id='nil-list_dir-optional-dir'>nil list_dir(optional<string> dir)</h4>
 <p>List files in directory relative to the script root. Returns table of file/directory names or nil if not found.</p>
 <h3 id='load_death_screen'>load_death_screen</h3>
 <blockquote>
