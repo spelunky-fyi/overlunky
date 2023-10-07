@@ -196,8 +196,45 @@ print("\n# Lua libraries")
 print(
     "The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6). We're using Lua 5.4 with the [Sol C++ binding](https://sol2.readthedocs.io/en/latest/)."
 )
+
+print("\n## io")
+include_example("io")
+print(
+    """
+`meta.unsafe` exposes all [standard library functions](https://www.lua.org/manual/5.4/manual.html#6.8) and removes basedir restrictions from the custom functions.
+
+In safe mode (default) the following standard and custom functions are available:
+
+- `io.type`
+- `io.open_data`: like `io.open` but restricted to base directory `Mods/Data/modname`
+- `io.open_mod`: like `io.open` but restricted to the mod directory
+
+Safely opened files can be used normally through the `file:` handle. Files and folders opened in write mode are automatically created.
+
+Also see [list_dir](#list_dir) and [list_data_dir](#list_data_dir).
+"""
+)
+
+print("\n## os")
+include_example("os")
+print(
+    """
+`meta.unsafe` exposes all [standard library functions](https://www.lua.org/manual/5.4/manual.html#6.9) and removes basedir restrictions from the custom functions.
+
+In safe mode (default) the following standard and custom functions are available:
+
+- `os.clock`
+- `os.date`
+- `os.difftime`
+- `os.time`
+- `os.remove_data`: like `os.remove` but restricted to base directory `Mods/Data/modname`
+- `os.remove_mod`: like `os.remove` but restricted to the mod directory
+"""
+)
+
 for lib in ps.lualibs:
     print("\n## " + lib + "")
+
 print("\n## json")
 include_example("json")
 print(
@@ -269,7 +306,7 @@ end
 
 print("\n# Unsafe mode")
 print(
-    "Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory."
+    "Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like unrestricted `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory."
 )
 
 print("\n# Modules")

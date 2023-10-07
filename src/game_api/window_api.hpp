@@ -33,5 +33,6 @@ HWND get_window();
 
 void show_cursor();
 void hide_cursor();
+void imgui_vsync(bool enable);
 
 struct ID3D11Device* get_device();

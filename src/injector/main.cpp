@@ -360,11 +360,15 @@ bool inject_search(fs::path overlunky_path)
     return false;
 }
 
-bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
+bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject, bool& oldflip)
 {
     auto exe_dir = fs::canonical(exe_path).parent_path();
     auto cwd = fs::current_path();
     g_exe = exe_path.filename().string();
+
+    std::string cmdline{"Spel2.exe"};
+    if (oldflip)
+        cmdline = cmdline + " -oldflip";
 
     char dll_path[MAX_PATH] = {};
     sprintf_s(dll_path, MAX_PATH, "%s", overlunky_path.string().c_str());
@@ -400,14 +404,14 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject)
     STARTUPINFOA si{};
     si.cb = sizeof(STARTUPINFO);
 
-    if (!do_inject && DetourCreateProcessWithDlls(NULL, (LPSTR)exe_path.string().c_str(), NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi, 1, dll_paths, NULL))
+    if (!do_inject && DetourCreateProcessWithDlls((LPSTR)exe_path.string().c_str(), (LPSTR)cmdline.c_str(), NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi, 1, dll_paths, NULL))
     {
         INFO("Game launched with DLL");
         wait();
         CloseHandle(pi.hThread);
         return true;
     }
-    else if (CreateProcess((LPSTR)exe_path.string().c_str(), NULL, NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
+    else if (CreateProcess((LPSTR)exe_path.string().c_str(), (LPSTR)cmdline.c_str(), NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
     {
         auto proc = Process{pi.hProcess, {g_exe, pi.dwProcessId}};
         INFO("Game launched, injecting DLL...");
@@ -454,6 +458,7 @@ int main(int argc, char** argv)
         INFO("You can press ENTER to stop searching and try to launch the game from the parent folder.");
         INFO("Command line switches:");
         INFO("  --launch_game [path]    launch ../Spel2.exe, path/Spel2.exe, or a specific exe, and load OL with Detours");
+        INFO("  --oldflip               launch the game with -oldflip, may improve performance with external windows");
         INFO("  --console               keep console open to debug scripts etc");
         INFO("  --inject                use the old injection method instead of Detours with --launch_game");
         INFO("  --info_dump             output a bunch of game data to 'Spelunky 2/game_data'");
@@ -519,6 +524,7 @@ int main(int argc, char** argv)
 
     bool do_inject = GetCmdLineParam<bool>(cmd_line_parser, "inject", false);
     g_console = GetCmdLineParam<bool>(cmd_line_parser, "console", false);
+    bool oldflip = GetCmdLineParam<bool>(cmd_line_parser, "oldflip", false);
     if (info_dump)
     {
         do_inject = true;
@@ -537,7 +543,7 @@ int main(int argc, char** argv)
 
     if (fs::exists(exe))
     {
-        if (launch(exe, overlunky_path, do_inject))
+        if (launch(exe, overlunky_path, do_inject, oldflip))
         {
             FreeConsole();
             return 0;
@@ -547,7 +553,7 @@ int main(int argc, char** argv)
     {
         if (inject_search(overlunky_path))
         {
-            launch(fs::canonical("../Spel2.exe"), overlunky_path, do_inject);
+            launch(fs::canonical("../Spel2.exe"), overlunky_path, do_inject, oldflip);
         }
     }
     FreeConsole();

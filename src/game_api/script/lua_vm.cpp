@@ -1948,12 +1948,12 @@ end
     };
 
     /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
-    lua["list_dir"] = [&lua](std::string dir)
+    lua["list_dir"] = [&lua](std::optional<std::string> dir)
     {
         std::vector<std::string> files;
         auto backend = LuaBackend::get_calling_backend();
         auto base = backend->get_root_path();
-        auto path = base / std::filesystem::path(dir);
+        auto path = base / std::filesystem::path(dir.value_or("."));
         if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
             return sol::make_object(lua, sol::lua_nil);
         auto base_check = std::filesystem::relative(path, base).string();
@@ -1962,6 +1962,40 @@ end
             luaL_error(lua, "Tried to list parent directory without unsafe mode.");
             return sol::make_object(lua, sol::lua_nil);
         }
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (std::filesystem::is_directory(file.path()))
+                str = str + "/";
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
+
+    /// List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.
+    lua["list_data_dir"] = [&lua](std::optional<std::string> dir)
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string moddir = backend->get_root_path().filename().string();
+        std::string luafile = std::filesystem::path(backend->get_path()).filename().string();
+        std::string datadir = "Mods/Data/" + (is_pack ? moddir : luafile);
+        auto base = std::filesystem::path(datadir);
+        std::string fullpath = datadir + "/" + dir.value_or(".");
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        auto is_based = check_safe_io_path(fullpath, datadir);
+        DEBUG("list_data_dir: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
+        if (is_safe && !is_based)
+        {
+            luaL_error(lua, "Tried to list files outside data directory");
+            return sol::make_object(lua, sol::lua_nil);
+        }
+        auto path = std::filesystem::path(fullpath);
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
         for (const auto& file : std::filesystem::directory_iterator(path))
         {
             auto str = std::filesystem::relative(file.path(), base).string();
@@ -2015,30 +2049,45 @@ end
         return AABB(ax + index * w + 0.02f * f, ay, ax + index * w + w - 0.02f * f, ay - h);
     };
 
+    /// Olmec cutscene moves Olmec and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and Olmec will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with Olmec in the hole.
     lua["set_olmec_cutscene_enabled"] = set_olmec_cutscene_enabled;
 
-    /// Tiamat cutscene is also responsible for locking the exit door
-    /// So you may need to close it yourself if you still want to be required to kill Tiamat
+    /// Tiamat cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want Tiamat kill to be required
     lua["set_tiamat_cutscene_enabled"] = set_tiamat_cutscene_enabled;
 
     /// Activate custom variables for position used for detecting the player (normally hardcoded)
-    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending `set_post_entity_spawn`
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending set_post_entity_spawn
     /// default game values are: attack_x = 17.5 attack_y = 62.5
     lua["activate_tiamat_position_hack"] = activate_tiamat_position_hack;
 
     /// Activate custom variables for speed and y coordinate limit for crushing elevator
-    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending `set_post_entity_spawn`
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending set_post_entity_spawn
     /// default game values are: speed = 0.0125, y_limit = 98.5
     lua["activate_crush_elevator_hack"] = activate_crush_elevator_hack;
 
     /// Activate custom variables for y coordinate limit for hundun and spawn of it's heads
-    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending set_post_entity_spawn
     /// default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
     lua["activate_hundun_hack"] = activate_hundun_hack;
 
     /// Allows you to disable the control over the door for Hundun and Tiamat
     /// This will also prevent game crashing when there is no exit door when they are in level
     lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
+
+    /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
+    lua["update_state"] = update_state;
+
+    /// Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+    lua["set_frametime"] = set_frametime;
+
+    /// Get engine target frametime (1/framerate, default 1/60).
+    lua["get_frametime"] = get_frametime;
+
+    /// Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
+    lua["set_frametime_unfocused"] = set_frametime_inactive;
+
+    /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+    lua["get_frametime_unfocused"] = get_frametime_inactive;
 
     /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
     lua["add_custom_type"] = add_custom_type;
@@ -2568,6 +2617,7 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
             }
         }
 
+        safe_fields.push_back("serpent");
         load_unsafe_libraries(lua_vm);
 
         for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
@@ -2599,6 +2649,20 @@ sol::protected_function_result execute_lua(sol::environment& env, std::string_vi
     return global_vm.safe_script(code, env);
 }
 
+bool check_safe_io_path(const std::string& filepath, const std::string& basepath)
+{
+    if (basepath.empty())
+        return false;
+
+    auto base = std::filesystem::absolute(basepath).lexically_normal();
+    auto path = std::filesystem::absolute(filepath).lexically_normal();
+
+    auto [rootEnd, nothing] =
+        std::mismatch(base.begin(), base.end(), path.begin());
+
+    return rootEnd == base.end();
+}
+
 void populate_lua_env(sol::environment& env)
 {
     static const sol::state& global_vm = get_lua_vm();
@@ -2607,6 +2671,136 @@ void populate_lua_env(sol::environment& env)
         env[field] = global_vm["_G"][field];
     }
     env["_G"] = env;
+    add_partial_safe_libraries(env);
+}
+void add_partial_safe_libraries(sol::environment& env)
+{
+    static const sol::state& global_vm = get_lua_vm();
+
+    auto open_data = [](std::string filename, std::optional<std::string> mode) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string moddir = backend->get_root_path().filename().string();
+        std::string luafile = std::filesystem::path(backend->get_path()).filename().string();
+        std::string datadir = "Mods/Data/" + (is_pack ? moddir : luafile);
+        std::string fullpath = datadir + "/" + filename;
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        auto is_based = check_safe_io_path(fullpath, datadir);
+        DEBUG("io.open_data: safe:{} pack:{} based:{} mode:{} {}", is_safe, is_pack, is_based, mode.value_or("r"), fullpath);
+        if (is_safe && !is_based)
+        {
+            luaL_error(global_vm, "Attempted to open data file outside data directory");
+            return sol::nil;
+        }
+        if (mode.value_or("r") != "r")
+            std::filesystem::create_directories(dirpath);
+        return global_vm["io"]["open"](fullpath, mode.value_or("r"));
+    };
+
+    auto open_mod = [](std::string filename, std::optional<std::string> mode) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string fullpath = std::string(backend->get_root()) + "/" + filename;
+        auto is_based = check_safe_io_path(fullpath, backend->get_root());
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        DEBUG("io.open_mod: safe:{} pack:{} based:{} mode:{} {}", is_safe, is_pack, is_based, mode.value_or("r"), fullpath);
+        if (is_safe)
+        {
+            if (!is_based)
+            {
+                luaL_error(global_vm, "Attempted to open mod file outside mod directory");
+                return sol::nil;
+            }
+            if (!is_pack && mode.value_or("r") != "r")
+            {
+                luaL_error(global_vm, "Attempted to write mod file outside Packs directory");
+                return sol::nil;
+            }
+        }
+        if (mode.value_or("r") != "r")
+            std::filesystem::create_directories(dirpath);
+        return global_vm["io"]["open"](fullpath, mode);
+    };
+
+    auto remove_data = [](std::string filename) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string moddir = backend->get_root_path().filename().string();
+        std::string luafile = std::filesystem::path(backend->get_path()).filename().string();
+        std::string datadir = "Mods/Data/" + (is_pack ? moddir : luafile);
+        std::string fullpath = datadir + "/" + filename;
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        auto is_based = check_safe_io_path(fullpath, datadir);
+        DEBUG("os.remove_data: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
+        if (is_safe && !is_based)
+        {
+            luaL_error(global_vm, "Attempted to remove data file outside data directory");
+            return sol::nil;
+        }
+        return global_vm["os"]["remove"](fullpath);
+    };
+
+    auto remove_mod = [](std::string filename) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string fullpath = std::string(backend->get_root()) + "/" + filename;
+        auto is_based = check_safe_io_path(fullpath, backend->get_root());
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        DEBUG("os.remove_mod: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
+        if (is_safe)
+        {
+            if (!is_based)
+            {
+                luaL_error(global_vm, "Attempted to remove mod file outside mod directory");
+                return sol::nil;
+            }
+            if (!is_pack)
+            {
+                luaL_error(global_vm, "Attempted to remove mod file outside Packs directory");
+                return sol::nil;
+            }
+        }
+        return global_vm["os"]["remove"](fullpath);
+    };
+
+    if (env["os"] == sol::nil)
+    {
+        sol::table os(global_vm, sol::create);
+        os["clock"] = global_vm["os"]["clock"];
+        os["date"] = global_vm["os"]["date"];
+        os["difftime"] = global_vm["os"]["difftime"];
+        os["time"] = global_vm["os"]["time"];
+        os["remove_data"] = remove_data;
+        os["remove_mod"] = remove_mod;
+        env["os"] = os;
+    }
+    else if (env["os"].get_type() == sol::type::table)
+    {
+        env["os"]["remove_data"] = remove_data;
+        env["os"]["remove_mod"] = remove_mod;
+    }
+
+    if (env["io"] == sol::nil)
+    {
+        sol::table io(global_vm, sol::create);
+        io["type"] = global_vm["io"]["type"];
+        io["open_data"] = open_data;
+        io["open_mod"] = open_mod;
+        env["io"] = io;
+    }
+    else if (env["io"].get_type() == sol::type::table)
+    {
+        env["io"]["open_data"] = open_data;
+        env["io"]["open_mod"] = open_mod;
+    }
 }
 void hide_unsafe_libraries(sol::environment& env)
 {
@@ -2614,6 +2808,7 @@ void hide_unsafe_libraries(sol::environment& env)
     {
         env[field] = sol::nil;
     }
+    add_partial_safe_libraries(env);
 }
 void expose_unsafe_libraries(sol::environment& env)
 {
@@ -2622,4 +2817,5 @@ void expose_unsafe_libraries(sol::environment& env)
     {
         env[field] = global_vm["_G"][field];
     }
+    add_partial_safe_libraries(env);
 }
