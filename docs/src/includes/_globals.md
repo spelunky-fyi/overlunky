@@ -588,6 +588,18 @@ end
 Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
 Recommended to always set the mask, even if you look for one entity type
 
+### get_entities_by_draw_depth
+
+
+> Search script examples for [get_entities_by_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_draw_depth)
+
+#### array&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
+
+#### array&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
+
+Get uids of entities by draw_depth. Can also use table of draw_depths.
+You can later use [filter_entities](#filter_entities) if you want specific entity
+
 ### get_entities_by_type
 
 

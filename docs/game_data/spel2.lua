@@ -1202,6 +1202,18 @@ function set_boss_door_control_enabled(enable) end
 ---@param types ENT_TYPE[]
 ---@return ENT_TYPE
 function add_custom_type(types) end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depth integer
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depth, l) end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depths integer[]
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depths, l) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2361,6 +2373,31 @@ function Entity:overlaps_with(rect_left, rect_bottom, rect_right, rect_top) end
 ---@param other Entity
 ---@return boolean
 function Entity:overlaps_with(other) end
+---Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
+---To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+---destroy_corpse and responsible are the standard parameters for the kill funciton
+---@param destroy_corpse boolean
+---@param responsible Entity
+---@param mask integer?
+---@param ent_types ENT_TYPE[]
+---@param rec_mode RECURSIVE_MODE
+---@return nil
+function Entity:kill_recursive(destroy_corpse, responsible, mask, ent_types, rec_mode) end
+---Short for using RECURSIVE_MODE.NONE
+---@param destroy_corpse boolean
+---@param responsible Entity
+---@return nil
+function Entity:kill_recursive(destroy_corpse, responsible) end
+---Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
+---To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+---@param mask integer?
+---@param ent_types ENT_TYPE[]
+---@param rec_mode RECURSIVE_MODE
+---@return nil
+function Entity:destroy_recursive(mask, ent_types, rec_mode) end
+---Short for using RECURSIVE_MODE.NONE
+---@return nil
+function Entity:destroy_recursive() end
 
 ---@class Movable : Entity
     ---@field move Vec2 @{movex, movey}

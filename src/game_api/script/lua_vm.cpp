@@ -2043,6 +2043,14 @@ end
     /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
     lua["add_custom_type"] = add_custom_type;
 
+    auto get_entities_by_draw_depth = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(uint8_t, LAYER)>(::get_entities_by_draw_depth),
+        static_cast<std::vector<uint32_t> (*)(std::vector<uint8_t>, LAYER)>(::get_entities_by_draw_depth));
+
+    /// Get uids of entities by draw_depth. Can also use table of draw_depths.
+    /// You can later use [filter_entities](#filter_entities) if you want specific entity
+    lua["get_entities_by_draw_depth"] = get_entities_by_draw_depth;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

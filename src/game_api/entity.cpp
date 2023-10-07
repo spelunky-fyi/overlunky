@@ -476,3 +476,53 @@ void Movable::set_position(float to_x, float to_y)
         State::get().ptr()->camera->calculated_focus_y += dy;
     }
 }
+
+template <typename F>
+void recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode, F func)
+{
+    auto acutal_mask = [](uint32_t m) -> uint32_t // for the MASK.ANY
+    { return m == 0 ? 0xFFFF : m; };
+
+    if (rec_mode == RECURSIVE_MODE::EXCLUSIVE)
+    {
+        if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) != 0)
+            return;
+
+        if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) != ent_types.end())
+            return;
+    }
+    else if (rec_mode == RECURSIVE_MODE::INCLUSIVE)
+    {
+        if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) == 0)
+        {
+            if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) == ent_types.end())
+                return;
+        }
+        else if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) == ent_types.end())
+            return;
+    }
+    const std::vector<Entity*> items{ent->items.entities().begin(), ent->items.entities().end()};
+    for (auto entity : items)
+    {
+        recursive(entity, mask, ent_types, rec_mode, func);
+    }
+    func(ent);
+}
+
+void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
+{
+    auto kill_func = [destroy_corpse, &responsible](Entity* ent) -> void
+    {
+        ent->kill(destroy_corpse, responsible);
+    };
+    recursive(this, mask, ent_types, rec_mode, kill_func);
+}
+
+void Entity::destroy_recursive(std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
+{
+    auto destroy_func = [](Entity* ent) -> void
+    {
+        ent->destroy();
+    };
+    recursive(this, mask, ent_types, rec_mode, destroy_func);
+}

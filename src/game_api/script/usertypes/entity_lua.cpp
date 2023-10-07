@@ -207,6 +207,13 @@ void register_usertypes(sol::state& lua)
         static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
         static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
 
+    auto kill_recursive = sol::overload(
+        static_cast<void (Entity::*)(bool, Entity*)>(&Entity::kill_recursive),
+        static_cast<void (Entity::*)(bool, Entity*, std::optional<uint32_t>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::kill_recursive));
+    auto destroy_recursive = sol::overload(
+        static_cast<void (Entity::*)()>(&Entity::destroy_recursive),
+        static_cast<void (Entity::*)(std::optional<uint32_t>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::destroy_recursive));
+
     auto entity_type = lua.new_usertype<Entity>("Entity");
     entity_type["type"] = &Entity::type;
     entity_type["overlay"] = std::move(overlay);
@@ -271,6 +278,8 @@ void register_usertypes(sol::state& lua)
     entity_type["get_items"] = &Entity::get_items;
     entity_type["is_in_liquid"] = &Entity::is_in_liquid;
     entity_type["is_cursed"] = &Entity::is_cursed;
+    entity_type["kill_recursive"] = kill_recursive;
+    entity_type["destroy_recursive"] = destroy_recursive;
     /* Entity
     // user_data
     // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.
@@ -359,6 +368,17 @@ void register_usertypes(sol::state& lua)
     {
         lua["ENT_TYPE"][elm.second] = (uint32_t)elm.first;
     }
+
+    lua.create_named_table("RECURSIVE_MODE", "EXCLUSIVE", RECURSIVE_MODE::EXCLUSIVE, "INCLUSIVE", RECURSIVE_MODE::INCLUSIVE, "NONE", RECURSIVE_MODE::NONE);
+    /* RECURSIVE_MODE
+    // EXCLUSIVE
+    // In this mode the provided ENT_TYPE and MASK will not be affected nor will entities attached to them
+    // INCLUSIVE
+    // In this mode the provided ENT_TYPE and MASK will be the only affected entities, anything outside of the specified mask or type will not be touched including entities attached to them
+    // For this mode you have to specify at least one mask or ENT_TYPE, otherwise nothing will be affected
+    // NONE
+    // Ignores provided ENT_TYPE and MASK and affects all the entities
+    */
 
     lua.create_named_table("REPEAT_TYPE", "NO_REPEAT", REPEAT_TYPE::NoRepeat, "LINEAR", REPEAT_TYPE::Linear, "BACK_AND_FORTH", REPEAT_TYPE::BackAndForth);
     lua.create_named_table("SHAPE", "RECTANGLE", SHAPE::RECTANGLE, "CIRCLE", SHAPE::CIRCLE);
