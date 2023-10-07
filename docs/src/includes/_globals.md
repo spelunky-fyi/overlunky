@@ -1425,12 +1425,21 @@ Same as `Player.is_female`
 
 List all char.png files recursively from Mods/Packs. Returns table of file paths.
 
+### list_data_dir
+
+
+> Search script examples for [list_data_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_data_dir)
+
+#### nil list_data_dir(optional<string> dir)
+
+List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.
+
 ### list_dir
 
 
 > Search script examples for [list_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_dir)
 
-#### nil list_dir(string dir)
+#### nil list_dir(optional<string> dir)
 
 List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 
