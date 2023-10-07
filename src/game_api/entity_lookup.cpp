@@ -313,3 +313,30 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, ui
 {
     return entity_get_items_by(uid, std::vector<ENT_TYPE>{entity_type}, mask);
 }
+
+std::vector<uint32_t> get_entities_by_draw_depth(uint8_t draw_depth, LAYER l)
+{
+    return get_entities_by_draw_depth(std::vector<uint8_t>{draw_depth}, l);
+}
+
+std::vector<uint32_t> get_entities_by_draw_depth(std::vector<uint8_t> draw_depths, LAYER l)
+{
+    auto state = State::get().ptr_local();
+    std::vector<uint32_t> found;
+    auto actual_layer = enum_to_layer(l);
+    for (auto draw_depth : draw_depths)
+    {
+        if (draw_depth > 52)
+            continue;
+
+        auto uids_layer1 = state->layers[actual_layer]->entities_by_draw_depth[draw_depth].uids();
+        found.insert(found.end(), uids_layer1.begin(), uids_layer1.end());
+
+        if (l == LAYER::BOTH) // if it's both, then the actual_layer is 0
+        {
+            auto uids_layer2 = state->layers[1]->entities_by_draw_depth[draw_depth].uids();
+            found.insert(found.end(), uids_layer2.begin(), uids_layer2.end());
+        }
+    }
+    return found;
+}

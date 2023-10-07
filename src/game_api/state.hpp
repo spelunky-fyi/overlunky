@@ -242,7 +242,7 @@ struct StateMemory
     Items* items;
     /// Entrance and exit coordinates, shop types and all themes
     LevelGenSystem* level_gen;
-    Layer* layers[2];
+    std::array<Layer*, 2> layers;
     /// Level logic like dice game and cutscenes
     LogicList* logic;
     /// NPC quest states

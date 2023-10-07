@@ -29,3 +29,5 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types);
 bool entity_has_item_type(uint32_t uid, ENT_TYPE entity_type);
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask);
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask);
+std::vector<uint32_t> get_entities_by_draw_depth(uint8_t draw_depth, LAYER l);
+std::vector<uint32_t> get_entities_by_draw_depth(std::vector<uint8_t> draw_depths, LAYER l);
