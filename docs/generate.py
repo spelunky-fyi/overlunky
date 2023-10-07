@@ -211,7 +211,7 @@ In safe mode (default) the following standard and custom functions are available
 
 Safely opened files can be used normally through the `file:` handle. Files and folders opened in write mode are automatically created.
 
-Also see list_dir and list_data_dir.
+Also see [list_dir](#list_dir) and [list_data_dir](#list_data_dir).
 """
 )
 
@@ -229,8 +229,6 @@ In safe mode (default) the following standard and custom functions are available
 - `os.time`
 - `os.remove_data`: like `os.remove` but restricted to base directory `Mods/Data/modname`
 - `os.remove_mod`: like `os.remove` but restricted to the mod directory
-
-Also see list_dir and list_data_dir.
 """
 )
 

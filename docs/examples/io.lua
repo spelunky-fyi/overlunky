@@ -1,4 +1,3 @@
-```lua
 -- Write a data file
 -- Data will be written to Mods/Data/[scriptname.lua or Mod Name]/timestamp.txt
 local f = io.open_data(tostring(os.time()) .. ".txt", "w")
@@ -14,4 +13,3 @@ for _, v in pairs(list_data_dir()) do
         print(v .. ": " .. f:read("a"))
     end
 end
-```

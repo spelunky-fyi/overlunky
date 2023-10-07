@@ -18,6 +18,26 @@ The following Lua libraries and their functions are available. You can read more
 
 ## io
 
+```lua
+-- Write a data file
+-- Data will be written to Mods/Data/[scriptname.lua or Mod Name]/timestamp.txt
+local f = io.open_data(tostring(os.time()) .. ".txt", "w")
+if f then
+    f:write("hello world at " .. os.date())
+    f:close()
+end
+
+-- List all files in data dir and read them out
+for _, v in pairs(list_data_dir()) do
+    local f = io.open_data(v)
+    if f then
+        print(v .. ": " .. f:read("a"))
+    end
+end
+
+```
+
+
 `meta.unsafe` exposes all [standard library functions](https://www.lua.org/manual/5.4/manual.html#6.8) and removes basedir restrictions from the custom functions.
 
 In safe mode (default) the following standard and custom functions are available:
@@ -28,7 +48,7 @@ In safe mode (default) the following standard and custom functions are available
 
 Safely opened files can be used normally through the `file:` handle. Files and folders opened in write mode are automatically created.
 
-Also see list_dir and list_data_dir.
+Also see [list_dir](#list_dir) and [list_data_dir](#list_data_dir).
 
 
 ## os
@@ -43,8 +63,6 @@ In safe mode (default) the following standard and custom functions are available
 - `os.time`
 - `os.remove_data`: like `os.remove` but restricted to base directory `Mods/Data/modname`
 - `os.remove_mod`: like `os.remove` but restricted to the mod directory
-
-Also see list_dir and list_data_dir.
 
 
 ## math
