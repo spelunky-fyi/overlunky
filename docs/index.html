@@ -744,6 +744,12 @@
                             <a href="#get_frame" class="toc-h3 toc-link" data-title="get_frame">get_frame</a>
                           </li>
                           <li>
+                            <a href="#get_frametime" class="toc-h3 toc-link" data-title="get_frametime">get_frametime</a>
+                          </li>
+                          <li>
+                            <a href="#get_frametime_unfocused" class="toc-h3 toc-link" data-title="get_frametime_unfocused">get_frametime_unfocused</a>
+                          </li>
+                          <li>
                             <a href="#get_id" class="toc-h3 toc-link" data-title="get_id">get_id</a>
                           </li>
                           <li>
@@ -843,6 +849,12 @@
                             <a href="#set_ending_unlock" class="toc-h3 toc-link" data-title="set_ending_unlock">set_ending_unlock</a>
                           </li>
                           <li>
+                            <a href="#set_frametime" class="toc-h3 toc-link" data-title="set_frametime">set_frametime</a>
+                          </li>
+                          <li>
+                            <a href="#set_frametime_unfocused" class="toc-h3 toc-link" data-title="set_frametime_unfocused">set_frametime_unfocused</a>
+                          </li>
+                          <li>
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
@@ -877,6 +889,9 @@
                           </li>
                           <li>
                             <a href="#update_liquid_collision_at" class="toc-h3 toc-link" data-title="update_liquid_collision_at">update_liquid_collision_at</a>
+                          </li>
+                          <li>
+                            <a href="#update_state" class="toc-h3 toc-link" data-title="update_state">update_state</a>
                           </li>
                           <li>
                             <a href="#warp" class="toc-h3 toc-link" data-title="warp">warp</a>
@@ -4367,7 +4382,9 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_olmec_cutscene_enabled">set_olmec_cutscene_enabled</a></p>
 </blockquote>
-<h4 id='nil-set_olmec_cutscene_enabled-bool-enable'>nil set_olmec_cutscene_enabled(bool enable)</h4><h3 id='set_olmec_phase_y_level'>set_olmec_phase_y_level</h3>
+<h4 id='nil-set_olmec_cutscene_enabled-bool-enable'>nil set_olmec_cutscene_enabled(bool enable)</h4>
+<p><a href="#Olmec">Olmec</a> cutscene moves <a href="#Olmec">Olmec</a> and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and <a href="#Olmec">Olmec</a> will spawn on even ground. More useful for level gen mods, where the cutscene doesn&#39;t make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with <a href="#Olmec">Olmec</a> in the hole.</p>
+<h3 id='set_olmec_phase_y_level'>set_olmec_phase_y_level</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_olmec_phase_y_level">set_olmec_phase_y_level</a></p>
 </blockquote>
@@ -4529,7 +4546,7 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='nil-activate_crush_elevator_hack-bool-activate'>nil activate_crush_elevator_hack(bool activate)</h4>
 <p>Activate custom variables for speed and y coordinate limit for crushing elevator
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#CrushElevator">CrushElevator</a> entity, recommending <code>set_post_entity_spawn</code>
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#CrushElevator">CrushElevator</a> entity, recommending set_post_entity_spawn
 default game values are: speed = 0.0125, y_limit = 98.5</p>
 <h3 id='activate_hundun_hack'>activate_hundun_hack</h3>
 <blockquote>
@@ -4537,7 +4554,7 @@ default game values are: speed = 0.0125, y_limit = 98.5</p>
 </blockquote>
 <h4 id='nil-activate_hundun_hack-bool-activate'>nil activate_hundun_hack(bool activate)</h4>
 <p>Activate custom variables for y coordinate limit for hundun and spawn of it&#39;s heads
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Hundun">Hundun</a> entity, recommending <code>set_post_entity_spawn</code>
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Hundun">Hundun</a> entity, recommending set_post_entity_spawn
 default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71</p>
 <h3 id='change_poison_timer'>change_poison_timer</h3>
 <blockquote>
@@ -4607,6 +4624,18 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 </blockquote>
 <h4 id='int-get_frame'>int get_frame()</h4>
 <p>Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.</p>
+<h3 id='get_frametime'>get_frametime</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime">get_frametime</a></p>
+</blockquote>
+<h4 id='optional-lt-double-gt-get_frametime'>optional&lt;double&gt; get_frametime()</h4>
+<p>Get engine target frametime (1/framerate, default 1/60).</p>
+<h3 id='get_frametime_unfocused'>get_frametime_unfocused</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime_unfocused">get_frametime_unfocused</a></p>
+</blockquote>
+<h4 id='optional-lt-double-gt-get_frametime_unfocused'>optional&lt;double&gt; get_frametime_unfocused()</h4>
+<p>Get engine target frametime when game is unfocused (1/framerate, default 1/33).</p>
 <h3 id='get_id'>get_id</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_id">get_id</a></p>
@@ -4829,6 +4858,18 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_ending_unlock-ENT_TYPE-type'>nil set_ending_unlock(<a href="#ENT_TYPE">ENT_TYPE</a> type)</h4>
 <p>Force the character unlocked in either ending to <a href="#ENT_TYPE">ENT_TYPE</a>. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)</p>
+<h3 id='set_frametime'>set_frametime</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_frametime">set_frametime</a></p>
+</blockquote>
+<h4 id='nil-set_frametime-optional-frametime'>nil set_frametime(optional<double> frametime)</h4>
+<p>Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.</p>
+<h3 id='set_frametime_unfocused'>set_frametime_unfocused</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_frametime_unfocused">set_frametime_unfocused</a></p>
+</blockquote>
+<h4 id='nil-set_frametime_unfocused-optional-frametime'>nil set_frametime_unfocused(optional<double> frametime)</h4>
+<p>Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.</p>
 <h3 id='set_journal_enabled'>set_journal_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_journal_enabled">set_journal_enabled</a></p>
@@ -4922,8 +4963,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_tiamat_cutscene_enabled">set_tiamat_cutscene_enabled</a></p>
 </blockquote>
 <h4 id='nil-set_tiamat_cutscene_enabled-bool-enable'>nil set_tiamat_cutscene_enabled(bool enable)</h4>
-<p><a href="#Tiamat">Tiamat</a> cutscene is also responsible for locking the exit door
-So you may need to close it yourself if you still want to be required to kill <a href="#Tiamat">Tiamat</a></p>
+<p><a href="#Tiamat">Tiamat</a> cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want <a href="#Tiamat">Tiamat</a> kill to be required</p>
 <h3 id='show_journal'>show_journal</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=show_journal">show_journal</a></p>
@@ -4956,6 +4996,12 @@ So you may need to close it yourself if you still want to be required to kill <a
 </blockquote>
 <h4 id='nil-update_liquid_collision_at-float-x-float-y-bool-add'>nil update_liquid_collision_at(float x, float y, bool add)</h4>
 <p>Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one</p>
+<h3 id='update_state'>update_state</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update_state">update_state</a></p>
+</blockquote>
+<h4 id='nil-update_state'>nil update_state()</h4>
+<p>Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.</p>
 <h3 id='warp'>warp</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=warp">warp</a></p>
@@ -5234,7 +5280,7 @@ limits, you can override them in the UI with double click.</p>
 </blockquote>
 <h4 id='nil-activate_tiamat_position_hack-bool-activate'>nil activate_tiamat_position_hack(bool activate)</h4>
 <p>Activate custom variables for position used for detecting the player (normally hardcoded)
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Tiamat">Tiamat</a> entity, recommending <code>set_post_entity_spawn</code>
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Tiamat">Tiamat</a> entity, recommending set_post_entity_spawn
 default game values are: attack_x = 17.5 attack_y = 62.5</p>
 <h3 id='distance'>distance</h3>
 <blockquote>
@@ -19473,22 +19519,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door_type">door_type</a></td>
-<td></td>
+<td>Spawns this entity when not covered by floor. Must be initialized to valid <a href="#ENT_TYPE">ENT_TYPE</a> before revealed, or crashes the game.</td>
 </tr>
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=platform_type">platform_type</a></td>
-<td></td>
+<td>Spawns this entity below when tile below is uncovered. Doesn&#39;t spawn anything if it was never covered by floor, unless platform_spawned is set to false. Must be initialized to valid <a href="#ENT_TYPE">ENT_TYPE</a> before revealed, or crashes the game.</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=visible">visible</a></td>
-<td></td>
+<td>Set automatically when not covered by floor.</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=platform_spawned">platform_spawned</a></td>
-<td>Is set true when you bomb the door, no matter what door, can&#39;t be reset</td>
+<td>Set automatically when tile below is not covered by floor. Unset to force the platform to spawn if it was never covered in the first place.</td>
 </tr>
 </tbody></table>
 <h3 id='LogicalDrain'>LogicalDrain</h3>

@@ -3994,10 +3994,10 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
-[ENT_TYPE](#ENT_TYPE) | [door_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_type) | 
-[ENT_TYPE](#ENT_TYPE) | [platform_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_type) | 
-bool | [visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visible) | 
-bool | [platform_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_spawned) | Is set true when you bomb the door, no matter what door, can't be reset
+[ENT_TYPE](#ENT_TYPE) | [door_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door_type) | Spawns this entity when not covered by floor. Must be initialized to valid [ENT_TYPE](#ENT_TYPE) before revealed, or crashes the game.
+[ENT_TYPE](#ENT_TYPE) | [platform_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_type) | Spawns this entity below when tile below is uncovered. Doesn't spawn anything if it was never covered by floor, unless platform_spawned is set to false. Must be initialized to valid [ENT_TYPE](#ENT_TYPE) before revealed, or crashes the game.
+bool | [visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visible) | Set automatically when not covered by floor.
+bool | [platform_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_spawned) | Set automatically when tile below is not covered by floor. Unset to force the platform to spawn if it was never covered in the first place.
 
 ### LogicalDrain
 
