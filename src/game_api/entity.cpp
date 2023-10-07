@@ -15,6 +15,7 @@
 
 #include "containers/custom_map.hpp" // for custom_map
 #include "entities_chars.hpp"        // for Player
+#include "entities_monsters.hpp"     //
 #include "entity_hooks_info.hpp"     // for EntityHooksInfo
 #include "memory.hpp"                // for write_mem_prot
 #include "movable.hpp"               // for Movable
@@ -505,6 +506,31 @@ void recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> 
     for (auto entity : items)
     {
         recursive(entity, mask, ent_types, rec_mode, func);
+    }
+
+    {
+        static const ENT_TYPE jellys[] = {
+            to_id("ENT_TYPE_MONS_MEGAJELLYFISH"),
+            to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND"),
+        };
+        static const ENT_TYPE jellys_tails[] = {
+            to_id("ENT_TYPE_FX_MEGAJELLYFISH_TAIL"),
+            to_id("ENT_TYPE_FX_MEGAJELLYFISH_TAIL_BG"),
+        };
+
+        if (type->id == jellys[0] || type->id == jellys[1]) // special only for MEGAJELLYFISH
+        {
+            auto true_type = (MegaJellyfish*)this;
+            auto currend_uid = true_type->tail_bg_uid;
+            for (int idx = 0; idx < 8; ++idx)
+            {
+                auto tail_ent = get_entity_ptr(currend_uid + idx);
+                if (tail_ent != nullptr && (tail_ent->type->id == jellys_tails[0] || tail_ent->type->id == jellys_tails[1])) // only kill the tail
+                {
+                    recursive(tail_ent, mask, ent_types, rec_mode, func);
+                }
+            }
+        }
     }
     func(ent);
 }
