@@ -518,9 +518,9 @@ void recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> 
             to_id("ENT_TYPE_FX_MEGAJELLYFISH_TAIL_BG"),
         };
 
-        if (type->id == jellys[0] || type->id == jellys[1]) // special only for MEGAJELLYFISH
+        if (ent->type->id == jellys[0] || ent->type->id == jellys[1]) // special only for MEGAJELLYFISH
         {
-            auto true_type = (MegaJellyfish*)this;
+            auto true_type = (MegaJellyfish*)ent;
             auto currend_uid = true_type->tail_bg_uid;
             for (int idx = 0; idx < 8; ++idx)
             {
