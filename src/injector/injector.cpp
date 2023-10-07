@@ -113,6 +113,31 @@ void call(const Process& proc, LPTHREAD_START_ROUTINE addr, LPVOID args)
     WaitForSingleObject(handle, INFINITE);
 }
 
+bool find_dll_in_process(DWORD pid, const std::string& name)
+{
+    HMODULE hMods[1024];
+    HANDLE hProcess;
+    DWORD cbNeeded;
+    unsigned int i;
+    hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+    if (NULL == hProcess)
+        return false;
+    if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
+    {
+        for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+        {
+            TCHAR szModName[MAX_PATH];
+            if (GetModuleFileNameEx(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
+            {
+                auto modName = std::string(szModName);
+                if (modName.ends_with(name))
+                    return true;
+            }
+        }
+    }
+    return false;
+}
+
 void inject_dll(const Process& proc, const std::string& name)
 {
     auto str = alloc_str(proc, name);

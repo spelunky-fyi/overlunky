@@ -126,13 +126,11 @@ Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     {
     case 11:
     {
-        DEBUG("In camp, spawning starting exit");
         door = spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT"), round(x), round(y), false, 0.0, 0.0, true);
         break;
     }
     case 12:
     {
-        DEBUG("In game, spawning regular exit");
         door = spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"), round(x), round(y), false, 0.0, 0.0, true);
         break;
     }

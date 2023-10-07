@@ -618,7 +618,7 @@ for type_cat in type_cats:
     for cat in sorted(type_cats[type_cat], key=lambda x: x):
         print("\n## " + cat + "\n")
         for type in sorted(type_cats[type_cat][cat], key=lambda x: x["name"]):
-            if type["comment"] and "NoDoc" in type["comment"]:
+            if "comment" in type and "NoDoc" in type["comment"]:
                 continue
             type_name = type["name"]
             print("\n### " + type_name + "\n")
@@ -627,7 +627,7 @@ for type_cat in type_cats:
                 for com in type["comment"]:
                     com = link_custom_type(com)
                     print(com)
-            if type["base"]:
+            if "base" in type and type["base"]:
                 print("Derived from", end="")
                 bases = type["base"].split(",")
                 for base in bases:

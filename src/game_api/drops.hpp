@@ -11,7 +11,7 @@
 struct DropEntry
 {
     std::string caption;
-    std::string pattern;
+    std::string_view pattern;
     VTABLE_OFFSET vtable_offset; // some patterns are not found in the vtables, use NONE to look for pattern in entire exe
     uint32_t vtable_rel_offset;
     uint8_t value_offset = 0;      // the offset of the value to be replaced within the pattern
@@ -22,7 +22,7 @@ struct DropEntry
 struct DropChanceEntry
 {
     std::string caption;
-    std::string pattern;
+    std::string_view pattern;
     VTABLE_OFFSET vtable_offset;
     uint32_t vtable_rel_offset;
     uint8_t chance_sizeof = 4;
