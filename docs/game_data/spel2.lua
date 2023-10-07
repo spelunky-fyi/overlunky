@@ -1219,6 +1219,22 @@ function set_frametime_unfocused(frametime) end
 ---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 ---@return double?
 function get_frametime_unfocused() end
+---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+---@param types ENT_TYPE[]
+---@return ENT_TYPE
+function add_custom_type(types) end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depth integer
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depth, l) end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depths integer[]
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depths, l) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
