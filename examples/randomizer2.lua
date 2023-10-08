@@ -3546,6 +3546,7 @@ function start_leak(type)
 end
 
 function can_leak(type)
+    if state.screen ~= SCREEN.LEVEL then return false end
     if not players[1] then return false end
     if state.theme == THEME.COSMIC_OCEAN then return false end
     if state.theme == THEME.ICE_CAVES then
@@ -3573,7 +3574,7 @@ function can_leak(type)
 end
 
 function wait_for_leak()
-    if prng:random() < options.leak_chance / 100 and not water_level then
+    if state.screen == SCREEN.LEVEL and prng:random() < options.leak_chance / 100 and not water_level then
         set_interval(function()
             shuffle(leak_liquids)
             for _,v in pairs(leak_liquids) do
