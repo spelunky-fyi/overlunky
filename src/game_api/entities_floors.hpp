@@ -90,6 +90,8 @@ class Door : public Floor
 
     // check if it's CHAR_*, then sets State.level_flags -> 21 (Hide hud, transition)
     virtual void hide_ui(Entity* who) = 0;
+
+    /// Returns the entity state / behavior id to set the entity to after the entering animation.
     virtual uint8_t enter(Entity* who) = 0;
 
     // checks layer of the Entity entering, except for FLOOR_DOOR_EGGSHIP_ROOM which gets the overlay (BG_EGGSHIP_ROOM) and returns BGEggshipRoom.player_in
