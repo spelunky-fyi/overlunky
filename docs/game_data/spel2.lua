@@ -1,4 +1,6 @@
----@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias,duplicate-set-field
+---@meta
+---@diagnostic disable: duplicate-doc-alias
+
 ---@class Meta
 ---@field name string
 ---@field version string
