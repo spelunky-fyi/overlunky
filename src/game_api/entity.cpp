@@ -17,6 +17,7 @@
 #include "entities_chars.hpp"        // for Player
 #include "entities_monsters.hpp"     //
 #include "entity_hooks_info.hpp"     // for EntityHooksInfo
+#include "entity_lookup.hpp"         //
 #include "memory.hpp"                // for write_mem_prot
 #include "movable.hpp"               // for Movable
 #include "movable_behavior.hpp"      // for MovableBehavior
@@ -542,7 +543,7 @@ void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optio
     {
         ent->kill(destroy_corpse, responsible);
     };
-    if (!recursive(this, mask, ent_types, rec_mode, kill_func))
+    if (!recursive(this, mask, get_proper_types(ent_types), rec_mode, kill_func))
         kill(destroy_corpse, responsible);
 }
 
@@ -552,6 +553,6 @@ void Entity::destroy_recursive(std::optional<uint32_t> mask, const std::vector<E
     {
         ent->destroy();
     };
-    if (!recursive(this, mask, ent_types, rec_mode, destroy_func))
+    if (!recursive(this, mask, get_proper_types(ent_types), rec_mode, destroy_func))
         destroy();
 }

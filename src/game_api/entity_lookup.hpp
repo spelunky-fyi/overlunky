@@ -31,3 +31,4 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask);
 std::vector<uint32_t> get_entities_by_draw_depth(uint8_t draw_depth, LAYER l);
 std::vector<uint32_t> get_entities_by_draw_depth(std::vector<uint8_t> draw_depths, LAYER l);
+std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types);
