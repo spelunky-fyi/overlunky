@@ -300,6 +300,7 @@ State& State::get()
                 patch_orbs_limit();
                 patch_olmec_kill_crash();
                 patch_liquid_OOB();
+                patch_ushabti_error();
             }
             else
             {

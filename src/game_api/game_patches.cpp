@@ -294,3 +294,14 @@ void set_skip_tiamat_cutscene(bool skip)
     else
         recover_mem("set_skip_tiamat_cutscene");
 }
+
+void patch_ushabti_error()
+{
+    // nops MessageBoxA("Number of generated Ushabti statues isn't 100!")
+    static bool once = false;
+    if (once)
+        return;
+    const auto offset = get_address("ushabti_error");
+    write_mem_prot(offset, "\x90\x90\x90\x90\x90\x90"sv, true);
+    once = true;
+}
