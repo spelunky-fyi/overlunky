@@ -1397,8 +1397,7 @@ void register_usertypes(sol::state& lua)
         "exit_doors",
         &LevelGenSystem::exit_doors,
         "themes",
-        sol::property([](LevelGenSystem& lgs)
-                      { return std::ref(lgs.themes) /**/; }),
+        &LevelGenSystem::themes,
         "flags",
         &LevelGenSystem::flags,
         "flags2",
