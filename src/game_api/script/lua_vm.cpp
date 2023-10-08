@@ -2100,7 +2100,7 @@ end
     /// You can later use [filter_entities](#filter_entities) if you want specific entity
     lua["get_entities_by_draw_depth"] = get_entities_by_draw_depth;
 
-    /// Just convinet way of getting the current amount of money
+    /// Just convenient way of getting the current amount of money
     /// short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
     lua["get_current_money"] = get_current_money;
 

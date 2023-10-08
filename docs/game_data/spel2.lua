@@ -1235,6 +1235,16 @@ function get_entities_by_draw_depth(draw_depth, l) end
 ---@param l LAYER
 ---@return integer[]
 function get_entities_by_draw_depth(draw_depths, l) end
+---Just convenient way of getting the current amount of money
+---short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+---@return integer
+function get_current_money() end
+---Display the effect of adding or subtracting money in the hud, does not actually change the amount of money
+---It actually subtracts the amount of money first for the effect, look at the example, default display_time = 60 (about 2s)
+---@param amount integer
+---@param display_time integer?
+---@return integer
+function add_money_hud(amount, display_time) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
