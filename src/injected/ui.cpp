@@ -8011,6 +8011,35 @@ void render_game_props()
         }
         endmenu();
     }
+    if (submenu("Level generation flags"))
+    {
+        ImGui::Text("Flags 1:");
+        auto flags = (int)g_state->level_gen->flags;
+        auto flags2 = (int)g_state->level_gen->flags2;
+        auto flags3 = (int)g_state->level_gen->flags3;
+        for (int i = 0; i < 8; i++)
+        {
+            ImGui::CheckboxFlags(levelgen_flags[i], &flags, (int)std::pow(2, i));
+        }
+        ImGui::Text("Flags 2:");
+        for (int i = 0; i < 8; i++)
+        {
+            ImGui::CheckboxFlags(levelgen_flags2[i], &flags2, (int)std::pow(2, i));
+        }
+        ImGui::Text("Flags 3:");
+        for (int i = 0; i < 8; i++)
+        {
+            ImGui::CheckboxFlags(levelgen_flags3[i], &flags3, (int)std::pow(2, i));
+        }
+        g_state->level_gen->flags = (uint8_t)flags;
+        g_state->level_gen->flags2 = (uint8_t)flags2;
+        g_state->level_gen->flags3 = (uint8_t)flags3;
+        ImGui::Text("Theme flags:");
+        ImGui::Checkbox("Allow beehives##ThemeBeeHive", &g_state->current_theme->allow_beehive);
+        ImGui::Checkbox("Allow leprechauns##ThemeLeprechaun", &g_state->current_theme->allow_leprechaun);
+
+        endmenu();
+    }
     if (submenu("AI targets"))
     {
         for (size_t x = 0; x < 8; ++x)
