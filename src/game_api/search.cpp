@@ -2035,6 +2035,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc()
             .at_exe(),
     },
+    {
+        "enter_closed_door_crash"sv,
+        // third virtual in behavior of the dog in walking state, the exact line crashing the game when pet tries to enter closed door (tiamat/hundun)
+        PatternCommandBuffer{}
+            .find_after_inst("FF 90 A8 00 00 00 48 89 F1"_gh)
+            .offset(0x5)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
