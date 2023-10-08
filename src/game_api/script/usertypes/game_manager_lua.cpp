@@ -69,6 +69,7 @@ void register_usertypes(sol::state& lua)
     gamemanager_type["pause_ui"] = &GameManager::pause_ui;
     gamemanager_type["journal_ui"] = &GameManager::journal_ui;
     gamemanager_type["save_related"] = &GameManager::save_related;
+    gamemanager_type["main_menu_music"] = &GameManager::main_menu_music;
 
     lua.new_usertype<SaveRelated>(
         "SaveRelated",

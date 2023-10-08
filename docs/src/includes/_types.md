@@ -1198,7 +1198,10 @@ float | [spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn
 int | [spawn_room_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) | 
 int | [spawn_room_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) | 
 custom_array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
-[ThemeInfo](#ThemeInfo) | [themes[18]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
+array&lt;[ThemeInfo](#ThemeInfo), 18&gt; | [themes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
+int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
+int | [flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags2) | 
+int | [flags3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags3) | 
 
 ## Lighting types
 
@@ -2471,6 +2474,7 @@ Type | Name | Description
 [PauseUI](#PauseUI) | [pause_ui](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) | 
 [JournalUI](#JournalUI) | [journal_ui](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) | 
 [SaveRelated](#SaveRelated) | [save_related](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) | 
+[BackgroundSound](#BackgroundSound) | [main_menu_music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_menu_music) | 
 
 ### GameProps
 

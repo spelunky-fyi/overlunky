@@ -1239,12 +1239,19 @@ function get_entities_by_draw_depth(draw_depths, l) end
 ---short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
 ---@return integer
 function get_current_money() end
----Display the effect of adding or subtracting money in the hud, does not actually change the amount of money
----It actually subtracts the amount of money first for the effect, look at the example, default display_time = 60 (about 2s)
+---Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+---Can be negative, default display_time = 60 (about 2s)
 ---@param amount integer
 ---@param display_time integer?
 ---@return integer
-function add_money_hud(amount, display_time) end
+function add_money(amount, display_time) end
+---Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+---Can be negative, default display_time = 60 (about 2s)
+---@param amount integer
+---@param player_slot integer
+---@param display_time integer?
+---@return integer
+function add_money_slot(amount, player_slot, display_time) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1571,6 +1578,8 @@ function set_lut(texture_id, layer) end
 ---@param layer LAYER
 ---@return nil
 function reset_lut(layer) end
+---@return HudData
+function get_hud() end
 ---Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
 ---Use `-1` as dropchance_id to reset all to default
 ---@param dropchance_id integer
@@ -2175,6 +2184,7 @@ do
     ---@field pause_ui PauseUI
     ---@field journal_ui JournalUI
     ---@field save_related SaveRelated
+    ---@field main_menu_music BackgroundSound
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
@@ -4558,6 +4568,9 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_room_y integer
     ---@field exit_doors custom_Array<Vec2>
     ---@field themes ThemeInfo[] @size: 18
+    ---@field flags integer
+    ---@field flags2 integer
+    ---@field flags3 integer
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.

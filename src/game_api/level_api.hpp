@@ -436,7 +436,7 @@ struct LevelGenSystem
     uint64_t unknown2;
     union
     {
-        ThemeInfo* themes[18];
+        std::array<ThemeInfo*, 18> themes;
         struct
         {
             ThemeInfo* theme_dwelling;
