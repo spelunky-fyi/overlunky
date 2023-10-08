@@ -68,7 +68,7 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"pick_up", 67, void(Entity*)>,
         VTableEntry<"picked_up_by", 68, void(Entity*)>,
         VTableEntry<"drop", 69, void(Entity*)>,
-        VTableEntry<"add_money", 70, void(uint32_t)>,
+        VTableEntry<"collect_treasure", 70, void(int32_t, uint32_t)>,
         VTableEntry<"apply_movement", 71, void()>,
         VTableEntry<"damage_entity", 72, void(Entity*)>,
         VTableEntry<"initialize", 75, void()>,

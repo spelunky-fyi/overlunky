@@ -127,6 +127,14 @@ class Movable : public Entity
     /// Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
     void set_position(float to_x, float to_y);
 
+    // for backwards compatibility
+    // adds a coin to the table cause the collected_money_count is expected to increase
+    void add_money_broken(int amount)
+    {
+        static const auto coin = to_id("ENT_TYPE_ITEM_GOLDCOIN");
+        this->collect_treasure(amount, coin);
+    }
+
     virtual bool can_jump() = 0;                                             // 37
     virtual void get_collision_info(CollisionInfo*) = 0;                     // 38
     virtual float sprint_factor() = 0;                                       // 39
@@ -166,8 +174,8 @@ class Movable : public Entity
     virtual void on_picked_up_by(Entity* entity_picking_up) = 0; // 68
     virtual void drop(Entity* entity_to_drop) = 0;               // 69, also used when throwing
 
-    /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
-    virtual void add_money(uint32_t money, ENT_TYPE money_type) = 0;         // 70
+    /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
+    virtual void collect_treasure(int32_t value, ENT_TYPE treasure) = 0;     // 70
     virtual void apply_movement() = 0;                                       // 71, disable this function and things can't move, some spin in place
     virtual void damage_entity(Entity* victim) = 0;                          // 72, can't trigger, maybe extra params are needed
     virtual void v73() = 0;                                                  // 73
