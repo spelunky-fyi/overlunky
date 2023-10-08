@@ -6,7 +6,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' IN MODLUNKY! YO
 I recommend resetting options to defaults after updating to 2.9 for a more balanced experience. Speaking of balance...
 
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.]]
-meta.version = "2.9b"
+meta.version = "2.9c"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -73,9 +73,10 @@ local real_default_options = {
     kali = true,
     jellyless_chance = 60,
     crust_chance = 0.75,
-    water_chance = 9,
+    water_chance = 4,
     themes = true,
-    bosses = true
+    bosses = true,
+    leak_chance = 5,
 }
 local default_options = table.unpack({real_default_options})
 local function register_options()
@@ -143,6 +144,7 @@ local function register_options()
     register_option_float("crust_chance", "Crust item chance", default_options.crust_chance, 0, 100)
     register_option_float("water_chance", "Water level chance", default_options.water_chance, 0, 100)
     register_option_bool("themes", "Remix themes", default_options.themes)
+    register_option_float("leak_chance", "Rushing liquid chance", default_options.leak_chance, 0, 100)
     register_option_button("_reset", "Reset options to defaults", function()
         default_options = table.unpack({real_default_options})
         register_options()
@@ -3414,8 +3416,10 @@ end, ON.PRE_GET_RANDOM_ROOM)
 --[[WATER LEVELS]]
 set_callback(function()
     if #get_entities_by_mask(MASK.LIQUID) > 0 or state.theme == THEME.COSMIC_OCEAN or state.screen ~= SCREEN.LEVEL then return end
+    water_level = false
     if prng:random() < options.water_chance / 100 then
         swapping_liquid = false
+        water_level = true
         local ax, ay, bx, by = get_bounds()
         for y=by,ay-8,8 do
             local box = AABB:new(ax, y+8, bx, y)
@@ -3523,3 +3527,63 @@ set_callback(function(x, y, l, room_template)
         ]]
     end
 end, ON.PRE_GET_RANDOM_ROOM)
+
+--[[ LEAKY LIQUID FEELINGS ]]
+leak_liquids = { ENT_TYPE.LIQUID_COARSE_WATER, ENT_TYPE.LIQUID_COARSE_LAVA }
+leak_toasts = {
+    [ENT_TYPE.LIQUID_COARSE_WATER] = "Uh, who left the tap on?",
+    [ENT_TYPE.LIQUID_COARSE_LAVA] = "Uh, you should probably RUN!!!",
+}
+function start_leak(type)
+    local x, y = state.level_gen.spawn_x, state.level_gen.spawn_y
+    set_interval(function()
+        spawn_liquid(type, x, y)
+        fix_liquid_out_of_bounds()
+    end, prng:random_int(10, 30, PRNG_CLASS.LIQUID))
+    if leak_toasts[type] then
+        toast(leak_toasts[type])
+    end
+end
+
+function can_leak(type)
+    if not players[1] then return false end
+    if state.theme == THEME.COSMIC_OCEAN then return false end
+    if state.theme == THEME.ICE_CAVES then
+        if type == ENT_TYPE.LIQUID_COARSE_LAVA then return false end
+        local x, y, l = get_position(players[1].uid)
+        local rx, ry = get_room_index(x, y)
+        local room = get_room_template_name(get_room_template(rx, ry, l))
+        if room:match("entrance") then return false end
+    else
+        local x, y, l = get_position(players[1].uid)
+        local rx, ry = get_room_index(x, y)
+        local room = get_room_template_name(get_room_template(rx, ry, l))
+        if not room:match("path") then return false end
+    end
+    if has(boss_levels, state.theme) then return false end
+    if state.presence_flags > 0 then return false end
+    if #get_entities_by(ENT_TYPE.FLOOR_ICE, MASK.FLOOR, LAYER.FRONT) > 0 then return false end
+    if type == ENT_TYPE.LIQUID_COARSE_WATER then
+        if #get_entities_by(ENT_TYPE.LIQUID_LAVA, MASK.LAVA, LAYER.FRONT) > 0 then return false end
+        if #get_entities_by(ENT_TYPE.LIQUID_WATER, MASK.WATER, LAYER.FRONT) > 0 then type = ENT_TYPE.LIQUID_WATER end
+    elseif type == ENT_TYPE.LIQUID_COARSE_LAVA then
+        if #get_entities_by(ENT_TYPE.LIQUID_LAVA, MASK.LAVA, LAYER.FRONT) > 0 then type = ENT_TYPE.LIQUID_LAVA end
+    end
+    return true
+end
+
+function wait_for_leak()
+    if prng:random() < options.leak_chance / 100 and not water_level then
+        set_interval(function()
+            shuffle(leak_liquids)
+            for _,v in pairs(leak_liquids) do
+                if can_leak(v) then
+                    start_leak(v)
+                    return false
+                end
+            end
+        end, 20)
+    end
+end
+
+set_callback(wait_for_leak, ON.POST_LEVEL_GENERATION)
