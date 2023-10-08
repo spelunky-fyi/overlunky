@@ -16,6 +16,55 @@ If you use a text editor/IDE that has a Lua linter available you can download [s
 # Lua libraries
 The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6). We're using Lua 5.4 with the [Sol C++ binding](https://sol2.readthedocs.io/en/latest/).
 
+## io
+
+```lua
+-- Write a data file
+-- Data will be written to Mods/Data/[scriptname.lua or Mod Name]/timestamp.txt
+local f = io.open_data(tostring(os.time()) .. ".txt", "w")
+if f then
+    f:write("hello world at " .. os.date())
+    f:close()
+end
+
+-- List all files in data dir and read them out
+for _, v in pairs(list_data_dir()) do
+    local f = io.open_data(v)
+    if f then
+        print(v .. ": " .. f:read("a"))
+    end
+end
+
+```
+
+
+`meta.unsafe` exposes all [standard library functions](https://www.lua.org/manual/5.4/manual.html#6.8) and removes basedir restrictions from the custom functions.
+
+In safe mode (default) the following standard and custom functions are available:
+
+- `io.type`
+- `io.open_data`: like `io.open` but restricted to base directory `Mods/Data/modname`
+- `io.open_mod`: like `io.open` but restricted to the mod directory
+
+Safely opened files can be used normally through the `file:` handle. Files and folders opened in write mode are automatically created.
+
+Also see [list_dir](#list_dir) and [list_data_dir](#list_data_dir).
+
+
+## os
+
+`meta.unsafe` exposes all [standard library functions](https://www.lua.org/manual/5.4/manual.html#6.9) and removes basedir restrictions from the custom functions.
+
+In safe mode (default) the following standard and custom functions are available:
+
+- `os.clock`
+- `os.date`
+- `os.difftime`
+- `os.time`
+- `os.remove_data`: like `os.remove` but restricted to base directory `Mods/Data/modname`
+- `os.remove_mod`: like `os.remove` but restricted to the mod directory
+
+
 ## math
 
 ## base
@@ -91,7 +140,7 @@ end
 ```
 
 # Unsafe mode
-Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.
+Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like unrestricted `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.
 
 # Modules
 You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.

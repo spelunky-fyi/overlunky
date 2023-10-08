@@ -772,3 +772,10 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     }
     return -1;
 }
+
+MagmamanSpawnPosition::MagmamanSpawnPosition(uint32_t x_, uint32_t y_)
+{
+    x = x_;
+    y = y_;
+    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(10000));
+}

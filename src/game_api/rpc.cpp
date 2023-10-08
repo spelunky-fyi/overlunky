@@ -2058,3 +2058,67 @@ void set_boss_door_control_enabled(bool enable)
     else
         recover_mem("set_boss_door_control_enabled");
 }
+
+void update_state()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("state_refresh");
+    }
+    if (offset != 0)
+    {
+        auto state = State::get().ptr();
+        typedef void refresh_func(StateMemory*);
+        static refresh_func* rf = (refresh_func*)(offset);
+        rf(state);
+    }
+}
+
+void set_frametime(std::optional<double> frametime)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime");
+    if (offset != 0)
+    {
+        if (frametime.has_value())
+            write_mem_recoverable("engine_frametime", offset, frametime.value(), true);
+        else
+            recover_mem("engine_frametime");
+    }
+}
+
+std::optional<double> get_frametime()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime");
+    if (offset != 0)
+        return memory_read<double>(offset);
+    return std::nullopt;
+}
+
+void set_frametime_inactive(std::optional<double> frametime)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime") + 0x10;
+    if (offset != 0)
+    {
+        if (frametime.has_value())
+            write_mem_recoverable("engine_frametime_inactive", offset, frametime.value(), true);
+        else
+            recover_mem("engine_frametime_inactive");
+    }
+}
+
+std::optional<double> get_frametime_inactive()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime") + 0x10;
+    if (offset != 0)
+        return memory_read<double>(offset);
+    return std::nullopt;
+}

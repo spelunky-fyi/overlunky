@@ -891,6 +891,7 @@ Sets the maximum length of a thrown rope (anchor segment not included). Unfortun
 
 #### nil set_olmec_cutscene_enabled(bool enable)
 
+[Olmec](#Olmec) cutscene moves [Olmec](#Olmec) and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and [Olmec](#Olmec) will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with [Olmec](#Olmec) in the hole.
 
 ### set_olmec_phase_y_level
 
@@ -1143,7 +1144,7 @@ Returns true if the nth bit is set in the number.
 #### nil activate_crush_elevator_hack(bool activate)
 
 Activate custom variables for speed and y coordinate limit for crushing elevator
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each [CrushElevator](#CrushElevator) entity, recommending `set_post_entity_spawn`
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [CrushElevator](#CrushElevator) entity, recommending set_post_entity_spawn
 default game values are: speed = 0.0125, y_limit = 98.5
 
 ### activate_hundun_hack
@@ -1154,7 +1155,7 @@ default game values are: speed = 0.0125, y_limit = 98.5
 #### nil activate_hundun_hack(bool activate)
 
 Activate custom variables for y coordinate limit for hundun and spawn of it's heads
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Hundun](#Hundun) entity, recommending `set_post_entity_spawn`
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Hundun](#Hundun) entity, recommending set_post_entity_spawn
 default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
 
 ### change_poison_timer
@@ -1257,6 +1258,24 @@ Same as `Player.get_heart_color`
 #### int get_frame()
 
 Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+
+### get_frametime
+
+
+> Search script examples for [get_frametime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime)
+
+#### optional&lt;double&gt; get_frametime()
+
+Get engine target frametime (1/framerate, default 1/60).
+
+### get_frametime_unfocused
+
+
+> Search script examples for [get_frametime_unfocused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime_unfocused)
+
+#### optional&lt;double&gt; get_frametime_unfocused()
+
+Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 
 ### get_id
 
@@ -1425,12 +1444,21 @@ Same as `Player.is_female`
 
 List all char.png files recursively from Mods/Packs. Returns table of file paths.
 
+### list_data_dir
+
+
+> Search script examples for [list_data_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_data_dir)
+
+#### nil list_data_dir(optional<string> dir)
+
+List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.
+
 ### list_dir
 
 
 > Search script examples for [list_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_dir)
 
-#### nil list_dir(string dir)
+#### nil list_dir(optional<string> dir)
 
 List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 
@@ -1579,6 +1607,24 @@ end, ON.WIN)
 
 Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
 
+### set_frametime
+
+
+> Search script examples for [set_frametime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_frametime)
+
+#### nil set_frametime(optional<double> frametime)
+
+Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+
+### set_frametime_unfocused
+
+
+> Search script examples for [set_frametime_unfocused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_frametime_unfocused)
+
+#### nil set_frametime_unfocused(optional<double> frametime)
+
+Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
+
 ### set_journal_enabled
 
 
@@ -1700,8 +1746,7 @@ Set layer to search for storage items on
 
 #### nil set_tiamat_cutscene_enabled(bool enable)
 
-[Tiamat](#Tiamat) cutscene is also responsible for locking the exit door
-So you may need to close it yourself if you still want to be required to kill [Tiamat](#Tiamat)
+[Tiamat](#Tiamat) cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want [Tiamat](#Tiamat) kill to be required
 
 ### show_journal
 
@@ -1752,6 +1797,15 @@ Gets line1_A, intersection point and line2_B and calls the 3 parameter version o
 #### nil update_liquid_collision_at(float x, float y, bool add)
 
 Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+
+### update_state
+
+
+> Search script examples for [update_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_state)
+
+#### nil update_state()
+
+Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
 
 ### warp
 
@@ -2193,7 +2247,7 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_TIAMAT)
 #### nil activate_tiamat_position_hack(bool activate)
 
 Activate custom variables for position used for detecting the player (normally hardcoded)
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Tiamat](#Tiamat) entity, recommending `set_post_entity_spawn`
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Tiamat](#Tiamat) entity, recommending set_post_entity_spawn
 default game values are: attack_x = 17.5 attack_y = 62.5
 
 ### distance

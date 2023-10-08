@@ -504,6 +504,8 @@ void register_usertypes(sol::state& lua)
         &LogicList::olmec_cutscene,
         "tiamat_cutscene",
         &LogicList::tiamat_cutscene,
+        "magmaman_spawn",
+        &LogicList::magmaman_spawn,
         "diceshop",
         &LogicList::diceshop);
     /// Used in LogicList
@@ -535,6 +537,22 @@ void register_usertypes(sol::state& lua)
         &LogicTiamatCutscene::cinematic_anchor,
         "timer",
         &LogicTiamatCutscene::timer,
+        sol::base_classes,
+        sol::bases<Logic>());
+    /// Used in LogicList
+    lua.new_usertype<MagmamanSpawnPosition>(
+        "MagmamanSpawnPosition",
+        sol::constructors<MagmamanSpawnPosition(uint32_t, uint32_t)>{},
+        "x",
+        &MagmamanSpawnPosition::x,
+        "y",
+        &MagmamanSpawnPosition::y,
+        "timer",
+        &MagmamanSpawnPosition::timer);
+    lua.new_usertype<LogicMagmamanSpawn>(
+        "LogicVolcana",
+        "magmaman_positions",
+        &LogicMagmamanSpawn::magmaman_positions,
         sol::base_classes,
         sol::bases<Logic>());
 

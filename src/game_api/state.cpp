@@ -290,13 +290,22 @@ State& State::get()
             strings_init();
             init_state_update_hook();
 
-            // game patches
-            patch_tiamat_kill_crash();
-            patch_orbs_limit();
-            patch_olmec_kill_crash();
-            patch_liquid_OOB();
+            auto watermark_offset = get_address("destroy_game_manager") - 8; // pulled this out of a hat, its just a random place with some CCCC hopefully
+            auto watermark = memory_read<uint32_t>(watermark_offset);
+            if (watermark != 0x4C4F4C4F)
+            {
+                write_mem_prot(watermark_offset, "\x4F\x4C\x4F\x4C", true);
+                DEBUG("Applying patches");
+                patch_tiamat_kill_crash();
+                patch_orbs_limit();
+                patch_olmec_kill_crash();
+                patch_liquid_OOB();
+            }
+            else
+            {
+                DEBUG("Not applying patches, someone has already done it");
+            }
         }
-
         get_is_init() = true;
     }
     return STATE;

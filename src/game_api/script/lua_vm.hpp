@@ -15,3 +15,5 @@ sol::protected_function_result execute_lua(sol::environment& env, std::string_vi
 void populate_lua_env(sol::environment& env);
 void hide_unsafe_libraries(sol::environment& env);
 void expose_unsafe_libraries(sol::environment& env);
+void add_partial_safe_libraries(sol::environment& env);
+bool check_safe_io_path(const std::string& filepath, const std::string& basepath);

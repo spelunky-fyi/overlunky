@@ -24,6 +24,7 @@ bool detect_wine()
     return true;
 }
 
+UINT g_SyncInterval{1};
 IDXGISwapChain* g_SwapChain{nullptr};
 ID3D11Device* g_Device{nullptr};
 ID3D11DeviceContext* g_Context{nullptr};
@@ -210,6 +211,8 @@ LRESULT CALLBACK hkKeyboard(const int code, const WPARAM wParam, const LPARAM lP
 static bool skip_hkPresent = false;
 HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
+    SyncInterval = g_SyncInterval;
+
     if (skip_hkPresent)
         return g_OrigSwapChainPresent(pSwapChain, SyncInterval, Flags);
 
@@ -466,6 +469,11 @@ void hide_cursor()
         ImGuiIO& io = ImGui::GetIO();
         io.MouseDrawCursor = false;
     }
+}
+
+void imgui_vsync(bool enable)
+{
+    g_SyncInterval = (UINT)enable;
 }
 
 ID3D11Device* get_device()

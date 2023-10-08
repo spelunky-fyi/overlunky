@@ -95,6 +95,7 @@ std::map<std::string, int64_t> default_keys{
     {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
     {"toggle_grid", OL_KEY_CTRL | OL_KEY_SHIFT | 'G'},
     {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
+    {"toggle_entityinfo", OL_KEY_CTRL | OL_KEY_SHIFT | 'E'},
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
@@ -211,6 +212,7 @@ std::map<std::string, int64_t> default_keys{
     {"speedhack_normal", OL_KEY_CTRL | OL_KEY_SHIFT | '0'},
     {"speedhack_turbo", VK_PRIOR},
     {"speedhack_slow", VK_NEXT},
+    {"toggle_uncapped_fps", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
     //{ "", 0x },
 };
 
@@ -265,7 +267,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, pause_updates = true;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -294,7 +296,7 @@ std::string fontfile = "";
 std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 
 [[maybe_unused]] const char s8_zero = 0, s8_one = 1, s8_min = -128, s8_max = 127;
-[[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17, u8_draw_depth_max = 53;
+[[maybe_unused]] const ImU8 u8_zero = 0, u8_one = 1, u8_min = 0, u8_max = 255, u8_four = 4, u8_seven = 7, u8_seventeen = 17, u8_draw_depth_max = 52, u8_shader_max = 36;
 [[maybe_unused]] const short s16_zero = 0, s16_one = 1, s16_min = -32768, s16_max = 32767;
 [[maybe_unused]] const ImU16 u16_zero = 0, u16_one = 1, u16_min = 0, u16_max = 65535;
 [[maybe_unused]] const ImS32 s32_zero = 0, s32_one = 1, s32_min = INT_MIN / 2, s32_max = INT_MAX / 2, s32_hi_a = INT_MAX / 2 - 100, s32_hi_b = INT_MAX / 2;
@@ -327,6 +329,7 @@ std::map<std::string, bool> options = {
     {"disable_pause", false},
     {"draw_grid", false},
     {"draw_hitboxes", false},
+    {"draw_entityinfo", false},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
     {"warp_transition", false},
@@ -348,7 +351,12 @@ std::map<std::string, bool> options = {
     {"hd_cursor", true},
     {"inverted", false},
     {"borders", false},
-    {"console_alt_keys", false}};
+    {"console_alt_keys", false},
+    {"vsync", true},
+    {"uncap_unfocused_fps", true}};
+
+double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
+double fps_min = 0, fps_max = 600.0;
 
 bool g_speedhack_hooked = false;
 float g_speedhack_multiplier = 1.0;
@@ -804,6 +812,12 @@ void autorun_scripts()
     }
 }
 
+void update_frametimes()
+{
+    g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps));
+    g_Console.get()->execute(fmt::format("set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_unfocused_fps));
+}
+
 void save_config(std::string file)
 {
     std::ofstream writeData(file);
@@ -1042,6 +1056,12 @@ void load_config(std::string file)
     }
     ImGui::GetIO().ConfigDockingWithShift = options["docking_with_shift"];
     g_Console->set_alt_keys(options["console_alt_keys"]);
+    imgui_vsync(options["vsync"]);
+    if (options["uncap_unfocused_fps"])
+    {
+        g_unfocused_fps = 0;
+        update_frametimes();
+    }
     save_config(file);
 }
 
@@ -1304,6 +1324,11 @@ std::string spawned_type()
 
 int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
 {
+    static const ENT_TYPE also_snap[] = {
+        to_id("ENT_TYPE_LOGICAL_DOOR"),
+        to_id("ENT_TYPE_LOGICAL_BLACKMARKET_DOOR"),
+        to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"),
+    };
     bool flip = g_vx < -0.04f;
     std::pair<float, float> cpos = UI::click_position(g_x, g_y);
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
@@ -1330,7 +1355,11 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
     {
         bool snap = options["snap_to_grid"];
-        if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
+        if (std::find(std::begin(also_snap), std::end(also_snap), to_spawn.id) != std::end(also_snap))
+        {
+            snap = true;
+        }
+        else if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos)
         {
             snap = true;
             g_vx = 0;
@@ -1381,11 +1410,17 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                 callbacks.push_back(cb);
             }
         }
-        else if (flip)
+        if (flip)
         {
             auto ent = get_entity_ptr(spawned);
             if (ent)
                 ent->flags |= (1U << 16);
+        }
+        if (to_spawn.id == also_snap[0])
+        {
+            auto ent = get_entity_ptr(spawned)->as<LogicalDoor>();
+            ent->door_type = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
+            ent->platform_type = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
         }
         if (!lock_entity && set_last)
             g_last_id = spawned;
@@ -2069,12 +2104,55 @@ void force_kits()
     }
 }
 
+bool toggle_pause()
+{
+    g_pause_at = -1;
+    g_pause_time = -1;
+    if (g_pause_type & 0x40)
+    {
+        if (!paused)
+        {
+            g_pause_time = g_state->time_startup;
+            pause_updates = true;
+            paused = true;
+        }
+        else
+        {
+            g_pause_time = -1;
+            pause_updates = false;
+            paused = false;
+        }
+        g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+    }
+    else
+    {
+        if (g_state->pause == 0)
+        {
+            g_state->pause = (uint8_t)g_pause_type;
+            paused = true;
+        }
+        else
+        {
+            g_state->pause = 0;
+            paused = false;
+        }
+    }
+    return paused;
+}
+
 void frame_advance()
 {
-    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
+    if (g_pause_type & 0x40)
     {
-        g_state->pause = (uint8_t)g_pause_type;
-        g_pause_at = -1;
+        g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+    }
+    else
+    {
+        if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
+        {
+            g_state->pause = (uint8_t)g_pause_type;
+            g_pause_at = -1;
+        }
     }
 }
 
@@ -2773,6 +2851,14 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_zoom = 0.0f;
         set_zoom();
     }
+    else if (pressed("toggle_uncapped_fps", wParam))
+    {
+        if (g_engine_fps != 60.0)
+            g_engine_fps = 60.0;
+        else
+            g_engine_fps = 0;
+        update_frametimes();
+    }
     else if (pressed("toggle_godmode", wParam))
     {
         options["god_mode"] = !options["god_mode"];
@@ -2795,6 +2881,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["draw_hitboxes"] = !options["draw_hitboxes"];
     }
+    else if (pressed("toggle_entityinfo", wParam))
+    {
+        options["draw_entityinfo"] = !options["draw_entityinfo"];
+    }
     else if (pressed("toggle_grid", wParam))
     {
         options["draw_grid"] = !options["draw_grid"];
@@ -2813,17 +2903,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("toggle_pause", wParam))
     {
-        g_pause_at = -1;
-        if (g_state->pause == 0)
-        {
-            g_state->pause = (uint8_t)g_pause_type;
-            paused = true;
-        }
-        else
-        {
-            g_state->pause = 0;
-            paused = false;
-        }
+        toggle_pause();
     }
     else if (pressed("toggle_hud", wParam))
     {
@@ -2835,10 +2915,21 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_state->pause == (uint8_t)g_pause_type)
+        if (g_pause_type & 0x40)
         {
-            g_pause_at = UI::get_frame_count() + 1;
-            g_state->pause = 0;
+            if (pause_updates)
+            {
+                g_pause_time = g_state->time_startup + 1;
+                g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+            }
+        }
+        else
+        {
+            if (g_state->pause == (uint8_t)g_pause_type)
+            {
+                g_pause_at = UI::get_frame_count() + 1;
+                g_state->pause = 0;
+            }
         }
     }
     else if (pressed("toggle_disable_pause", wParam))
@@ -3997,7 +4088,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     {
         for (unsigned int y = 0; y < g_state->h; ++y)
         {
-            auto room_temp = UI::get_room_template(x, y, g_state->camera_layer);
+            auto room_temp = UI::get_room_template(x, y, peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer);
             if (room_temp.has_value())
             {
                 auto room_name = UI::get_room_template_name(room_temp.value());
@@ -4175,7 +4266,46 @@ void render_path()
     draw_list->PathStroke(color, 0, thick);
 }
 
-void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
+std::string entity_tooltip(Entity* hovered)
+{
+    std::string coords;
+    coords += fmt::format("{}, {} ({:.2f}, {:.2f})", hovered->uid, entity_names[hovered->type->id], hovered->abs_x == -FLT_MAX ? hovered->x : hovered->abs_x, hovered->abs_y == -FLT_MAX ? hovered->y : hovered->abs_y);
+    if (hovered->type->id == to_id("ENT_TYPE_ITEM_POT") && hovered->as<Pot>()->inside > 0)
+        coords += fmt::format(" ({})", entity_names[hovered->as<Pot>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_PRESENT") || hovered->type->id == to_id("ENT_TYPE_ITEM_GHIST_PRESENT"))
+        coords += fmt::format(" ({})", entity_names[hovered->as<Present>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_COFFIN"))
+        coords += fmt::format(" ({})", entity_names[hovered->as<Coffin>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_CRATE") || hovered->type->id == to_id("ENT_TYPE_ITEM_DMCRATE") || hovered->type->id == to_id("ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE"))
+        coords += fmt::format(" ({})", entity_names[hovered->as<Container>()->inside]);
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_CHEST"))
+    {
+        auto chest = hovered->as<Chest>();
+        if (chest->bomb)
+            coords += " (BOMB)";
+        if (chest->leprechaun)
+            coords += " (LEPRECHAUN)";
+    }
+    else if (hovered->type->search_flags & 7)
+    {
+        auto ent = hovered->as<Movable>();
+        coords += fmt::format(" ({} HP)", ent->health);
+    }
+    if (hovered->overlay)
+    {
+        coords += fmt::format("\nON: {}, {} ({:.2f}, {:.2f})", hovered->overlay->uid, entity_names[hovered->overlay->type->id], hovered->overlay->abs_x == -FLT_MAX ? hovered->overlay->x : hovered->overlay->abs_x, hovered->overlay->abs_y == -FLT_MAX ? hovered->overlay->y : hovered->overlay->abs_y);
+    }
+    if (hovered->type->search_flags & 15 && hovered->as<Movable>()->last_owner_uid > -1)
+    {
+        auto ent = hovered->as<Movable>();
+        auto owner = get_entity_ptr(ent->last_owner_uid);
+        if (owner)
+            coords += fmt::format("\nOWNER: {}, {} ({:.2f}, {:.2f})", owner->uid, entity_names[owner->type->id], owner->abs_x == -FLT_MAX ? owner->x : owner->abs_x, owner->abs_y == -FLT_MAX ? owner->y : owner->abs_y);
+    }
+    return coords;
+}
+
+void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, bool rounded = false)
 {
     const auto type = ent->type->id;
     if (!type)
@@ -4191,8 +4321,8 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         UI::screen_position(render_position.first + ent->hitboxx + ent->offsetx, render_position.second + ent->hitboxy + ent->offsety);
     ImVec2 sorigin = screenify({originx, originy});
     ImVec2 spos = screenify({(boxa_x + boxb_x) / 2, (boxa_y + boxb_y) / 2});
-    ImVec2 sboxa = screenify({boxa_x, boxa_y});
-    ImVec2 sboxb = screenify({boxb_x, boxb_y});
+    ImVec2 sboxa = screenify({boxa_x, boxb_y});
+    ImVec2 sboxb = screenify({boxb_x, boxa_y});
     auto* draw_list = ImGui::GetWindowDrawList();
     if (cross)
     {
@@ -4218,9 +4348,12 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false)
         else
             draw_list->AddCircle(fix_pos(spos), sboxb.x - spos.x, color, 0, 2.0f);
     else if (filled)
-        draw_list->AddRectFilled(fix_pos(sboxa), fix_pos(sboxb), color);
+        draw_list->AddRectFilled(fix_pos(sboxa), fix_pos(sboxb), color, rounded ? 5.0f : 0.0f);
     else
-        draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, 0.0f, 0, 2.0f);
+        draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, rounded ? 5.0f : 0.0f, 0, 2.0f);
+
+    if (options["draw_entityinfo"] && !cross && !filled)
+        draw_list->AddText(fix_pos(ImVec2(sboxa.x, sboxb.y)), ImColor(1.0f, 1.0f, 1.0f, 0.8f), entity_tooltip(ent).c_str());
 
     if ((g_hitbox_mask & 0x8000) == 0)
         return;
@@ -4496,7 +4629,7 @@ void render_clickhandler()
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer)))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -4511,7 +4644,8 @@ void render_clickhandler()
             if (!UI::has_active_render(ent) && (ent->type->search_flags & 0x7000) == 0)
                 continue;
 
-            render_hitbox(ent, false, ImColor(0, 255, 255, 150));
+            if ((ent->type->search_flags & 1) == 0 || ent->as<Player>()->ai)
+                render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
         if ((g_hitbox_mask & 0x1) != 0)
         {
@@ -4546,15 +4680,20 @@ void render_clickhandler()
                 to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
                 to_id("ENT_TYPE_FLOOR_SPIKES"),
             };
-            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, LAYER::PLAYER)) // FLOOR | ACTIVEFLOOR
+            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // FLOOR | ACTIVEFLOOR
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
             }
-            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, LAYER::PLAYER)) // LOGICAL
+            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // LOGICAL
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
+            }
+            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // DOOR
+            {
+                auto ent = get_entity_ptr(entity);
+                render_hitbox(ent, false, ImColor(255, 180, 45, 150), false, true);
             }
 
             // OOB kill bounds
@@ -4584,7 +4723,7 @@ void render_clickhandler()
             if (hovered != nullptr)
             {
                 render_hitbox(hovered, true, ImColor(50, 50, 255, 200));
-                coords += fmt::format("\n{}, {}", hovered->uid, entity_names[hovered->type->id]);
+                coords += "\n" + entity_tooltip(hovered);
             }
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
@@ -4603,7 +4742,7 @@ void render_clickhandler()
         auto ent = get_entity_ptr(entity);
         if (ent)
         {
-            if (ent->layer == g_state->camera_layer)
+            if (ent->layer == (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))
                 render_hitbox(ent, false, front_col, true);
             else
                 render_hitbox(ent, false, back_col, true);
@@ -5375,15 +5514,7 @@ void render_options()
                 hook_savegame();
         }
         tooltip("Enable this if you want to keep your\nsave game unaffected by tomfoolery.");
-        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 5.f))
-        {
-            if (should_speedhack())
-                options["speedhack"] = false;
-            speedhack();
-        }
-        tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
-        ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
-        tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+
         bool void_mode = g_ui_scripts["void"]->is_enabled();
         if (ImGui::Checkbox("Void sandbox mode", &void_mode))
         {
@@ -5407,6 +5538,45 @@ void render_options()
             if (ImGui::SliderInt("Height##ForceHeight", &g_force_level_height, 1, 15, "%d", ImGuiSliderFlags_AlwaysClamp))
                 force_level_size();
         }
+
+        ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
+        tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+
+        ImGui::Checkbox("Uncap unfocused FPS on start", &options["uncap_unfocused_fps"]);
+        tooltip("Sets the unfocused FPS to unlimited automatically.");
+
+        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 10.f, "%.2fx"))
+        {
+            if (should_speedhack())
+                options["speedhack"] = false;
+            speedhack();
+        }
+        tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetSpeedhack"))
+        {
+            g_speedhack_multiplier = 1.0f;
+            speedhack();
+        }
+        if (ImGui::SliderScalar("Engine FPS##EngineFPS", ImGuiDataType_Double, &g_engine_fps, &fps_min, &fps_max, "%f"))
+            update_frametimes();
+        tooltip("Set target engine FPS. Always capped by max GPU FPS.\n0 = as fast as it can go.");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetFPS"))
+        {
+            g_engine_fps = 60.0;
+            update_frametimes();
+        }
+
+        if (ImGui::SliderScalar("Unfocused FPS##UnfocusedFPS", ImGuiDataType_Double, &g_unfocused_fps, &fps_min, &fps_max, "%f"))
+            update_frametimes();
+        tooltip("Set target unfocused FPS. Always capped by max Engine FPS.\n0 = as fast as it can go.");
+        ImGui::SameLine();
+        if (ImGui::Button("Reset##ResetUnfocusedFPS"))
+        {
+            g_unfocused_fps = 33.0;
+            update_frametimes();
+        }
         endmenu();
     }
 
@@ -5423,10 +5593,12 @@ void render_options()
         ImGui::Checkbox("Spawn floor decorated##Decorate", &options["spawn_floor_decorated"]);
         tooltip("Add decorations to spawned floor.");
         ImGui::Checkbox("Draw hitboxes##DrawEntityBox", &options["draw_hitboxes"]);
-        tooltip("Draw hitboxes for all movable and hovered entities.", "toggle_hitboxes");
+        tooltip("Draw hitboxes for all movable and hovered entities. Also mouse tooltips.", "toggle_hitboxes");
         ImGui::SameLine();
         ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
         tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
+        ImGui::Checkbox("Draw entity info##DrawEntityInfo", &options["draw_entityinfo"]);
+        tooltip("Draw entity names, uids and some random stuff next to the hitboxes.", "toggle_entityinfo");
         ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
         tooltip("Smooth camera movement when dragging, unless paused.");
         ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
@@ -5446,7 +5618,11 @@ void render_options()
             else
                 ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_ViewportsEnable;
         }
-        tooltip("Allow dragging tools outside the main game window, to different monitor etc.");
+        tooltip("Allow dragging tools outside the main game window, to different monitor etc.\nMay work smoother with the -oldflip game command line switch.");
+
+        if (ImGui::Checkbox("Enable vsync", &options["vsync"]))
+            imgui_vsync(options["vsync"]);
+        tooltip("Disabling game vsync may affect performance with external windows,\nfor better or worse.");
 
         if (ImGui::Checkbox("Docking only while holding Shift", &options["docking_with_shift"]))
         {
@@ -5508,7 +5684,7 @@ void render_options()
     if (submenu("Frame advance / Engine pause type"))
     {
         ImGui::PushID("PauseType");
-        for (int i = 1; i < 6; i++)
+        for (int i = 1; i < 7; i++)
         {
             ImGui::CheckboxFlags(pause_types[i], &g_pause_type, (int)std::pow(2, i));
         }
@@ -6778,7 +6954,7 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::InputFloat("Absolute X##EntityAbsoluteX", &entity->abs_x, 0.2f, 1.0f);
             ImGui::InputFloat("Absolute Y##EntityAbsoluteY", &entity->abs_y, 0.2f, 1.0f);
             ImGui::InputFloat("Velocity X##EntityVelocityX", &movable->velocityx, 0.2f, 1.0f);
-            ImGui::InputFloat("Velocity y##EntityVelocityY", &movable->velocityy, 0.2f, 1.0f);
+            ImGui::InputFloat("Velocity Y##EntityVelocityY", &movable->velocityy, 0.2f, 1.0f);
         }
         ImGui::InputFloat("Angle##EntityAngle", &entity->angle, 0.2f, 1.0f);
         if (is_movable)
@@ -6901,6 +7077,20 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::SameLine();
             ImGui::Text("%s", theme_name(target->theme));
         }
+        else if (entity_type == to_id("ENT_TYPE_LOGICAL_DOOR"))
+        {
+            auto door = entity->as<LogicalDoor>();
+            ImGui::Text("Door type:");
+            ImGui::InputInt("##LogicalDoorDoor", (int*)&door->door_type, 1, 10);
+            ImGui::SameLine();
+            ImGui::Text("%s", entity_names[door->door_type].c_str());
+            ImGui::Text("Platform type:");
+            ImGui::InputInt("##LogicalDoorPlatform", (int*)&door->platform_type, 1, 10);
+            ImGui::SameLine();
+            ImGui::Text("%s", entity_names[door->platform_type].c_str());
+            ImGui::Checkbox("Door spawned##LogicalDoorSpawned", &door->not_hidden);
+            ImGui::Checkbox("Platform spawned##LogicalDoorPlatformSpawned", &door->platform_spawned);
+        }
         else if (entity->type->search_flags & 0x7) // PLYAER, MOUNT, MONSTER
         {
             auto entity_pow = entity->as<PowerupCapable>();
@@ -7009,7 +7199,8 @@ void render_entity_props(int uid, bool detached = false)
         uint8_t draw_depth = entity->draw_depth;
         if (ImGui::DragScalar("Draw depth##EntityDrawDepth", ImGuiDataType_U8, &draw_depth, 0.2f, &u8_zero, &u8_draw_depth_max))
             entity->set_draw_depth(draw_depth);
-
+        if (entity->rendering_info)
+            ImGui::DragScalar("Shader##EntityShader", ImGuiDataType_U8, &entity->rendering_info->shader, 0.2f, &u8_zero, &u8_shader_max);
         ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &entity->animation_frame, 0.2f, &u16_zero, &u16_max);
         ImGui::InputText(fmt::format("Texture: {}##EntityTexture", textureid).c_str(), &texture, ImGuiInputTextFlags_ReadOnly);
         // ImGui::InputText("Texture path##EntityTexturePath", &texturepath, ImGuiInputTextFlags_ReadOnly);
@@ -7517,12 +7708,7 @@ void render_game_props()
             gamestate += "Pause ";
         ImGui::LabelText("Game state", "%s", gamestate.c_str());
         if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
-        {
-            if (paused)
-                g_state->pause = (uint8_t)g_pause_type;
-            else
-                g_state->pause = 0;
-        }
+            toggle_pause();
         tooltip("Pause time while still being able to teleport, spawn and move entities", "toggle_pause");
         endmenu();
     }
@@ -8237,22 +8423,36 @@ AABB player_hud_position(int p = 0)
 
 void render_prohud()
 {
+    static float engine_fps = 0;
+    static std::chrono::time_point<std::chrono::system_clock> last_time;
+    static uint32_t last_frame;
+    auto this_frame = UI::get_frame_count();
+    auto frame_delta = this_frame - last_frame;
+    auto this_time = std::chrono::system_clock::now();
+    auto time_delta = std::chrono::duration<float>(this_time - last_time);
+    if (time_delta.count() > 1.0f)
+    {
+        engine_fps = static_cast<float>(frame_delta) / time_delta.count();
+        last_frame = this_frame;
+        last_time = this_time;
+    }
+
     auto io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
     ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("TIMER:{}/{} FRAME:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.0f}", format_time(g_state->time_level), format_time(g_state->time_total), UI::get_frame_count(), g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate);
+    std::string buf = fmt::format("TIMER:{}/{} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{} ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{:.2f} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{:.2f}x ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
     auto type = spawned_type();
-    buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}", type)));
+    buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}{}", type, options["snap_to_grid"] ? " SNAP" : "")));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -8361,6 +8561,18 @@ void imgui_init(ImGuiContext*)
     windows["tool_texture"] = new Window({"Texture viewer", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
     // windows["tool_sound"] = new Window({"Sound player", is_tab_detached("tool_sound"), is_tab_open("tool_sound")});
 
+    if (g_ui_scripts.find("pause") == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            R"(
+set_callback(function() return pause_at and pause_at ~= -1 and state.time_startup >= pause_at end, ON.PRE_UPDATE)
+            )",
+            "pause",
+            g_SoundManager.get(),
+            g_Console.get(),
+            true);
+        g_ui_scripts["pause"] = std::unique_ptr<SpelunkyScript>(script);
+    }
     if (g_ui_scripts.find("dark") == g_ui_scripts.end())
     {
         SpelunkyScript* script = new SpelunkyScript(

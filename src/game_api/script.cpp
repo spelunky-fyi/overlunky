@@ -128,3 +128,7 @@ void SpelunkyScript::render_options()
 {
     m_Impl->Lock()->render_options();
 }
+std::string SpelunkyScript::execute(std::string code)
+{
+    return m_Impl->Lock()->execute(code);
+}
