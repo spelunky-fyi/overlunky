@@ -126,6 +126,7 @@ void poison_entity(int32_t entity_uid);
 void modify_ankh_health_gain(uint8_t max_health, uint8_t beat_add_health);
 void move_grid_entity(int32_t uid, float x, float y, LAYER layer);
 void destroy_grid_entity(int32_t uid);
+void destroy_grid_entity(float x, float y, LAYER layer);
 void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid);
 void change_poison_timer(int16_t frames);
 void set_adventure_seed(int64_t first, int64_t second);

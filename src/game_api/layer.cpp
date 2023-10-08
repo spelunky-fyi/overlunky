@@ -225,7 +225,7 @@ void Layer::destroy_grid_entity(Entity* ent)
         {
             ptr--;
             Entity* item_ent = *ptr;
-            if (item_ent->type->search_flags & ~1) // if not player
+            if (!item_ent->is_player()) // if not player
             {
                 destroy_grid_entity(item_ent);
             }

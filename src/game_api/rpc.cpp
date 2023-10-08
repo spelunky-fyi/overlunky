@@ -1682,6 +1682,17 @@ void destroy_grid_entity(int32_t uid)
     }
 }
 
+void destroy_grid_entity(float x, float y, LAYER layer)
+{
+    auto state = State::get();
+    uint8_t actual_layer = enum_to_layer(layer);
+
+    if (Entity* entity = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    {
+        state.layer(entity->layer)->destroy_grid_entity(entity);
+    }
+}
+
 void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
 {
     Movable* item = get_entity_ptr(item_uid)->as<Movable>();

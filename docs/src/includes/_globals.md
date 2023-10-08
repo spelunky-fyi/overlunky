@@ -466,6 +466,8 @@ Use empty table as argument to reset to the game default
 
 #### nil destroy_grid_entity(int uid)
 
+#### nil destroy_grid_entity(float x, float y, [LAYER](#LAYER) layer)
+
 Destroy the grid entity, and its item entities, removing them from the grid without dropping particles or gold.
 Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes [MASK](#MASK).PLAYER to prevent crashes
 
