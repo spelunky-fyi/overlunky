@@ -1826,3 +1826,23 @@ ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types)
 {
     return (ENT_TYPE)add_new_custom_type(std::move(types));
 }
+
+int32_t get_current_money()
+{
+    auto state = State::get().ptr();
+    int32_t money = state->money_shop_total;
+    for (auto& inventory : state->items->player_inventories)
+    {
+        money += inventory.money;
+        money += inventory.collected_money_total;
+    }
+    return money;
+}
+
+int32_t add_money_hud(int32_t amount, std::optional<uint8_t> display_time)
+{
+    auto hud = get_hud();
+    hud->money.counter += amount;
+    hud->money.timer = display_time.value_or(0x3C);
+    return get_current_money();
+}

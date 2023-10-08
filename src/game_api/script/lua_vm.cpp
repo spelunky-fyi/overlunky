@@ -2100,6 +2100,14 @@ end
     /// You can later use [filter_entities](#filter_entities) if you want specific entity
     lua["get_entities_by_draw_depth"] = get_entities_by_draw_depth;
 
+    /// Just convinet way of getting the current amount of money
+    /// short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+    lua["get_current_money"] = get_current_money;
+
+    /// Display the effect of adding or subtracting money in the hud, does not actually change the amount of money
+    /// It actually subtracts the amount of money first for the effect, look at the example, default display_time = 60 (about 2s)
+    lua["add_money_hud"] = add_money_hud;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

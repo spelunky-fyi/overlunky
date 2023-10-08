@@ -2026,6 +2026,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    {
+        "hud"sv,
+        // you can get the address from the render_hud (first parameter), it's global/static, so just find good refrence to it
+        PatternCommandBuffer{}
+            .find_after_inst("41 C6 47 6B 01"_gh)
+            .find_inst("48 8D 0D"_gh)
+            .decode_pc()
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

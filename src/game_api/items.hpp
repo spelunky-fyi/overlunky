@@ -10,7 +10,7 @@ class Player;
 struct Inventory
 {
     /// Sum of the money collected in current level
-    uint32_t money;
+    int32_t money;
     uint8_t bombs;
     uint8_t ropes;
     /// Used to transfer information to transition/next level. Is not updated during a level
@@ -92,7 +92,7 @@ struct Inventory
     /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<ENT_TYPE, 30> acquired_powerups;
     /// Total money collected during previous levels (so excluding the current one)
-    uint32_t collected_money_total;
+    int32_t collected_money_total;
 };
 
 struct SelectPlayerSlot
