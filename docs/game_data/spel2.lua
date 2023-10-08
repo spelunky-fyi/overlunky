@@ -1240,13 +1240,13 @@ function get_entities_by_draw_depth(draw_depths, l) end
 ---@return integer
 function get_current_money() end
 ---Adds money to the state.money_shop_total and displays the effect on the HUD for money change
----Can be negative, default display_time = 60 (about 2s)
+---Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
 ---@param amount integer
 ---@param display_time integer?
 ---@return integer
 function add_money(amount, display_time) end
 ---Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
----Can be negative, default display_time = 60 (about 2s)
+---Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
 ---@param amount integer
 ---@param player_slot integer
 ---@param display_time integer?

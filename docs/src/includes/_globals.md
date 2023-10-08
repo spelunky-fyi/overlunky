@@ -1187,7 +1187,7 @@ Adds new custom type (group of ENT_TYPE) that can be later used in functions lik
 #### int add_money(int amount, optional<int> display_time)
 
 Adds money to the state.money_shop_total and displays the effect on the HUD for money change
-Can be negative, default display_time = 60 (about 2s)
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
 
 ### add_money_slot
 
@@ -1197,7 +1197,7 @@ Can be negative, default display_time = 60 (about 2s)
 #### int add_money_slot(int amount, int player_slot, optional<int> display_time)
 
 Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
-Can be negative, default display_time = 60 (about 2s)
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
 
 ### change_poison_timer
 

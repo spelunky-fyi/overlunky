@@ -2105,11 +2105,11 @@ end
     lua["get_current_money"] = get_current_money;
 
     /// Adds money to the state.money_shop_total and displays the effect on the HUD for money change
-    /// Can be negative, default display_time = 60 (about 2s)
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
     lua["add_money"] = add_money;
 
     /// Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
-    /// Can be negative, default display_time = 60 (about 2s)
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
     lua["add_money_slot"] = add_money_slot;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
