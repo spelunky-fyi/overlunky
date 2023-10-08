@@ -129,4 +129,5 @@ void set_frametime_inactive(std::optional<double> frametime);
 std::optional<double> get_frametime_inactive();
 ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types);
 int32_t get_current_money();
-int32_t add_money_hud(int32_t amount, std::optional<uint8_t> display_time);
+int32_t add_money(int32_t amount, std::optional<uint8_t> display_time);
+int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_t> display_time);

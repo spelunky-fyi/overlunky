@@ -1839,9 +1839,25 @@ int32_t get_current_money()
     return money;
 }
 
-int32_t add_money_hud(int32_t amount, std::optional<uint8_t> display_time)
+int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
 {
+    auto state = State::get().ptr();
     auto hud = get_hud();
+    state->money_shop_total += amount;
+    hud->money.counter += amount;
+    hud->money.timer = display_time.value_or(0x3C);
+    return get_current_money();
+}
+
+int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_t> display_time)
+{
+    auto state = State::get().ptr();
+    auto hud = get_hud();
+    uint8_t slot = player_slot - 1;
+    if (slot > 3)
+        return get_current_money();
+
+    state->items->player_inventories[slot].money += amount;
     hud->money.counter += amount;
     hud->money.timer = display_time.value_or(0x3C);
     return get_current_money();
