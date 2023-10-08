@@ -102,7 +102,7 @@ class Door : public Floor
     /// Returns the darkest light level used to fade the entity when entering or exiting. 0 = black, 1 = no change
     virtual float light_level() = 0;
     /// Should we display the button prompt when collided by player. Will always return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
-    virtual bool is_unlocked(Entity* player) = 0;
+    virtual bool is_unlocked() = 0;
     /// Can the door actually be entered by player. Overrides the button prompt too if false.
     virtual bool can_enter(Entity* player) = 0;
 };

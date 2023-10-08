@@ -100,7 +100,7 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"hide_ui", 41, float(Entity*)>,
         VTableEntry<"enter", 42, uint8_t(Entity*)>,
         VTableEntry<"light_level", 44, float()>,
-        VTableEntry<"is_unlocked", 45, bool(Entity*)>,
+        VTableEntry<"is_unlocked", 45, bool()>,
         VTableEntry<"can_enter", 46, bool(Entity*)>>;
     static DoorVTable door_vtable(lua, lua["Door"], "ENTITY_OVERRIDE");
 
