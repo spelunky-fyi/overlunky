@@ -459,18 +459,6 @@ Change [ENT_TYPE](#ENT_TYPE)'s spawned when [Waddler](#Waddler) dies, by default
 Max 255 types.
 Use empty table as argument to reset to the game default
 
-### destroy_grid_entity
-
-
-> Search script examples for [destroy_grid_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_grid_entity)
-
-#### nil destroy_grid_entity(int uid)
-
-#### nil destroy_grid_entity(float x, float y, [LAYER](#LAYER) layer)
-
-Destroy the grid entity, and its item entities, removing them from the grid without dropping particles or gold.
-Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes [MASK](#MASK).PLAYER to prevent crashes
-
 ### drop
 
 
@@ -1215,6 +1203,18 @@ Depending on the image size, this can take a moment, preferably don't create the
 
 Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
+
+### destroy_grid
+
+
+> Search script examples for [destroy_grid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_grid)
+
+#### nil destroy_grid(int uid)
+
+#### nil destroy_grid(float x, float y, [LAYER](#LAYER) layer)
+
+Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes [MASK](#MASK).PLAYER to prevent crashes
 
 ### disable_floor_embeds
 

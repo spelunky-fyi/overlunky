@@ -1673,7 +1673,7 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
     }
 }
 
-void destroy_grid_entity(int32_t uid)
+void destroy_grid(int32_t uid)
 {
     if (auto entity = get_entity_ptr(uid))
     {
@@ -1682,7 +1682,7 @@ void destroy_grid_entity(int32_t uid)
     }
 }
 
-void destroy_grid_entity(float x, float y, LAYER layer)
+void destroy_grid(float x, float y, LAYER layer)
 {
     auto state = State::get();
     uint8_t actual_layer = enum_to_layer(layer);

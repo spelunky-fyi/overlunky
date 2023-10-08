@@ -966,11 +966,12 @@ end
     lua["move_entity"] = move_entity_abs;
     /// Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
     lua["move_grid_entity"] = move_grid_entity;
-    /// Destroy the grid entity, and its item entities, removing them from the grid without dropping particles or gold.
+    auto destroy_grid = sol::overload(
+        static_cast<void (*)(int32_t uid)>(::destroy_grid),
+        static_cast<void (*)(float x, float y, LAYER layer)>(::destroy_grid));
+    /// Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
     /// Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
-    lua["destroy_grid_entity"] = sol::overload(
-        static_cast<void (*)(int32_t uid)>(::destroy_grid_entity),
-        static_cast<void (*)(float x, float y, LAYER layer)>(::destroy_grid_entity));
+    lua["destroy_grid"] = destroy_grid;
     /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).
