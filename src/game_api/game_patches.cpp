@@ -258,6 +258,16 @@ void patch_liquid_OOB()
     write_mem_prot(new_code_addr + 6, rel, true);
     write_mem_prot(new_code_addr + 16, rel - 10, true);
 
+    // replace "Ran out of liquids pool!" with jmp out of the main loop, which effectively
+    // fixes the problem of spawning too much liquid, simply removing some old ones when new is spawned
+    {
+        const size_t message_addr = offset - 0x10f;
+        // replace call MessageBoxA with
+        // jmp whatever (after of the main while do-while != 5 loop)
+        // nop
+        write_mem_prot(message_addr, "\xE9\x72\x01\x00\x00\x90"sv, true);
+    }
+
     once = true;
 }
 
