@@ -92,6 +92,18 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"floor_update", 0x26, void()>>;
     static FloorVTable floor_vtable(lua, lua["Floor"], "ENTITY_OVERRIDE");
 
+    using DoorVTable = HookableVTable<
+        Entity,
+        CallbackType::Entity,
+        EntityVTable,
+        VTableEntry<"enter_attempt", 40, float(Entity*)>,
+        VTableEntry<"hide_ui", 41, float(Entity*)>,
+        VTableEntry<"enter", 42, uint8_t(Entity*)>,
+        VTableEntry<"light_level", 44, float()>,
+        VTableEntry<"is_unlocked", 45, bool(Entity*)>,
+        VTableEntry<"can_enter", 46, bool(Entity*)>>;
+    static DoorVTable door_vtable(lua, lua["Door"], "ENTITY_OVERRIDE");
+
     using RenderInfoVTable = HookableVTable<
         RenderInfo,
         CallbackType::Entity,
