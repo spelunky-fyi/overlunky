@@ -5665,7 +5665,7 @@ Type | Name | Description
 [SoundMeta](#SoundMeta) | [sound1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound1) | 
 [SoundMeta](#SoundMeta) | [sound2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound2) | 
 [Entity](#Entity) | [top_chain_piece](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_chain_piece) | 
-nil | [trigger()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | 
+nil | [trigger(optional<bool> play_sound_effect)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | 
 
 ### DummyPurchasableEntity
 

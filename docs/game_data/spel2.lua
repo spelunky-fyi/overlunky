@@ -2822,7 +2822,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field sound1 SoundMeta
     ---@field sound2 SoundMeta
     ---@field top_chain_piece Entity
-    ---@field trigger fun(self): nil
+    ---@field trigger fun(self, play_sound_effect: boolean?): nil
 
 ---@class ThinIce : Movable
     ---@field strength integer @counts down when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite

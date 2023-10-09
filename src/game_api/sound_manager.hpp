@@ -294,3 +294,4 @@ struct BackgroundSound : public SoundMeta
 /// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
 /// Returns SoundMeta (read only), beware that after the sound starts, that memory is no longer valid
 SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);
+SoundMeta* play_sound_by_id(uint32_t sound_id, uint32_t source_uid);
