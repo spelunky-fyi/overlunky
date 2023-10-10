@@ -113,6 +113,7 @@ struct Items
     uint8_t unknown2;
     uint8_t unknown3;
     uint32_t unknown; // padding probably
+    /// Table of players, also keeps the dead body until they are destroyed (necromancer revive also destroys the old body)
     std::array<Player*, MAX_PLAYERS> players;
     std::array<Inventory, MAX_PLAYERS> player_inventories;
     std::array<SelectPlayerSlot, MAX_PLAYERS> player_select_slots;

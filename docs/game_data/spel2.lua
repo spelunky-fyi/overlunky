@@ -1892,8 +1892,9 @@ do
     ---@field is_pet_cursed boolean[] @size: 4
     ---@field is_pet_poisoned boolean[] @size: 4
     ---@field leader integer @Index of leader player in coop
-    ---@field player_inventory Inventory[] @size: MAX_PLAYERS
     ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
+    ---@field player_inventory Inventory[] @size: MAX_PLAYERS
+    ---@field players Player[] @size: MAX_PLAYERS @Array of players, also keeps the dead body until they are destroyed (necromancer revive also destroys the old body)
 
 ---@class LiquidPhysicsEngine
     ---@field pause boolean
