@@ -39,7 +39,7 @@ replace_table = {
     "void": "",
     "constexpr ": "",
     "const ": "",
-    "static": "",
+    "static ": "",
     "variadic_args va": "ENT_TYPE, ENT_TYPE...",
     "EmittedParticlesInfo": "array<Particle>",
     "ImVec2": "Vec2",

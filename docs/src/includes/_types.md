@@ -590,22 +590,22 @@ float | [r](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) |
 float | [g](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) | 
 float | [b](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b) | 
 float | [a](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=a) | 
- [Color](#Color) | [white()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=white) | 
- [Color](#Color) | [silver()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=silver) | 
- [Color](#Color) | [gray()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gray) | 
- [Color](#Color) | [black()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black) | 
- [Color](#Color) | [red()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) | 
- [Color](#Color) | [maroon()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maroon) | 
- [Color](#Color) | [yellow()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yellow) | 
- [Color](#Color) | [olive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olive) | 
- [Color](#Color) | [lime()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lime) | 
- [Color](#Color) | [green()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) | 
- [Color](#Color) | [aqua()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aqua) | 
- [Color](#Color) | [teal()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teal) | 
- [Color](#Color) | [blue()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) | 
- [Color](#Color) | [navy()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=navy) | 
- [Color](#Color) | [fuchsia()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuchsia) | 
- [Color](#Color) | [purple()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=purple) | 
+[Color](#Color) | [white()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=white) | 
+[Color](#Color) | [silver()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=silver) | 
+[Color](#Color) | [gray()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gray) | 
+[Color](#Color) | [black()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black) | 
+[Color](#Color) | [red()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) | 
+[Color](#Color) | [maroon()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maroon) | 
+[Color](#Color) | [yellow()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yellow) | 
+[Color](#Color) | [olive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olive) | 
+[Color](#Color) | [lime()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lime) | 
+[Color](#Color) | [green()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) | 
+[Color](#Color) | [aqua()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aqua) | 
+[Color](#Color) | [teal()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=teal) | 
+[Color](#Color) | [blue()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) | 
+[Color](#Color) | [navy()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=navy) | 
+[Color](#Color) | [fuchsia()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuchsia) | 
+[Color](#Color) | [purple()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=purple) | 
 tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rgba) | Returns RGBA colors in 0..255 range
 [Color](#Color)& | [set_rgba(int red, int green, int blue, int alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_rgba) | Changes color based on given RGBA colors in 0..255 range
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
