@@ -120,10 +120,11 @@ enum class ON
     PRE_UPDATE,
     POST_UPDATE,
     USER_DATA,
-    PRE_UNLOAD_LEVEL,
-    POST_UNLOAD_LEVEL,
-    PRE_UNLOAD_LAYER,
-    POST_UNLOAD_LAYER,
+    PRE_LEVEL_DESTRUCTION,
+    POST_LEVEL_DESTRUCTION,
+    PRE_LAYER_DESTRUCTION,
+    POST_LAYER_DESTRUCTION,
+    PRE_LEVEL_SPAWN,
 };
 
 struct IntOption
@@ -389,6 +390,7 @@ class LuaBackend
 
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);
+    void pre_spawn();
 
     bool pre_entity_instagib(Entity* victim);
 

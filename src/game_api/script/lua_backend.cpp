@@ -878,7 +878,7 @@ bool LuaBackend::pre_unload_level()
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::PRE_UNLOAD_LEVEL)
+        if (callback.screen == ON::PRE_LEVEL_DESTRUCTION)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func).value_or(false);
@@ -903,7 +903,7 @@ bool LuaBackend::pre_unload_layer(LAYER layer)
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::PRE_UNLOAD_LAYER)
+        if (callback.screen == ON::PRE_LAYER_DESTRUCTION)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func, layer).value_or(false);
@@ -1047,7 +1047,7 @@ void LuaBackend::post_unload_level()
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::POST_UNLOAD_LEVEL)
+        if (callback.screen == ON::POST_LEVEL_DESTRUCTION)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func);
@@ -1068,7 +1068,7 @@ void LuaBackend::post_unload_layer(LAYER layer)
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::POST_UNLOAD_LAYER)
+        if (callback.screen == ON::POST_LAYER_DESTRUCTION)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, layer);
@@ -1205,6 +1205,28 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
                 handle_function<void>(this, callback.func, entity, spawn_type_flags);
                 clear_current_callback();
             }
+        }
+    }
+}
+
+void LuaBackend::pre_spawn()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LEVEL_SPAWN)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
         }
     }
 }

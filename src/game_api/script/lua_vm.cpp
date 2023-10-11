@@ -2255,14 +2255,17 @@ end
         ON::POST_UPDATE,
         "USER_DATA",
         ON::USER_DATA,
-        "PRE_UNLOAD_LEVEL",
-        ON::PRE_UNLOAD_LEVEL,
-        "POST_UNLOAD_LEVEL",
-        ON::POST_UNLOAD_LEVEL,
-        "PRE_UNLOAD_LAYER",
-        ON::PRE_UNLOAD_LAYER,
-        "POST_UNLOAD_LAYER",
-        ON::POST_UNLOAD_LAYER);
+        "PRE_LEVEL_DESTRUCTION",
+        ON::PRE_LEVEL_DESTRUCTION,
+        "POST_LEVEL_DESTRUCTION",
+        ON::POST_LEVEL_DESTRUCTION,
+        "PRE_LAYER_DESTRUCTION",
+        ON::PRE_LAYER_DESTRUCTION,
+        "POST_LAYER_DESTRUCTION",
+        ON::POST_LAYER_DESTRUCTION,
+        "PRE_LEVEL_SPAWN",
+        ON::PRE_LEVEL_SPAWN);
+
     /* ON
     // LOGO
     // Runs when entering the the mossmouth logo screen.
@@ -2339,7 +2342,7 @@ end
     // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
-    // Runs before any level generation, no entities should exist at this point
+    // Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens, see PRE_LEVEL_SPAWN.
     // POST_ROOM_GENERATION
     // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
@@ -2474,16 +2477,18 @@ end
     // USER_DATA
     // Params: Entity ent
     // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
-    // PRE_UNLOAD_LEVEL
-    // Runs right before the current level is unloaded and any entities destroyed
-    // POST_UNLOAD_LEVEL
-    // Runs right after the current level has been unloaded and all entities destroyed
-    // PRE_UNLOAD_LAYER
+    // PRE_LEVEL_DESTRUCTION
+    // Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // POST_LEVEL_DESTRUCTION
+    // Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // PRE_LAYER_DESTRUCTION
     // Params: LAYER layer
-    // Runs right before a layer is unloaded and any entities there destroyed
-    // POST_UNLOAD_LAYER
+    // Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // POST_LAYER_DESTRUCTION
     // Params: LAYER layer
-    // Runs right after a layer has been unloaded and any entities there destroyed
+    // Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // PRE_LEVEL_SPAWN
+    // Runs right before the first entity in any screen is spawned. Doesn't run if the screen doesn't spawn entities. You should probably prefer PRE_LEVEL_GENERATION, but that doesn't support all level-like screens.
     */
 
     lua.create_named_table(

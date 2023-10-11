@@ -16,6 +16,8 @@
 class JournalPage;
 struct AABB;
 
+auto g_level_loaded = false;
+
 void pre_load_level_files()
 {
     LuaBackend::for_each_backend(
@@ -74,6 +76,7 @@ bool pre_load_screen()
 }
 bool pre_unload_level()
 {
+    g_level_loaded = false;
     bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
@@ -207,6 +210,17 @@ void post_tile_code_spawn(std::string_view tile_code, float x, float y, int laye
 
 Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
 {
+    if (!g_level_loaded)
+    {
+        g_level_loaded = true;
+        LuaBackend::for_each_backend(
+            [=](LuaBackend::LockedBackend backend)
+            {
+                backend->pre_spawn();
+                return true;
+            });
+    }
+
     Entity* spawned_ent{nullptr};
     LuaBackend::for_each_backend(
         [=, &spawned_ent](LuaBackend::LockedBackend backend)
