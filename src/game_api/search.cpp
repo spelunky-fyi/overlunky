@@ -2027,6 +2027,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        "ushabti_error"sv,
+        // it's one of the few calls to MessageBoxA, nagging about some Ushabti statues
+        PatternCommandBuffer{}
+            .find_inst("4c 89 e8 4c 29 e0 48 3d 20 03 00 00"_gh)
+            .offset(0x21)
+            .at_exe(),
+    },
+    {
         "hud"sv,
         // you can get the address from the render_hud (first parameter), it's global/static, so just find good refrence to it
         PatternCommandBuffer{}

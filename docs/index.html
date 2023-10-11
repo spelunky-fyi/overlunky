@@ -726,6 +726,9 @@
                             <a href="#create_image_crop" class="toc-h3 toc-link" data-title="create_image_crop">create_image_crop</a>
                           </li>
                           <li>
+                            <a href="#destroy_grid" class="toc-h3 toc-link" data-title="destroy_grid">destroy_grid</a>
+                          </li>
+                          <li>
                             <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
                           </li>
                           <li>
@@ -4588,6 +4591,13 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 <h4 id='tuple-lt-IMAGE-int-int-gt-create_image_crop-string-path-int-x-int-y-int-w-int-h'>tuple&lt;IMAGE, int, int&gt; create_image_crop(string path, int x, int y, int w, int h)</h4>
 <p>Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don&#39;t create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts</p>
+<h3 id='destroy_grid'>destroy_grid</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_grid">destroy_grid</a></p>
+</blockquote>
+<h4 id='nil-destroy_grid-int-uid'>nil destroy_grid(int uid)</h4><h4 id='nil-destroy_grid-float-x-float-y-LAYER-layer'>nil destroy_grid(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
+<p>Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes <a href="#MASK">MASK</a>.PLAYER to prevent crashes</p>
 <h3 id='disable_floor_embeds'>disable_floor_embeds</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_floor_embeds">disable_floor_embeds</a></p>
