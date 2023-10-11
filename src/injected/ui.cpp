@@ -1330,7 +1330,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
         int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
-        if (!lock_entity && set_last)
+        if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
     }
@@ -1344,7 +1344,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
         auto spawned = UI::spawn_playerghost(ana_spelunky + (rand() % 19), cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
 
-        if (!lock_entity && set_last)
+        if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
     }
@@ -1418,7 +1418,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             ent->door_type = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
             ent->platform_type = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
         }
-        if (!lock_entity && set_last)
+        if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
     }
@@ -4727,21 +4727,26 @@ void render_clickhandler()
         }
     }
 
+    static auto front_col = ImColor(0, 255, 51, 200);
+    static auto back_col = ImColor(255, 160, 31, 200);
+    static auto front_fill = ImColor(front_col);
+    front_fill.Value.w = 0.25f;
+    static auto back_fill = ImColor(back_col);
+    back_fill.Value.w = 0.25f;
     if (update_entity())
     {
-        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
+        auto this_layer = (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer) == g_entity->layer;
+        render_hitbox(g_entity, true, this_layer ? front_col : back_col);
     }
-    static auto front_col = ImColor(0, 255, 51, 100);
-    static auto back_col = ImColor(255, 160, 31, 100);
     for (auto entity : g_selected_ids)
     {
         auto ent = get_entity_ptr(entity);
         if (ent)
         {
             if (ent->layer == (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))
-                render_hitbox(ent, false, front_col, true);
+                render_hitbox(ent, false, front_fill, true);
             else
-                render_hitbox(ent, false, back_col, true);
+                render_hitbox(ent, false, back_fill, true);
         }
     }
 
