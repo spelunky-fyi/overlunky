@@ -759,3 +759,8 @@ std::pair<float, float> UI::spawn_position()
 {
     return {State::get().ptr()->level_gen->spawn_x, State::get().ptr()->level_gen->spawn_y};
 }
+
+void UI::load_death_screen()
+{
+    call_death_screen();
+}

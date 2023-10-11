@@ -86,4 +86,5 @@ class UI
     static int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer, float vx, float vy);
     static void spawn_player(uint8_t player_slot, float x, float y);
     static std::pair<float, float> spawn_position();
+    static void load_death_screen();
 };

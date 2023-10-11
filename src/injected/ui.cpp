@@ -1886,8 +1886,6 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->level_next = level;
     g_state->theme_next = theme;
     g_state->quest_flags = g_state->quest_flags | 1;
-    g_state->fadein = 1;
-    g_state->fadeout = 1;
     g_state->loading = 1;
 
     if (g_game_manager->main_menu_music)
@@ -3515,6 +3513,66 @@ const char* theme_name(int theme)
 
 void render_narnia()
 {
+    if (submenu("Other game screens"))
+    {
+        int screen = -1;
+        ImGui::PushID("WarpSpecial");
+        for (unsigned int i = 0; i < 21; ++i)
+        {
+            if ((i >= 5 && i <= 10))
+                continue;
+            if (options["menu_ui"])
+            {
+                if (ImGui::MenuItem(screen_names[i]))
+                    screen = i;
+            }
+            else
+            {
+                if (i % 2)
+                    ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+                if (ImGui::Button(screen_names[i], ImVec2(ImGui::GetContentRegionMax().x * 0.5f, 0)))
+                    screen = i;
+            }
+        }
+        endmenu();
+        if (screen != -1)
+        {
+            if (screen == 14)
+            {
+                if (g_state->screen == 11 or g_state->screen == 12)
+                    UI::load_death_screen();
+            }
+            else if (g_state->screen != 12 && screen >= 11)
+            {
+                quick_start((uint8_t)screen, 1, 1, 1);
+            }
+            else
+            {
+                g_state->screen_next = screen;
+                g_state->loading = 1;
+            }
+            if (screen >= 16 && screen <= 18)
+            {
+                g_state->win_state = 1;
+                if (!g_state->end_spaceship_character)
+                    g_state->end_spaceship_character = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
+            }
+            if (screen == 19)
+            {
+                g_state->world_next = 8;
+                g_state->level_next = 99;
+                g_state->theme_next = 10;
+                if (!g_state->level_gen->theme_cosmicocean->sub_theme)
+                    g_state->level_gen->theme_cosmicocean->sub_theme = g_state->level_gen->theme_dwelling;
+                g_state->current_theme = g_state->level_gen->theme_cosmicocean;
+                g_state->win_state = 3;
+                if (g_state->level_count < 1)
+                    g_state->level_count = 1;
+            }
+        }
+        ImGui::PopID();
+    }
+
     ImGui::Text("Next level");
     ImGui::SameLine(100.0f);
 
