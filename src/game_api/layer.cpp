@@ -9,6 +9,7 @@
 #include "entity.hpp"          // for Entity, to_id, EntityDB, entity_factory
 #include "logger.h"            // for DEBUG
 #include "movable.hpp"         // for Movable
+#include "rpc.hpp"             //
 #include "search.hpp"          // for get_address
 #include "state.hpp"           // for State, StateMemory
 
