@@ -699,10 +699,11 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
-        if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor
+        if (sf & 0x100)
         {
-            ent->destroy();
-            update_liquid_collision_at(x, y, false);
+            if (test_flag(ent->flags, 3)) // solid floor
+                update_liquid_collision_at(x, y, false);
+            destroy_grid(ent->uid);
         }
         else if (ent->is_liquid())
         {

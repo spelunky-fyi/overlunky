@@ -1234,6 +1234,7 @@ void smart_delete(Entity* ent, bool unsafe = false)
 {
     static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
+    UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
         auto pos = ent->position();
@@ -1245,14 +1246,9 @@ void smart_delete(Entity* ent, bool unsafe = false)
         auto pos = ent->position();
         auto layer = (LAYER)ent->layer;
         ENT_TYPE type = ent->type->id;
-        Callback cb = {g_state->time_total + 1, [pos, layer, type]
-                       {
-                           fix_decorations_at(std::round(pos.first), std::round(pos.second), layer);
-                           UI::cleanup_at(std::round(pos.first), std::round(pos.second), layer, type);
-                       }};
-        callbacks.push_back(cb);
+        fix_decorations_at(std::round(pos.first), std::round(pos.second), layer);
+        UI::cleanup_at(std::round(pos.first), std::round(pos.second), layer, type);
     }
-    UI::safe_destroy(ent, unsafe);
 }
 
 void reset_windows()
