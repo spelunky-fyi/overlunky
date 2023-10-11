@@ -35,6 +35,10 @@ void UI::godmode_companions(bool g)
 {
     State::get().godmode_companions(g);
 }
+void UI::death_enabled(bool g)
+{
+    set_death_enabled(g);
+}
 std::pair<float, float> UI::click_position(float x, float y)
 {
     return State::click_position(x, y);

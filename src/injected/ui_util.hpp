@@ -37,6 +37,7 @@ class UI
   public:
     static void godmode(bool g);
     static void godmode_companions(bool g);
+    static void death_enabled(bool g);
     static std::pair<float, float> click_position(float x, float y);
     static void zoom(float level);
     static uint32_t get_frame_count();

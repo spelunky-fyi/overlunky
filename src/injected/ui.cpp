@@ -213,6 +213,7 @@ std::map<std::string, int64_t> default_keys{
     {"speedhack_turbo", VK_PRIOR},
     {"speedhack_slow", VK_NEXT},
     {"toggle_uncapped_fps", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
+    {"respawn", OL_KEY_CTRL | 'R'},
     //{ "", 0x },
 };
 
@@ -267,7 +268,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, pause_updates = true;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, pause_updates = true, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -2290,6 +2291,44 @@ void warp_next_level(size_t num)
     }
 }
 
+void respawn()
+{
+    if (g_state->screen != 11 && g_state->screen != 12)
+    {
+        if (g_state->screen > 11)
+        {
+            quick_start(12, g_state->world_start, g_state->level_start, g_state->theme_start);
+        }
+        else
+        {
+            quick_start(12, 1, 1, 1);
+        }
+        return;
+    }
+    for (int8_t i = 0; i < 4; ++i)
+    {
+        auto found = false;
+        for (auto p : UI::get_players())
+        {
+            if (p->inventory_ptr->player_slot == i)
+            {
+                found = true;
+                if (p->health == 0 || test_flag(p->flags, 29))
+                {
+                    p->health = 4;
+                    p->flags = clr_flag(p->flags, 29);
+                    p->set_behavior(1);
+                }
+            }
+        }
+        if (!found)
+        {
+            g_state->items->player_inventories[i].health = 4;
+            UI::spawn_player(i, g_state->level_gen->spawn_x, g_state->level_gen->spawn_y);
+        }
+    }
+}
+
 bool pressed(std::string keyname, WPARAM wParam)
 {
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
@@ -2852,6 +2891,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         else
             g_engine_fps = 0;
         update_frametimes();
+    }
+    else if (pressed("respawn", wParam))
+    {
+        respawn();
     }
     else if (pressed("toggle_godmode", wParam))
     {
@@ -5524,6 +5567,11 @@ void render_options()
             UI::godmode_companions(options["god_mode_companions"]);
         }
         tooltip("Make the hired hands completely deathproof.");
+        if (ImGui::Checkbox("Disable death screen##NoDeath", &death_disable))
+        {
+            UI::death_enabled(!death_disable);
+        }
+        tooltip("Disable the death screen from popping up for any reason.");
         if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
         {
             toggle_noclip();
@@ -7988,6 +8036,8 @@ void render_game_props()
     }
     if (submenu("Players"))
     {
+        if (ImGui::MenuItem("Respawn dead players"))
+            respawn();
         ImGui::TextWrapped("New players spawned here can't be controlled, but can be used to test some things that require multiple players.");
         if (ImGui::SliderScalar("Number of players##SetNumPlayers", ImGuiDataType_U8, &g_state->items->player_count, &u8_one, &u8_four, "%d", ImGuiSliderFlags_AlwaysClamp))
         {
