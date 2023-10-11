@@ -2044,9 +2044,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "init_layer"sv,
-        // called a lot from the load_screen function
+        // TODO
         PatternCommandBuffer{}
             .from_exe_base(0x228b58f0),
+    },
+    {
+        "dead_players"sv,
+        // TODO
+        PatternCommandBuffer{}
+            .from_exe_base(0x22c061d0),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

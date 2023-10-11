@@ -2186,3 +2186,19 @@ void create_level()
     create_layer(0);
     create_layer(1);
 }
+
+void set_death_enabled(bool enable)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("dead_players");
+    }
+    if (offset != 0)
+    {
+        if (!enable)
+            write_mem_recoverable("death_disable", offset, "\xC3\x90"sv, true);
+        else
+            recover_mem("death_disable");
+    }
+}

@@ -2106,6 +2106,9 @@ end
     /// Initializes an empty layer that doesn't currently exist.
     lua["create_layer"] = create_layer;
 
+    /// Setting to false disables the death screen from popping up for any usual reason, can still load manually
+    lua["set_death_enabled"] = set_death_enabled;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
