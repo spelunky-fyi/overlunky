@@ -452,7 +452,7 @@ Make `mount_uid` carry `rider_uid` on their back. Only use this with actual moun
 
 > Search script examples for [change_waddler_drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_waddler_drop)
 
-#### nil change_waddler_drop(vector<[ENT_TYPE](#ENT_TYPE)> ent_types)
+#### nil change_waddler_drop(array<[ENT_TYPE](#ENT_TYPE)> ent_types)
 
 Change [ENT_TYPE](#ENT_TYPE)'s spawned when [Waddler](#Waddler) dies, by default there are 3:<br/>
 {ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}<br/>
@@ -482,7 +482,7 @@ Calls the enter door function, position doesn't matter, can also enter closed do
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-#### vector&lt;int&gt; entity_get_items_by(int uid, vector<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
+#### vector&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
 
 #### vector&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, int mask)
 
@@ -493,7 +493,7 @@ Gets uids of entities attached to given entity uid. Use `entity_type` and `mask`
 
 > Search script examples for [entity_has_item_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_has_item_type)
 
-#### bool entity_has_item_type(int uid, vector<[ENT_TYPE](#ENT_TYPE)> entity_types)
+#### bool entity_has_item_type(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types)
 
 #### bool entity_has_item_type(int uid, [ENT_TYPE](#ENT_TYPE) entity_type)
 
@@ -558,7 +558,7 @@ Get door target `world`, `level`, `theme`
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-#### vector&lt;int&gt; get_entities_at(vector<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
+#### vector&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
 #### vector&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
@@ -581,7 +581,7 @@ end
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-#### vector&lt;int&gt; get_entities_by(vector<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
 
 #### vector&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [LAYER](#LAYER) layer)
 
@@ -616,7 +616,7 @@ This function can be slower than the [get_entities_by](#get_entities_by) with th
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-#### vector&lt;int&gt; get_entities_overlapping_hitbox(vector<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
 #### vector&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
@@ -2623,7 +2623,7 @@ Adding other entities will result in not obtainable items or game crash
 
 > Search script examples for [change_diceshop_prizes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_diceshop_prizes)
 
-#### nil change_diceshop_prizes(vector<[ENT_TYPE](#ENT_TYPE)> ent_types)
+#### nil change_diceshop_prizes(array<[ENT_TYPE](#ENT_TYPE)> ent_types)
 
 Change [ENT_TYPE](#ENT_TYPE)'s spawned in dice shops (Madame Tusk as well), by default there are 25:<br/>
 {ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
@@ -2717,7 +2717,7 @@ Gets an existing sound, either if a file at the same path was already loaded or 
 
 > Search script examples for [change_altar_damage_spawns](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_altar_damage_spawns)
 
-#### nil change_altar_damage_spawns(vector<[ENT_TYPE](#ENT_TYPE)> ent_types)
+#### nil change_altar_damage_spawns(array<[ENT_TYPE](#ENT_TYPE)> ent_types)
 
 Change [ENT_TYPE](#ENT_TYPE)'s spawned when you damage the altar, by default there are 6:<br/>
 {MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}<br/>
@@ -2729,7 +2729,7 @@ Use empty table as argument to reset to the game default
 
 > Search script examples for [change_sunchallenge_spawns](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=change_sunchallenge_spawns)
 
-#### nil change_sunchallenge_spawns(vector<[ENT_TYPE](#ENT_TYPE)> ent_types)
+#### nil change_sunchallenge_spawns(array<[ENT_TYPE](#ENT_TYPE)> ent_types)
 
 Change [ENT_TYPE](#ENT_TYPE)'s spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:<br/>
 {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
@@ -3449,7 +3449,7 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### vector&lt;int&gt; get_entities_overlapping(vector<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 
 #### vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 

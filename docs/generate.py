@@ -129,7 +129,7 @@ def format_af(lf, af):
     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
     ret = link_custom_type(ret)
     name = lf["name"]
-    param = replace_all(af["param"])
+    param = replace_all(af["param"]).replace("vector<", "array<")
     param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
     return fun
@@ -717,7 +717,7 @@ Type | Name | Description
                             ret = replace_all(m.group(1)) or "nil"
                             name = m.group(2)
                             if m.group(3):
-                                param = replace_all(m.group(3).strip()) + ")"
+                                param = replace_all(m.group(3).strip()).replace("vector<", "array<") + ")"
                             signature = name + param
                     signature = signature.strip()
                     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
