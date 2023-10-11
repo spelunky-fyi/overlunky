@@ -2042,7 +2042,12 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
-
+    {
+        "init_layer"sv,
+        // called a lot from the load_screen function
+        PatternCommandBuffer{}
+            .from_exe_base(0x228b58f0),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

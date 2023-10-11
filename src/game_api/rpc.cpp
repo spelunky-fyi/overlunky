@@ -2164,3 +2164,25 @@ void destroy_level()
     destroy_layer(0);
     destroy_layer(1);
 }
+
+void create_layer(uint8_t layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("init_layer");
+    }
+    if (offset != 0)
+    {
+        auto* layer_ptr = State::get().layer(layer);
+        typedef void init_func(Layer*);
+        static init_func* ilf = (init_func*)(offset);
+        ilf(layer_ptr);
+    }
+}
+
+void create_level()
+{
+    create_layer(0);
+    create_layer(1);
+}

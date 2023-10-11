@@ -2094,11 +2094,17 @@ end
     /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
     lua["get_frametime_unfocused"] = get_frametime_inactive;
 
-    /// Destroys all layers and all entities in the level. Probably a bad idea.
+    /// Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
     lua["destroy_level"] = destroy_level;
 
-    /// Destroys a layer and all entities in it. No idea where you would need this either.
+    /// Destroys a layer and all entities in it.
     lua["destroy_layer"] = destroy_layer;
+
+    /// Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+    lua["create_level"] = create_level;
+
+    /// Initializes an empty layer that doesn't currently exist.
+    lua["create_layer"] = create_layer;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
@@ -2255,6 +2261,14 @@ end
         ON::POST_UPDATE,
         "USER_DATA",
         ON::USER_DATA,
+        "PRE_LEVEL_CREATION",
+        ON::PRE_LEVEL_CREATION,
+        "POST_LEVEL_CREATION",
+        ON::POST_LEVEL_CREATION,
+        "PRE_LAYER_CREATION",
+        ON::PRE_LAYER_CREATION,
+        "POST_LAYER_CREATION",
+        ON::POST_LAYER_CREATION,
         "PRE_LEVEL_DESTRUCTION",
         ON::PRE_LEVEL_DESTRUCTION,
         "POST_LEVEL_DESTRUCTION",
@@ -2262,9 +2276,7 @@ end
         "PRE_LAYER_DESTRUCTION",
         ON::PRE_LAYER_DESTRUCTION,
         "POST_LAYER_DESTRUCTION",
-        ON::POST_LAYER_DESTRUCTION,
-        "PRE_LEVEL_SPAWN",
-        ON::PRE_LEVEL_SPAWN);
+        ON::POST_LAYER_DESTRUCTION);
 
     /* ON
     // LOGO
@@ -2342,7 +2354,7 @@ end
     // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
-    // Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens, see PRE_LEVEL_SPAWN.
+    // Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.
     // POST_ROOM_GENERATION
     // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
@@ -2477,6 +2489,16 @@ end
     // USER_DATA
     // Params: Entity ent
     // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
+    // PRE_LEVEL_CREATION
+    // Runs right before the front layer is created. Runs in all screens that usually have entities, or when creating a layer manually.
+    // POST_LEVEL_CREATION
+    // Runs right after the back layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.
+    // PRE_LAYER_CREATION
+    // Params: LAYER layer
+    // Runs right before a layer is created. Runs in all screens that usually have entities, or when creating a layer manually.
+    // POST_LAYER_CREATION
+    // Params: LAYER layer
+    // Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.
     // PRE_LEVEL_DESTRUCTION
     // Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
     // POST_LEVEL_DESTRUCTION
@@ -2487,8 +2509,6 @@ end
     // POST_LAYER_DESTRUCTION
     // Params: LAYER layer
     // Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
-    // PRE_LEVEL_SPAWN
-    // Runs right before the first entity in any screen is spawned. Doesn't run if the screen doesn't spawn entities. You should probably prefer PRE_LEVEL_GENERATION, but that doesn't support all level-like screens.
     */
 
     lua.create_named_table(

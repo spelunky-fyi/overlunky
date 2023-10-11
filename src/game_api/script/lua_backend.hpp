@@ -120,11 +120,14 @@ enum class ON
     PRE_UPDATE,
     POST_UPDATE,
     USER_DATA,
+    PRE_LEVEL_CREATION,
+    POST_LEVEL_CREATION,
+    PRE_LAYER_CREATION,
+    POST_LAYER_CREATION,
     PRE_LEVEL_DESTRUCTION,
     POST_LEVEL_DESTRUCTION,
     PRE_LAYER_DESTRUCTION,
     POST_LAYER_DESTRUCTION,
-    PRE_LEVEL_SPAWN,
 };
 
 struct IntOption
@@ -365,14 +368,18 @@ class LuaBackend
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 
     void pre_load_level_files();
-    void pre_level_generation();
+    bool pre_level_generation();
     bool pre_load_screen();
+    bool pre_init_level();
+    bool pre_init_layer(LAYER layer);
     bool pre_unload_level();
     bool pre_unload_layer(LAYER layer);
 
     void post_room_generation();
     void post_level_generation();
     void post_load_screen();
+    void post_init_level();
+    void post_init_layer(LAYER layer);
     void post_unload_level();
     void post_unload_layer(LAYER layer);
 
@@ -390,7 +397,6 @@ class LuaBackend
 
     Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags);
     void post_entity_spawn(Entity* entity, int spawn_type_flags);
-    void pre_spawn();
 
     bool pre_entity_instagib(Entity* victim);
 

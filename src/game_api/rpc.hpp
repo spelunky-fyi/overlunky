@@ -152,3 +152,5 @@ void set_frametime_inactive(std::optional<double> frametime);
 std::optional<double> get_frametime_inactive();
 void destroy_layer(uint8_t layer);
 void destroy_level();
+void create_layer(uint8_t layer);
+void create_level();

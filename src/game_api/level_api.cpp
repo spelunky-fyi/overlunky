@@ -826,7 +826,8 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
     g_CustomShopTypes[0] = {};
     g_CustomShopTypes[1] = {};
 
-    pre_level_generation();
+    if (pre_level_generation())
+        return;
     g_level_gen_trampoline(level_gen_sys, param_2, param_3);
     post_level_generation();
 
@@ -868,6 +869,19 @@ void unload_layer(Layer* layer)
     post_unload_layer((LAYER)layer->is_back_layer);
     if (layer->is_back_layer)
         post_unload_level();
+}
+
+using InitLayerFun = void(Layer*);
+InitLayerFun* g_init_layer_trampoline{nullptr};
+void load_layer(Layer* layer)
+{
+    if (!layer->is_back_layer)
+        pre_init_level();
+    pre_init_layer((LAYER)layer->is_back_layer);
+    g_init_layer_trampoline(layer);
+    post_init_layer((LAYER)layer->is_back_layer);
+    if (layer->is_back_layer)
+        post_init_level();
 }
 
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
@@ -1485,6 +1499,7 @@ void LevelGenData::init()
 
         g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_func"sv);
         g_unload_layer_trampoline = (UnloadLayerFun*)get_address("unload_layer"sv);
+        g_init_layer_trampoline = (InitLayerFun*)get_address("init_layer"sv);
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
@@ -1501,6 +1516,7 @@ void LevelGenData::init()
 
         DetourAttach((void**)&g_load_screen_trampoline, load_screen);
         DetourAttach((void**)&g_unload_layer_trampoline, unload_layer);
+        DetourAttach((void**)&g_init_layer_trampoline, load_layer);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)

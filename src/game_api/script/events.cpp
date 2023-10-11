@@ -27,14 +27,16 @@ void pre_load_level_files()
             return true;
         });
 }
-void pre_level_generation()
+bool pre_level_generation()
 {
+    bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->pre_level_generation();
-            return true;
+            block = backend->pre_level_generation();
+            return !block;
         });
+    return block;
 }
 bool pre_load_screen()
 {
@@ -76,7 +78,6 @@ bool pre_load_screen()
 }
 bool pre_unload_level()
 {
-    g_level_loaded = false;
     bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
@@ -84,6 +85,21 @@ bool pre_unload_level()
             block = backend->pre_unload_level();
             return !block;
         });
+    if (!block)
+        g_level_loaded = false;
+    return block;
+}
+bool pre_init_level()
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_init_level();
+            return !block;
+        });
+    if (!block)
+        g_level_loaded = true;
     return block;
 }
 bool pre_unload_layer(LAYER layer)
@@ -93,6 +109,17 @@ bool pre_unload_layer(LAYER layer)
         [&](LuaBackend::LockedBackend backend)
         {
             block = backend->pre_unload_layer(layer);
+            return !block;
+        });
+    return block;
+}
+bool pre_init_layer(LAYER layer)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_init_layer(layer);
             return !block;
         });
     return block;
@@ -113,6 +140,24 @@ void post_level_generation()
         [&](LuaBackend::LockedBackend backend)
         {
             backend->post_level_generation();
+            return true;
+        });
+}
+void post_init_layer(LAYER layer)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_init_layer(layer);
+            return true;
+        });
+}
+void post_init_level()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_init_level();
             return true;
         });
 }
@@ -210,17 +255,6 @@ void post_tile_code_spawn(std::string_view tile_code, float x, float y, int laye
 
 Entity* pre_entity_spawn(std::uint32_t entity_type, float x, float y, int layer, Entity* overlay, int spawn_type_flags)
 {
-    if (!g_level_loaded)
-    {
-        g_level_loaded = true;
-        LuaBackend::for_each_backend(
-            [=](LuaBackend::LockedBackend backend)
-            {
-                backend->pre_spawn();
-                return true;
-            });
-    }
-
     Entity* spawned_ent{nullptr};
     LuaBackend::for_each_backend(
         [=, &spawned_ent](LuaBackend::LockedBackend backend)

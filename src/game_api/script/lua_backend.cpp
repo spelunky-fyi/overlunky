@@ -751,10 +751,10 @@ void LuaBackend::pre_load_level_files()
         }
     }
 }
-void LuaBackend::pre_level_generation()
+bool LuaBackend::pre_level_generation()
 {
     if (!get_enabled())
-        return;
+        return false;
 
     auto now = get_frame_count();
 
@@ -766,11 +766,62 @@ void LuaBackend::pre_level_generation()
         if (callback.screen == ON::PRE_LEVEL_GENERATION)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func);
+            auto return_value = handle_function<bool>(this, callback.func).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
+            if (return_value)
+                return return_value;
         }
     }
+    return false;
+}
+bool LuaBackend::pre_init_level()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LEVEL_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+    return false;
+}
+bool LuaBackend::pre_init_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LAYER_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func, layer).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+    return false;
 }
 bool LuaBackend::pre_load_screen()
 {
@@ -1008,6 +1059,48 @@ void LuaBackend::post_level_generation()
         }
     }
 }
+void LuaBackend::post_init_level()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LEVEL_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_init_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LAYER_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, layer);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::post_load_screen()
 {
     if (!get_enabled())
@@ -1205,28 +1298,6 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
                 handle_function<void>(this, callback.func, entity, spawn_type_flags);
                 clear_current_callback();
             }
-        }
-    }
-}
-
-void LuaBackend::pre_spawn()
-{
-    if (!get_enabled())
-        return;
-
-    auto now = get_frame_count();
-
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == ON::PRE_LEVEL_SPAWN)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func);
-            clear_current_callback();
-            callback.lastRan = now;
         }
     }
 }
