@@ -908,6 +908,16 @@ bool LuaConsole::pre_draw()
                 {
                     set_enabled(false);
                 }
+                else if (console_input == "safe"sv)
+                {
+                    hide_unsafe_libraries(lua);
+                    unsafe = false;
+                }
+                else if (console_input == "unsafe"sv)
+                {
+                    expose_unsafe_libraries(lua);
+                    unsafe = true;
+                }
                 else
                 {
                     std::size_t messages_before = messages.size();
@@ -971,7 +981,7 @@ bool LuaConsole::get_enabled() const
 }
 bool LuaConsole::get_unsafe() const
 {
-    return true;
+    return unsafe;
 }
 const char* LuaConsole::get_name() const
 {

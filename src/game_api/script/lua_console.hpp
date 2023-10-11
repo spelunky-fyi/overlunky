@@ -35,6 +35,7 @@ class LuaConsole : public LockableLuaBackend<LuaConsole>
 
     bool toggled{false};
     bool enabled{true};
+    bool unsafe{true};
     bool set_focus{false};
     bool scroll_to_bottom{false};
     std::optional<size_t> set_scroll_to_history_item;

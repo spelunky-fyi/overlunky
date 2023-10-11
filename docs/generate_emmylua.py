@@ -184,7 +184,9 @@ def main():
     gu.setup_stdout("game_data/spel2.lua")
 
     print(
-        """---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias,duplicate-set-field
+        """---@meta
+---@diagnostic disable: duplicate-doc-alias
+
 ---@class Meta
 ---@field name string
 ---@field version string

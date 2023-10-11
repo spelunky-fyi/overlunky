@@ -325,6 +325,12 @@
             <a href="#Lua-libraries" class="toc-h1 toc-link" data-title="Lua libraries">Lua libraries</a>
               <ul class="toc-list-h2">
                   <li>
+                    <a href="#io" class="toc-h2 toc-link" data-title="io">io</a>
+                  </li>
+                  <li>
+                    <a href="#os" class="toc-h2 toc-link" data-title="os">os</a>
+                  </li>
+                  <li>
                     <a href="#math" class="toc-h2 toc-link" data-title="math">math</a>
                   </li>
                   <li>
@@ -720,6 +726,9 @@
                             <a href="#create_image_crop" class="toc-h3 toc-link" data-title="create_image_crop">create_image_crop</a>
                           </li>
                           <li>
+                            <a href="#destroy_grid" class="toc-h3 toc-link" data-title="destroy_grid">destroy_grid</a>
+                          </li>
+                          <li>
                             <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
                           </li>
                           <li>
@@ -736,6 +745,12 @@
                           </li>
                           <li>
                             <a href="#get_frame" class="toc-h3 toc-link" data-title="get_frame">get_frame</a>
+                          </li>
+                          <li>
+                            <a href="#get_frametime" class="toc-h3 toc-link" data-title="get_frametime">get_frametime</a>
+                          </li>
+                          <li>
+                            <a href="#get_frametime_unfocused" class="toc-h3 toc-link" data-title="get_frametime_unfocused">get_frametime_unfocused</a>
                           </li>
                           <li>
                             <a href="#get_id" class="toc-h3 toc-link" data-title="get_id">get_id</a>
@@ -789,6 +804,9 @@
                             <a href="#list_char_mods" class="toc-h3 toc-link" data-title="list_char_mods">list_char_mods</a>
                           </li>
                           <li>
+                            <a href="#list_data_dir" class="toc-h3 toc-link" data-title="list_data_dir">list_data_dir</a>
+                          </li>
+                          <li>
                             <a href="#list_dir" class="toc-h3 toc-link" data-title="list_dir">list_dir</a>
                           </li>
                           <li>
@@ -834,6 +852,12 @@
                             <a href="#set_ending_unlock" class="toc-h3 toc-link" data-title="set_ending_unlock">set_ending_unlock</a>
                           </li>
                           <li>
+                            <a href="#set_frametime" class="toc-h3 toc-link" data-title="set_frametime">set_frametime</a>
+                          </li>
+                          <li>
+                            <a href="#set_frametime_unfocused" class="toc-h3 toc-link" data-title="set_frametime_unfocused">set_frametime_unfocused</a>
+                          </li>
+                          <li>
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
@@ -868,6 +892,9 @@
                           </li>
                           <li>
                             <a href="#update_liquid_collision_at" class="toc-h3 toc-link" data-title="update_liquid_collision_at">update_liquid_collision_at</a>
+                          </li>
+                          <li>
+                            <a href="#update_state" class="toc-h3 toc-link" data-title="update_state">update_state</a>
                           </li>
                           <li>
                             <a href="#warp" class="toc-h3 toc-link" data-title="warp">warp</a>
@@ -3611,6 +3638,49 @@
 <p>If you use a text editor/IDE that has a Lua linter available you can download <a href="https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua">spel2.lua</a>, place it in a folder of your choice and specify that folder as a &quot;external function library&quot;. For example <a href="https://code.visualstudio.com/">VSCode</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=sumneko.lua">Lua Extension</a> offers this feature. This will allow you to get auto-completion of API functions along with linting</p>
 <h1 id='Lua-libraries'>Lua libraries</h1>
 <p>The following Lua libraries and their functions are available. You can read more about them in the <a href="https://www.lua.org/manual/5.4/manual.html#6">Lua documentation</a>. We&#39;re using Lua 5.4 with the <a href="https://sol2.readthedocs.io/en/latest/">Sol C++ binding</a>.</p>
+<h2 id='io'>io</h2><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Write a data file</span>
+<span class="c1">-- Data will be written to Mods/Data/[scriptname.lua or Mod Name]/timestamp.txt</span>
+<span class="kd">local</span> <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">open_data</span><span class="p">(</span><span class="nb">tostring</span><span class="p">(</span><span class="nb">os.time</span><span class="p">())</span> <span class="o">..</span> <span class="s2">".txt"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">f</span> <span class="k">then</span>
+    <span class="n">f</span><span class="p">:</span><span class="n">write</span><span class="p">(</span><span class="s2">"hello world at "</span> <span class="o">..</span> <span class="nb">os.date</span><span class="p">())</span>
+    <span class="n">f</span><span class="p">:</span><span class="n">close</span><span class="p">()</span>
+<span class="k">end</span>
+
+<span class="c1">-- List all files in data dir and read them out</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">v</span> <span class="k">in</span> <span class="nb">pairs</span><span class="p">(</span><span class="n">list_data_dir</span><span class="p">())</span> <span class="k">do</span>
+    <span class="kd">local</span> <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="n">open_data</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">f</span> <span class="k">then</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">v</span> <span class="o">..</span> <span class="s2">": "</span> <span class="o">..</span> <span class="n">f</span><span class="p">:</span><span class="n">read</span><span class="p">(</span><span class="s2">"a"</span><span class="p">))</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+</code></pre></div>
+<p><code>meta.unsafe</code> exposes all <a href="https://www.lua.org/manual/5.4/manual.html#6.8">standard library functions</a> and removes basedir restrictions from the custom functions.</p>
+
+<p>In safe mode (default) the following standard and custom functions are available:</p>
+
+<ul>
+<li><code>io.type</code></li>
+<li><code>io.open_data</code>: like <code>io.open</code> but restricted to base directory <code>Mods/Data/modname</code></li>
+<li><code>io.open_mod</code>: like <code>io.open</code> but restricted to the mod directory</li>
+</ul>
+
+<p>Safely opened files can be used normally through the <code>file:</code> handle. Files and folders opened in write mode are automatically created.</p>
+
+<p>Also see <a href="#list_dir">list_dir</a> and <a href="#list_data_dir">list_data_dir</a>.</p>
+<h2 id='os'>os</h2>
+<p><code>meta.unsafe</code> exposes all <a href="https://www.lua.org/manual/5.4/manual.html#6.9">standard library functions</a> and removes basedir restrictions from the custom functions.</p>
+
+<p>In safe mode (default) the following standard and custom functions are available:</p>
+
+<ul>
+<li><code>os.clock</code></li>
+<li><code>os.date</code></li>
+<li><code>os.difftime</code></li>
+<li><code>os.time</code></li>
+<li><code>os.remove_data</code>: like <code>os.remove</code> but restricted to base directory <code>Mods/Data/modname</code></li>
+<li><code>os.remove_mod</code>: like <code>os.remove</code> but restricted to the mod directory</li>
+</ul>
 <h2 id='math'>math</h2><h2 id='base'>base</h2><h2 id='string'>string</h2><h2 id='table'>table</h2><h2 id='coroutine'>coroutine</h2><h2 id='package'>package</h2><h2 id='json'>json</h2>
 <p>To save data in your mod it makes a lot of sense to use <code>json</code> to encode a table into a string and decode strings to table. For example this code that saves table and loads it back:</p>
 <div class="highlight"><pre class="highlight lua tab-lua"><code><span class="kd">local</span> <span class="n">some_mod_data_that_should_be_saved</span> <span class="o">=</span> <span class="p">{{</span>
@@ -3662,7 +3732,7 @@
     <span class="n">message</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre></div><h1 id='Unsafe-mode'>Unsafe mode</h1>
-<p>Setting <code>meta.unsafe = true</code> enables the rest of the standard Lua libraries like <code>io</code> and <code>os</code>, loading dlls with require and <code>package.loadlib</code>. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.</p>
+<p>Setting <code>meta.unsafe = true</code> enables the rest of the standard Lua libraries like unrestricted <code>io</code> and <code>os</code>, loading dlls with require and <code>package.loadlib</code>. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.</p>
 <h1 id='Modules'>Modules</h1>
 <p>You can load modules with <code>require &quot;mymod&quot;</code> or <code>require &quot;mydir.mymod&quot;</code>, just put <code>mymod.lua</code> in the same directory the script is, or in <code>mydir/</code> to keep things organized.</p>
 
@@ -4315,7 +4385,9 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_olmec_cutscene_enabled">set_olmec_cutscene_enabled</a></p>
 </blockquote>
-<h4 id='nil-set_olmec_cutscene_enabled-bool-enable'>nil set_olmec_cutscene_enabled(bool enable)</h4><h3 id='set_olmec_phase_y_level'>set_olmec_phase_y_level</h3>
+<h4 id='nil-set_olmec_cutscene_enabled-bool-enable'>nil set_olmec_cutscene_enabled(bool enable)</h4>
+<p><a href="#Olmec">Olmec</a> cutscene moves <a href="#Olmec">Olmec</a> and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and <a href="#Olmec">Olmec</a> will spawn on even ground. More useful for level gen mods, where the cutscene doesn&#39;t make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with <a href="#Olmec">Olmec</a> in the hole.</p>
+<h3 id='set_olmec_phase_y_level'>set_olmec_phase_y_level</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_olmec_phase_y_level">set_olmec_phase_y_level</a></p>
 </blockquote>
@@ -4477,7 +4549,7 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 </blockquote>
 <h4 id='nil-activate_crush_elevator_hack-bool-activate'>nil activate_crush_elevator_hack(bool activate)</h4>
 <p>Activate custom variables for speed and y coordinate limit for crushing elevator
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#CrushElevator">CrushElevator</a> entity, recommending <code>set_post_entity_spawn</code>
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#CrushElevator">CrushElevator</a> entity, recommending set_post_entity_spawn
 default game values are: speed = 0.0125, y_limit = 98.5</p>
 <h3 id='activate_hundun_hack'>activate_hundun_hack</h3>
 <blockquote>
@@ -4485,7 +4557,7 @@ default game values are: speed = 0.0125, y_limit = 98.5</p>
 </blockquote>
 <h4 id='nil-activate_hundun_hack-bool-activate'>nil activate_hundun_hack(bool activate)</h4>
 <p>Activate custom variables for y coordinate limit for hundun and spawn of it&#39;s heads
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Hundun">Hundun</a> entity, recommending <code>set_post_entity_spawn</code>
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Hundun">Hundun</a> entity, recommending set_post_entity_spawn
 default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71</p>
 <h3 id='change_poison_timer'>change_poison_timer</h3>
 <blockquote>
@@ -4519,6 +4591,13 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 <h4 id='tuple-lt-IMAGE-int-int-gt-create_image_crop-string-path-int-x-int-y-int-w-int-h'>tuple&lt;IMAGE, int, int&gt; create_image_crop(string path, int x, int y, int w, int h)</h4>
 <p>Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don&#39;t create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts</p>
+<h3 id='destroy_grid'>destroy_grid</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_grid">destroy_grid</a></p>
+</blockquote>
+<h4 id='nil-destroy_grid-int-uid'>nil destroy_grid(int uid)</h4><h4 id='nil-destroy_grid-float-x-float-y-LAYER-layer'>nil destroy_grid(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
+<p>Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes <a href="#MASK">MASK</a>.PLAYER to prevent crashes</p>
 <h3 id='disable_floor_embeds'>disable_floor_embeds</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_floor_embeds">disable_floor_embeds</a></p>
@@ -4555,6 +4634,18 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 </blockquote>
 <h4 id='int-get_frame'>int get_frame()</h4>
 <p>Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.</p>
+<h3 id='get_frametime'>get_frametime</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime">get_frametime</a></p>
+</blockquote>
+<h4 id='optional-lt-double-gt-get_frametime'>optional&lt;double&gt; get_frametime()</h4>
+<p>Get engine target frametime (1/framerate, default 1/60).</p>
+<h3 id='get_frametime_unfocused'>get_frametime_unfocused</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime_unfocused">get_frametime_unfocused</a></p>
+</blockquote>
+<h4 id='optional-lt-double-gt-get_frametime_unfocused'>optional&lt;double&gt; get_frametime_unfocused()</h4>
+<p>Get engine target frametime when game is unfocused (1/framerate, default 1/33).</p>
 <h3 id='get_id'>get_id</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_id">get_id</a></p>
@@ -4666,11 +4757,17 @@ The callback signature is nil on_data(string response, string error)</p>
 </blockquote>
 <h4 id='nil-list_char_mods'>nil list_char_mods()</h4>
 <p>List all char.png files recursively from Mods/Packs. Returns table of file paths.</p>
+<h3 id='list_data_dir'>list_data_dir</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_data_dir">list_data_dir</a></p>
+</blockquote>
+<h4 id='nil-list_data_dir-optional-dir'>nil list_data_dir(optional<string> dir)</h4>
+<p>List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.</p>
 <h3 id='list_dir'>list_dir</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_dir">list_dir</a></p>
 </blockquote>
-<h4 id='nil-list_dir-string-dir'>nil list_dir(string dir)</h4>
+<h4 id='nil-list_dir-optional-dir'>nil list_dir(optional<string> dir)</h4>
 <p>List files in directory relative to the script root. Returns table of file/directory names or nil if not found.</p>
 <h3 id='load_death_screen'>load_death_screen</h3>
 <blockquote>
@@ -4771,6 +4868,18 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_ending_unlock-ENT_TYPE-type'>nil set_ending_unlock(<a href="#ENT_TYPE">ENT_TYPE</a> type)</h4>
 <p>Force the character unlocked in either ending to <a href="#ENT_TYPE">ENT_TYPE</a>. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)</p>
+<h3 id='set_frametime'>set_frametime</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_frametime">set_frametime</a></p>
+</blockquote>
+<h4 id='nil-set_frametime-optional-frametime'>nil set_frametime(optional<double> frametime)</h4>
+<p>Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.</p>
+<h3 id='set_frametime_unfocused'>set_frametime_unfocused</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_frametime_unfocused">set_frametime_unfocused</a></p>
+</blockquote>
+<h4 id='nil-set_frametime_unfocused-optional-frametime'>nil set_frametime_unfocused(optional<double> frametime)</h4>
+<p>Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.</p>
 <h3 id='set_journal_enabled'>set_journal_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_journal_enabled">set_journal_enabled</a></p>
@@ -4864,8 +4973,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_tiamat_cutscene_enabled">set_tiamat_cutscene_enabled</a></p>
 </blockquote>
 <h4 id='nil-set_tiamat_cutscene_enabled-bool-enable'>nil set_tiamat_cutscene_enabled(bool enable)</h4>
-<p><a href="#Tiamat">Tiamat</a> cutscene is also responsible for locking the exit door
-So you may need to close it yourself if you still want to be required to kill <a href="#Tiamat">Tiamat</a></p>
+<p><a href="#Tiamat">Tiamat</a> cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want <a href="#Tiamat">Tiamat</a> kill to be required</p>
 <h3 id='show_journal'>show_journal</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=show_journal">show_journal</a></p>
@@ -4898,6 +5006,12 @@ So you may need to close it yourself if you still want to be required to kill <a
 </blockquote>
 <h4 id='nil-update_liquid_collision_at-float-x-float-y-bool-add'>nil update_liquid_collision_at(float x, float y, bool add)</h4>
 <p>Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one</p>
+<h3 id='update_state'>update_state</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update_state">update_state</a></p>
+</blockquote>
+<h4 id='nil-update_state'>nil update_state()</h4>
+<p>Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.</p>
 <h3 id='warp'>warp</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=warp">warp</a></p>
@@ -5176,7 +5290,7 @@ limits, you can override them in the UI with double click.</p>
 </blockquote>
 <h4 id='nil-activate_tiamat_position_hack-bool-activate'>nil activate_tiamat_position_hack(bool activate)</h4>
 <p>Activate custom variables for position used for detecting the player (normally hardcoded)
-note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Tiamat">Tiamat</a> entity, recommending <code>set_post_entity_spawn</code>
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Tiamat">Tiamat</a> entity, recommending set_post_entity_spawn
 default game values are: attack_x = 17.5 attack_y = 62.5</p>
 <h3 id='distance'>distance</h3>
 <blockquote>
@@ -19415,22 +19529,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door_type">door_type</a></td>
-<td></td>
+<td>Spawns this entity when not covered by floor. Must be initialized to valid <a href="#ENT_TYPE">ENT_TYPE</a> before revealed, or crashes the game.</td>
 </tr>
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=platform_type">platform_type</a></td>
-<td></td>
+<td>Spawns this entity below when tile below is uncovered. Doesn&#39;t spawn anything if it was never covered by floor, unless platform_spawned is set to false. Must be initialized to valid <a href="#ENT_TYPE">ENT_TYPE</a> before revealed, or crashes the game.</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=visible">visible</a></td>
-<td></td>
+<td>Set automatically when not covered by floor.</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=platform_spawned">platform_spawned</a></td>
-<td>Is set true when you bomb the door, no matter what door, can&#39;t be reset</td>
+<td>Set automatically when tile below is not covered by floor. Unset to force the platform to spawn if it was never covered in the first place.</td>
 </tr>
 </tbody></table>
 <h3 id='LogicalDrain'>LogicalDrain</h3>

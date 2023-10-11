@@ -1673,6 +1673,26 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
     }
 }
 
+void destroy_grid(int32_t uid)
+{
+    if (auto entity = get_entity_ptr(uid))
+    {
+        auto state = State::get();
+        state.layer(entity->layer)->destroy_grid_entity(entity);
+    }
+}
+
+void destroy_grid(float x, float y, LAYER layer)
+{
+    auto state = State::get();
+    uint8_t actual_layer = enum_to_layer(layer);
+
+    if (Entity* entity = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    {
+        state.layer(entity->layer)->destroy_grid_entity(entity);
+    }
+}
+
 void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
 {
     Movable* item = get_entity_ptr(item_uid)->as<Movable>();
@@ -2057,4 +2077,68 @@ void set_boss_door_control_enabled(bool enable)
     }
     else
         recover_mem("set_boss_door_control_enabled");
+}
+
+void update_state()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("state_refresh");
+    }
+    if (offset != 0)
+    {
+        auto state = State::get().ptr();
+        typedef void refresh_func(StateMemory*);
+        static refresh_func* rf = (refresh_func*)(offset);
+        rf(state);
+    }
+}
+
+void set_frametime(std::optional<double> frametime)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime");
+    if (offset != 0)
+    {
+        if (frametime.has_value())
+            write_mem_recoverable("engine_frametime", offset, frametime.value(), true);
+        else
+            recover_mem("engine_frametime");
+    }
+}
+
+std::optional<double> get_frametime()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime");
+    if (offset != 0)
+        return memory_read<double>(offset);
+    return std::nullopt;
+}
+
+void set_frametime_inactive(std::optional<double> frametime)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime") + 0x10;
+    if (offset != 0)
+    {
+        if (frametime.has_value())
+            write_mem_recoverable("engine_frametime_inactive", offset, frametime.value(), true);
+        else
+            recover_mem("engine_frametime_inactive");
+    }
+}
+
+std::optional<double> get_frametime_inactive()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime") + 0x10;
+    if (offset != 0)
+        return memory_read<double>(offset);
+    return std::nullopt;
 }

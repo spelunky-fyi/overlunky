@@ -1,4 +1,6 @@
----@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias,duplicate-set-field
+---@meta
+---@diagnostic disable: duplicate-doc-alias
+
 ---@class Meta
 ---@field name string
 ---@field version string
@@ -464,6 +466,18 @@ function move_entity(uid, x, y, vx, vy, layer) end
 ---@param layer LAYER
 ---@return nil
 function move_grid_entity(uid, x, y, layer) end
+---Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+---Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
+---@param uid integer
+---@return nil
+function destroy_grid(uid) end
+---Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+---Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return nil
+function destroy_grid(x, y, layer) end
 ---Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
 ---@param uid integer
 ---@param w integer
@@ -1157,9 +1171,13 @@ function get_local_state() end
 ---@return nil
 function get_local_players() end
 ---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
----@param dir string
+---@param dir string?
 ---@return nil
 function list_dir(dir) end
+---List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.
+---@param dir string?
+---@return nil
+function list_data_dir(dir) end
 ---List all char.png files recursively from Mods/Packs. Returns table of file paths.
 ---@return nil
 function list_char_mods() end
@@ -1167,28 +1185,28 @@ function list_char_mods() end
 ---@param index integer
 ---@return AABB
 function get_hud_position(index) end
+---Olmec cutscene moves Olmec and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and Olmec will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with Olmec in the hole.
 ---@param enable boolean
 ---@return nil
 function set_olmec_cutscene_enabled(enable) end
----Tiamat cutscene is also responsible for locking the exit door
----So you may need to close it yourself if you still want to be required to kill Tiamat
+---Tiamat cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want Tiamat kill to be required
 ---@param enable boolean
 ---@return nil
 function set_tiamat_cutscene_enabled(enable) end
 ---Activate custom variables for position used for detecting the player (normally hardcoded)
----note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending `set_post_entity_spawn`
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending set_post_entity_spawn
 ---default game values are: attack_x = 17.5 attack_y = 62.5
 ---@param activate boolean
 ---@return nil
 function activate_tiamat_position_hack(activate) end
 ---Activate custom variables for speed and y coordinate limit for crushing elevator
----note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending `set_post_entity_spawn`
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending set_post_entity_spawn
 ---default game values are: speed = 0.0125, y_limit = 98.5
 ---@param activate boolean
 ---@return nil
 function activate_crush_elevator_hack(activate) end
 ---Activate custom variables for y coordinate limit for hundun and spawn of it's heads
----note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending `set_post_entity_spawn`
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending set_post_entity_spawn
 ---default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
 ---@param activate boolean
 ---@return nil
@@ -1198,6 +1216,23 @@ function activate_hundun_hack(activate) end
 ---@param enable boolean
 ---@return nil
 function set_boss_door_control_enabled(enable) end
+---Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
+---@return nil
+function update_state() end
+---Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+---@param frametime double?
+---@return nil
+function set_frametime(frametime) end
+---Get engine target frametime (1/framerate, default 1/60).
+---@return double?
+function get_frametime() end
+---Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
+---@param frametime double?
+---@return nil
+function set_frametime_unfocused(frametime) end
+---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+---@return double?
+function get_frametime_unfocused() end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -4044,10 +4079,10 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field timer integer
 
 ---@class LogicalDoor : Entity
-    ---@field door_type ENT_TYPE
-    ---@field platform_type ENT_TYPE
-    ---@field visible boolean
-    ---@field platform_spawned boolean @Is set true when you bomb the door, no matter what door, can't be reset
+    ---@field door_type ENT_TYPE @Spawns this entity when not covered by floor. Must be initialized to valid ENT_TYPE before revealed, or crashes the game.
+    ---@field platform_type ENT_TYPE @Spawns this entity below when tile below is uncovered. Doesn't spawn anything if it was never covered by floor, unless platform_spawned is set to false. Must be initialized to valid ENT_TYPE before revealed, or crashes the game.
+    ---@field visible boolean @Set automatically when not covered by floor.
+    ---@field platform_spawned boolean @Set automatically when tile below is not covered by floor. Unset to force the platform to spawn if it was never covered in the first place.
 
 ---@class LogicalSound : Entity
     ---@field sound SoundMeta
