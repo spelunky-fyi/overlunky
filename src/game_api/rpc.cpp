@@ -2142,3 +2142,25 @@ std::optional<double> get_frametime_inactive()
         return memory_read<double>(offset);
     return std::nullopt;
 }
+
+void destroy_layer(uint8_t layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unload_layer");
+    }
+    if (offset != 0)
+    {
+        auto* layer_ptr = State::get().layer(layer);
+        typedef void destroy_func(Layer*);
+        static destroy_func* df = (destroy_func*)(offset);
+        df(layer_ptr);
+    }
+}
+
+void destroy_level()
+{
+    destroy_layer(0);
+    destroy_layer(1);
+}

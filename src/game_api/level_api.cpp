@@ -856,6 +856,20 @@ void load_screen(StateMemory* state, size_t param_2, size_t param_3)
     post_load_screen();
 }
 
+using UnloadLayerFun = void(Layer*);
+UnloadLayerFun* g_unload_layer_trampoline{nullptr};
+void unload_layer(Layer* layer)
+{
+    if (!layer->is_back_layer && pre_unload_level())
+        return;
+    if (pre_unload_layer((LAYER)layer->is_back_layer))
+        return;
+    g_unload_layer_trampoline(layer);
+    post_unload_layer((LAYER)layer->is_back_layer);
+    if (layer->is_back_layer)
+        post_unload_level();
+}
+
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
 HandleTileCodeFun* g_handle_tile_code_trampoline{nullptr};
 void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16_t room_template, float x, float y, std::uint8_t layer)
@@ -1470,6 +1484,7 @@ void LevelGenData::init()
         g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
 
         g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_func"sv);
+        g_unload_layer_trampoline = (UnloadLayerFun*)get_address("unload_layer"sv);
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
@@ -1485,6 +1500,7 @@ void LevelGenData::init()
         DetourAttach((void**)&g_spawn_room_from_tile_codes_trampoline, spawn_room_from_tile_codes);
 
         DetourAttach((void**)&g_load_screen_trampoline, load_screen);
+        DetourAttach((void**)&g_unload_layer_trampoline, unload_layer);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)

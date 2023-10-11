@@ -2094,6 +2094,12 @@ end
     /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
     lua["get_frametime_unfocused"] = get_frametime_inactive;
 
+    /// Destroys all layers and all entities in the level. Probably a bad idea.
+    lua["destroy_level"] = destroy_level;
+
+    /// Destroys a layer and all entities in it. No idea where you would need this either.
+    lua["destroy_layer"] = destroy_layer;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -2248,7 +2254,15 @@ end
         "POST_UPDATE",
         ON::POST_UPDATE,
         "USER_DATA",
-        ON::USER_DATA);
+        ON::USER_DATA,
+        "PRE_UNLOAD_LEVEL",
+        ON::PRE_UNLOAD_LEVEL,
+        "POST_UNLOAD_LEVEL",
+        ON::POST_UNLOAD_LEVEL,
+        "PRE_UNLOAD_LAYER",
+        ON::PRE_UNLOAD_LAYER,
+        "POST_UNLOAD_LAYER",
+        ON::POST_UNLOAD_LAYER);
     /* ON
     // LOGO
     // Runs when entering the the mossmouth logo screen.
@@ -2460,6 +2474,16 @@ end
     // USER_DATA
     // Params: Entity ent
     // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
+    // PRE_UNLOAD_LEVEL
+    // Runs right before the current level is unloaded and any entities destroyed
+    // POST_UNLOAD_LEVEL
+    // Runs right after the current level has been unloaded and all entities destroyed
+    // PRE_UNLOAD_LAYER
+    // Params: LAYER layer
+    // Runs right before a layer is unloaded and any entities there destroyed
+    // POST_UNLOAD_LAYER
+    // Params: LAYER layer
+    // Runs right after a layer has been unloaded and any entities there destroyed
     */
 
     lua.create_named_table(

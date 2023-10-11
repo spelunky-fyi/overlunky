@@ -18,9 +18,15 @@ struct Hud;
 void pre_load_level_files();
 void pre_level_generation();
 bool pre_load_screen();
+bool pre_unload_level();
+bool pre_unload_layer(LAYER layer);
+
 void post_room_generation();
 void post_level_generation();
 void post_load_screen();
+void post_unload_level();
+void post_unload_layer(LAYER layer);
+
 void on_death_message(STRINGID stringid);
 std::optional<bool> pre_get_feat(FEAT feat);
 bool pre_set_feat(FEAT feat);

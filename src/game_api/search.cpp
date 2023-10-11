@@ -2034,6 +2034,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x21)
             .at_exe(),
     },
+    {
+        "unload_layer"sv,
+        // bp on destroy entity, leave level, it's third in stack or something
+        PatternCommandBuffer{}
+            .find_inst("49 89 cc 8b 41 18 85 c0 74 0b 49 8b 74 24 08"_gh)
+            .at_exe()
+            .function_start(),
+    },
+
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

@@ -865,6 +865,58 @@ bool LuaBackend::pre_load_screen()
 
     return false;
 }
+
+bool LuaBackend::pre_unload_level()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_UNLOAD_LEVEL)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+
+    return false;
+}
+bool LuaBackend::pre_unload_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_UNLOAD_LAYER)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func, layer).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+
+    return false;
+}
+
 void LuaBackend::post_room_generation()
 {
     if (!get_enabled())
@@ -983,6 +1035,49 @@ void LuaBackend::post_load_screen()
         }
     }
 }
+void LuaBackend::post_unload_level()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_UNLOAD_LEVEL)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_unload_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_UNLOAD_LAYER)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, layer);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+
 void LuaBackend::on_death_message(STRINGID stringid)
 {
     if (!get_enabled())

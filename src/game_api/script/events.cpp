@@ -72,6 +72,29 @@ bool pre_load_screen()
 
     return block;
 }
+bool pre_unload_level()
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_unload_level();
+            return !block;
+        });
+    return block;
+}
+bool pre_unload_layer(LAYER layer)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_unload_layer(layer);
+            return !block;
+        });
+    return block;
+}
+
 void post_room_generation()
 {
     LuaBackend::for_each_backend(
@@ -96,6 +119,24 @@ void post_load_screen()
         [&](LuaBackend::LockedBackend backend)
         {
             backend->post_load_screen();
+            return true;
+        });
+}
+void post_unload_level()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_unload_level();
+            return true;
+        });
+}
+void post_unload_layer(LAYER layer)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_unload_layer(layer);
             return true;
         });
 }
