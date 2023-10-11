@@ -37,7 +37,7 @@ replace_table = {
     "std::": "",
     "sol::": "",
     "void": "",
-    "constexpr": "",
+    "constexpr ": "",
     "const ": "",
     "static": "",
     "variadic_args va": "ENT_TYPE, ENT_TYPE...",
