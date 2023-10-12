@@ -2054,6 +2054,30 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .from_exe_base(0x22c061d0),
     },
+    {
+        "spawn_transition"sv,
+        // TODO
+        PatternCommandBuffer{}
+            .from_exe_base(0x22afe5c0),
+    },
+    {
+        "spawn_transition_cosmic"sv,
+        // TODO
+        PatternCommandBuffer{}
+            .from_exe_base(0x22b373b0),
+    },
+    {
+        "spawn_transition_duat"sv,
+        // TODO
+        PatternCommandBuffer{}
+            .from_exe_base(0x22b34940),
+    },
+    {
+        "spawn_transition_olmecship"sv,
+        // TODO
+        PatternCommandBuffer{}
+            .from_exe_base(0x22b2d350),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
