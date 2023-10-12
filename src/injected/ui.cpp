@@ -8149,6 +8149,44 @@ void render_game_props()
 
         endmenu();
     }
+    if (submenu("Procedural chances"))
+    {
+        static auto render_procedural_chance = [](uint32_t id, LevelChanceDef& def)
+        {
+            int inverse_chance = g_state->level_gen->get_procedural_spawn_chance(id);
+            std::string name = std::string(g_state->level_gen->get_procedural_spawn_chance_name(id).value_or(fmt::format("{}", id)));
+            if (def.chances.empty())
+                return;
+            float chance = inverse_chance > 0 ? 100.f / static_cast<float>(inverse_chance) : 0;
+            std::string all = fmt::format("{}", def.chances[0]);
+            for (auto i = 1; i < def.chances.size(); ++i)
+                all += "," + fmt::format("{}", def.chances[i]);
+            std::string str = fmt::format("{:.3f}% ({})", chance, all);
+            ImGui::LabelText(str.c_str(), name.c_str());
+        };
+
+        static auto render_chance = [](int inverse_chance, const char* name)
+        {
+            float chance = inverse_chance > 0 ? 100.f / static_cast<float>(inverse_chance) : 0;
+            std::string str = fmt::format("{:.3f}%", chance);
+            ImGui::LabelText(str.c_str(), name);
+        };
+
+        ImGui::SeparatorText("Monster chances");
+        for (auto [id, def] : g_state->level_gen->data->level_monster_chances)
+            render_procedural_chance(id, def);
+
+        ImGui::SeparatorText("Trap chances");
+        for (auto [id, def] : g_state->level_gen->data->level_trap_chances)
+            render_procedural_chance(id, def);
+
+        ImGui::SeparatorText("Level chances");
+        if (g_state->current_theme)
+            render_chance(g_state->current_theme->get_shop_chance(), "shop");
+        for (auto i = 0; i < 15; ++i)
+            render_chance(g_state->level_gen->data->level_config[i], level_chances[i]);
+        endmenu();
+    }
     if (submenu("AI targets"))
     {
         for (size_t x = 0; x < 8; ++x)

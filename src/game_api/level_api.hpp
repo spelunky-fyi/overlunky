@@ -531,7 +531,7 @@ struct LevelGenSystem
     bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType shop_type);
 
     std::string_view get_room_template_name(uint16_t room_template);
-
+    std::optional<std::string_view> get_procedural_spawn_chance_name(uint32_t chance_id);
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 

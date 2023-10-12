@@ -1981,6 +1981,15 @@ LevelChanceDef& get_or_emplace_level_chance(game_unordered_map<std::uint32_t, Le
     return node.first->value.second;
 }
 
+std::optional<std::string_view> LevelGenSystem::get_procedural_spawn_chance_name(uint32_t chance_id)
+{
+    if (g_monster_chance_id_to_name.contains(chance_id))
+        return g_monster_chance_id_to_name[chance_id];
+    if (g_trap_chance_id_to_name.contains(chance_id))
+        return g_trap_chance_id_to_name[chance_id];
+    return std::nullopt;
+}
+
 uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
 {
     if (g_monster_chance_id_to_name.contains(chance_id))

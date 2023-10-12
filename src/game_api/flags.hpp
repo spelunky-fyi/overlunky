@@ -789,3 +789,21 @@ const char* levelgen_flags3[]{
     "7: unknown",
     "8: unknown",
 };
+
+const char* level_chances[]{
+    "backroom",
+    "backroom interconnect",
+    "backroom hidden door",
+    "backroom hidden cache",
+    "mount",
+    "altar",
+    "idol",
+    "floor side spread",
+    "floor bottom spread",
+    "background",
+    "ground background",
+    "bigroom",
+    "wideroom",
+    "tallroom",
+    "rewardroom",
+};
