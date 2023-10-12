@@ -90,6 +90,8 @@ class Door : public Floor
 
     // check if it's CHAR_*, then sets State.level_flags -> 21 (Hide hud, transition)
     virtual void hide_ui(Entity* who) = 0;
+
+    /// Returns the entity state / behavior id to set the entity to after the entering animation.
     virtual uint8_t enter(Entity* who) = 0;
 
     // checks layer of the Entity entering, except for FLOOR_DOOR_EGGSHIP_ROOM which gets the overlay (BG_EGGSHIP_ROOM) and returns BGEggshipRoom.player_in
@@ -97,10 +99,12 @@ class Door : public Floor
 
     // returns 0.0 except for eggship doors
     // for example: FLOOR_DOOR_EGGSHIP_ROOM returns 0.75 when entering the room, and 1.0 when exiting, runs every frame while entering/exiting
-    virtual float v44() = 0;
-    /// Will alwyas return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    /// Returns the darkest light level used to fade the entity when entering or exiting. 0 = black, 1 = no change
+    virtual float light_level() = 0;
+    /// Should we display the button prompt when collided by player. Will always return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
     virtual bool is_unlocked() = 0;
-    virtual bool v46() = 0; // dunno, runs every frame when player overlays door
+    /// Can the door actually be entered by player. Overrides the button prompt too if false.
+    virtual bool can_enter(Entity* player) = 0;
 };
 
 class ExitDoor : public Door

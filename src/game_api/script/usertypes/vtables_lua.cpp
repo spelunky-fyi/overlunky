@@ -43,10 +43,31 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"damage", 0x30, bool(Entity*, int8_t, uint16_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>,
-        VTableEntry<"apply_movement", 71, void()>,
-        VTableEntry<"check_is_falling", 75, void()>,
-        VTableEntry<"process_input", 77, void()>>;
+        VTableEntry<"can_jump", 37, bool()>,
+        VTableEntry<"stomp_damage", 43, int8_t()>,
+        VTableEntry<"is_on_fire", 45, bool()>,
+        VTableEntry<"damage", 48, bool(Entity*, int8_t, uint16_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>,
+        VTableEntry<"on_hit", 49, void(Entity*)>,
+        VTableEntry<"stun", 51, void(uint16_t)>,
+        VTableEntry<"freeze", 52, void(uint8_t)>,
+        VTableEntry<"light_on_fire", 53, void(uint8_t)>,
+        VTableEntry<"set_cursed", 54, void(bool)>,
+        VTableEntry<"web_collision", 55, void()>,
+        VTableEntry<"check_out_of_bounds", 58, void()>,
+        VTableEntry<"standing_on", 60, Entity*()>,
+        VTableEntry<"stomped_by", 61, void(Entity*)>,
+        VTableEntry<"thrown_by", 62, void(Entity*)>,
+        VTableEntry<"cloned_to", 63, void(Entity*)>,
+        VTableEntry<"pick_up", 67, void(Entity*)>,
+        VTableEntry<"picked_up_by", 68, void(Entity*)>,
+        VTableEntry<"drop", 69, void(Entity*)>,
+        VTableEntry<"collect_treasure", 70, void(int32_t, uint32_t)>,
+        VTableEntry<"initialize", 75, void()>,
+        VTableEntry<"process_input", 78, void()>,
+        VTableEntry<"picked_up", 80, void()>,
+        VTableEntry<"fall", 83, void()>,
+        VTableEntry<"apply_friction", 84, void()>,
+        VTableEntry<"crush", 90, void(Entity*)>>;
     static MovableVTable movable_vtable(lua, lua["Movable"], "ENTITY_OVERRIDE");
 
     using FloorVTable = HookableVTable<
@@ -55,6 +76,18 @@ void register_usertypes(sol::state& lua)
         EntityVTable,
         VTableEntry<"floor_update", 0x26, void()>>;
     static FloorVTable floor_vtable(lua, lua["Floor"], "ENTITY_OVERRIDE");
+
+    using DoorVTable = HookableVTable<
+        Entity,
+        CallbackType::Entity,
+        EntityVTable,
+        VTableEntry<"enter_attempt", 40, float(Entity*)>,
+        VTableEntry<"hide_hud", 41, float(Entity*)>,
+        VTableEntry<"enter", 42, uint8_t(Entity*)>,
+        VTableEntry<"light_level", 44, float()>,
+        VTableEntry<"is_unlocked", 45, bool()>,
+        VTableEntry<"can_enter", 46, bool(Entity*)>>;
+    static DoorVTable door_vtable(lua, lua["Door"], "ENTITY_OVERRIDE");
 
     using RenderInfoVTable = HookableVTable<
         RenderInfo,
