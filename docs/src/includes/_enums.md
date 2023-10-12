@@ -245,11 +245,38 @@ Name | Data | Description
 [LEDGE_GRAB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LEDGE_GRAB) | 31 | 
 [STOOD_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOOD_ON) | 32 | 
 [INIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INIT) | 36 | 
+[CAN_JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_JUMP) | 37 | 
+[STOMP_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMP_DAMAGE) | 43 | 
+[IS_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_ON_FIRE) | 45 | 
 [DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
-[APPLY_MOVEMENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_MOVEMENT) | 71 | 
-[CHECK_IS_FALLING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CHECK_IS_FALLING) | 75 | 
-[PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PROCESS_INPUT) | 77 | 
+[ON_HIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_HIT) | 49 | 
+[STUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STUN) | 51 | 
+[FREEZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FREEZE) | 52 | 
+[LIGHT_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_ON_FIRE) | 53 | 
+[SET_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_CURSED) | 54 | 
+[WEB_COLLISION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.WEB_COLLISION) | 55 | 
+[CHECK_OUT_OF_BOUNDS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CHECK_OUT_OF_BOUNDS) | 58 | 
+[STANDING_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STANDING_ON) | 60 | 
+[STOMPED_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMPED_BY) | 61 | 
+[THROWN_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.THROWN_BY) | 62 | 
+[CLONED_TO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CLONED_TO) | 63 | 
+[PICK_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICK_UP) | 67 | 
+[PICKED_UP_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP_BY) | 68 | 
+[DROP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DROP) | 69 | 
+[COLLECT_TREASURE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.COLLECT_TREASURE) | 70 | 
+[INITIALIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INITIALIZE) | 75 | 
+[PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PROCESS_INPUT) | 78 | 
+[PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP) | 80 | 
+[FALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FALL) | 83 | 
+[APPLY_FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_FRICTION) | 84 | 
+[CRUSH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CRUSH) | 90 | 
 [FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
+[ENTER_ATTEMPT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER_ATTEMPT) | 40 | 
+[HIDE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.HIDE_HUD) | 41 | 
+[ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER) | 42 | 
+[LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_LEVEL) | 44 | 
+[IS_UNLOCKED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_UNLOCKED) | 45 | 
+[CAN_ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_ENTER) | 46 | 
 
 ## ENT_FLAG
 
