@@ -378,7 +378,7 @@ void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instan
         {
             if (p.second)
             {
-                p.first->~JournalPage();
+                delete p.first;
             }
         }
     }

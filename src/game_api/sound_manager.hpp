@@ -295,3 +295,8 @@ struct BackgroundSound : public SoundMeta
 /// Returns SoundMeta (read only), beware that after the sound starts, that memory is no longer valid
 SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);
 SoundMeta* play_sound_by_id(uint32_t sound_id, uint32_t source_uid);
+
+// could probably be exposed if someone can actually figure out how to properly "register it"?
+// it also needs to make sure the lua owns the returned object and it will properly delete it
+SoundMeta* construct_soundmeta(VANILLA_SOUND sound, bool background_sound);
+SoundMeta* construct_soundmeta(uint32_t sound_id, bool background_sound);

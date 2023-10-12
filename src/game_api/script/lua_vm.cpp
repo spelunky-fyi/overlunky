@@ -82,6 +82,7 @@
 #include "usertypes/gui_lua.hpp"                   // for register_usertypes
 #include "usertypes/hitbox_lua.hpp"                // for register_usertypes
 #include "usertypes/level_lua.hpp"                 // for register_usertypes
+#include "usertypes/logic_lua.hpp"                 // for register_usertypes
 #include "usertypes/particles_lua.hpp"             // for register_usertypes
 #include "usertypes/player_lua.hpp"                // for register_usertypes
 #include "usertypes/prng_lua.hpp"                  // for register_usertypes
@@ -292,6 +293,7 @@ end
     NBehavior::register_usertypes(lua);
     NSteam::register_usertypes(lua);
     NVTables::register_usertypes(lua);
+    NLogic::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
 

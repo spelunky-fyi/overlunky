@@ -10,6 +10,7 @@
 #include <map>
 
 class Entity;
+struct SoundMeta;
 
 struct RobinHoodTableEntry
 {
@@ -388,99 +389,106 @@ struct ArenaState
     bool punish_ball;
 };
 
+enum class LOGIC : uint32_t
+{
+    TUTORIAL = 0,
+    OUROBOROS,
+    SPEEDRUN,
+    GHOST,
+    GHOST_TOAST,
+    TUN_AGGRO,
+    DICESHOP,
+    PRE_CHALLENGE,
+    MOON_CHALLENGE,
+    STAR_CHALLENGE,
+    SUN_CHALLENGE,
+    MAGMAMAN_SPAWN,
+    WATER_BUBBLES,
+    OLMEC_CUTSCENE,
+    TIAMAT_CUTSCENE,
+    APEP,
+    COG_SACRIFICE,
+    DUAT_BOSSES,
+    BUBBLER,
+    PLEASURE_PALACE,
+    DISCOVERY_INFO,
+    BLACK_MARKET,
+    JELLYFISH,
+    ARENA_1,
+    ARENA_2,
+    ARENA_3,
+    ARENA_ALIEN_BLAST,
+    ARENA_LOOSE_BOMBS,
+};
+
 class Logic
 {
   public:
-    uint32_t logic_index; // array index into state.logic, where this instance resides
-    uint32_t padding;
+    LOGIC logic_index;
+    uint32_t unused_padding;
 
     virtual ~Logic() = 0;
 
     // Continuously performs the main functionality of the logic instance
-    // Tutorial: handles dropping of the torch and rope in intro routine
-    // Ouroboros: transitions to level when music finished
-    // Basecamp speedrun: keep track of time, player position passing official
-    // Ghost trigger: spawns ghost when time is up (checks cursed for earlier ghost)
-    // Ghost toast trigger: shows the 'A terrible chill...' toast after 90 frames
-    // Tun aggro: spawns Tun after 30 seconds
-    // Dice shop: runs the logic of the dice shop
-    // Tun pre challenge: unknown
-    // Moon challenge: handles waitroom forcefields + tracks mattock breakage
-    // Star challenge: handles waitroom forcefields + tracks torches/timer
-    // Sun challenge: handles waitroom forcefields + tracks timer
-    // Volcana/Lava: spawns magmamen at random (and does other things)
-    // Water: unknown
-    // Olmec cutscene: runs the cutscene
-    // Tiamat cutscene: runs the cutscene
-    // Apep trigger: tracks player position, spawns APEP_HEAD
-    // COG Ankh sacrifice: countdown timer (100 frames) from the moment you die, triggers transitioning to duat
-    // Duat bosses trigger: tracks player position, spawns ANUBIS2 and OSIRIS_HEAD
-    // Tiamat: spawns bubbles
-    // Tusk pleasure palace: triggers aggro on everyone when non-high roller enters door
-    // Discovery: shows the toast
-    // Black market: lifts camera bounds restrictions
-    // Cosmic ocean: spawns jelly when time is up
-    // Arena 1: handles crate spawning
-    // Arena 3: handles death mist
-    virtual void perform() = 0;
+    // If it returns false, game will call deconstructor next in most cases
+    virtual bool perform() = 0;
 };
 
 class LogicOuroboros : public Logic
 {
   public:
-    size_t unknown3; // sound related?
-    uint16_t timer;
-
-    virtual ~LogicOuroboros() = 0;
+    SoundMeta* sound;
+    uint32_t timer;
 };
 
 class LogicBasecampSpeedrun : public Logic
 {
   public:
-    uint32_t official; // entity uid of the character that keeps the time
-    uint32_t crate;    // entity uid; you must break this crate for the run to be valid, otherwise you're cheating
-    uint32_t unknown3;
-    uint32_t unknown4;
-
-    virtual ~LogicBasecampSpeedrun() = 0;
+    /// entity uid of the character that keeps the time
+    uint32_t administrator;
+    /// entity uid. you must break this crate for the run to be valid, otherwise you're cheating
+    uint32_t crate;
 };
 
 class LogicGhostToast : public Logic
 {
   public:
+    ///  default 90
     uint32_t toast_timer;
-
-    virtual ~LogicGhostToast() = 0;
 };
 
 class LogicDiceShop : public Logic
 {
   public:
-    uint32_t boss; // entity uid; either tusk or the shopkeeper
-    uint32_t unknown4;
-    uint32_t bet_machine; // entity uid
-    uint32_t die1;        // entity uid
-    uint32_t die2;        // entity uid
+    uint32_t boss_uid;
+    ENT_TYPE boss_type;
+    /// entity uid
+    uint32_t bet_machine;
+    /// entity uid
+    uint32_t die1;
+    /// entity uid
+    uint32_t die2;
     int8_t die_1_value;
     int8_t die_2_value;
     uint16_t unknown8;
-    uint32_t prize_dispenser; // entity uid
-    uint32_t prize;           // entity uid
-    uint32_t forcefield;      // entity uid
+    /// entity uid
+    uint32_t prize_dispenser;
+    /// entity uid
+    uint32_t prize;
+    /// entity uid
+    uint32_t forcefield;
     bool bet_active;
     bool forcefield_deactivated;
-    bool boss_angry;
-    uint8_t result_announcement_timer; // the time the boss waits after your second die throw to announce the results
-    uint8_t won_prizes_count;          // to see whether you achieved high roller status
-    uint8_t unknown14;
-    uint8_t unknown15;
-    uint8_t unknown16;
-    int32_t balance; // cash balance of all the games
-
-    virtual ~LogicDiceShop() = 0;
+    bool unknown;
+    /// the time the boss waits after your second die throw to announce the results
+    uint8_t result_announcement_timer;
+    uint8_t won_prizes_count;
+    uint8_t padding[3];
+    /// cash balance of all the games
+    int32_t balance;
 };
 
-class LogicMoonChallenge : public Logic
+class LogicChallenge : public Logic
 {
   public:
     uint32_t unknown3;
@@ -489,45 +497,36 @@ class LogicMoonChallenge : public Logic
     uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint16_t unknown8a;
-    uint16_t unknown8b;
-    uint32_t mattock; // entity uid
-
-    virtual ~LogicMoonChallenge() = 0;
+    uint16_t padding1;
+    uint32_t padding2;
 };
 
-class LogicStarChallenge : public Logic
+class LogicMoonChallenge : public LogicChallenge
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint32_t floor_challenge_entrance_uid;
-    uint32_t floor_challenge_waitroom_uid;
-    bool challenge_active;
-    uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint32_t unknown8;
-    std::vector<Entity*> torches;
-    uint32_t start_countdown;
-
-    virtual ~LogicStarChallenge() = 0;
+    /// entity uid
+    int32_t mattock_uid;
 };
 
-class LogicSunChallenge : public Logic
+class LogicStarChallenge : public LogicChallenge
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint32_t floor_challenge_entrance_uid;
-    uint32_t floor_challenge_waitroom_uid;
-    bool challenge_active;
-    uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint32_t unknown8;
+    std::vector<Entity*> torches; // TODO: check if custom vector (probably yes)
     uint8_t start_countdown;
+    uint8_t padding[3];
+    uint32_t unknown9;
+    float unknown10; // position in front of tun and one tile higher, dunno what for?
+    float unknown11; // kind of would make sense for the wanted poster, but you get this struct after you buy the challenge, not possible when tun is angry?
+};
 
-    virtual ~LogicSunChallenge() = 0;
+class LogicSunChallenge : public LogicChallenge
+{
+  public:
+    uint8_t start_countdown;
+    uint8_t padding[3];
+    uint32_t unknown9;
+    float unknown10; // same as for LogicStarChallenge
+    float unknown11;
 };
 
 class MagmamanSpawnPosition
@@ -544,42 +543,44 @@ class LogicMagmamanSpawn : public Logic
 {
   public:
     custom_vector<MagmamanSpawnPosition> magmaman_positions;
+
+    void add_spawn(uint32_t x, uint32_t y);
+    void add_spawn(MagmamanSpawnPosition ms)
+    {
+        add_spawn(ms.x, ms.y);
+    };
+    void remove_spawn(uint32_t x, uint32_t y);
+    void remove_spawn(MagmamanSpawnPosition ms)
+    {
+        remove_spawn(ms.x, ms.y);
+    };
 };
 
 class LogicOlmecCutscene : public Logic
 {
   public:
-    uint8_t unknown6a;
-    uint8_t unknown6b;
-    uint8_t unknown6c;
-    uint8_t unknown6d;
-    uint8_t unknown7a;
-    uint8_t unknown7b;
-    uint8_t unknown7c;
-    uint8_t unknown7d;
+    /// Copied over [buttons_gameplay](#PlayerSlot) from the leader, used to skip the cutscene
+    /// You can skip the cutscene if you set it to 1 or 4
+    uint8_t leader_inputs;
+    uint8_t padding[7];
     Entity* fx_olmecpart_large;
     Entity* olmec;
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
-
-    virtual ~LogicOlmecCutscene() = 0;
 };
 
 class LogicTiamatCutscene : public Logic
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
+    /// Copied over [buttons_gameplay](#PlayerSlot) from the leader, used to skip the cutscene
+    /// You can skip the cutscene if you set it to 1 or 4
+    uint8_t leader_inputs;
+    uint8_t padding[7];
     Entity* tiamat;
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
-    int32_t unknown5;
-    uint32_t unknown6;
-    uint32_t unknown7;
-
-    virtual ~LogicTiamatCutscene() = 0;
 };
 
 class LogicApepTrigger : public Logic
@@ -588,102 +589,135 @@ class LogicApepTrigger : public Logic
     uint32_t spawn_cooldown;
     bool cooling_down;
     bool apep_journal_entry_logged;
-    uint32_t unknown4c;
-    uint32_t unknown4d;
-    uint32_t unknown5;
-    uint32_t unknown6;
-
-    virtual ~LogicApepTrigger() = 0;
 };
 
 class LogicCOGAnkhSacrifice : public Logic
 {
+  public:
     uint8_t unknown3;
     uint8_t timer;
-
-    virtual ~LogicCOGAnkhSacrifice() = 0;
-};
-
-class LogicDuatBossesTrigger : public Logic
-{
-  public:
-    virtual ~LogicDuatBossesTrigger() = 0;
 };
 
 class LogicTiamatBubbles : public Logic
 {
   public:
     uint8_t bubble_spawn_timer;
-
-    virtual ~LogicTiamatBubbles() = 0;
 };
 
 class LogicTuskPleasurePalace : public Logic
 {
   public:
-    uint32_t locked_door; // entity uid
-    uint32_t unknown4;
-
-    virtual ~LogicTuskPleasurePalace() = 0;
+    int32_t locked_door; // entity uid
+    uint32_t unknown4;   // default 1552
+    uint32_t unknown5;   // dunno
+    uint32_t unknown6;   // padding probably
 };
 
 class LogicArena1 : public Logic
 {
   public:
     uint32_t crate_spawn_timer;
-    uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
-
-    virtual ~LogicArena1() = 0;
 };
 
 class LogicArenaAlienBlast : public Logic
 {
   public:
     uint32_t timer;
-
-    virtual ~LogicArenaAlienBlast() = 0;
 };
 
 class LogicArenaLooseBombs : public Logic
 {
   public:
     uint32_t timer;
+};
 
-    virtual ~LogicArenaLooseBombs() = 0;
+class LogicUnderwaterBubbles : public Logic
+{
+  public:
+    // no idea what does are, messing with them can crash
+    float unknown1; // default: 1.0, excludes liquid from spawning the bubbles by y level from the top to bottom
+                    // is treated like number (calculations to get the right grid entity level)
+                    // it's more like a value in rooms than y coordinates
+
+    int16_t unknown2; // default: 1000
+    bool unknown3;    // default: 1 or 0
+};
+
+class LogicTunPreChallenge : public Logic
+{
+  public:
+    // except for Tun the rest of the values do not make any sense (garbage)
+    // the logic.perform does only ever touches the tun as well, first one always 0?
+    size_t unknown1;
+    size_t unknown2;
+    size_t unknown3;
+    int32_t tun_uid;
+};
+
+class LogicTutorial : public Logic
+{
+  public:
+    Entity* pet_tutorial;
+    uint32_t timer;
 };
 
 struct LogicList
 {
-    Logic* tutorial;
-    LogicOuroboros* ouroboros;
-    LogicBasecampSpeedrun* basecamp_speedrun;
-    Logic* ghost_trigger;
-    LogicGhostToast* ghost_toast_trigger;
-    Logic* tun_aggro;
-    LogicDiceShop* diceshop;
-    Logic* tun_pre_challenge;
-    LogicMoonChallenge* tun_moon_challenge;
-    LogicStarChallenge* tun_star_challenge;
-    LogicSunChallenge* tun_sun_challenge;
-    LogicMagmamanSpawn* magmaman_spawn;
-    Logic* water_related;
-    LogicOlmecCutscene* olmec_cutscene;
-    LogicTiamatCutscene* tiamat_cutscene;
-    LogicApepTrigger* apep_trigger;
-    LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
-    LogicDuatBossesTrigger* duat_bosses_trigger;
-    LogicTiamatBubbles* bubbler;
-    LogicTuskPleasurePalace* tusk_pleasure_palace;
-    Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
-    Logic* black_market;
-    Logic* cosmic_ocean;
-    LogicArena1* arena_1;
-    Logic* arena_2;
-    Logic* arena_3;
-    LogicArenaAlienBlast* arena_alien_blast;
-    LogicArenaLooseBombs* arena_loose_bombs;
+    /// This only properly constructs the base class
+    /// you may still need to initialise the parameters correctly
+    Logic* start_logic(LOGIC idx);
+    void stop_logic(LOGIC idx);
+    void stop_logic(Logic* log);
+
+    union
+    {
+        std::array<Logic*, 28> logic_indexed;
+        struct
+        {
+            /// Handles dropping of the torch and rope in intro routine (first time play)
+            LogicTutorial* tutorial;
+            LogicOuroboros* ouroboros;
+            /// Keep track of time, player position passing official
+            LogicBasecampSpeedrun* basecamp_speedrun;
+            /// It's absence is the only reason why ghost doesn't spawn at boss levels or CO
+            Logic* ghost_trigger; // virtual does nothing, all the code elsewhere, the only purpose is to mark if ghost should spawn this level or not
+            LogicGhostToast* ghost_toast_trigger;
+            /// Spawns tun at the door at 30s mark
+            Logic* tun_aggro;
+            LogicDiceShop* diceshop;
+            LogicTunPreChallenge* tun_pre_challenge;
+            LogicMoonChallenge* tun_moon_challenge;
+            LogicStarChallenge* tun_star_challenge;
+            LogicSunChallenge* tun_sun_challenge;
+            LogicMagmamanSpawn* magmaman_spawn;
+            /// Only the bubbles that spawn from the floor
+            /// Even without it, entities moving in water still spawn bubbles
+            LogicUnderwaterBubbles* water_bubbles;
+            LogicOlmecCutscene* olmec_cutscene;
+            LogicTiamatCutscene* tiamat_cutscene;
+            /// Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
+            LogicApepTrigger* apep_spawner;
+            /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
+            LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
+            Logic* duat_bosses_spawner;
+            /// Spawn rising bubbles at Tiamat (position hardcoded)
+            LogicTiamatBubbles* bubbler;
+            /// Triggers aggro on everyone when non-high roller enters door
+            LogicTuskPleasurePalace* tusk_pleasure_palace; //  TODO: van helsing?
+            /// black market, vlad, wet fur discovery, logic shows the toast
+            Logic* discovery_info;
+            /// Changes the camera bounds when you reach black market
+            Logic* black_market;
+            Logic* jellyfish_trigger; // same as ghost_trigger
+            /// Handles create spawns and more, is cleared as soon as the winner is decided (on last player alive)
+            LogicArena1* arena_1;
+            Logic* arena_2; // can't trigger
+            /// Handles time end death
+            Logic* arena_3;
+            LogicArenaAlienBlast* arena_alien_blast;
+            LogicArenaLooseBombs* arena_loose_bombs;
+        };
+    };
 };
 
 struct LiquidPhysicsEngine

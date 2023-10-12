@@ -613,7 +613,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
                     // if cutscene is still running, perform the last frame of cutscene before killing olmec
                     state->logic->olmec_cutscene->timer = 809;
                     state->logic->olmec_cutscene->perform();
-                    state->logic->olmec_cutscene->~LogicOlmecCutscene();
+                    delete state->logic->olmec_cutscene;
                     state->logic->olmec_cutscene = nullptr;
                 }
                 destroy_entity_items(check);

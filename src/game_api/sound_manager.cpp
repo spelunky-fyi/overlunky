@@ -919,3 +919,15 @@ SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid)
     auto sound_id = sound_name_to_id(sound);
     return play_sound_by_id(sound_id, source_uid);
 }
+
+SoundMeta* construct_soundmeta(VANILLA_SOUND sound, bool background_sound)
+{
+    return construct_soundmeta(sound_name_to_id(sound), background_sound);
+}
+
+SoundMeta* construct_soundmeta(uint32_t sound_id, bool background_sound)
+{
+    using construct_soundposition_ptr_fun_t = SoundMeta*(uint32_t id, bool background_sound);
+    static const auto construct_soundposition_ptr_call = (construct_soundposition_ptr_fun_t*)get_address("construct_soundmeta");
+    return construct_soundposition_ptr_call(sound_id, background_sound);
+}
