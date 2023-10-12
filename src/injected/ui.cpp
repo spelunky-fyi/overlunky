@@ -8122,20 +8122,20 @@ void render_game_props()
     }
     if (submenu("Level generation flags"))
     {
-        ImGui::Text("Flags 1:");
         auto flags = (int)g_state->level_gen->flags;
         auto flags2 = (int)g_state->level_gen->flags2;
         auto flags3 = (int)g_state->level_gen->flags3;
+        ImGui::SeparatorText("Flags 1");
         for (int i = 0; i < 8; i++)
         {
             ImGui::CheckboxFlags(levelgen_flags[i], &flags, (int)std::pow(2, i));
         }
-        ImGui::Text("Flags 2:");
+        ImGui::SeparatorText("Flags 2");
         for (int i = 0; i < 8; i++)
         {
             ImGui::CheckboxFlags(levelgen_flags2[i], &flags2, (int)std::pow(2, i));
         }
-        ImGui::Text("Flags 3:");
+        ImGui::SeparatorText("Flags 3");
         for (int i = 0; i < 8; i++)
         {
             ImGui::CheckboxFlags(levelgen_flags3[i], &flags3, (int)std::pow(2, i));
@@ -8143,19 +8143,23 @@ void render_game_props()
         g_state->level_gen->flags = (uint8_t)flags;
         g_state->level_gen->flags2 = (uint8_t)flags2;
         g_state->level_gen->flags3 = (uint8_t)flags3;
-        ImGui::Text("Theme flags:");
-        ImGui::Checkbox("Allow beehives##ThemeBeeHive", &g_state->current_theme->allow_beehive);
-        ImGui::Checkbox("Allow leprechauns##ThemeLeprechaun", &g_state->current_theme->allow_leprechaun);
-
+        if (g_state->current_theme)
+        {
+            ImGui::SeparatorText("Theme flags");
+            ImGui::Checkbox("Allow beehives##ThemeBeeHive", &g_state->current_theme->allow_beehive);
+            ImGui::Checkbox("Allow leprechauns##ThemeLeprechaun", &g_state->current_theme->allow_leprechaun);
+        }
         endmenu();
     }
     if (submenu("Procedural chances"))
     {
+        static auto hide_zero = true;
+        ImGui::Checkbox("Hide 0% chances", &hide_zero);
         static auto render_procedural_chance = [](uint32_t id, LevelChanceDef& def)
         {
             int inverse_chance = g_state->level_gen->get_procedural_spawn_chance(id);
             std::string name = std::string(g_state->level_gen->get_procedural_spawn_chance_name(id).value_or(fmt::format("{}", id)));
-            if (def.chances.empty())
+            if (def.chances.empty() || (hide_zero && inverse_chance == 0))
                 return;
             float chance = inverse_chance > 0 ? 100.f / static_cast<float>(inverse_chance) : 0;
             std::string all = fmt::format("{}", def.chances[0]);
@@ -8167,6 +8171,8 @@ void render_game_props()
 
         static auto render_chance = [](int inverse_chance, const char* name)
         {
+            if (hide_zero && inverse_chance == 0)
+                return;
             float chance = inverse_chance > 0 ? 100.f / static_cast<float>(inverse_chance) : 0;
             std::string str = fmt::format("{:.3f}%", chance);
             ImGui::LabelText(str.c_str(), name);
