@@ -152,6 +152,36 @@ bool | [final_ghost](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fi
 int | [breath_cooldown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=breath_cooldown) | 
 bool | [punish_ball](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=punish_ball) | 
 
+### LogicArena1
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [crate_spawn_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crate_spawn_timer) | 
+
+### LogicArenaAlienBlast
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicArenaLooseBombs
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
 ## Callback context types
 
 
@@ -709,7 +739,7 @@ nil | [set_quad(Quad quad)](https://github.com/spelunky-fyi/overlunky/search?l=L
 
 ### MagmamanSpawnPosition
 
-Used in [LogicList](#LogicList)
+Used in [LogicMagmamanSpawn](#LogicMagmamanSpawn)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -1293,7 +1323,53 @@ Used in [LogicList](#LogicList)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [logic_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic_index) | 
+[LOGIC](#LOGIC) | [logic_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic_index) | 
+
+### LogicApepTrigger
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [spawn_cooldown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_cooldown) | 
+bool | [cooling_down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooling_down) | 
+bool | [apep_journal_entry_logged](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apep_journal_entry_logged) | 
+
+### LogicBasecampSpeedrun
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [administrator](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=administrator) | entity uid of the character that keeps the time
+int | [crate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crate) | entity uid. you must break this crate for the run to be valid, otherwise you're cheating
+
+### LogicCOGAnkhSacrifice
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicChallenge
+
+Used in [LogicMoonChallenge](#LogicMoonChallenge), [LogicStarChallenge](#LogicStarChallenge), [LogicSunChallenge](#LogicSunChallenge)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [floor_challenge_entrance_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=floor_challenge_entrance_uid) | 
+int | [floor_challenge_waitroom_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=floor_challenge_waitroom_uid) | 
+bool | [challenge_active](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=challenge_active) | 
+int | [forcefield_countdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield_countdown) | 
 
 ### LogicDiceShop
 
@@ -1303,20 +1379,31 @@ Derived from [Logic](#Logic)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [bet_machine](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_machine) | 
-int | [die1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die1) | 
-int | [die2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die2) | 
+int | [boss_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boss_uid) | 
+[ENT_TYPE](#ENT_TYPE) | [boss_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boss_type) | 
+int | [bet_machine](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_machine) | entity uid
+int | [die1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die1) | entity uid
+int | [die2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die2) | entity uid
 int | [die_1_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die_1_value) | 
 int | [die_2_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=die_2_value) | 
-int | [prize_dispenser](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize_dispenser) | 
-int | [prize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize) | 
-int | [forcefield](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield) | 
+int | [prize_dispenser](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize_dispenser) | entity uid
+int | [prize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prize) | entity uid
+int | [forcefield](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield) | entity uid
 bool | [bet_active](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bet_active) | 
 bool | [forcefield_deactivated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=forcefield_deactivated) | 
-bool | [boss_angry](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=boss_angry) | 
-int | [result_announcement_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=result_announcement_timer) | 
+int | [result_announcement_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=result_announcement_timer) | the time the boss waits after your second die throw to announce the results
 int | [won_prizes_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=won_prizes_count) | 
-int | [balance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=balance) | 
+int | [balance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=balance) | cash balance of all the games
+
+### LogicGhostToast
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [toast_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toast_timer) |  default 90
 
 ### LogicList
 
@@ -1324,10 +1411,61 @@ Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
+[LogicTutorial](#LogicTutorial) | [tutorial](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tutorial) | Handles dropping of the torch and rope in intro routine (first time play)
+[LogicOuroboros](#LogicOuroboros) | [ouroboros](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ouroboros) | 
+[LogicBasecampSpeedrun](#LogicBasecampSpeedrun) | [basecamp_speedrun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp_speedrun) | Keep track of time, player position passing official
+[Logic](#Logic) | [ghost_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_trigger) | It's absence is the only reason why ghost doesn't spawn at boss levels or CO
+[LogicGhostToast](#LogicGhostToast) | [ghost_toast_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ghost_toast_trigger) | 
+[Logic](#Logic) | [tun_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_aggro) | Spawns tun at the door at 30s mark
+[LogicDiceShop](#LogicDiceShop) | [diceshop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) | 
+[LogicTunPreChallenge](#LogicTunPreChallenge) | [tun_pre_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_pre_challenge) | 
+[LogicMoonChallenge](#LogicMoonChallenge) | [tun_moon_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_moon_challenge) | 
+[LogicStarChallenge](#LogicStarChallenge) | [tun_star_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_star_challenge) | 
+[LogicSunChallenge](#LogicSunChallenge) | [tun_sun_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_sun_challenge) | 
+[LogicMagmamanSpawn](#LogicMagmamanSpawn) | [magmaman_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_spawn) | 
+[LogicUnderwaterBubbles](#LogicUnderwaterBubbles) | [water_bubbles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=water_bubbles) | Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
 [LogicOlmecCutscene](#LogicOlmecCutscene) | [olmec_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) | 
 [LogicTiamatCutscene](#LogicTiamatCutscene) | [tiamat_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) | 
-LogicMagmamanSpawn | [magmaman_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_spawn) | 
-[LogicDiceShop](#LogicDiceShop) | [diceshop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=diceshop) | 
+[LogicApepTrigger](#LogicApepTrigger) | [apep_spawner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apep_spawner) | Triggers and spawns Apep only in rooms set as [ROOM_TEMPLATE](#ROOM_TEMPLATE).APEP
+[LogicCOGAnkhSacrifice](#LogicCOGAnkhSacrifice) | [city_of_gold_ankh_sacrifice](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=city_of_gold_ankh_sacrifice) | All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
+[Logic](#Logic) | [duat_bosses_spawner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=duat_bosses_spawner) | 
+[LogicTiamatBubbles](#LogicTiamatBubbles) | [bubbler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bubbler) | Spawn rising bubbles at [Tiamat](#Tiamat) (position hardcoded)
+[LogicTuskPleasurePalace](#LogicTuskPleasurePalace) | [tusk_pleasure_palace](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tusk_pleasure_palace) | Triggers aggro on everyone when non-high roller enters door
+[Logic](#Logic) | [discovery_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=discovery_info) | black market, vlad, wet fur discovery, logic shows the toast
+[Logic](#Logic) | [black_market](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=black_market) | Changes the camera bounds when you reach black market
+[Logic](#Logic) | [jellyfish_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jellyfish_trigger) | 
+[LogicArena1](#LogicArena1) | [arena_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_1) | Handles create spawns and more, is cleared as soon as the winner is decided (on last player alive)
+[Logic](#Logic) | [arena_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_2) | 
+[Logic](#Logic) | [arena_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_3) | Handles time end death
+[LogicArenaAlienBlast](#LogicArenaAlienBlast) | [arena_alien_blast](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_alien_blast) | 
+[LogicArenaLooseBombs](#LogicArenaLooseBombs) | [arena_loose_bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena_loose_bombs) | 
+[Logic](#Logic) | [start_logic(LOGIC idx)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_logic) | This only properly constructs the base class<br/>you may still need to initialise the parameters correctly
+nil | [stop_logic(LOGIC idx)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop_logic) | 
+nil | [stop_logic(Logic log)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop_logic) | 
+
+### LogicMagmamanSpawn
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+custom_array&lt;[MagmamanSpawnPosition](#MagmamanSpawnPosition)&gt; | [magmaman_positions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_positions) | 
+nil | [add_spawn(int x, int y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_spawn) | 
+nil | [add_spawn(MagmamanSpawnPosition ms)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_spawn) | 
+nil | [remove_spawn(int x, int y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_spawn) | 
+nil | [remove_spawn(MagmamanSpawnPosition ms)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_spawn) | 
+
+### LogicMoonChallenge
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic) [LogicChallenge](#LogicChallenge)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [mattock_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mattock_uid) | entity uid
 
 ### LogicOlmecCutscene
 
@@ -1337,10 +1475,53 @@ Derived from [Logic](#Logic)
 
 Type | Name | Description
 ---- | ---- | -----------
+[Entity](#Entity) | [fx_olmecpart_large](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_olmecpart_large) | 
 [Entity](#Entity) | [olmec](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec) | 
 [Entity](#Entity) | [player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) | 
 [Entity](#Entity) | [cinematic_anchor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicOuroboros
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+[SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicStarChallenge
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic) [LogicChallenge](#LogicChallenge)
+
+
+Type | Name | Description
+---- | ---- | -----------
+array&lt;[Entity](#Entity)&gt; | [torches](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=torches) | 
+int | [start_countdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_countdown) | 
+
+### LogicSunChallenge
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic) [LogicChallenge](#LogicChallenge)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [start_countdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_countdown) | 
+
+### LogicTiamatBubbles
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [bubble_spawn_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bubble_spawn_timer) | 
 
 ### LogicTiamatCutscene
 
@@ -1355,14 +1536,35 @@ Type | Name | Description
 [Entity](#Entity) | [cinematic_anchor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 
-### LogicVolcana
+### LogicTuskPleasurePalace
 
+Used in [LogicList](#LogicList)
 Derived from [Logic](#Logic)
 
 
 Type | Name | Description
 ---- | ---- | -----------
-custom_array&lt;[MagmamanSpawnPosition](#MagmamanSpawnPosition)&gt; | [magmaman_positions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_positions) | 
+int | [locked_door](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=locked_door) | 
+
+### LogicTutorial
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+[Entity](#Entity) | [pet_tutorial](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pet_tutorial) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicUnderwaterBubbles
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
 
 ## Online types
 

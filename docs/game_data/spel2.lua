@@ -2069,51 +2069,6 @@ do
     ---@field local_player_slot integer
     ---@field get_code fun(self): string @Gets the string equivalent of the code
 
----@class LogicList
-    ---@field olmec_cutscene LogicOlmecCutscene
-    ---@field tiamat_cutscene LogicTiamatCutscene
-    ---@field magmaman_spawn LogicMagmamanSpawn
-    ---@field diceshop LogicDiceShop
-
----@class Logic
-    ---@field logic_index integer
-
----@class LogicOlmecCutscene : Logic
-    ---@field olmec Entity
-    ---@field player Entity
-    ---@field cinematic_anchor Entity
-    ---@field timer integer
-
----@class LogicTiamatCutscene : Logic
-    ---@field tiamat Entity
-    ---@field player Entity
-    ---@field cinematic_anchor Entity
-    ---@field timer integer
-
----@class MagmamanSpawnPosition
-    ---@field x integer
-    ---@field y integer
-    ---@field timer integer
-
----@class LogicVolcana : Logic
-    ---@field magmaman_positions custom_Array<MagmamanSpawnPosition>
-
----@class LogicDiceShop : Logic
-    ---@field bet_machine integer
-    ---@field die1 integer
-    ---@field die2 integer
-    ---@field die_1_value integer
-    ---@field die_2_value integer
-    ---@field prize_dispenser integer
-    ---@field prize integer
-    ---@field forcefield integer
-    ---@field bet_active boolean
-    ---@field forcefield_deactivated boolean
-    ---@field boss_angry boolean
-    ---@field result_announcement_timer integer
-    ---@field won_prizes_count integer
-    ---@field balance integer
-
 ---@class RoomOwnersInfo
     ---@field owned_items custom_map<integer, ItemOwnerDetails> @key/index is the uid of an item
     ---@field owned_rooms RoomOwnerDetails[]
@@ -6016,6 +5971,159 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
 
+---@class LogicList
+    ---@field tutorial LogicTutorial @Handles dropping of the torch and rope in intro routine (first time play)
+    ---@field ouroboros LogicOuroboros
+    ---@field basecamp_speedrun LogicBasecampSpeedrun @Keep track of time, player position passing official
+    ---@field ghost_trigger Logic @It's absence is the only reason why ghost doesn't spawn at boss levels or CO
+    ---@field ghost_toast_trigger LogicGhostToast
+    ---@field tun_aggro Logic @Spawns tun at the door at 30s mark
+    ---@field diceshop LogicDiceShop
+    ---@field tun_pre_challenge LogicTunPreChallenge
+    ---@field tun_moon_challenge LogicMoonChallenge
+    ---@field tun_star_challenge LogicStarChallenge
+    ---@field tun_sun_challenge LogicSunChallenge
+    ---@field magmaman_spawn LogicMagmamanSpawn
+    ---@field water_bubbles LogicUnderwaterBubbles @Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
+    ---@field olmec_cutscene LogicOlmecCutscene
+    ---@field tiamat_cutscene LogicTiamatCutscene
+    ---@field apep_spawner LogicApepTrigger @Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
+    ---@field city_of_gold_ankh_sacrifice LogicCOGAnkhSacrifice @All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
+    ---@field duat_bosses_spawner Logic
+    ---@field bubbler LogicTiamatBubbles @Spawn rising bubbles at Tiamat (position hardcoded)
+    ---@field tusk_pleasure_palace LogicTuskPleasurePalace @Triggers aggro on everyone when non-high roller enters door
+    ---@field discovery_info Logic @black market, vlad, wet fur discovery, logic shows the toast
+    ---@field black_market Logic @Changes the camera bounds when you reach black market
+    ---@field jellyfish_trigger Logic
+    ---@field arena_1 LogicArena1 @Handles create spawns and more, is cleared as soon as the winner is decided (on last player alive)
+    ---@field arena_2 Logic
+    ---@field arena_3 Logic @Handles time end death
+    ---@field arena_alien_blast LogicArenaAlienBlast
+    ---@field arena_loose_bombs LogicArenaLooseBombs
+    ---@field start_logic fun(self, idx: LOGIC): Logic @This only properly constructs the base class<br/>you may still need to initialise the parameters correctly
+local LogicList = nil
+---@param idx LOGIC
+---@return nil
+function LogicList:stop_logic(idx) end
+---@param log Logic
+---@return nil
+function LogicList:stop_logic(log) end
+
+---@class Logic
+    ---@field logic_index LOGIC
+
+---@class LogicTutorial : Logic
+    ---@field pet_tutorial Entity
+    ---@field timer integer
+
+---@class LogicOuroboros : Logic
+    ---@field sound SoundMeta
+    ---@field timer integer
+
+---@class LogicBasecampSpeedrun : Logic
+    ---@field administrator integer @entity uid of the character that keeps the time
+    ---@field crate integer @entity uid. you must break this crate for the run to be valid, otherwise you're cheating
+
+---@class LogicGhostToast : Logic
+    ---@field toast_timer integer @ default 90
+
+---@class LogicDiceShop : Logic
+    ---@field boss_uid integer
+    ---@field boss_type ENT_TYPE
+    ---@field bet_machine integer @entity uid
+    ---@field die1 integer @entity uid
+    ---@field die2 integer @entity uid
+    ---@field die_1_value integer
+    ---@field die_2_value integer
+    ---@field prize_dispenser integer @entity uid
+    ---@field prize integer @entity uid
+    ---@field forcefield integer @entity uid
+    ---@field bet_active boolean
+    ---@field forcefield_deactivated boolean
+    ---@field result_announcement_timer integer @the time the boss waits after your second die throw to announce the results
+    ---@field won_prizes_count integer
+    ---@field balance integer @cash balance of all the games
+
+---@class LogicTunPreChallenge : Logic
+    ---@field tun_uid integer
+
+---@class LogicChallenge : Logic
+    ---@field floor_challenge_entrance_uid integer
+    ---@field floor_challenge_waitroom_uid integer
+    ---@field challenge_active boolean
+    ---@field forcefield_countdown integer
+
+---@class LogicMoonChallenge : LogicChallenge
+    ---@field mattock_uid integer @entity uid
+
+---@class LogicStarChallenge : LogicChallenge
+    ---@field torches Entity[]
+    ---@field start_countdown integer
+
+---@class LogicSunChallenge : LogicChallenge
+    ---@field start_countdown integer
+
+---@class LogicMagmamanSpawn : Logic
+    ---@field magmaman_positions custom_Array<MagmamanSpawnPosition>
+local LogicMagmamanSpawn = nil
+---@param x integer
+---@param y integer
+---@return nil
+function LogicMagmamanSpawn:add_spawn(x, y) end
+---@param ms MagmamanSpawnPosition
+---@return nil
+function LogicMagmamanSpawn:add_spawn(ms) end
+---@param x integer
+---@param y integer
+---@return nil
+function LogicMagmamanSpawn:remove_spawn(x, y) end
+---@param ms MagmamanSpawnPosition
+---@return nil
+function LogicMagmamanSpawn:remove_spawn(ms) end
+
+---@class LogicUnderwaterBubbles : Logic
+
+---@class LogicOlmecCutscene : Logic
+    ---@field fx_olmecpart_large Entity
+    ---@field olmec Entity
+    ---@field player Entity
+    ---@field cinematic_anchor Entity
+    ---@field timer integer
+
+---@class LogicTiamatCutscene : Logic
+    ---@field tiamat Entity
+    ---@field player Entity
+    ---@field cinematic_anchor Entity
+    ---@field timer integer
+
+---@class LogicApepTrigger : Logic
+    ---@field spawn_cooldown integer
+    ---@field cooling_down boolean
+    ---@field apep_journal_entry_logged boolean
+
+---@class LogicCOGAnkhSacrifice : Logic
+    ---@field timer integer
+
+---@class LogicTiamatBubbles : Logic
+    ---@field bubble_spawn_timer integer
+
+---@class LogicTuskPleasurePalace : Logic
+    ---@field locked_door integer
+
+---@class LogicArena1 : Logic
+    ---@field crate_spawn_timer integer
+
+---@class LogicArenaAlienBlast : Logic
+    ---@field timer integer
+
+---@class LogicArenaLooseBombs : Logic
+    ---@field timer integer
+
+---@class MagmamanSpawnPosition
+    ---@field x integer
+    ---@field y integer
+    ---@field timer integer
+
 end
 --## Static class functions
 
@@ -6054,12 +6162,6 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
-
-MagmamanSpawnPosition = nil
----@param x_ integer
----@param y_ integer
----@return MagmamanSpawnPosition
-function MagmamanSpawnPosition:new(x_, y_) end
 ---Create a new color - defaults to black
 ---@return Color
 function Color:new() end
@@ -6177,6 +6279,12 @@ function Quad:new(_bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right
 ---@param aabb AABB
 ---@return Quad
 function Quad:new(aabb) end
+
+MagmamanSpawnPosition = nil
+---@param x_ integer
+---@param y_ integer
+---@return MagmamanSpawnPosition
+function MagmamanSpawnPosition:new(x_, y_) end
 
 --## Enums
 
