@@ -135,17 +135,19 @@ class Movable : public Entity
         this->collect_treasure(amount, coin);
     }
 
+    /// Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
     virtual bool can_jump() = 0;                                             // 37
     virtual void get_collision_info(CollisionInfo*) = 0;                     // 38
     virtual float sprint_factor() = 0;                                       // 39
     virtual void calculate_jump_height() = 0;                                // 40, when disabled, jump height is very high
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0; // 41
     virtual void apply_velocity(Vec2* velocities) = 0;                       // 42, param is pointer to an array of two floats: velocity x and y
-    virtual int8_t stomp_damage() = 0;                                       // 43, calculates the amount of stomp damage applied (checks spike shoes, movable.state and stand_counter resulting in different damage values)
-    virtual int8_t stomp_damage_trampoline() = 0;                            // 44, simply jumps to the 43rd virtual function, aka stomp_damage...
-    virtual bool is_on_fire() = 0;                                           // 45
-    virtual void v46() = 0;                                                  // 46
-    virtual void v47() = 0;                                                  // 47
+    /// Returns stomp damage based on shoes and fall time
+    virtual int8_t stomp_damage() = 0;            // 43, calculates the amount of stomp damage applied (checks spike shoes, movable.state and stand_counter resulting in different damage values)
+    virtual int8_t stomp_damage_trampoline() = 0; // 44, simply jumps to the 43rd virtual function, aka stomp_damage...
+    virtual bool is_on_fire() = 0;                // 45
+    virtual void v46() = 0;                       // 46
+    virtual void v47() = 0;                       // 47
 
     virtual bool on_damage(Entity* damage_dealer, int8_t damage_amount, DAMAGE_TYPE damage_flags, Vec2* velocity, uint8_t unknown_damage_phase, uint16_t stun_amount, uint8_t iframes, bool unknown_is_final) = 0; // 48
 
@@ -156,11 +158,12 @@ class Movable : public Entity
     virtual void freeze(uint8_t framecount) = 0;    // 52
 
     /// Does not damage entity
-    virtual void light_on_fire(uint8_t time) = 0;                // 53
-    virtual void set_cursed(bool b) = 0;                         // 54
-    virtual void on_spiderweb_collision() = 0;                   // 55
-    virtual void set_last_owner_uid_b127(Entity* owner) = 0;     // 56, assigns player as last_owner_uid and also manipulates movable.b127
-    virtual uint32_t get_last_owner_uid() = 0;                   // 57, for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
+    virtual void light_on_fire(uint8_t time) = 0;            // 53
+    virtual void set_cursed(bool b) = 0;                     // 54
+    virtual void on_spiderweb_collision() = 0;               // 55
+    virtual void set_last_owner_uid_b127(Entity* owner) = 0; // 56, assigns player as last_owner_uid and also manipulates movable.b127
+    virtual uint32_t get_last_owner_uid() = 0;               // 57, for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
+    /// Disable to not get killed outside level bounds.
     virtual void check_out_of_bounds() = 0;                      // 58, kills with the 'still falling' death cause, is called for any item/fx/mount/monster/player but not for liquid :(
     virtual void v59() = 0;                                      // 59
     virtual Entity* standing_on() = 0;                           // 60, looks up movable.standing_on_uid in state.instance_id_to_pointer
@@ -172,22 +175,24 @@ class Movable : public Entity
     virtual bool is_player_mount_or_monster() = 0;               // 66
     virtual void pick_up(Entity* entity_to_pick_up) = 0;         // 67
     virtual void on_picked_up_by(Entity* entity_picking_up) = 0; // 68
-    virtual void drop(Entity* entity_to_drop) = 0;               // 69, also used when throwing
+    /// Called when dropping or throwing
+    virtual void drop(Entity* entity_to_drop) = 0; // 69, also used when throwing
 
     /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
-    virtual void collect_treasure(int32_t value, ENT_TYPE treasure) = 0;     // 70
-    virtual void apply_movement() = 0;                                       // 71, disable this function and things can't move, some spin in place
-    virtual void damage_entity(Entity* victim) = 0;                          // 72, can't trigger, maybe extra params are needed
-    virtual void v73() = 0;                                                  // 73
-    virtual bool is_monster_or_player() = 0;                                 // 74
-    virtual void initialize() = 0;                                           // 75, e.g. cobra: set random spit_timer; bat: set random stand_counter; emerald: set price
-    virtual void check_is_falling() = 0;                                     // 76, sets more_flags.falling by comparing velocityy to 0
-    virtual void handle_stun_transition_animation() = 0;                     // 77, e.g. the wiggle the dog does when waking up from being stunned
-    virtual void process_input() = 0;                                        // 78, unsure of params
-    virtual void post_collision_damage_related() = 0;                        // 79, used for enemies attacks as well?
-    virtual void on_picked_up() = 0;                                         // 80, gets called after on_picked_up_by
-    virtual void hired_hand_related() = 0;                                   // 81, checks ai_func, gets triggered just after throwing hired hand
-    virtual void generate_fall_poof_particles() = 0;                         // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
+    virtual void collect_treasure(int32_t value, ENT_TYPE treasure) = 0; // 70
+    virtual void apply_movement() = 0;                                   // 71, disable this function and things can't move, some spin in place
+    virtual void damage_entity(Entity* victim) = 0;                      // 72, can't trigger, maybe extra params are needed
+    virtual void v73() = 0;                                              // 73
+    virtual bool is_monster_or_player() = 0;                             // 74
+    virtual void initialize() = 0;                                       // 75, e.g. cobra: set random spit_timer; bat: set random stand_counter; emerald: set price
+    virtual void check_is_falling() = 0;                                 // 76, sets more_flags.falling by comparing velocityy to 0
+    virtual void handle_stun_transition_animation() = 0;                 // 77, e.g. the wiggle the dog does when waking up from being stunned
+    virtual void process_input() = 0;                                    // 78, unsure of params
+    virtual void post_collision_damage_related() = 0;                    // 79, used for enemies attacks as well?
+    virtual void on_picked_up() = 0;                                     // 80, gets called after on_picked_up_by
+    virtual void hired_hand_related() = 0;                               // 81, checks ai_func, gets triggered just after throwing hired hand
+    virtual void generate_fall_poof_particles() = 0;                     // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
+    /// Applies gravity to entity. Disable to float like on hoverpack.
     virtual void handle_fall_logic() = 0;                                    // 83, adjusts entity.velocityy when falling
     virtual void apply_friction() = 0;                                       // 84, applies entity.type.friction to entity.velocityx
     virtual void boss_related() = 0;                                         // 85, when disabled, quillback keeps stomping through the level, including border tiles
