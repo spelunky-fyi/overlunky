@@ -8166,7 +8166,10 @@ void render_game_props()
             for (auto i = 1; i < def.chances.size(); ++i)
                 all += "," + fmt::format("{}", def.chances[i]);
             std::string str = fmt::format("{:.3f}% ({})", chance, all);
-            ImGui::LabelText(str.c_str(), name.c_str());
+            ImGui::Text("%s", name.c_str());
+            auto w = ImGui::GetItemRectSize().x;
+            ImGui::SameLine(std::max(0.5f * ImGui::GetContentRegionMax().x, w), 4.f);
+            ImGui::Text("%s", str.c_str());
         };
 
         static auto render_chance = [](int inverse_chance, const char* name)
@@ -8175,7 +8178,10 @@ void render_game_props()
                 return;
             float chance = inverse_chance > 0 ? 100.f / static_cast<float>(inverse_chance) : 0;
             std::string str = fmt::format("{:.3f}%", chance);
-            ImGui::LabelText(str.c_str(), name);
+            ImGui::Text("%s", name);
+            auto w = ImGui::GetItemRectSize().x;
+            ImGui::SameLine(std::max(0.5f * ImGui::GetContentRegionMax().x, w), 4.f);
+            ImGui::Text("%s", str.c_str());
         };
 
         ImGui::SeparatorText("Monster chances");
