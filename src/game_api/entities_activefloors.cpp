@@ -38,8 +38,6 @@ void Drill::trigger()
     move_state = 6;
     flags = flags & ~(1U << (10 - 1));
 
-    using construct_soundposition_ptr_fun_t = SoundMeta*(uint32_t id, bool background_sound);
-    static const auto construct_soundposition_ptr_call = (construct_soundposition_ptr_fun_t*)get_address("construct_soundmeta");
-    sound1 = construct_soundposition_ptr_call(0x159, 0);
-    sound2 = construct_soundposition_ptr_call(0x153, 0);
+    sound1 = construct_soundmeta(0x159, false);
+    sound2 = construct_soundmeta(0x153, false);
 }

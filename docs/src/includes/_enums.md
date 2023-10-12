@@ -245,11 +245,38 @@ Name | Data | Description
 [LEDGE_GRAB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LEDGE_GRAB) | 31 | 
 [STOOD_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOOD_ON) | 32 | 
 [INIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INIT) | 36 | 
+[CAN_JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_JUMP) | 37 | 
+[STOMP_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMP_DAMAGE) | 43 | 
+[IS_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_ON_FIRE) | 45 | 
 [DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
-[APPLY_MOVEMENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_MOVEMENT) | 71 | 
-[CHECK_IS_FALLING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CHECK_IS_FALLING) | 75 | 
-[PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PROCESS_INPUT) | 77 | 
+[ON_HIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_HIT) | 49 | 
+[STUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STUN) | 51 | 
+[FREEZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FREEZE) | 52 | 
+[LIGHT_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_ON_FIRE) | 53 | 
+[SET_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_CURSED) | 54 | 
+[WEB_COLLISION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.WEB_COLLISION) | 55 | 
+[CHECK_OUT_OF_BOUNDS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CHECK_OUT_OF_BOUNDS) | 58 | 
+[STANDING_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STANDING_ON) | 60 | 
+[STOMPED_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMPED_BY) | 61 | 
+[THROWN_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.THROWN_BY) | 62 | 
+[CLONED_TO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CLONED_TO) | 63 | 
+[PICK_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICK_UP) | 67 | 
+[PICKED_UP_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP_BY) | 68 | 
+[DROP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DROP) | 69 | 
+[COLLECT_TREASURE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.COLLECT_TREASURE) | 70 | 
+[INITIALIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INITIALIZE) | 75 | 
+[PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PROCESS_INPUT) | 78 | 
+[PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP) | 80 | 
+[FALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FALL) | 83 | 
+[APPLY_FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_FRICTION) | 84 | 
+[CRUSH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CRUSH) | 90 | 
 [FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
+[ENTER_ATTEMPT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER_ATTEMPT) | 40 | 
+[HIDE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.HIDE_HUD) | 41 | 
+[ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER) | 42 | 
+[LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_LEVEL) | 44 | 
+[IS_UNLOCKED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_UNLOCKED) | 45 | 
+[CAN_ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_ENTER) | 46 | 
 
 ## ENT_FLAG
 
@@ -641,6 +668,44 @@ Name | Data | Description
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.LAVA) | 3 | 
 [COARSE_LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.COARSE_LAVA) | 4 | 
 [STAGNANT_LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.STAGNANT_LAVA) | 5 | 
+
+## LOGIC
+
+
+> Search script examples for [LOGIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[TUTORIAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TUTORIAL) | LOGIC::TUTORIAL | 
+[OUROBOROS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.OUROBOROS) | LOGIC::OUROBOROS | 
+[SPEEDRUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.SPEEDRUN) | LOGIC::SPEEDRUN | 
+[GHOST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.GHOST) | LOGIC::GHOST | 
+[GHOST_TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.GHOST_TOAST) | LOGIC::GHOST_TOAST | 
+[TUN_AGGRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TUN_AGGRO) | LOGIC::TUN_AGGRO | 
+[DICESHOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DICESHOP) | LOGIC::DICESHOP | 
+[PRE_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.PRE_CHALLENGE) | LOGIC::PRE_CHALLENGE | 
+[MOON_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MOON_CHALLENGE) | LOGIC::MOON_CHALLENGE | 
+[STAR_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.STAR_CHALLENGE) | LOGIC::STAR_CHALLENGE | 
+[SUN_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.SUN_CHALLENGE) | LOGIC::SUN_CHALLENGE | 
+[MAGMAMAN_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MAGMAMAN_SPAWN) | LOGIC::MAGMAMAN_SPAWN | 
+[WATER_BUBBLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.WATER_BUBBLES) | LOGIC::WATER_BUBBLES | 
+[OLMEC_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.OLMEC_CUTSCENE) | LOGIC::OLMEC_CUTSCENE | 
+[TIAMAT_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TIAMAT_CUTSCENE) | LOGIC::TIAMAT_CUTSCENE | 
+[APEP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.APEP) | LOGIC::APEP | 
+[COG_SACRIFICE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.COG_SACRIFICE) | LOGIC::COG_SACRIFICE | 
+[DUAT_BOSSES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DUAT_BOSSES) | LOGIC::DUAT_BOSSES | 
+[BUBBLER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.BUBBLER) | LOGIC::BUBBLER | 
+[PLEASURE_PALACE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.PLEASURE_PALACE) | LOGIC::PLEASURE_PALACE | 
+[DISCOVERY_INFO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DISCOVERY_INFO) | LOGIC::DISCOVERY_INFO | 
+[BLACK_MARKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.BLACK_MARKET) | LOGIC::BLACK_MARKET | 
+[JELLYFISH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.JELLYFISH) | LOGIC::JELLYFISH | 
+[ARENA_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_1) | LOGIC::ARENA_1 | 
+[ARENA_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_2) | LOGIC::ARENA_2 | 
+[ARENA_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_3) | LOGIC::ARENA_3 | 
+[ARENA_ALIEN_BLAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_ALIEN_BLAST) | LOGIC::ARENA_ALIEN_BLAST | 
+[ARENA_LOOSE_BOMBS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_LOOSE_BOMBS) | LOGIC::ARENA_LOOSE_BOMBS | 
 
 ## MASK
 
