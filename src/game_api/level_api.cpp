@@ -1989,13 +1989,17 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
-            if (this_chances.chances.size() >= state->level)
+            if (this_chances.chances.size() >= state->level && state->level > 0)
             {
-                return this_chances.chances[state->level];
+                return this_chances.chances[state->level - 1];
+            }
+            else if (this_chances.chances.size() == 1)
+            {
+                return this_chances.chances[0];
             }
             else
             {
-                return this_chances.chances[0];
+                return 0;
             }
         }
     }
@@ -2006,13 +2010,17 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
         if (!this_chances.chances.empty())
         {
             auto* state = State::get().ptr();
-            if (this_chances.chances.size() >= state->level)
+            if (this_chances.chances.size() >= state->level && state->level > 0)
             {
-                return this_chances.chances[state->level];
+                return this_chances.chances[state->level - 1];
+            }
+            else if (this_chances.chances.size() == 1)
+            {
+                return this_chances.chances[0];
             }
             else
             {
-                return this_chances.chances[0];
+                return 0;
             }
         }
     }
