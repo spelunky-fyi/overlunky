@@ -2324,7 +2324,7 @@ void respawn()
         if (!found)
         {
             g_state->items->player_inventories[i].health = 4;
-            UI::spawn_player(i, g_state->level_gen->spawn_x, g_state->level_gen->spawn_y);
+            UI::spawn_player(i);
         }
     }
 }
@@ -8071,7 +8071,7 @@ void render_game_props()
                 {
                     g_state->items->player_inventories[i].health = 4;
                     auto uid = g_state->next_entity_uid;
-                    UI::spawn_player(i, spawn_x, spawn_y);
+                    UI::spawn_player(i);
                     auto player = get_entity_ptr(uid)->as<Player>();
                     player->set_position(spawn_x, spawn_y);
                 }
