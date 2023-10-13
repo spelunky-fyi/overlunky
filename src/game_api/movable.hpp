@@ -14,7 +14,7 @@ class CutsceneBehavior
 {
   public:
     virtual ~CutsceneBehavior(){};
-    virtual void update() = 0;
+    virtual void update(Movable* e) = 0;
     // no more virtuals, it's possible that different sub classes have some extra variables as well
 };
 
@@ -24,7 +24,7 @@ class Movable : public Entity
     custom_map<uint32_t, MovableBehavior*> behaviors_map;
     custom_set<MovableBehavior*, SortMovableBehavior> behaviors;
     MovableBehavior* current_behavior;
-    CutsceneBehavior* ic8;
+    CutsceneBehavior* cutscene_behavior;
     union
     {
         /// {movex, movey}
