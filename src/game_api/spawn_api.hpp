@@ -49,7 +49,7 @@ void pop_spawn_type_flags(SPAWN_TYPE flags);
 
 void init_spawn_hooks();
 
-int32_t spawn_player(int8_t player_slot, std::optional<float> x = std::nullopt, std::optional<float> y = std::nullopt);
+int32_t spawn_player(int8_t player_slot, std::optional<float> x = std::nullopt, std::optional<float> y = std::nullopt, std::optional<LAYER> layer = std::nullopt);
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer);
 int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_template = 65);
 int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int16_t room_template = -1);

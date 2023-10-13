@@ -2305,7 +2305,7 @@ void respawn()
         }
         return;
     }
-    for (int8_t i = 0; i < 4; ++i)
+    for (int8_t i = 0; i < g_state->items->player_count; ++i)
     {
         auto found = false;
         for (auto p : UI::get_players())

@@ -662,7 +662,7 @@ void init_spawn_hooks()
     }
 }
 
-int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<float> y)
+int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<float> y, std::optional<LAYER> layer)
 {
     if (player_slot < 1 || player_slot > 4)
         return -1;
@@ -685,7 +685,12 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
     auto uid = (int32_t)state->next_entity_uid;
     using spawn_player_fun = void(Items*, uint8_t ps);
     static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
+    // lazy? maybe. it's where it gets the state+0x1300 layer0 pointer
+    auto layer_off = get_address("spawn_player") + 0x3ea;
+    if (layer.has_value() && layer.value() == LAYER::BACK)
+        write_mem_recoverable("spawn_player_layer", layer_off, 0x1308, true);
     spawn_player(get_state_ptr()->items, player_slot - 1);
+    recover_mem("spawn_player_layer");
     state->level_gen->spawn_x = old_x;
     state->level_gen->spawn_y = old_y;
     return uid;

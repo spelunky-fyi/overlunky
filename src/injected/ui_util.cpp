@@ -754,9 +754,9 @@ int32_t UI::spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer,
     return uid;
 }
 
-void UI::spawn_player(uint8_t player_slot, std::optional<float> x, std::optional<float> y)
+void UI::spawn_player(uint8_t player_slot, std::optional<float> x, std::optional<float> y, std::optional<LAYER> layer)
 {
-    ::spawn_player(player_slot + 1, x, y);
+    ::spawn_player(player_slot + 1, x, y, layer);
 }
 
 std::pair<float, float> UI::spawn_position()
