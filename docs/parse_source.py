@@ -104,6 +104,7 @@ api_files = [
     "../src/game_api/script/usertypes/screen_arena_lua.cpp",
     "../src/game_api/script/usertypes/socket_lua.cpp",
     "../src/game_api/script/usertypes/steam_lua.cpp",
+    "../src/game_api/script/usertypes/logic_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
@@ -124,6 +125,8 @@ constructors = {}
 
 cpp_type_exceptions = [
     "Players",
+    "CutsceneBehavior",
+    "CustomCutsceneBehavior",
 ]
 not_functions = [
     "players",
@@ -892,7 +895,8 @@ def run_parse():
                 if not var:
                     continue
                 var = var.split(",")
-                vars.append({"name": var[0], "type": var[1]})
+                if len(var) > 1:
+                    vars.append({"name": var[0], "type": var[1]})
             enums.append({"name": name, "vars": vars})
         data = open(file, "r").read()
         data = data.replace("\n", " ")

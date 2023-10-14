@@ -2142,3 +2142,69 @@ std::optional<double> get_frametime_inactive()
         return memory_read<double>(offset);
     return std::nullopt;
 }
+
+void destroy_layer(uint8_t layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unload_layer");
+    }
+    if (offset != 0)
+    {
+        auto state = State::get().ptr();
+        for (auto i = 0; i < MAX_PLAYERS; ++i)
+        {
+            if (state->items->players[i] && state->items->players[i]->layer == layer)
+                state->items->players[i] = nullptr;
+        }
+        auto* layer_ptr = State::get().layer(layer);
+        typedef void destroy_func(Layer*);
+        static destroy_func* df = (destroy_func*)(offset);
+        df(layer_ptr);
+    }
+}
+
+void destroy_level()
+{
+    destroy_layer(0);
+    destroy_layer(1);
+}
+
+void create_layer(uint8_t layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("init_layer");
+    }
+    if (offset != 0)
+    {
+        auto* layer_ptr = State::get().layer(layer);
+        typedef void init_func(Layer*);
+        static init_func* ilf = (init_func*)(offset);
+        ilf(layer_ptr);
+    }
+}
+
+void create_level()
+{
+    create_layer(0);
+    create_layer(1);
+}
+
+void set_death_enabled(bool enable)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("dead_players");
+    }
+    if (offset != 0)
+    {
+        if (!enable)
+            write_mem_recoverable("death_disable", offset, "\xC3\x90"sv, true);
+        else
+            recover_mem("death_disable");
+    }
+}

@@ -81,6 +81,7 @@
 #include "usertypes/gui_lua.hpp"                   // for register_usertypes
 #include "usertypes/hitbox_lua.hpp"                // for register_usertypes
 #include "usertypes/level_lua.hpp"                 // for register_usertypes
+#include "usertypes/logic_lua.hpp"                 // for register_usertypes
 #include "usertypes/particles_lua.hpp"             // for register_usertypes
 #include "usertypes/player_lua.hpp"                // for register_usertypes
 #include "usertypes/prng_lua.hpp"                  // for register_usertypes
@@ -94,6 +95,7 @@
 #include "usertypes/texture_lua.hpp"               // for register_usertypes
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 #include "usertypes/vtables_lua.hpp"               // for register_usertypes
+#include "virtual_table.hpp"
 
 struct Illumination;
 
@@ -291,6 +293,7 @@ end
     NBehavior::register_usertypes(lua);
     NSteam::register_usertypes(lua);
     NVTables::register_usertypes(lua);
+    NLogic::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
 
@@ -1890,13 +1893,16 @@ end
     /// Disable all crust item spawns, returns whether they were already disabled before the call
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
-    /// Get the address for a pattern name
-    lua["get_address"] = get_address;
-
-    /// Get the rva for a pattern name
-    lua["get_rva"] = [](std::string_view address_name) -> size_t
+    /// Get the rva for a pattern name, used for debugging.
+    lua["get_rva"] = [](std::string_view address_name) -> std::string
     {
-        return get_address(address_name) - Memory::get().at_exe(0);
+        return fmt::format("{:x}", get_address(address_name) - Memory::get().at_exe(0));
+    };
+
+    /// Get the rva for a vtable offset and index, used for debugging.
+    lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index) -> std::string
+    {
+        return fmt::format("{:x}", get_virtual_function_address(offset, index));
     };
 
     /// Log to spelunky.log
@@ -2094,6 +2100,53 @@ end
     /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
     lua["get_frametime_unfocused"] = get_frametime_inactive;
 
+    /// Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
+    lua["destroy_level"] = destroy_level;
+
+    /// Destroys a layer and all entities in it.
+    lua["destroy_layer"] = destroy_layer;
+
+    /// Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+    lua["create_level"] = create_level;
+
+    /// Initializes an empty layer that doesn't currently exist.
+    lua["create_layer"] = create_layer;
+
+    /// Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
+    lua["set_level_logic_enabled"] = set_death_enabled;
+
+    /// Converts INPUTS to (x, y, BUTTON)
+    lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
+    {
+        float x = 0;
+        float y = 0;
+        if (inputs & 0x100)
+            x = -1;
+        else if (inputs & 0x200)
+            x = 1;
+        if (inputs & 0x400)
+            y = 1;
+        else if (inputs & 0x800)
+            y = -1;
+        BUTTON buttons = (BUTTON)(inputs & 0x3f);
+        return std::make_tuple(x, y, buttons);
+    };
+
+    /// Converts (x, y, BUTTON) to INPUTS
+    lua["buttons_to_inputs"] = [](float x, float y, BUTTON buttons) -> INPUTS
+    {
+        INPUTS inputs = buttons;
+        if (x < 0)
+            inputs |= 0x100;
+        else if (x > 0)
+            inputs |= 0x200;
+        if (y > 0)
+            inputs |= 0x400;
+        else if (y < 0)
+            inputs |= 0x800;
+        return inputs;
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(
@@ -2248,7 +2301,24 @@ end
         "POST_UPDATE",
         ON::POST_UPDATE,
         "USER_DATA",
-        ON::USER_DATA);
+        ON::USER_DATA,
+        "PRE_LEVEL_CREATION",
+        ON::PRE_LEVEL_CREATION,
+        "POST_LEVEL_CREATION",
+        ON::POST_LEVEL_CREATION,
+        "PRE_LAYER_CREATION",
+        ON::PRE_LAYER_CREATION,
+        "POST_LAYER_CREATION",
+        ON::POST_LAYER_CREATION,
+        "PRE_LEVEL_DESTRUCTION",
+        ON::PRE_LEVEL_DESTRUCTION,
+        "POST_LEVEL_DESTRUCTION",
+        ON::POST_LEVEL_DESTRUCTION,
+        "PRE_LAYER_DESTRUCTION",
+        ON::PRE_LAYER_DESTRUCTION,
+        "POST_LAYER_DESTRUCTION",
+        ON::POST_LAYER_DESTRUCTION);
+
     /* ON
     // LOGO
     // Runs when entering the the mossmouth logo screen.
@@ -2325,7 +2395,7 @@ end
     // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
-    // Runs before any level generation, no entities should exist at this point
+    // Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.
     // POST_ROOM_GENERATION
     // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
@@ -2460,6 +2530,26 @@ end
     // USER_DATA
     // Params: Entity ent
     // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
+    // PRE_LEVEL_CREATION
+    // Runs right before the front layer is created. Runs in all screens that usually have entities, or when creating a layer manually.
+    // POST_LEVEL_CREATION
+    // Runs right after the back layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.
+    // PRE_LAYER_CREATION
+    // Params: LAYER layer
+    // Runs right before a layer is created. Runs in all screens that usually have entities, or when creating a layer manually.
+    // POST_LAYER_CREATION
+    // Params: LAYER layer
+    // Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.
+    // PRE_LEVEL_DESTRUCTION
+    // Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // POST_LEVEL_DESTRUCTION
+    // Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // PRE_LAYER_DESTRUCTION
+    // Params: LAYER layer
+    // Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // POST_LAYER_DESTRUCTION
+    // Params: LAYER layer
+    // Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
     */
 
     lua.create_named_table(

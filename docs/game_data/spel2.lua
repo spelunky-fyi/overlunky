@@ -383,10 +383,11 @@ function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 ---If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ---@param player_slot integer
----@param x number
----@param y number
----@return nil
-function spawn_player(player_slot, x, y) end
+---@param x number?
+---@param y number?
+---@param layer LAYER?
+---@return integer
+function spawn_player(player_slot, x, y, layer) end
 ---Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input) and send_input to controll it
 ---or change it's `player_inputs` to the `input` of real player so he can control it directly
 ---@param char_type ENT_TYPE
@@ -1134,14 +1135,15 @@ function update_liquid_collision_at(x, y, add) end
 ---@param disable boolean
 ---@return boolean
 function disable_floor_embeds(disable) end
----Get the address for a pattern name
+---Get the rva for a pattern name, used for debugging.
 ---@param address_name string
----@return integer
-function get_address(address_name) end
----Get the rva for a pattern name
----@param address_name string
----@return integer
+---@return string
 function get_rva(address_name) end
+---Get the rva for a vtable offset and index, used for debugging.
+---@param offset VTABLE_OFFSET
+---@param index integer
+---@return string
+function get_virtual_rva(offset, index) end
 ---Log to spelunky.log
 ---@param message string
 ---@return nil
@@ -1233,6 +1235,34 @@ function set_frametime_unfocused(frametime) end
 ---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 ---@return double?
 function get_frametime_unfocused() end
+---Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
+---@return nil
+function destroy_level() end
+---Destroys a layer and all entities in it.
+---@param layer integer
+---@return nil
+function destroy_layer(layer) end
+---Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+---@return nil
+function create_level() end
+---Initializes an empty layer that doesn't currently exist.
+---@param layer integer
+---@return nil
+function create_layer(layer) end
+---Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
+---@param enable boolean
+---@return nil
+function set_level_logic_enabled(enable) end
+---Converts INPUTS to (x, y, BUTTON)
+---@param inputs INPUTS
+---@return number, number, BUTTON
+function inputs_to_buttons(inputs) end
+---Converts (x, y, BUTTON) to INPUTS
+---@param x number
+---@param y number
+---@param buttons BUTTON
+---@return INPUTS
+function buttons_to_inputs(x, y, buttons) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1475,13 +1505,13 @@ function grow_chainandblocks(x, y) end
 ---@return nil
 function load_screen() end
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
----@param customtheme CustomTheme|ThemeInfo|THEME
+---@param e customthem
 ---@return nil
-function force_custom_theme(customtheme) end
+function force_custom_theme(e) end
 ---Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
----@param customtheme CustomTheme|ThemeInfo|THEME
+---@param e customthem
 ---@return nil
-function force_custom_subtheme(customtheme) end
+function force_custom_subtheme(e) end
 ---Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
 ---@param path string
 ---@return CustomSound?
@@ -1660,13 +1690,13 @@ function show_journal(chapter, page) end
 ---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 ---The server will be closed once the handle is released.
 ---@param host string
----@param port integer
+---@param port in_port_t
 ---@param cb function
 ---@return UdpServer
 function udp_listen(host, port, cb) end
 ---Send data to specified UDP address. Requires unsafe mode.
 ---@param host string
----@param port integer
+---@param port in_port_t
 ---@param msg string
 ---@return nil
 function udp_send(host, port, msg) end
@@ -2017,7 +2047,7 @@ do
     ---@field light1 LightParams
     ---@field light2 LightParams
     ---@field light3 LightParams
-    ---@field light4 LightParams @It's rendered on objects around, not as an actual bright spot
+    ---@field light4 LightParams @It's rendered on anys around, not as an actual bright spot
     ---@field brightness number
     ---@field brightness_multiplier number
     ---@field light_pos_x number
@@ -2068,51 +2098,6 @@ do
     ---@field code integer
     ---@field local_player_slot integer
     ---@field get_code fun(self): string @Gets the string equivalent of the code
-
----@class LogicList
-    ---@field olmec_cutscene LogicOlmecCutscene
-    ---@field tiamat_cutscene LogicTiamatCutscene
-    ---@field magmaman_spawn LogicMagmamanSpawn
-    ---@field diceshop LogicDiceShop
-
----@class Logic
-    ---@field logic_index integer
-
----@class LogicOlmecCutscene : Logic
-    ---@field olmec Entity
-    ---@field player Entity
-    ---@field cinematic_anchor Entity
-    ---@field timer integer
-
----@class LogicTiamatCutscene : Logic
-    ---@field tiamat Entity
-    ---@field player Entity
-    ---@field cinematic_anchor Entity
-    ---@field timer integer
-
----@class MagmamanSpawnPosition
-    ---@field x integer
-    ---@field y integer
-    ---@field timer integer
-
----@class LogicMagmamanSpawn : Logic
-    ---@field magmaman_positions custom_Array<MagmamanSpawnPosition>
-
----@class LogicDiceShop : Logic
-    ---@field bet_machine integer
-    ---@field die1 integer
-    ---@field die2 integer
-    ---@field die_1_value integer
-    ---@field die_2_value integer
-    ---@field prize_dispenser integer
-    ---@field prize integer
-    ---@field forcefield integer
-    ---@field bet_active boolean
-    ---@field forcefield_deactivated boolean
-    ---@field boss_angry boolean
-    ---@field result_announcement_timer integer
-    ---@field won_prizes_count integer
-    ---@field balance integer
 
 ---@class RoomOwnersInfo
     ---@field owned_items custom_map<integer, ItemOwnerDetails> @key/index is the uid of an item
@@ -2187,8 +2172,8 @@ do
     ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean @Returns true with a chance of `1/inverse_chance`
     ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
     ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
-    ---@field get_pair fun(self, type: PRNG_CLASS): integer, integer
-    ---@field set_pair fun(self, type: PRNG_CLASS, first: integer, second: integer): nil
+    ---@field get_pair any @&PRNG::get_pair
+    ---@field set_pair any @&PRNG::set_pair
 local PRNG = nil
 ---Drop-in replacement for `math.random()`
 ---@return number
@@ -2270,7 +2255,7 @@ function PRNG:random(min, max) end
     ---@field facing_left boolean
     ---@field render_inactive boolean
     ---@field texture_num integer
-    ---@field get_entity fun(self): Entity
+    ---@field get_entity fun(self): class Entity
     ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
     ---@field get_second_texture TEXTURE?
     ---@field get_third_texture TEXTURE?
@@ -2433,11 +2418,11 @@ function Entity:overlaps_with(other) end
     ---@field freeze fun(self, framecount: integer): nil
     ---@field light_on_fire fun(self, time: integer): nil @Does not damage entity
     ---@field set_cursed fun(self, b: boolean): nil
-    ---@field drop fun(self, entity_to_drop: Entity): nil
+    ---@field drop fun(self, entity_to_drop: Entity): nil @Called when dropping or throwing
     ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
-    ---@field can_jump fun(self): boolean
+    ---@field can_jump fun(self): boolean @Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
     ---@field standing_on fun(self): Entity
-    ---@field add_money fun(self, money: integer): nil @Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
+    ---@field collect_treasure fun(self, value: integer, treasure: ENT_TYPE): nil @Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
     ---@field is_on_fire fun(self): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean @Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field get_all_behaviors fun(self): integer[] @Get all avaible behavior ids
@@ -2446,6 +2431,9 @@ function Entity:overlaps_with(other) end
     ---@field set_gravity fun(self, gravity: number): nil @Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
     ---@field reset_gravity fun(self): nil @Remove the gravity hook and reset to defaults
     ---@field set_position fun(self, to_x: number, to_y: number): nil @Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
+    ---@field process_input fun(self): nil
+    ---@field cutscene CutsceneBehavior
+    ---@field clear_cutscene any @[](Movable&movable){deletemovable.cutscene_behavior
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior @Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
@@ -2453,14 +2441,56 @@ function Entity:overlaps_with(other) end
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
+    ---@field set_pre_can_jump fun(self, fun: fun(self: Movable): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> can_jump(Movable self)`<br/>Virtual function docs:<br/>Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
+    ---@field set_post_can_jump fun(self, fun: fun(self: Movable): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil can_jump(Movable self)`<br/>Virtual function docs:<br/>Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
+    ---@field set_pre_stomp_damage fun(self, fun: fun(self: Movable): integer?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<integer> stomp_damage(Movable self)`
+    ---@field set_post_stomp_damage fun(self, fun: fun(self: Movable): integer?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stomp_damage(Movable self)`
+    ---@field set_pre_is_on_fire fun(self, fun: fun(self: Movable): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> is_on_fire(Movable self)`
+    ---@field set_post_is_on_fire fun(self, fun: fun(self: Movable): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil is_on_fire(Movable self)`
     ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-    ---@field set_pre_apply_movement fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool apply_movement(Movable self)`
-    ---@field set_post_apply_movement fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil apply_movement(Movable self)`
-    ---@field set_pre_check_is_falling fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool check_is_falling(Movable self)`
-    ---@field set_post_check_is_falling fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil check_is_falling(Movable self)`
+    ---@field set_pre_on_hit fun(self, fun: fun(self: Movable, damage_dealer: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_hit(Movable self, Entity damage_dealer)`<br/>Virtual function docs:<br/>Hit by broken arrows etc that don't deal damage, calls on_damage with 0 damage.
+    ---@field set_post_on_hit fun(self, fun: fun(self: Movable, damage_dealer: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_hit(Movable self, Entity damage_dealer)`<br/>Virtual function docs:<br/>Hit by broken arrows etc that don't deal damage, calls on_damage with 0 damage.
+    ---@field set_pre_stun fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stun(Movable self, integer framecount)`
+    ---@field set_post_stun fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stun(Movable self, integer framecount)`
+    ---@field set_pre_freeze fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool freeze(Movable self, integer framecount)`
+    ---@field set_post_freeze fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil freeze(Movable self, integer framecount)`
+    ---@field set_pre_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
+    ---@field set_post_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
+    ---@field set_pre_set_cursed fun(self, fun: fun(self: Movable, b: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, boolean b)`
+    ---@field set_post_set_cursed fun(self, fun: fun(self: Movable, b: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, boolean b)`
+    ---@field set_pre_web_collision fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool web_collision(Movable self)`
+    ---@field set_post_web_collision fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil web_collision(Movable self)`
+    ---@field set_pre_check_out_of_bounds fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool check_out_of_bounds(Movable self)`
+    ---@field set_post_check_out_of_bounds fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil check_out_of_bounds(Movable self)`
+    ---@field set_pre_standing_on fun(self, fun: fun(self: Movable): Entity?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<Entity> standing_on(Movable self)`
+    ---@field set_post_standing_on fun(self, fun: fun(self: Movable): Entity?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil standing_on(Movable self)`
+    ---@field set_pre_stomped_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stomped_by(Movable self, Entity*)`
+    ---@field set_post_stomped_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stomped_by(Movable self, Entity*)`
+    ---@field set_pre_thrown_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool thrown_by(Movable self, Entity*)`
+    ---@field set_post_thrown_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil thrown_by(Movable self, Entity*)`
+    ---@field set_pre_cloned_to fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool cloned_to(Movable self, Entity*)`
+    ---@field set_post_cloned_to fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil cloned_to(Movable self, Entity*)`
+    ---@field set_pre_pick_up fun(self, fun: fun(self: Movable, entity_to_pick_up: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool pick_up(Movable self, Entity entity_to_pick_up)`
+    ---@field set_post_pick_up fun(self, fun: fun(self: Movable, entity_to_pick_up: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil pick_up(Movable self, Entity entity_to_pick_up)`
+    ---@field set_pre_picked_up_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool picked_up_by(Movable self, Entity*)`
+    ---@field set_post_picked_up_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil picked_up_by(Movable self, Entity*)`
+    ---@field set_pre_drop fun(self, fun: fun(self: Movable, entity_to_drop: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool drop(Movable self, Entity entity_to_drop)`<br/>Virtual function docs:<br/>Called when dropping or throwing
+    ---@field set_post_drop fun(self, fun: fun(self: Movable, entity_to_drop: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil drop(Movable self, Entity entity_to_drop)`<br/>Virtual function docs:<br/>Called when dropping or throwing
+    ---@field set_pre_collect_treasure fun(self, fun: fun(self: Movable, value: integer, treasure: ENT_TYPE): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool collect_treasure(Movable self, integer value, ENT_TYPE treasure)`<br/>Virtual function docs:<br/>Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
+    ---@field set_post_collect_treasure fun(self, fun: fun(self: Movable, value: integer, treasure: ENT_TYPE): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil collect_treasure(Movable self, integer value, ENT_TYPE treasure)`<br/>Virtual function docs:<br/>Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
+    ---@field set_pre_initialize fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool initialize(Movable self)`
+    ---@field set_post_initialize fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil initialize(Movable self)`
     ---@field set_pre_process_input fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool process_input(Movable self)`
     ---@field set_post_process_input fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil process_input(Movable self)`
+    ---@field set_pre_picked_up fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool picked_up(Movable self)`
+    ---@field set_post_picked_up fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil picked_up(Movable self)`
+    ---@field set_pre_fall fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool fall(Movable self)`
+    ---@field set_post_fall fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil fall(Movable self)`
+    ---@field set_pre_apply_friction fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool apply_friction(Movable self)`
+    ---@field set_post_apply_friction fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil apply_friction(Movable self)`
+    ---@field set_pre_crush fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool crush(Movable self, Entity*)`
+    ---@field set_post_crush fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil crush(Movable self, Entity*)`
 local Movable = nil
 ---Move a movable according to its velocity, update physics, gravity, etc.
 ---Will also update `movable.animation_frame` and various timers and counters
@@ -2481,6 +2511,8 @@ function Movable:generic_update_world(disable_gravity) end
 ---@param on_rope boolean
 ---@return nil
 function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_rope) end
+
+---@class CutsceneBehavior
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
@@ -2508,7 +2540,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field kills_level integer
     ---@field kills_total integer
     ---@field collected_money_total integer @Total money collected during previous levels (so excluding the current one)
-    ---@field collected_money_count integer @Count/size for the `collected_money` arrays
+    ---@field collected_money_count integer @Count/size for the `collected_money` Arrays
     ---@field collected_money ENT_TYPE[] @size: 512 @Types of gold/gems collected during this level, used later to display during the transition
     ---@field collected_money_values integer[] @size: 512 @Values of gold/gems collected during this level, used later to display during the transition
     ---@field killed_enemies ENT_TYPE[] @size: 256 @Types of enemies killed during this level, used later to display during the transition
@@ -2573,9 +2605,26 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Door : Floor
     ---@field counter integer
     ---@field fx_button Entity
-    ---@field enter fun(self, who: Entity): integer
-    ---@field is_unlocked fun(self): boolean @Will alwyas return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    ---@field enter fun(self, who: Entity): integer @Returns the entity state / behavior id to set the entity to after the entering animation.
+    ---@field light_level fun(self): number @Returns the darkest light level used to fade the entity when entering or exiting. 0 = black, 1 = no change
+    ---@field is_unlocked fun(self): boolean @Should we display the button prompt when collided by player. Will always return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    ---@field can_enter fun(self, player: Entity): boolean @Can the door actually be entered by player. Overrides the button prompt too if false.
     ---@field unlock fun(self, unlock: boolean): nil @Lock/Unlock doors
+    ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
+    ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
+    ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
+    ---@field set_pre_enter_attempt fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> enter_attempt(Door self, Entity*)`
+    ---@field set_post_enter_attempt fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil enter_attempt(Door self, Entity*)`
+    ---@field set_pre_hide_hud fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> hide_hud(Door self, Entity*)`
+    ---@field set_post_hide_hud fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil hide_hud(Door self, Entity*)`
+    ---@field set_pre_enter fun(self, fun: fun(self: Door, who: Entity): integer?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<integer> enter(Door self, Entity who)`<br/>Virtual function docs:<br/>Returns the entity state / behavior id to set the entity to after the entering animation.
+    ---@field set_post_enter fun(self, fun: fun(self: Door, who: Entity): integer?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil enter(Door self, Entity who)`<br/>Virtual function docs:<br/>Returns the entity state / behavior id to set the entity to after the entering animation.
+    ---@field set_pre_light_level fun(self, fun: fun(self: Door): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> light_level(Door self)`<br/>Virtual function docs:<br/>Returns the darkest light level used to fade the entity when entering or exiting. 0 = black, 1 = no change
+    ---@field set_post_light_level fun(self, fun: fun(self: Door): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil light_level(Door self)`<br/>Virtual function docs:<br/>Returns the darkest light level used to fade the entity when entering or exiting. 0 = black, 1 = no change
+    ---@field set_pre_is_unlocked fun(self, fun: fun(self: Door): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> is_unlocked(Door self)`<br/>Virtual function docs:<br/>Should we display the button prompt when collided by player. Will always return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    ---@field set_post_is_unlocked fun(self, fun: fun(self: Door): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil is_unlocked(Door self)`<br/>Virtual function docs:<br/>Should we display the button prompt when collided by player. Will always return `true` for exits, layers and others that the game never locks, even if you lock it with `unlock` function
+    ---@field set_pre_can_enter fun(self, fun: fun(self: Door, player: Entity): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> can_enter(Door self, Entity player)`<br/>Virtual function docs:<br/>Can the door actually be entered by player. Overrides the button prompt too if false.
+    ---@field set_post_can_enter fun(self, fun: fun(self: Door, player: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil can_enter(Door self, Entity player)`<br/>Virtual function docs:<br/>Can the door actually be entered by player. Overrides the button prompt too if false.
 
 ---@class ExitDoor : Door
     ---@field entered boolean @if true entering it does not load the transition
@@ -4307,7 +4356,7 @@ function MovableBehavior:get_state_id() end
     ---@field post_transition fun(self): nil @Handles loading the next level screen from a transition screen
     ---@field spawn_players fun(self): nil @Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     ---@field spawn_effects fun(self): nil @Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
-    ---@field get_level_file fun(self): char @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
+    ---@field get_level_file fun(self): string @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     ---@field get_theme_id fun(self): integer @Returns: THEME, or subtheme in CO
     ---@field get_base_id fun(self): integer @Returns: THEME, or logical base THEME for special levels (Abzu->Tide Pool etc)
     ---@field get_floor_spreading_type fun(self): integer @Returns: ENT_TYPE used for floor spreading (generic or one of the styled floors)
@@ -4472,7 +4521,7 @@ function MovableBehavior:get_state_id() end
     ---@field post_transition fun(self): nil
     ---@field spawn_players fun(self): nil
     ---@field spawn_effects fun(self): nil
-    ---@field get_level_file fun(self): char
+    ---@field get_level_file fun(self): string
     ---@field get_theme_id fun(self): integer
     ---@field get_base_id fun(self): integer
     ---@field get_floor_spreading_type fun(self): integer
@@ -4626,7 +4675,7 @@ function MovableBehavior:get_state_id() end
     ---@field to integer
 
 ---@class CustomSound
-    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, char>
+    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
 local CustomSound = nil
 ---@return PlayingSound
 function CustomSound:play() end
@@ -4648,7 +4697,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field set_volume fun(self, volume: number): boolean
     ---@field set_looping fun(self, loop_mode: SOUND_LOOP_MODE): boolean
     ---@field set_callback fun(self, callback: SoundCallbackFunction): boolean
-    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, char>
+    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
     ---@field get_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM): number?
     ---@field set_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM, value: number): boolean
 
@@ -4722,11 +4771,11 @@ function CustomSound:play(paused, sound_type) end
     ---@field win_button fun(self, text: string): boolean @Add a button
     ---@field win_input_text fun(self, label: string, value: string): string @Add a text field
     ---@field win_input_int fun(self, label: string, value: integer): integer @Add an integer field
-    ---@field win_input_float fun(self, label: string, value: number): number @Add a float field
+    ---@field win_input_float fun(self, label: string, value: number): number @Add a number field
     ---@field win_slider_int fun(self, label: string, value: integer, min: integer, max: integer): integer @Add an integer slider
     ---@field win_drag_int fun(self, label: string, value: integer, min: integer, max: integer): integer @Add an integer dragfield
-    ---@field win_slider_float fun(self, label: string, value: number, min: number, max: number): number @Add an float slider
-    ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number @Add an float dragfield
+    ---@field win_slider_float fun(self, label: string, value: number, min: number, max: number): number @Add an number slider
+    ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number @Add an number dragfield
     ---@field win_check fun(self, label: string, value: boolean): boolean @Add a checkbox
     ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer @Add a combo box
     ---@field win_popid fun(self): nil @Pop unique identifier from the stack. Put after the input.
@@ -4837,7 +4886,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field displaysize Vec2
     ---@field framerate number
     ---@field wantkeyboard boolean
-    ---@field keysdown boolean[] @size: ImGuiKey_COUNT
+    ---@field keysdown boolean[] @size: ImGuiKey_COUNT. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean
@@ -4847,16 +4896,16 @@ function GuiDrawContext:win_pushid(id) end
     ---@field keysuper boolean
     ---@field wantmouse boolean
     ---@field mousepos Vec2
-    ---@field mousedown boolean[] @size: 5
-    ---@field mouseclicked boolean[] @size: 5
-    ---@field mousedoubleclicked boolean[] @size: 5
+    ---@field mousedown boolean       [] @size: 5
+    ---@field mouseclicked boolean       [] @size: 5
+    ---@field mousedoubleclicked boolean       [] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
     ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
-    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer<br/>If you can, consider creating your own TextRenderingInfo instead<br/>You can then use `:text_size()` and `draw_text` with that one object<br/>`draw_text_size` works by creating new TextRenderingInfo just to call `:text_size()`, which is not very optimal
+    ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer<br/>If you can, consider creating your own TextRenderingInfo instead<br/>You can then use `:text_size()` and `draw_text` with that one any<br/>`draw_text_size` works by creating new TextRenderingInfo just to call `:text_size()`, which is not very optimal
     ---@field set_corner_finish fun(self, c: CORNER_FINISH): nil @Set the prefered way of drawing corners for the non filled shapes
     ---@field draw_screen_line fun(self, A: Vec2, B: Vec2, thickness: number, color: Color): nil @Draws a line on screen using the built-in renderer from point `A` to point `B`.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     ---@field draw_screen_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
@@ -5116,17 +5165,16 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field new any @sol::initializers(&TextRenderingInfo_ctor
     ---@field x number
     ---@field y number
-    ---@field text_length integer @You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
+    ---@field text_length integer @You can also just use `#` operator on the whole any to get the text lenght
     ---@field width number
     ---@field height number
     ---@field special_texture_id integer @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
+    ---@field font Texture
     ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
     ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: VANILLA_TEXT_ALIGNMENT, fontstyle: VANILLA_FONT_STYLE): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
-    ---@field get_font fun(self): TEXTURE
-    ---@field set_font fun(self, id: TEXTURE): boolean
 
 ---@class HudInventory
     ---@field enabled boolean
@@ -5323,10 +5371,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field particle_torchflame_ash ParticleEmitterInfo
     ---@field music SoundMeta
     ---@field torch_sound SoundMeta
-
----@class SpearDanglerAnimFrames
-    ---@field column integer
-    ---@field row integer
 
 ---@class ScreenMenu : Screen
     ---@field tunnel_background TextureRenderingInfo
@@ -5591,10 +5635,6 @@ function Quad:is_point_inside(x, y, epsilon) end
 ---@class ScreenOnlineLoading : Screen
     ---@field ouroboros TextureRenderingInfo
     ---@field ouroboros_angle number
-
----@class OnlineLobbyScreenPlayer
-    ---@field character integer @0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
-    ---@field ready boolean
 
 ---@class ScreenOnlineLobby : Screen
     ---@field woodpanels_slidein_timer number
@@ -5966,6 +6006,159 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
 
+---@class LogicList
+    ---@field tutorial LogicTutorial @Handles dropping of the torch and rope in intro routine (first time play)
+    ---@field ouroboros LogicOuroboros
+    ---@field basecamp_speedrun LogicBasecampSpeedrun @Keep track of time, player position passing official
+    ---@field ghost_trigger Logic @It's absence is the only reason why ghost doesn't spawn at boss levels or CO
+    ---@field ghost_toast_trigger LogicGhostToast
+    ---@field tun_aggro Logic @Spawns tun at the door at 30s mark
+    ---@field diceshop LogicDiceShop
+    ---@field tun_pre_challenge LogicTunPreChallenge
+    ---@field tun_moon_challenge LogicMoonChallenge
+    ---@field tun_star_challenge LogicStarChallenge
+    ---@field tun_sun_challenge LogicSunChallenge
+    ---@field magmaman_spawn LogicMagmamanSpawn
+    ---@field water_bubbles LogicUnderwaterBubbles @Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
+    ---@field olmec_cutscene LogicOlmecCutscene
+    ---@field tiamat_cutscene LogicTiamatCutscene
+    ---@field apep_spawner LogicApepTrigger @Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
+    ---@field city_of_gold_ankh_sacrifice LogicCOGAnkhSacrifice @All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
+    ---@field duat_bosses_spawner Logic
+    ---@field bubbler LogicTiamatBubbles @Spawn rising bubbles at Tiamat (position hardcoded)
+    ---@field tusk_pleasure_palace LogicTuskPleasurePalace @Triggers aggro on everyone when non-high roller enters door
+    ---@field discovery_info Logic @black market, vlad, wet fur discovery, logic shows the toast
+    ---@field black_market Logic @Changes the camera bounds when you reach black market
+    ---@field jellyfish_trigger Logic
+    ---@field arena_1 LogicArena1 @Handles create spawns and more, is cleared as soon as the winner is decided (on last player alive)
+    ---@field arena_2 Logic
+    ---@field arena_3 Logic @Handles time end death
+    ---@field arena_alien_blast LogicArenaAlienBlast
+    ---@field arena_loose_bombs LogicArenaLooseBombs
+    ---@field start_logic fun(self, idx: LOGIC): Logic @This only properly constructs the base class<br/>you may still need to initialise the parameters correctly
+local LogicList = nil
+---@param idx LOGIC
+---@return nil
+function LogicList:stop_logic(idx) end
+---@param log Logic
+---@return nil
+function LogicList:stop_logic(log) end
+
+---@class Logic
+    ---@field logic_index LOGIC
+
+---@class LogicTutorial : Logic
+    ---@field pet_tutorial Entity
+    ---@field timer integer
+
+---@class LogicOuroboros : Logic
+    ---@field sound SoundMeta
+    ---@field timer integer
+
+---@class LogicBasecampSpeedrun : Logic
+    ---@field administrator integer @entity uid of the character that keeps the time
+    ---@field crate integer @entity uid. you must break this crate for the run to be valid, otherwise you're cheating
+
+---@class LogicGhostToast : Logic
+    ---@field toast_timer integer @ default 90
+
+---@class LogicDiceShop : Logic
+    ---@field boss_uid integer
+    ---@field boss_type ENT_TYPE
+    ---@field bet_machine integer @entity uid
+    ---@field die1 integer @entity uid
+    ---@field die2 integer @entity uid
+    ---@field die_1_value integer
+    ---@field die_2_value integer
+    ---@field prize_dispenser integer @entity uid
+    ---@field prize integer @entity uid
+    ---@field forcefield integer @entity uid
+    ---@field bet_active boolean
+    ---@field forcefield_deactivated boolean
+    ---@field result_announcement_timer integer @the time the boss waits after your second die throw to announce the results
+    ---@field won_prizes_count integer
+    ---@field balance integer @cash balance of all the games
+
+---@class LogicTunPreChallenge : Logic
+    ---@field tun_uid integer
+
+---@class LogicChallenge : Logic
+    ---@field floor_challenge_entrance_uid integer
+    ---@field floor_challenge_waitroom_uid integer
+    ---@field challenge_active boolean
+    ---@field forcefield_countdown integer
+
+---@class LogicMoonChallenge : LogicChallenge
+    ---@field mattock_uid integer @entity uid
+
+---@class LogicStarChallenge : LogicChallenge
+    ---@field torches Entity[]
+    ---@field start_countdown integer
+
+---@class LogicSunChallenge : LogicChallenge
+    ---@field start_countdown integer
+
+---@class LogicMagmamanSpawn : Logic
+    ---@field magmaman_positions custom_Array<MagmamanSpawnPosition>
+local LogicMagmamanSpawn = nil
+---@param x integer
+---@param y integer
+---@return nil
+function LogicMagmamanSpawn:add_spawn(x, y) end
+---@param ms MagmamanSpawnPosition
+---@return nil
+function LogicMagmamanSpawn:add_spawn(ms) end
+---@param x integer
+---@param y integer
+---@return nil
+function LogicMagmamanSpawn:remove_spawn(x, y) end
+---@param ms MagmamanSpawnPosition
+---@return nil
+function LogicMagmamanSpawn:remove_spawn(ms) end
+
+---@class LogicUnderwaterBubbles : Logic
+
+---@class LogicOlmecCutscene : Logic
+    ---@field fx_olmecpart_large Entity
+    ---@field olmec Entity
+    ---@field player Entity
+    ---@field cinematic_anchor Entity
+    ---@field timer integer
+
+---@class LogicTiamatCutscene : Logic
+    ---@field tiamat Entity
+    ---@field player Entity
+    ---@field cinematic_anchor Entity
+    ---@field timer integer
+
+---@class LogicApepTrigger : Logic
+    ---@field spawn_cooldown integer
+    ---@field cooling_down boolean
+    ---@field apep_journal_entry_logged boolean
+
+---@class LogicCOGAnkhSacrifice : Logic
+    ---@field timer integer
+
+---@class LogicTiamatBubbles : Logic
+    ---@field bubble_spawn_timer integer
+
+---@class LogicTuskPleasurePalace : Logic
+    ---@field locked_door integer
+
+---@class LogicArena1 : Logic
+    ---@field crate_spawn_timer integer
+
+---@class LogicArenaAlienBlast : Logic
+    ---@field timer integer
+
+---@class LogicArenaLooseBombs : Logic
+    ---@field timer integer
+
+---@class MagmamanSpawnPosition
+    ---@field x integer
+    ---@field y integer
+    ---@field timer integer
+
 end
 --## Static class functions
 
@@ -6004,18 +6197,12 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
-
-MagmamanSpawnPosition = nil
----@param x_ integer
----@param y_ integer
----@return MagmamanSpawnPosition
-function MagmamanSpawnPosition:new(x_, y_) end
 ---Create a new color - defaults to black
 ---@return Color
 function Color:new() end
----@param r Colo
+---@param color Color
 ---@return Color
-function Color:new(r) end
+function Color:new(color) end
 ---@param color Color
 ---@return Color
 function Color:new(color) end
@@ -6054,9 +6241,9 @@ function CustomTheme:new() end
 Vec2 = nil
 ---@return Vec2
 function Vec2:new() end
----@param 2 Vec
+---@param vec2 Vec2
 ---@return Vec2
-function Vec2:new(2) end
+function Vec2:new(vec2) end
 ---@param x_ number
 ---@param y_ number
 ---@return Vec2
@@ -6067,9 +6254,9 @@ AABB = nil
 ---@return AABB
 function AABB:new() end
 ---Copy an axis aligned bounding box
----@param B AAB
+---@param aabb AABB
 ---@return AABB
-function AABB:new(B) end
+function AABB:new(aabb) end
 ---@param top_left Vec2
 ---@param bottom_right Vec2
 ---@return AABB
@@ -6085,9 +6272,9 @@ function AABB:new(left_, top_, right_, bottom_) end
 Triangle = nil
 ---@return Triangle
 function Triangle:new() end
----@param e Triangl
+---@param triangle Triangle
 ---@return Triangle
-function Triangle:new(e) end
+function Triangle:new(triangle) end
 ---@param _a Vec2
 ---@param _b Vec2
 ---@param _c Vec2
@@ -6105,9 +6292,9 @@ function Triangle:new(ax, ay, bx, by, cx, cy) end
 Quad = nil
 ---@return Quad
 function Quad:new() end
----@param d Qua
+---@param quad Quad
 ---@return Quad
-function Quad:new(d) end
+function Quad:new(quad) end
 ---@param bottom_left_ Vec2
 ---@param bottom_right_ Vec2
 ---@param top_right_ Vec2
@@ -6127,6 +6314,12 @@ function Quad:new(_bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right
 ---@param aabb AABB
 ---@return Quad
 function Quad:new(aabb) end
+
+MagmamanSpawnPosition = nil
+---@param x_ integer
+---@param y_ integer
+---@return MagmamanSpawnPosition
+function MagmamanSpawnPosition:new(x_, y_) end
 
 --## Enums
 

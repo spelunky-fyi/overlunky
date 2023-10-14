@@ -12,13 +12,17 @@
 #include <utility>     // for min, max, swap, pair
 #include <vector>      // for _Vector_iterator, vector, _Vector_...
 
-#include "color.hpp"              // for Color, Color::a, Color::b, Color::g
-#include "custom_types.hpp"       // for get_custom_types_map
-#include "entity.hpp"             // for Entity, EntityDB, Animation, Rect
-#include "math.hpp"               // for Quad, AABB
-#include "movable.hpp"            // for Movable, Movable::falling_timer
-#include "render_api.hpp"         // for RenderInfo, RenderInfo::flip_horiz...
-#include "script/lua_backend.hpp" // for LuaBackend
+#include "color.hpp"                     // for Color, Color::a, Color::b, Color::g
+#include "containers/game_allocator.hpp" // for game_allocator
+#include "custom_types.hpp"              // for get_custom_types_map
+#include "entities_chars.hpp"            // for Player
+#include "entity.hpp"                    // for Entity, EntityDB, Animation, Rect
+#include "items.hpp"                     // for Inventory
+#include "math.hpp"                      // for Quad, AABB
+#include "movable.hpp"                   // for Movable, Movable::falling_timer
+#include "render_api.hpp"                // for RenderInfo, RenderInfo::flip_horiz...
+#include "script/lua_backend.hpp"        // for LuaBackend
+#include "script/safe_cb.hpp"            // for make_safe_cb
 
 namespace NEntity
 {
@@ -283,7 +287,9 @@ void register_usertypes(sol::state& lua)
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
-
+    auto add_money = sol::overload(
+        static_cast<void (Movable::*)(int32_t)>(&Movable::add_money_broken),
+        static_cast<void (Movable::*)(int32_t, uint32_t)>(&Movable::collect_treasure));
     auto movable_type = lua.new_usertype<Movable>("Movable", sol::base_classes, sol::bases<Entity>());
     movable_type["move"] = &Movable::move;
     movable_type["movex"] = &Movable::movex;
@@ -332,7 +338,9 @@ void register_usertypes(sol::state& lua)
     movable_type["pick_up"] = &Movable::pick_up;
     movable_type["can_jump"] = &Movable::can_jump;
     movable_type["standing_on"] = &Movable::standing_on;
-    movable_type["add_money"] = &Movable::add_money;
+    /// NoDoc
+    movable_type["add_money"] = add_money;
+    movable_type["collect_treasure"] = &Movable::collect_treasure;
     movable_type["is_on_fire"] = &Movable::is_on_fire;
     movable_type["damage"] = damage;
     movable_type["get_all_behaviors"] = &Movable::get_all_behaviors;
@@ -341,6 +349,15 @@ void register_usertypes(sol::state& lua)
     movable_type["set_gravity"] = &Movable::set_gravity;
     movable_type["reset_gravity"] = &Movable::reset_gravity;
     movable_type["set_position"] = &Movable::set_position;
+    movable_type["process_input"] = &Movable::process_input;
+    movable_type["cutscene"] = sol::readonly(&Movable::cutscene_behavior);
+    movable_type["clear_cutscene"] = [](Movable& movable)
+    {
+        delete movable.cutscene_behavior;
+        movable.cutscene_behavior = nullptr;
+    };
+
+    lua.new_usertype<CutsceneBehavior>("CutsceneBehavior", sol::no_constructor);
 
     lua["Entity"]["as_entity"] = &Entity::as<Entity>;
     lua["Entity"]["as_movable"] = &Entity::as<Movable>;

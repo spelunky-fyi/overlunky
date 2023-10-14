@@ -35,6 +35,10 @@ void UI::godmode_companions(bool g)
 {
     State::get().godmode_companions(g);
 }
+void UI::death_enabled(bool g)
+{
+    set_death_enabled(g);
+}
 std::pair<float, float> UI::click_position(float x, float y)
 {
     return State::click_position(x, y);
@@ -612,7 +616,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
                     // if cutscene is still running, perform the last frame of cutscene before killing olmec
                     state->logic->olmec_cutscene->timer = 809;
                     state->logic->olmec_cutscene->perform();
-                    state->logic->olmec_cutscene->~LogicOlmecCutscene();
+                    delete state->logic->olmec_cutscene;
                     state->logic->olmec_cutscene = nullptr;
                 }
                 destroy_entity_items(check);
@@ -699,10 +703,11 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
-        if (sf & 0x100 && test_flag(ent->flags, 3)) // solid floor
+        if (sf & 0x100)
         {
-            ent->destroy();
-            update_liquid_collision_at(x, y, false);
+            if (test_flag(ent->flags, 3)) // solid floor
+                update_liquid_collision_at(x, y, false);
+            destroy_grid(ent->uid);
         }
         else if (ent->is_liquid())
         {
@@ -749,12 +754,17 @@ int32_t UI::spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer,
     return uid;
 }
 
-void UI::spawn_player(uint8_t player_slot, float x, float y)
+void UI::spawn_player(uint8_t player_slot, std::optional<float> x, std::optional<float> y, std::optional<LAYER> layer)
 {
-    ::spawn_player(player_slot + 1, x, y);
+    ::spawn_player(player_slot + 1, x, y, layer);
 }
 
 std::pair<float, float> UI::spawn_position()
 {
     return {State::get().ptr()->level_gen->spawn_x, State::get().ptr()->level_gen->spawn_y};
+}
+
+void UI::load_death_screen()
+{
+    call_death_screen();
 }
