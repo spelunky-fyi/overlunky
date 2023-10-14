@@ -1205,6 +1205,24 @@ Depending on the image size, this can take a moment, preferably don't create the
 Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
 
+### create_layer
+
+
+> Search script examples for [create_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_layer)
+
+#### nil create_layer(int layer)
+
+Initializes an empty layer that doesn't currently exist.
+
+### create_level
+
+
+> Search script examples for [create_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_level)
+
+#### nil create_level()
+
+Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+
 ### destroy_grid
 
 
@@ -1216,6 +1234,24 @@ Depending on the image size, this can take a moment, preferably don't create the
 
 Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
 Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes [MASK](#MASK).PLAYER to prevent crashes
+
+### destroy_layer
+
+
+> Search script examples for [destroy_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_layer)
+
+#### nil destroy_layer(int layer)
+
+Destroys a layer and all entities in it.
+
+### destroy_level
+
+
+> Search script examples for [destroy_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_level)
+
+#### nil destroy_level()
+
+Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
 
 ### disable_floor_embeds
 
@@ -1592,6 +1628,15 @@ Set the current adventure seed pair
 #### nil set_character_heart_color([ENT_TYPE](#ENT_TYPE) type_id, [Color](#Color) color)
 
 Same as `Player.set_heart_color`
+
+### set_death_enabled
+
+
+> Search script examples for [set_death_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_death_enabled)
+
+#### nil set_death_enabled(bool enable)
+
+Setting to false disables the death screen from popping up for any usual reason, can still load manually
 
 ### set_ending_unlock
 
@@ -2995,7 +3040,7 @@ Short for [spawn_entity_over](#spawn_entity_over)
 
 > Search script examples for [spawn_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_player)
 
-#### nil spawn_player(int player_slot, float x, float y)
+#### int spawn_player(int player_slot, optional<float> x, optional<float> y, optional<[LAYER](#LAYER)> layer)
 
 Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his [Inventory](#Inventory) `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically

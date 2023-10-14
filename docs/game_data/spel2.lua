@@ -383,10 +383,11 @@ function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 ---If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ---@param player_slot integer
----@param x number
----@param y number
----@return nil
-function spawn_player(player_slot, x, y) end
+---@param x number?
+---@param y number?
+---@param layer LAYER?
+---@return integer
+function spawn_player(player_slot, x, y, layer) end
 ---Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input) and send_input to controll it
 ---or change it's `player_inputs` to the `input` of real player so he can control it directly
 ---@param char_type ENT_TYPE
@@ -1233,6 +1234,24 @@ function set_frametime_unfocused(frametime) end
 ---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 ---@return double?
 function get_frametime_unfocused() end
+---Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
+---@return nil
+function destroy_level() end
+---Destroys a layer and all entities in it.
+---@param layer integer
+---@return nil
+function destroy_layer(layer) end
+---Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+---@return nil
+function create_level() end
+---Initializes an empty layer that doesn't currently exist.
+---@param layer integer
+---@return nil
+function create_layer(layer) end
+---Setting to false disables the death screen from popping up for any usual reason, can still load manually
+---@param enable boolean
+---@return nil
+function set_death_enabled(enable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2401,6 +2420,9 @@ function Entity:overlaps_with(other) end
     ---@field set_gravity fun(self, gravity: number): nil @Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
     ---@field reset_gravity fun(self): nil @Remove the gravity hook and reset to defaults
     ---@field set_position fun(self, to_x: number, to_y: number): nil @Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
+    ---@field process_input fun(self): nil
+    ---@field cutscene CutsceneBehavior
+    ---@field set_cutscene any @[](Movable&movable
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior @Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
@@ -2478,6 +2500,10 @@ function Movable:generic_update_world(disable_gravity) end
 ---@param on_rope boolean
 ---@return nil
 function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_rope) end
+
+---@class CutsceneBehavior
+
+---@class MovableCutscene : CutsceneBehavior
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
