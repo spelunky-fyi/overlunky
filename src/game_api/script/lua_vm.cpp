@@ -1894,13 +1894,13 @@ end
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
     /// Get the rva for a pattern name, used for debugging.
-    lua["get_rva"] = [](std::string_view address_name)
+    lua["get_rva"] = [](std::string_view address_name) -> std::string
     {
         return fmt::format("{:x}", get_address(address_name) - Memory::get().at_exe(0));
     };
 
     /// Get the rva for a vtable offset and index, used for debugging.
-    lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index)
+    lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index) -> std::string
     {
         return fmt::format("{:x}", get_virtual_function_address(offset, index));
     };

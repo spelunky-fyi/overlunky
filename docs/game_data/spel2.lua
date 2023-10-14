@@ -1135,14 +1135,15 @@ function update_liquid_collision_at(x, y, add) end
 ---@param disable boolean
 ---@return boolean
 function disable_floor_embeds(disable) end
----Get the address for a pattern name
+---Get the rva for a pattern name, used for debugging.
 ---@param address_name string
----@return integer
-function get_address(address_name) end
----Get the rva for a pattern name
----@param address_name string
----@return integer
+---@return string
 function get_rva(address_name) end
+---Get the rva for a vtable offset and index, used for debugging.
+---@param offset VTABLE_OFFSET
+---@param index integer
+---@return string
+function get_virtual_rva(offset, index) end
 ---Log to spelunky.log
 ---@param message string
 ---@return nil

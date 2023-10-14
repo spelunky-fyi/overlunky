@@ -351,23 +351,23 @@ If you set such a callback and then play the same sound yourself you have to wai
 
 Hook the sendto and recvfrom functions and start dumping network data to terminal
 
-### get_address
-
-
-> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
-
-#### size_t get_address(string_view address_name)
-
-Get the address for a pattern name
-
 ### get_rva
 
 
 > Search script examples for [get_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rva)
 
-#### size_t get_rva(string_view address_name)
+#### string get_rva(string_view address_name)
 
-Get the rva for a pattern name
+Get the rva for a pattern name, used for debugging.
+
+### get_virtual_rva
+
+
+> Search script examples for [get_virtual_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_virtual_rva)
+
+#### string get_virtual_rva(VTABLE_OFFSET offset, int index)
+
+Get the rva for a vtable offset and index, used for debugging.
 
 ### raise
 
@@ -1431,25 +1431,6 @@ Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is w
 
 Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
-### http_get
-
-
-> Search script examples for [http_get](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get)
-
-#### optional&lt;string&gt; http_get(string url)
-
-Send a synchronous HTTP GET request and return response as a string or nil on an error
-
-### http_get_async
-
-
-> Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
-
-#### HttpRequest http_get_async(string url, function on_data)
-
-Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
-The callback signature is nil on_data(string response, string error)
-
 ### import
 
 
@@ -2110,6 +2091,25 @@ be returned instead.
 
 ## Network functions
 
+
+### http_get
+
+
+> Search script examples for [http_get](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get)
+
+#### optional&lt;string&gt; http_get(string url)
+
+Send a synchronous HTTP GET request and return response as a string or nil on an error
+
+### http_get_async
+
+
+> Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
+
+#### HttpRequest http_get_async(string url, function on_data)
+
+Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
+The callback signature is nil on_data(string response, string error)
 
 ### udp_listen
 
