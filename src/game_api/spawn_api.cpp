@@ -682,7 +682,6 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
     auto old_y = state->level_gen->spawn_y;
     state->level_gen->spawn_x = x.value_or(old_x);
     state->level_gen->spawn_y = y.value_or(old_y);
-    auto uid = (int32_t)state->next_entity_uid;
     using spawn_player_fun = void(Items*, uint8_t ps);
     static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
     // move the back layer to front layer offset if spawning in back layer
@@ -693,7 +692,10 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
         std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
     state->level_gen->spawn_x = old_x;
     state->level_gen->spawn_y = old_y;
-    return uid;
+    auto player = state->items->player(player_slot - 1);
+    if (player)
+        return player->uid;
+    return -1;
 }
 
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
