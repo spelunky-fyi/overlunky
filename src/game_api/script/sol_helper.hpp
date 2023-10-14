@@ -76,7 +76,7 @@ struct usertype_container<ZeroIndexArray<T>>
     static int size(lua_State* L)
     {
         ZeroIndexArray<T>& v = sol::stack::get<ZeroIndexArray<T>&>(L, 1);
-        return stack::push(L, v.size());
+        return sol::stack::push(L, v.size());
     }
     // Used by default implementation
     static auto begin(lua_State*, ZeroIndexArray<T>& self)
