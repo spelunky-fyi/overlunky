@@ -1445,6 +1445,15 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 - `false` if the script was not found but optional is set to true
 - an error if the script was not found and the optional argument was not set
 
+### inputs_to_buttons
+
+
+> Search script examples for [inputs_to_buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inputs_to_buttons)
+
+#### tuple&lt;float, float, [BUTTON](#BUTTON)&gt; inputs_to_buttons([INPUTS](#INPUTS) inputs)
+
+Converts [INPUTS](#INPUTS) to (x, y, BUTTON)
+
 ### intersection
 
 
@@ -1856,6 +1865,15 @@ Warp to a level immediately.
 
 ## Input functions
 
+
+### buttons_to_inputs
+
+
+> Search script examples for [buttons_to_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_to_inputs)
+
+#### [INPUTS](#INPUTS) buttons_to_inputs(float x, float y, [BUTTON](#BUTTON) buttons)
+
+Converts (x, y, BUTTON) to [INPUTS](#INPUTS)
 
 ### get_io
 

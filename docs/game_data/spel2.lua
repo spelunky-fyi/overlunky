@@ -1253,6 +1253,16 @@ function create_layer(layer) end
 ---@param enable boolean
 ---@return nil
 function set_death_enabled(enable) end
+---Converts INPUTS to (x, y, BUTTON)
+---@param inputs INPUTS
+---@return number, number, BUTTON
+function inputs_to_buttons(inputs) end
+---Converts (x, y, BUTTON) to INPUTS
+---@param x number
+---@param y number
+---@param buttons BUTTON
+---@return INPUTS
+function buttons_to_inputs(x, y, buttons) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2423,7 +2433,7 @@ function Entity:overlaps_with(other) end
     ---@field set_position fun(self, to_x: number, to_y: number): nil @Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
     ---@field process_input fun(self): nil
     ---@field cutscene CutsceneBehavior
-    ---@field set_cutscene any @[](Movable&movable
+    ---@field clear_cutscene any @[](Movable&movable){deletemovable.cutscene_behavior
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior @Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
@@ -2503,8 +2513,6 @@ function Movable:generic_update_world(disable_gravity) end
 function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_rope) end
 
 ---@class CutsceneBehavior
-
----@class MovableCutscene : CutsceneBehavior
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.

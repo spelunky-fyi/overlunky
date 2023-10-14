@@ -24,36 +24,6 @@
 #include "script/lua_backend.hpp"        // for LuaBackend
 #include "script/safe_cb.hpp"            // for make_safe_cb
 
-class CustomCutsceneBehavior : public CutsceneBehavior
-{
-  public:
-    using CutsceneCb = bool(Movable*, uint32_t);
-    CustomCutsceneBehavior(sol::function cb);
-    ~CustomCutsceneBehavior();
-    uint32_t frame{0};
-    std::function<CutsceneCb> func;
-    void update(Movable* movable);
-};
-
-CustomCutsceneBehavior::CustomCutsceneBehavior(sol::function cb)
-{
-    func = make_safe_cb<CutsceneCb>(std::move(cb));
-}
-
-CustomCutsceneBehavior::~CustomCutsceneBehavior()
-{
-}
-
-void CustomCutsceneBehavior::update(Movable* movable)
-{
-    if (func(movable, ++frame))
-    {
-        game_allocator<CutsceneBehavior> a;
-        a.destroy(movable->cutscene_behavior);
-        movable->cutscene_behavior = nullptr;
-    }
-}
-
 namespace NEntity
 {
 void register_usertypes(sol::state& lua)
@@ -381,25 +351,13 @@ void register_usertypes(sol::state& lua)
     movable_type["set_position"] = &Movable::set_position;
     movable_type["process_input"] = &Movable::process_input;
     movable_type["cutscene"] = sol::readonly(&Movable::cutscene_behavior);
-    movable_type["set_cutscene"] = [](Movable& movable, sol::optional<sol::function> cb)
+    movable_type["clear_cutscene"] = [](Movable& movable)
     {
-        if (movable.cutscene_behavior)
-        {
-            game_allocator<CutsceneBehavior> a;
-            a.destroy(movable.cutscene_behavior);
-            movable.cutscene_behavior = nullptr;
-        }
-        if (cb.has_value())
-        {
-            game_allocator<CustomCutsceneBehavior> a;
-            CustomCutsceneBehavior* p = a.allocate(1);
-            a.construct(p, cb.value());
-            movable.cutscene_behavior = p;
-        }
+        delete movable.cutscene_behavior;
+        movable.cutscene_behavior = nullptr;
     };
 
     lua.new_usertype<CutsceneBehavior>("CutsceneBehavior", sol::no_constructor);
-    lua.new_usertype<CustomCutsceneBehavior>("MovableCutscene", sol::no_constructor, sol::base_classes, sol::bases<CutsceneBehavior>());
 
     lua["Entity"]["as_entity"] = &Entity::as<Entity>;
     lua["Entity"]["as_movable"] = &Entity::as<Movable>;

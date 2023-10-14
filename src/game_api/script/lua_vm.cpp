@@ -2115,6 +2115,38 @@ end
     /// Setting to false disables the death screen from popping up for any usual reason, can still load manually
     lua["set_death_enabled"] = set_death_enabled;
 
+    /// Converts INPUTS to (x, y, BUTTON)
+    lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
+    {
+        float x = 0;
+        float y = 0;
+        if (inputs & 0x100)
+            x = -1;
+        else if (inputs & 0x200)
+            x = 1;
+        if (inputs & 0x400)
+            y = 1;
+        else if (inputs & 0x800)
+            y = -1;
+        BUTTON buttons = (BUTTON)(inputs & 0x3f);
+        return std::make_tuple(x, y, buttons);
+    };
+
+    /// Converts (x, y, BUTTON) to INPUTS
+    lua["buttons_to_inputs"] = [](float x, float y, BUTTON buttons) -> INPUTS
+    {
+        INPUTS inputs = buttons;
+        if (x < 0)
+            inputs |= 0x100;
+        else if (x > 0)
+            inputs |= 0x200;
+        if (y > 0)
+            inputs |= 0x400;
+        else if (y < 0)
+            inputs |= 0x800;
+        return inputs;
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

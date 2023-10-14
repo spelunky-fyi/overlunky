@@ -763,14 +763,6 @@ Type | Name | Description
 int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state_id) | 
 int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state_id) | Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's<br/>`get_next_state_id` to enter this state, given that the behavior is added to the movable.
 
-### MovableCutscene
-
-Derived from [CutsceneBehavior](#CutsceneBehavior)
-
-
-Type | Name | Description
----- | ---- | -----------
-
 ### PRNG
 
 [PRNG](#PRNG) (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
@@ -6664,7 +6656,7 @@ nil | [reset_gravity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 nil | [set_position(float to_x, float to_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_position) | Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
 nil | [process_input()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=process_input) | 
 [CutsceneBehavior](#CutsceneBehavior) | [cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cutscene) | 
- | [set_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cutscene) | 
+ | [clear_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_cutscene) | 
 [VanillaMovableBehavior](#VanillaMovableBehavior) | [get_base_behavior(int state_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_behavior) | Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
 nil | [add_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_behavior) | Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
 nil | [clear_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behavior) | Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
