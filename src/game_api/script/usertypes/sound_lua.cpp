@@ -27,6 +27,7 @@
 #include "logger.h"               // for DEBUG
 #include "script/lua_backend.hpp" // for LuaBackend
 #include "script/safe_cb.hpp"     // for make_safe_cb
+#include "script/sol_helper.hpp"  //
 #include "sound_manager.hpp"      // for CustomSound, PlayingSound, SoundMa...
 #include "string_aliases.hpp"     // for VANILLA_SOUND
 
@@ -167,10 +168,12 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         &SoundMeta::x,
         "y",
         &SoundMeta::y,
-        //"left_channel",
-        //&SoundMeta::left_channel, // TODO: index 0-37 instead of 1-38
-        //"right_channel",
-        //&SoundMeta::right_channel,
+        "left_channel",
+        sol::property([&lua](SoundMeta* sm) // -> std::array<float, 38>
+                      { return ZeroIndexArray<float>(sm->left_channel) /**/; }),
+        "right_channel",
+        sol::property([](SoundMeta* sm) // -> std::array<float, 38>
+                      { return ZeroIndexArray<float>(sm->right_channel) /**/; }),
         "start_over",
         &SoundMeta::start_over,
         "playing",
