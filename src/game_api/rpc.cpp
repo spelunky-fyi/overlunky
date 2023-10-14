@@ -2152,6 +2152,12 @@ void destroy_layer(uint8_t layer)
     }
     if (offset != 0)
     {
+        auto state = State::get().ptr();
+        for (auto i = 0; i < MAX_PLAYERS; ++i)
+        {
+            if (state->items->players[i] && state->items->players[i]->layer == layer)
+                state->items->players[i] = nullptr;
+        }
         auto* layer_ptr = State::get().layer(layer);
         typedef void destroy_func(Layer*);
         static destroy_func* df = (destroy_func*)(offset);
