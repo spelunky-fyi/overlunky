@@ -2044,39 +2044,57 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "init_layer"sv,
-        // TODO
+        // called a lot in load_screen, for both layers in every screen that has layers
         PatternCommandBuffer{}
-            .from_exe_base(0x228b58f0),
+            .find_inst("48 8d 7e 40 c7 44 24 2c 00 01 00 00"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x228b58f0),
     },
     {
         "dead_players"sv,
-        // TODO
+        // I guess it writes 14 to screen_next before the death screen pops up
         PatternCommandBuffer{}
-            .from_exe_base(0x22c061d0),
+            .find_inst("4c 8b b8 e8 12 00 00 48 8b 80 f0 12 00 00"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x22c061d0),
     },
     {
         "spawn_transition"sv,
-        // TODO
+        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
         PatternCommandBuffer{}
-            .from_exe_base(0x22afe5c0),
+            .find_inst("0f b6 45 75 48 8b 5c c2 08"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x22afe5c0),
     },
     {
         "spawn_transition_cosmic"sv,
-        // TODO
+        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
         PatternCommandBuffer{}
-            .from_exe_base(0x22b373b0),
+            .find_inst("48 b9 00 00 40 40 00 00 e0 42 48 89 8a 18 01 00 00"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x22b373b0),
     },
     {
         "spawn_transition_duat"sv,
-        // TODO
+        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
         PatternCommandBuffer{}
-            .from_exe_base(0x22b34940),
+            .find_inst("48 8b 85 f8 12 00 00 0f b6 4d 75 48 8b 4c c8 08 48 8b 01 ff 90 d0 00 00 00"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x22b34940),
     },
     {
         "spawn_transition_olmecship"sv,
-        // TODO
+        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
         PatternCommandBuffer{}
-            .from_exe_base(0x22b2d350),
+            .find_inst("48 89 f1 ba 63 01 00 00"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x22b2d350),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
