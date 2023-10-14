@@ -12,15 +12,17 @@
 #include <utility>     // for min, max, swap, pair
 #include <vector>      // for _Vector_iterator, vector, _Vector_...
 
-#include "color.hpp"              // for Color, Color::a, Color::b, Color::g
-#include "custom_types.hpp"       // for get_custom_types_map
-#include "entities_chars.hpp"     // for Player
-#include "entity.hpp"             // for Entity, EntityDB, Animation, Rect
-#include "items.hpp"              // for Inventory
-#include "math.hpp"               // for Quad, AABB
-#include "movable.hpp"            // for Movable, Movable::falling_timer
-#include "render_api.hpp"         // for RenderInfo, RenderInfo::flip_horiz...
-#include "script/lua_backend.hpp" // for LuaBackend
+#include "color.hpp"                     // for Color, Color::a, Color::b, Color::g
+#include "containers/game_allocator.hpp" // for game_allocator
+#include "custom_types.hpp"              // for get_custom_types_map
+#include "entities_chars.hpp"            // for Player
+#include "entity.hpp"                    // for Entity, EntityDB, Animation, Rect
+#include "items.hpp"                     // for Inventory
+#include "math.hpp"                      // for Quad, AABB
+#include "movable.hpp"                   // for Movable, Movable::falling_timer
+#include "render_api.hpp"                // for RenderInfo, RenderInfo::flip_horiz...
+#include "script/lua_backend.hpp"        // for LuaBackend
+#include "script/safe_cb.hpp"            // for make_safe_cb
 
 namespace NEntity
 {
@@ -347,6 +349,15 @@ void register_usertypes(sol::state& lua)
     movable_type["set_gravity"] = &Movable::set_gravity;
     movable_type["reset_gravity"] = &Movable::reset_gravity;
     movable_type["set_position"] = &Movable::set_position;
+    movable_type["process_input"] = &Movable::process_input;
+    movable_type["cutscene"] = sol::readonly(&Movable::cutscene_behavior);
+    movable_type["clear_cutscene"] = [](Movable& movable)
+    {
+        delete movable.cutscene_behavior;
+        movable.cutscene_behavior = nullptr;
+    };
+
+    lua.new_usertype<CutsceneBehavior>("CutsceneBehavior", sol::no_constructor);
 
     lua["Entity"]["as_entity"] = &Entity::as<Entity>;
     lua["Entity"]["as_movable"] = &Entity::as<Movable>;

@@ -756,3 +756,54 @@ const char* pause_types[]{
     "32: Ankh (smooth camera, janky audio)",
     "Freeze on PRE_UPDATE", // this is not a real state.pause flag, it's only used by ui.cpp for magic
 };
+
+const char* levelgen_flags[]{
+    "1: Should generate path",
+    "2: Can spawn vault",
+    "3: Can spawn shops",
+    "4: Can have outpost?",
+    "5: Should spawn hard floor decorations",
+    "6: Apply ambient occlusion",
+    "7: Should spawn behind-floor and below-floorstyled decorations",
+    "8: unknown",
+};
+
+const char* levelgen_flags2[]{
+    "1: Spawns background decorations on ground (ceiling if false)",
+    "2: Spawns fake ladder/chain midbg?",
+    "3: Spawn entrance door background (Ignored in 7-1 to 7-2 transition)",
+    "4: Procedural backlayer door midbg indicator related",
+    "5: Spawn backlayer border/background",
+    "6: Should spawn procedural backlayers",
+    "7: Should spawn backlayer torches",
+    "8: Has ghost",
+};
+
+const char* levelgen_flags3[]{
+    "1: Can spawn angry NPCs",
+    "2: Can echo",
+    "3: Can spawn Dead are Restless",
+    "4: Can spawn procedural skeletons",
+    "5: Can have quests?",
+    "6: Can spawn player coffins",
+    "7: unknown",
+    "8: unknown",
+};
+
+const char* level_chances[]{
+    "backroom",
+    "backroom interconnect",
+    "backroom hidden door",
+    "backroom hidden cache",
+    "mount",
+    "altar",
+    "idol",
+    "floor side spread",
+    "floor bottom spread",
+    "background",
+    "ground background",
+    "bigroom",
+    "wideroom",
+    "tallroom",
+    "rewardroom",
+};

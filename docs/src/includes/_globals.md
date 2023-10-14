@@ -351,23 +351,23 @@ If you set such a callback and then play the same sound yourself you have to wai
 
 Hook the sendto and recvfrom functions and start dumping network data to terminal
 
-### get_address
-
-
-> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
-
-#### size_t get_address(string_view address_name)
-
-Get the address for a pattern name
-
 ### get_rva
 
 
 > Search script examples for [get_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rva)
 
-#### size_t get_rva(string_view address_name)
+#### string get_rva(string_view address_name)
 
-Get the rva for a pattern name
+Get the rva for a pattern name, used for debugging.
+
+### get_virtual_rva
+
+
+> Search script examples for [get_virtual_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_virtual_rva)
+
+#### string get_virtual_rva(VTABLE_OFFSET offset, int index)
+
+Get the rva for a vtable offset and index, used for debugging.
 
 ### raise
 
@@ -1205,6 +1205,24 @@ Depending on the image size, this can take a moment, preferably don't create the
 Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
 
+### create_layer
+
+
+> Search script examples for [create_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_layer)
+
+#### nil create_layer(int layer)
+
+Initializes an empty layer that doesn't currently exist.
+
+### create_level
+
+
+> Search script examples for [create_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_level)
+
+#### nil create_level()
+
+Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+
 ### destroy_grid
 
 
@@ -1216,6 +1234,24 @@ Depending on the image size, this can take a moment, preferably don't create the
 
 Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
 Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes [MASK](#MASK).PLAYER to prevent crashes
+
+### destroy_layer
+
+
+> Search script examples for [destroy_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_layer)
+
+#### nil destroy_layer(int layer)
+
+Destroys a layer and all entities in it.
+
+### destroy_level
+
+
+> Search script examples for [destroy_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_level)
+
+#### nil destroy_level()
+
+Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
 
 ### disable_floor_embeds
 
@@ -1395,25 +1431,6 @@ Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is w
 
 Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
-### http_get
-
-
-> Search script examples for [http_get](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get)
-
-#### optional&lt;string&gt; http_get(string url)
-
-Send a synchronous HTTP GET request and return response as a string or nil on an error
-
-### http_get_async
-
-
-> Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
-
-#### HttpRequest http_get_async(string url, function on_data)
-
-Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
-The callback signature is nil on_data(string response, string error)
-
 ### import
 
 
@@ -1427,6 +1444,15 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 - `nil` if the script was found but has no exports
 - `false` if the script was not found but optional is set to true
 - an error if the script was not found and the optional argument was not set
+
+### inputs_to_buttons
+
+
+> Search script examples for [inputs_to_buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inputs_to_buttons)
+
+#### tuple&lt;float, float, [BUTTON](#BUTTON)&gt; inputs_to_buttons([INPUTS](#INPUTS) inputs)
+
+Converts [INPUTS](#INPUTS) to (x, y, BUTTON)
 
 ### intersection
 
@@ -1655,6 +1681,15 @@ Enables or disables the journal
 
 Set the value for the specified config
 
+### set_level_logic_enabled
+
+
+> Search script examples for [set_level_logic_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_logic_enabled)
+
+#### nil set_level_logic_enabled(bool enable)
+
+Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
+
 ### set_mask
 
 
@@ -1830,6 +1865,15 @@ Warp to a level immediately.
 
 ## Input functions
 
+
+### buttons_to_inputs
+
+
+> Search script examples for [buttons_to_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_to_inputs)
+
+#### [INPUTS](#INPUTS) buttons_to_inputs(float x, float y, [BUTTON](#BUTTON) buttons)
+
+Converts (x, y, BUTTON) to [INPUTS](#INPUTS)
 
 ### get_io
 
@@ -2065,6 +2109,25 @@ be returned instead.
 
 ## Network functions
 
+
+### http_get
+
+
+> Search script examples for [http_get](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get)
+
+#### optional&lt;string&gt; http_get(string url)
+
+Send a synchronous HTTP GET request and return response as a string or nil on an error
+
+### http_get_async
+
+
+> Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
+
+#### HttpRequest http_get_async(string url, function on_data)
+
+Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
+The callback signature is nil on_data(string response, string error)
 
 ### udp_listen
 
@@ -2995,7 +3058,7 @@ Short for [spawn_entity_over](#spawn_entity_over)
 
 > Search script examples for [spawn_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_player)
 
-#### nil spawn_player(int player_slot, float x, float y)
+#### int spawn_player(int player_slot, optional<float> x, optional<float> y, optional<[LAYER](#LAYER)> layer)
 
 Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his [Inventory](#Inventory) `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically

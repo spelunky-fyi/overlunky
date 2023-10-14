@@ -114,6 +114,9 @@ void register_usertypes(sol::state& lua)
         {
             Entity* ent = get_entity_ptr(uid);
             entity_vtable.unhook(ent, callback_id);
+            movable_vtable.unhook(ent, callback_id);
+            floor_vtable.unhook(ent, callback_id);
+            door_vtable.unhook(ent, callback_id);
         });
 
     HookHandler<RenderInfo, CallbackType::Entity>::set_hook_dtor_impl(
@@ -150,6 +153,9 @@ void register_usertypes(sol::state& lua)
         [](Entity* ent, std::uint32_t callback_id)
         {
             entity_vtable.unhook(ent, callback_id);
+            movable_vtable.unhook(ent, callback_id);
+            floor_vtable.unhook(ent, callback_id);
+            door_vtable.unhook(ent, callback_id);
         });
 }
 }; // namespace NVTables

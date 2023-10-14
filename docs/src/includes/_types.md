@@ -640,6 +640,12 @@ tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/o
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
 [Color](#Color)& | [set_ucolor(const uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
 
+### CutsceneBehavior
+
+
+Type | Name | Description
+---- | ---- | -----------
+
 ### Hud
 
 
@@ -6648,6 +6654,9 @@ int | [get_behavior()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 nil | [set_gravity(float gravity)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_gravity) | Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
 nil | [reset_gravity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_gravity) | Remove the gravity hook and reset to defaults
 nil | [set_position(float to_x, float to_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_position) | Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
+nil | [process_input()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=process_input) | 
+[CutsceneBehavior](#CutsceneBehavior) | [cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cutscene) | 
+ | [clear_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_cutscene) | 
 [VanillaMovableBehavior](#VanillaMovableBehavior) | [get_base_behavior(int state_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_behavior) | Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
 nil | [add_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_behavior) | Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
 nil | [clear_behavior(MovableBehavior behavior)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_behavior) | Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
