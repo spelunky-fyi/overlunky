@@ -685,15 +685,12 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
     auto uid = (int32_t)state->next_entity_uid;
     using spawn_player_fun = void(Items*, uint8_t ps);
     static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
-    auto layer_off = (size_t)State::get().ptr() + 0x1300;
     // move the back layer to front layer offset if spawning in back layer
     if (layer.has_value() && layer.value() == LAYER::BACK)
-    {
-        auto layer1_ptr = memory_read<size_t>(layer_off + 8);
-        write_mem_recoverable("spawn_player_layer", layer_off, layer1_ptr, true);
-    }
+        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
     spawn_player(get_state_ptr()->items, player_slot - 1);
-    recover_mem("spawn_player_layer");
+    if (layer.has_value() && layer.value() == LAYER::BACK)
+        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
     state->level_gen->spawn_x = old_x;
     state->level_gen->spawn_y = old_y;
     return uid;
