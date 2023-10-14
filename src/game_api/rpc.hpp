@@ -133,3 +133,8 @@ ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types);
 int32_t get_current_money();
 int32_t add_money(int32_t amount, std::optional<uint8_t> display_time);
 int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_t> display_time);
+void destroy_layer(uint8_t layer);
+void destroy_level();
+void create_layer(uint8_t layer);
+void create_level();
+void set_death_enabled(bool enable);

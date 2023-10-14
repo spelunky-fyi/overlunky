@@ -213,6 +213,7 @@ std::map<std::string, int64_t> default_keys{
     {"speedhack_turbo", VK_PRIOR},
     {"speedhack_slow", VK_NEXT},
     {"toggle_uncapped_fps", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
+    {"respawn", OL_KEY_CTRL | 'R'},
     //{ "", 0x },
 };
 
@@ -267,7 +268,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, pause_updates = true;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, pause_updates = true, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -1234,6 +1235,7 @@ void smart_delete(Entity* ent, bool unsafe = false)
 {
     static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
+    UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
         auto pos = ent->position();
@@ -1245,14 +1247,9 @@ void smart_delete(Entity* ent, bool unsafe = false)
         auto pos = ent->position();
         auto layer = (LAYER)ent->layer;
         ENT_TYPE type = ent->type->id;
-        Callback cb = {g_state->time_total + 1, [pos, layer, type]
-                       {
-                           fix_decorations_at(std::round(pos.first), std::round(pos.second), layer);
-                           UI::cleanup_at(std::round(pos.first), std::round(pos.second), layer, type);
-                       }};
-        callbacks.push_back(cb);
+        fix_decorations_at(std::round(pos.first), std::round(pos.second), layer);
+        UI::cleanup_at(std::round(pos.first), std::round(pos.second), layer, type);
     }
-    UI::safe_destroy(ent, unsafe);
 }
 
 void reset_windows()
@@ -1334,7 +1331,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
         int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
-        if (!lock_entity && set_last)
+        if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
     }
@@ -1348,7 +1345,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
         auto spawned = UI::spawn_playerghost(ana_spelunky + (rand() % 19), cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
 
-        if (!lock_entity && set_last)
+        if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
     }
@@ -1422,7 +1419,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             ent->door_type = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
             ent->platform_type = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
         }
-        if (!lock_entity && set_last)
+        if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
     }
@@ -1890,8 +1887,6 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->level_next = level;
     g_state->theme_next = theme;
     g_state->quest_flags = g_state->quest_flags | 1;
-    g_state->fadein = 1;
-    g_state->fadeout = 1;
     g_state->loading = 1;
 
     if (g_game_manager->main_menu_music)
@@ -2293,6 +2288,44 @@ void warp_next_level(size_t num)
         uint8_t world, level, theme;
         std::tie(world, level, theme) = targets.at(num);
         warp_inc(world, level, theme);
+    }
+}
+
+void respawn()
+{
+    if (g_state->screen != 11 && g_state->screen != 12)
+    {
+        if (g_state->screen > 11)
+        {
+            quick_start(12, g_state->world_start, g_state->level_start, g_state->theme_start);
+        }
+        else
+        {
+            quick_start(12, 1, 1, 1);
+        }
+        return;
+    }
+    for (int8_t i = 0; i < g_state->items->player_count; ++i)
+    {
+        auto found = false;
+        for (auto p : UI::get_players())
+        {
+            if (p->inventory_ptr->player_slot == i)
+            {
+                found = true;
+                if (p->health == 0 || test_flag(p->flags, 29))
+                {
+                    p->health = 4;
+                    p->flags = clr_flag(p->flags, 29);
+                    p->set_behavior(1);
+                }
+            }
+        }
+        if (!found)
+        {
+            g_state->items->player_inventories[i].health = 4;
+            UI::spawn_player(i);
+        }
     }
 }
 
@@ -2858,6 +2891,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         else
             g_engine_fps = 0;
         update_frametimes();
+    }
+    else if (pressed("respawn", wParam))
+    {
+        respawn();
     }
     else if (pressed("toggle_godmode", wParam))
     {
@@ -3519,6 +3556,66 @@ const char* theme_name(int theme)
 
 void render_narnia()
 {
+    if (submenu("Other game screens"))
+    {
+        int screen = -1;
+        ImGui::PushID("WarpSpecial");
+        for (unsigned int i = 0; i < 21; ++i)
+        {
+            if ((i >= 5 && i <= 10))
+                continue;
+            if (options["menu_ui"])
+            {
+                if (ImGui::MenuItem(screen_names[i]))
+                    screen = i;
+            }
+            else
+            {
+                if (i % 2)
+                    ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
+                if (ImGui::Button(screen_names[i], ImVec2(ImGui::GetContentRegionMax().x * 0.5f, 0)))
+                    screen = i;
+            }
+        }
+        endmenu();
+        if (screen != -1)
+        {
+            if (screen == 14)
+            {
+                if (g_state->screen == 11 or g_state->screen == 12)
+                    UI::load_death_screen();
+            }
+            else if (g_state->screen != 12 && screen >= 11)
+            {
+                quick_start((uint8_t)screen, 1, 1, 1);
+            }
+            else
+            {
+                g_state->screen_next = screen;
+                g_state->loading = 1;
+            }
+            if (screen >= 16 && screen <= 18)
+            {
+                g_state->win_state = 1;
+                if (!g_state->end_spaceship_character)
+                    g_state->end_spaceship_character = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
+            }
+            if (screen == 19)
+            {
+                g_state->world_next = 8;
+                g_state->level_next = 99;
+                g_state->theme_next = 10;
+                if (!g_state->level_gen->theme_cosmicocean->sub_theme)
+                    g_state->level_gen->theme_cosmicocean->sub_theme = g_state->level_gen->theme_dwelling;
+                g_state->current_theme = g_state->level_gen->theme_cosmicocean;
+                g_state->win_state = 3;
+                if (g_state->level_count < 1)
+                    g_state->level_count = 1;
+            }
+        }
+        ImGui::PopID();
+    }
+
     ImGui::Text("Next level");
     ImGui::SameLine(100.0f);
 
@@ -4731,21 +4828,26 @@ void render_clickhandler()
         }
     }
 
+    static auto front_col = ImColor(0, 255, 51, 200);
+    static auto back_col = ImColor(255, 160, 31, 200);
+    static auto front_fill = ImColor(front_col);
+    front_fill.Value.w = 0.25f;
+    static auto back_fill = ImColor(back_col);
+    back_fill.Value.w = 0.25f;
     if (update_entity())
     {
-        render_hitbox(g_entity, true, ImColor(0, 255, 0, 200));
+        auto this_layer = (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer) == g_entity->layer;
+        render_hitbox(g_entity, true, this_layer ? front_col : back_col);
     }
-    static auto front_col = ImColor(0, 255, 51, 100);
-    static auto back_col = ImColor(255, 160, 31, 100);
     for (auto entity : g_selected_ids)
     {
         auto ent = get_entity_ptr(entity);
         if (ent)
         {
             if (ent->layer == (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))
-                render_hitbox(ent, false, front_col, true);
+                render_hitbox(ent, false, front_fill, true);
             else
-                render_hitbox(ent, false, back_col, true);
+                render_hitbox(ent, false, back_fill, true);
         }
     }
 
@@ -5465,6 +5567,11 @@ void render_options()
             UI::godmode_companions(options["god_mode_companions"]);
         }
         tooltip("Make the hired hands completely deathproof.");
+        if (ImGui::Checkbox("Disable death screen##NoDeath", &death_disable))
+        {
+            UI::death_enabled(!death_disable);
+        }
+        tooltip("Disable the death screen from popping up for any reason.");
         if (ImGui::Checkbox("Noclip##Noclip", &options["noclip"]))
         {
             toggle_noclip();
@@ -7929,6 +8036,8 @@ void render_game_props()
     }
     if (submenu("Players"))
     {
+        if (ImGui::MenuItem("Respawn dead players"))
+            respawn();
         ImGui::TextWrapped("New players spawned here can't be controlled, but can be used to test some things that require multiple players.");
         if (ImGui::SliderScalar("Number of players##SetNumPlayers", ImGuiDataType_U8, &g_state->items->player_count, &u8_one, &u8_four, "%d", ImGuiSliderFlags_AlwaysClamp))
         {
@@ -7962,7 +8071,7 @@ void render_game_props()
                 {
                     g_state->items->player_inventories[i].health = 4;
                     auto uid = g_state->next_entity_uid;
-                    UI::spawn_player(i, spawn_x, spawn_y);
+                    UI::spawn_player(i);
                     auto player = get_entity_ptr(uid)->as<Player>();
                     player->set_position(spawn_x, spawn_y);
                 }
@@ -8009,6 +8118,85 @@ void render_game_props()
         {
             ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, (int)std::pow(2, i));
         }
+        endmenu();
+    }
+    if (submenu("Level generation flags"))
+    {
+        auto flags = (int)g_state->level_gen->flags;
+        auto flags2 = (int)g_state->level_gen->flags2;
+        auto flags3 = (int)g_state->level_gen->flags3;
+        ImGui::SeparatorText("Flags 1");
+        for (int i = 0; i < 8; i++)
+        {
+            ImGui::CheckboxFlags(levelgen_flags[i], &flags, (int)std::pow(2, i));
+        }
+        ImGui::SeparatorText("Flags 2");
+        for (int i = 0; i < 8; i++)
+        {
+            ImGui::CheckboxFlags(levelgen_flags2[i], &flags2, (int)std::pow(2, i));
+        }
+        ImGui::SeparatorText("Flags 3");
+        for (int i = 0; i < 8; i++)
+        {
+            ImGui::CheckboxFlags(levelgen_flags3[i], &flags3, (int)std::pow(2, i));
+        }
+        g_state->level_gen->flags = (uint8_t)flags;
+        g_state->level_gen->flags2 = (uint8_t)flags2;
+        g_state->level_gen->flags3 = (uint8_t)flags3;
+        if (g_state->current_theme)
+        {
+            ImGui::SeparatorText("Theme flags");
+            ImGui::Checkbox("Allow beehives##ThemeBeeHive", &g_state->current_theme->allow_beehive);
+            ImGui::Checkbox("Allow leprechauns##ThemeLeprechaun", &g_state->current_theme->allow_leprechaun);
+        }
+        endmenu();
+    }
+    if (submenu("Procedural chances"))
+    {
+        static auto hide_zero = true;
+        ImGui::Checkbox("Hide 0% chances", &hide_zero);
+        static auto render_procedural_chance = [](uint32_t id, LevelChanceDef& def)
+        {
+            int inverse_chance = g_state->level_gen->get_procedural_spawn_chance(id);
+            std::string name = std::string(g_state->level_gen->get_procedural_spawn_chance_name(id).value_or(fmt::format("{}", id)));
+            if (def.chances.empty() || (hide_zero && inverse_chance == 0))
+                return;
+            float chance = inverse_chance > 0 ? 100.f / static_cast<float>(inverse_chance) : 0;
+            std::string all = fmt::format("{}", def.chances[0]);
+            for (auto i = 1; i < def.chances.size(); ++i)
+                all += "," + fmt::format("{}", def.chances[i]);
+            std::string str = fmt::format("{:.3f}% ({})", chance, all);
+            ImGui::Text("%s", name.c_str());
+            auto w = ImGui::GetItemRectSize().x;
+            ImGui::SameLine(std::max(0.5f * ImGui::GetContentRegionMax().x, w), 4.f);
+            ImGui::Text("%s", str.c_str());
+        };
+
+        static auto render_chance = [](int inverse_chance, const char* name)
+        {
+            if (hide_zero && inverse_chance == 0)
+                return;
+            float chance = inverse_chance > 0 ? 100.f / static_cast<float>(inverse_chance) : 0;
+            std::string str = fmt::format("{:.3f}%", chance);
+            ImGui::Text("%s", name);
+            auto w = ImGui::GetItemRectSize().x;
+            ImGui::SameLine(std::max(0.5f * ImGui::GetContentRegionMax().x, w), 4.f);
+            ImGui::Text("%s", str.c_str());
+        };
+
+        ImGui::SeparatorText("Monster chances");
+        for (auto [id, def] : g_state->level_gen->data->level_monster_chances)
+            render_procedural_chance(id, def);
+
+        ImGui::SeparatorText("Trap chances");
+        for (auto [id, def] : g_state->level_gen->data->level_trap_chances)
+            render_procedural_chance(id, def);
+
+        ImGui::SeparatorText("Level chances");
+        if (g_state->current_theme)
+            render_chance(g_state->current_theme->get_shop_chance(), "shop");
+        for (auto i = 0; i < 15; ++i)
+            render_chance(g_state->level_gen->data->level_config[i], level_chances[i]);
         endmenu();
     }
     if (submenu("AI targets"))

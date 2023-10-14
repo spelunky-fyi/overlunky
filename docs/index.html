@@ -454,10 +454,10 @@
                             <a href="#dump_network" class="toc-h3 toc-link" data-title="dump_network">dump_network</a>
                           </li>
                           <li>
-                            <a href="#get_address" class="toc-h3 toc-link" data-title="get_address">get_address</a>
+                            <a href="#get_rva" class="toc-h3 toc-link" data-title="get_rva">get_rva</a>
                           </li>
                           <li>
-                            <a href="#get_rva" class="toc-h3 toc-link" data-title="get_rva">get_rva</a>
+                            <a href="#get_virtual_rva" class="toc-h3 toc-link" data-title="get_virtual_rva">get_virtual_rva</a>
                           </li>
                           <li>
                             <a href="#raise" class="toc-h3 toc-link" data-title="raise">raise</a>
@@ -726,7 +726,19 @@
                             <a href="#create_image_crop" class="toc-h3 toc-link" data-title="create_image_crop">create_image_crop</a>
                           </li>
                           <li>
+                            <a href="#create_layer" class="toc-h3 toc-link" data-title="create_layer">create_layer</a>
+                          </li>
+                          <li>
+                            <a href="#create_level" class="toc-h3 toc-link" data-title="create_level">create_level</a>
+                          </li>
+                          <li>
                             <a href="#destroy_grid" class="toc-h3 toc-link" data-title="destroy_grid">destroy_grid</a>
+                          </li>
+                          <li>
+                            <a href="#destroy_layer" class="toc-h3 toc-link" data-title="destroy_layer">destroy_layer</a>
+                          </li>
+                          <li>
+                            <a href="#destroy_level" class="toc-h3 toc-link" data-title="destroy_level">destroy_level</a>
                           </li>
                           <li>
                             <a href="#disable_floor_embeds" class="toc-h3 toc-link" data-title="disable_floor_embeds">disable_floor_embeds</a>
@@ -786,13 +798,10 @@
                             <a href="#grow_vines" class="toc-h3 toc-link" data-title="grow_vines">grow_vines</a>
                           </li>
                           <li>
-                            <a href="#http_get" class="toc-h3 toc-link" data-title="http_get">http_get</a>
-                          </li>
-                          <li>
-                            <a href="#http_get_async" class="toc-h3 toc-link" data-title="http_get_async">http_get_async</a>
-                          </li>
-                          <li>
                             <a href="#import" class="toc-h3 toc-link" data-title="import">import</a>
+                          </li>
+                          <li>
+                            <a href="#inputs_to_buttons" class="toc-h3 toc-link" data-title="inputs_to_buttons">inputs_to_buttons</a>
                           </li>
                           <li>
                             <a href="#intersection" class="toc-h3 toc-link" data-title="intersection">intersection</a>
@@ -864,6 +873,9 @@
                             <a href="#set_level_config" class="toc-h3 toc-link" data-title="set_level_config">set_level_config</a>
                           </li>
                           <li>
+                            <a href="#set_level_logic_enabled" class="toc-h3 toc-link" data-title="set_level_logic_enabled">set_level_logic_enabled</a>
+                          </li>
+                          <li>
                             <a href="#set_mask" class="toc-h3 toc-link" data-title="set_mask">set_mask</a>
                           </li>
                           <li>
@@ -904,6 +916,9 @@
                   <li>
                     <a href="#Input-functions" class="toc-h2 toc-link" data-title="Input functions">Input functions</a>
                       <ul class="toc-list-h3">
+                          <li>
+                            <a href="#buttons_to_inputs" class="toc-h3 toc-link" data-title="buttons_to_inputs">buttons_to_inputs</a>
+                          </li>
                           <li>
                             <a href="#get_io" class="toc-h3 toc-link" data-title="get_io">get_io</a>
                           </li>
@@ -993,6 +1008,12 @@
                   <li>
                     <a href="#Network-functions" class="toc-h2 toc-link" data-title="Network functions">Network functions</a>
                       <ul class="toc-list-h3">
+                          <li>
+                            <a href="#http_get" class="toc-h3 toc-link" data-title="http_get">http_get</a>
+                          </li>
+                          <li>
+                            <a href="#http_get_async" class="toc-h3 toc-link" data-title="http_get_async">http_get_async</a>
+                          </li>
                           <li>
                             <a href="#udp_listen" class="toc-h3 toc-link" data-title="udp_listen">udp_listen</a>
                           </li>
@@ -1683,6 +1704,9 @@
                           </li>
                           <li>
                             <a href="#Color" class="toc-h3 toc-link" data-title="Color">Color</a>
+                          </li>
+                          <li>
+                            <a href="#CutsceneBehavior" class="toc-h3 toc-link" data-title="CutsceneBehavior">CutsceneBehavior</a>
                           </li>
                           <li>
                             <a href="#Hud" class="toc-h3 toc-link" data-title="Hud">Hud</a>
@@ -3451,6 +3475,30 @@
                   <li>
                     <a href="#ON-USER_DATA" class="toc-h2 toc-link" data-title="ON.USER_DATA">ON.USER_DATA</a>
                   </li>
+                  <li>
+                    <a href="#ON-PRE_LEVEL_CREATION" class="toc-h2 toc-link" data-title="ON.PRE_LEVEL_CREATION">ON.PRE_LEVEL_CREATION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-POST_LEVEL_CREATION" class="toc-h2 toc-link" data-title="ON.POST_LEVEL_CREATION">ON.POST_LEVEL_CREATION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-PRE_LAYER_CREATION" class="toc-h2 toc-link" data-title="ON.PRE_LAYER_CREATION">ON.PRE_LAYER_CREATION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-POST_LAYER_CREATION" class="toc-h2 toc-link" data-title="ON.POST_LAYER_CREATION">ON.POST_LAYER_CREATION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-PRE_LEVEL_DESTRUCTION" class="toc-h2 toc-link" data-title="ON.PRE_LEVEL_DESTRUCTION">ON.PRE_LEVEL_DESTRUCTION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-POST_LEVEL_DESTRUCTION" class="toc-h2 toc-link" data-title="ON.POST_LEVEL_DESTRUCTION">ON.POST_LEVEL_DESTRUCTION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-PRE_LAYER_DESTRUCTION" class="toc-h2 toc-link" data-title="ON.PRE_LAYER_DESTRUCTION">ON.PRE_LAYER_DESTRUCTION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-POST_LAYER_DESTRUCTION" class="toc-h2 toc-link" data-title="ON.POST_LAYER_DESTRUCTION">ON.POST_LAYER_DESTRUCTION</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -4080,18 +4128,18 @@ If you set such a callback and then play the same sound yourself you have to wai
 </blockquote>
 <h4 id='nil-dump_network'>nil dump_network()</h4>
 <p>Hook the sendto and recvfrom functions and start dumping network data to terminal</p>
-<h3 id='get_address'>get_address</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_address">get_address</a></p>
-</blockquote>
-<h4 id='size_t-get_address-string_view-address_name'>size_t get_address(string_view address_name)</h4>
-<p>Get the address for a pattern name</p>
 <h3 id='get_rva'>get_rva</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_rva">get_rva</a></p>
 </blockquote>
-<h4 id='size_t-get_rva-string_view-address_name'>size_t get_rva(string_view address_name)</h4>
-<p>Get the rva for a pattern name</p>
+<h4 id='string-get_rva-string_view-address_name'>string get_rva(string_view address_name)</h4>
+<p>Get the rva for a pattern name, used for debugging.</p>
+<h3 id='get_virtual_rva'>get_virtual_rva</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_virtual_rva">get_virtual_rva</a></p>
+</blockquote>
+<h4 id='string-get_virtual_rva-VTABLE_OFFSET-offset-int-index'>string get_virtual_rva(VTABLE_OFFSET offset, int index)</h4>
+<p>Get the rva for a vtable offset and index, used for debugging.</p>
 <h3 id='raise'>raise</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=raise">raise</a></p>
@@ -4642,6 +4690,18 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 <h4 id='tuple-lt-IMAGE-int-int-gt-create_image_crop-string-path-int-x-int-y-int-w-int-h'>tuple&lt;IMAGE, int, int&gt; create_image_crop(string path, int x, int y, int w, int h)</h4>
 <p>Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don&#39;t create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts</p>
+<h3 id='create_layer'>create_layer</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_layer">create_layer</a></p>
+</blockquote>
+<h4 id='nil-create_layer-int-layer'>nil create_layer(int layer)</h4>
+<p>Initializes an empty layer that doesn&#39;t currently exist.</p>
+<h3 id='create_level'>create_level</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_level">create_level</a></p>
+</blockquote>
+<h4 id='nil-create_level'>nil create_level()</h4>
+<p>Initializes an empty front and back layer that don&#39;t currently exist. Does nothing(?) if layers already exist.</p>
 <h3 id='destroy_grid'>destroy_grid</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_grid">destroy_grid</a></p>
@@ -4649,6 +4709,18 @@ Depending on the image size, this can take a moment, preferably don&#39;t create
 <h4 id='nil-destroy_grid-int-uid'>nil destroy_grid(int uid)</h4><h4 id='nil-destroy_grid-float-x-float-y-LAYER-layer'>nil destroy_grid(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
 Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes <a href="#MASK">MASK</a>.PLAYER to prevent crashes</p>
+<h3 id='destroy_layer'>destroy_layer</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_layer">destroy_layer</a></p>
+</blockquote>
+<h4 id='nil-destroy_layer-int-layer'>nil destroy_layer(int layer)</h4>
+<p>Destroys a layer and all entities in it.</p>
+<h3 id='destroy_level'>destroy_level</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_level">destroy_level</a></p>
+</blockquote>
+<h4 id='nil-destroy_level'>nil destroy_level()</h4>
+<p>Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.</p>
 <h3 id='disable_floor_embeds'>disable_floor_embeds</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=disable_floor_embeds">disable_floor_embeds</a></p>
@@ -4764,19 +4836,6 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 </blockquote>
 <h4 id='nil-grow_vines-LAYER-l-int-max_lengh'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh)</h4><h4 id='nil-grow_vines-LAYER-l-int-max_lengh-AABB-area-bool-destroy_broken'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4>
 <p>Grow vines from <code>GROWABLE_VINE</code> and <code>VINE_TREE_TOP</code> entities in a level, <code>area</code> default is whole level, <code>destroy_broken</code> default is false</p>
-<h3 id='http_get'>http_get</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get">http_get</a></p>
-</blockquote>
-<h4 id='optional-lt-string-gt-http_get-string-url'>optional&lt;string&gt; http_get(string url)</h4>
-<p>Send a synchronous HTTP GET request and return response as a string or nil on an error</p>
-<h3 id='http_get_async'>http_get_async</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get_async">http_get_async</a></p>
-</blockquote>
-<h4 id='HttpRequest-http_get_async-string-url-function-on_data'>HttpRequest http_get_async(string url, function on_data)</h4>
-<p>Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
-The callback signature is nil on_data(string response, string error)</p>
 <h3 id='import'>import</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
@@ -4790,6 +4849,12 @@ The callback signature is nil on_data(string response, string error)</p>
 <li><code>false</code> if the script was not found but optional is set to true</li>
 <li>an error if the script was not found and the optional argument was not set</li>
 </ul>
+<h3 id='inputs_to_buttons'>inputs_to_buttons</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inputs_to_buttons">inputs_to_buttons</a></p>
+</blockquote>
+<h4 id='tuple-lt-float-float-BUTTON-gt-inputs_to_buttons-INPUTS-inputs'>tuple&lt;float, float, <a href="#BUTTON">BUTTON</a>&gt; inputs_to_buttons(<a href="#INPUTS">INPUTS</a> inputs)</h4>
+<p>Converts <a href="#INPUTS">INPUTS</a> to (x, y, BUTTON)</p>
 <h3 id='intersection'>intersection</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=intersection">intersection</a></p>
@@ -4943,6 +5008,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_level_config-LEVEL_CONFIG-config-int-value'>nil set_level_config(<a href="#LEVEL_CONFIG">LEVEL_CONFIG</a> config, int value)</h4>
 <p>Set the value for the specified config</p>
+<h3 id='set_level_logic_enabled'>set_level_logic_enabled</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_level_logic_enabled">set_level_logic_enabled</a></p>
+</blockquote>
+<h4 id='nil-set_level_logic_enabled-bool-enable'>nil set_level_logic_enabled(bool enable)</h4>
+<p>Setting to false disables all player logic in <a href="#SCREEN">SCREEN</a>.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.</p>
 <h3 id='set_mask'>set_mask</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_mask">set_mask</a></p>
@@ -5069,7 +5140,13 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-warp-int-w-int-l-int-t'>nil warp(int w, int l, int t)</h4>
 <p>Warp to a level immediately.</p>
-<h2 id='Input-functions'>Input functions</h2><h3 id='get_io'>get_io</h3>
+<h2 id='Input-functions'>Input functions</h2><h3 id='buttons_to_inputs'>buttons_to_inputs</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_to_inputs">buttons_to_inputs</a></p>
+</blockquote>
+<h4 id='INPUTS-buttons_to_inputs-float-x-float-y-BUTTON-buttons'><a href="#INPUTS">INPUTS</a> buttons_to_inputs(float x, float y, <a href="#BUTTON">BUTTON</a> buttons)</h4>
+<p>Converts (x, y, BUTTON) to <a href="#INPUTS">INPUTS</a></p>
+<h3 id='get_io'>get_io</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_io">get_io</a></p>
 </blockquote>
@@ -5215,7 +5292,20 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Make a <code>CustomMovableBehavior</code>, if <code>base_behavior</code> is <code>nil</code> you will have to set all of the
 behavior functions. If a behavior with <code>behavior_name</code> already exists for your script it will
 be returned instead.</p>
-<h2 id='Network-functions'>Network functions</h2><h3 id='udp_listen'>udp_listen</h3>
+<h2 id='Network-functions'>Network functions</h2><h3 id='http_get'>http_get</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get">http_get</a></p>
+</blockquote>
+<h4 id='optional-lt-string-gt-http_get-string-url'>optional&lt;string&gt; http_get(string url)</h4>
+<p>Send a synchronous HTTP GET request and return response as a string or nil on an error</p>
+<h3 id='http_get_async'>http_get_async</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get_async">http_get_async</a></p>
+</blockquote>
+<h4 id='HttpRequest-http_get_async-string-url-function-on_data'>HttpRequest http_get_async(string url, function on_data)</h4>
+<p>Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
+The callback signature is nil on_data(string response, string error)</p>
+<h3 id='udp_listen'>udp_listen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udp_listen">udp_listen</a></p>
 </blockquote>
@@ -5838,7 +5928,7 @@ Returns uid of the base or -1 if it wasn&#39;t able to spawn</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_player">spawn_player</a></p>
 </blockquote>
-<h4 id='nil-spawn_player-int-player_slot-float-x-float-y'>nil spawn_player(int player_slot, float x, float y)</h4>
+<h4 id='int-spawn_player-int-player_slot-optional-x-optional-y-optional-lt-LAYER-gt-layer'>int spawn_player(int player_slot, optional<float> x, optional<float> y, optional&lt;<a href="#LAYER">LAYER</a>&gt; layer)</h4>
 <p>Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his <a href="#Inventory">Inventory</a> <code>health</code> to above 0, and <code>time_of_death</code> to 0 and call this function, the ghost entity will be removed automatically</p>
 <h3 id='spawn_playerghost'>spawn_playerghost</h3>
@@ -8770,6 +8860,15 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_ucolor">set_ucolor(const uColor color)</a></td>
 <td>Changes color based on given <a href="#Aliases">uColor</a></td>
 </tr>
+</tbody></table>
+<h3 id='CutsceneBehavior'>CutsceneBehavior</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
 </tbody></table>
 <h3 id='Hud'>Hud</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">hud</span><span class="p">)</span>
     <span class="c1">-- draw on screen bottom but keep neat animations</span>
@@ -26105,6 +26204,21 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.</td>
 </tr>
 <tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=process_input">process_input()</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#CutsceneBehavior">CutsceneBehavior</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=cutscene">cutscene</a></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_cutscene">clear_cutscene</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#VanillaMovableBehavior">VanillaMovableBehavior</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_base_behavior">get_base_behavior(int state_id)</a></td>
 <td>Gets a vanilla behavior from this movable, needs to be called before <code>clear_behaviors</code><br/>but the returned values are still valid after a call to <code>clear_behaviors</code></td>
@@ -27891,7 +28005,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_GENERATION">ON.PRE_LEVEL_GENERATION</a></p>
 </blockquote>
 
-<p>Runs before any level generation, no entities should exist at this point<br/></p>
+<p>Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.<br/></p>
 <h2 id='ON-PRE_LOAD_SCREEN'>ON.PRE_LOAD_SCREEN</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">ON.PRE_LOAD_SCREEN</a></p>
@@ -28112,6 +28226,54 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </blockquote>
 
 <p>Params: <a href="#Entity">Entity</a> ent<br/>Runs on all changes to <a href="#Entity">Entity</a>.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won&#39;t be saved to bother you on future levels.<br/></p>
+<h2 id='ON-PRE_LEVEL_CREATION'>ON.PRE_LEVEL_CREATION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_CREATION">ON.PRE_LEVEL_CREATION</a></p>
+</blockquote>
+
+<p>Runs right before the front layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/></p>
+<h2 id='ON-POST_LEVEL_CREATION'>ON.POST_LEVEL_CREATION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_CREATION">ON.POST_LEVEL_CREATION</a></p>
+</blockquote>
+
+<p>Runs right after the back layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/></p>
+<h2 id='ON-PRE_LAYER_CREATION'>ON.PRE_LAYER_CREATION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LAYER_CREATION">ON.PRE_LAYER_CREATION</a></p>
+</blockquote>
+
+<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/></p>
+<h2 id='ON-POST_LAYER_CREATION'>ON.POST_LAYER_CREATION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_CREATION">ON.POST_LAYER_CREATION</a></p>
+</blockquote>
+
+<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/></p>
+<h2 id='ON-PRE_LEVEL_DESTRUCTION'>ON.PRE_LEVEL_DESTRUCTION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_DESTRUCTION">ON.PRE_LEVEL_DESTRUCTION</a></p>
+</blockquote>
+
+<p>Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<h2 id='ON-POST_LEVEL_DESTRUCTION'>ON.POST_LEVEL_DESTRUCTION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_DESTRUCTION">ON.POST_LEVEL_DESTRUCTION</a></p>
+</blockquote>
+
+<p>Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<h2 id='ON-PRE_LAYER_DESTRUCTION'>ON.PRE_LAYER_DESTRUCTION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LAYER_DESTRUCTION">ON.PRE_LAYER_DESTRUCTION</a></p>
+</blockquote>
+
+<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<h2 id='ON-POST_LAYER_DESTRUCTION'>ON.POST_LAYER_DESTRUCTION</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_DESTRUCTION">ON.POST_LAYER_DESTRUCTION</a></p>
+</blockquote>
+
+<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
 <h1 id='Enums'>Enums</h1>
 <p>Enums are like numbers but in text that&#39;s easier to remember.</p>
 <div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -30724,7 +30886,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_GENERATION">PRE_LEVEL_GENERATION</a></td>
 <td>ON::PRE_LEVEL_GENERATION</td>
-<td>Runs before any level generation, no entities should exist at this point<br/></td>
+<td>Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">PRE_LOAD_SCREEN</a></td>
@@ -30895,6 +31057,46 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.USER_DATA">USER_DATA</a></td>
 <td>ON::USER_DATA</td>
 <td>Params: <a href="#Entity">Entity</a> ent<br/>Runs on all changes to <a href="#Entity">Entity</a>.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won&#39;t be saved to bother you on future levels.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_CREATION">PRE_LEVEL_CREATION</a></td>
+<td>ON::PRE_LEVEL_CREATION</td>
+<td>Runs right before the front layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_CREATION">POST_LEVEL_CREATION</a></td>
+<td>ON::POST_LEVEL_CREATION</td>
+<td>Runs right after the back layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LAYER_CREATION">PRE_LAYER_CREATION</a></td>
+<td>ON::PRE_LAYER_CREATION</td>
+<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_CREATION">POST_LAYER_CREATION</a></td>
+<td>ON::POST_LAYER_CREATION</td>
+<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_DESTRUCTION">PRE_LEVEL_DESTRUCTION</a></td>
+<td>ON::PRE_LEVEL_DESTRUCTION</td>
+<td>Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_DESTRUCTION">POST_LEVEL_DESTRUCTION</a></td>
+<td>ON::POST_LEVEL_DESTRUCTION</td>
+<td>Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LAYER_DESTRUCTION">PRE_LAYER_DESTRUCTION</a></td>
+<td>ON::PRE_LAYER_DESTRUCTION</td>
+<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_DESTRUCTION">POST_LAYER_DESTRUCTION</a></td>
+<td>ON::POST_LAYER_DESTRUCTION</td>
+<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>

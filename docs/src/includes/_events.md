@@ -290,7 +290,7 @@ Params: [PreLoadLevelFilesContext](#PreLoadLevelFilesContext) load_level_ctx<br/
 
 > Search script examples for [ON.PRE_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION)
 
-Runs before any level generation, no entities should exist at this point<br/>
+Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.<br/>
 
 ## ON.PRE_LOAD_SCREEN
 
@@ -549,3 +549,59 @@ Runs right after the State is updated, runs always (menu, settings, camp, game, 
 > Search script examples for [ON.USER_DATA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.USER_DATA)
 
 Params: [Entity](#Entity) ent<br/>Runs on all changes to [Entity](#Entity).user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.<br/>
+
+## ON.PRE_LEVEL_CREATION
+
+
+> Search script examples for [ON.PRE_LEVEL_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_CREATION)
+
+Runs right before the front layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+
+## ON.POST_LEVEL_CREATION
+
+
+> Search script examples for [ON.POST_LEVEL_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_CREATION)
+
+Runs right after the back layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+
+## ON.PRE_LAYER_CREATION
+
+
+> Search script examples for [ON.PRE_LAYER_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LAYER_CREATION)
+
+Params: [LAYER](#LAYER) layer<br/>Runs right before a layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+
+## ON.POST_LAYER_CREATION
+
+
+> Search script examples for [ON.POST_LAYER_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LAYER_CREATION)
+
+Params: [LAYER](#LAYER) layer<br/>Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+
+## ON.PRE_LEVEL_DESTRUCTION
+
+
+> Search script examples for [ON.PRE_LEVEL_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_DESTRUCTION)
+
+Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+
+## ON.POST_LEVEL_DESTRUCTION
+
+
+> Search script examples for [ON.POST_LEVEL_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_DESTRUCTION)
+
+Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+
+## ON.PRE_LAYER_DESTRUCTION
+
+
+> Search script examples for [ON.PRE_LAYER_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LAYER_DESTRUCTION)
+
+Params: [LAYER](#LAYER) layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+
+## ON.POST_LAYER_DESTRUCTION
+
+
+> Search script examples for [ON.POST_LAYER_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LAYER_DESTRUCTION)
+
+Params: [LAYER](#LAYER) layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>

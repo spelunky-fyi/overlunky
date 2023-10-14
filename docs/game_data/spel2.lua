@@ -383,10 +383,11 @@ function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 ---If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
 ---@param player_slot integer
----@param x number
----@param y number
----@return nil
-function spawn_player(player_slot, x, y) end
+---@param x number?
+---@param y number?
+---@param layer LAYER?
+---@return integer
+function spawn_player(player_slot, x, y, layer) end
 ---Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input) and send_input to controll it
 ---or change it's `player_inputs` to the `input` of real player so he can control it directly
 ---@param char_type ENT_TYPE
@@ -1134,14 +1135,15 @@ function update_liquid_collision_at(x, y, add) end
 ---@param disable boolean
 ---@return boolean
 function disable_floor_embeds(disable) end
----Get the address for a pattern name
+---Get the rva for a pattern name, used for debugging.
 ---@param address_name string
----@return integer
-function get_address(address_name) end
----Get the rva for a pattern name
----@param address_name string
----@return integer
+---@return string
 function get_rva(address_name) end
+---Get the rva for a vtable offset and index, used for debugging.
+---@param offset VTABLE_OFFSET
+---@param index integer
+---@return string
+function get_virtual_rva(offset, index) end
 ---Log to spelunky.log
 ---@param message string
 ---@return nil
@@ -1233,39 +1235,34 @@ function set_frametime_unfocused(frametime) end
 ---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 ---@return double?
 function get_frametime_unfocused() end
----Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
----@param types ENT_TYPE[]
----@return ENT_TYPE
-function add_custom_type(types) end
----Get uids of entities by draw_depth. Can also use table of draw_depths.
----You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
----@param draw_depth integer
----@param l LAYER
----@return integer[]
-function get_entities_by_draw_depth(draw_depth, l) end
----Get uids of entities by draw_depth. Can also use table of draw_depths.
----You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
----@param draw_depths integer[]
----@param l LAYER
----@return integer[]
-function get_entities_by_draw_depth(draw_depths, l) end
----Just convenient way of getting the current amount of money
----short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
----@return integer
-function get_current_money() end
----Adds money to the state.money_shop_total and displays the effect on the HUD for money change
----Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
----@param amount integer
----@param display_time integer?
----@return integer
-function add_money(amount, display_time) end
----Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
----Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
----@param amount integer
----@param player_slot integer
----@param display_time integer?
----@return integer
-function add_money_slot(amount, player_slot, display_time) end
+---Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
+---@return nil
+function destroy_level() end
+---Destroys a layer and all entities in it.
+---@param layer integer
+---@return nil
+function destroy_layer(layer) end
+---Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+---@return nil
+function create_level() end
+---Initializes an empty layer that doesn't currently exist.
+---@param layer integer
+---@return nil
+function create_layer(layer) end
+---Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
+---@param enable boolean
+---@return nil
+function set_level_logic_enabled(enable) end
+---Converts INPUTS to (x, y, BUTTON)
+---@param inputs INPUTS
+---@return number, number, BUTTON
+function inputs_to_buttons(inputs) end
+---Converts (x, y, BUTTON) to INPUTS
+---@param x number
+---@param y number
+---@param buttons BUTTON
+---@return INPUTS
+function buttons_to_inputs(x, y, buttons) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1592,8 +1589,6 @@ function set_lut(texture_id, layer) end
 ---@param layer LAYER
 ---@return nil
 function reset_lut(layer) end
----@return HudData
-function get_hud() end
 ---Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
 ---Use `-1` as dropchance_id to reset all to default
 ---@param dropchance_id integer
@@ -1906,9 +1901,8 @@ do
     ---@field is_pet_cursed boolean[] @size: 4
     ---@field is_pet_poisoned boolean[] @size: 4
     ---@field leader integer @Index of leader player in coop
-    ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
     ---@field player_inventory Inventory[] @size: MAX_PLAYERS
-    ---@field players Player[] @size: MAX_PLAYERS @Array of players, also keeps the dead body until they are destroyed (necromancer revive also destroys the old body)
+    ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
 
 ---@class LiquidPhysicsEngine
     ---@field pause boolean
@@ -2154,7 +2148,6 @@ do
     ---@field pause_ui PauseUI
     ---@field journal_ui JournalUI
     ---@field save_related SaveRelated
-    ---@field main_menu_music BackgroundSound
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
@@ -2384,31 +2377,6 @@ function Entity:overlaps_with(rect_left, rect_bottom, rect_right, rect_top) end
 ---@param other Entity
 ---@return boolean
 function Entity:overlaps_with(other) end
----Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
----To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
----destroy_corpse and responsible are the standard parameters for the kill funciton
----@param destroy_corpse boolean
----@param responsible Entity
----@param mask integer?
----@param ent_types ENT_TYPE[]
----@param rec_mode RECURSIVE_MODE
----@return nil
-function Entity:kill_recursive(destroy_corpse, responsible, mask, ent_types, rec_mode) end
----Short for using RECURSIVE_MODE.NONE
----@param destroy_corpse boolean
----@param responsible Entity
----@return nil
-function Entity:kill_recursive(destroy_corpse, responsible) end
----Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
----To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
----@param mask integer?
----@param ent_types ENT_TYPE[]
----@param rec_mode RECURSIVE_MODE
----@return nil
-function Entity:destroy_recursive(mask, ent_types, rec_mode) end
----Short for using RECURSIVE_MODE.NONE
----@return nil
-function Entity:destroy_recursive() end
 
 ---@class Movable : Entity
     ---@field move Vec2 @{movex, movey}
@@ -2463,6 +2431,9 @@ function Entity:destroy_recursive() end
     ---@field set_gravity fun(self, gravity: number): nil @Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
     ---@field reset_gravity fun(self): nil @Remove the gravity hook and reset to defaults
     ---@field set_position fun(self, to_x: number, to_y: number): nil @Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
+    ---@field process_input fun(self): nil
+    ---@field cutscene CutsceneBehavior
+    ---@field clear_cutscene any @[](Movable&movable){deletemovable.cutscene_behavior
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior @Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
@@ -2540,6 +2511,8 @@ function Movable:generic_update_world(disable_gravity) end
 ---@param on_rope boolean
 ---@return nil
 function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_rope) end
+
+---@class CutsceneBehavior
 
 ---@class PowerupCapable : Movable
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
@@ -2851,7 +2824,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field sound1 SoundMeta
     ---@field sound2 SoundMeta
     ---@field top_chain_piece Entity
-    ---@field trigger fun(self, play_sound_effect: boolean?): nil
+    ---@field trigger fun(self): nil
 
 ---@class ThinIce : Movable
     ---@field strength integer @counts down when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite
@@ -4597,9 +4570,6 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_room_y integer
     ---@field exit_doors custom_Array<Vec2>
     ---@field themes ThemeInfo[] @size: 18
-    ---@field flags integer
-    ---@field flags2 integer
-    ---@field flags3 integer
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.

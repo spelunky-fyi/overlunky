@@ -662,18 +662,40 @@ void init_spawn_hooks()
     }
 }
 
-void spawn_player(int8_t player_slot, float x, float y)
+int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<float> y, std::optional<LAYER> layer)
 {
     if (player_slot < 1 || player_slot > 4)
-        return;
+        return -1;
+    auto state = State::get().ptr();
+    auto& slot = state->items->player_select_slots[player_slot - 1];
+    if (slot.character < to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") || slot.character > to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))
+        return -1;
+    if (state->items->player_count < player_slot)
+        state->items->player_count = player_slot;
+    slot.activated = true;
 
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    using spawn_player_fun = void(Items*, uint8_t ps, float pos_x, float pos_y);
+    auto old_x = state->level_gen->spawn_x;
+    auto old_y = state->level_gen->spawn_y;
+    state->level_gen->spawn_x = x.value_or(old_x);
+    state->level_gen->spawn_y = y.value_or(old_y);
+    using spawn_player_fun = void(Items*, uint8_t ps);
     static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
-    spawn_player(get_state_ptr()->items, player_slot - 1, x, y);
+    // move the back layer to front layer offset if spawning in back layer
+    if (layer.has_value() && layer.value() == LAYER::BACK)
+        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
+    spawn_player(get_state_ptr()->items, player_slot - 1);
+    if (layer.has_value() && layer.value() == LAYER::BACK)
+        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
+    state->level_gen->spawn_x = old_x;
+    state->level_gen->spawn_y = old_y;
+    auto player = state->items->player(player_slot - 1);
+    if (player)
+        return player->uid;
+    return -1;
 }
 
 int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)

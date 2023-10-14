@@ -393,7 +393,7 @@ for func in ps.funcs:
         cat = "Message functions"
     elif any(
         subs in func["name"]
-        for subs in ["get_address", "get_rva", "raise", "dump_network"]
+        for subs in ["get_rva", "get_virtual_rva", "raise", "dump_network"]
     ):
         cat = "Debug functions"
     elif any(subs in func["name"] for subs in ["_option"]):
@@ -474,7 +474,7 @@ for func in ps.funcs:
         cat = "Particle functions"
     elif any(subs in func["name"] for subs in ["string", "_name"]):
         cat = "String functions"
-    elif any(subs in func["name"] for subs in ["udp_"]):
+    elif any(subs in func["name"] for subs in ["udp_", "http_"]):
         cat = "Network functions"
     elif any(subs in func["name"] for subs in ["illuminati"]):
         cat = "Lighting functions"
@@ -630,7 +630,7 @@ for type in ps.types:
             "QuestsInfo",
             "PlayerSlot",
             "JournalProgressStickerSlot",
-            "JournalProgressStainSlot"
+            "JournalProgressStainSlot",
         ]
     ):
         cat = "State types"

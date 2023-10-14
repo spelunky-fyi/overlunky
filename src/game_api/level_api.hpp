@@ -423,11 +423,16 @@ struct LevelGenSystem
         {
             hook_impl.template hook<PopulateLevelFun, 0xd>(theme, &populate_level_hook);
             hook_impl.template hook<DoProceduralSpawnFun, 0x33>(theme, &do_procedural_spawn_hook);
+            // this didn't work right
+            // hook_impl.template hook<PopulateTransitionFun, 0x15>(theme, &populate_transition_hook);
         }
     }
 
     using PopulateLevelFun = void(ThemeInfo*, uint64_t, uint64_t, uint64_t);
     static void populate_level_hook(ThemeInfo*, uint64_t, uint64_t, uint64_t, PopulateLevelFun*);
+
+    using PopulateTransitionFun = void(ThemeInfo*);
+    static void populate_transition_hook(ThemeInfo*, PopulateTransitionFun*);
 
     using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
     static void do_procedural_spawn_hook(ThemeInfo*, SpawnInfo*, DoProceduralSpawnFun*);
@@ -531,7 +536,7 @@ struct LevelGenSystem
     bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType shop_type);
 
     std::string_view get_room_template_name(uint16_t room_template);
-
+    std::optional<std::string_view> get_procedural_spawn_chance_name(uint32_t chance_id);
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 

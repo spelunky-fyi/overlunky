@@ -2051,6 +2051,64 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .offset(0x5)
             .at_exe(),
     },
+    {
+        "unload_layer"sv,
+        // bp on destroy entity, leave level, it's third in stack or something
+        PatternCommandBuffer{}
+            .find_inst("49 89 cc 8b 41 18 85 c0 74 0b 49 8b 74 24 08"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "init_layer"sv,
+        // called a lot in load_screen, for both layers in every screen that has layers
+        PatternCommandBuffer{}
+            .find_inst("48 8d 7e 40 c7 44 24 2c 00 01 00 00"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x228b58f0),
+    },
+    {
+        "dead_players"sv,
+        // I guess it writes 14 to screen_next before the death screen pops up. Apparently it's a SCREEN_LEVEL virtual too.
+        PatternCommandBuffer{}
+            .find_inst("4c 8b b8 e8 12 00 00 48 8b 80 f0 12 00 00"_gh)
+            .at_exe()
+            .function_start(),
+        //.from_exe_base(0x22c061d0),
+    },
+    {
+        "spawn_transition"sv,
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_DWELLING, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
+        //.from_exe_base(0x22afe5c0),
+    },
+    {
+        "spawn_transition_cosmic"sv,
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_COSMICOCEAN, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
+        //.from_exe_base(0x22b373b0),
+    },
+    {
+        "spawn_transition_duat"sv,
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_CITY_OF_GOLD, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
+        //.from_exe_base(0x22b34940),
+    },
+    {
+        "spawn_transition_olmecship"sv,
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_BASECAMP, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
+        //.from_exe_base(0x22b2d350),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
