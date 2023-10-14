@@ -1619,15 +1619,6 @@ Set the current adventure seed pair
 
 Same as `Player.set_heart_color`
 
-### set_death_enabled
-
-
-> Search script examples for [set_death_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_death_enabled)
-
-#### nil set_death_enabled(bool enable)
-
-Setting to false disables the death screen from popping up for any usual reason, can still load manually
-
 ### set_ending_unlock
 
 
@@ -1689,6 +1680,15 @@ Enables or disables the journal
 #### nil set_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config, int value)
 
 Set the value for the specified config
+
+### set_level_logic_enabled
+
+
+> Search script examples for [set_level_logic_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_logic_enabled)
+
+#### nil set_level_logic_enabled(bool enable)
+
+Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
 
 ### set_mask
 

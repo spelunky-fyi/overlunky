@@ -1249,10 +1249,10 @@ function create_level() end
 ---@param layer integer
 ---@return nil
 function create_layer(layer) end
----Setting to false disables the death screen from popping up for any usual reason, can still load manually
+---Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
 ---@param enable boolean
 ---@return nil
-function set_death_enabled(enable) end
+function set_level_logic_enabled(enable) end
 ---Converts INPUTS to (x, y, BUTTON)
 ---@param inputs INPUTS
 ---@return number, number, BUTTON

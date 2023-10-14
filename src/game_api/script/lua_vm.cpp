@@ -2112,8 +2112,8 @@ end
     /// Initializes an empty layer that doesn't currently exist.
     lua["create_layer"] = create_layer;
 
-    /// Setting to false disables the death screen from popping up for any usual reason, can still load manually
-    lua["set_death_enabled"] = set_death_enabled;
+    /// Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
+    lua["set_level_logic_enabled"] = set_death_enabled;
 
     /// Converts INPUTS to (x, y, BUTTON)
     lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
