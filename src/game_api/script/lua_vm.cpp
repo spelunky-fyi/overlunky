@@ -95,6 +95,7 @@
 #include "usertypes/texture_lua.hpp"               // for register_usertypes
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 #include "usertypes/vtables_lua.hpp"               // for register_usertypes
+#include "virtual_table.hpp"
 
 struct Illumination;
 
@@ -1892,13 +1893,16 @@ end
     /// Disable all crust item spawns, returns whether they were already disabled before the call
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
-    /// Get the address for a pattern name
-    lua["get_address"] = get_address;
-
-    /// Get the rva for a pattern name
-    lua["get_rva"] = [](std::string_view address_name) -> size_t
+    /// Get the rva for a pattern name, used for debugging.
+    lua["get_rva"] = [](std::string_view address_name)
     {
-        return get_address(address_name) - Memory::get().at_exe(0);
+        return fmt::format("{:x}", get_address(address_name) - Memory::get().at_exe(0));
+    };
+
+    /// Get the rva for a vtable offset and index, used for debugging.
+    lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index)
+    {
+        return fmt::format("{:x}", get_virtual_function_address(offset, index));
     };
 
     /// Log to spelunky.log

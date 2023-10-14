@@ -423,11 +423,16 @@ struct LevelGenSystem
         {
             hook_impl.template hook<PopulateLevelFun, 0xd>(theme, &populate_level_hook);
             hook_impl.template hook<DoProceduralSpawnFun, 0x33>(theme, &do_procedural_spawn_hook);
+            // this didn't work right
+            // hook_impl.template hook<PopulateTransitionFun, 0x15>(theme, &populate_transition_hook);
         }
     }
 
     using PopulateLevelFun = void(ThemeInfo*, uint64_t, uint64_t, uint64_t);
     static void populate_level_hook(ThemeInfo*, uint64_t, uint64_t, uint64_t, PopulateLevelFun*);
+
+    using PopulateTransitionFun = void(ThemeInfo*);
+    static void populate_transition_hook(ThemeInfo*, PopulateTransitionFun*);
 
     using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
     static void do_procedural_spawn_hook(ThemeInfo*, SpawnInfo*, DoProceduralSpawnFun*);

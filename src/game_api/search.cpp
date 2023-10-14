@@ -2053,7 +2053,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "dead_players"sv,
-        // I guess it writes 14 to screen_next before the death screen pops up
+        // I guess it writes 14 to screen_next before the death screen pops up. Apparently it's a SCREEN_LEVEL virtual too.
         PatternCommandBuffer{}
             .find_inst("4c 8b b8 e8 12 00 00 48 8b 80 f0 12 00 00"_gh)
             .at_exe()
@@ -2062,38 +2062,34 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "spawn_transition"sv,
-        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
         PatternCommandBuffer{}
-            .find_inst("0f b6 45 75 48 8b 5c c2 08"_gh)
-            .at_exe()
-            .function_start(),
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_DWELLING, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
         //.from_exe_base(0x22afe5c0),
     },
     {
         "spawn_transition_cosmic"sv,
-        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
         PatternCommandBuffer{}
-            .find_inst("48 b9 00 00 40 40 00 00 e0 42 48 89 8a 18 01 00 00"_gh)
-            .at_exe()
-            .function_start(),
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_COSMICOCEAN, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
         //.from_exe_base(0x22b373b0),
     },
     {
         "spawn_transition_duat"sv,
-        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
         PatternCommandBuffer{}
-            .find_inst("48 8b 85 f8 12 00 00 0f b6 4d 75 48 8b 4c c8 08 48 8b 01 ff 90 d0 00 00 00"_gh)
-            .at_exe()
-            .function_start(),
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_CITY_OF_GOLD, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
         //.from_exe_base(0x22b34940),
     },
     {
         "spawn_transition_olmecship"sv,
-        // I hooked ThemeInfo::spawn_transition to find these, but didn't actually want to hook the vtable for this purpose
+        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
         PatternCommandBuffer{}
-            .find_inst("48 89 f1 ba 63 01 00 00"_gh)
-            .at_exe()
-            .function_start(),
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_BASECAMP, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .at_exe(),
         //.from_exe_base(0x22b2d350),
     },
 };

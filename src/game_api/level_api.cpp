@@ -878,17 +878,20 @@ void trans_gen2(ThemeInfo* theme)
     g_trans_gen2_trampoline(theme);
     post_level_generation();
 }
-// duat transition hook
+// cog-duat transition hook
 void trans_gen3(size_t a, size_t b, ThemeInfo* theme)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
 
-    if (pre_level_generation())
+    auto state = State::get().ptr();
+    // trampoline will call the generic trans_gen if not going to duat
+    if (state->theme_next == 12 && pre_level_generation())
         return;
     g_trans_gen3_trampoline(a, b, theme);
-    post_level_generation();
+    if (state->theme_next == 12)
+        post_level_generation();
 }
 // olmecship transition hook
 void trans_gen4(size_t a, size_t b, size_t c, size_t d, size_t e, size_t f)
@@ -1892,6 +1895,12 @@ void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint
     }
 
     original(self, param_2, param_3, param_4);
+}
+void LevelGenSystem::populate_transition_hook(ThemeInfo* self, PopulateTransitionFun* original)
+{
+    pre_level_generation();
+    original(self);
+    post_level_generation();
 }
 void LevelGenSystem::do_procedural_spawn_hook(ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
 {
