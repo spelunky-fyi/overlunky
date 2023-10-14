@@ -162,6 +162,11 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "set_parameter",
         &PlayingSound::set_parameter);
 
+    auto left_channel = sol::property([&lua](SoundMeta* sm)
+                                      { return ZeroIndexArray<float>(sm->left_channel); });
+    auto right_channel = sol::property([](SoundMeta* sm)
+                                       { return ZeroIndexArray<float>(sm->right_channel); });
+
     lua.new_usertype<SoundMeta>(
         "SoundMeta",
         "x",
@@ -169,11 +174,9 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "y",
         &SoundMeta::y,
         "left_channel",
-        sol::property([&lua](SoundMeta* sm) // -> std::array<float, 38>
-                      { return ZeroIndexArray<float>(sm->left_channel) /**/; }),
+        left_channel,
         "right_channel",
-        sol::property([](SoundMeta* sm) // -> std::array<float, 38>
-                      { return ZeroIndexArray<float>(sm->right_channel) /**/; }),
+        right_channel,
         "start_over",
         &SoundMeta::start_over,
         "playing",
