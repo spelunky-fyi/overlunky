@@ -136,9 +136,8 @@ not_functions = [
     "prng",
 ]
 
-replace_fun = None
+replace_fun_import = None
 
-reConstructorFix = re.compile(r"const (\w+)(?: \w+)?(&&|&)?")
 reSignature = re.compile(r"(?:\bsignature\b.*is|function) `?([\S]*) (\w*?)\((.*?)\)")
 
 
@@ -164,9 +163,10 @@ def camel_case_to_snake_case(name):
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
-def fix_constructor_param(params_text):
-    return reConstructorFix.sub(r"\1", params_text)
-
+def fix_spaces(thing):
+    thing = thing.strip()
+    thing = re.sub('\s{2,}', ' ', thing)    # change double spaces into single
+    return re.sub('(?<=\(|\<) ', '', thing) # remove spaces after ( or < 
 
 def getfunc(name):
     for func in funcs:
@@ -182,15 +182,17 @@ def rpcfunc(name):
             ret.append(func)
     return ret
 
+def replace_fun(text):
+    return fix_spaces(replace_fun_import(text))
 
 def configure_parse(replace_function, cache_file):
-    global replace_fun, CACHE_FILE
-    replace_fun = replace_function
+    global replace_fun_import, CACHE_FILE
+    replace_fun_import = replace_function
     CACHE_FILE = cache_file
 
 
 def run_parse():
-    if not replace_fun:
+    if not replace_fun_import:
         print_console("Did not run configure_parse, can not parse source files...")
         return
 
@@ -235,11 +237,13 @@ def run_parse():
             m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", line)
             if m:
                 if skip == 0 or file.endswith("script.hpp"):
+                    param = replace_fun(m.group(3))
+                    ret = replace_fun(m.group(1))
                     rpc.append(
                         {
-                            "return": m.group(1),
+                            "return": ret,
                             "name": m.group(2),
-                            "param": m.group(3),
+                            "param": param,
                             "comment": comment,
                         }
                     )
@@ -314,9 +318,9 @@ def run_parse():
                                     param = f"{param} {param.lower()}"
                                 member_funs[name].append(
                                     {
-                                        "return": m[2],
+                                        "return": replace_fun(m[2]),
                                         "name": m[3],
-                                        "param": param,
+                                        "param": replace_fun(param),
                                         "comment": comment,
                                     }
                                 )
@@ -339,21 +343,21 @@ def run_parse():
                                 for m_var in re.findall(r"(\w*),", vars_except_last):
                                     member_vars.append(
                                         {
-                                            "type": vars_type,
+                                            "type": replace_fun(vars_type),
                                             "name": m_var,
                                             "comment": comment,
                                         }
                                     )
                                 member_vars.append(
                                     {
-                                        "type": vars_type,
+                                        "type": replace_fun(vars_type),
                                         "name": m[2],
                                         "comment": comment,
                                     }
                                 )
                             else:
                                 member_vars.append(
-                                    {"type": m[1], "name": m[2], "comment": comment}
+                                    {"type": replace_fun(m[1]), "name": m[2], "comment": comment}
                                 )
                             comment = []
                 elif brackets_depth == 0:
@@ -391,8 +395,7 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            line = line.replace("*", "")
-            line = line.strip()
+            line = line.replace("*", "") # TODO
             if line == "":
                 comment = []
 
@@ -433,10 +436,10 @@ def run_parse():
                         ret = "nil"
                         param = ""
                         if m:
-                            ret = replace_fun(m.group(2)).strip() or "nil"
+                            ret = replace_fun(m.group(2)) or "nil"
                         if m or m2:
                             param = (m or m2).group(1)
-                            param = replace_fun(param).strip()
+                            param = replace_fun(param)
                             param = ", ".join([p.strip() for p in param.split(",")[1:]])
                         underlying_cpp_type["member_funs"][name].append(
                             {
@@ -459,7 +462,7 @@ def run_parse():
                         )
                         func = {
                             "name": m.group(1),
-                            "cpp": m.group(2),
+                            "cpp": replace_fun(m.group(2)),
                             "comment": comment,
                             "cb_signature": cb_signature,
                         }
@@ -524,9 +527,9 @@ def run_parse():
                     signature = re.search(
                         r"([_a-zA-Z][_a-zA-Z0-9]*.*)\((.*)\)", signature
                     )
-                    ret = replace_fun(signature.group(1).strip())
+                    ret = replace_fun(signature.group(1))
                     args = [
-                        replace_fun(t.strip()) for t in signature.group(2).split(",")
+                        replace_fun(t) for t in signature.group(2).split(",")
                     ]
                     vtable_entries[name] = {
                         "name": name,
@@ -648,8 +651,7 @@ def run_parse():
                 if var[0].startswith("sol::constructors"):
                     for fun in underlying_cpp_type["member_funs"][cpp_type]:
                         param = replace_fun(fun["param"])
-                        param = fix_constructor_param(param)
-
+                        
                         if cpp_type not in constructors:
                             constructors[cpp_type] = []
                         constructors[cpp_type].append(
@@ -765,11 +767,10 @@ def run_parse():
                     cpp_comment = []
                     if entry_name in underlying_cpp_type["member_funs"]:
                         for fun in underlying_cpp_type["member_funs"][entry_name]:
-                            ret = fun["return"]
-                            ret = replace_fun(ret)
+                            ret = replace_fun(fun["return"])
                             ret = f"optional<{ret}>" if ret else "bool"
                             ret = ret if entry_name != "dtor" else "nil"
-                            args = replace_fun(fun["param"]).strip()
+                            args = replace_fun(fun["param"])
                             args = f"{name} self, {args}" if args else f"{name} self"
                             binds = entry["binds"]
                             if binds:
@@ -781,8 +782,7 @@ def run_parse():
                                 cpp_comment = ["Virtual function docs:"] + cpp_comment
                             break
                     else:
-                        ret = entry["ret"]
-                        ret = replace_fun(ret)
+                        ret = replace_fun(entry["ret"])
                         ret = f"optional<{ret}>" if ret else "bool"
                         ret = ret if entry_name != "dtor" else "nil"
                         args = replace_fun(" ".join(entry["args"]))

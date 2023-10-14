@@ -627,7 +627,7 @@ Get uids of matching entities overlapping with the given hitbox. Set `entity_typ
 
 > Search script examples for [get_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
 
-#### [Entity](#Entity) get_entity(int uid)
+#### [Entity](#Entity)  get_entity(int uid)
 
 Get the [Entity](#Entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
 
@@ -3267,7 +3267,7 @@ Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(
 
 > Search script examples for [force_custom_subtheme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_subtheme)
 
-#### nil force_custom_subtheme(mixed customtheme)
+#### nil force_custom_subtheme([CustomTheme](#CustomTheme)|[ThemeInfo](#ThemeInfo)|[THEME](#THEME) customtheme)
 
 Force current subtheme used in the CO theme. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME). Not to be confused with force_co_subtheme.
 
@@ -3276,7 +3276,7 @@ Force current subtheme used in the CO theme. You can pass a [CustomTheme](#Custo
 
 > Search script examples for [force_custom_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_theme)
 
-#### nil force_custom_theme(mixed customtheme)
+#### nil force_custom_theme([CustomTheme](#CustomTheme)|[ThemeInfo](#ThemeInfo)|[THEME](#THEME) customtheme)
 
 Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME).
 

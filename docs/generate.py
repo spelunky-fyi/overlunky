@@ -37,9 +37,9 @@ replace_table = {
     "std::": "",
     "sol::": "",
     "void": "",
-    "constexpr ": "",
-    "const ": "",
-    "static ": "",
+    "constexpr": "",
+    "const": "",
+    "static": "",
     "variadic_args va": "ENT_TYPE, ENT_TYPE...",
     "EmittedParticlesInfo": "array<Particle>",
     "ImVec2": "Vec2",
@@ -504,10 +504,9 @@ for cat in sorted(func_cats):
             ret = "nil"
             param = ""
             if m:
-                ret = replace_all(m.group(2)).strip() or "nil"
+                ret = m.group(2) or "nil"
             if m or m2:
                 param = (m or m2).group(1)
-                param = replace_all(param).strip()
             name = lf["name"]
             ret = link_custom_type(ret)
             ret = ret.replace("<", "&lt;").replace(">", "&gt;")
@@ -549,10 +548,9 @@ for lf in ps.deprecated_funcs:
         ret = "nil"
         param = ""
         if m:
-            ret = replace_all(m.group(2)).strip() or "nil"
+            ret = m.group(2) or "nil"
         if m or m2:
             param = (m or m2).group(1)
-            param = replace_all(param).strip()
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
@@ -711,13 +709,13 @@ Type | Name | Description
                         if n:
                             name = n.group(1)
                             if n.group(2):
-                                param = replace_all(n.group(2).strip()) + ")"
+                                param = n.group(2) + ")"
                             signature = name + param
                         elif m:
-                            ret = replace_all(m.group(1)) or "nil"
+                            ret = m.group(1) or "nil"
                             name = m.group(2)
                             if m.group(3):
-                                param = replace_all(m.group(3).strip()).replace("vector<", "array<") + ")"
+                                param = m.group(3).strip().replace("vector<", "array<") + ")"
                             signature = name + param
                     signature = signature.strip()
                     ret = ret.replace("<", "&lt;").replace(">", "&gt;")

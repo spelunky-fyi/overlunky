@@ -807,8 +807,8 @@ bool | [render_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 int | [texture_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture_num) | 
 [Entity](#Entity) | [get_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity) | 
 bool | [set_normal_map_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_normal_map_texture) | Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
-optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_second_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_second_texture) | 
-optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_third_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_third_texture) | 
+std::optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_second_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_second_texture) | 
+std::optional&lt;[TEXTURE](#TEXTURE)&gt; | [get_third_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_third_texture) | 
 bool | [set_second_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_second_texture) | 
 bool | [set_third_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_third_texture) | 
 bool | [set_texture_num(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture_num) | Set the number of textures that may be used, need to have them set before for it to work
@@ -919,26 +919,26 @@ Used in [get_io](#get_io)
 
 Type | Name | Description
 ---- | ---- | -----------
-[Vec2](#Vec2)      | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
-float       | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
-bool        | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
-bool        | [keysdown[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
+[Vec2](#Vec2) | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
+float | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
+bool | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
+bool | [keysdown[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
  | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown(int keycode)<br/>bool keydown(char key)<br/> 
  | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
  | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/> 
-bool        | [keyctrl](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) | 
-bool        | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) | 
-bool        | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 
-bool        | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) | 
-bool        | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
-[Vec2](#Vec2)      | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
-bool        | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
-bool        | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
-bool        | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
-float       | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
+bool | [keyctrl](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) | 
+bool | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) | 
+bool | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 
+bool | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) | 
+bool | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
+[Vec2](#Vec2) | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
+bool | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
+bool | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
+bool | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
+float | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
 [Gamepad](#Gamepad) | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
  | [gamepads](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepads) | [Gamepad](#Gamepad) gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/> 
-bool        | [showcursor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=showcursor) | 
+bool | [showcursor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=showcursor) | 
 
 ### InputMapping
 
@@ -1470,8 +1470,8 @@ Used in [ScreenCharacterSelect](#ScreenCharacterSelect), [ScreenTitle](#ScreenTi
 Type | Name | Description
 ---- | ---- | -----------
 [ParticleDB](#ParticleDB) | [particle_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type) | 
-int | [particle_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count) | 
-int | [particle_count_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count_back_layer) | 
+uint32_t | [particle_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count) | 
+uint32_t | [particle_count_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count_back_layer) | 
 int | [entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) | 
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 

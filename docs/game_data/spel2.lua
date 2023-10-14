@@ -1475,11 +1475,11 @@ function grow_chainandblocks(x, y) end
 ---@return nil
 function load_screen() end
 ---Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a CustomTheme, ThemeInfo or THEME.
----@param customtheme mixed
+---@param customtheme CustomTheme|ThemeInfo|THEME
 ---@return nil
 function force_custom_theme(customtheme) end
 ---Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
----@param customtheme mixed
+---@param customtheme CustomTheme|ThemeInfo|THEME
 ---@return nil
 function force_custom_subtheme(customtheme) end
 ---Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
@@ -1811,18 +1811,18 @@ do
 
 ---@class ArenaState
     ---@field current_arena integer
-    ---@field player_teams Array<integer, 4>
+    ---@field player_teams integer[] @size: 4
     ---@field format integer
     ---@field ruleset integer
-    ---@field player_lives Array<integer, 4>
-    ---@field player_totalwins Array<integer, 4>
-    ---@field player_won Array<boolean, 4>
+    ---@field player_lives integer[] @size: 4
+    ---@field player_totalwins integer[] @size: 4
+    ---@field player_won boolean[] @size: 4
     ---@field timer integer @The menu selection for timer, default values 0..20 where 0 == 30 seconds, 19 == 10 minutes and 20 == infinite. Can go higher, although this will glitch the menu text. Actual time (seconds) = (state.arena.timer + 1) x 30
     ---@field timer_ending integer
     ---@field wins integer
     ---@field lives integer
     ---@field time_to_win integer
-    ---@field player_idolheld_countdown Array<integer, 4>
+    ---@field player_idolheld_countdown integer[] @size: 4
     ---@field health integer
     ---@field bombs integer
     ---@field ropes integer
@@ -1867,12 +1867,12 @@ do
 ---@class Items
     ---@field player_count integer
     ---@field saved_pets_count integer
-    ---@field saved_pets Array<ENT_TYPE, 4> @Pet information for level transition
-    ---@field is_pet_cursed Array<boolean, 4>
-    ---@field is_pet_poisoned Array<boolean, 4>
+    ---@field saved_pets ENT_TYPE[] @size: 4 @Pet information for level transition
+    ---@field is_pet_cursed boolean[] @size: 4
+    ---@field is_pet_poisoned boolean[] @size: 4
     ---@field leader integer @Index of leader player in coop
-    ---@field player_inventory Array<Inventory, MAX_PLAYERS>
-    ---@field player_select Array<SelectPlayerSlot, MAX_PLAYERS>
+    ---@field player_inventory Inventory[] @size: MAX_PLAYERS
+    ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
 
 ---@class LiquidPhysicsEngine
     ---@field pause boolean
@@ -1893,7 +1893,7 @@ do
     ---@field engine LiquidPhysicsEngine
 
 ---@class LiquidPhysics
-    ---@field pools Array<LiquidPool, 5>
+    ---@field pools LiquidPool[] @size: 5
 
 ---@class StateMemory
     ---@field screen_last integer @Previous SCREEN, used to check where we're coming from when loading another SCREEN
@@ -1992,14 +1992,14 @@ do
     ---@field screen_change_counter integer
     ---@field time_startup integer @Number of frames since the game was launched
     ---@field storage_uid integer @entity uid of the first floor_storage entity
-    ---@field waddler_storage Array<ENT_TYPE, 99>
-    ---@field waddler_metadata Array<integer, 99>
+    ---@field waddler_storage ENT_TYPE[] @size: 99
+    ---@field waddler_metadata integer[] @size: 99
     ---@field journal_progress_sticker_count integer
-    ---@field journal_progress_sticker_slots Array<JournalProgressStickerSlot, 40> @stickers for notable items and entities in journal progress page
+    ---@field journal_progress_sticker_slots JournalProgressStickerSlot[] @size: 40 @stickers for notable items and entities in journal progress page
     ---@field journal_progress_stain_count integer
-    ---@field journal_progress_stain_slots Array<JournalProgressStainSlot, 30> @blood splats and paw prints in journal progress page
+    ---@field journal_progress_stain_slots JournalProgressStainSlot[] @size: 30 @blood splats and paw prints in journal progress page
     ---@field journal_progress_theme_count integer
-    ---@field journal_progress_theme_slots Array<integer, 9> @visited themes in journal progress page
+    ---@field journal_progress_theme_slots integer[] @size: 9 @visited themes in journal progress page
     ---@field theme_info ThemeInfo @Points to the current ThemeInfo
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
@@ -2013,7 +2013,7 @@ do
     ---@field size number
 
 ---@class Illumination
-    ---@field lights Array<LightParams, 4> @Table of light1, light2, ... etc.
+    ---@field lights LightParams[] @size: 4 @Table of light1, light2, ... etc.
     ---@field light1 LightParams
     ---@field light2 LightParams
     ---@field light3 LightParams
@@ -2055,7 +2055,7 @@ do
     ---@field inertia number
 
 ---@class Online
-    ---@field online_players Array<OnlinePlayer, 4>
+    ---@field online_players OnlinePlayer[] @size: 4
     ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
 
@@ -2116,7 +2116,7 @@ do
 
 ---@class RoomOwnersInfo
     ---@field owned_items custom_map<integer, ItemOwnerDetails> @key/index is the uid of an item
-    ---@field owned_rooms Array<RoomOwnerDetails>
+    ---@field owned_rooms RoomOwnerDetails[]
 
 ---@class ItemOwnerDetails
     ---@field owner_type ENT_TYPE
@@ -2333,7 +2333,7 @@ function PRNG:random(min, max) end
     ---@field get_metadata fun(self): integer @e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, value: boolean): nil
-    ---@field get_items fun(self): Array<integer>
+    ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean @Returns true if entity is in water/lava
     ---@field is_cursed fun(self): boolean
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
@@ -2440,7 +2440,7 @@ function Entity:overlaps_with(other) end
     ---@field add_money fun(self, money: integer): nil @Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD.
     ---@field is_on_fire fun(self): boolean
     ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean @Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-    ---@field get_all_behaviors fun(self): Array<integer> @Get all avaible behavior ids
+    ---@field get_all_behaviors fun(self): integer[] @Get all avaible behavior ids
     ---@field set_behavior fun(self, behavior_id: integer): boolean @Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
     ---@field get_behavior fun(self): integer @Get the current behavior id
     ---@field set_gravity fun(self, gravity: number): nil @Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
@@ -2486,7 +2486,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field remove_powerup fun(self, powerup_type: ENT_TYPE): nil @Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
     ---@field give_powerup fun(self, powerup_type: ENT_TYPE): nil @Gives the player/monster the specified powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Giving true crown to a monster crashes the game.
     ---@field has_powerup fun(self, powerup_type: ENT_TYPE): boolean @Checks whether the player/monster has a certain powerup
-    ---@field get_powerups fun(self): Array<ENT_TYPE> @Return all powerups that the entity has
+    ---@field get_powerups fun(self): ENT_TYPE[] @Return all powerups that the entity has
     ---@field unequip_backitem fun(self): nil @Unequips the currently worn backitem
     ---@field worn_backitem fun(self): integer @Returns the uid of the currently worn backitem, or -1 if wearing nothing
 
@@ -2509,18 +2509,18 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field kills_total integer
     ---@field collected_money_total integer @Total money collected during previous levels (so excluding the current one)
     ---@field collected_money_count integer @Count/size for the `collected_money` arrays
-    ---@field collected_money Array<ENT_TYPE, 512> @Types of gold/gems collected during this level, used later to display during the transition
-    ---@field collected_money_values Array<integer, 512> @Values of gold/gems collected during this level, used later to display during the transition
-    ---@field killed_enemies Array<ENT_TYPE, 256> @Types of enemies killed during this level, used later to display during the transition
+    ---@field collected_money ENT_TYPE[] @size: 512 @Types of gold/gems collected during this level, used later to display during the transition
+    ---@field collected_money_values integer[] @size: 512 @Values of gold/gems collected during this level, used later to display during the transition
+    ---@field killed_enemies ENT_TYPE[] @size: 256 @Types of enemies killed during this level, used later to display during the transition
     ---@field companion_count integer @Number of companions, it will determinate how many companions will be transfered to next level<br/>Increments when player acquires new companion, decrements when one of them dies
-    ---@field companions Array<ENT_TYPE, 8> @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field companion_held_items Array<ENT_TYPE, 8> @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field companion_held_item_metadatas Array<integer, 8> @Metadata of items held by companions (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field companion_trust Array<integer, 8> @(0..3) Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field companion_health Array<integer, 8> @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field companion_poison_tick_timers Array<integer, 8> @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field is_companion_cursed Array<boolean, 8> @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field acquired_powerups Array<ENT_TYPE, 30> @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companions ENT_TYPE[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_held_items ENT_TYPE[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_held_item_metadatas integer[] @size: 8 @Metadata of items held by companions (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_trust integer[] @size: 8 @(0..3) Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_health integer[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field companion_poison_tick_timers integer[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field is_companion_cursed boolean[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field acquired_powerups ENT_TYPE[] @size: 30 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
 
 ---@class Ai
     ---@field target Entity
@@ -2672,17 +2672,17 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field timer integer
 
 ---@class MotherStatue : Floor
-    ---@field players_standing Array<boolean, 4> @Table of player1_standing, player2_standing, ... etc.
+    ---@field players_standing boolean[] @size: 4 @Table of player1_standing, player2_standing, ... etc.
     ---@field player1_standing boolean
     ---@field player2_standing boolean
     ---@field player3_standing boolean
     ---@field player4_standing boolean
-    ---@field players_health_received Array<boolean, 4> @Table of player1_health_received, player2_health_received, ... etc.
+    ---@field players_health_received boolean[] @size: 4 @Table of player1_health_received, player2_health_received, ... etc.
     ---@field player1_health_received boolean
     ---@field player2_health_received boolean
     ---@field player3_health_received boolean
     ---@field player4_health_received boolean
-    ---@field players_health_timer Array<integer, 4> @Table of player1_health_timer, player2_health_timer, ... etc.
+    ---@field players_health_timer integer[] @size: 4 @Table of player1_health_timer, player2_health_timer, ... etc.
     ---@field player1_health_timer integer
     ---@field player2_health_timer integer
     ---@field player3_health_timer integer
@@ -2922,7 +2922,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
-    ---@field turkeys_in_den Array<integer> @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    ---@field turkeys_in_den integer[] @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
     ---@field first_message_shown boolean @I'm looking for turkeys, wanna help?
     ---@field quest_incomplete boolean @Is set to false when the quest is over (Yang dead or second turkey delivered)
     ---@field special_message_shown boolean @Tusk palace/black market/one way door - message shown
@@ -3820,7 +3820,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field shake number
 
 ---@class PrizeDispenser : Movable
-    ---@field item_ids Array<integer, 6> @Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes<br/>so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
+    ---@field item_ids integer[] @size: 6 @Id's of the items (not types), by default 0-24, look at [change_diceshop_prizes](#change_diceshop_prizes) for the list of default prizes<br/>so for example: id 0 equals ITEM_PICKUP_BOMBBAG, id 1 equals ITEM_PICKUP_BOMBBOX etc. Game generates 6 but uses max 5 for Tusk dice shop
     ---@field prizes_spawned integer
 
 ---@class Web : Movable
@@ -4262,8 +4262,8 @@ function MovableBehavior:get_state_id() end
     ---@field y number
     ---@field offset_x number
     ---@field offset_y number
-    ---@field emitted_particles Array<Particle>
-    ---@field emitted_particles_back_layer Array<Particle>
+    ---@field emitted_particles Particle[]
+    ---@field emitted_particles_back_layer Particle[]
 
 ---@class Particle
     ---@field x number
@@ -4501,8 +4501,8 @@ function MovableBehavior:get_state_id() end
     ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
 
 ---@class PreLoadLevelFilesContext
-    ---@field override_level_files fun(self, levels: Array<string>): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
-    ---@field add_level_files fun(self, levels: Array<string>): nil @Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
+    ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
+    ---@field add_level_files fun(self, levels: string[]): nil @Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
 
 ---@class DoorCoords
     ---@field door1_x number
@@ -4556,19 +4556,19 @@ function MovableBehavior:get_state_id() end
     ---@field beg_state integer
 
 ---@class SaveData
-    ---@field places Array<boolean, 16>
-    ---@field bestiary Array<boolean, 78>
-    ---@field people Array<boolean, 38>
-    ---@field items Array<boolean, 54>
-    ---@field traps Array<boolean, 24>
+    ---@field places boolean[] @size: 16
+    ---@field bestiary boolean[] @size: 78
+    ---@field people boolean[] @size: 38
+    ---@field items boolean[] @size: 54
+    ---@field traps boolean[] @size: 24
     ---@field last_daily string
     ---@field characters integer @20bit bitmask of unlocked characters
     ---@field tutorial_state integer @Tutorial state 0..4. Changes the camp layout, camera and lighting. (0=nothing, 1=journal got, 2=key spawned, 3=door unlocked, 4=complete)
     ---@field shortcuts integer @Terra quest state 0..10 (0=not met ... 10=complete)
-    ---@field bestiary_killed Array<integer, 78>
-    ---@field bestiary_killed_by Array<integer, 78>
-    ---@field people_killed Array<integer, 38>
-    ---@field people_killed_by Array<integer, 38>
+    ---@field bestiary_killed integer[] @size: 78
+    ---@field bestiary_killed_by integer[] @size: 78
+    ---@field people_killed integer[] @size: 38
+    ---@field people_killed_by integer[] @size: 38
     ---@field plays integer
     ---@field deaths integer
     ---@field wins_normal integer
@@ -4581,8 +4581,8 @@ function MovableBehavior:get_state_id() end
     ---@field time_best integer
     ---@field time_total integer
     ---@field time_tutorial integer
-    ---@field character_deaths Array<integer, 20>
-    ---@field pets_rescued Array<integer, 3>
+    ---@field character_deaths integer[] @size: 20
+    ---@field pets_rescued integer[] @size: 3
     ---@field completed_normal boolean
     ---@field completed_ironman boolean
     ---@field completed_hard boolean
@@ -4593,16 +4593,16 @@ function MovableBehavior:get_state_id() end
     ---@field theme_last integer
     ---@field score_last integer
     ---@field time_last integer
-    ---@field stickers Array<ENT_TYPE, 20>
-    ---@field players Array<integer, 4>
+    ---@field stickers ENT_TYPE[] @size: 20
+    ---@field players integer[] @size: 4
     ---@field constellation Constellation
 
 ---@class Constellation
     ---@field star_count integer
-    ---@field stars Array<ConstellationStar, 45>
+    ---@field stars ConstellationStar[] @size: 45
     ---@field scale number
     ---@field line_count integer
-    ---@field lines Array<ConstellationLine, 90>
+    ---@field lines ConstellationLine[] @size: 90
     ---@field line_red_intensity number
 
 ---@class ConstellationStar
@@ -4655,8 +4655,8 @@ function CustomSound:play(paused, sound_type) end
 ---@class SoundMeta
     ---@field x number
     ---@field y number
-    ---@field left_channel Array<number, 38>
-    ---@field right_channel Array<number, 38>
+    ---@field left_channel number[] @size: 38
+    ---@field right_channel number[] @size: 38
     ---@field start_over boolean @when false, current track starts from the beginning, is immediately set back to true
     ---@field playing boolean @set to false to turn off
 
@@ -4690,12 +4690,12 @@ function CustomSound:play(paused, sound_type) end
     ---@field down integer
 
 ---@class PlayerInputs
-    ---@field player_slots Array<PlayerSlot, MAX_PLAYERS>
+    ---@field player_slots PlayerSlot[] @size: MAX_PLAYERS
     ---@field player_slot_1 PlayerSlot
     ---@field player_slot_2 PlayerSlot
     ---@field player_slot_3 PlayerSlot
     ---@field player_slot_4 PlayerSlot
-    ---@field player_settings Array<PlayerSlotSettings, MAX_PLAYERS>
+    ---@field player_settings PlayerSlotSettings[] @size: MAX_PLAYERS
     ---@field player_slot_1_settings PlayerSlotSettings
     ---@field player_slot_2_settings PlayerSlotSettings
     ---@field player_slot_3_settings PlayerSlotSettings
@@ -4705,8 +4705,8 @@ function CustomSound:play(paused, sound_type) end
     ---@field draw_line fun(self, x1: number, y1: number, x2: number, y2: number, thickness: number, color: uColor): nil @Draws a line on screen
     ---@field draw_triangle fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil @Draws a triangle on screen.
     ---@field draw_triangle_filled fun(self, p1: Vec2, p2: Vec2, p3: Vec2, color: uColor): nil @Draws a filled triangle on screen.
-    ---@field draw_poly fun(self, points: Array<Vec2>, thickness: number, color: uColor): nil @Draws a polyline on screen.
-    ---@field draw_poly_filled fun(self, points: Array<Vec2>, color: uColor): nil @Draws a filled convex polyline on screen.
+    ---@field draw_poly fun(self, points: Vec2[], thickness: number, color: uColor): nil @Draws a polyline on screen.
+    ---@field draw_poly_filled fun(self, points: Vec2[], color: uColor): nil @Draws a filled convex polyline on screen.
     ---@field draw_bezier_cubic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, p4: Vec2, thickness: number, color: uColor): nil @Draws a cubic bezier curve on screen.
     ---@field draw_bezier_quadratic fun(self, p1: Vec2, p2: Vec2, p3: Vec2, thickness: number, color: uColor): nil @Draws a quadratic bezier curve on screen.
     ---@field draw_circle fun(self, x: number, y: number, radius: number, thickness: number, color: uColor): nil @Draws a circle on screen
@@ -4837,7 +4837,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field displaysize Vec2
     ---@field framerate number
     ---@field wantkeyboard boolean
-    ---@field keysdown boolean[] @size: ImGuiKey_COUNT. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    ---@field keysdown boolean[] @size: ImGuiKey_COUNT
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean
@@ -4847,9 +4847,9 @@ function GuiDrawContext:win_pushid(id) end
     ---@field keysuper boolean
     ---@field wantmouse boolean
     ---@field mousepos Vec2
-    ---@field mousedown boolean       [] @size: 5
-    ---@field mouseclicked boolean       [] @size: 5
-    ---@field mousedoubleclicked boolean       [] @size: 5
+    ---@field mousedown boolean[] @size: 5
+    ---@field mouseclicked boolean[] @size: 5
+    ---@field mousedoubleclicked boolean[] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
     ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
@@ -4947,7 +4947,7 @@ function VanillaRenderContext:draw_screen_texture(texture_id, tri, color) end
 ---Draw a polyline on screen from points using the built-in renderer
 ---Draws from the first to the last point, use `closed` to connect first and last as well
 ---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
----@param points Array<Vec2>
+---@param points Vec2[]
 ---@param thickness number
 ---@param color Color
 ---@param closed boolean
@@ -4964,7 +4964,7 @@ function VanillaRenderContext:draw_screen_poly(points, thickness, color, closed)
 ---Draw a convex polygon on screen from points using the built-in renderer
 ---Can probably draw almost any polygon, but the convex one is guaranteed to look correct
 ---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
----@param points Array<Vec2>
+---@param points Vec2[]
 ---@param color Color
 ---@return nil
 function VanillaRenderContext:draw_screen_poly_filled(points, color) end
@@ -5051,7 +5051,7 @@ function VanillaRenderContext:draw_world_texture(texture_id, source, dest, color
 ---Draw a polyline in world coordinates from points using the built-in renderer
 ---Draws from the first to the last point, use `closed` to connect first and last as well
 ---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
----@param points Array<Vec2>
+---@param points Vec2[]
 ---@param thickness number
 ---@param color Color
 ---@param closed boolean
@@ -5068,7 +5068,7 @@ function VanillaRenderContext:draw_world_poly(points, thickness, color, closed) 
 ---Draw a convex polygon in world coordinates from points using the built-in renderer
 ---Can probably draw almost any polygon, but the convex one is guaranteed to look correct
 ---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
----@param points Array<Vec2>
+---@param points Vec2[]
 ---@param color Color
 ---@return nil
 function VanillaRenderContext:draw_world_poly_filled(points, color) end
@@ -5120,8 +5120,8 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field width number
     ---@field height number
     ---@field special_texture_id integer @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
-    ---@field get_dest fun(self): Array<Letter> @Returns refrence to the letter coordinates relative to the x,y position
-    ---@field get_source fun(self): Array<Letter> @Returns refrence to the letter coordinates in the texture
+    ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
+    ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: VANILLA_TEXT_ALIGNMENT, fontstyle: VANILLA_FONT_STYLE): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
@@ -5158,7 +5158,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field timer integer
 
 ---@class HudData
-    ---@field inventory Array<HudInventory, MAX_PLAYERS>
+    ---@field inventory HudInventory[] @size: MAX_PLAYERS
     ---@field udjat boolean
     ---@field money_total integer
     ---@field money_counter integer
@@ -5168,7 +5168,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field level_num integer
     ---@field seed integer
     ---@field opacity number
-    ---@field players Array<HudPlayer, MAX_PLAYERS>
+    ---@field players HudPlayer[] @size: MAX_PLAYERS
     ---@field money HudMoney
     ---@field timer HudElement
     ---@field level HudElement
@@ -5350,8 +5350,8 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field cthulhu_timer number
     ---@field selected_menu_index integer
 ---@field menu_text_opacity number
-    ---@field spear_position Array<number, 6>
-    ---@field spear_dangler Array<SpearDanglerAnimFrames, 6>
+    ---@field spear_position number[] @size: 6
+    ---@field spear_dangler SpearDanglerAnimFrames[] @size: 6
     ---@field play_scroll_descend_timer number
     ---@field scroll_text STRINGID
 
@@ -5443,15 +5443,15 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field quick_select_panel TextureRenderingInfo
     ---@field quick_select_selected_char_background TextureRenderingInfo
     ---@field quick_select_panel_related TextureRenderingInfo
-    ---@field player_shutter_timer Array<number, MAX_PLAYERS>
-    ---@field player_x Array<number, MAX_PLAYERS>
-    ---@field player_y Array<number, MAX_PLAYERS>
-    ---@field player_arrow_slidein_timer Array<Array<number, 2>, MAX_PLAYERS>
-    ---@field player_facing_left Array<boolean, MAX_PLAYERS>
-    ---@field player_quickselect_shown Array<boolean, MAX_PLAYERS>
-    ---@field player_quickselect_fadein_timer Array<number, MAX_PLAYERS>
-    ---@field player_quickselect_coords Array<Array<number, 2>, MAX_PLAYERS>
-    ---@field player_quickselect_wiggle_angle Array<number, MAX_PLAYERS>
+    ---@field player_shutter_timer number[] @size: MAX_PLAYERS
+    ---@field player_x number[] @size: MAX_PLAYERS
+    ---@field player_y number[] @size: MAX_PLAYERS
+    ---@field player_arrow_slidein_timer number[][] @size: MAX_PLAYERS
+    ---@field player_facing_left boolean[] @size: MAX_PLAYERS
+    ---@field player_quickselect_shown boolean[] @size: MAX_PLAYERS
+    ---@field player_quickselect_fadein_timer number[] @size: MAX_PLAYERS
+    ---@field player_quickselect_coords number[][] @size: MAX_PLAYERS
+    ---@field player_quickselect_wiggle_angle number[] @size: MAX_PLAYERS
     ---@field topleft_woodpanel_esc_slidein_timer number
     ---@field start_panel_slidein_timer number
     ---@field action_buttons_keycap_size number
@@ -5462,7 +5462,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field opacity number
     ---@field start_pressed boolean
     ---@field transition_to_game_started boolean
-    ---@field flying_things Array<FlyingThing, 6>
+    ---@field flying_things FlyingThing[] @size: 6
     ---@field flying_thing_countdown integer
     ---@field particle_ceilingdust_smoke ParticleEmitterInfo
     ---@field particle_ceilingdust_rubble ParticleEmitterInfo
@@ -5549,11 +5549,11 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field woodpanel_cutout_big_money3 TextureRenderingInfo
     ---@field big_dollar_sign TextureRenderingInfo
     ---@field unknown26 TextureRenderingInfo
-    ---@field player_stats_scroll_numeric_value Array<integer, MAX_PLAYERS>
-    ---@field player_secondary_icon Array<TextureRenderingInfo, MAX_PLAYERS>
-    ---@field player_icon Array<TextureRenderingInfo, MAX_PLAYERS>
-    ---@field player_secondary_icon_type Array<integer, MAX_PLAYERS>
-    ---@field player_icon_index Array<integer, MAX_PLAYERS>
+    ---@field player_stats_scroll_numeric_value integer[] @size: MAX_PLAYERS
+    ---@field player_secondary_icon TextureRenderingInfo[] @size: MAX_PLAYERS
+    ---@field player_icon TextureRenderingInfo[] @size: MAX_PLAYERS
+    ---@field player_secondary_icon_type integer[] @size: MAX_PLAYERS
+    ---@field player_icon_index integer[] @size: MAX_PLAYERS
     ---@field hourglasses TextureRenderingInfo
     ---@field small_dollar_signs TextureRenderingInfo
     ---@field this_level_money_color Color
@@ -5610,7 +5610,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field woodpanel_top_visible boolean
     ---@field woodpanel_bottom_visible boolean
     ---@field toggle_panels_slidein boolean
-    ---@field players Array<OnlineLobbyScreenPlayer, 4>
+    ---@field players OnlineLobbyScreenPlayer[] @size: 4
     ---@field background_image TextureRenderingInfo
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field topleft_woodpanel_esc_slidein_timer number
@@ -5781,7 +5781,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field time_text_info TextRenderingInfo
     ---@field time_value_text_info TextRenderingInfo
     ---@field sticker_count integer
-    ---@field stickers Array<TextureRenderingInfo, 20>
+    ---@field stickers TextureRenderingInfo[] @size: 20
 
 ---@class ScreenArenaMenu : Screen
     ---@field brick_background_animation ScreenZoomAnimation
@@ -5954,16 +5954,16 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field score_counter TextureRenderingInfo
     ---@field unknown27 TextureRenderingInfo
     ---@field lava_bubbles TextureRenderingInfo
-    ---@field player_won Array<boolean, MAX_PLAYERS>
+    ---@field player_won boolean[] @size: MAX_PLAYERS
     ---@field victory_jump_y_pos number
     ---@field victory_jump_velocity number
     ---@field animation_frame integer
     ---@field squash_and_celebrate boolean
-    ---@field player_ready Array<boolean, MAX_PLAYERS>
+    ---@field player_ready boolean[] @size: MAX_PLAYERS
     ---@field next_transition_timer integer
-    ---@field player_bottom_pillar_offset Array<number, MAX_PLAYERS>
-    ---@field player_crushing_pillar_height Array<number, MAX_PLAYERS>
-    ---@field player_create_giblets Array<boolean, MAX_PLAYERS>
+    ---@field player_bottom_pillar_offset number[] @size: MAX_PLAYERS
+    ---@field player_crushing_pillar_height number[] @size: MAX_PLAYERS
+    ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
 
 end
