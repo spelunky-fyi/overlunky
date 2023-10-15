@@ -936,16 +936,16 @@ function send_input(uid, buttons) end
 function clear_screen_callback(screen_id, cb_id) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](https://spelunky-fyi.github.io/overlunky/#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
----The callback signature is bool render_screen(Screen self, VanillaRenderContext render_ctx)
+---The callback signature is bool render_screen(Screen* self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
----@param fun fun(self: Screen, render_ctx: VanillaRenderContext): boolean
+---@param fun fun(self: Screen*, render_ctx: VanillaRenderContext): boolean
 ---@return CallbackId?
 function set_pre_render_screen(screen_id, fun) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](https://spelunky-fyi.github.io/overlunky/#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right after the screen is drawn.
----The callback signature is nil render_screen(Screen self, VanillaRenderContext render_ctx)
+---The callback signature is nil render_screen(Screen* self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
----@param fun fun(self: Screen, render_ctx: VanillaRenderContext): nil
+---@param fun fun(self: Screen*, render_ctx: VanillaRenderContext): nil
 ---@return CallbackId?
 function set_post_render_screen(screen_id, fun) end
 ---Returns unique id for the callback to be used in [clear_callback](https://spelunky-fyi.github.io/overlunky/#clear_callback) or `nil` if uid is not valid.
@@ -982,7 +982,7 @@ function change_string(id, str) end
 ---@param str string
 ---@return STRINGID
 function add_string(str) end
----Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+---Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 ---if the entity has no localized name
 ---@param type ENT_TYPE
 ---@param fallback_strategy boolean?
@@ -1180,7 +1180,7 @@ function list_dir(dir) end
 ---@param dir string?
 ---@return nil
 function list_data_dir(dir) end
----List all char.png files recursively from Mods/Packs. Returns table of file paths.
+---List all char_*.png files recursively from Mods/Packs. Returns table of file paths.
 ---@return nil
 function list_char_mods() end
 ---Approximate bounding box of the player hud element for player index 1..4 based on user settings and player count
@@ -1986,7 +1986,7 @@ do
     ---@field speechbubble_timer integer
     ---@field speechbubble_owner integer
     ---@field level_gen LevelGenSystem @Entrance and exit coordinates, shop types and all themes
-    ---@field correct_ushabti integer @See `get_correct_ushabti`. == anim_frame - (2  floor(anim_frame/12))
+    ---@field correct_ushabti integer @See `get_correct_ushabti`. == anim_frame - (2 * floor(anim_frame/12))
     ---@field items Items @Has the current player count, player inventories and character selections
     ---@field camera_layer integer @The currently drawn layer, can't be changed
     ---@field layer_transition_timer integer
@@ -2352,14 +2352,14 @@ function PRNG:random(min, max) end
     ---@field set_post_activate fun(self, fun: fun(self: Entity, activator: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
     ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
-    ---@field set_pre_walked_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_on(Entity self, Entity*)`
-    ---@field set_post_walked_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil walked_on(Entity self, Entity*)`
-    ---@field set_pre_walked_off fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_off(Entity self, Entity*)`
-    ---@field set_post_walked_off fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil walked_off(Entity self, Entity*)`
-    ---@field set_pre_ledge_grab fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool ledge_grab(Entity self, Entity*)`
-    ---@field set_post_ledge_grab fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil ledge_grab(Entity self, Entity*)`
-    ---@field set_pre_stood_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stood_on(Entity self, Entity*)`
-    ---@field set_post_stood_on fun(self, fun: fun(self: Entity, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stood_on(Entity self, Entity*)`
+    ---@field set_pre_walked_on fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_on(Entity self, Entity)`
+    ---@field set_post_walked_on fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil walked_on(Entity self, Entity)`
+    ---@field set_pre_walked_off fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_off(Entity self, Entity)`
+    ---@field set_post_walked_off fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil walked_off(Entity self, Entity)`
+    ---@field set_pre_ledge_grab fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool ledge_grab(Entity self, Entity)`
+    ---@field set_post_ledge_grab fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil ledge_grab(Entity self, Entity)`
+    ---@field set_pre_stood_on fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stood_on(Entity self, Entity)`
+    ---@field set_post_stood_on fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stood_on(Entity self, Entity)`
     ---@field set_pre_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init(Entity self)`
     ---@field set_post_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init(Entity self)`
 local Entity = nil
@@ -2465,16 +2465,16 @@ function Entity:overlaps_with(other) end
     ---@field set_post_check_out_of_bounds fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil check_out_of_bounds(Movable self)`
     ---@field set_pre_standing_on fun(self, fun: fun(self: Movable): Entity?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<Entity> standing_on(Movable self)`
     ---@field set_post_standing_on fun(self, fun: fun(self: Movable): Entity?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil standing_on(Movable self)`
-    ---@field set_pre_stomped_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stomped_by(Movable self, Entity*)`
-    ---@field set_post_stomped_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stomped_by(Movable self, Entity*)`
-    ---@field set_pre_thrown_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool thrown_by(Movable self, Entity*)`
-    ---@field set_post_thrown_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil thrown_by(Movable self, Entity*)`
-    ---@field set_pre_cloned_to fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool cloned_to(Movable self, Entity*)`
-    ---@field set_post_cloned_to fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil cloned_to(Movable self, Entity*)`
+    ---@field set_pre_stomped_by fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stomped_by(Movable self, Entity)`
+    ---@field set_post_stomped_by fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stomped_by(Movable self, Entity)`
+    ---@field set_pre_thrown_by fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool thrown_by(Movable self, Entity)`
+    ---@field set_post_thrown_by fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil thrown_by(Movable self, Entity)`
+    ---@field set_pre_cloned_to fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool cloned_to(Movable self, Entity)`
+    ---@field set_post_cloned_to fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil cloned_to(Movable self, Entity)`
     ---@field set_pre_pick_up fun(self, fun: fun(self: Movable, entity_to_pick_up: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool pick_up(Movable self, Entity entity_to_pick_up)`
     ---@field set_post_pick_up fun(self, fun: fun(self: Movable, entity_to_pick_up: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil pick_up(Movable self, Entity entity_to_pick_up)`
-    ---@field set_pre_picked_up_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool picked_up_by(Movable self, Entity*)`
-    ---@field set_post_picked_up_by fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil picked_up_by(Movable self, Entity*)`
+    ---@field set_pre_picked_up_by fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool picked_up_by(Movable self, Entity)`
+    ---@field set_post_picked_up_by fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil picked_up_by(Movable self, Entity)`
     ---@field set_pre_drop fun(self, fun: fun(self: Movable, entity_to_drop: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool drop(Movable self, Entity entity_to_drop)`<br/>Virtual function docs:<br/>Called when dropping or throwing
     ---@field set_post_drop fun(self, fun: fun(self: Movable, entity_to_drop: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil drop(Movable self, Entity entity_to_drop)`<br/>Virtual function docs:<br/>Called when dropping or throwing
     ---@field set_pre_collect_treasure fun(self, fun: fun(self: Movable, value: integer, treasure: ENT_TYPE): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool collect_treasure(Movable self, integer value, ENT_TYPE treasure)`<br/>Virtual function docs:<br/>Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
@@ -2489,8 +2489,8 @@ function Entity:overlaps_with(other) end
     ---@field set_post_fall fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil fall(Movable self)`
     ---@field set_pre_apply_friction fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool apply_friction(Movable self)`
     ---@field set_post_apply_friction fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil apply_friction(Movable self)`
-    ---@field set_pre_crush fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool crush(Movable self, Entity*)`
-    ---@field set_post_crush fun(self, fun: fun(self: Movable, Entity*: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil crush(Movable self, Entity*)`
+    ---@field set_pre_crush fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool crush(Movable self, Entity)`
+    ---@field set_post_crush fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil crush(Movable self, Entity)`
 local Movable = nil
 ---Move a movable according to its velocity, update physics, gravity, etc.
 ---Will also update `movable.animation_frame` and various timers and counters
@@ -2591,7 +2591,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field deco_left integer
     ---@field deco_right integer
     ---@field fix_border_tile_animation fun(self): nil @Sets `animation_frame` of the floor for types `FLOOR_BORDERTILE`, `FLOOR_BORDERTILE_METAL` and `FLOOR_BORDERTILE_OCTOPUS`.
-    ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil @Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_` entities, those usually only have decorations when broken.
+    ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil @Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_*` entities, those usually only have decorations when broken.
     ---@field add_decoration fun(self, side: FLOOR_SIDE): nil @Explicitly add a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
     ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil @Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
     ---@field decorate_internal fun(self): nil
@@ -2613,10 +2613,10 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
-    ---@field set_pre_enter_attempt fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> enter_attempt(Door self, Entity*)`
-    ---@field set_post_enter_attempt fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil enter_attempt(Door self, Entity*)`
-    ---@field set_pre_hide_hud fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> hide_hud(Door self, Entity*)`
-    ---@field set_post_hide_hud fun(self, fun: fun(self: Door, Entity*: ): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil hide_hud(Door self, Entity*)`
+    ---@field set_pre_enter_attempt fun(self, fun: fun(self: Door, Entity: ): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> enter_attempt(Door self, Entity)`
+    ---@field set_post_enter_attempt fun(self, fun: fun(self: Door, Entity: ): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil enter_attempt(Door self, Entity)`
+    ---@field set_pre_hide_hud fun(self, fun: fun(self: Door, Entity: ): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> hide_hud(Door self, Entity)`
+    ---@field set_post_hide_hud fun(self, fun: fun(self: Door, Entity: ): number?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil hide_hud(Door self, Entity)`
     ---@field set_pre_enter fun(self, fun: fun(self: Door, who: Entity): integer?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<integer> enter(Door self, Entity who)`<br/>Virtual function docs:<br/>Returns the entity state / behavior id to set the entity to after the entering animation.
     ---@field set_post_enter fun(self, fun: fun(self: Door, who: Entity): integer?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil enter(Door self, Entity who)`<br/>Virtual function docs:<br/>Returns the entity state / behavior id to set the entity to after the entering animation.
     ---@field set_pre_light_level fun(self, fun: fun(self: Door): number?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<number> light_level(Door self)`<br/>Virtual function docs:<br/>Returns the darkest light level used to fade the entity when entering or exiting. 0 = black, 1 = no change
@@ -3582,7 +3582,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field rotation_angle number
     ---@field size number @slowly goes down to default 1.0, is 0.0 when not on screen
     ---@field size_multiply number @0.0 when not on screen
-    ---@field next_size number @width and height will be set to `next_size  size_multiply` next frame
+    ---@field next_size number @width and height will be set to `next_size * size_multiply` next frame
     ---@field size_change_timer integer @very short timer before next size change, giving a pulsing effect
     ---@field speed number @This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     ---@field distance number @This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
@@ -3924,7 +3924,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Rubble : Movable
 
 ---@class FxCompass : Movable
-    ---@field sine_angle number @Counts form 0 to 2pi, responsible for moving back and forth
+    ---@field sine_angle number @Counts form 0 to 2*pi, responsible for moving back and forth
     ---@field visibility number
     ---@field is_active boolean @Player has compass
 
@@ -4356,7 +4356,7 @@ function MovableBehavior:get_state_id() end
     ---@field post_transition fun(self): nil @Handles loading the next level screen from a transition screen
     ---@field spawn_players fun(self): nil @Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     ---@field spawn_effects fun(self): nil @Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
-    ---@field get_level_file fun(self): char @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
+    ---@field get_level_file fun(self): string @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     ---@field get_theme_id fun(self): integer @Returns: THEME, or subtheme in CO
     ---@field get_base_id fun(self): integer @Returns: THEME, or logical base THEME for special levels (Abzu->Tide Pool etc)
     ---@field get_floor_spreading_type fun(self): integer @Returns: ENT_TYPE used for floor spreading (generic or one of the styled floors)
@@ -4521,7 +4521,7 @@ function MovableBehavior:get_state_id() end
     ---@field post_transition fun(self): nil
     ---@field spawn_players fun(self): nil
     ---@field spawn_effects fun(self): nil
-    ---@field get_level_file fun(self): char
+    ---@field get_level_file fun(self): string
     ---@field get_theme_id fun(self): integer
     ---@field get_base_id fun(self): integer
     ---@field get_floor_spreading_type fun(self): integer
@@ -4675,7 +4675,7 @@ function MovableBehavior:get_state_id() end
     ---@field to integer
 
 ---@class CustomSound
-    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, char>
+    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
 local CustomSound = nil
 ---@return PlayingSound
 function CustomSound:play() end
@@ -4697,7 +4697,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field set_volume fun(self, volume: number): boolean
     ---@field set_looping fun(self, loop_mode: SOUND_LOOP_MODE): boolean
     ---@field set_callback fun(self, callback: SoundCallbackFunction): boolean
-    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, char>
+    ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
     ---@field get_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM): number?
     ---@field set_parameter fun(self, parameter_index: VANILLA_SOUND_PARAM, value: number): boolean
 
@@ -4762,7 +4762,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil @Draws a filled circle on screen
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil @Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
     ---@field draw_layer fun(self, layer: DRAW_LAYER): nil @Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
-    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean @Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
+    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean @Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>**Important: Keep all your labels unique!** If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
     ---@field win_text fun(self, text: string): nil @Add some text to window, automatically wrapped
     ---@field win_separator fun(self): nil @Add a separator line to window
     ---@field win_separator_text fun(self, text: string): nil @Add a separator text line to window

@@ -168,8 +168,9 @@ def camel_case_to_snake_case(name):
 
 def fix_spaces(thing):
     thing = thing.strip()
-    thing = re.sub('\s{2,}', ' ', thing)    # change double spaces into single
-    return re.sub('(?<=\(|\<) ', '', thing) # remove spaces after ( or < 
+    thing = re.sub("\s{2,}", " ", thing)           # change double spaces into single
+    thing = re.sub("(?<=\(|\<)\s", "", thing)      # remove spaces after ( or < 
+    return thing.replace("*", "").replace("&", "") # remove * and &
 
 def getfunc(name):
     for func in funcs:
@@ -232,7 +233,6 @@ def run_parse():
         data = open(file, "r").read().split("\n")
         skip = 0
         for line in data:
-            line = line.replace("*", "")
             skip += line.count("{") - line.count("}")
             c = re.search(r"/// ?(.*)$", line)
             if c:
@@ -267,7 +267,7 @@ def run_parse():
         member_funs = {}
         member_vars = []
         for line in data:
-            line = line.replace("*", "")
+            #line = line.replace("*", "")
             if not class_name and ("struct" in line or "class" in line):
                 m = re.match(r"(struct|class)\s+(\S+)", line)
                 if m and not line.endswith(";"):
@@ -381,7 +381,7 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            line = line.replace("*", "")
+            #line = line.replace("*", "")
             m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\];', line)
             if m:
                 events.append({"name": m.group(1), "comment": comment})
@@ -398,7 +398,7 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            line = line.replace("*", "") # TODO
+            #line = line.replace("*", "")
             if line == "":
                 comment = []
 
@@ -838,7 +838,7 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            line = line.replace("*", "")
+            #line = line.replace("*", "")
             m = re.findall(r"new_usertype\<(.*?)\>", line)
             if m:
                 type = m[0]

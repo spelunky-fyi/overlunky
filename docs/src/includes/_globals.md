@@ -291,7 +291,7 @@ This is run right after the entity is spawned but before and particular properti
 
 Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 Sets a callback that is called right after the screen is drawn.
-<br/>The callback signature is nil render_screen([Screen](#Screen) self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
+<br/>The callback signature is nil render_screen([Screen](#Screen)* self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
 
 ### set_pre_entity_spawn
 
@@ -314,7 +314,7 @@ In many cases replacing the intended entity won't have the indended effect or wi
 
 Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
-<br/>The callback signature is bool render_screen([Screen](#Screen) self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
+<br/>The callback signature is bool render_screen([Screen](#Screen)* self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
 
 ### set_timeout
 
@@ -638,7 +638,7 @@ Get the [Entity](#Entity) behind an uid, converted to the correct type. To see w
 
 #### string get_entity_name([ENT_TYPE](#ENT_TYPE) type, optional<bool> fallback_strategy)
 
-Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 if the entity has no localized name
 
 ### get_entity_type
@@ -1480,7 +1480,7 @@ Same as `Player.is_female`
 
 #### nil list_char_mods()
 
-List all char.png files recursively from Mods/Packs. Returns table of file paths.
+List all char_*.png files recursively from Mods/Packs. Returns table of file paths.
 
 ### list_data_dir
 

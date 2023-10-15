@@ -2018,7 +2018,7 @@ end
         return sol::make_object(lua, sol::as_table(files));
     };
 
-    /// List all char*.png files recursively from Mods/Packs. Returns table of file paths.
+    /// List all char_*.png files recursively from Mods/Packs. Returns table of file paths.
     lua["list_char_mods"] = [&lua]()
     {
         std::vector<std::string> files;
