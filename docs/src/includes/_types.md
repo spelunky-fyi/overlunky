@@ -885,6 +885,16 @@ Type | Name | Description
 int | [chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chance) | Chance in percent to pick `tile_code` over `alt_tile_code`, ignored if `chance == 0`. Defaults to 100.
 [TILE_CODE](#TILE_CODE) | [alt_tile_code](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=alt_tile_code) | Alternative tile code, ignored if `chance == 100`. Defaults to 0.
 
+### SpawnInfo
+
+
+Type | Name | Description
+---- | ---- | -----------
+[ROOM_TEMPLATE](#ROOM_TEMPLATE) | [room_temp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_temp) | 
+[Entity](#Entity) | [grid_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_entity) | Grid entity at this position, will only try to spawn procedural if this is nil
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+
 ### SpearDanglerAnimFrames
 
 
@@ -3184,7 +3194,7 @@ int | [get_shop_chance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua
 nil | [spawn_decoration()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration) | Spawns some specific decoration, e.g. [Vlad](#Vlad)'s big banner
 nil | [spawn_decoration2()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_decoration2) | Spawns some other specific decorations, e.g. grass, flowers, udjat room decal
 nil | [spawn_extra()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_extra) | Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-nil | [do_procedural_spawn(SpawnInfo info)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=do_procedural_spawn) | Spawns a single procedural entity, used in spawn_procedural
+nil | [do_procedural_spawn(SpawnInfo info)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=do_procedural_spawn) | Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
 [CallbackId](#Aliases) | [set_pre_virtual(THEME_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(THEME_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -3288,8 +3298,8 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_spawn_decoration2(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_spawn_decoration2) | Hooks after the virtual function.<br/>The callback signature is `nil spawn_decoration2(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns some other specific decorations, e.g. grass, flowers, udjat room decal
 [CallbackId](#Aliases) | [set_pre_spawn_extra(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_spawn_extra) | Hooks before the virtual function.<br/>The callback signature is `bool spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
 [CallbackId](#Aliases) | [set_post_spawn_extra(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_spawn_extra) | Hooks after the virtual function.<br/>The callback signature is `nil spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-[CallbackId](#Aliases) | [set_pre_do_procedural_spawn(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_do_procedural_spawn) | Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
-[CallbackId](#Aliases) | [set_post_do_procedural_spawn(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_do_procedural_spawn) | Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
+[CallbackId](#Aliases) | [set_pre_do_procedural_spawn(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_do_procedural_spawn) | Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
+[CallbackId](#Aliases) | [set_post_do_procedural_spawn(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_do_procedural_spawn) | Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
 
 # Entity types
 

@@ -4382,7 +4382,7 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_decoration fun(self): nil @Spawns some specific decoration, e.g. Vlad's big banner
     ---@field spawn_decoration2 fun(self): nil @Spawns some other specific decorations, e.g. grass, flowers, udjat room decal
     ---@field spawn_extra fun(self): nil @Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil @Spawns a single procedural entity, used in spawn_procedural
+    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil @Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
     ---@field set_pre_virtual fun(self, entry: THEME_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: THEME_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -4486,8 +4486,8 @@ function MovableBehavior:get_state_id() end
     ---@field set_post_spawn_decoration2 fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_decoration2(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns some other specific decorations, e.g. grass, flowers, udjat room decal
     ---@field set_pre_spawn_extra fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
     ---@field set_post_spawn_extra fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-    ---@field set_pre_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
-    ---@field set_post_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural
+    ---@field set_pre_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
+    ---@field set_post_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
 
 ---@class CustomTheme : ThemeInfo
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
@@ -4673,6 +4673,12 @@ function MovableBehavior:get_state_id() end
 ---@class ConstellationLine
     ---@field from integer
     ---@field to integer
+
+---@class SpawnInfo
+    ---@field room_temp ROOM_TEMPLATE
+    ---@field grid_entity Entity @Grid entity at this position, will only try to spawn procedural if this is nil
+    ---@field x number
+    ---@field y number
 
 ---@class CustomSound
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>

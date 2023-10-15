@@ -20,6 +20,8 @@
 #include "level_api_types.hpp"               // for ShortTileCodeDef
 #include "math.hpp"                          // for AABB (ptr only), Vec2
 
+class Entity;
+
 struct TileCodeDef
 {
     std::uint32_t id;
@@ -170,8 +172,11 @@ struct DoorCoords
 
 struct SpawnInfo
 {
-    void* ptr0;
-    void* ptr1;
+    ROOM_TEMPLATE room_temp;
+    // probably padding here
+
+    /// Grid entity at this position, will only try to spawn procedural if this is nil
+    Entity* grid_entity;
     float x;
     float y;
 };
@@ -359,7 +364,7 @@ class ThemeInfo
     /// Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
     virtual void spawn_extra() = 0;
 
-    /// Spawns a single procedural entity, used in spawn_procedural
+    /// Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
     virtual void do_procedural_spawn(SpawnInfo* info) = 0;
 
     uint32_t get_aux_id();

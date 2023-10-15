@@ -1808,5 +1808,16 @@ void register_usertypes(sol::state& lua)
     // DEFAULT
     // FLOOR | SAFE | EMPTY
     */
+
+    lua.new_usertype<SpawnInfo>(
+        "SpawnInfo",
+        "room_temp",
+        &SpawnInfo::room_temp,
+        "grid_entity",
+        &SpawnInfo::grid_entity,
+        "x",
+        &SpawnInfo::x,
+        "y",
+        &SpawnInfo::y);
 }
 }; // namespace NLevel
