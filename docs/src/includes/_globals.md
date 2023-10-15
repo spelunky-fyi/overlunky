@@ -342,6 +342,15 @@ If you set such a callback and then play the same sound yourself you have to wai
 ## Debug functions
 
 
+### dump
+
+
+> Search script examples for [dump](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dump)
+
+#### table dump(object object, optional<int> depth)
+
+Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
+
 ### dump_network
 
 
@@ -1983,7 +1992,7 @@ Prinspect to ingame console.
 
 #### nil console_print(string message)
 
-Print a log message to ingame console.
+Print a log message to ingame console with a comment identifying the script that sent it.
 
 ### log_print
 

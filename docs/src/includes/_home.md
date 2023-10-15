@@ -140,7 +140,7 @@ end
 ```
 
 # Unsafe mode
-Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like unrestricted `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.
+Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like unrestricted `io`, `os`, `ffi` and `debug`, loading dlls with require, `package.loadlib`, the [network functions](#Network-functions) and some [debug functions](#Debug-functions). Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.
 
 # Modules
 You can load modules with `require "mymod"` or `require "mydir.mymod"`, just put `mymod.lua` in the same directory the script is, or in `mydir/` to keep things organized.

@@ -53,7 +53,7 @@ function lua_print() end
 ---@param message string
 ---@return nil
 function print(message) end
----Print a log message to ingame console.
+---Print a log message to ingame console with a comment identifying the script that sent it.
 ---@param message string
 ---@return nil
 function console_print(message) end
@@ -73,6 +73,11 @@ function prinspect(...) end
 ---@vararg any
 ---@return nil
 function messpect(...) end
+---Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
+---@param any any
+---@param depth integer?
+---@return table
+function dump(object, depth) end
 ---Adds a command that can be used in the console.
 ---@param name string
 ---@param cmd function
