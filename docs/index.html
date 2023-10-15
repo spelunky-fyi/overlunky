@@ -451,6 +451,9 @@
                     <a href="#Debug-functions" class="toc-h2 toc-link" data-title="Debug functions">Debug functions</a>
                       <ul class="toc-list-h3">
                           <li>
+                            <a href="#dump" class="toc-h3 toc-link" data-title="dump">dump</a>
+                          </li>
+                          <li>
                             <a href="#dump_network" class="toc-h3 toc-link" data-title="dump_network">dump_network</a>
                           </li>
                           <li>
@@ -3831,7 +3834,7 @@
     <span class="n">message</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 <span class="k">end</span>
 </code></pre></div><h1 id='Unsafe-mode'>Unsafe mode</h1>
-<p>Setting <code>meta.unsafe = true</code> enables the rest of the standard Lua libraries like unrestricted <code>io</code> and <code>os</code>, loading dlls with require and <code>package.loadlib</code>. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.</p>
+<p>Setting <code>meta.unsafe = true</code> enables the rest of the standard Lua libraries like unrestricted <code>io</code>, <code>os</code>, <code>ffi</code> and <code>debug</code>, loading dlls with require, <code>package.loadlib</code>, the <a href="#Network-functions">network functions</a> and some <a href="#Debug-functions">debug functions</a>. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory.</p>
 <h1 id='Modules'>Modules</h1>
 <p>You can load modules with <code>require &quot;mymod&quot;</code> or <code>require &quot;mydir.mymod&quot;</code>, just put <code>mymod.lua</code> in the same directory the script is, or in <code>mydir/</code> to keep things organized.</p>
 
@@ -4122,7 +4125,13 @@ Sets a callback for a vanilla sound which lets you hook creation or playing even
 Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
 If you set such a callback and then play the same sound yourself you have to wait until receiving the STARTED event before changing any properties on the sound. Otherwise you may cause a deadlock.
 <br/>The callback signature is nil on_vanilla_sound(<a href="#PlayingSound">PlayingSound</a> sound)</p>
-<h2 id='Debug-functions'>Debug functions</h2><h3 id='dump_network'>dump_network</h3>
+<h2 id='Debug-functions'>Debug functions</h2><h3 id='dump'>dump</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dump">dump</a></p>
+</blockquote>
+<h4 id='table-dump-object-object-optional-depth'>table dump(object object, optional<int> depth)</h4>
+<p>Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don&#39;t use this for anything except debug printing. Unsafe.</p>
+<h3 id='dump_network'>dump_network</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dump_network">dump_network</a></p>
 </blockquote>
@@ -5214,7 +5223,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=console_print">console_print</a></p>
 </blockquote>
 <h4 id='nil-console_print-string-message'>nil console_print(string message)</h4>
-<p>Print a log message to ingame console.</p>
+<p>Print a log message to ingame console with a comment identifying the script that sent it.</p>
 <h3 id='log_print'>log_print</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=log_print">log_print</a></p>
