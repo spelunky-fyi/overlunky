@@ -363,20 +363,28 @@ end
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
+
     /// Print a log message on screen.
     lua["print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
         backend->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->messages.size() > 20)
+        if (backend->messages.size() > 40 && !is_console)
             backend->messages.pop_front();
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to ingame console.
-    lua["console_print"] = [](std::string message) -> void
+    /// Print a log message to ingame console with a comment identifying the script that sent it.
+    lua["console_print"] = [&lua](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
+        if (is_console)
+        {
+            lua["print"](std::move(message));
+            return;
+        }
         auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         std::tm time_buf;
         localtime_s(&time_buf, &in_time_t);
@@ -405,6 +413,7 @@ end
     /// Same as `print`
     lua["message"] = [&lua](std::string message) -> void
     { lua["print"](message); };
+
     /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
     lua["prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
@@ -422,9 +431,13 @@ end
             lua["print"](std::move(message));
         }
     };
+
     /// Same as `prinspect`
     lua["messpect"] = [&lua](sol::variadic_args objects) -> void
     { lua["prinspect"](objects); };
+
+    /// Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
+    // lua["dump"] = [](object object, optional<int> depth) -> table
 
     /// Adds a command that can be used in the console.
     lua["register_console_command"] = [](std::string name, sol::function cmd)
@@ -2772,7 +2785,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = datadir + "/" + filename;
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
         auto is_based = check_safe_io_path(fullpath, datadir);
-        DEBUG("io.open_data: safe:{} pack:{} based:{} mode:{} {}", is_safe, is_pack, is_based, mode.value_or("r"), fullpath);
         if (is_safe && !is_based)
         {
             luaL_error(global_vm, "Attempted to open data file outside data directory");
@@ -2791,7 +2803,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = std::string(backend->get_root()) + "/" + filename;
         auto is_based = check_safe_io_path(fullpath, backend->get_root());
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
-        DEBUG("io.open_mod: safe:{} pack:{} based:{} mode:{} {}", is_safe, is_pack, is_based, mode.value_or("r"), fullpath);
         if (is_safe)
         {
             if (!is_based)
@@ -2821,7 +2832,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = datadir + "/" + filename;
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
         auto is_based = check_safe_io_path(fullpath, datadir);
-        DEBUG("os.remove_data: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
         if (is_safe && !is_based)
         {
             luaL_error(global_vm, "Attempted to remove data file outside data directory");
@@ -2838,7 +2848,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = std::string(backend->get_root()) + "/" + filename;
         auto is_based = check_safe_io_path(fullpath, backend->get_root());
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
-        DEBUG("os.remove_mod: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
         if (is_safe)
         {
             if (!is_based)
