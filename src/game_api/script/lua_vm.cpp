@@ -363,20 +363,28 @@ end
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
+
     /// Print a log message on screen.
     lua["print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
         backend->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->messages.size() > 20)
+        if (backend->messages.size() > 40 && !is_console)
             backend->messages.pop_front();
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to ingame console.
-    lua["console_print"] = [](std::string message) -> void
+    /// Print a log message to ingame console with a comment identifying the script that sent it.
+    lua["console_print"] = [&lua](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
+        if (is_console)
+        {
+            lua["print"](std::move(message));
+            return;
+        }
         auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         std::tm time_buf;
         localtime_s(&time_buf, &in_time_t);
