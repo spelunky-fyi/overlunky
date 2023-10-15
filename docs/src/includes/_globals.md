@@ -291,7 +291,7 @@ This is run right after the entity is spawned but before and particular properti
 
 Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 Sets a callback that is called right after the screen is drawn.
-<br/>The callback signature is nil render_screen([Screen](#Screen)* self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
+<br/>The callback signature is nil render_screen([Screen](#Screen) self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
 
 ### set_pre_entity_spawn
 
@@ -314,7 +314,7 @@ In many cases replacing the intended entity won't have the indended effect or wi
 
 Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
 Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
-<br/>The callback signature is bool render_screen([Screen](#Screen)* self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
+<br/>The callback signature is bool render_screen([Screen](#Screen) self, [VanillaRenderContext](#VanillaRenderContext) render_ctx)
 
 ### set_timeout
 
@@ -627,7 +627,7 @@ Get uids of matching entities overlapping with the given hitbox. Set `entity_typ
 
 > Search script examples for [get_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity)
 
-#### [Entity](#Entity)  get_entity(int uid)
+#### [Entity](#Entity) get_entity(int uid)
 
 Get the [Entity](#Entity) behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
 

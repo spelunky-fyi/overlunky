@@ -267,7 +267,6 @@ def run_parse():
         member_funs = {}
         member_vars = []
         for line in data:
-            #line = line.replace("*", "")
             if not class_name and ("struct" in line or "class" in line):
                 m = re.match(r"(struct|class)\s+(\S+)", line)
                 if m and not line.endswith(";"):
@@ -381,7 +380,6 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            #line = line.replace("*", "")
             m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\];', line)
             if m:
                 events.append({"name": m.group(1), "comment": comment})
@@ -398,7 +396,6 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            #line = line.replace("*", "")
             if line == "":
                 comment = []
 
@@ -721,7 +718,8 @@ def run_parse():
                             r"->([:<>\w]+){", var[1]
                         )  # Use var[1] instead of cpp because it could be replaced on the sol::property stuff
                         if m_return_type:
-                            sig = f"{m_return_type[1]} {var_name}"
+                            type = replace_fun(m_return_type[1])
+                            sig = f"{type} {var_name}"
                             vars.append(
                                 {"name": var_name, "type": cpp, "signature": sig}
                             )
@@ -838,7 +836,6 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            #line = line.replace("*", "")
             m = re.findall(r"new_usertype\<(.*?)\>", line)
             if m:
                 type = m[0]

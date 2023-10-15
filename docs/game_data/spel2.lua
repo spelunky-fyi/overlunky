@@ -936,16 +936,16 @@ function send_input(uid, buttons) end
 function clear_screen_callback(screen_id, cb_id) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](https://spelunky-fyi.github.io/overlunky/#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
----The callback signature is bool render_screen(Screen* self, VanillaRenderContext render_ctx)
+---The callback signature is bool render_screen(Screen self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
----@param fun fun(self: Screen*, render_ctx: VanillaRenderContext): boolean
+---@param fun fun(self: Screen, render_ctx: VanillaRenderContext): boolean
 ---@return CallbackId?
 function set_pre_render_screen(screen_id, fun) end
 ---Returns unique id for the callback to be used in [clear_screen_callback](https://spelunky-fyi.github.io/overlunky/#clear_screen_callback) or `nil` if screen_id is not valid.
 ---Sets a callback that is called right after the screen is drawn.
----The callback signature is nil render_screen(Screen* self, VanillaRenderContext render_ctx)
+---The callback signature is nil render_screen(Screen self, VanillaRenderContext render_ctx)
 ---@param screen_id integer
----@param fun fun(self: Screen*, render_ctx: VanillaRenderContext): nil
+---@param fun fun(self: Screen, render_ctx: VanillaRenderContext): nil
 ---@return CallbackId?
 function set_post_render_screen(screen_id, fun) end
 ---Returns unique id for the callback to be used in [clear_callback](https://spelunky-fyi.github.io/overlunky/#clear_callback) or `nil` if uid is not valid.
