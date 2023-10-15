@@ -48,7 +48,6 @@ replace_table = {
     "object ": "any ",
 }
 
-
 def replace_all(text):
     for repl, wth in replace_table.items():
         pos = text.find(repl)
@@ -58,7 +57,6 @@ def replace_all(text):
             continue
         text = text.replace(repl, wth)
     return text
-
 
 ps.configure_parse(replace_all, "slate.pickle")
 ps.run_parse()
@@ -126,11 +124,11 @@ printed_funcs = []
 
 
 def format_af(lf, af):
-    ret = replace_all(af["return"]) or "nil"
+    ret = af["return"] or "nil"
     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
     ret = link_custom_type(ret)
     name = lf["name"]
-    param = replace_all(af["param"]).replace("vector<", "array<")
+    param = af["param"].replace("vector<", "array<")
     param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
     return fun

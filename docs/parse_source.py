@@ -516,9 +516,7 @@ def run_parse():
                     index = literal_eval(index.strip())
                     if binds := re.search(r"BackBinder<([^>]*)>", signature_and_binder):
                         binds = binds.group(1)
-                        binds = replace_fun(
-                            "{} {}".format(binds, camel_case_to_snake_case(binds))
-                        )
+                        binds = "{} {}".format(binds, camel_case_to_snake_case(binds))
                     else:
                         binds = None
                     signature = re.sub(
@@ -527,9 +525,9 @@ def run_parse():
                     signature = re.search(
                         r"([_a-zA-Z][_a-zA-Z0-9]*.*)\((.*)\)", signature
                     )
-                    ret = replace_fun(signature.group(1))
+                    ret = signature.group(1)
                     args = [
-                        replace_fun(t) for t in signature.group(2).split(",")
+                        t for t in signature.group(2).split(",")
                     ]
                     vtable_entries[name] = {
                         "name": name,
@@ -650,7 +648,7 @@ def run_parse():
 
                 if var[0].startswith("sol::constructors"):
                     for fun in underlying_cpp_type["member_funs"][cpp_type]:
-                        param = replace_fun(fun["param"])
+                        param = fun["param"]
                         
                         if cpp_type not in constructors:
                             constructors[cpp_type] = []

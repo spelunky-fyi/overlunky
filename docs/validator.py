@@ -69,7 +69,8 @@ known_types = [
     "variadic_args",
     "MAX_PLAYERS",
     "any",
-    "IMAGE",
+    "IMAGE"
+    "VTABLE_OFFSET",
 ]
 
 unknown_types = []
@@ -100,10 +101,9 @@ for lf in ps.funcs + ps.deprecated_funcs:
         ret = "nil"
         param = ""
         if m:
-            ret = replace_all(m.group(2)).strip() or "nil"
+            ret = m.group(2) or "nil"
         if m or m2:
             param = (m or m2).group(1)
-            param = replace_all(param).strip()
             
         check_types(ret)
         check_types(param)
@@ -135,11 +135,11 @@ for type in ps.types:
 
                 if n:
                     if n.group(2):
-                        param = replace_all(n.group(2).strip())
+                        param = n.group(2)
                 elif m:
-                    ret = replace_all(m.group(1)) or "nil"
+                    ret = m.group(1) or "nil"
                     if m.group(3):
-                        param = replace_all(m.group(3).strip())
+                        param = m.group(3)
 
             if(param):
                 check_types(param)
