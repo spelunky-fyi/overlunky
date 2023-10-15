@@ -69,7 +69,7 @@ known_types = [
     "variadic_args",
     "MAX_PLAYERS",
     "any",
-    "IMAGE"
+    "IMAGE",
     "VTABLE_OFFSET",
 ]
 
