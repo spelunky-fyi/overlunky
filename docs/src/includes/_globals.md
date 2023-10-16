@@ -1177,7 +1177,10 @@ default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0
 
 #### [ENT_TYPE](#ENT_TYPE) add_custom_type(array<[ENT_TYPE](#ENT_TYPE)> types)
 
+#### [ENT_TYPE](#ENT_TYPE) add_custom_type()
+
 Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+Use empty array or no parameter to get new uniqe [ENT_TYPE](#ENT_TYPE) that can be used for custom [EntityDB](#EntityDB)
 
 ### add_money
 

@@ -1236,9 +1236,14 @@ function set_frametime_unfocused(frametime) end
 ---@return double?
 function get_frametime_unfocused() end
 ---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+---Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
 ---@param types ENT_TYPE[]
 ---@return ENT_TYPE
 function add_custom_type(types) end
+---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+---Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+---@return ENT_TYPE
+function add_custom_type() end
 ---Get uids of entities by draw_depth. Can also use table of draw_depths.
 ---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
 ---@param draw_depth integer

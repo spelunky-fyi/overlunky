@@ -1847,6 +1847,11 @@ ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types)
     return (ENT_TYPE)add_new_custom_type(std::move(types));
 }
 
+ENT_TYPE add_custom_type()
+{
+    return (ENT_TYPE)add_new_custom_type({});
+}
+
 int32_t get_current_money()
 {
     auto state = State::get().ptr();

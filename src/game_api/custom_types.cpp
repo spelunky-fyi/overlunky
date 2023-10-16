@@ -1578,10 +1578,11 @@ std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
 
 CUSTOM_TYPE add_new_custom_type(std::vector<ENT_TYPE> types)
 {
-    if (types.empty())
-        return (CUSTOM_TYPE)0;
-
     ++g_last_custom_id;
+    if (types.empty())
+    {
+        types.push_back(g_last_custom_id);
+    }
     user_custom_types.emplace((CUSTOM_TYPE)g_last_custom_id, std::move(types));
     return (CUSTOM_TYPE)g_last_custom_id;
 }

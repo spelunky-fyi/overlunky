@@ -2101,7 +2101,12 @@ end
     /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
     lua["get_frametime_unfocused"] = get_frametime_inactive;
 
+    auto add_custom_type = sol::overload(
+        static_cast<ENT_TYPE (*)(std::vector<ENT_TYPE>)>(::add_custom_type),
+        static_cast<ENT_TYPE (*)()>(::add_custom_type));
+
     /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+    /// Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
     lua["add_custom_type"] = add_custom_type;
 
     auto get_entities_by_draw_depth = sol::overload(
