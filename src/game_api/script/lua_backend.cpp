@@ -1330,6 +1330,9 @@ bool LuaBackend::process_vanilla_render_callbacks(ON event)
     if (!get_enabled())
         return skip;
 
+    // used in infinite loop detection to see if game is hanging because a script is hanging
+    frame_counter++;
+
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)

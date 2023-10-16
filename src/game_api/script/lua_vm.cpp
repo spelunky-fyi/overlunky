@@ -224,15 +224,15 @@ void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
     auto infinite_loop = [](lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
     {
-        static uint32_t last_frame = 0;
-        auto state = State::get().ptr();
-        if (last_frame == state->time_startup)
-            luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
-        last_frame = state->time_startup;
+        static size_t last_frame = 0;
+        auto backend = LuaBackend::get_calling_backend();
+        if (last_frame == backend->frame_counter && backend->infinite_loop_detection)
+            luaL_error(argst, "Hit Infinite Loop Detection of 420 million instructions");
+        last_frame = backend->frame_counter;
     };
 
     lua_sethook(lua.lua_state(), NULL, 0, 0);
-    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 500000000);
+    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 420000000);
 
     lua.safe_script(R"(
 -- This function walks up the stack until it finds an _ENV that is not _G
@@ -2158,6 +2158,13 @@ end
         else if (y < 0)
             inputs |= 0x800;
         return inputs;
+    };
+
+    /// Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you're doing and need to perform some serious calculations that hang the game updates for several seconds.
+    lua["set_infinite_loop_detection_enabled"] = [](bool enable)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->infinite_loop_detection = enable;
     };
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
