@@ -322,6 +322,9 @@ class LuaBackend
 
     std::map<IMAGE, ScriptImage*> images;
 
+    size_t frame_counter{0};
+    bool infinite_loop_detection{true};
+
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
 
