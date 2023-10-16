@@ -1672,6 +1672,15 @@ Set engine target frametime (1/framerate, default 1/60). Always capped by your G
 
 Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
 
+### set_infinite_loop_detection_enabled
+
+
+> Search script examples for [set_infinite_loop_detection_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_infinite_loop_detection_enabled)
+
+#### nil set_infinite_loop_detection_enabled(bool enable)
+
+Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you're doing and need to perform some serious calculations that hang the game updates for several seconds.
+
 ### set_journal_enabled
 
 

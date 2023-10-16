@@ -1268,6 +1268,10 @@ function inputs_to_buttons(inputs) end
 ---@param buttons BUTTON
 ---@return INPUTS
 function buttons_to_inputs(x, y, buttons) end
+---Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you're doing and need to perform some serious calculations that hang the game updates for several seconds.
+---@param enable boolean
+---@return nil
+function set_infinite_loop_detection_enabled(enable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean

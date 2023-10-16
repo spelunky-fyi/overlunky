@@ -870,6 +870,9 @@
                             <a href="#set_frametime_unfocused" class="toc-h3 toc-link" data-title="set_frametime_unfocused">set_frametime_unfocused</a>
                           </li>
                           <li>
+                            <a href="#set_infinite_loop_detection_enabled" class="toc-h3 toc-link" data-title="set_infinite_loop_detection_enabled">set_infinite_loop_detection_enabled</a>
+                          </li>
+                          <li>
                             <a href="#set_journal_enabled" class="toc-h3 toc-link" data-title="set_journal_enabled">set_journal_enabled</a>
                           </li>
                           <li>
@@ -5005,6 +5008,12 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_frametime_unfocused-optional-frametime'>nil set_frametime_unfocused(optional<double> frametime)</h4>
 <p>Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.</p>
+<h3 id='set_infinite_loop_detection_enabled'>set_infinite_loop_detection_enabled</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_infinite_loop_detection_enabled">set_infinite_loop_detection_enabled</a></p>
+</blockquote>
+<h4 id='nil-set_infinite_loop_detection_enabled-bool-enable'>nil set_infinite_loop_detection_enabled(bool enable)</h4>
+<p>Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you&#39;re doing and need to perform some serious calculations that hang the game updates for several seconds.</p>
 <h3 id='set_journal_enabled'>set_journal_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_journal_enabled">set_journal_enabled</a></p>
