@@ -6,7 +6,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' IN MODLUNKY! YO
 I recommend resetting options to defaults after updating to 2.9 for a more balanced experience. Speaking of balance...
 
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.]]
-meta.version = "2.9c"
+meta.version = "2.9d"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -591,12 +591,14 @@ local function spawn_boss(boss)
 end
 
 set_callback(function()
+    if state.screen ~= SCREEN.LEVEL then return end
     if has(all_boss_levels, state.theme) and options.bosses then
         next_boss = pick(insert_bosses)
     end
 end, ON.PRE_LEVEL_GENERATION)
 
 set_callback(function()
+    if state.screen ~= SCREEN.LEVEL then return end
     if has(all_boss_levels, state.theme) and options.bosses then
         local boss = next_boss
         spawn_boss(boss)
@@ -1798,6 +1800,7 @@ set_callback(function()
 end, ON.START)
 
 set_callback(function()
+    if state.screen ~= SCREEN.LEVEL then return end
     local in_shop = {}
     local items = get_entities_by(0, MASK.ITEM | MASK.MOUNT | MASK.PLAYER | MASK.MONSTER, LAYER.BOTH)
     for i,v in ipairs(items) do
@@ -1996,6 +1999,7 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_USHABTI)
 
 set_callback(function()
+    if state.screen ~= SCREEN.LEVEL then return end
     local coffins = get_entities_by_type(ENT_TYPE.ITEM_COFFIN)
     for i,v in ipairs(coffins) do
         local ent = get_entity(v)
@@ -3119,6 +3123,7 @@ end, ON.GUIFRAME)]]
 --[[LIQUIDS]]
 --[[SPIKES]]
 set_callback(function()
+    if state.screen ~= SCREEN.LEVEL then return end
     swapping_liquid = (not has(all_boss_levels, state.theme)) and prng:random() < options.liquid_chance/100
     if state.theme == THEME.OLMEC then
         replace_drop(DROP.OLMEC_SISTERS_BOMBBOX, pick(crate_items))
@@ -3223,6 +3228,7 @@ set_pre_tile_code_callback(function(x, y, l)
 end, "timed_forcefield")
 
 set_callback(function()
+    if state.screen ~= SCREEN.LEVEL then return end
     for i,v in ipairs(get_entities_by_type(ENT_TYPE.FLOOR_QUICKSAND)) do
         local decos = entity_get_items_by(v, ENT_TYPE.DECORATION_GENERIC, 0)
         for j,d in ipairs(decos) do
