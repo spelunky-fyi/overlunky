@@ -1,5 +1,6 @@
 #pragma once
 
+#include "containers/custom_set.hpp"
 #include "entities_chars.hpp"
 #include "movable.hpp"
 #include "particles.hpp"
@@ -243,7 +244,7 @@ class Yang : public RoomOwner
 {
   public:
     /// Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
-    std::set<int32_t> turkeys_in_den;
+    custom_set<int32_t> turkeys_in_den;
     uint8_t unknown4;
     uint8_t unknown5;
     /// I'm looking for turkeys, wanna help?

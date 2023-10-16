@@ -374,6 +374,35 @@ for lf in ps.funcs:
             com = link_custom_type(com)
             print(com)
 
+print("# STD Library")
+print(
+    """Sometimes game variables and return of some functions will be of type `map`, `set`, `vector` etc. from the C++ Standard Library.
+
+You don't really need to know much of this as they will behave similar to a lua table, even accept some table functions from the `table` library and support looping thru using `pair` function. You can also use them as parameter for functions that take `array`, Sol will happily convert them for you.
+
+They come with some extra functionality:"""
+)
+print(
+"""
+
+Type | Name | Description
+---- | ---- | -----------"""
+)
+print("any | vector:at(int index) | Same as `vector[index]`")
+print("any | set:at(int order) | Returns elements in order, it's not an index as sets don't have one")
+print("int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable")
+print("any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable")
+print("nil | vector:erase(int index) | Removes element at given index, the rest of elements swift down so that the vector stays contiguous")
+print("nil | set:erase(any value) | Removes element from set")
+print("nil | vector:clear() | Removes all elements from vector")
+print("nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up")
+print("nil | set:insert(int order, any element) | If the set is ordered, the order param doesn't matter and can be set to nil")
+
+print("bool | all:empty() | Returns true if container is empty, false otherwise")
+print("int | aLL:size() | Same as `#container`")
+
+
+
 
 print("# Functions")
 print(
