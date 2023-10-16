@@ -224,7 +224,16 @@ std::array g_community_tile_codes{
     CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
     CommunityTileCode{"firebug", "ENT_TYPE_MONS_FIREBUG"},
     CommunityTileCode{"vampire", "ENT_TYPE_MONS_VAMPIRE", g_spawn_not_snapped_to_floor},
-    CommunityTileCode{"vampire_flying", "ENT_TYPE_MONS_VAMPIRE"},
+    CommunityTileCode{
+        "vampire_flying",
+        "ENT_TYPE_MONS_VAMPIRE",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            if (Movable* vampire = (Movable*)layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true))
+            {
+                vampire->move_state = 9;
+            }
+        }},
     CommunityTileCode{
         "vlad_flying",
         "ENT_TYPE_MONS_VLAD",
