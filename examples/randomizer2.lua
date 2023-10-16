@@ -6,7 +6,7 @@ meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' IN MODLUNKY! YO
 I recommend resetting options to defaults after updating to 2.9 for a more balanced experience. Speaking of balance...
 
 Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.]]
-meta.version = "2.9d"
+meta.version = "2.9e"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -522,12 +522,7 @@ local function spawn_boss(boss)
         elseif state.theme == THEME.TIAMAT then
             spawn_critical(boss, 18.5, 60.5, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.HUNDUN then
-            local ce = get_entity(get_entities_by(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, MASK.ACTIVEFLOOR, LAYER.FRONT)[1])
-            if ce then
-                spawn_over(boss, ce.uid, 1, 12)
-            else
-                spawn_critical(boss, 17.5, 107, LAYER.FRONT, 0, 0)
-            end
+            spawn_critical(boss, 18.5, 106.5, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.EGGPLANT_WORLD then
             spawn_critical(boss, 23.5, 116.5, LAYER.FRONT, 0, 0)
         end
@@ -577,12 +572,7 @@ local function spawn_boss(boss)
         elseif state.theme == THEME.TIAMAT then
             spawn_critical(boss, 17.5, 59.5, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.HUNDUN then
-            local ce = get_entity(get_entities_by(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, MASK.ACTIVEFLOOR, LAYER.FRONT)[1])
-            if ce then
-                spawn_over(boss, ce.uid, 0, 11)
-            else
-                spawn_critical(boss, 17.5, 106, LAYER.FRONT, 0, 0)
-            end
+            spawn_critical(boss, 17.5, 105.5, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.EGGPLANT_WORLD then
             spawn_critical(boss, 22.5, 115.5, LAYER.FRONT, 0, 0)
         end
@@ -741,12 +731,6 @@ local function random_bosses(enable)
             end
         end, SPAWN_TYPE.ANY, MASK.ACTIVEFLOOR, ENT_TYPE.ACTIVEFLOOR_OLMEC)
 
-        -- Don't collide moving tiamat platforms with floor
-        boss_cbs[#boss_cbs + 1] = set_post_entity_spawn(function(e)
-            e.flags = clr_flag(e.flags, ENT_FLAG.COLLIDES_WALLS)
-        end, SPAWN_TYPE.ANY, MASK.ACTIVEFLOOR,
-        { ENT_TYPE.ACTIVEFLOOR_TIAMAT_PLATFORM, ENT_TYPE.ACTIVEFLOOR_TIAMAT_SHOULDERPLATFORM })
-
         -- Don't kill tiamat or kingu with lame regen blocks
         boss_cbs[#boss_cbs + 1] = set_post_entity_spawn(function(e)
             e:set_pre_kill(function(_, _, killer)
@@ -755,13 +739,6 @@ local function random_bosses(enable)
                 end
             end)
         end, SPAWN_TYPE.ANY, MASK.MONSTER, {ENT_TYPE.MONS_TIAMAT, ENT_TYPE.MONS_KINGU})
-
-        -- Replace (moving) yama platforms with activefloor
-        boss_cbs[#boss_cbs + 1] = set_pre_entity_spawn(function(type, x, y, l, overlay)
-            if overlay then
-                return spawn_over(ENT_TYPE.ACTIVEFLOOR_TIAMAT_PLATFORM, overlay.uid, x, y+0.25)
-            end
-        end, SPAWN_TYPE.ANY, MASK.FLOOR, ENT_TYPE.FLOOR_YAMA_PLATFORM)
 
         -- Lol
         boss_cbs[#boss_cbs + 1] = set_post_entity_spawn(function(e)
