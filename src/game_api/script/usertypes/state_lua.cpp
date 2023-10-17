@@ -12,14 +12,15 @@
 #include <type_traits>            // for move, declval, decay_t, reference_...
 #include <utility>                // for min, max
 
-#include "entity.hpp"        // IWYU pragma: keep
-#include "items.hpp"         // for Items, SelectPlayerSlot, Items::is...
-#include "level_api.hpp"     // IWYU pragma: keep
-#include "online.hpp"        // for OnlinePlayer, OnlineLobby, Online
-#include "screen.hpp"        // IWYU pragma: keep
-#include "screen_arena.hpp"  // IWYU pragma: keep
-#include "state.hpp"         // for StateMemory, State, StateMemory::a...
-#include "state_structs.hpp" // for ArenaConfigArenas, ArenaConfigItems
+#include "entities_chars.hpp" // IWYU pragma: keep
+#include "entity.hpp"         // IWYU pragma: keep
+#include "items.hpp"          // for Items, SelectPlayerSlot, Items::is...
+#include "level_api.hpp"      // IWYU pragma: keep
+#include "online.hpp"         // for OnlinePlayer, OnlineLobby, Online
+#include "screen.hpp"         // IWYU pragma: keep
+#include "screen_arena.hpp"   // IWYU pragma: keep
+#include "state.hpp"          // for StateMemory, State, StateMemory::a...
+#include "state_structs.hpp"  // for ArenaConfigArenas, ArenaConfigItems
 
 namespace NState
 {
@@ -199,6 +200,7 @@ void register_usertypes(sol::state& lua)
         &SelectPlayerSlot::character,
         "texture",
         &SelectPlayerSlot::texture_id);
+
     /// Used in StateMemory
     lua.new_usertype<Items>(
         "Items",
@@ -212,27 +214,17 @@ void register_usertypes(sol::state& lua)
         &Items::is_pet_cursed,
         "is_pet_poisoned",
         &Items::is_pet_poisoned,
-
-        // had to be done this way as autodoc doesn't like sol::property stuff
-        /*"leader",
-        &Items::leader,*/
-        /*"player_inventory",
-        &Items::player_inventories,*/
-        /*"player_select",
-        &Items::player_select_slots,*/
-        //); stop autodoc here
-
         "leader",
         sol::property([](Items& s) -> uint8_t
                       { return s.leader + 1; },
                       [](Items& s, uint8_t leader)
                       { s.leader = leader - 1; }),
         "player_select",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_select_slots); }),
+        &Items::player_select_slots,
         "player_inventory",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_inventories); }));
+        &Items::player_inventories,
+        "players",
+        &Items::players);
 
     /// Used in LiquidPool
     lua.new_usertype<LiquidPhysicsEngine>(
@@ -275,8 +267,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<LiquidPhysics>(
         "LiquidPhysics",
         "pools",
-        sol::property([](LiquidPhysics& lp)
-                      { return std::ref(lp.pools) /**/; }));
+        &LiquidPhysics::pools);
 
     lua.create_named_table(
         "LIQUID_POOL",

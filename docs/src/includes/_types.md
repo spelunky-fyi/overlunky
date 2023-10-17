@@ -1234,7 +1234,10 @@ float | [spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn
 int | [spawn_room_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_x) | 
 int | [spawn_room_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_room_y) | 
 custom_array&lt;[Vec2](#Vec2)&gt; | [exit_doors](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_doors) | 
-[ThemeInfo](#ThemeInfo) | [themes[18]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
+array&lt;[ThemeInfo](#ThemeInfo), 18&gt; | [themes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=themes) | 
+int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
+int | [flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags2) | 
+int | [flags3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags3) | 
 
 ## Lighting types
 
@@ -2620,8 +2623,8 @@ Type | Name | Description
 ---- | ---- | -----------
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
-array&lt;float, 38&gt; | [left_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_channel) | 
-array&lt;float, 38&gt; | [right_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_channel) | 
+array&lt;float, 38&gt; | [left_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_channel) | Use [VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM) as index, warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
+array&lt;float, 38&gt; | [right_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_channel) | Use [VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM) as index warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
 bool | [start_over](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_over) | when false, current track starts from the beginning, is immediately set back to true
 bool | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | set to false to turn off
 
@@ -2679,6 +2682,7 @@ Type | Name | Description
 [PauseUI](#PauseUI) | [pause_ui](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_ui) | 
 [JournalUI](#JournalUI) | [journal_ui](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) | 
 [SaveRelated](#SaveRelated) | [save_related](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) | 
+[BackgroundSound](#BackgroundSound) | [main_menu_music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_menu_music) | 
 
 ### GameProps
 
@@ -2700,8 +2704,9 @@ array&lt;[ENT_TYPE](#ENT_TYPE), 4&gt; | [saved_pets](https://github.com/spelunky
 array&lt;bool, 4&gt; | [is_pet_cursed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_cursed) | 
 array&lt;bool, 4&gt; | [is_pet_poisoned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_pet_poisoned) | 
 int | [leader](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leader) | Index of leader player in coop
-array&lt;[Inventory](#Inventory), MAX_PLAYERS&gt; | [player_inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) | 
 array&lt;[SelectPlayerSlot](#SelectPlayerSlot), MAX_PLAYERS&gt; | [player_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_select) | 
+array&lt;[Inventory](#Inventory), MAX_PLAYERS&gt; | [player_inventory](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inventory) | 
+array&lt;[Player](#Player), MAX_PLAYERS&gt; | [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) | Table of players, also keeps the dead body until they are destroyed (necromancer revive also destroys the old body)
 
 ### JournalProgressStainSlot
 
@@ -4001,6 +4006,10 @@ nil | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/sear
 array&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
 bool | [is_cursed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_cursed) | 
+nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, const array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To a that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s<br/>destroy_corpse and responsible are the standard parameters for the kill funciton
+nil | [kill_recursive(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
+nil | [destroy_recursive(optional<int> mask, const array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To a that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
+nil | [destroy_recursive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -5882,7 +5891,7 @@ Type | Name | Description
 [SoundMeta](#SoundMeta) | [sound1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound1) | 
 [SoundMeta](#SoundMeta) | [sound2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound2) | 
 [Entity](#Entity) | [top_chain_piece](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_chain_piece) | 
-nil | [trigger()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | 
+nil | [trigger(optional<bool> play_sound_effect)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | 
 
 ### DummyPurchasableEntity
 

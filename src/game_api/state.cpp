@@ -303,6 +303,7 @@ State& State::get()
                 patch_olmec_kill_crash();
                 patch_liquid_OOB();
                 patch_ushabti_error();
+                patch_entering_closed_door_crash();
             }
             else
             {

@@ -195,7 +195,59 @@ size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_vi
     VirtualProtect(new_code, new_memory_size, PAGE_EXECUTE_READ, &dummy);
 
     int32_t rel = static_cast<int32_t>((size_t)new_code - (addr + jump_size));
-    const std::string redirect_code = fmt::format("\xE9{}{}"sv, to_le_bytes(rel), std::string(replace_size - jump_size, '\x90'));
+    const std::string redirect_code = fmt::format("\xE9{}{}"sv, to_le_bytes(rel), get_nop(replace_size - jump_size));
     write_mem_prot(addr, redirect_code, true);
     return (size_t)new_code;
+}
+
+std::string get_nop(size_t size, bool true_nop)
+{
+    if (true_nop)
+        return std::string(size, '\x90');
+
+    switch (size)
+    {
+    case 0:
+        return "";
+    case 1:
+        return "\x90"s;
+    case 2:
+        return "\x66\x90"s;
+    case 3:
+        return "\x0F\x1F\x00"s;
+    case 4:
+        return "\x0F\x1F\x40\x00"s;
+    case 5:
+        return "\x0F\x1F\x44\x00\x00"s;
+    case 6:
+        return "\x66\x0F\x1F\x44\x00\x00"s;
+    case 7:
+        return "\x0F\x1F\x80\x00\x00\x00\x00"s;
+    case 8:
+        return "\x0F\x1F\x84\x00\x00\x00\x00\x00"s;
+    case 9:
+        return "\x66\x0F\x1F\x84\x00\x00\x00\x00\x00"s;
+    case 10:
+        return "\x66\x2E\x0F\x1F\x84\x00\x00\x00\x00\x00"s;
+    default:
+    {
+        std::string ret_str;
+        size_t remaning = size;
+
+        for (uint8_t idx = 10; idx > 0; --idx)
+        {
+            size_t d_t = remaning / idx;
+            if (d_t > 0)
+            {
+                std::string c_nop = get_nop(idx);
+                for (; d_t > 0; --d_t)
+                {
+                    ret_str += c_nop;
+                    remaning -= idx;
+                }
+            }
+        }
+        return ret_str;
+    }
+    }
 }

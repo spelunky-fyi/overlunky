@@ -23,12 +23,10 @@ class Screen
     float render_timer;
     uint32_t unknown_zero;
 
-    // this first virtual does not appear to be the destructor in the game
-    // but is made one here to appease Clang
+    virtual void init() = 0;
+    virtual void handle_player() = 0; // for normal level: death, camera zoom, camera bounds, some save data stuff
     virtual ~Screen() = 0;
-    virtual void v1() = 0;
-    virtual void v2() = 0;
-    virtual void render() = 0;
+    virtual void render() = 0; // mostly used by the non gameplay screens to draw textures and text
 
     std::uint32_t reserve_callback_id();
     void unhook(std::uint32_t id);

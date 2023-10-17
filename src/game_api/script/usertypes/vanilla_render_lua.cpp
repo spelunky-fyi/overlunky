@@ -943,6 +943,6 @@ void register_usertypes(sol::state& lua)
     hud_type["opacity"] = &Hud::opacity;
     hud_type["data"] = &Hud::data;
 
-    // TODO: maybe add a getter for HudData outside render_hud, I think it's always at 0x22e18020
+    lua["get_hud"] = get_hud;
 };
 } // namespace NVanillaRender

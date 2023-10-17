@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint32_t, int32_t, uint64_t, uint8_t
 #include <functional> // for less
@@ -151,7 +152,7 @@ struct Layer
     EntityList entities_overlaping_grid[g_level_max_y][g_level_max_x]; // static entities (like midbg, decorations) that overlap this grid position
 
     EntityList unknown_entities2;
-    EntityList entities_by_draw_depth[53];
+    std::array<EntityList, 53> entities_by_draw_depth;
     EntityList unknown_entities3;        // debris, explosions, laserbeams etc. ?
     EntityList unknown_entities4;        // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
     std::vector<Entity*> unknown_vector; // add_to_layer uses this

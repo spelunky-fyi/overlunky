@@ -652,7 +652,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "spawn_liquid"sv,
         // See tile code for water (0xea for 1.23.3) in handle_tile_code, last call before returning
         PatternCommandBuffer{}
-            .find_inst("\xE8****\xE9****\x48\x81\xC6"sv)
+            .find_inst("\xE8****\xE9****\x48\x81\xC6"sv) // alternative find_after_inst("41 0F 28 D1 41 B9 90 03 00 00"_gh)
             .decode_call()
             .at_exe(),
     },
@@ -2032,6 +2032,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .find_inst("4c 89 e8 4c 29 e0 48 3d 20 03 00 00"_gh)
             .offset(0x21)
+            .at_exe(),
+    },
+    {
+        "hud"sv,
+        // you can get the address from the render_hud (first parameter), it's global/static, so just find good refrence to it
+        PatternCommandBuffer{}
+            .find_after_inst("41 C6 47 6B 01"_gh)
+            .find_inst("48 8D 0D"_gh)
+            .decode_pc()
+            .at_exe(),
+    },
+    {
+        "enter_closed_door_crash"sv,
+        // third virtual in behavior of the dog in walking state, the exact line crashing the game when pet tries to enter closed door (tiamat/hundun)
+        PatternCommandBuffer{}
+            .find_after_inst("FF 90 A8 00 00 00 48 89 F1"_gh)
+            .offset(0x5)
             .at_exe(),
     },
     {

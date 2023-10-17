@@ -970,6 +970,19 @@ Name | Data | Description
 [STAR_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.STAR_CHALLENGE_SPAWNED) | 26 | 
 [SUN_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED) | 27 | 
 
+## RECURSIVE_MODE
+
+
+> Search script examples for [RECURSIVE_MODE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[EXCLUSIVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE.EXCLUSIVE) | RECURSIVE_MODE::EXCLUSIVE | In this mode the provided [ENT_TYPE](#ENT_TYPE) and [MASK](#MASK) will not be affected nor will entities attached to them<br/>
+[INCLUSIVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE.INCLUSIVE) | RECURSIVE_MODE::INCLUSIVE | In this mode the provided [ENT_TYPE](#ENT_TYPE) and [MASK](#MASK) will be the only affected entities, anything outside of the specified mask or type will not be touched including entities attached to them<br/>For this mode you have to specify at least one mask or [ENT_TYPE](#ENT_TYPE), otherwise nothing will be affected<br/>
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE.NONE) | RECURSIVE_MODE::NONE | Ignores provided [ENT_TYPE](#ENT_TYPE) and [MASK](#MASK) and affects all the entities<br/>
+
 ## RENDER_INFO_OVERRIDE
 
 

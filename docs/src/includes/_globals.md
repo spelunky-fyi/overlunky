@@ -597,6 +597,18 @@ end
 Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
 Recommended to always set the mask, even if you look for one entity type
 
+### get_entities_by_draw_depth
+
+
+> Search script examples for [get_entities_by_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_draw_depth)
+
+#### array&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
+
+#### array&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
+
+Get uids of entities by draw_depth. Can also use table of draw_depths.
+You can later use [filter_entities](#filter_entities) if you want specific entity
+
 ### get_entities_by_type
 
 
@@ -1167,6 +1179,38 @@ Activate custom variables for y coordinate limit for hundun and spawn of it's he
 note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Hundun](#Hundun) entity, recommending set_post_entity_spawn
 default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
 
+### add_custom_type
+
+
+> Search script examples for [add_custom_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_custom_type)
+
+#### [ENT_TYPE](#ENT_TYPE) add_custom_type(array<[ENT_TYPE](#ENT_TYPE)> types)
+
+#### [ENT_TYPE](#ENT_TYPE) add_custom_type()
+
+Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+Use empty array or no parameter to get new uniqe [ENT_TYPE](#ENT_TYPE) that can be used for custom [EntityDB](#EntityDB)
+
+### add_money
+
+
+> Search script examples for [add_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money)
+
+#### int add_money(int amount, optional<int> display_time)
+
+Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+
+### add_money_slot
+
+
+> Search script examples for [add_money_slot](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money_slot)
+
+#### int add_money_slot(int amount, int player_slot, optional<int> display_time)
+
+Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+
 ### change_poison_timer
 
 
@@ -1307,6 +1351,16 @@ Get the current adventure seed pair
 
 Same as `Player.get_heart_color`
 
+### get_current_money
+
+
+> Search script examples for [get_current_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_current_money)
+
+#### int get_current_money()
+
+Just convenient way of getting the current amount of money
+short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+
 ### get_frame
 
 
@@ -1333,6 +1387,14 @@ Get engine target frametime (1/framerate, default 1/60).
 #### optional&lt;double&gt; get_frametime_unfocused()
 
 Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+
+### get_hud
+
+
+> Search script examples for [get_hud](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hud)
+
+#### [HudData](#HudData) get_hud()
+
 
 ### get_id
 

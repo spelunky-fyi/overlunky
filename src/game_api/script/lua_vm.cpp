@@ -35,6 +35,7 @@
 #include "entities_chars.hpp"                      // for Player
 #include "entities_items.hpp"                      // for Container, Player...
 #include "entity.hpp"                              // for get_entity_ptr
+#include "entity_lookup.hpp"                       //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
 #include "items.hpp"                               // for Inventory
@@ -2112,6 +2113,34 @@ end
 
     /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
     lua["get_frametime_unfocused"] = get_frametime_inactive;
+
+    auto add_custom_type = sol::overload(
+        static_cast<ENT_TYPE (*)(std::vector<ENT_TYPE>)>(::add_custom_type),
+        static_cast<ENT_TYPE (*)()>(::add_custom_type));
+
+    /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+    /// Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+    lua["add_custom_type"] = add_custom_type;
+
+    auto get_entities_by_draw_depth = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(uint8_t, LAYER)>(::get_entities_by_draw_depth),
+        static_cast<std::vector<uint32_t> (*)(std::vector<uint8_t>, LAYER)>(::get_entities_by_draw_depth));
+
+    /// Get uids of entities by draw_depth. Can also use table of draw_depths.
+    /// You can later use [filter_entities](#filter_entities) if you want specific entity
+    lua["get_entities_by_draw_depth"] = get_entities_by_draw_depth;
+
+    /// Just convenient way of getting the current amount of money
+    /// short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+    lua["get_current_money"] = get_current_money;
+
+    /// Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+    lua["add_money"] = add_money;
+
+    /// Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+    lua["add_money_slot"] = add_money_slot;
 
     /// Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
     lua["destroy_level"] = destroy_level;
