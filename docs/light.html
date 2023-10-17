@@ -525,6 +525,9 @@
                             <a href="#get_entities_by" class="toc-h3 toc-link" data-title="get_entities_by">get_entities_by</a>
                           </li>
                           <li>
+                            <a href="#get_entities_by_draw_depth" class="toc-h3 toc-link" data-title="get_entities_by_draw_depth">get_entities_by_draw_depth</a>
+                          </li>
+                          <li>
                             <a href="#get_entities_by_type" class="toc-h3 toc-link" data-title="get_entities_by_type">get_entities_by_type</a>
                           </li>
                           <li>
@@ -714,6 +717,15 @@
                             <a href="#activate_hundun_hack" class="toc-h3 toc-link" data-title="activate_hundun_hack">activate_hundun_hack</a>
                           </li>
                           <li>
+                            <a href="#add_custom_type" class="toc-h3 toc-link" data-title="add_custom_type">add_custom_type</a>
+                          </li>
+                          <li>
+                            <a href="#add_money" class="toc-h3 toc-link" data-title="add_money">add_money</a>
+                          </li>
+                          <li>
+                            <a href="#add_money_slot" class="toc-h3 toc-link" data-title="add_money_slot">add_money_slot</a>
+                          </li>
+                          <li>
                             <a href="#change_poison_timer" class="toc-h3 toc-link" data-title="change_poison_timer">change_poison_timer</a>
                           </li>
                           <li>
@@ -759,6 +771,9 @@
                             <a href="#get_character_heart_color" class="toc-h3 toc-link" data-title="get_character_heart_color">get_character_heart_color</a>
                           </li>
                           <li>
+                            <a href="#get_current_money" class="toc-h3 toc-link" data-title="get_current_money">get_current_money</a>
+                          </li>
+                          <li>
                             <a href="#get_frame" class="toc-h3 toc-link" data-title="get_frame">get_frame</a>
                           </li>
                           <li>
@@ -766,6 +781,9 @@
                           </li>
                           <li>
                             <a href="#get_frametime_unfocused" class="toc-h3 toc-link" data-title="get_frametime_unfocused">get_frametime_unfocused</a>
+                          </li>
+                          <li>
+                            <a href="#get_hud" class="toc-h3 toc-link" data-title="get_hud">get_hud</a>
                           </li>
                           <li>
                             <a href="#get_id" class="toc-h3 toc-link" data-title="get_id">get_id</a>
@@ -3640,6 +3658,9 @@
                     <a href="#QUEST_FLAG" class="toc-h2 toc-link" data-title="QUEST_FLAG">QUEST_FLAG</a>
                   </li>
                   <li>
+                    <a href="#RECURSIVE_MODE" class="toc-h2 toc-link" data-title="RECURSIVE_MODE">RECURSIVE_MODE</a>
+                  </li>
+                  <li>
                     <a href="#RENDER_INFO_OVERRIDE" class="toc-h2 toc-link" data-title="RENDER_INFO_OVERRIDE">RENDER_INFO_OVERRIDE</a>
                   </li>
                   <li>
@@ -4295,6 +4316,13 @@ Recommended to always set the mask, even if you look for one entity type</p>
 <h4 id='array-lt-int-gt-get_entities_by-array-lt-ENT_TYPE-gt-entity_types-int-mask-LAYER-layer'>array&lt;int&gt; get_entities_by(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='array-lt-int-gt-get_entities_by-ENT_TYPE-entity_type-int-mask-LAYER-layer'>array&lt;int&gt; get_entities_by(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Get uids of entities by some conditions (<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#MASK">MASK</a>). Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types.
 Recommended to always set the mask, even if you look for one entity type</p>
+<h3 id='get_entities_by_draw_depth'>get_entities_by_draw_depth</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_draw_depth">get_entities_by_draw_depth</a></p>
+</blockquote>
+<h4 id='array-lt-int-gt-get_entities_by_draw_depth-int-draw_depth-LAYER-l'>array&lt;int&gt; get_entities_by_draw_depth(int draw_depth, <a href="#LAYER">LAYER</a> l)</h4><h4 id='array-lt-int-gt-get_entities_by_draw_depth-array-draw_depths-LAYER-l'>array&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, <a href="#LAYER">LAYER</a> l)</h4>
+<p>Get uids of entities by draw_depth. Can also use table of draw_depths.
+You can later use <a href="#filter_entities">filter_entities</a> if you want specific entity</p>
 <h3 id='get_entities_by_type'>get_entities_by_type</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="kd">local</span> <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_SNAKE</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_BAT</span><span class="p">}</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
     <span class="kd">local</span> <span class="n">uids</span> <span class="o">=</span> <span class="n">get_entities_by_type</span><span class="p">(</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_SNAKE</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_BAT</span><span class="p">)</span>
@@ -4670,6 +4698,27 @@ default game values are: speed = 0.0125, y_limit = 98.5</p>
 <p>Activate custom variables for y coordinate limit for hundun and spawn of it&#39;s heads
 note: because those variables are custom and game does not initiate them, you need to do it yourself for each <a href="#Hundun">Hundun</a> entity, recommending set_post_entity_spawn
 default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71</p>
+<h3 id='add_custom_type'>add_custom_type</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_custom_type">add_custom_type</a></p>
+</blockquote>
+<h4 id='ENT_TYPE-add_custom_type-array-lt-ENT_TYPE-gt-types'><a href="#ENT_TYPE">ENT_TYPE</a> add_custom_type(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; types)</h4><h4 id='ENT_TYPE-add_custom_type'><a href="#ENT_TYPE">ENT_TYPE</a> add_custom_type()</h4>
+<p>Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+Use empty array or no parameter to get new uniqe <a href="#ENT_TYPE">ENT_TYPE</a> that can be used for custom <a href="#EntityDB">EntityDB</a></p>
+<h3 id='add_money'>add_money</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_money">add_money</a></p>
+</blockquote>
+<h4 id='int-add_money-int-amount-optional-display_time'>int add_money(int amount, optional<int> display_time)</h4>
+<p>Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction</p>
+<h3 id='add_money_slot'>add_money_slot</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_money_slot">add_money_slot</a></p>
+</blockquote>
+<h4 id='int-add_money_slot-int-amount-int-player_slot-optional-display_time'>int add_money_slot(int amount, int player_slot, optional<int> display_time)</h4>
+<p>Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction</p>
 <h3 id='change_poison_timer'>change_poison_timer</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=change_poison_timer">change_poison_timer</a></p>
@@ -4763,6 +4812,13 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 </blockquote>
 <h4 id='Color-get_character_heart_color-ENT_TYPE-type_id'><a href="#Color">Color</a> get_character_heart_color(<a href="#ENT_TYPE">ENT_TYPE</a> type_id)</h4>
 <p>Same as <code>Player.get_heart_color</code></p>
+<h3 id='get_current_money'>get_current_money</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_current_money">get_current_money</a></p>
+</blockquote>
+<h4 id='int-get_current_money'>int get_current_money()</h4>
+<p>Just convenient way of getting the current amount of money
+short for state-&gt;money_shop_total + loop[inventory.money + inventory.collected_money_total]</p>
 <h3 id='get_frame'>get_frame</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame</a></p>
@@ -4781,7 +4837,11 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 </blockquote>
 <h4 id='optional-lt-double-gt-get_frametime_unfocused'>optional&lt;double&gt; get_frametime_unfocused()</h4>
 <p>Get engine target frametime when game is unfocused (1/framerate, default 1/33).</p>
-<h3 id='get_id'>get_id</h3>
+<h3 id='get_hud'>get_hud</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_hud">get_hud</a></p>
+</blockquote>
+<h4 id='HudData-get_hud'><a href="#HudData">HudData</a> get_hud()</h4><h3 id='get_id'>get_id</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_id">get_id</a></p>
 </blockquote>
@@ -10640,8 +10700,23 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td><a href="#ThemeInfo">ThemeInfo</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=themes">themes[18]</a></td>
+<td>array&lt;<a href="#ThemeInfo">ThemeInfo</a>, 18&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=themes">themes</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flags">flags</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flags2">flags2</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flags3">flags3</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -15302,12 +15377,12 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>array&lt;float, 38&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=left_channel">left_channel</a></td>
-<td></td>
+<td>Use <a href="#VANILLA_SOUND_PARAM">VANILLA_SOUND_PARAM</a> as index, warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element</td>
 </tr>
 <tr>
 <td>array&lt;float, 38&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=right_channel">right_channel</a></td>
-<td></td>
+<td>Use <a href="#VANILLA_SOUND_PARAM">VANILLA_SOUND_PARAM</a> as index warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -15534,6 +15609,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=save_related">save_related</a></td>
 <td></td>
 </tr>
+<tr>
+<td><a href="#BackgroundSound">BackgroundSound</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=main_menu_music">main_menu_music</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='GameProps'>GameProps</h3>
 <table><thead>
@@ -15595,14 +15675,19 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>Index of leader player in coop</td>
 </tr>
 <tr>
+<td>array&lt;<a href="#SelectPlayerSlot">SelectPlayerSlot</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_select">player_select</a></td>
+<td></td>
+</tr>
+<tr>
 <td>array&lt;<a href="#Inventory">Inventory</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_inventory">player_inventory</a></td>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;<a href="#SelectPlayerSlot">SelectPlayerSlot</a>, MAX_PLAYERS&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_select">player_select</a></td>
-<td></td>
+<td>array&lt;<a href="#Player">Player</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=players">players</a></td>
+<td>Table of players, also keeps the dead body until they are destroyed (necromancer revive also destroys the old body)</td>
 </tr>
 </tbody></table>
 <h3 id='JournalProgressStainSlot'>JournalProgressStainSlot</h3>
@@ -19703,6 +19788,26 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_cursed">is_cursed()</a></td>
 <td></td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kill_recursive">kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, const array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)</a></td>
+<td>Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To a that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s<br/>destroy_corpse and responsible are the standard parameters for the kill funciton</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kill_recursive">kill_recursive(bool destroy_corpse, Entity responsible)</a></td>
+<td>Short for using <a href="#RECURSIVE_MODE">RECURSIVE_MODE</a>.NONE</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_recursive">destroy_recursive(optional<int> mask, const array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)</a></td>
+<td>Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To a that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check the mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_recursive">destroy_recursive()</a></td>
+<td>Short for using <a href="#RECURSIVE_MODE">RECURSIVE_MODE</a>.NONE</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -24509,7 +24614,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger()</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger">trigger(optional<bool> play_sound_effect)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -31548,6 +31653,34 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED">SUN_CHALLENGE_SPAWNED</a></td>
 <td>27</td>
 <td></td>
+</tr>
+</tbody></table>
+<h2 id='RECURSIVE_MODE'>RECURSIVE_MODE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RECURSIVE_MODE">RECURSIVE_MODE</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RECURSIVE_MODE.EXCLUSIVE">EXCLUSIVE</a></td>
+<td>RECURSIVE_MODE::EXCLUSIVE</td>
+<td>In this mode the provided <a href="#ENT_TYPE">ENT_TYPE</a> and <a href="#MASK">MASK</a> will not be affected nor will entities attached to them<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RECURSIVE_MODE.INCLUSIVE">INCLUSIVE</a></td>
+<td>RECURSIVE_MODE::INCLUSIVE</td>
+<td>In this mode the provided <a href="#ENT_TYPE">ENT_TYPE</a> and <a href="#MASK">MASK</a> will be the only affected entities, anything outside of the specified mask or type will not be touched including entities attached to them<br/>For this mode you have to specify at least one mask or <a href="#ENT_TYPE">ENT_TYPE</a>, otherwise nothing will be affected<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RECURSIVE_MODE.NONE">NONE</a></td>
+<td>RECURSIVE_MODE::NONE</td>
+<td>Ignores provided <a href="#ENT_TYPE">ENT_TYPE</a> and <a href="#MASK">MASK</a> and affects all the entities<br/></td>
 </tr>
 </tbody></table>
 <h2 id='RENDER_INFO_OVERRIDE'>RENDER_INFO_OVERRIDE</h2>
