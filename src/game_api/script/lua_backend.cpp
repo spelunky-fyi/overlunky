@@ -14,6 +14,7 @@
 #include "constants.hpp"                    // for no_return_str
 #include "entities_chars.hpp"               // for Player
 #include "entity.hpp"                       // for Entity, get_entity_ptr
+#include "entity_lookup.hpp"                //
 #include "handle_lua_function.hpp"          // for handle_function
 #include "items.hpp"                        // for Inventory
 #include "level_api.hpp"                    // for LevelGenData, LevelGenSy...
@@ -1329,6 +1330,9 @@ bool LuaBackend::process_vanilla_render_callbacks(ON event)
     bool skip{false};
     if (!get_enabled())
         return skip;
+
+    // used in infinite loop detection to see if game is hanging because a script is hanging
+    frame_counter++;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;

@@ -1046,8 +1046,10 @@ std::string LuaConsole::execute_raw(std::string code)
         }
         else
         {
-            sol::function serpent = lua["serpent"]["block"];
-            return serpent(ret);
+            // sol::function serpent = lua["serpent"]["block"];
+            // return serpent(ret);
+            sol::function dump_string = lua["dump_string"];
+            return dump_string(ret, 2);
         }
     }
     catch (const sol::error& e)

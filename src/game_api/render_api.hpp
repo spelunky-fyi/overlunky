@@ -425,7 +425,8 @@ struct HudMoney : HudElement
 {
     int32_t total;
     int32_t counter;
-    int32_t timer;
+    uint8_t timer;
+    // padding?
 };
 
 struct HudData
@@ -456,3 +457,5 @@ struct Hud
     float opacity;
     HudData* data;
 };
+
+HudData* get_hud();

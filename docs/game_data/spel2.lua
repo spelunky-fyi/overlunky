@@ -53,7 +53,7 @@ function lua_print() end
 ---@param message string
 ---@return nil
 function print(message) end
----Print a log message to ingame console.
+---Print a log message to ingame console with a comment identifying the script that sent it.
 ---@param message string
 ---@return nil
 function console_print(message) end
@@ -73,6 +73,11 @@ function prinspect(...) end
 ---@vararg any
 ---@return nil
 function messpect(...) end
+---Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
+---@param any any
+---@param depth integer?
+---@return table
+function dump(object, depth) end
 ---Adds a command that can be used in the console.
 ---@param name string
 ---@param cmd function
@@ -1235,6 +1240,44 @@ function set_frametime_unfocused(frametime) end
 ---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 ---@return double?
 function get_frametime_unfocused() end
+---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+---Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+---@param types ENT_TYPE[]
+---@return ENT_TYPE
+function add_custom_type(types) end
+---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+---Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+---@return ENT_TYPE
+function add_custom_type() end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depth integer
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depth, l) end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depths integer[]
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depths, l) end
+---Just convenient way of getting the current amount of money
+---short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+---@return integer
+function get_current_money() end
+---Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+---Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+---@param amount integer
+---@param display_time integer?
+---@return integer
+function add_money(amount, display_time) end
+---Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+---Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+---@param amount integer
+---@param player_slot integer
+---@param display_time integer?
+---@return integer
+function add_money_slot(amount, player_slot, display_time) end
 ---Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
 ---@return nil
 function destroy_level() end
@@ -1263,6 +1306,10 @@ function inputs_to_buttons(inputs) end
 ---@param buttons BUTTON
 ---@return INPUTS
 function buttons_to_inputs(x, y, buttons) end
+---Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you're doing and need to perform some serious calculations that hang the game updates for several seconds.
+---@param enable boolean
+---@return nil
+function set_infinite_loop_detection_enabled(enable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1589,6 +1636,8 @@ function set_lut(texture_id, layer) end
 ---@param layer LAYER
 ---@return nil
 function reset_lut(layer) end
+---@return HudData
+function get_hud() end
 ---Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
 ---Use `-1` as dropchance_id to reset all to default
 ---@param dropchance_id integer
@@ -1901,8 +1950,9 @@ do
     ---@field is_pet_cursed boolean[] @size: 4
     ---@field is_pet_poisoned boolean[] @size: 4
     ---@field leader integer @Index of leader player in coop
-    ---@field player_inventory Inventory[] @size: MAX_PLAYERS
     ---@field player_select SelectPlayerSlot[] @size: MAX_PLAYERS
+    ---@field player_inventory Inventory[] @size: MAX_PLAYERS
+    ---@field players Player[] @size: MAX_PLAYERS @Table of players, also keeps the dead body until they are destroyed (necromancer revive also destroys the old body)
 
 ---@class LiquidPhysicsEngine
     ---@field pause boolean
@@ -2148,6 +2198,7 @@ do
     ---@field pause_ui PauseUI
     ---@field journal_ui JournalUI
     ---@field save_related SaveRelated
+    ---@field main_menu_music BackgroundSound
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
@@ -2377,6 +2428,31 @@ function Entity:overlaps_with(rect_left, rect_bottom, rect_right, rect_top) end
 ---@param other Entity
 ---@return boolean
 function Entity:overlaps_with(other) end
+---Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
+---To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+---destroy_corpse and responsible are the standard parameters for the kill funciton
+---@param destroy_corpse boolean
+---@param responsible Entity
+---@param mask integer?
+---@param ent_types ENT_TYPE[]
+---@param rec_mode RECURSIVE_MODE
+---@return nil
+function Entity:kill_recursive(destroy_corpse, responsible, mask, ent_types, rec_mode) end
+---Short for using RECURSIVE_MODE.NONE
+---@param destroy_corpse boolean
+---@param responsible Entity
+---@return nil
+function Entity:kill_recursive(destroy_corpse, responsible) end
+---Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
+---To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+---@param mask integer?
+---@param ent_types ENT_TYPE[]
+---@param rec_mode RECURSIVE_MODE
+---@return nil
+function Entity:destroy_recursive(mask, ent_types, rec_mode) end
+---Short for using RECURSIVE_MODE.NONE
+---@return nil
+function Entity:destroy_recursive() end
 
 ---@class Movable : Entity
     ---@field move Vec2 @{movex, movey}
@@ -2824,7 +2900,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field sound1 SoundMeta
     ---@field sound2 SoundMeta
     ---@field top_chain_piece Entity
-    ---@field trigger fun(self): nil
+    ---@field trigger fun(self, play_sound_effect: boolean?): nil
 
 ---@class ThinIce : Movable
     ---@field strength integer @counts down when standing on, maximum is 134 as based of this value it changes animation_frame, and above that value it changes to wrong sprite
@@ -4570,6 +4646,9 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_room_y integer
     ---@field exit_doors custom_Array<Vec2>
     ---@field themes ThemeInfo[] @size: 18
+    ---@field flags integer
+    ---@field flags2 integer
+    ---@field flags3 integer
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
@@ -4710,8 +4789,8 @@ function CustomSound:play(paused, sound_type) end
 ---@class SoundMeta
     ---@field x number
     ---@field y number
-    ---@field left_channel number[] @size: 38
-    ---@field right_channel number[] @size: 38
+    ---@field left_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index, warning: special case with first index at 0, loop using tuples will get you all results but the key/index will be wrong, ituples will have correct key/index but will skip the first element
+    ---@field right_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index warning: special case with first index at 0, loop using tuples will get you all results but the key/index will be wrong, ituples will have correct key/index but will skip the first element
     ---@field start_over boolean @when false, current track starts from the beginning, is immediately set back to true
     ---@field playing boolean @set to false to turn off
 

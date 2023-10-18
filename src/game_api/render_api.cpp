@@ -867,3 +867,9 @@ void TextRenderingInfo::rotate(float angle, std::optional<float> px, std::option
         letter->top.C.x *= inverse_ratio;
     }
 }
+
+HudData* get_hud()
+{
+    static auto hud = (HudData*)get_address("hud");
+    return hud;
+}

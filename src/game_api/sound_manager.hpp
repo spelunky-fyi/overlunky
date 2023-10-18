@@ -264,10 +264,13 @@ struct SoundMeta
 {
     float x;
     float y;
-    SoundInfo* sound_info;               // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
-    uint64_t fmod_param_id;              // param to FMOD::Studio::EventInstance::SetParameterByID
-    std::array<float, 38> left_channel;  // VANILLA_SOUND_PARAM
-    std::array<float, 38> right_channel; // VANILLA_SOUND_PARAM
+    SoundInfo* sound_info;  // param to FMOD::Studio::EventInstance::SetParameterByID (this ptr + 0x30)
+    uint64_t fmod_param_id; // param to FMOD::Studio::EventInstance::SetParameterByID
+
+    /// Use VANILLA_SOUND_PARAM as index, warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
+    std::array<float, 38> left_channel;
+    /// Use VANILLA_SOUND_PARAM as index warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
+    std::array<float, 38> right_channel;
 
     /// when false, current track starts from the beginning, is immediately set back to true
     bool start_over;
@@ -294,6 +297,7 @@ struct BackgroundSound : public SoundMeta
 /// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
 /// Returns SoundMeta (read only), beware that after the sound starts, that memory is no longer valid
 SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);
+SoundMeta* play_sound_by_id(uint32_t sound_id, uint32_t source_uid);
 
 // could probably be exposed if someone can actually figure out how to properly "register it"?
 // it also needs to make sure the lua owns the returned object and it will properly delete it

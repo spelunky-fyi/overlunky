@@ -3,6 +3,7 @@
 #include <cstddef>       // for size_t
 #include <cstdint>       // for uint8_t, uint32_t, int32_t, uint16_t, int64_t
 #include <functional>    // for function, equal_to
+#include <optional>      //
 #include <span>          // for span
 #include <string>        // for allocator, string
 #include <string_view>   // for string_view
@@ -29,6 +30,13 @@ class Movable;
 struct EntityHooksInfo;
 using ENT_FLAG = uint32_t;
 using ENT_MORE_FLAG = uint32_t;
+
+enum class RECURSIVE_MODE
+{
+    EXCLUSIVE,
+    INCLUSIVE,
+    NONE,
+};
 
 class Entity
 {
@@ -209,6 +217,24 @@ class Entity
     void set_enable_turning(bool enabled);
 
     std::span<uint32_t> get_items();
+
+    /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
+    /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+    /// destroy_corpse and responsible are the standard parameters for the kill funciton
+    void kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
+    /// Short for using RECURSIVE_MODE.NONE
+    void kill_recursive(bool destroy_corpse, Entity* responsible)
+    {
+        kill_recursive(destroy_corpse, responsible, std::nullopt, {}, RECURSIVE_MODE::NONE);
+    };
+    /// Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
+    /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+    void destroy_recursive(std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
+    /// Short for using RECURSIVE_MODE.NONE
+    void destroy_recursive()
+    {
+        destroy_recursive(std::nullopt, {}, RECURSIVE_MODE::NONE);
+    }
 
     template <typename T>
     T* as()

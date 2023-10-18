@@ -22,6 +22,7 @@
 #include "entities_items.hpp"        //
 #include "entities_monsters.hpp"     // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
 #include "entity.hpp"                // for to_id, Entity, get_entity_ptr, Enti...
+#include "entity_lookup.hpp"         //
 #include "layer.hpp"                 // for Layer, g_level_max_y, g_level_max_x
 #include "logger.h"                  // for DEBUG
 #include "memory.hpp"                // for to_le_bytes, write_mem_prot, Execut...
@@ -223,8 +224,26 @@ std::array g_community_tile_codes{
     CommunityTileCode{"monkey", "ENT_TYPE_MONS_MONKEY"},
     CommunityTileCode{"firebug", "ENT_TYPE_MONS_FIREBUG"},
     CommunityTileCode{"vampire", "ENT_TYPE_MONS_VAMPIRE", g_spawn_not_snapped_to_floor},
-    CommunityTileCode{"vampire_flying", "ENT_TYPE_MONS_VAMPIRE"},
-    CommunityTileCode{"vlad_flying", "ENT_TYPE_MONS_VLAD"},
+    CommunityTileCode{
+        "vampire_flying",
+        "ENT_TYPE_MONS_VAMPIRE",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            if (Movable* vampire = (Movable*)layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true))
+            {
+                vampire->move_state = 9;
+            }
+        }},
+    CommunityTileCode{
+        "vlad_flying",
+        "ENT_TYPE_MONS_VLAD",
+        [](const CommunityTileCode& self, float x, float y, Layer* layer)
+        {
+            if (Movable* vlad = (Movable*)layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true))
+            {
+                vlad->move_state = 9;
+            }
+        }},
     CommunityTileCode{"osiris", "ENT_TYPE_MONS_OSIRIS_HEAD"},
     CommunityTileCode{"anubis2", "ENT_TYPE_MONS_ANUBIS2"},
     CommunityTileCode{"assassin", "ENT_TYPE_MONS_FEMALE_JIANGSHI"},
@@ -419,20 +438,14 @@ std::array g_community_tile_codes{
     },
     CommunityTileCode{"boulder", "ENT_TYPE_ACTIVEFLOOR_BOULDER"},
     CommunityTileCode{"apep", "ENT_TYPE_MONS_APEP_HEAD"},
-    CommunityTileCode{
-        "apep_left",
-        "ENT_TYPE_MONS_APEP_HEAD",
-        []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            layer->spawn_apep(x, y, is_room_flipped(x, y));
-        }},
-    CommunityTileCode{
-        "apep_right",
-        "ENT_TYPE_MONS_APEP_HEAD",
-        []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            layer->spawn_apep(x, y, !is_room_flipped(x, y));
-        }},
+    CommunityTileCode{"apep_left", "ENT_TYPE_MONS_APEP_HEAD", []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
+                      {
+                          layer->spawn_apep(x, y, is_room_flipped(x, y));
+                      }},
+    CommunityTileCode{"apep_right", "ENT_TYPE_MONS_APEP_HEAD", []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
+                      {
+                          layer->spawn_apep(x, y, !is_room_flipped(x, y));
+                      }},
     CommunityTileCode{"olmite_naked", "ENT_TYPE_MONS_OLMITE_NAKED"},
     CommunityTileCode{"olmite_helmet", "ENT_TYPE_MONS_OLMITE_HELMET"},
     CommunityTileCode{
@@ -470,46 +483,34 @@ std::array g_community_tile_codes{
     CommunityTileCode{"punishball_attach_bottom", "ENT_TYPE_ITEM_PUNISHBALL", g_spawn_punishball_attach<0, -1>},
     CommunityTileCode{"critter_slime", "ENT_TYPE_MONS_CRITTERSLIME"},
     CommunityTileCode{"skull", "ENT_TYPE_ITEM_SKULL"},
-    CommunityTileCode{
-        "venom",
-        "ENT_TYPE_ITEM_ACIDSPIT",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            layer->spawn_entity(self.entity_id, x, y - 1, false, 0, 0, false);
-        }},
+    CommunityTileCode{"venom", "ENT_TYPE_ITEM_ACIDSPIT", [](const CommunityTileCode& self, float x, float y, Layer* layer)
+                      {
+                          layer->spawn_entity(self.entity_id, x, y - 1, false, 0, 0, false);
+                      }},
     CommunityTileCode{"arrow_wooden", "ENT_TYPE_ITEM_WOODEN_ARROW"},
     CommunityTileCode{"arrow_metal", "ENT_TYPE_ITEM_METAL_ARROW"},
-    CommunityTileCode{
-        "arrow_wooden_poison",
-        "ENT_TYPE_ITEM_WOODEN_ARROW",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            Arrow* arrow = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Arrow>();
-            arrow->poison_arrow(true);
-        }},
-    CommunityTileCode{
-        "arrow_metal_poison",
-        "ENT_TYPE_ITEM_METAL_ARROW",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            Arrow* arrow = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Arrow>();
-            arrow->poison_arrow(true);
-        }},
-    CommunityTileCode{
-        "movable_spikes",
-        "ENT_TYPE_ITEM_SPIKES",
-        [](const CommunityTileCode& self, float x, float y, Layer* layer)
-        {
-            auto do_spawn = [=]()
-            {
-                std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
-                if (!entities_neighbour.empty())
-                {
-                    layer->spawn_entity_over(self.entity_id, get_entity_ptr(entities_neighbour.front()), 0.0f, 1.0f);
-                }
-            };
-            g_attachee_requiring_entities.push_back({{{x, y - 1}}, do_spawn});
-        }},
+    CommunityTileCode{"arrow_wooden_poison", "ENT_TYPE_ITEM_WOODEN_ARROW", [](const CommunityTileCode& self, float x, float y, Layer* layer)
+                      {
+                          Arrow* arrow = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Arrow>();
+                          arrow->poison_arrow(true);
+                      }},
+    CommunityTileCode{"arrow_metal_poison", "ENT_TYPE_ITEM_METAL_ARROW", [](const CommunityTileCode& self, float x, float y, Layer* layer)
+                      {
+                          Arrow* arrow = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Arrow>();
+                          arrow->poison_arrow(true);
+                      }},
+    CommunityTileCode{"movable_spikes", "ENT_TYPE_ITEM_SPIKES", [](const CommunityTileCode& self, float x, float y, Layer* layer)
+                      {
+                          auto do_spawn = [=]()
+                          {
+                              std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
+                              if (!entities_neighbour.empty())
+                              {
+                                  layer->spawn_entity_over(self.entity_id, get_entity_ptr(entities_neighbour.front()), 0.0f, 1.0f);
+                              }
+                          };
+                          g_attachee_requiring_entities.push_back({{{x, y - 1}}, do_spawn});
+                      }},
     CommunityTileCode{"boombox", "ENT_TYPE_ITEM_BOOMBOX"},
     // CommunityTileCode{
     //    "lake_imposter",

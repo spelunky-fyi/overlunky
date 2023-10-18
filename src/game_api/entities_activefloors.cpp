@@ -23,7 +23,7 @@ uint8_t Olmec::broken_floaters()
     return broken;
 }
 
-void Drill::trigger()
+void Drill::trigger(std::optional<bool> play_sound_effect)
 {
     if (move_state != 0 || standing_on_uid != -1)
     {
@@ -39,5 +39,9 @@ void Drill::trigger()
     flags = flags & ~(1U << (10 - 1));
 
     sound1 = construct_soundmeta(0x159, false);
+    sound1->start();
     sound2 = construct_soundmeta(0x153, false);
+    sound2->start();
+    if (play_sound_effect.value_or(false))
+        play_sound_by_id(0xA4, uid);
 }

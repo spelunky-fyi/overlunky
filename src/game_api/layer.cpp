@@ -9,7 +9,7 @@
 #include "entity.hpp"          // for Entity, to_id, EntityDB, entity_factory
 #include "logger.h"            // for DEBUG
 #include "movable.hpp"         // for Movable
-#include "rpc.hpp"             // for entity_get_items_by
+#include "rpc.hpp"             //
 #include "search.hpp"          // for get_address
 #include "state.hpp"           // for State, StateMemory
 
@@ -164,18 +164,17 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
         int current_uid = apep_head->uid;
         do
         {
-            auto body_parts = entity_get_items_by(current_uid, {}, 0);
+            auto body_parts = apep_head->items;
             int temp = current_uid;
-            for (auto body_part_uid : body_parts)
+            for (auto body_part : body_parts.entities())
             {
-                Entity* body_part = get_entity_ptr(body_part_uid);
                 body_part->flags = right
                                        ? body_part->flags & ~facing_left_flag
                                        : body_part->flags | facing_left_flag;
                 body_part->x *= -1.0f;
                 if (body_part->type->id == body_id)
                 {
-                    current_uid = body_part_uid;
+                    current_uid = body_part->uid;
                 }
             }
             if (temp == current_uid)

@@ -305,3 +305,37 @@ void patch_ushabti_error()
     write_mem_prot(offset, "\x90\x90\x90\x90\x90\x90"sv, true);
     once = true;
 }
+
+void patch_entering_closed_door_crash()
+{
+    static bool once = false;
+    if (once)
+        return;
+
+    size_t addr = get_address("enter_closed_door_crash");
+    size_t return_addr;
+    {
+        auto memory = Memory::get();
+        auto rva = find_inst(memory.exe(), "\x49\x39\xD4", addr - memory.exe_ptr, addr - memory.exe_ptr + 0x3F5, "patch_entering_closed_door_crash");
+        if (rva == 0)
+            return;
+        size_t jump_addr = memory.at_exe(rva + 3);
+        size_t offset = memory_read<int32_t>(jump_addr + 2);
+        return_addr = jump_addr + 6 + offset;
+    }
+    std::string_view new_code{
+        "\x48\x85\xC0"sv         // test   rax,rax
+        "\x74\x0D"sv             // je     <end>
+        "\x48\x8B\x48\x08"sv     // mov    rcx,QWORD PTR [rax+0x8]   // game code
+        "\x41\x8B\x47\x28"sv     // mov    eax,DWORD PTR [r15+0x28]  // game code
+        "\xE9\x00\x00\x00\x00"sv // jmp    (offset needs to be updated after we know the address)
+    };
+
+    auto new_code_addr = patch_and_redirect(addr, 8, new_code, true, return_addr);
+    if (new_code_addr == 0)
+        return;
+
+    int32_t rel = static_cast<int32_t>((addr + 8) - (new_code_addr + 18));
+    write_mem_prot(new_code_addr + 14, rel, true);
+    once = true;
+}

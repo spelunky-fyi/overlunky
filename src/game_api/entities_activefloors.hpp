@@ -113,7 +113,7 @@ class Drill : public Movable
     Entity* top_chain_piece;
     uint8_t unknown1; // it's forced to 0, for whatever reason
 
-    void trigger();
+    void trigger(std::optional<bool> play_sound_effect);
 };
 
 class ThinIce : public Movable

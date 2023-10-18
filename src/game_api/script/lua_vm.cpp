@@ -35,6 +35,7 @@
 #include "entities_chars.hpp"                      // for Player
 #include "entities_items.hpp"                      // for Container, Player...
 #include "entity.hpp"                              // for get_entity_ptr
+#include "entity_lookup.hpp"                       //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
 #include "items.hpp"                               // for Inventory
@@ -224,15 +225,15 @@ void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
     auto infinite_loop = [](lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
     {
-        static uint32_t last_frame = 0;
-        auto state = State::get().ptr();
-        if (last_frame == state->time_startup)
-            luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
-        last_frame = state->time_startup;
+        static size_t last_frame = 0;
+        auto backend = LuaBackend::get_calling_backend();
+        if (last_frame == backend->frame_counter && backend->infinite_loop_detection)
+            luaL_error(argst, "Hit Infinite Loop Detection of 420 million instructions");
+        last_frame = backend->frame_counter;
     };
 
     lua_sethook(lua.lua_state(), NULL, 0, 0);
-    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 500000000);
+    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 420000000);
 
     lua.safe_script(R"(
 -- This function walks up the stack until it finds an _ENV that is not _G
@@ -363,20 +364,28 @@ end
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
+
     /// Print a log message on screen.
     lua["print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
         backend->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->messages.size() > 20)
+        if (backend->messages.size() > 40 && !is_console)
             backend->messages.pop_front();
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to ingame console.
-    lua["console_print"] = [](std::string message) -> void
+    /// Print a log message to ingame console with a comment identifying the script that sent it.
+    lua["console_print"] = [&lua](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
+        if (is_console)
+        {
+            lua["print"](std::move(message));
+            return;
+        }
         auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         std::tm time_buf;
         localtime_s(&time_buf, &in_time_t);
@@ -405,6 +414,7 @@ end
     /// Same as `print`
     lua["message"] = [&lua](std::string message) -> void
     { lua["print"](message); };
+
     /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
     lua["prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
@@ -422,9 +432,13 @@ end
             lua["print"](std::move(message));
         }
     };
+
     /// Same as `prinspect`
     lua["messpect"] = [&lua](sol::variadic_args objects) -> void
     { lua["prinspect"](objects); };
+
+    /// Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
+    // lua["dump"] = [](object object, optional<int> depth) -> table
 
     /// Adds a command that can be used in the console.
     lua["register_console_command"] = [](std::string name, sol::function cmd)
@@ -2100,6 +2114,34 @@ end
     /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
     lua["get_frametime_unfocused"] = get_frametime_inactive;
 
+    auto add_custom_type = sol::overload(
+        static_cast<ENT_TYPE (*)(std::vector<ENT_TYPE>)>(::add_custom_type),
+        static_cast<ENT_TYPE (*)()>(::add_custom_type));
+
+    /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+    /// Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+    lua["add_custom_type"] = add_custom_type;
+
+    auto get_entities_by_draw_depth = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(uint8_t, LAYER)>(::get_entities_by_draw_depth),
+        static_cast<std::vector<uint32_t> (*)(std::vector<uint8_t>, LAYER)>(::get_entities_by_draw_depth));
+
+    /// Get uids of entities by draw_depth. Can also use table of draw_depths.
+    /// You can later use [filter_entities](#filter_entities) if you want specific entity
+    lua["get_entities_by_draw_depth"] = get_entities_by_draw_depth;
+
+    /// Just convenient way of getting the current amount of money
+    /// short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+    lua["get_current_money"] = get_current_money;
+
+    /// Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+    lua["add_money"] = add_money;
+
+    /// Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+    lua["add_money_slot"] = add_money_slot;
+
     /// Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
     lua["destroy_level"] = destroy_level;
 
@@ -2145,6 +2187,13 @@ end
         else if (y < 0)
             inputs |= 0x800;
         return inputs;
+    };
+
+    /// Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you're doing and need to perform some serious calculations that hang the game updates for several seconds.
+    lua["set_infinite_loop_detection_enabled"] = [](bool enable)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->infinite_loop_detection = enable;
     };
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
@@ -2772,7 +2821,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = datadir + "/" + filename;
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
         auto is_based = check_safe_io_path(fullpath, datadir);
-        DEBUG("io.open_data: safe:{} pack:{} based:{} mode:{} {}", is_safe, is_pack, is_based, mode.value_or("r"), fullpath);
         if (is_safe && !is_based)
         {
             luaL_error(global_vm, "Attempted to open data file outside data directory");
@@ -2791,7 +2839,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = std::string(backend->get_root()) + "/" + filename;
         auto is_based = check_safe_io_path(fullpath, backend->get_root());
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
-        DEBUG("io.open_mod: safe:{} pack:{} based:{} mode:{} {}", is_safe, is_pack, is_based, mode.value_or("r"), fullpath);
         if (is_safe)
         {
             if (!is_based)
@@ -2821,7 +2868,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = datadir + "/" + filename;
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
         auto is_based = check_safe_io_path(fullpath, datadir);
-        DEBUG("os.remove_data: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
         if (is_safe && !is_based)
         {
             luaL_error(global_vm, "Attempted to remove data file outside data directory");
@@ -2838,7 +2884,6 @@ void add_partial_safe_libraries(sol::environment& env)
         std::string fullpath = std::string(backend->get_root()) + "/" + filename;
         auto is_based = check_safe_io_path(fullpath, backend->get_root());
         std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
-        DEBUG("os.remove_mod: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
         if (is_safe)
         {
             if (!is_based)
