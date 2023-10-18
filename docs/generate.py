@@ -80,13 +80,6 @@ def is_custom_type(name):
     return False
 
 
-extra_link = {
-    "vector":"STD-Library-Containers",
-    "map":"STD-Library-Containers",
-    "span":"STD-Library-Containers",
-    "set":"STD-Library-Containers",
-}
-
 def link_custom_type(ret):
     parts = re.findall(r"[\w_]+|[^\w_]+", ret)
     ret = ""
@@ -113,7 +106,6 @@ def link_custom_type(ret):
             ):
                 part = f"[{part}](#Aliases)"
         ret += part
-# TODO link extra types (map, set, vector)
     return ret
 
 
