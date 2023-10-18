@@ -376,7 +376,7 @@ If you set such a callback and then play the same sound yourself you have to wai
 
 > Search script examples for [dump](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dump)
 
-#### table dump(object object, optional<int> depth)
+#### table dump(any object, optional<int> depth)
 
 Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
 
@@ -631,9 +631,9 @@ Recommended to always set the mask, even if you look for one entity type
 
 > Search script examples for [get_entities_by_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_draw_depth)
 
-#### array&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
+#### vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
 
-#### array&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
+#### vector&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
 
 Get uids of entities by draw_depth. Can also use table of draw_depths.
 You can later use [filter_entities](#filter_entities) if you want specific entity

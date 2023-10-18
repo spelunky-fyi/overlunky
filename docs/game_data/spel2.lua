@@ -77,7 +77,7 @@ function messpect(...) end
 ---@param any any
 ---@param depth integer?
 ---@return table
-function dump(object, depth) end
+function dump(any, depth) end
 ---Adds a command that can be used in the console.
 ---@param name string
 ---@param cmd function
@@ -2429,7 +2429,7 @@ function Entity:overlaps_with(rect_left, rect_bottom, rect_right, rect_top) end
 ---@return boolean
 function Entity:overlaps_with(other) end
 ---Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
----To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+---To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
 ---destroy_corpse and responsible are the standard parameters for the kill funciton
 ---@param destroy_corpse boolean
 ---@param responsible Entity
@@ -2444,7 +2444,7 @@ function Entity:kill_recursive(destroy_corpse, responsible, mask, ent_types, rec
 ---@return nil
 function Entity:kill_recursive(destroy_corpse, responsible) end
 ---Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
----To a that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
+---To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
 ---@param mask integer?
 ---@param ent_types ENT_TYPE[]
 ---@param rec_mode RECURSIVE_MODE
@@ -4789,8 +4789,8 @@ function CustomSound:play(paused, sound_type) end
 ---@class SoundMeta
     ---@field x number
     ---@field y number
-    ---@field left_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index, warning: special case with first index at 0, loop using tuples will get you all results but the key/index will be wrong, ituples will have correct key/index but will skip the first element
-    ---@field right_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index warning: special case with first index at 0, loop using tuples will get you all results but the key/index will be wrong, ituples will have correct key/index but will skip the first element
+    ---@field left_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index, warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
+    ---@field right_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
     ---@field start_over boolean @when false, current track starts from the beginning, is immediately set back to true
     ---@field playing boolean @set to false to turn off
 
