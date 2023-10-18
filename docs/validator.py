@@ -4,6 +4,7 @@ import parse_source as ps
 
 #should be the same as in generate.py
 replace_table = {
+    # standard basic types
     "uint8_t": "int",
     "uint16_t": "int",
     "uint32_t": "int",
@@ -15,12 +16,6 @@ replace_table = {
     "ImU32": "int",
     "in_port_t": "int",
     "size_t": "int",
-    "custom_vector<": "vector<",
-    "span<": "array<",
-    "unordered_map<": "map<",
-    "game_map<": "map<",
-    "custom_map<": "map<",
-    ", identity_hasher<>": "",
     "char*": "string",
     "wstring": "string",
     "u16string": "string",
@@ -28,12 +23,28 @@ replace_table = {
     "char16_t*": "string",
     "char16_t": "char",
     "pair<": "tuple<",
+    # std containers
+    "custom_vector<": "vector<",
+    "custom_map<": "map<",
+    "custom_unordered_map<": "map<",
+    "custom_set<": "set<",
+    "custom_unordered_set<": "set<",
+    "game_vector<": "vector<",
+    "game_map<": "map<",
+    "game_unordered_map<": "map<",
+    "game_set<": "set<",
+    "game_unordered_set<": "set<",
+    "unordered_map<": "map<", # doesn't seam to matter for lua if it's ordered or not
+    "unordered_set<": "set<", # doesn't seam to matter for lua if it's ordered or not
+    # removers
+    ", identity_hasher<>": "",
     "std::": "",
     "sol::": "",
     "void": "",
     "constexpr": "",
     "const": "",
     "static": "",
+    # special
     "variadic_args va": "ENT_TYPE, ENT_TYPE...",
     "EmittedParticlesInfo": "array<Particle>",
     "ImVec2": "Vec2",
@@ -71,6 +82,11 @@ known_types = [
     "any",
     "IMAGE",
     "VTABLE_OFFSET",
+    # std library
+    "map",
+    "set",
+    "vector",
+    "span",
 ]
 
 unknown_types = []
