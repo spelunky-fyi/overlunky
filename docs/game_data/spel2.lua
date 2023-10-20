@@ -6294,9 +6294,9 @@ function Color:purple() end
 ---Create a new color - defaults to black
 ---@return Color
 function Color:new() end
----@param r Colo
+---@param other Color
 ---@return Color
-function Color:new(r) end
+function Color:new(other) end
 ---@param color Color
 ---@return Color
 function Color:new(color) end
@@ -6335,9 +6335,9 @@ function CustomTheme:new() end
 Vec2 = nil
 ---@return Vec2
 function Vec2:new() end
----@param 2 Vec
+---@param other Vec2
 ---@return Vec2
-function Vec2:new(2) end
+function Vec2:new(other) end
 ---@param x_ number
 ---@param y_ number
 ---@return Vec2
@@ -6348,9 +6348,9 @@ AABB = nil
 ---@return AABB
 function AABB:new() end
 ---Copy an axis aligned bounding box
----@param B AAB
+---@param other AABB
 ---@return AABB
-function AABB:new(B) end
+function AABB:new(other) end
 ---@param top_left Vec2
 ---@param bottom_right Vec2
 ---@return AABB
@@ -6366,9 +6366,9 @@ function AABB:new(left_, top_, right_, bottom_) end
 Triangle = nil
 ---@return Triangle
 function Triangle:new() end
----@param e Triangl
+---@param other Triangle
 ---@return Triangle
-function Triangle:new(e) end
+function Triangle:new(other) end
 ---@param _a Vec2
 ---@param _b Vec2
 ---@param _c Vec2
