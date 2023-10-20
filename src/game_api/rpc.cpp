@@ -1940,11 +1940,9 @@ void create_level()
 
 void set_death_enabled(bool enable)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("dead_players");
-    }
+    auto state = State::get().ptr();
+    static size_t offset = get_virtual_function_address(state->screen_level, 1);
+
     if (offset != 0)
     {
         if (!enable)

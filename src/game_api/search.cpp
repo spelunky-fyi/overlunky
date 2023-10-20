@@ -2060,15 +2060,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
         //.from_exe_base(0x228b58f0),
     },
-    {
-        "dead_players"sv,
-        // I guess it writes 14 to screen_next before the death screen pops up. Apparently it's a SCREEN_LEVEL virtual too.
-        PatternCommandBuffer{}
-            .find_inst("4c 8b b8 e8 12 00 00 48 8b 80 f0 12 00 00"_gh)
-            .at_exe()
-            .function_start(),
-        //.from_exe_base(0x22c061d0),
-    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
