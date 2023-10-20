@@ -1938,7 +1938,7 @@ void create_level()
     create_layer(1);
 }
 
-void set_death_enabled(bool enable)
+void set_level_logic_enabled(bool enable)
 {
     auto state = State::get().ptr();
     static size_t offset = get_virtual_function_address(state->screen_level, 1);
@@ -1946,8 +1946,8 @@ void set_death_enabled(bool enable)
     if (offset != 0)
     {
         if (!enable)
-            write_mem_recoverable("death_disable", offset, "\xC3\x90"sv, true);
+            write_mem_recoverable("set_level_logic_enabled", offset, "\xC3\x90"sv, true);
         else
-            recover_mem("death_disable");
+            recover_mem("set_level_logic_enabled");
     }
 }

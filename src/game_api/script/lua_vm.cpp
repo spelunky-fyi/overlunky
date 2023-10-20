@@ -2155,7 +2155,7 @@ end
     lua["create_layer"] = create_layer;
 
     /// Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
-    lua["set_level_logic_enabled"] = set_death_enabled;
+    lua["set_level_logic_enabled"] = set_level_logic_enabled;
 
     /// Converts INPUTS to (x, y, BUTTON)
     lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
