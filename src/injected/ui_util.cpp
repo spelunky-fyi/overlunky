@@ -767,5 +767,5 @@ std::pair<float, float> UI::spawn_position()
 
 void UI::load_death_screen()
 {
-    call_death_screen();
+    ::load_death_screen();
 }

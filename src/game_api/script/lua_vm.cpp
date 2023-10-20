@@ -1923,7 +1923,7 @@ end
     lua["log_print"] = game_log;
 
     /// Immediately ends the run with the death screen, also calls the [save_progress](#save_progress)
-    lua["load_death_screen"] = call_death_screen;
+    lua["load_death_screen"] = load_death_screen;
 
     /// Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
     lua["save_progress"] = []() -> bool

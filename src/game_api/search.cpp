@@ -1264,6 +1264,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "show_journal"sv,
         // aka render_journal / open journal chapter
         // Break on GameManager.journal_ui.state, open the journal
+        // Or go to state->death screen, to first virtul function, the second call in that virtual is the function
         PatternCommandBuffer{}
             .find_inst("88 5F 04 80 FB 0B 0F"_gh)
             .at_exe()
@@ -1878,16 +1879,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // Set write bp on write_to_file, take a death in game, return from write_to_file, then from the next function as well
-        // you should be now in the death_screen function, the first call is also the save_progress function
-        "death_screen"sv,
-        PatternCommandBuffer{}
-            .find_inst("4D 0F 44 C1 49 8B 88 F0 12 00 00"_gh)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        // see death_screen
+        // go to state->death screen, to first virtual, this is the first call in that virtual
         "save_progress"sv,
         PatternCommandBuffer{}
             .find_inst("48 8B 90 F0 12 00 00 8B 5A 28"_gh)

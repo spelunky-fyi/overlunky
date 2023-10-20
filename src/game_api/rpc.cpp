@@ -37,6 +37,7 @@
 #include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
 #include "movable.hpp"          // for Movable
 #include "particles.hpp"        // for ParticleEmitterInfo
+#include "screen.hpp"           //
 #include "search.hpp"           // for get_address, find_inst
 #include "state.hpp"            // for State, get_state_ptr, enum_to_layer
 #include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
@@ -1510,11 +1511,10 @@ void game_log(std::string message)
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
 }
 
-void call_death_screen()
+void load_death_screen()
 {
-    using DeathScreen = void();
-    static auto death_screen = (DeathScreen*)get_address("death_screen");
-    death_screen();
+    auto state = State::get().ptr();
+    state->screen_death->init();
 }
 
 void save_progress()
