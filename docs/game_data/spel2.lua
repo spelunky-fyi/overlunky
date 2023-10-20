@@ -6386,9 +6386,9 @@ function Triangle:new(ax, ay, bx, by, cx, cy) end
 Quad = nil
 ---@return Quad
 function Quad:new() end
----@param d Qua
+---@param other Quad
 ---@return Quad
-function Quad:new(d) end
+function Quad:new(other) end
 ---@param bottom_left_ Vec2
 ---@param bottom_right_ Vec2
 ---@param top_right_ Vec2

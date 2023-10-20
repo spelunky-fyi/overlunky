@@ -790,7 +790,7 @@ nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spel
 Type | Name | Description
 ---- | ---- | -----------
 [Quad](#Quad) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
-[Quad](#Quad) | [new(Quad)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
+[Quad](#Quad) | [new(Quad other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(Vec2 bottom_left_, Vec2 bottom_right_, Vec2 top_right_, Vec2 top_left_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(float _bottom_left_x, float _bottom_left_y, float _bottom_right_x, float _bottom_right_y, float _top_right_x, float _top_right_y, float _top_left_x, float _top_left_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 
 [Quad](#Quad) | [new(AABB aabb)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Quad) | 

@@ -407,7 +407,7 @@ struct Quad
 {
     Quad() = default;
 
-    Quad(const Quad&) = default;
+    Quad(const Quad& other) = default;
 
     Quad(const Vec2& bottom_left_, const Vec2& bottom_right_, const Vec2& top_right_, const Vec2& top_left_)
         : bottom_left_x(bottom_left_.x), bottom_left_y(bottom_left_.y), bottom_right_x(bottom_right_.x), bottom_right_y(bottom_right_.y), top_right_x(top_right_.x), top_right_y(top_right_.y), top_left_x(top_left_.x), top_left_y(top_left_.y){};
