@@ -2069,38 +2069,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
         //.from_exe_base(0x22c061d0),
     },
-    {
-        "spawn_transition"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_DWELLING, VIRT_FUNC::THEME_SPAWN_TRANSITION)
-            .at_exe(),
-        //.from_exe_base(0x22afe5c0),
-    },
-    {
-        "spawn_transition_cosmic"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_COSMICOCEAN, VIRT_FUNC::THEME_SPAWN_TRANSITION)
-            .at_exe(),
-        //.from_exe_base(0x22b373b0),
-    },
-    {
-        "spawn_transition_duat"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_CITY_OF_GOLD, VIRT_FUNC::THEME_SPAWN_TRANSITION)
-            .at_exe(),
-        //.from_exe_base(0x22b34940),
-    },
-    {
-        "spawn_transition_olmecship"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_BASECAMP, VIRT_FUNC::THEME_SPAWN_TRANSITION)
-            .at_exe(),
-        //.from_exe_base(0x22b2d350),
-    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

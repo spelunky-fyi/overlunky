@@ -280,6 +280,7 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
+        get_is_init() = true;
 
         if (get_do_hooks())
         {
@@ -310,7 +311,6 @@ State& State::get()
                 DEBUG("Not applying patches, someone has already done it");
             }
         }
-        get_is_init() = true;
     }
     return STATE;
 }
