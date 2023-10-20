@@ -1,5 +1,6 @@
 from bdb import Breakpoint
 import re
+from generate_util import print_console
 
 import generate_util as gu
 import parse_source as ps
@@ -37,8 +38,8 @@ replace_table = {
     
     "game_table": "table",
     "custom_table": "table",
-    "game_array": "Array",
-    "custom_array": "Array",
+    "game_Array": "Array",
+    "custom_Array": "Array",
     
     "const ": "",
     "EmittedParticlesInfo": "Array<Particle>",
@@ -93,7 +94,7 @@ ps.run_parse()
 
 reGetParam = re.compile(r"(?!const)(\b[^ ]+) *([^,]+),?")
 reRemoveDefault = re.compile(r" = .*")
-reHandleConst = re.compile(r"const (\w+) (\w+)")
+reHandleConst = re.compile(r"(\w+) (\w+)")
 
 
 def get_emmylua_signature(cb_signature):
@@ -398,8 +399,6 @@ function F(f_string) end
             if "comment" in ctor and ctor["comment"] and "NoDoc" in ctor["comment"][0]:
                 continue
             typed_params, params = cpp_params_to_emmy_lua(ctor["signature"])
-            typed_params.strip()
-            typed_params = replace_all(typed_params)
 
             new_name = f"{name}:new"
 

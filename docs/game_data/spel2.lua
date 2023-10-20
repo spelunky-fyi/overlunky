@@ -3047,7 +3047,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
-    ---@field turkeys_in_den custom_Array<integer> @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    ---@field turkeys_in_den integer[] @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
     ---@field first_message_shown boolean @I'm looking for turkeys, wanna help?
     ---@field quest_incomplete boolean @Is set to false when the quest is over (Yang dead or second turkey delivered)
     ---@field special_message_shown boolean @Tusk palace/black market/one way door - message shown
@@ -4644,7 +4644,7 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_y number
     ---@field spawn_room_x integer
     ---@field spawn_room_y integer
-    ---@field exit_doors custom_Array<Vec2>
+    ---@field exit_doors Vec2[]
     ---@field themes ThemeInfo[] @size: 18
     ---@field flags integer
     ---@field flags2 integer
@@ -5812,7 +5812,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field page_timer integer
     ---@field fade_timer integer
     ---@field opacity integer
-    ---@field pages custom_Array<JournalPage> @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
@@ -6193,7 +6193,7 @@ function LogicList:stop_logic(log) end
     ---@field start_countdown integer
 
 ---@class LogicMagmamanSpawn : Logic
-    ---@field magmaman_positions custom_Array<MagmamanSpawnPosition>
+    ---@field magmaman_positions MagmamanSpawnPosition[]
 local LogicMagmamanSpawn = nil
 ---@param x integer
 ---@param y integer
