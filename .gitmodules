@@ -28,3 +28,6 @@
 [submodule "src/neo"]
 	path = src/neo
 	url = https://github.com/vector-of-bool/neo-fun.git
+[submodule "src/lua"]
+	path = src/lua
+	url = https://github.com/lua/lua
