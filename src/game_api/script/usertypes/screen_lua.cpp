@@ -340,6 +340,8 @@ void register_usertypes(sol::state& lua)
         "ScreenLevel",
         "buttons",
         &ScreenLevel::buttons,
+        "time_till_death_screen",
+        &ScreenLevel::time_till_death_screen,
         sol::base_classes,
         sol::bases<Screen>());
 
