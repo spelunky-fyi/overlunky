@@ -1850,12 +1850,15 @@ void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint
 
     original(self, param_2, param_3, param_4);
 }
-void LevelGenSystem::populate_transition_hook(ThemeInfo* self, PopulateTransitionFun* original)
-{
-    pre_level_generation();
-    original(self);
-    post_level_generation();
-}
+// void LevelGenSystem::populate_transition_hook([[maybe_unused]] ThemeInfo* self, [[maybe_unused]] PopulateTransitionFun* original)
+//{
+//     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
+//     OnScopeExit pop{[]
+//                     { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
+//     pre_level_generation();
+//     original(self);
+//     post_level_generation();
+// }
 void LevelGenSystem::do_procedural_spawn_hook(ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
