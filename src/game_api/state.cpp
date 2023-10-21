@@ -724,7 +724,7 @@ uint8_t enum_to_layer(const LAYER layer)
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
-            return player->layer;
+            return player->layer > 1 ? 0 : player->layer;
         }
     }
     return 0;
