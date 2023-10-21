@@ -613,7 +613,7 @@ void unequip_backitem(uint32_t who_uid)
 
 int32_t worn_backitem(uint32_t who_uid)
 {
-    static const std::unordered_set<uint32_t> backitem_types = {
+    static const auto backitem_types = {
         to_id("ENT_TYPE_ITEM_JETPACK"),
         to_id("ENT_TYPE_ITEM_HOVERPACK"),
         to_id("ENT_TYPE_ITEM_POWERPACK"),
@@ -623,14 +623,13 @@ int32_t worn_backitem(uint32_t who_uid)
     };
 
     auto ent = get_entity_ptr(who_uid)->as<PowerupCapable>();
-    if (ent != nullptr)
+    if (ent != nullptr && !ent->powerups.empty())
     {
-        for (const auto& [powerup_type, powerup_entity] : ent->powerups)
+        for (auto powerup_type : backitem_types)
         {
-            if (backitem_types.count(powerup_type) > 0)
-            {
-                return powerup_entity->uid;
-            }
+            auto it = ent->powerups.find(powerup_type);
+            if (it != ent->powerups.end())
+                return it->second->uid;
         }
     }
     return -1;

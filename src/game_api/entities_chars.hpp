@@ -7,9 +7,10 @@
 #include <string>     // for u16string, allocator
 #include <vector>     // for vector
 
-#include "aliases.hpp" // for ENT_TYPE
-#include "color.hpp"   // for Color
-#include "movable.hpp" // for Movable
+#include "aliases.hpp"               // for ENT_TYPE
+#include "color.hpp"                 // for Color
+#include "containers/custom_map.hpp" //
+#include "movable.hpp"               // for Movable
 
 struct Illumination;
 struct PlayerInputs;
@@ -60,7 +61,7 @@ class Ai
 class PowerupCapable : public Movable
 {
   public:
-    std::map<ENT_TYPE, Entity*> powerups; // type id -> entity
+    custom_map<ENT_TYPE, Entity*> powerups; // type id -> entity
 
     /// Removes a currently applied powerup. Specify `ENT_TYPE.ITEM_POWERUP_xxx`, not `ENT_TYPE.ITEM_PICKUP_xxx`! Removing the Eggplant crown does not seem to undo the throwing of eggplants, the other powerups seem to work.
     void remove_powerup(ENT_TYPE powerup_type);
