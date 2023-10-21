@@ -960,7 +960,9 @@ return { _NAME = n, _COPYRIGHT = c, _DESCRIPTION = d, _VERSION = v, serialize = 
         function dump(o, d, n)
             local n = n or 0
             local t = nil
-            if getmetatable(o) and (not d or n < d) then
+            if type(o) == "string" or type(o) == "number" then
+                t = o
+            elseif getmetatable(o) and (not d or n < d) then
                 t = {}
                 if o.pairs then
                     for k,v in pairs(o) do
@@ -979,7 +981,7 @@ return { _NAME = n, _COPYRIGHT = c, _DESCRIPTION = d, _VERSION = v, serialize = 
             return t
         end
         function dump_string(o, d)
-            return serpent.line(dump(o, d), {comment=false, indent="  "})
+            return ((type(o) ~= "boolean" and type(o) ~= "string" and type(o) ~= "number" and type(o) ~= "table") and tostring(o)..": " or "") .. serpent.line(dump(o, d), {comment=false, indent="  "})
         end
         )##");
 }
