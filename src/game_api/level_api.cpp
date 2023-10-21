@@ -1278,7 +1278,7 @@ bool handle_chance(SpawnInfo* spawn_info)
     auto level_gen_data = State::get().ptr()->level_gen->data;
 
     uint8_t layer = 0;
-    auto* layer_ptr = State::get().layer_local(layer);
+    auto* layer_ptr = State::get().layer(layer);
     for (const CommunityChance& community_chance : g_community_chances)
     {
         if (community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
@@ -1664,7 +1664,7 @@ std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_
     {
         provider.is_valid = [](float x, float y, uint8_t layer)
         {
-            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+            return g_DefaultTestFunc(x, y, State::get().layer(layer));
         };
     }
 
@@ -1688,7 +1688,7 @@ std::uint32_t LevelGenData::define_extra_spawn(std::uint32_t num_spawns_front_la
     {
         provider.is_valid = [](float x, float y, uint8_t layer)
         {
-            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+            return g_DefaultTestFunc(x, y, State::get().layer(layer));
         };
     }
 
@@ -2102,13 +2102,13 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 bool default_spawn_is_valid(float x, float y, LAYER layer)
 {
     uint8_t correct_layer = enum_to_layer(layer);
-    return g_DefaultTestFunc(x, y, State::get().layer_local(correct_layer));
+    return g_DefaultTestFunc(x, y, State::get().layer(correct_layer));
 }
 
 bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags)
 {
     uint8_t correct_layer = enum_to_layer(layer);
-    return g_PositionTestFunc(x, y, State::get().layer_local(correct_layer), (uint32_t)flags);
+    return g_PositionTestFunc(x, y, State::get().layer(correct_layer), (uint32_t)flags);
 }
 
 void override_next_levels(std::vector<std::string> next_levels)

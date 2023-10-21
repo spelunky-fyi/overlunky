@@ -801,7 +801,7 @@ void Door::unlock(bool unlock)
             {
                 if (!main_door->door_blocker)
                 {
-                    main_door->door_blocker = state.layer_local(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
+                    main_door->door_blocker = state.layer(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
                     main_door->door_blocker->animation_frame = 1;
                 }
             }

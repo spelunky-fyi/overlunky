@@ -166,7 +166,7 @@ int32_t spawn_entity_abs(ENT_TYPE entity_type, float x, float y, LAYER layer, fl
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
+    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
 }
 
 int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -178,7 +178,7 @@ int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
+    return State::get().layer(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
 }
 
 int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -190,7 +190,7 @@ int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER 
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
+    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
 }
 
 int32_t spawn_entity_abs_nonreplaceable(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
@@ -215,7 +215,7 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     if (layer > 1)
         return -1;
 
-    return state.layer_local(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
+    return state.layer(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
 int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint8_t t)
@@ -227,7 +227,7 @@ int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
+    return State::get().layer(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
 }
 
 void spawn_backdoor_abs(float x, float y)
@@ -238,8 +238,8 @@ void spawn_backdoor_abs(float x, float y)
 
     auto state = State::get();
     DEBUG("Spawning backdoor on {}, {}", x, y);
-    Layer* front_layer = state.layer_local(0);
-    Layer* back_layer = state.layer_local(1);
+    Layer* front_layer = state.layer(0);
+    Layer* back_layer = state.layer(1);
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
@@ -255,7 +255,7 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
+    return State::get().layer(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
 int32_t spawn_tree(float x, float y, LAYER layer)
@@ -274,7 +274,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     x = std::roundf(x + offset_position.first);
     y = std::roundf(y + offset_position.second);
 
-    Layer* layer_ptr = State::get().layer_local(actual_layer);
+    Layer* layer_ptr = State::get().layer(actual_layer);
 
     // Needs some space on top
     if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 1 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
@@ -358,7 +358,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
 
     std::pair<float, float> offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(l, offset);
-    const auto layer_ptr = State::get().layer_local(actual_layer);
+    const auto layer_ptr = State::get().layer(actual_layer);
     const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
     uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
     static const auto base = to_id("ENT_TYPE_FLOOR_MUSHROOM_BASE");
@@ -427,7 +427,7 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
 
     std::pair<float, float> offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(layer, offset);
-    const auto layer_ptr = State::get().layer_local(actual_layer);
+    const auto layer_ptr = State::get().layer(actual_layer);
     const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
     const uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
     const float g_x = static_cast<float>(i_x);

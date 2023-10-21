@@ -309,13 +309,10 @@ struct State
     StateMemory* ptr() const;
     StateMemory* ptr_local() const;
 
+    // use only if you only want the layer, otherwise use `ptr()->layers`
     Layer* layer(uint8_t index) const
     {
         return ptr()->layers[index];
-    }
-    Layer* layer_local(uint8_t index) const
-    {
-        return ptr_local()->layers[index];
     }
 
     void godmode(bool g);

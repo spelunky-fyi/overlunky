@@ -1412,14 +1412,14 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                auto state = State::get();
+                auto state = State::get().ptr();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
-                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
-                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
+                state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
+                state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
 
                 ItemOwnerDetails iod{shop_owner_uid, owner->type->id};
-                state.ptr()->room_owners.owned_items.insert({item->uid, iod});
+                state->room_owners.owned_items.insert({item->uid, iod});
                 return;
             }
         }
