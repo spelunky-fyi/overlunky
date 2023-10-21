@@ -757,6 +757,8 @@ void set_time_jelly_enabled(bool b)
 
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
 {
+    // this functions just calculates the room index and then loops thru state->room_owners->owned_rooms and compares the room index
+    // TODO: we could probably get rid of this pattern and write that ourselves
     static size_t offset = get_address("coord_inside_active_shop_room");
     if (offset != 0)
     {
@@ -769,20 +771,24 @@ bool is_inside_active_shop_room(float x, float y, LAYER layer)
 
 bool is_inside_shop_zone(float x, float y, LAYER layer)
 {
+    // this function is weird, the main check does this (where rax is the room_template):
+    // ecx = rax - 0x41
+    // cmp cx, 0x17
+    // ja return 0
+    //
+    // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
+
     static size_t offset = 0;
-    static void* rcx = nullptr;
+    auto state = State::get().ptr_main(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
     if (offset == 0)
     {
         offset = get_address("coord_inside_shop_zone");
-        size_t* tmp = (size_t*)get_address("coord_inside_shop_zone_rcx");
-        auto heap_ptr = OnHeapPointer<void*>(*tmp);
-        rcx = heap_ptr.decode();
     }
     if (offset != 0)
     {
-        typedef bool coord_inside_shop_zone_func(void*, uint32_t layer, float x, float y);
+        typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
         static coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
-        return ciszf(rcx, enum_to_layer(layer), x, y);
+        return ciszf(state->level_gen, enum_to_layer(layer), x, y);
     }
     return false;
 }

@@ -530,6 +530,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "state_location"sv,
+        // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
         PatternCommandBuffer{}
             .find_inst("\x49\x0F\x44\xC0"sv)
             .find_next_inst("\x49\x0F\x44\xC0"sv)
@@ -1114,6 +1115,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "coord_inside_active_shop_room"sv,
         // Same pattern as default_zoom_level_shop, check the condition before the jump that decides whether to activate
         // the shop zoom level or regular zoom level
+        // Found at second to last function inside screen level -> handle players (second) virtual function
         PatternCommandBuffer{}
             .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
             .offset(-0x24)
@@ -1123,20 +1125,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "coord_inside_shop_zone"sv,
         // Can be found in same function as default_zoom_level_shop, check the condition higher up
+        // Also found in screen level -> handle players (second) virtual function but more like in the middle of it
         PatternCommandBuffer{}
             .find_inst("\x40\x8A\xBB\xA0\x00\x00\x00\x89\xFA\xE8"sv)
             .offset(0x9)
             .decode_call()
-            .at_exe(),
-    },
-    {
-        "coord_inside_shop_zone_rcx"sv,
-        // See coord_inside_shop_zone, a little higher up rcx gets set to an on heap pointer
-        PatternCommandBuffer{}
-            .find_inst("\x0F\x84****\x48\x8B\x05****\x4A\x8D\x0C\x08"sv)
-            .find_next_inst("\x0F\x84****\x48\x8B\x05****\x4A\x8D\x0C\x08"sv)
-            .offset(0x6)
-            .decode_pc()
             .at_exe(),
     },
     {
