@@ -16,6 +16,7 @@ class UdpServer
 
     UdpServer(std::string host, in_port_t port, std::function<SocketCb> cb);
     ~UdpServer();
+    void clear();
 
     std::string host;
     in_port_t port;

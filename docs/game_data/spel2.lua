@@ -1760,7 +1760,7 @@ function http_get(url) end
 ---The callback signature is nil on_data(string response, string error)
 ---@param url string
 ---@param on_data fun(response: string, error: string): nil
----@return HttpRequest
+---@return nil
 function http_get_async(url, on_data) end
 ---Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
 ---@param feat FEAT
@@ -6099,6 +6099,8 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_crushing_pillar_height number[] @size: MAX_PLAYERS
     ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
+
+---@class UdpServer
 
 ---@class LogicList
     ---@field tutorial LogicTutorial @Handles dropping of the torch and rope in intro routine (first time play)

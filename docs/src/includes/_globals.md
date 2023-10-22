@@ -2233,7 +2233,7 @@ Send a synchronous HTTP GET request and return response as a string or nil on an
 
 > Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
 
-#### HttpRequest http_get_async(string url, function on_data)
+#### nil http_get_async(string url, function on_data)
 
 Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
 The callback signature is nil on_data(string response, string error)
@@ -2243,7 +2243,7 @@ The callback signature is nil on_data(string response, string error)
 
 > Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
 
-#### UdpServer udp_listen(string host, int port, function cb)
+#### [UdpServer](#UdpServer) udp_listen(string host, int port, function cb)
 
 Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 The server will be closed once the handle is released.
