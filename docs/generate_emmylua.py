@@ -92,7 +92,7 @@ ps.configure_parse(replace_all, "emmy_lua.pickle")
 ps.run_parse()
 
 
-reGetParam = re.compile(r"(?!const)(\b[^ ]+) *([^,]+),?") # this pattern have some issues
+reGetParam = re.compile(r"(\b[^ ]+) *([^,]+),?") # this pattern have some issues
 reRemoveDefault = re.compile(r" = .*")
 reHandleConst = re.compile(r"(\w+) (\w+)")
 
