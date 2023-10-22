@@ -139,3 +139,4 @@ void destroy_level();
 void create_layer(uint8_t layer);
 void create_level();
 void set_level_logic_enabled(bool enable);
+void set_camera_layer_control_enabled(bool enable);

@@ -20,29 +20,30 @@
 #include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
 #include <utility>          // for min, max, pair, find
 
-#include "custom_types.hpp"     // for get_custom_entity_types, CUSTOM_TYPE
-#include "entities_chars.hpp"   // for Player (ptr only), PowerupCapable
-#include "entities_floors.hpp"  // for ExitDoor, Door
-#include "entities_items.hpp"   // for StretchChain, PunishBall, Container
-#include "entities_liquids.hpp" // for Liquid
-#include "entities_mounts.hpp"  // for Mount
-#include "entity.hpp"           // for get_entity_ptr, to_id, Entity, EntityDB
-#include "entity_lookup.hpp"    //
-#include "game_manager.hpp"     //
-#include "game_patches.hpp"     //
-#include "items.hpp"            // for Items
-#include "layer.hpp"            // for EntityList, EntityList::Range, Layer
-#include "logger.h"             // for DEBUG
-#include "math.hpp"             // for AABB
-#include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
-#include "movable.hpp"          // for Movable
-#include "particles.hpp"        // for ParticleEmitterInfo
-#include "screen.hpp"           //
-#include "search.hpp"           // for get_address, find_inst
-#include "state.hpp"            // for State, get_state_ptr, enum_to_layer
-#include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"     // for OnHeapPointer
-#include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
+#include "containers/custom_vector.hpp" //
+#include "custom_types.hpp"             // for get_custom_entity_types, CUSTOM_TYPE
+#include "entities_chars.hpp"           // for Player (ptr only), PowerupCapable
+#include "entities_floors.hpp"          // for ExitDoor, Door
+#include "entities_items.hpp"           // for StretchChain, PunishBall, Container
+#include "entities_liquids.hpp"         // for Liquid
+#include "entities_mounts.hpp"          // for Mount
+#include "entity.hpp"                   // for get_entity_ptr, to_id, Entity, EntityDB
+#include "entity_lookup.hpp"            //
+#include "game_manager.hpp"             //
+#include "game_patches.hpp"             //
+#include "items.hpp"                    // for Items
+#include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
+#include "logger.h"                     // for DEBUG
+#include "math.hpp"                     // for AABB
+#include "memory.hpp"                   // for write_mem_prot, write_mem_recoverable
+#include "movable.hpp"                  // for Movable
+#include "particles.hpp"                // for ParticleEmitterInfo
+#include "screen.hpp"                   //
+#include "search.hpp"                   // for get_address, find_inst
+#include "state.hpp"                    // for State, get_state_ptr, enum_to_layer
+#include "state_structs.hpp"            // for ShopRestrictedItem, Illumination
+#include "thread_utils.hpp"             // for OnHeapPointer
+#include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
 
 uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {
@@ -803,7 +804,7 @@ ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint
         if (entity != nullptr)
         {
             auto state = get_state_ptr();
-            typedef ParticleEmitterInfo* generate_particles_func(std::vector<ParticleEmitterInfo*>*, uint32_t, Entity*);
+            typedef ParticleEmitterInfo* generate_particles_func(custom_vector<ParticleEmitterInfo*>*, uint32_t, Entity*);
             static generate_particles_func* gpf = (generate_particles_func*)(offset);
             return gpf(state->particle_emitters, particle_emitter_id, entity);
         }
@@ -875,7 +876,7 @@ Illumination* create_illumination_internal(Color color, float size, float x, flo
 
         float position[] = {x, y};
 
-        typedef Illumination* create_illumination_func(std::vector<Illumination*>*, float*, Color*, uint32_t r9, float size, uint8_t flags, uint32_t uid, uint8_t);
+        typedef Illumination* create_illumination_func(custom_vector<Illumination*>*, float*, Color*, uint32_t r9, float size, uint8_t flags, uint32_t uid, uint8_t);
         static create_illumination_func* cif = (create_illumination_func*)(offset);
         auto emitted_light = cif(state->lightsources, position, &color, 0x2, size, 32, uid, 0x0);
 
@@ -1954,5 +1955,23 @@ void set_level_logic_enabled(bool enable)
             write_mem_recoverable("set_level_logic_enabled", offset, "\xC3\x90"sv, true);
         else
             recover_mem("set_level_logic_enabled");
+    }
+}
+
+void set_camera_layer_control_enabled(bool enable)
+{
+    static auto offset = get_address("camera_layer_controll");
+    static auto offset2 = get_address("player_behavior_layer_switch");
+    if (!offset || !offset2)
+        return;
+
+    if (enable)
+    {
+        recover_mem("set_camera_layer_control");
+    }
+    else
+    {
+        write_mem_recoverable("set_camera_layer_control", offset, get_nop(7), true);
+        write_mem_recoverable("set_camera_layer_control", offset2, get_nop(18), true);
     }
 }

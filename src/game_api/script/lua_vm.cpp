@@ -2196,6 +2196,11 @@ end
         backend->infinite_loop_detection = enable;
     };
 
+    /// This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+    /// Letting you control those manually.
+    /// Look at the example on how to mimic game layer switching behavior
+    lua["set_camera_layer_control_enabled"] = set_camera_layer_control_enabled;
+
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 
     lua.create_named_table(

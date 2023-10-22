@@ -7537,7 +7537,7 @@ struct TextureViewer
 static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
-    if (peek_layer && g_state->layer_transition_effect_timer == 0)
+    if (peek_layer && g_state->layer_transition_timer == 0)
     {
         uint8_t other_layer = g_state->camera_layer ? 0 : 1;
         auto [bbox_left, bbox_top] = UI::click_position(-1.0f, 1.0f);

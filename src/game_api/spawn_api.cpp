@@ -12,23 +12,24 @@
 #include <utility>     // for pair, identity, min, _Find_fn, find
 #include <vector>      // for vector, allocator, _Vector_iterator
 
-#include "entities_chars.hpp"    // for Player
-#include "entities_items.hpp"    // for ClimbableRope
-#include "entities_liquids.hpp"  // for Lava
-#include "entities_monsters.hpp" // for Shopkeeper, RoomOwner
-#include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
-#include "items.hpp"             //
-#include "layer.hpp"             // for Layer, g_level_max_y, g_level_max_x
-#include "level_api.hpp"         // for LevelGenSystem, ThemeInfo
-#include "logger.h"              // for DEBUG
-#include "math.hpp"              // for AABB
-#include "memory.hpp"            // for write_mem_prot, memory_read
-#include "prng.hpp"              // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
-#include "script/events.hpp"     // for post_entity_spawn, pre_entity_spawn
-#include "search.hpp"            // for get_address
-#include "state.hpp"             // for enum_to_layer, State, StateMemory
-#include "state_structs.hpp"     // for LiquidTileSpawnData, LiquidPhysics
-#include "util.hpp"              // for OnScopeExit
+#include "containers/custom_vector.hpp" //
+#include "entities_chars.hpp"           // for Player
+#include "entities_items.hpp"           // for ClimbableRope
+#include "entities_liquids.hpp"         // for Lava
+#include "entities_monsters.hpp"        // for Shopkeeper, RoomOwner
+#include "entity.hpp"                   // for to_id, Entity, get_entity_ptr, Enti...
+#include "items.hpp"                    //
+#include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x
+#include "level_api.hpp"                // for LevelGenSystem, ThemeInfo
+#include "logger.h"                     // for DEBUG
+#include "math.hpp"                     // for AABB
+#include "memory.hpp"                   // for write_mem_prot, memory_read
+#include "prng.hpp"                     // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
+#include "script/events.hpp"            // for post_entity_spawn, pre_entity_spawn
+#include "search.hpp"                   // for get_address
+#include "state.hpp"                    // for enum_to_layer, State, StateMemory
+#include "state_structs.hpp"            // for LiquidTileSpawnData, LiquidPhysics
+#include "util.hpp"                     // for OnScopeExit
 
 struct Items;
 
@@ -75,7 +76,7 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
             float light_size = 1.0f;
             uint32_t flags = 0x63;
 
-            using construct_illumination_ptr_fun_t = Illumination*(std::vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
+            using construct_illumination_ptr_fun_t = Illumination*(custom_vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
             static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("generate_illumination");
 
             auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);

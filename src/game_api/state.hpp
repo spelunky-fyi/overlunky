@@ -6,8 +6,9 @@
 #include <utility> // for pair
 #include <vector>  // for vector
 
-#include "aliases.hpp"       // for ENT_TYPE, LAYER
-#include "state_structs.hpp" // for JournalProgressStickerSlot, Illumination (p...
+#include "aliases.hpp"                  // for ENT_TYPE, LAYER
+#include "containers/custom_vector.hpp" //
+#include "state_structs.hpp"            // for JournalProgressStickerSlot, Illumination (p...
 
 class Entity;
 class ScreenArenaIntro;
@@ -249,8 +250,8 @@ struct StateMemory
     QuestsInfo* quests;
     AITarget* ai_targets; // e.g. hired hand uid -> snake uid
     LiquidPhysics* liquid_physics;
-    std::vector<ParticleEmitterInfo*>* particle_emitters;
-    std::vector<Illumination*>* lightsources;
+    custom_vector<ParticleEmitterInfo*>* particle_emitters;
+    custom_vector<Illumination*>* lightsources;
     EntityLookup* entity_lookup;
 
     // This is a Robin Hood Table
@@ -258,10 +259,12 @@ struct StateMemory
     uint32_t padding13;
     RobinHoodTableEntry* uid_to_entity_data;
 
-    custom_vector<std::pair<Entity*, uint8_t>> backlayer_player_related1; // inside vector: player and destination layer?
-    uint32_t layer_transition_effect_timer;
-    /// The currently drawn layer, can't be changed
-    uint8_t camera_layer;
+    custom_vector<std::pair<Entity*, uint8_t>> entities_switching_layer; // inside vector: entity and destination layer
+                                                                         // only entities that go thru the layer (char_*, ghost, doesn't care about held items)
+                                                                         // does not care about the entity:set_layer() either
+
+    uint32_t layer_transition_timer;
+    uint8_t transition_to_layer;
     uint8_t unknown31a; // padding probably
     uint8_t unknown31b;
     uint8_t unknown31c;
@@ -269,7 +272,20 @@ struct StateMemory
     RoomOwnersInfo room_owners;
     /// Number of frames since the game was launched
     uint32_t time_startup;
-    uint32_t special_visibility_flags;
+
+    union
+    {
+        uint32_t special_visibility_flags; // it's actually four 8bit values, last one is not even a flag, it's just layer
+
+        struct
+        {
+            uint8_t crust_visibility;
+            uint8_t compass_visibility;
+            uint8_t special_compass_visibility;
+            uint8_t camera_layer;
+        };
+    };
+
     /// Camera bounds and position
     Camera* camera;
     uint8_t unknown40;

@@ -2053,6 +2053,23 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
         //.from_exe_base(0x228b58f0),
     },
+    {
+        "camera_layer_controll"sv,
+        // overwrites state.camera_layer every frame
+        PatternCommandBuffer{}
+            .get_address("state_refresh"sv)
+            .find_after_inst("8A 80 A0 00 00 00"_gh)
+            .at_exe(),
+    },
+    {
+        "player_behavior_layer_switch"sv,
+        // function in player behavior (index 7), we need instruction that sets state.layer_transition_timer = 0x24 and state.transition_to_layer = (dest layer)
+        PatternCommandBuffer{}
+            .find_after_inst("41 80 FC 01 0F 95 C1"_gh)
+            .find_inst("\xE8"sv)
+            .offset(0x5)
+            .at_exe(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
