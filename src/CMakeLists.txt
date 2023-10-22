@@ -20,8 +20,8 @@ target_include_directories(imgui PUBLIC imgui)
 # --------------------------------------------------
 # sol
 set(BUILD_LUA_AS_DLL OFF)
-set(SOL2_LUA_VERSION "5.4")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/sol2/cmake/Modules")
+set(SOL2_LUA_VERSION "5.4.6")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/sol2/cmake/Modules;${CMAKE_CURRENT_SOURCE_DIR}/sol2/cmake/Packages;${CMAKE_CURRENT_SOURCE_DIR}/sol2/cmake/Includes")
 find_package(LuaBuild REQUIRED COMPONENTS ${SOL2_LUA_VERSION})
 add_subdirectory(sol2)
 
