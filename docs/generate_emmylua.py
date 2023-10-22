@@ -1,6 +1,6 @@
-from bdb import Breakpoint
+#from bdb import Breakpoint
 import re
-from generate_util import print_console
+#from generate_util import print_console
 
 import generate_util as gu
 import parse_source as ps
@@ -131,7 +131,7 @@ def cpp_params_to_emmy_lua(params_text, cb_signatures=None):
 
 
 def cpp_params_to_emmy_lua_fun(params_text):
-    params = replace_all(params_text).strip().split(",")
+    params = replace_all(params_text).split(",")
     params = [
         ": ".join([part.strip() for part in param.rsplit(" ", 1)[::-1]])
         for param in params
@@ -177,8 +177,6 @@ def print_af(lf, af):
     ret = replace_all(af["return"]) or "nil"
     name = lf["name"]
     typed_params, params = cpp_params_to_emmy_lua(af["param"])
-    typed_params.strip()
-    typed_params = replace_all(typed_params)
     print_comment(lf if lf["comment"] else af)
     print_func(name, params, ret, typed_params)
 
@@ -242,13 +240,12 @@ function F(f_string) end
             typed_params = ""
             params = ""
             if m:
-                ret = replace_all(m.group(2)).strip() or "nil"
+                ret = m.group(2) or "nil"
             if m or m2:
                 params = (m or m2).group(1)
                 typed_params, params = cpp_params_to_emmy_lua(
                     params, lf["cb_signature"] if "cb_signature" in lf else ""
                 )
-                typed_params = replace_all(typed_params).strip()
             name = lf["name"]
             print_comment(lf)
             print_func(name, params, ret, typed_params)
@@ -382,8 +379,6 @@ function F(f_string) end
             if "comment" in func and func["comment"] and "NoDoc" in func["comment"][0]:
                 continue
             typed_params, params = cpp_params_to_emmy_lua(func["params"])
-            typed_params.strip()
-            typed_params = replace_all(typed_params)
 
             new_name = f"{name}:{func['name']}"
 
