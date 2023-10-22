@@ -779,16 +779,13 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     //
     // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
 
-    static size_t offset = 0;
-    auto state = State::get().ptr_main(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
-    if (offset == 0)
-    {
-        offset = get_address("coord_inside_shop_zone");
-    }
+    static size_t offset = get_address("coord_inside_shop_zone");
+    auto state = State::get().ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
+
     if (offset != 0)
     {
         typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
-        static coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
+        coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
         return ciszf(state->level_gen, enum_to_layer(layer), x, y);
     }
     return false;
