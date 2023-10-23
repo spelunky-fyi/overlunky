@@ -398,6 +398,9 @@
               </ul>
           </li>
           <li>
+            <a href="#STD-Library-Containers" class="toc-h1 toc-link" data-title="STD Library Containers">STD Library Containers</a>
+          </li>
+          <li>
             <a href="#Functions" class="toc-h1 toc-link" data-title="Functions">Functions</a>
               <ul class="toc-list-h2">
                   <li>
@@ -1778,7 +1781,16 @@
                             <a href="#ShortTileCodeDef" class="toc-h3 toc-link" data-title="ShortTileCodeDef">ShortTileCodeDef</a>
                           </li>
                           <li>
+                            <a href="#SpawnInfo" class="toc-h3 toc-link" data-title="SpawnInfo">SpawnInfo</a>
+                          </li>
+                          <li>
+                            <a href="#SpearDanglerAnimFrames" class="toc-h3 toc-link" data-title="SpearDanglerAnimFrames">SpearDanglerAnimFrames</a>
+                          </li>
+                          <li>
                             <a href="#Triangle" class="toc-h3 toc-link" data-title="Triangle">Triangle</a>
+                          </li>
+                          <li>
+                            <a href="#UdpServer" class="toc-h3 toc-link" data-title="UdpServer">UdpServer</a>
                           </li>
                           <li>
                             <a href="#Vec2" class="toc-h3 toc-link" data-title="Vec2">Vec2</a>
@@ -2012,6 +2024,9 @@
                           </li>
                           <li>
                             <a href="#JournalUI" class="toc-h3 toc-link" data-title="JournalUI">JournalUI</a>
+                          </li>
+                          <li>
+                            <a href="#OnlineLobbyScreenPlayer" class="toc-h3 toc-link" data-title="OnlineLobbyScreenPlayer">OnlineLobbyScreenPlayer</a>
                           </li>
                           <li>
                             <a href="#PauseUI" class="toc-h3 toc-link" data-title="PauseUI">PauseUI</a>
@@ -4009,6 +4024,116 @@
 </blockquote>
 
 <p>The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.</p>
+<h1 id='STD-Library-Containers'>STD Library Containers</h1>
+<p>Sometimes game variables and return of some functions will be of type <code>map</code>, <code>set</code>, <code>vector</code> etc. from the C++ Standard Library.</p>
+
+<p>You don&#39;t really need to know much of this as they will behave similar to a lua table, even accept some table functions from the <code>table</code> library and support looping thru using <code>pair</code> function. You can also use them as parameter for functions that take <code>array</code>, Sol will happily convert them for you.</p>
+
+<p>They come with some extra functionality:</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td>all:empty()</td>
+<td>Returns true if container is empty, false otherwise</td>
+</tr>
+<tr>
+<td>int</td>
+<td>aLL:size()</td>
+<td>Same as <code>#container</code></td>
+</tr>
+<tr>
+<td>any</td>
+<td>vector:at(int index)</td>
+<td>Same as <code>vector[index]</code></td>
+</tr>
+<tr>
+<td>any</td>
+<td>span:at(int index)</td>
+<td>Same as <code>span[index]</code></td>
+</tr>
+<tr>
+<td>any</td>
+<td>set:at(int order)</td>
+<td>Returns elements in order, it&#39;s not an index as sets don&#39;t have one</td>
+</tr>
+<tr>
+<td>any</td>
+<td>map:at(int order)</td>
+<td>Returns elements in order, it&#39;s not an index as maps don&#39;t have one</td>
+</tr>
+<tr>
+<td>int</td>
+<td>vector:find(any value)</td>
+<td>Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable</td>
+</tr>
+<tr>
+<td>int</td>
+<td>span:find(any value)</td>
+<td>Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable</td>
+</tr>
+<tr>
+<td>any</td>
+<td>set:find(any value)</td>
+<td>Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable</td>
+</tr>
+<tr>
+<td>any</td>
+<td>map:find(any key)</td>
+<td>Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>vector:erase(int index)</td>
+<td>Removes element at given index, the rest of elements shift down so that the vector stays contiguous</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>set:erase(any value)</td>
+<td>Removes element from set</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>map:erase(any key)</td>
+<td>Removes element from map by key</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>vector:clear()</td>
+<td>Removes all elements from vector</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>set:clear()</td>
+<td>Removes all elements from set</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>map:clear()</td>
+<td>Removes all elements from map</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>vector:insert(int index, any element)</td>
+<td>Inserts element at given index, the rest of elements shift up in index</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>set:insert(int order, any element)</td>
+<td>The order param doesn&#39;t acutally matter and can be set to nil</td>
+</tr>
+<tr>
+<td>nil</td>
+<td>map:insert(any key, any value)</td>
+<td>unsure, probably easier to just use <code>map[key] = value</code></td>
+</tr>
+</tbody></table>
 <h1 id='Functions'>Functions</h1>
 <p>The game functions like <code>spawn</code> use <a href="#get_position">level coordinates</a>. Draw functions use normalized <a href="#screen_position">screen coordinates</a> from <code>-1.0 .. 1.0</code> where <code>0.0, 0.0</code> is the center of the screen.</p>
 <h2 id='Callback-functions'>Callback functions</h2><h3 id='clear_callback'>clear_callback</h3>
@@ -4153,7 +4278,7 @@ If you set such a callback and then play the same sound yourself you have to wai
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dump">dump</a></p>
 </blockquote>
-<h4 id='table-dump-object-object-optional-depth'>table dump(object object, optional<int> depth)</h4>
+<h4 id='table-dump-any-object-optional-depth'>table dump(any object, optional<int> depth)</h4>
 <p>Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don&#39;t use this for anything except debug printing. Unsafe.</p>
 <h3 id='dump_network'>dump_network</h3>
 <blockquote>
@@ -4165,7 +4290,7 @@ If you set such a callback and then play the same sound yourself you have to wai
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_rva">get_rva</a></p>
 </blockquote>
-<h4 id='string-get_rva-string_view-address_name'>string get_rva(string_view address_name)</h4>
+<h4 id='string-get_rva-string-address_name'>string get_rva(string address_name)</h4>
 <p>Get the rva for a pattern name, used for debugging.</p>
 <h3 id='get_virtual_rva'>get_virtual_rva</h3>
 <blockquote>
@@ -4251,7 +4376,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=entity_get_items_by">entity_get_items_by</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-entity_get_items_by-int-uid-array-lt-ENT_TYPE-gt-entity_types-int-mask'>array&lt;int&gt; entity_get_items_by(int uid, array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask)</h4><h4 id='array-lt-int-gt-entity_get_items_by-int-uid-ENT_TYPE-entity_type-int-mask'>array&lt;int&gt; entity_get_items_by(int uid, <a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask)</h4>
+<h4 id='vector-lt-int-gt-entity_get_items_by-int-uid-array-lt-ENT_TYPE-gt-entity_types-int-mask'>vector&lt;int&gt; entity_get_items_by(int uid, array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask)</h4><h4 id='vector-lt-int-gt-entity_get_items_by-int-uid-ENT_TYPE-entity_type-int-mask'>vector&lt;int&gt; entity_get_items_by(int uid, <a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask)</h4>
 <p>Gets uids of entities attached to given entity uid. Use <code>entity_type</code> and <code>mask</code> (<a href="#MASK">MASK</a>) to filter, set them to 0 to return all attached entities.</p>
 <h3 id='entity_has_item_type'>entity_has_item_type</h3>
 <blockquote>
@@ -4275,7 +4400,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=filter_entities">filter_entities</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-filter_entities-array-entities-function-predicate'>array&lt;int&gt; filter_entities(array<int> entities, function predicate)</h4>
+<h4 id='vector-lt-int-gt-filter_entities-vector-entities-function-predicate'>vector&lt;int&gt; filter_entities(vector<int> entities, function predicate)</h4>
 <p>Returns a list of all uids in <code>entities</code> for which <code>predicate(get_entity(uid))</code> returns true</p>
 <h3 id='flip_entity'>flip_entity</h3>
 <blockquote>
@@ -4299,7 +4424,7 @@ Use empty table as argument to reset to the game default</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_at">get_entities_at</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_at-array-lt-ENT_TYPE-gt-entity_types-int-mask-float-x-float-y-LAYER-layer-float-radius'>array&lt;int&gt; get_entities_at(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, float x, float y, <a href="#LAYER">LAYER</a> layer, float radius)</h4><h4 id='array-lt-int-gt-get_entities_at-ENT_TYPE-entity_type-int-mask-float-x-float-y-LAYER-layer-float-radius'>array&lt;int&gt; get_entities_at(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, float x, float y, <a href="#LAYER">LAYER</a> layer, float radius)</h4>
+<h4 id='vector-lt-int-gt-get_entities_at-array-lt-ENT_TYPE-gt-entity_types-int-mask-float-x-float-y-LAYER-layer-float-radius'>vector&lt;int&gt; get_entities_at(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, float x, float y, <a href="#LAYER">LAYER</a> layer, float radius)</h4><h4 id='vector-lt-int-gt-get_entities_at-ENT_TYPE-entity_type-int-mask-float-x-float-y-LAYER-layer-float-radius'>vector&lt;int&gt; get_entities_at(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, float x, float y, <a href="#LAYER">LAYER</a> layer, float radius)</h4>
 <p>Get uids of matching entities inside some radius (<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#MASK">MASK</a>). Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types
 Recommended to always set the mask, even if you look for one entity type</p>
 <h3 id='get_entities_by'>get_entities_by</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- find all cavemen and give them bombs</span>
@@ -4313,14 +4438,14 @@ Recommended to always set the mask, even if you look for one entity type</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by">get_entities_by</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_by-array-lt-ENT_TYPE-gt-entity_types-int-mask-LAYER-layer'>array&lt;int&gt; get_entities_by(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='array-lt-int-gt-get_entities_by-ENT_TYPE-entity_type-int-mask-LAYER-layer'>array&lt;int&gt; get_entities_by(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, <a href="#LAYER">LAYER</a> layer)</h4>
+<h4 id='vector-lt-int-gt-get_entities_by-array-lt-ENT_TYPE-gt-entity_types-int-mask-LAYER-layer'>vector&lt;int&gt; get_entities_by(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='vector-lt-int-gt-get_entities_by-ENT_TYPE-entity_type-int-mask-LAYER-layer'>vector&lt;int&gt; get_entities_by(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Get uids of entities by some conditions (<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#MASK">MASK</a>). Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types.
 Recommended to always set the mask, even if you look for one entity type</p>
 <h3 id='get_entities_by_draw_depth'>get_entities_by_draw_depth</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_draw_depth">get_entities_by_draw_depth</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_by_draw_depth-int-draw_depth-LAYER-l'>array&lt;int&gt; get_entities_by_draw_depth(int draw_depth, <a href="#LAYER">LAYER</a> l)</h4><h4 id='array-lt-int-gt-get_entities_by_draw_depth-array-draw_depths-LAYER-l'>array&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, <a href="#LAYER">LAYER</a> l)</h4>
+<h4 id='vector-lt-int-gt-get_entities_by_draw_depth-int-draw_depth-LAYER-l'>vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, <a href="#LAYER">LAYER</a> l)</h4><h4 id='vector-lt-int-gt-get_entities_by_draw_depth-array-draw_depths-LAYER-l'>vector&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, <a href="#LAYER">LAYER</a> l)</h4>
 <p>Get uids of entities by draw_depth. Can also use table of draw_depths.
 You can later use <a href="#filter_entities">filter_entities</a> if you want specific entity</p>
 <h3 id='get_entities_by_type'>get_entities_by_type</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="kd">local</span> <span class="n">types</span> <span class="o">=</span> <span class="p">{</span><span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_SNAKE</span><span class="p">,</span> <span class="n">ENT_TYPE</span><span class="p">.</span><span class="n">MONS_BAT</span><span class="p">}</span>
@@ -4335,7 +4460,7 @@ You can later use <a href="#filter_entities">filter_entities</a> if you want spe
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_type">get_entities_by_type</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_by_type-int-int'>array&lt;int&gt; get_entities_by_type(int, int...)</h4>
+<h4 id='vector-lt-int-gt-get_entities_by_type-ENT_TYPE-ENT_TYPE'>vector&lt;int&gt; get_entities_by_type(<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#ENT_TYPE">ENT_TYPE</a>...)</h4>
 <p>Get uids of entities matching id. This function is variadic, meaning it accepts any number of id&#39;s.
 You can even pass a table!
 This function can be slower than the <a href="#get_entities_by">get_entities_by</a> with the mask parameter filled</p>
@@ -4343,7 +4468,7 @@ This function can be slower than the <a href="#get_entities_by">get_entities_by<
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_overlapping_hitbox">get_entities_overlapping_hitbox</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_overlapping_hitbox-array-lt-ENT_TYPE-gt-entity_types-int-mask-AABB-hitbox-LAYER-layer'>array&lt;int&gt; get_entities_overlapping_hitbox(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, <a href="#AABB">AABB</a> hitbox, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='array-lt-int-gt-get_entities_overlapping_hitbox-ENT_TYPE-entity_type-int-mask-AABB-hitbox-LAYER-layer'>array&lt;int&gt; get_entities_overlapping_hitbox(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, <a href="#AABB">AABB</a> hitbox, <a href="#LAYER">LAYER</a> layer)</h4>
+<h4 id='vector-lt-int-gt-get_entities_overlapping_hitbox-array-lt-ENT_TYPE-gt-entity_types-int-mask-AABB-hitbox-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping_hitbox(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, <a href="#AABB">AABB</a> hitbox, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='vector-lt-int-gt-get_entities_overlapping_hitbox-ENT_TYPE-entity_type-int-mask-AABB-hitbox-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping_hitbox(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, <a href="#AABB">AABB</a> hitbox, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Get uids of matching entities overlapping with the given hitbox. Set <code>entity_type</code> or <code>mask</code> to <code>0</code> to ignore that, can also use table of entity_types</p>
 <h3 id='get_entity'>get_entity</h3>
 <blockquote>
@@ -4356,7 +4481,7 @@ This function can be slower than the <a href="#get_entities_by">get_entities_by<
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_name">get_entity_name</a></p>
 </blockquote>
 <h4 id='string-get_entity_name-ENT_TYPE-type-optional-fallback_strategy'>string get_entity_name(<a href="#ENT_TYPE">ENT_TYPE</a> type, optional<bool> fallback_strategy)</h4>
-<p>Get localized name of an entity, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.</code> enum name
+<p>Get localized name of an entity, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.*</code> enum name
 if the entity has no localized name</p>
 <h3 id='get_entity_type'>get_entity_type</h3>
 <blockquote>
@@ -4608,7 +4733,7 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_feat">get_feat</a></p>
 </blockquote>
-<h4 id='tuple-lt-bool-bool-const-string-const-string-gt-get_feat-FEAT-feat'>tuple&lt;bool, bool, const string, const string&gt; get_feat(<a href="#Aliases">FEAT</a> feat)</h4>
+<h4 id='tuple-lt-bool-bool-string-string-gt-get_feat-FEAT-feat'>tuple&lt;bool, bool, string, string&gt; get_feat(<a href="#Aliases">FEAT</a> feat)</h4>
 <p>Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: <code>bool unlocked, bool hidden, string name, string description</code></p>
 <h3 id='get_feat_hidden'>get_feat_hidden</h3>
 <blockquote>
@@ -4931,7 +5056,7 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=intersection">intersection</a></p>
 </blockquote>
-<h4 id='Vec2-intersection-const-Vec2-A-const-Vec2-B-const-Vec2-C-const-Vec2-D'><a href="#Vec2">Vec2</a> intersection(const <a href="#Vec2">Vec2</a> A, const <a href="#Vec2">Vec2</a> B, const <a href="#Vec2">Vec2</a> C, const <a href="#Vec2">Vec2</a> D)</h4>
+<h4 id='Vec2-intersection-Vec2-A-Vec2-B-Vec2-C-Vec2-D'><a href="#Vec2">Vec2</a> intersection(<a href="#Vec2">Vec2</a> A, <a href="#Vec2">Vec2</a> B, <a href="#Vec2">Vec2</a> C, <a href="#Vec2">Vec2</a> D)</h4>
 <p>Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don&#39;t intersect each other [parallel]</p>
 <h3 id='is_character_female'>is_character_female</h3>
 <blockquote>
@@ -4944,7 +5069,7 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_char_mods">list_char_mods</a></p>
 </blockquote>
 <h4 id='nil-list_char_mods'>nil list_char_mods()</h4>
-<p>List all char.png files recursively from Mods/Packs. Returns table of file paths.</p>
+<p>List all char_*.png files recursively from Mods/Packs. Returns table of file paths.</p>
 <h3 id='list_data_dir'>list_data_dir</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list_data_dir">list_data_dir</a></p>
@@ -5366,7 +5491,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=make_custom_behavior">make_custom_behavior</a></p>
 </blockquote>
-<h4 id='CustomMovableBehavior-make_custom_behavior-string_view-behavior_name-int-state_id-VanillaMovableBehavior-base_behavior'><a href="#CustomMovableBehavior">CustomMovableBehavior</a> make_custom_behavior(string_view behavior_name, int state_id, <a href="#VanillaMovableBehavior">VanillaMovableBehavior</a> base_behavior)</h4>
+<h4 id='CustomMovableBehavior-make_custom_behavior-string-behavior_name-int-state_id-VanillaMovableBehavior-base_behavior'><a href="#CustomMovableBehavior">CustomMovableBehavior</a> make_custom_behavior(string behavior_name, int state_id, <a href="#VanillaMovableBehavior">VanillaMovableBehavior</a> base_behavior)</h4>
 <p>Make a <code>CustomMovableBehavior</code>, if <code>base_behavior</code> is <code>nil</code> you will have to set all of the
 behavior functions. If a behavior with <code>behavior_name</code> already exists for your script it will
 be returned instead.</p>
@@ -5380,21 +5505,21 @@ be returned instead.</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get_async">http_get_async</a></p>
 </blockquote>
-<h4 id='HttpRequest-http_get_async-string-url-function-on_data'>HttpRequest http_get_async(string url, function on_data)</h4>
+<h4 id='nil-http_get_async-string-url-function-on_data'>nil http_get_async(string url, function on_data)</h4>
 <p>Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
 The callback signature is nil on_data(string response, string error)</p>
 <h3 id='udp_listen'>udp_listen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udp_listen">udp_listen</a></p>
 </blockquote>
-<h4 id='UdpServer-udp_listen-string-host-in_port_t-port-function-cb'>UdpServer udp_listen(string host, in_port_t port, function cb)</h4>
+<h4 id='UdpServer-udp_listen-string-host-int-port-function-cb'><a href="#UdpServer">UdpServer</a> udp_listen(string host, int port, function cb)</h4>
 <p>Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 The server will be closed once the handle is released.</p>
 <h3 id='udp_send'>udp_send</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udp_send">udp_send</a></p>
 </blockquote>
-<h4 id='nil-udp_send-string-host-in_port_t-port-string-msg'>nil udp_send(string host, in_port_t port, string msg)</h4>
+<h4 id='nil-udp_send-string-host-int-port-string-msg'>nil udp_send(string host, int port, string msg)</h4>
 <p>Send data to specified UDP address. Requires unsafe mode.</p>
 <h2 id='Option-functions'>Option functions</h2><h3 id='register_option_bool'>register_option_bool</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">register_option_bool</span><span class="p">(</span><span class="s2">"bomb_bag"</span><span class="p">,</span> <span class="s2">"BombBag"</span><span class="p">,</span> <span class="s2">"Spawn bomb bag at the start of every level"</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
 
@@ -5421,7 +5546,7 @@ The server will be closed once the handle is released.</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_option_callback">register_option_callback</a></p>
 </blockquote>
-<h4 id='nil-register_option_callback-string-name-object-value-function-on_render'>nil register_option_callback(string name, object value, function on_render)</h4>
+<h4 id='nil-register_option_callback-string-name-any-value-function-on_render'>nil register_option_callback(string name, any value, function on_render)</h4>
 <p>Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to <code>options[name]</code> or overwriting the whole <code>options</code> table if using and empty name.
 <code>value</code> is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
 <br/>The callback signature is optional<any> on_render(<a href="#GuiDrawContext">GuiDrawContext</a> draw_ctx)</p>
@@ -5697,7 +5822,7 @@ you&#39;re standing on, not real level coordinates.</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_room_template_name">get_room_template_name</a></p>
 </blockquote>
-<h4 id='string_view-get_room_template_name-int-room_template'>string_view get_room_template_name(int room_template)</h4>
+<h4 id='string-get_room_template_name-int-room_template'>string get_room_template_name(int room_template)</h4>
 <p>For debugging only, get the name of a room template, returns <code>&#39;invalid&#39;</code> if room template is not defined</p>
 <h3 id='is_machine_room_origin'>is_machine_room_origin</h3>
 <blockquote>
@@ -6089,7 +6214,7 @@ This edits custom string and in game strings but changing the language in settin
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_string">get_string</a></p>
 </blockquote>
-<h4 id='const-string-get_string-STRINGID-string_id'>const string get_string(<a href="#Aliases">STRINGID</a> string_id)</h4>
+<h4 id='string-get_string-STRINGID-string_id'>string get_string(<a href="#Aliases">STRINGID</a> string_id)</h4>
 <p>Get string behind <a href="#Aliases">STRINGID</a>, don&#39;t use stringid diretcly for vanilla string, use <a href="#hash_to_stringid">hash_to_stringid</a> first
 Will return the string of currently choosen language</p>
 <h3 id='hash_to_stringid'>hash_to_stringid</h3>
@@ -6183,13 +6308,13 @@ Pass <code>nil</code> in the first parameter to reset</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_custom_subtheme">force_custom_subtheme</a></p>
 </blockquote>
-<h4 id='nil-force_custom_subtheme-customtheme'>nil force_custom_subtheme(customtheme)</h4>
+<h4 id='nil-force_custom_subtheme-CustomTheme-ThemeInfo-THEME-customtheme'>nil force_custom_subtheme(<a href="#CustomTheme">CustomTheme</a>|<a href="#ThemeInfo">ThemeInfo</a>|<a href="#THEME">THEME</a> customtheme)</h4>
 <p>Force current subtheme used in the CO theme. You can pass a <a href="#CustomTheme">CustomTheme</a>, <a href="#ThemeInfo">ThemeInfo</a> or <a href="#THEME">THEME</a>. Not to be confused with force_co_subtheme.</p>
 <h3 id='force_custom_theme'>force_custom_theme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_custom_theme">force_custom_theme</a></p>
 </blockquote>
-<h4 id='nil-force_custom_theme-customtheme'>nil force_custom_theme(customtheme)</h4>
+<h4 id='nil-force_custom_theme-CustomTheme-ThemeInfo-THEME-customtheme'>nil force_custom_theme(<a href="#CustomTheme">CustomTheme</a>|<a href="#ThemeInfo">ThemeInfo</a>|<a href="#THEME">THEME</a> customtheme)</h4>
 <p>Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a <a href="#CustomTheme">CustomTheme</a>, <a href="#ThemeInfo">ThemeInfo</a> or <a href="#THEME">THEME</a>.</p>
 <h3 id='get_co_subtheme'>get_co_subtheme</h3>
 <blockquote>
@@ -6266,7 +6391,7 @@ Same as import().</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_prng">read_prng</a></p>
 </blockquote>
 
-<p><code>array&lt;int&gt; read_prng()</code><br/>
+<p><code>vector&lt;int&gt; read_prng()</code><br/>
 Read the game prng state. Use <a href="#PRNG">prng</a>:get_pair() instead.</p>
 <h3 id='force_dark_level'>force_dark_level</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- forces any level to be dark, even bosses</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -6284,25 +6409,25 @@ Set level flag 18 on post room generation instead, to properly force every level
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities">get_entities</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities'>array&lt;int&gt; get_entities()</h4>
+<h4 id='vector-lt-int-gt-get_entities'>vector&lt;int&gt; get_entities()</h4>
 <p>Use <code>get_entities_by(0, MASK.ANY, LAYER.BOTH)</code> instead</p>
 <h3 id='get_entities_by_mask'>get_entities_by_mask</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_mask">get_entities_by_mask</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_by_mask-int-mask'>array&lt;int&gt; get_entities_by_mask(int mask)</h4>
+<h4 id='vector-lt-int-gt-get_entities_by_mask-int-mask'>vector&lt;int&gt; get_entities_by_mask(int mask)</h4>
 <p>Use <code>get_entities_by(0, mask, LAYER.BOTH)</code> instead</p>
 <h3 id='get_entities_by_layer'>get_entities_by_layer</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_layer">get_entities_by_layer</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_by_layer-LAYER-layer'>array&lt;int&gt; get_entities_by_layer(<a href="#LAYER">LAYER</a> layer)</h4>
+<h4 id='vector-lt-int-gt-get_entities_by_layer-LAYER-layer'>vector&lt;int&gt; get_entities_by_layer(<a href="#LAYER">LAYER</a> layer)</h4>
 <p>Use <code>get_entities_by(0, MASK.ANY, layer)</code> instead</p>
 <h3 id='get_entities_overlapping'>get_entities_overlapping</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_overlapping">get_entities_overlapping</a></p>
 </blockquote>
-<h4 id='array-lt-int-gt-get_entities_overlapping-array-lt-ENT_TYPE-gt-entity_types-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>array&lt;int&gt; get_entities_overlapping(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='array-lt-int-gt-get_entities_overlapping-ENT_TYPE-entity_type-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>array&lt;int&gt; get_entities_overlapping(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4>
+<h4 id='vector-lt-int-gt-get_entities_overlapping-array-lt-ENT_TYPE-gt-entity_types-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='vector-lt-int-gt-get_entities_overlapping-ENT_TYPE-entity_type-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4>
 <p>Use <code>get_entities_overlapping_hitbox</code> instead</p>
 <h3 id='get_entity_ai_state'>get_entity_ai_state</h3>
 <blockquote>
@@ -7537,7 +7662,7 @@ Derived from <a href="#Logic">Logic</a></p>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=window">window(string title, float x, float y, float w, float h, bool movable, function callback)</a></td>
-<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/>Important: Keep all your labels unique! If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)</td>
+<td>Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/><a href="https://github.com/ocornut/imgui/">ImGui</a> widgets, so read more about them there. Use screen position and distance, or <code>0, 0, 0, 0</code> to<br/>autosize in center. Use just a <code>##Label</code> as title to hide titlebar.<br/><strong>Important: Keep all your labels unique!</strong> If you need inputs with the same label, add <code>##SomeUniqueLabel</code> after the text, or use pushid to<br/>give things unique ids. ImGui doesn&#39;t know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -7751,7 +7876,7 @@ Used to change the room data as well as add a backlayer room if none is set yet.
 <td>Sets the tile code at the specified tile coordinate<br/>Valid coordinates are <code>0 &lt;= tx &lt; CONST.ROOM_WIDTH</code>, <code>0 &lt;= ty &lt; CONST.ROOM_HEIGHT</code> and <code>layer</code> in <code>{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}</code><br/>Also returns <code>false</code> if <code>layer == LAYER.BACK</code> and the room does not have a back layer</td>
 </tr>
 <tr>
-<td>array&lt;tuple&lt;int, int, <a href="#LAYER">LAYER</a>&gt;&gt;</td>
+<td>vector&lt;tuple&lt;int, int, <a href="#LAYER">LAYER</a>&gt;&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=find_all_short_tile_codes">find_all_short_tile_codes(LAYER layer, SHORT_TILE_CODE short_tile_code)</a></td>
 <td>Finds all places a short tile code is used in the room, <code>layer</code> must be in <code>{LAYER.FRONT, LAYER.BACK, LAYER.BOTH}</code><br/>Returns an empty list if <code>layer == LAYER.BACK</code> and the room does not have a back layer</td>
 </tr>
@@ -7816,7 +7941,7 @@ Future calls to this will override the save</p>
 </tr>
 </tbody></table>
 <h3 id='VanillaRenderContext'>VanillaRenderContext</h3>
-<p>Used in <a href="#set_callback">set_callback</a> <a href="#ON">ON</a>.RENDER_ callbacks, <a href="#set_post_render">set_post_render</a>, <a href="#set_post_render_screen">set_post_render_screen</a>, <a href="#set_pre_render">set_pre_render</a>, <a href="#set_pre_render_screen">set_pre_render_screen</a></p>
+<p>Used in <a href="#set_callback">set_callback</a> <a href="#ON">ON</a>.RENDER_* callbacks, <a href="#set_post_render">set_post_render</a>, <a href="#set_post_render_screen">set_post_render_screen</a>, <a href="#set_pre_render">set_pre_render</a>, <a href="#set_pre_render_screen">set_pre_render_screen</a></p>
 
 <table><thead>
 <tr>
@@ -7827,17 +7952,17 @@ Future calls to this will override the save</p>
 </thead><tbody>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(const string&amp; text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(string text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)</a></td>
 <td>Draw text using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱ events. See vanilla_rendering.lua in the example scripts.</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(const TextRenderingInfo tri, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text">draw_text(TextRenderingInfo tri, Color color)</a></td>
 <td></td>
 </tr>
 <tr>
 <td>tuple&lt;float, float&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text_size">draw_text_size(const string&amp; text, float scale_x, float scale_y, int fontstyle)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_text_size">draw_text_size(string text, float scale_x, float scale_y, int fontstyle)</a></td>
 <td>Measure the provided text using the built-in renderer<br/>If you can, consider creating your own <a href="#TextRenderingInfo">TextRenderingInfo</a> instead<br/>You can then use <code>:text_size()</code> and <code>draw_text</code> with that one object<br/><code>draw_text_size</code> works by creating new TextRenderingInfo just to call <code>:text_size()</code>, which is not very optimal</td>
 </tr>
 <tr>
@@ -7847,22 +7972,22 @@ Future calls to this will override the save</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB&amp; rect, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, AABB rect, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, const AABB&amp; rect, Color color, float angle, float px, float py)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, AABB rect, Color color, float angle, float px, float py)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, Quad dest, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, Quad source, Quad dest, Color color)</a></td>
 <td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
@@ -7877,27 +8002,27 @@ Future calls to this will override the save</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_line">draw_screen_line(const Vec2&amp; A, const Vec2&amp; B, float thickness, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_line">draw_screen_line(Vec2 A, Vec2 B, float thickness, Color color)</a></td>
 <td>Draws a line on screen using the built-in renderer from point <code>A</code> to point <code>B</code>.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect">draw_screen_rect(const AABB&amp; rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect">draw_screen_rect(AABB rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
 <td>Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect_filled">draw_screen_rect_filled(const AABB&amp; rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect_filled">draw_screen_rect_filled(AABB rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
 <td>Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_triangle">draw_screen_triangle(const Triangle&amp; triangle, float thickness, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_triangle">draw_screen_triangle(Triangle triangle, float thickness, Color color)</a></td>
 <td>Draw triangle in screen coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_triangle_filled">draw_screen_triangle_filled(const Triangle&amp; triangle, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_triangle_filled">draw_screen_triangle_filled(Triangle triangle, Color color)</a></td>
 <td>Draw filled triangle in screen coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
@@ -7907,7 +8032,7 @@ Future calls to this will override the save</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly">draw_screen_poly(const Quad&amp; points, float thickness, Color color, bool closed)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly">draw_screen_poly(Quad points, float thickness, Color color, bool closed)</a></td>
 <td>Draw quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
@@ -7917,7 +8042,7 @@ Future calls to this will override the save</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly_filled">draw_screen_poly_filled(const Quad&amp; points, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_poly_filled">draw_screen_poly_filled(Quad points, Color color)</a></td>
 <td>Draw filled quadrilateral in screen coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
@@ -7927,57 +8052,57 @@ Future calls to this will override the save</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; dest, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, AABB dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const AABB&amp; dest, Color color, float angle, float px, float py)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, AABB dest, Color color, float angle, float px, float py)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color, WORLD_SHADER shader)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, Quad dest, Color color, WORLD_SHADER shader)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>The <code>shader</code> parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, const Quad&amp; dest, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, Quad dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color, WORLD_SHADER shader)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, Quad source, Quad dest, Color color, WORLD_SHADER shader)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>The <code>shader</code> parameter controls how to render the texture<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, const Quad&amp; source, const Quad&amp; dest, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, Quad source, Quad dest, Color color)</a></td>
 <td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer.  <code>source</code> - the coordinates in the texture, <code>dest</code> - the coordinates on the screen<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_line">draw_world_line(const Vec2&amp; A, const Vec2&amp; B, float thickness, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_line">draw_world_line(Vec2 A, Vec2 B, float thickness, Color color)</a></td>
 <td>Draws a line in world coordinates using the built-in renderer from point <code>A</code> to point <code>B</code>.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect">draw_world_rect(const AABB&amp; rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect">draw_world_rect(AABB rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
 <td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect_filled">draw_world_rect_filled(const AABB&amp; rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect_filled">draw_world_rect_filled(AABB rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
 <td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_triangle">draw_world_triangle(const Triangle&amp; triangle, float thickness, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_triangle">draw_world_triangle(Triangle triangle, float thickness, Color color)</a></td>
 <td>Draw triangle in world coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_triangle_filled">draw_world_triangle_filled(const Triangle&amp; triangle, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_triangle_filled">draw_world_triangle_filled(Triangle triangle, Color color)</a></td>
 <td>Draw filled triangle in world coordinates using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
@@ -7987,7 +8112,7 @@ Future calls to this will override the save</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly">draw_world_poly(const Quad&amp; points, float thickness, Color color, bool closed)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly">draw_world_poly(Quad points, float thickness, Color color, bool closed)</a></td>
 <td>Draw quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
@@ -7997,7 +8122,7 @@ Future calls to this will override the save</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly_filled">draw_world_poly_filled(const Quad&amp; points, Color color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_poly_filled">draw_world_poly_filled(Quad points, Color color)</a></td>
 <td>Draw filled quadrilateral in world coordinates from top-left to bottom-right using the built-in renderer.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
@@ -8171,7 +8296,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 </tr>
 <tr>
 <td><a href="#EntityDB">EntityDB</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=EntityDB">new(ENT_TYPE)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=EntityDB">new(ENT_TYPE other)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -8607,7 +8732,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 </tr>
 <tr>
 <td><a href="#AABB">AABB</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=AABB">new(AABB)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=AABB">new(AABB other)</a></td>
 <td>Copy an axis aligned bounding box</td>
 </tr>
 <tr>
@@ -8642,26 +8767,26 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=overlaps_with">overlaps_with(const AABB&amp; other)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=overlaps_with">overlaps_with(AABB other)</a></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="#AABB">AABB</a>&amp;</td>
+<td><a href="#AABB">AABB</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs">abs()</a></td>
 <td>Fixes the <a href="#AABB">AABB</a> if any of the sides have negative length</td>
 </tr>
 <tr>
-<td><a href="#AABB">AABB</a>&amp;</td>
+<td><a href="#AABB">AABB</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=extrude">extrude(float amount)</a></td>
 <td>Grows or shrinks the <a href="#AABB">AABB</a> by the given amount in all directions.<br/>If <code>amount &lt; 0</code> and <code>abs(amount) &gt; right/top - left/bottom</code> the respective dimension of the AABB will become <code>0</code>.</td>
 </tr>
 <tr>
-<td><a href="#AABB">AABB</a>&amp;</td>
+<td><a href="#AABB">AABB</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=extrude">extrude(float amount_x, float amount_y)</a></td>
 <td>Grows or shrinks the <a href="#AABB">AABB</a> by the given amount in each direction.<br/>If <code>amount_x/y &lt; 0</code> and <code>abs(amount_x/y) &gt; right/top - left/bottom</code> the respective dimension of the AABB will become <code>0</code>.</td>
 </tr>
 <tr>
-<td><a href="#AABB">AABB</a>&amp;</td>
+<td><a href="#AABB">AABB</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float off_x, float off_y)</a></td>
 <td>Offsets the <a href="#AABB">AABB</a> by the given offset.</td>
 </tr>
@@ -8687,7 +8812,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(const Vec2 p)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_point_inside">is_point_inside(Vec2 p)</a></td>
 <td>Checks if point lies between left/right and top/bottom</td>
 </tr>
 <tr>
@@ -8810,7 +8935,12 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 </tr>
 <tr>
 <td><a href="#Color">Color</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(Color)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(Color other)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Color">Color</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(Color color)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -8924,7 +9054,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Returns RGBA colors in 0..255 range</td>
 </tr>
 <tr>
-<td><a href="#Color">Color</a>&amp;</td>
+<td><a href="#Color">Color</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_rgba">set_rgba(int red, int green, int blue, int alpha)</a></td>
 <td>Changes color based on given RGBA colors in 0..255 range</td>
 </tr>
@@ -8934,8 +9064,8 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Returns the <code>uColor</code> used in <code>GuiDrawContext</code> drawing functions</td>
 </tr>
 <tr>
-<td><a href="#Color">Color</a>&amp;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_ucolor">set_ucolor(const uColor color)</a></td>
+<td><a href="#Color">Color</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_ucolor">set_ucolor(uColor color)</a></td>
 <td>Changes color based on given <a href="#Aliases">uColor</a></td>
 </tr>
 </tbody></table>
@@ -9326,7 +9456,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Quad">Quad</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(Quad)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Quad">new(Quad other)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -9390,22 +9520,22 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>Returns the max/min values of the <a href="#Quad">Quad</a></td>
 </tr>
 <tr>
-<td><a href="#Quad">Quad</a>&amp;</td>
+<td><a href="#Quad">Quad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float off_x, float off_y)</a></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="#Quad">Quad</a>&amp;</td>
+<td><a href="#Quad">Quad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
 <td>Rotates a <a href="#Quad">Quad</a> by an angle, px/py are not offsets, use <code>:get_AABB():center()</code> to get approximated center for simetrical quadrangle</td>
 </tr>
 <tr>
-<td><a href="#Quad">Quad</a>&amp;</td>
+<td><a href="#Quad">Quad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flip_horizontally">flip_horizontally()</a></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="#Quad">Quad</a>&amp;</td>
+<td><a href="#Quad">Quad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flip_vertically">flip_vertically()</a></td>
 <td></td>
 </tr>
@@ -9499,7 +9629,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td>class <a href="#Entity">Entity</a></td>
+<td><a href="#Entity">Entity</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity">get_entity()</a></td>
 <td></td>
 </tr>
@@ -9606,12 +9736,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 </thead><tbody>
 <tr>
-<td>custom_map&lt;int, <a href="#ItemOwnerDetails">ItemOwnerDetails</a>&gt;</td>
+<td>map&lt;int, <a href="#ItemOwnerDetails">ItemOwnerDetails</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=owned_items">owned_items</a></td>
 <td>key/index is the uid of an item</td>
 </tr>
 <tr>
-<td>array&lt;<a href="#RoomOwnerDetails">RoomOwnerDetails</a>&gt;</td>
+<td>vector&lt;<a href="#RoomOwnerDetails">RoomOwnerDetails</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=owned_rooms">owned_rooms</a></td>
 <td></td>
 </tr>
@@ -9642,6 +9772,54 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>Alternative tile code, ignored if <code>chance == 100</code>. Defaults to 0.</td>
 </tr>
 </tbody></table>
+<h3 id='SpawnInfo'>SpawnInfo</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=room_template">room_template</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Entity">Entity</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grid_entity">grid_entity</a></td>
+<td>Grid entity at this position, will only try to spawn procedural if this is nil</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='SpearDanglerAnimFrames'>SpearDanglerAnimFrames</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=column">column</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=row">row</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='Triangle'>Triangle</h3>
 <table><thead>
 <tr>
@@ -9657,7 +9835,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Triangle">Triangle</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new(Triangle)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Triangle">new(Triangle other)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -9686,17 +9864,17 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td><a href="#Triangle">Triangle</a>&amp;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(const Vec2&amp; off)</a></td>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(Vec2 off)</a></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="#Triangle">Triangle</a>&amp;</td>
+<td><a href="#Triangle">Triangle</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float x, float y)</a></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="#Triangle">Triangle</a>&amp;</td>
+<td><a href="#Triangle">Triangle</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
 <td>Rotate triangle by an angle, the px/py are just coordinates, not offset from the center</td>
 </tr>
@@ -9711,7 +9889,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>Returns ABC, BCA, CAB angles in radians</td>
 </tr>
 <tr>
-<td><a href="#Triangle">Triangle</a>&amp;</td>
+<td><a href="#Triangle">Triangle</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scale">scale(float scale)</a></td>
 <td></td>
 </tr>
@@ -9736,6 +9914,15 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>Returns the corner points</td>
 </tr>
 </tbody></table>
+<h3 id='UdpServer'>UdpServer</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+</tbody></table>
 <h3 id='Vec2'>Vec2</h3>
 <p>Simple object to hold pair of coordinates</p>
 
@@ -9753,7 +9940,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Vec2">Vec2</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Vec2">new(Vec2)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Vec2">new(Vec2 other)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -9772,13 +9959,13 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td><a href="#Vec2">Vec2</a>&amp;</td>
+<td><a href="#Vec2">Vec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
 <td></td>
 </tr>
 <tr>
 <td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance_to">distance_to(const Vec2 other)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance_to">distance_to(Vec2 other)</a></td>
 <td>Just simple pythagoras theorem</td>
 </tr>
 <tr>
@@ -10655,12 +10842,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 </thead><tbody>
 <tr>
-<td>ShopType</td>
+<td><a href="#SHOP_TYPE">SHOP_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shop_type">shop_type</a></td>
 <td></td>
 </tr>
 <tr>
-<td>ShopType</td>
+<td><a href="#SHOP_TYPE">SHOP_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=backlayer_shop_type">backlayer_shop_type</a></td>
 <td></td>
 </tr>
@@ -10695,7 +10882,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td>custom_array&lt;<a href="#Vec2">Vec2</a>&gt;</td>
+<td>vector&lt;<a href="#Vec2">Vec2</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=exit_doors">exit_doors</a></td>
 <td></td>
 </tr>
@@ -11354,7 +11541,7 @@ Derived from <a href="#Logic">Logic</a></p>
 </tr>
 </thead><tbody>
 <tr>
-<td>custom_array&lt;<a href="#MagmamanSpawnPosition">MagmamanSpawnPosition</a>&gt;</td>
+<td>vector&lt;<a href="#MagmamanSpawnPosition">MagmamanSpawnPosition</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=magmaman_positions">magmaman_positions</a></td>
 <td></td>
 </tr>
@@ -11467,7 +11654,7 @@ Derived from <a href="#Logic">Logic</a> <a href="#LogicChallenge">LogicChallenge
 </tr>
 </thead><tbody>
 <tr>
-<td>array&lt;<a href="#Entity">Entity</a>&gt;</td>
+<td>vector&lt;<a href="#Entity">Entity</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=torches">torches</a></td>
 <td></td>
 </tr>
@@ -12474,9 +12661,28 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td></td>
 </tr>
 <tr>
-<td>custom_array&lt;<a href="#JournalPage">JournalPage</a>&gt;</td>
+<td>vector&lt;<a href="#JournalPage">JournalPage</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pages">pages</a></td>
 <td>Stores pages loaded into memeory. It&#39;s not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use <code>:get_type()</code> to chcek page type and cast it correctly (see ON.<a href="#ON-RENDER_PRE_JOURNAL_PAGE">RENDER_POST_DRAW_DEPTH</a>)</td>
+</tr>
+</tbody></table>
+<h3 id='OnlineLobbyScreenPlayer'>OnlineLobbyScreenPlayer</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=character">character</a></td>
+<td>0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in <a href="#ENT_TYPE">ENT_TYPE</a></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ready">ready</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='PauseUI'>PauseUI</h3>
@@ -14100,7 +14306,7 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td></td>
 </tr>
 <tr>
-<td>array&lt;SpearDanglerAnimFrames, 6&gt;</td>
+<td>array&lt;<a href="#SpearDanglerAnimFrames">SpearDanglerAnimFrames</a>, 6&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spear_dangler">spear_dangler</a></td>
 <td></td>
 </tr>
@@ -14212,7 +14418,7 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td></td>
 </tr>
 <tr>
-<td>array&lt;OnlineLobbyScreenPlayer, 4&gt;</td>
+<td>array&lt;<a href="#OnlineLobbyScreenPlayer">OnlineLobbyScreenPlayer</a>, 4&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=players">players</a></td>
 <td></td>
 </tr>
@@ -14413,7 +14619,7 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_code">set_code(const string&amp; code)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_code">set_code(string code)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -15337,7 +15543,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_callback">set_callback(SoundCallbackFunction callback)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_callback">set_callback(function callback)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -16218,7 +16424,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=correct_ushabti">correct_ushabti</a></td>
-<td>See <code>get_correct_ushabti</code>. == anim_frame - (2  floor(anim_frame/12))</td>
+<td>See <code>get_correct_ushabti</code>. == anim_frame - (2 * floor(anim_frame/12))</td>
 </tr>
 <tr>
 <td><a href="#Items">Items</a></td>
@@ -16487,7 +16693,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_length">text_length</a></td>
-<td>You can also just use <code>#</code> operator on the whole object to get the text lenght</td>
+<td>You can also just use <code>#</code> operator on the whole TextRenderingInfo to get the text lenght</td>
 </tr>
 <tr>
 <td>float</td>
@@ -16505,17 +16711,12 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>Used to draw buttons and stuff, default is -1 wich uses the buttons texture</td>
 </tr>
 <tr>
-<td>Texture</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=font">font</a></td>
-<td></td>
-</tr>
-<tr>
-<td>array&lt;<a href="#Letter">Letter</a>&gt;</td>
+<td>span&lt;<a href="#Letter">Letter</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dest">get_dest()</a></td>
 <td>Returns refrence to the letter coordinates relative to the x,y position</td>
 </tr>
 <tr>
-<td>array&lt;<a href="#Letter">Letter</a>&gt;</td>
+<td>span&lt;<a href="#Letter">Letter</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_source">get_source()</a></td>
 <td>Returns refrence to the letter coordinates in the texture</td>
 </tr>
@@ -16531,8 +16732,18 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_text">set_text(const string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_text">set_text(string text, float scale_x, float scale_y, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)</a></td>
 <td>Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters</td>
+</tr>
+<tr>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_font">get_font()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_font">set_font(TEXTURE id)</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='TextureDefinition'>TextureDefinition</h3>
@@ -16660,7 +16871,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_destination">set_destination(const AABB&amp; bbox)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_destination">set_destination(AABB bbox)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -16670,7 +16881,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dest_set_quad">dest_set_quad(const Quad&amp; quad)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dest_set_quad">dest_set_quad(Quad quad)</a></td>
 <td></td>
 </tr>
 <tr>
@@ -16720,7 +16931,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=source_set_quad">source_set_quad(const Quad&amp; quad)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=source_set_quad">source_set_quad(Quad quad)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -17395,7 +17606,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=do_procedural_spawn">do_procedural_spawn(SpawnInfo info)</a></td>
-<td>Spawns a single procedural entity, used in spawn_procedural</td>
+<td>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -17915,12 +18126,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_do_procedural_spawn">set_pre_do_procedural_spawn(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_do_procedural_spawn">set_post_do_procedural_spawn(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)</td>
 </tr>
 </tbody></table>
 <h1 id='Entity-types'>Entity types</h1><h2 id='Background-entities'>Background entities</h2><h3 id='BGBackLayerDoor'>BGBackLayerDoor</h3>
@@ -18525,22 +18736,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_enter_attempt">set_pre_enter_attempt(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;float&gt; enter_attempt(Door self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;float&gt; enter_attempt(Door self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_enter_attempt">set_post_enter_attempt(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil enter_attempt(Door self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil enter_attempt(Door self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_hide_hud">set_pre_hide_hud(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;float&gt; hide_hud(Door self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;float&gt; hide_hud(Door self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_hide_hud">set_post_hide_hud(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil hide_hud(Door self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil hide_hud(Door self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -18694,7 +18905,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fix_decorations">fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)</a></td>
-<td>Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set <code>fix_also_neighbours</code> to <code>true</code> to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set <code>fix_styled_floor</code> to <code>true</code> to fix decorations on <code>FLOORSTYLED_</code> entities, those usually only have decorations when broken.</td>
+<td>Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set <code>fix_also_neighbours</code> to <code>true</code> to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set <code>fix_styled_floor</code> to <code>true</code> to fix decorations on <code>FLOORSTYLED_*</code> entities, those usually only have decorations when broken.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -19775,7 +19986,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;int&gt;</td>
+<td>span&lt;int&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_items">get_items()</a></td>
 <td></td>
 </tr>
@@ -19791,8 +20002,8 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kill_recursive">kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, const array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)</a></td>
-<td>Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To a that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s<br/>destroy_corpse and responsible are the standard parameters for the kill funciton</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kill_recursive">kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)</a></td>
+<td>Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s<br/>destroy_corpse and responsible are the standard parameters for the kill funciton</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -19801,8 +20012,8 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_recursive">destroy_recursive(optional<int> mask, const array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)</a></td>
-<td>Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To a that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check the mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_recursive">destroy_recursive(optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)</a></td>
+<td>Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check the mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -19967,42 +20178,42 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_walked_on">set_pre_walked_on(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool walked_on(Entity self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool walked_on(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_walked_on">set_post_walked_on(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil walked_on(Entity self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil walked_on(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_walked_off">set_pre_walked_off(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool walked_off(Entity self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool walked_off(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_walked_off">set_post_walked_off(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil walked_off(Entity self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil walked_off(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_ledge_grab">set_pre_ledge_grab(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool ledge_grab(Entity self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool ledge_grab(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_ledge_grab">set_post_ledge_grab(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ledge_grab(Entity self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil ledge_grab(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_stood_on">set_pre_stood_on(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool stood_on(Entity self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool stood_on(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_stood_on">set_post_stood_on(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil stood_on(Entity self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil stood_on(Entity self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -22953,7 +23164,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Checks whether the player/monster has a certain powerup</td>
 </tr>
 <tr>
-<td>array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt;</td>
+<td>vector&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_powerups">get_powerups()</a></td>
 <td>Return all powerups that the entity has</td>
 </tr>
@@ -24948,7 +25159,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sine_angle">sine_angle</a></td>
-<td>Counts form 0 to 2pi, responsible for moving back and forth</td>
+<td>Counts form 0 to 2*pi, responsible for moving back and forth</td>
 </tr>
 <tr>
 <td>float</td>
@@ -26297,7 +26508,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
-<td>array&lt;int&gt;</td>
+<td>vector&lt;int&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_all_behaviors">get_all_behaviors()</a></td>
 <td>Get all avaible behavior ids</td>
 </tr>
@@ -26514,32 +26725,32 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_stomped_by">set_pre_stomped_by(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool stomped_by(Movable self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool stomped_by(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_stomped_by">set_post_stomped_by(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil stomped_by(Movable self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil stomped_by(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_thrown_by">set_pre_thrown_by(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool thrown_by(Movable self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool thrown_by(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_thrown_by">set_post_thrown_by(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil thrown_by(Movable self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil thrown_by(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_cloned_to">set_pre_cloned_to(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool cloned_to(Movable self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool cloned_to(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_cloned_to">set_post_cloned_to(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil cloned_to(Movable self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil cloned_to(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -26554,12 +26765,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_picked_up_by">set_pre_picked_up_by(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool picked_up_by(Movable self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool picked_up_by(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_picked_up_by">set_post_picked_up_by(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil picked_up_by(Movable self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil picked_up_by(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -26634,12 +26845,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_crush">set_pre_crush(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool crush(Movable self, Entity*)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool crush(Movable self, Entity)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_crush">set_post_crush(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil crush(Movable self, Entity*)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil crush(Movable self, Entity)</code></td>
 </tr>
 </tbody></table>
 <h3 id='MovingIcon'>MovingIcon</h3>
@@ -27306,7 +27517,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=next_size">next_size</a></td>
-<td>width and height will be set to <code>next_size  size_multiply</code> next frame</td>
+<td>width and height will be set to <code>next_size * size_multiply</code> next frame</td>
 </tr>
 <tr>
 <td>int</td>
