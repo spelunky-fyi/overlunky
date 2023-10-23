@@ -17,6 +17,7 @@
 
 struct JournalUI;
 struct Layer;
+class Entity;
 
 using VANILLA_TEXT_ALIGNMENT = uint32_t;
 using VANILLA_FONT_STYLE = uint32_t;
@@ -143,12 +144,28 @@ struct TextRenderingInfo
     {
         return text_length;
     }
+    TEXTURE get_font() const
+    {
+        if (font)
+            return font->id;
+        else
+            return 0;
+    }
+    bool set_font(TEXTURE id)
+    {
+        if (auto* texture = get_texture(id))
+        {
+            font = get_texture(id);
+            return true;
+        }
+        return false;
+    }
     /// Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     void rotate(float angle, std::optional<float> px, std::optional<float> py);
 
     float x;
     float y;
-    /// You can also just use `#` operator on the whole object to get the text lenght
+    /// You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
     uint32_t text_length;
     float width;
     float height;
@@ -333,7 +350,7 @@ struct RenderInfo
     virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
 
     // gets the entity owning this RenderInfo
-    class Entity* get_entity() const;
+    Entity* get_entity() const;
 
     // for supporting HookableVTable
     uint32_t get_aux_id() const;

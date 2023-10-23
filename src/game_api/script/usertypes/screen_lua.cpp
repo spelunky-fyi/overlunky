@@ -136,6 +136,13 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Screen>());
 
+    lua.new_usertype<SpearDanglerAnimFrames>(
+        "SpearDanglerAnimFrames",
+        "column",
+        &SpearDanglerAnimFrames::column,
+        "row",
+        &SpearDanglerAnimFrames::row);
+
     auto screenmenu_type = lua.new_usertype<ScreenMenu>("ScreenMenu", sol::base_classes, sol::bases<Screen>());
     screenmenu_type["tunnel_background"] = &ScreenMenu::tunnel_background;
     screenmenu_type["cthulhu_disc"] = &ScreenMenu::cthulhu_disc;
@@ -481,6 +488,13 @@ void register_usertypes(sol::state& lua)
         &ScreenOnlineLoading::ouroboros_angle,
         sol::base_classes,
         sol::bases<Screen>());
+
+    lua.new_usertype<OnlineLobbyScreenPlayer>(
+        "OnlineLobbyScreenPlayer",
+        "character",
+        &OnlineLobbyScreenPlayer::character,
+        "ready",
+        &OnlineLobbyScreenPlayer::ready);
 
     auto screenonlinelobby_type = lua.new_usertype<ScreenOnlineLobby>("ScreenOnlineLobby", sol::base_classes, sol::bases<Screen>());
     screenonlinelobby_type["woodpanels_slidein_timer"] = &ScreenOnlineLobby::woodpanels_slidein_timer;

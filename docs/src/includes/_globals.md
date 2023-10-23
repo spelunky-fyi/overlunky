@@ -147,6 +147,35 @@ end, ON.LEVEL)
 > Search script examples for [prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prng)
 
 The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
+# STD Library Containers
+Sometimes game variables and return of some functions will be of type `map`, `set`, `vector` etc. from the C++ Standard Library.
+
+You don't really need to know much of this as they will behave similar to a lua table, even accept some table functions from the `table` library and support looping thru using `pair` function. You can also use them as parameter for functions that take `array`, Sol will happily convert them for you.
+
+They come with some extra functionality:
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | all:empty() | Returns true if container is empty, false otherwise
+int | aLL:size() | Same as `#container`
+any | vector:at(int index) | Same as `vector[index]`
+any | span:at(int index) | Same as `span[index]`
+any | set:at(int order) | Returns elements in order, it's not an index as sets don't have one
+any | map:at(int order) | Returns elements in order, it's not an index as maps don't have one
+int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable
+int | span:find(any value) | Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable
+any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable
+any | map:find(any key) | Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable
+nil | vector:erase(int index) | Removes element at given index, the rest of elements shift down so that the vector stays contiguous
+nil | set:erase(any value) | Removes element from set
+nil | map:erase(any key) | Removes element from map by key
+nil | vector:clear() | Removes all elements from vector
+nil | set:clear() | Removes all elements from set
+nil | map:clear() | Removes all elements from map
+nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up in index
+nil | set:insert(int order, any element) | The order param doesn't acutally matter and can be set to nil
+nil | map:insert(any key, any value) | unsure, probably easier to just use `map[key] = value`
 # Functions
 The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 
@@ -347,7 +376,7 @@ If you set such a callback and then play the same sound yourself you have to wai
 
 > Search script examples for [dump](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dump)
 
-#### table dump(object object, optional<int> depth)
+#### table dump(any object, optional<int> depth)
 
 Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
 
@@ -365,7 +394,7 @@ Hook the sendto and recvfrom functions and start dumping network data to termina
 
 > Search script examples for [get_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rva)
 
-#### string get_rva(string_view address_name)
+#### string get_rva(string address_name)
 
 Get the rva for a pattern name, used for debugging.
 
@@ -491,9 +520,9 @@ Calls the enter door function, position doesn't matter, can also enter closed do
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-#### array&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
+#### vector&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
 
-#### array&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, int mask)
+#### vector&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, int mask)
 
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
 
@@ -531,7 +560,7 @@ Remove item by uid from entity
 
 > Search script examples for [filter_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=filter_entities)
 
-#### array&lt;int&gt; filter_entities(array<int> entities, function predicate)
+#### vector&lt;int&gt; filter_entities(vector<int> entities, function predicate)
 
 Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
 
@@ -567,9 +596,9 @@ Get door target `world`, `level`, `theme`
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-#### array&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
+#### vector&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
-#### array&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
+#### vector&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
 Get uids of matching entities inside some radius ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 Recommended to always set the mask, even if you look for one entity type
@@ -590,9 +619,9 @@ end
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-#### array&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
 
-#### array&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [LAYER](#LAYER) layer)
 
 Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
 Recommended to always set the mask, even if you look for one entity type
@@ -602,9 +631,9 @@ Recommended to always set the mask, even if you look for one entity type
 
 > Search script examples for [get_entities_by_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_draw_depth)
 
-#### array&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
+#### vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
 
-#### array&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
+#### vector&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
 
 Get uids of entities by draw_depth. Can also use table of draw_depths.
 You can later use [filter_entities](#filter_entities) if you want specific entity
@@ -626,7 +655,7 @@ end, ON.LEVEL)
 
 > Search script examples for [get_entities_by_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 
-#### array&lt;int&gt; get_entities_by_type(int, int...)
+#### vector&lt;int&gt; get_entities_by_type([ENT_TYPE](#ENT_TYPE), [ENT_TYPE](#ENT_TYPE)...)
 
 Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
 You can even pass a table!
@@ -637,9 +666,9 @@ This function can be slower than the [get_entities_by](#get_entities_by) with th
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-#### array&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
-#### array&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -659,7 +688,7 @@ Get the [Entity](#Entity) behind an uid, converted to the correct type. To see w
 
 #### string get_entity_name([ENT_TYPE](#ENT_TYPE) type, optional<bool> fallback_strategy)
 
-Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 if the entity has no localized name
 
 ### get_entity_type
@@ -1039,7 +1068,7 @@ Helper function to set the title and description strings for a [FEAT](#Aliases) 
 
 > Search script examples for [get_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat)
 
-#### tuple&lt;bool, bool, const string, const string&gt; get_feat([FEAT](#Aliases) feat)
+#### tuple&lt;bool, bool, string, string&gt; get_feat([FEAT](#Aliases) feat)
 
 Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
 
@@ -1530,7 +1559,7 @@ Converts [INPUTS](#INPUTS) to (x, y, BUTTON)
 
 > Search script examples for [intersection](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=intersection)
 
-#### [Vec2](#Vec2) intersection(const [Vec2](#Vec2) A, const [Vec2](#Vec2) B, const [Vec2](#Vec2) C, const [Vec2](#Vec2) D)
+#### [Vec2](#Vec2) intersection([Vec2](#Vec2) A, [Vec2](#Vec2) B, [Vec2](#Vec2) C, [Vec2](#Vec2) D)
 
 Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
 
@@ -1551,7 +1580,7 @@ Same as `Player.is_female`
 
 #### nil list_char_mods()
 
-List all char.png files recursively from Mods/Packs. Returns table of file paths.
+List all char_*.png files recursively from Mods/Packs. Returns table of file paths.
 
 ### list_data_dir
 
@@ -2181,7 +2210,7 @@ Show a message that looks like a level feeling.
 
 > Search script examples for [make_custom_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=make_custom_behavior)
 
-#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string_view behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
+#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
 
 Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
 behavior functions. If a behavior with `behavior_name` already exists for your script it will
@@ -2204,7 +2233,7 @@ Send a synchronous HTTP GET request and return response as a string or nil on an
 
 > Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
 
-#### HttpRequest http_get_async(string url, function on_data)
+#### nil http_get_async(string url, function on_data)
 
 Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
 The callback signature is nil on_data(string response, string error)
@@ -2214,7 +2243,7 @@ The callback signature is nil on_data(string response, string error)
 
 > Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
 
-#### UdpServer udp_listen(string host, in_port_t port, function cb)
+#### [UdpServer](#UdpServer) udp_listen(string host, int port, function cb)
 
 Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 The server will be closed once the handle is released.
@@ -2224,7 +2253,7 @@ The server will be closed once the handle is released.
 
 > Search script examples for [udp_send](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_send)
 
-#### nil udp_send(string host, in_port_t port, string msg)
+#### nil udp_send(string host, int port, string msg)
 
 Send data to specified UDP address. Requires unsafe mode.
 
@@ -2267,7 +2296,7 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 
 > Search script examples for [register_option_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_callback)
 
-#### nil register_option_callback(string name, object value, function on_render)
+#### nil register_option_callback(string name, any value, function on_render)
 
 Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name.
 `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
@@ -2685,7 +2714,7 @@ Get the room template given a certain index, returns `nil` if coordinates are ou
 
 > Search script examples for [get_room_template_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 
-#### string_view get_room_template_name(int room_template)
+#### string get_room_template_name(int room_template)
 
 For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
 
@@ -3267,7 +3296,7 @@ Same as `Player.get_short_name`
 
 > Search script examples for [get_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_string)
 
-#### const string get_string([STRINGID](#Aliases) string_id)
+#### string get_string([STRINGID](#Aliases) string_id)
 
 Get string behind [STRINGID](#Aliases), don't use stringid diretcly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
 Will return the string of currently choosen language
@@ -3410,7 +3439,7 @@ Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(
 
 > Search script examples for [force_custom_subtheme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_subtheme)
 
-#### nil force_custom_subtheme(customtheme)
+#### nil force_custom_subtheme([CustomTheme](#CustomTheme)|[ThemeInfo](#ThemeInfo)|[THEME](#THEME) customtheme)
 
 Force current subtheme used in the CO theme. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME). Not to be confused with force_co_subtheme.
 
@@ -3419,7 +3448,7 @@ Force current subtheme used in the CO theme. You can pass a [CustomTheme](#Custo
 
 > Search script examples for [force_custom_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_theme)
 
-#### nil force_custom_theme(customtheme)
+#### nil force_custom_theme([CustomTheme](#CustomTheme)|[ThemeInfo](#ThemeInfo)|[THEME](#THEME) customtheme)
 
 Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME).
 
@@ -3540,7 +3569,7 @@ Same as import().
 
 > Search script examples for [read_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
 
-`array<int> read_prng()`<br/>
+`vector<int> read_prng()`<br/>
 Read the game prng state. Use [prng](#PRNG):get_pair() instead.
 
 ### force_dark_level
@@ -3565,7 +3594,7 @@ Set level flag 18 on post room generation instead, to properly force every level
 
 > Search script examples for [get_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 
-#### array&lt;int&gt; get_entities()
+#### vector&lt;int&gt; get_entities()
 
 Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
@@ -3574,7 +3603,7 @@ Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
 
-#### array&lt;int&gt; get_entities_by_mask(int mask)
+#### vector&lt;int&gt; get_entities_by_mask(int mask)
 
 Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
@@ -3583,7 +3612,7 @@ Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
 
-#### array&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)
 
 Use `get_entities_by(0, MASK.ANY, layer)` instead
 
@@ -3592,9 +3621,9 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### array&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 
-#### array&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 
 Use `get_entities_overlapping_hitbox` instead
 

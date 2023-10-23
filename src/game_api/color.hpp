@@ -9,7 +9,7 @@ struct Color
 {
     /// Create a new color - defaults to black
     constexpr Color() = default;
-    constexpr Color(const Color&) = default;
+    constexpr Color(const Color& other) = default;
     constexpr Color(Color&&) = default;
     constexpr Color& operator=(const Color&) = default;
     constexpr Color& operator=(Color&&) = default;

@@ -1,0 +1,21 @@
+name: Docs validator
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-python@v4 
+      - name: Checking if all the types are documented in the API doc
+        run: |
+            cd docs
+            python validator.py

@@ -668,6 +668,7 @@ class ScreenOnlineLoading : public Screen // ID: 28
 struct OnlineLobbyScreenPlayer
 {
     uint8_t unknown1;
+    /// 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     uint8_t character;
     bool ready;
     uint8_t unknown2;

@@ -9,7 +9,7 @@ struct Vec2
 {
     Vec2() = default;
 
-    Vec2(const Vec2&) = default;
+    Vec2(const Vec2& other) = default;
 
     Vec2(float x_, float y_)
         : x(x_), y(y_){};
@@ -144,7 +144,7 @@ struct AABB
     AABB() = default;
 
     /// Copy an axis aligned bounding box
-    AABB(const AABB&) = default;
+    AABB(const AABB& other) = default;
     /// NoDoc
     AABB(const std::tuple<float, float, float, float> tuple)
     {
@@ -289,7 +289,7 @@ struct AABB
 struct Triangle
 {
     Triangle() = default;
-    Triangle(const Triangle&) = default;
+    Triangle(const Triangle& other) = default;
     Triangle(const Vec2& _a, const Vec2& _b, const Vec2& _c)
         : A(_a), B(_b), C(_c){};
     Triangle(float ax, float ay, float bx, float by, float cx, float cy)
@@ -407,7 +407,7 @@ struct Quad
 {
     Quad() = default;
 
-    Quad(const Quad&) = default;
+    Quad(const Quad& other) = default;
 
     Quad(const Vec2& bottom_left_, const Vec2& bottom_right_, const Vec2& top_right_, const Vec2& top_left_)
         : bottom_left_x(bottom_left_.x), bottom_left_y(bottom_left_.y), bottom_right_x(bottom_right_.x), bottom_right_y(bottom_right_.y), top_right_x(top_right_.x), top_right_y(top_right_.y), top_left_x(top_left_.x), top_left_y(top_left_.y){};

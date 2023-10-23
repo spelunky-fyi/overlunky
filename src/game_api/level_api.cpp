@@ -775,7 +775,7 @@ std::optional<uint16_t> g_overridden_room_templates[2];
 LevelGenRooms g_CustomRoomShims[2];
 
 // Used for making per-room shop types possible
-std::array<std::array<std::optional<ShopType>, 16>, 8> g_CustomShopTypes[2]{};
+std::array<std::array<std::optional<SHOP_TYPE>, 16>, 8> g_CustomShopTypes[2]{};
 
 // Some select room templates
 enum class RoomTemplate : uint16_t
@@ -1291,10 +1291,10 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
 {
     auto level_gen = State::get().ptr()->level_gen;
 
-    std::optional<ShopType> before[2];
+    std::optional<SHOP_TYPE> before[2];
     for (size_t i = 0; i < 2; i++)
     {
-        const std::optional<ShopType> custom_type = g_CustomShopTypes[i][room_idx_x][room_idx_y];
+        const std::optional<SHOP_TYPE> custom_type = g_CustomShopTypes[i][room_idx_x][room_idx_y];
         if (custom_type != std::nullopt)
         {
             before[i] = level_gen->shop_type;
@@ -1321,7 +1321,7 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
 
     for (size_t i = 0; i < 2; i++)
     {
-        const std::optional<ShopType> before_type = before[i];
+        const std::optional<SHOP_TYPE> before_type = before[i];
         if (before_type != std::nullopt)
         {
             level_gen->shop_types[i] = before_type.value();
@@ -2015,7 +2015,7 @@ bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is
     return true;
 }
 
-bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType _shop_type)
+bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE _shop_type)
 {
     auto* state_ptr = State::get().ptr_local();
 
