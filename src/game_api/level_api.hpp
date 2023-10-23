@@ -172,7 +172,7 @@ struct DoorCoords
 
 struct SpawnInfo
 {
-    ROOM_TEMPLATE room_temp;
+    ROOM_TEMPLATE room_template;
     // probably padding here
 
     /// Grid entity at this position, will only try to spawn procedural if this is nil

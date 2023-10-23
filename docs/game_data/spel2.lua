@@ -4754,7 +4754,7 @@ function MovableBehavior:get_state_id() end
     ---@field to integer
 
 ---@class SpawnInfo
-    ---@field room_temp ROOM_TEMPLATE
+    ---@field room_template ROOM_TEMPLATE
     ---@field grid_entity Entity @Grid entity at this position, will only try to spawn procedural if this is nil
     ---@field x number
     ---@field y number

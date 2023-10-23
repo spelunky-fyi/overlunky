@@ -890,7 +890,7 @@ int | [chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=chance) 
 
 Type | Name | Description
 ---- | ---- | -----------
-[ROOM_TEMPLATE](#ROOM_TEMPLATE) | [room_temp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_temp) | 
+[ROOM_TEMPLATE](#ROOM_TEMPLATE) | [room_template](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_template) | 
 [Entity](#Entity) | [grid_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_entity) | Grid entity at this position, will only try to spawn procedural if this is nil
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 

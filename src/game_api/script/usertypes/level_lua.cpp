@@ -1810,8 +1810,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<SpawnInfo>(
         "SpawnInfo",
-        "room_temp",
-        &SpawnInfo::room_temp,
+        "room_template",
+        &SpawnInfo::room_template,
         "grid_entity",
         &SpawnInfo::grid_entity,
         "x",
