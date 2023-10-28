@@ -1287,8 +1287,9 @@ float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offs
 float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
 float | [distortion](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distortion) | 
 int | [entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
-int | [type_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type_flags) | Only one can be set: 1 - Follow camera, 2 - Follow [Entity](#Entity), 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
+LIGHT_TYPE | [type_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type_flags) | Only one can be set: 1 - Follow camera, 2 - Follow [Entity](#Entity), 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
 bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
 
@@ -2261,6 +2262,7 @@ Derived from [Screen](#Screen)
 Type | Name | Description
 ---- | ---- | -----------
 int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+int | [time_till_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_till_death_screen) | Delay after player death to open the death screen
 
 ### ScreenLogo
 
@@ -2879,8 +2881,9 @@ int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 [LevelGenSystem](#LevelGenSystem) | [level_gen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gen) | Entrance and exit coordinates, shop types and all themes
 int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | See `get_correct_ushabti`. == anim_frame - (2 * floor(anim_frame/12))
 [Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | Has the current player count, player inventories and character selections
-int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | The currently drawn layer, can't be changed
+int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
 int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
+int | [transition_to_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_to_layer) | 
 [ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 

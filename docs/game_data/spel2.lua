@@ -1060,20 +1060,30 @@ function add_item_to_shop(item_uid, shop_owner_uid) end
 ---@param frames integer
 ---@return nil
 function change_poison_timer(frames) end
----Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---@param pos Vec2
+---@param color Color
+---@param type LIGHT_TYPE
+---@param size number
+---@param flags integer
+---@param uid integer
+---@param layer LAYER
+---@return Illumination
+function create_illumination(pos, color, type, size, flags, uid, layer) end
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
 ---@param color Color
 ---@param size number
 ---@param x number
 ---@param y number
 ---@return Illumination
 function create_illumination(color, size, x, y) end
----Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
 ---@param color Color
 ---@param size number
 ---@param uid integer
 ---@return Illumination
 function create_illumination(color, size, uid) end
----Refreshes an Illumination, keeps it from fading out
+---Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
@@ -1310,6 +1320,12 @@ function buttons_to_inputs(x, y, buttons) end
 ---@param enable boolean
 ---@return nil
 function set_infinite_loop_detection_enabled(enable) end
+---This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+---Letting you control those manually.
+---Look at the example on how to mimic game layer switching behavior
+---@param enable boolean
+---@return nil
+function set_camera_layer_control_enabled(enable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2038,8 +2054,9 @@ do
     ---@field level_gen LevelGenSystem @Entrance and exit coordinates, shop types and all themes
     ---@field correct_ushabti integer @See `get_correct_ushabti`. == anim_frame - (2 * floor(anim_frame/12))
     ---@field items Items @Has the current player count, player inventories and character selections
-    ---@field camera_layer integer @The currently drawn layer, can't be changed
+    ---@field camera_layer integer
     ---@field layer_transition_timer integer
+    ---@field transition_to_layer integer
     ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
     ---@field screen_transition ScreenTransition
@@ -2106,8 +2123,9 @@ do
     ---@field offset_y number
     ---@field distortion number
     ---@field entity_uid integer
+    ---@field timer integer
     ---@field flags integer @see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
-    ---@field type_flags integer @Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
+    ---@field type_flags LIGHT_TYPE @Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
     ---@field enabled boolean
     ---@field layer integer
 
@@ -5643,6 +5661,7 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class ScreenLevel : Screen
     ---@field buttons integer
+    ---@field time_till_death_screen integer @Delay after player death to open the death screen
 
 ---@class ScreenTransition : Screen
     ---@field woodpanel_pos number
