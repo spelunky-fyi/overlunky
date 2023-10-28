@@ -654,6 +654,20 @@ Name | Data | Description
 [MAX_LIQUID_PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LEVEL_CONFIG.MAX_LIQUID_PARTICLES) | 15 | 
 [FLAGGED_LIQUID_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LEVEL_CONFIG.FLAGGED_LIQUID_ROOMS) | 16 | 
 
+## LIGHT_TYPE
+
+
+> Search script examples for [LIGHT_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.NONE) | LIGHT_TYPE::NONE | Normal static light, position can be edited to move it around<br/>
+[FOLLOW_CAMERA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.FOLLOW_CAMERA) | LIGHT_TYPE::FOLLOW_CAMERA | Position is updated to the camera position, can be moved around via offset<br/>
+[FOLLOW_ENTITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.FOLLOW_ENTITY) | LIGHT_TYPE::FOLLOW_ENTITY | Position is updated to the entity position (from the uid field), if the uid is not found it will behave as [LIGHT_TYPE](#LIGHT_TYPE).NONE, can be moved around via offset<br/>
+[ROOM_LIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.ROOM_LIGHT) | LIGHT_TYPE::ROOM_LIGHT | Rectangle, full brightness always uses light1, disabling light1 does nothing<br/>
+
 ## LIQUID_POOL
 
 

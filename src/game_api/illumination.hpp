@@ -54,12 +54,8 @@ struct Illumination
         uint32_t flags;
         struct
         {
-            // TODO: separate flags in api
+            uint8_t light_flags; // not exposed since flags already is so no reason to essentially expose this again, even thou flags is technically not correct
 
-            uint8_t light_flags; // no reason to expose this
-
-            /// Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
-            /// Rectangle always uses light1, even when it's disabled in flags
             LIGHT_TYPE type_flags;
             uint8_t layer;
             bool enabled;

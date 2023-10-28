@@ -436,6 +436,19 @@ void register_usertypes(sol::state& lua)
     illumination_type["enabled"] = &Illumination::enabled;
     illumination_type["layer"] = &Illumination::layer;
 
+    lua.create_named_table("LIGHT_TYPE", "NONE", LIGHT_TYPE::NONE, "FOLLOW_CAMERA", LIGHT_TYPE::FOLLOW_CAMERA, "FOLLOW_ENTITY", LIGHT_TYPE::FOLLOW_ENTITY, "ROOM_LIGHT", LIGHT_TYPE::ROOM_LIGHT);
+
+    /* LIGHT_TYPE
+    // NONE
+    // Normal static light, position can be edited to move it around
+    // FOLLOW_CAMERA
+    // Position is updated to the camera position, can be moved around via offset
+    // FOLLOW_ENTITY
+    // Position is updated to the entity position (from the uid field), if the uid is not found it will behave as LIGHT_TYPE.NONE, can be moved around via offset
+    // ROOM_LIGHT
+    // Rectangle, full brightness always uses light1, disabling light1 does nothing
+    */
+
     auto camera_type = lua.new_usertype<Camera>("Camera");
     camera_type["bounds_left"] = &Camera::bounds_left;
     camera_type["bounds_right"] = &Camera::bounds_right;

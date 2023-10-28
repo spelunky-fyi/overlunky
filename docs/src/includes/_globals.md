@@ -2082,7 +2082,7 @@ Steal input from a [Player](#Player), HiredHand or [PlayerGhost](#PlayerGhost)
 
 > Search script examples for [create_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 
-#### [Illumination](#Illumination) create_illumination([Vec2](#Vec2) pos, [Color](#Color) color, LIGHT_TYPE type, float size, int flags, int uid, [LAYER](#LAYER) layer)
+#### [Illumination](#Illumination) create_illumination([Vec2](#Vec2) pos, [Color](#Color) color, [LIGHT_TYPE](#LIGHT_TYPE) type, float size, int flags, int uid, [LAYER](#LAYER) layer)
 
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, float x, float y)
 

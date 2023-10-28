@@ -2125,7 +2125,7 @@ do
     ---@field entity_uid integer
     ---@field timer integer
     ---@field flags integer @see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
-    ---@field type_flags LIGHT_TYPE @Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
+    ---@field type_flags LIGHT_TYPE
     ---@field enabled boolean
     ---@field layer integer
 

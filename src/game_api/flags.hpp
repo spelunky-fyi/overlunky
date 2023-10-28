@@ -319,14 +319,6 @@ const char* special_visibility_flags[]{
     "22: ",
     "23: ",
     "24: ",
-    "25: In back layer",
-    "26: ",
-    "27: ",
-    "28: ",
-    "29: ",
-    "30: ",
-    "31: ",
-    "32: ",
 };
 
 const char* basecamp_dialogue_win_flags[]{
