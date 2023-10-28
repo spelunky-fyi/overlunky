@@ -10,7 +10,7 @@
 
 #include "entities_liquids.hpp" // for Liquid, Lava, Lava::emitted_light
 #include "entity.hpp"           // for Entity
-#include "state_structs.hpp"    // IWYU pragma: keep
+#include "illumination.hpp"     // IWYU pragma: keep
 
 namespace NEntitiesLiquids
 {

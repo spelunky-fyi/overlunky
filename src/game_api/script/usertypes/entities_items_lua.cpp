@@ -11,9 +11,10 @@
 
 #include "entities_items.hpp" // for Spark, Boombox, AnkhPowerup, Arrow
 #include "entity.hpp"         // for Entity
+#include "illumination.hpp"   // IWYU pragma: keep
 #include "items.hpp"          // IWYU pragma: keep
 #include "particles.hpp"      // IWYU pragma: keep
-#include "sound_manager.hpp"  //
+#include "sound_manager.hpp"  // IWYU pragma: keep
 #include "state_structs.hpp"  // IWYU pragma: keep
 
 class Movable;

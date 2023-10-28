@@ -8,7 +8,7 @@
 
 #include "aliases.hpp"                  // for ENT_TYPE, LAYER
 #include "containers/custom_vector.hpp" //
-#include "state_structs.hpp"            // for JournalProgressStickerSlot, Illumination (p...
+#include "state_structs.hpp"            // for JournalProgressStickerSlot, ...
 
 class Entity;
 class ScreenArenaIntro;
@@ -44,6 +44,7 @@ struct Layer;
 struct LevelGenSystem;
 class ThemeInfo;
 struct Items;
+struct Illumination;
 
 void fix_liquid_out_of_bounds();
 

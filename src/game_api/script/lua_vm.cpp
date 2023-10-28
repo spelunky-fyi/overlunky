@@ -38,6 +38,7 @@
 #include "entity_lookup.hpp"                       //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
+#include "illumination.hpp"                        //
 #include "items.hpp"                               // for Inventory
 #include "layer.hpp"                               // for g_level_max_x
 #include "lua_backend.hpp"                         // for LuaBackend, ON
@@ -96,7 +97,7 @@
 #include "usertypes/texture_lua.hpp"               // for register_usertypes
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 #include "usertypes/vtables_lua.hpp"               // for register_usertypes
-#include "virtual_table.hpp"
+#include "virtual_table.hpp"                       //
 
 struct Illumination;
 
@@ -1798,11 +1799,12 @@ end
     lua["change_poison_timer"] = change_poison_timer;
 
     auto create_illumination = sol::overload(
-        static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
-        static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
+        static_cast<Illumination* (*)(Color, float, float, float)>(::create_illumination),
+        static_cast<Illumination* (*)(Color, float, int32_t)>(::create_illumination),
+        static_cast<Illumination* (*)(Vec2, Color, LIGHT_TYPE, float, uint8_t, int32_t, LAYER)>(::create_illumination));
     /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
     lua["create_illumination"] = create_illumination;
-    /// Refreshes an Illumination, keeps it from fading out
+    /// Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
     lua["refresh_illumination"] = refresh_illumination;
 
     /// Removes all liquid that is about to go out of bounds, which crashes the game.

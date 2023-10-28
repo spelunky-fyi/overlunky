@@ -10,9 +10,9 @@
 
 #include "entities_activefloors.hpp" // for Olmec, ClamBase, Crushtrap, Ele...
 #include "entity.hpp"                // for Entity
+#include "illumination.hpp"          // IWYU pragma: keep
 #include "particles.hpp"             // IWYU pragma: keep
-#include "sound_manager.hpp"         //
-#include "state_structs.hpp"         // IWYU pragma: keep
+#include "sound_manager.hpp"         // IWYU pragma: keep
 
 class Movable;
 

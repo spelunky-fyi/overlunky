@@ -39,6 +39,7 @@
 #include "file_api.hpp"
 #include "flags.hpp"
 #include "game_manager.hpp"
+#include "illumination.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
 #include "logger.h"

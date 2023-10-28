@@ -8,9 +8,9 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
-#include "entities_fx.hpp"   // for FxSaleContainer, Button, FxAnkhRotatingSpark
-#include "entity.hpp"        // for Entity
-#include "state_structs.hpp" // IWYU pragma: keep
+#include "entities_fx.hpp"  // for FxSaleContainer, Button, FxAnkhRotatingSpark
+#include "entity.hpp"       // for Entity
+#include "illumination.hpp" // IWYU pragma: keep
 
 class Movable;
 

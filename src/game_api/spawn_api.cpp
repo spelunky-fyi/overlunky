@@ -18,6 +18,7 @@
 #include "entities_liquids.hpp"         // for Lava
 #include "entities_monsters.hpp"        // for Shopkeeper, RoomOwner
 #include "entity.hpp"                   // for to_id, Entity, get_entity_ptr, Enti...
+#include "illumination.hpp"             //
 #include "items.hpp"                    //
 #include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x
 #include "level_api.hpp"                // for LevelGenSystem, ThemeInfo
@@ -71,15 +72,20 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 
         for (Lava* lava : lavas)
         {
-            float position[2] = {lava->x, lava->y};
-            float color[4] = {1.782f, 0.575262f, 0.0f, 0.0f}; // green value is randomized!
-            float light_size = 1.0f;
-            uint32_t flags = 0x63;
+            Vec2 position{lava->x, lava->y};
+            Color color{1.782f, 0.575262f, 0.0f, 0.0f};
+            // green value is randomized in game
+            // uses PRNG_CLASS::LEVEL_DECO
+            // green = (PRNG::random_float / 1000 * 0.3 + 0.2) / 1.62
 
-            using construct_illumination_ptr_fun_t = Illumination*(custom_vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
-            static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("generate_illumination");
+            float light_size = 0.6f; // should be 0.8f for dark level
+            uint8_t flags = 0x63;
 
-            auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);
+            // using construct_illumination_ptr_fun_t = Illumination*(custom_vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
+            // static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("generate_illumination");
+
+            // auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);
+            auto ill_ptr = create_illumination(position, color, LIGHT_TYPE::FOLLOW_ENTITY, light_size, flags, lava->uid, (LAYER)lava->layer);
             lava->emitted_light = ill_ptr;
         }
     }

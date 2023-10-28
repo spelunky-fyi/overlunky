@@ -14,6 +14,7 @@
 
 #include "entities_chars.hpp" // IWYU pragma: keep
 #include "entity.hpp"         // IWYU pragma: keep
+#include "illumination.hpp"   // IWYU pragma: keep
 #include "items.hpp"          // for Items, SelectPlayerSlot, Items::is...
 #include "level_api.hpp"      // IWYU pragma: keep
 #include "online.hpp"         // for OnlinePlayer, OnlineLobby, Online
@@ -429,6 +430,7 @@ void register_usertypes(sol::state& lua)
     illumination_type["offset_y"] = &Illumination::offset_y;
     illumination_type["distortion"] = &Illumination::distortion;
     illumination_type["entity_uid"] = &Illumination::entity_uid;
+    illumination_type["timer"] = &Illumination::timer;
     illumination_type["flags"] = &Illumination::flags;
     illumination_type["type_flags"] = &Illumination::type_flags;
     illumination_type["enabled"] = &Illumination::enabled;

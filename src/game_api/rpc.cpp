@@ -31,6 +31,7 @@
 #include "entity_lookup.hpp"            //
 #include "game_manager.hpp"             //
 #include "game_patches.hpp"             //
+#include "illumination.hpp"             //
 #include "items.hpp"                    // for Items
 #include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
 #include "logger.h"                     // for DEBUG
@@ -861,55 +862,6 @@ void extinguish_particles(ParticleEmitterInfo* particle_emitter)
         generic_free(particle_emitter->emitted_particles_back_layer.memory);
         generic_free(particle_emitter);
     }
-}
-
-Illumination* create_illumination_internal(Color color, float size, float x, float y, int32_t uid)
-{
-    static size_t offset = get_address("generate_illumination");
-
-    if (offset != 0)
-    {
-        auto state = get_state_ptr();
-
-        float position[] = {x, y};
-
-        typedef Illumination* create_illumination_func(custom_vector<Illumination*>*, float*, Color*, uint32_t r9, float size, uint8_t flags, uint32_t uid, uint8_t);
-        static create_illumination_func* cif = (create_illumination_func*)(offset);
-        auto emitted_light = cif(state->lightsources, position, &color, 0x2, size, 32, uid, 0x0);
-
-        // turn on Enabled flag
-        emitted_light->flags = emitted_light->flags | (1U << (25 - 1));
-
-        return emitted_light;
-    }
-    return nullptr;
-}
-
-Illumination* create_illumination(Color color, float size, float x, float y)
-{
-    return create_illumination_internal(color, size, x, y, -1);
-}
-
-Illumination* create_illumination(Color color, float size, uint32_t uid)
-{
-    auto entity = get_entity_ptr(uid);
-    if (entity != nullptr)
-    {
-        return create_illumination_internal(color, size, entity->abs_x, entity->abs_y, uid);
-    }
-    return nullptr;
-}
-
-void refresh_illumination(Illumination* illumination)
-{
-    static uint32_t* offset = 0;
-    if (offset == 0)
-    {
-        size_t** heap_offset = (size_t**)get_address("refresh_illumination_heap_offset");
-        auto illumination_counter = OnHeapPointer<uint32_t>(**heap_offset);
-        offset = illumination_counter.decode();
-    }
-    illumination->timer = *offset;
 }
 
 void set_journal_enabled(bool b)
