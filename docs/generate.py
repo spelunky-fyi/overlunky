@@ -9,8 +9,9 @@ import parse_source as ps
 if not os.path.exists("src/includes"):
     os.makedirs("src/includes")
 
-
+# if you change anything in here, please update it in validator.py as well
 replace_table = {
+    # standard basic types
     "uint8_t": "int",
     "uint16_t": "int",
     "uint32_t": "int",
@@ -20,26 +21,43 @@ replace_table = {
     "int32_t": "int",
     "int64_t": "int",
     "ImU32": "int",
-    "vector<": "array<",
-    "span<": "array<",
-    "unordered_map<": "map<",
-    "game_map<": "map<",
-    ", identity_hasher<>": "",
-    "const char*": "string",
+    "in_port_t": "int",
+    "size_t": "int",
+    "char*": "string",
     "wstring": "string",
     "u16string": "string",
-    "char16_t": "string",
+    "string_view": "string",
+    "char16_t*": "string",
+    "char16_t": "char",
     "pair<": "tuple<",
+    # std containers
+    "custom_vector<": "vector<",
+    "custom_map<": "map<",
+    "custom_unordered_map<": "map<",
+    "custom_set<": "set<",
+    "custom_unordered_set<": "set<",
+    "game_vector<": "vector<",
+    "game_map<": "map<",
+    "game_unordered_map<": "map<",
+    "game_set<": "set<",
+    "game_unordered_set<": "set<",
+    "unordered_map<": "map<", # doesn't seam to matter for lua if it's ordered or not
+    "unordered_set<": "set<", # doesn't seam to matter for lua if it's ordered or not
+    # removers
+    ", identity_hasher<>": "",
     "std::": "",
     "sol::": "",
     "void": "",
     "constexpr": "",
+    "const": "",
     "static": "",
-    "variadic_args va": "int, int...",
+    # special
+    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
     "EmittedParticlesInfo": "array<Particle>",
     "ImVec2": "Vec2",
+    "SoundCallbackFunction": "function",
+    "object ": "any ",
 }
-
 
 def replace_all(text):
     for repl, wth in replace_table.items():
@@ -50,7 +68,6 @@ def replace_all(text):
             continue
         text = text.replace(repl, wth)
     return text
-
 
 ps.configure_parse(replace_all, "slate.pickle")
 ps.run_parse()
@@ -118,11 +135,11 @@ printed_funcs = []
 
 
 def format_af(lf, af):
-    ret = replace_all(af["return"]) or "nil"
+    ret = af["return"] or "nil"
     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
     ret = link_custom_type(ret)
     name = lf["name"]
-    param = replace_all(af["param"])
+    param = af["param"].replace("vector<", "array<")
     param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
     return fun
@@ -368,6 +385,45 @@ for lf in ps.funcs:
             com = link_custom_type(com)
             print(com)
 
+print("# STD Library Containers")
+print(
+    """Sometimes game variables and return of some functions will be of type `map`, `set`, `vector` etc. from the C++ Standard Library.
+
+You don't really need to know much of this as they will behave similar to a lua table, even accept some table functions from the `table` library and support looping thru using `pair` function. You can also use them as parameter for functions that take `array`, Sol will happily convert them for you.
+
+They come with some extra functionality:"""
+)
+print(
+"""
+
+Type | Name | Description
+---- | ---- | -----------"""
+)
+print("bool | all:empty() | Returns true if container is empty, false otherwise")
+print("int | aLL:size() | Same as `#container`")
+
+print("any | vector:at(int index) | Same as `vector[index]`")
+print("any | span:at(int index) | Same as `span[index]`")
+print("any | set:at(int order) | Returns elements in order, it's not an index as sets don't have one")
+print("any | map:at(int order) | Returns elements in order, it's not an index as maps don't have one")
+
+print("int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable")
+print("int | span:find(any value) | Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable")
+print("any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable")
+print("any | map:find(any key) | Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable")
+
+print("nil | vector:erase(int index) | Removes element at given index, the rest of elements shift down so that the vector stays contiguous")
+print("nil | set:erase(any value) | Removes element from set")
+print("nil | map:erase(any key) | Removes element from map by key")
+
+print("nil | vector:clear() | Removes all elements from vector")
+print("nil | set:clear() | Removes all elements from set")
+print("nil | map:clear() | Removes all elements from map")
+
+print("nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up in index")
+print("nil | set:insert(int order, any element) | The order param doesn't acutally matter and can be set to nil")
+print("nil | map:insert(any key, any value) | unsure, probably easier to just use `map[key] = value`")
+
 
 print("# Functions")
 print(
@@ -504,10 +560,9 @@ for cat in sorted(func_cats):
             ret = "nil"
             param = ""
             if m:
-                ret = replace_all(m.group(2)).strip() or "nil"
+                ret = m.group(2) or "nil"
             if m or m2:
                 param = (m or m2).group(1)
-                param = replace_all(param).strip()
             name = lf["name"]
             ret = link_custom_type(ret)
             ret = ret.replace("<", "&lt;").replace(">", "&gt;")
@@ -549,10 +604,9 @@ for lf in ps.deprecated_funcs:
         ret = "nil"
         param = ""
         if m:
-            ret = replace_all(m.group(2)).strip() or "nil"
+            ret = m.group(2) or "nil"
         if m or m2:
             param = (m or m2).group(1)
-            param = replace_all(param).strip()
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
@@ -711,13 +765,13 @@ Type | Name | Description
                         if n:
                             name = n.group(1)
                             if n.group(2):
-                                param = replace_all(n.group(2).strip()) + ")"
+                                param = n.group(2) + ")"
                             signature = name + param
                         elif m:
-                            ret = replace_all(m.group(1)) or "nil"
+                            ret = m.group(1) or "nil"
                             name = m.group(2)
                             if m.group(3):
-                                param = replace_all(m.group(3).strip()) + ")"
+                                param = m.group(3).strip().replace("vector<", "array<") + ")"
                             signature = name + param
                     signature = signature.strip()
                     ret = ret.replace("<", "&lt;").replace(">", "&gt;")

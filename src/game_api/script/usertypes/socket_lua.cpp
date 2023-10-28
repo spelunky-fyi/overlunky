@@ -45,10 +45,18 @@ UdpServer::UdpServer(std::string host_, in_port_t port_, std::function<SocketCb>
     kill_thr.test_and_set();
     thr = std::thread(udp_data, std::move(sock), this);
 }
-UdpServer::~UdpServer()
+void UdpServer::clear() // TODO: fix and expose: this and the destructor causes deadlock
 {
     kill_thr.clear(std::memory_order_release);
     thr.join();
+}
+UdpServer::~UdpServer()
+{
+    if (thr.joinable())
+    {
+        kill_thr.clear(std::memory_order_release);
+        thr.join();
+    }
 }
 
 using NetFun = int(SOCKET, char*, int, int, sockaddr_in*, int*);
@@ -175,10 +183,14 @@ namespace NSocket
 {
 void register_usertypes(sol::state& lua)
 {
+    lua.new_usertype<UdpServer>(
+        "UdpServer",
+        sol::no_constructor);
     /// Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
     /// The server will be closed once the handle is released.
     lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> UdpServer*
     {
+        // TODO: change the return to std::unique_ptr after fixing the dead lock with the destroctor
         UdpServer* server = new UdpServer(std::move(host), std::move(port), make_safe_cb<UdpServer::SocketCb>(std::move(cb)));
         return server;
     };
@@ -225,10 +237,9 @@ void register_usertypes(sol::state& lua)
 
     /// Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
     /// The callback signature is nil on_data(string response, string error)
-    lua["http_get_async"] = [](std::string url, sol::function on_data) -> HttpRequest*
+    lua["http_get_async"] = [](std::string url, sol::function on_data)
     {
-        auto req = new HttpRequest(std::move(url), make_safe_cb<HttpRequest::HttpCb>(std::move(on_data)));
-        return req;
+        new HttpRequest(std::move(url), make_safe_cb<HttpRequest::HttpCb>(std::move(on_data)));
     };
 }
 }; // namespace NSocket

@@ -1000,7 +1000,7 @@ end
     /// Check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) for what the exact ENT_TYPE's can this function affect
     lua["set_contents"] = set_contents;
     /// Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
-    // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
+    // lua["get_entity"] = [](uint32_t uid) -> Entity*{};
     /// NoDoc
     /// Get the [Entity](#Entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
@@ -1435,7 +1435,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
-    /// <br/>The callback signature is bool render_screen(Screen* self, VanillaRenderContext render_ctx)
+    /// <br/>The callback signature is bool render_screen(Screen self, VanillaRenderContext render_ctx)
     lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -1459,7 +1459,7 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right after the screen is drawn.
-    /// <br/>The callback signature is nil render_screen(Screen* self, VanillaRenderContext render_ctx)
+    /// <br/>The callback signature is nil render_screen(Screen self, VanillaRenderContext render_ctx)
     lua["set_post_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -2034,7 +2034,7 @@ end
         return sol::make_object(lua, sol::as_table(files));
     };
 
-    /// List all char*.png files recursively from Mods/Packs. Returns table of file paths.
+    /// List all char_*.png files recursively from Mods/Packs. Returns table of file paths.
     lua["list_char_mods"] = [&lua]()
     {
         std::vector<std::string> files;
