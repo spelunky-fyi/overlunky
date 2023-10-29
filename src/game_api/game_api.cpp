@@ -1,6 +1,8 @@
 #include "game_api.hpp"
 
+#include "render_api.hpp"
 #include "search.hpp"
+#include "state.hpp"
 
 GameAPI* GameAPI::get()
 {
@@ -11,7 +13,8 @@ GameAPI* GameAPI::get()
 
 float GameAPI::get_current_zoom()
 {
-    return renderer->current_zoom + renderer->current_zoom_offset;
+    auto state = State::get().ptr();
+    return renderer->current_zoom + get_layer_transition_zoom_offset(state->camera_layer);
 }
 
 float GameAPI::get_target_zoom()

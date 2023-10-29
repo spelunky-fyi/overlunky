@@ -64,6 +64,7 @@ void render_loading(size_t param_1)
 }
 
 std::optional<TEXTURE> g_forced_lut_textures[2]{};
+float g_layer_zoom_offset[2];
 
 using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, const char**, const char**);
 RenderLayer* g_render_layer_trampoline{nullptr};
@@ -71,6 +72,9 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
 {
     if (trigger_vanilla_render_layer_callbacks(ON::RENDER_PRE_LAYER, layer))
         return;
+
+    auto game_api = GameAPI::get();
+    g_layer_zoom_offset[layer] = game_api->renderer->current_zoom_offset;
 
     // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
     // with a single LUT for now
@@ -104,6 +108,11 @@ void render_game(StateMemory* state)
         return;
     g_render_game_trampoline(state);
     trigger_vanilla_render_callbacks(ON::RENDER_POST_GAME);
+}
+
+float get_layer_transition_zoom_offset(uint8_t l)
+{
+    return g_layer_zoom_offset[l];
 }
 
 void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)

@@ -365,6 +365,7 @@ void init_render_api_hooks();
 bool& get_journal_enabled();
 void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);
 void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float bbox_bottom, float bbox_right, float bbox_top);
+float get_layer_transition_zoom_offset(uint8_t layer);
 
 struct HudInventory
 {
