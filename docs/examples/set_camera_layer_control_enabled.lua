@@ -19,6 +19,5 @@ function change_layer(layer_to, load_time)
     
     state.layer_transition_timer = load_time
     state.transition_to_layer = layer_to
-    -- actual layer change after time delay
-    set_timeout(function() state.camera_layer = layer_to end, load_time)
+    state.camera_layer = layer_to
 end
