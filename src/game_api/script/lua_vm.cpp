@@ -672,17 +672,18 @@ end
     lua["read_prng"] = []() -> std::vector<int64_t>
     { return read_prng(); };
 
+    using Toast = void(const char16_t*);
+    using Say = void(HudData*, Entity*, const char16_t*, int, bool);
+
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::u16string message)
     {
-        using Toast = void(const char16_t*);
-        static Toast* toast_fun = (Toast*)get_address("toast");
+        static auto toast_fun = (Toast*)get_address("toast");
         toast_fun(message.c_str());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::u16string message, int sound_type, bool top)
     {
-        using Say = void(HudData*, Entity*, const char16_t*, int, bool);
         static auto say = (Say*)get_address("speech_bubble_fun");
         const auto hud = get_hud();
 
