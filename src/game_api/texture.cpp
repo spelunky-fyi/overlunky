@@ -261,8 +261,6 @@ void reload_texture(const char* texture_name)
 }
 void reload_texture(const char** texture_name)
 {
-    class Renderer;
-
     using LoadTextureFunT = void(Renderer*, const char**);
 
     auto& render = RenderAPI::get();
@@ -272,7 +270,7 @@ void reload_texture(const char** texture_name)
     // to the wanted function
     static constexpr size_t c_LoadTextureVirtualIndex = 0x2E;
 
-    auto renderer_ptr = (Renderer*)render.renderer();
+    auto renderer_ptr = render.renderer();
     auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, c_LoadTextureVirtualIndex);
     load_texture(renderer_ptr, texture_name);
 }

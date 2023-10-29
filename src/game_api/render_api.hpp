@@ -18,6 +18,7 @@
 struct JournalUI;
 struct Layer;
 class Entity;
+struct Renderer;
 
 using VANILLA_TEXT_ALIGNMENT = uint32_t;
 using VANILLA_FONT_STYLE = uint32_t;
@@ -225,9 +226,6 @@ struct TextureRenderingInfo
 
 struct RenderAPI
 {
-    const size_t* api;
-    size_t swap_chain_off;
-
     mutable std::mutex custom_textures_lock;
     std::unordered_map<TEXTURE, Texture> custom_textures;
     std::unordered_map<TEXTURE, Texture> original_textures;
@@ -236,7 +234,7 @@ struct RenderAPI
 
     static RenderAPI& get();
 
-    size_t renderer() const;
+    Renderer* renderer() const;
     size_t swap_chain() const;
 
     void set_lut(TEXTURE texture_id, uint8_t layer);
@@ -366,7 +364,6 @@ struct RenderInfo
 void init_render_api_hooks();
 bool& get_journal_enabled();
 void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);
-float get_layer_zoom_offset(uint8_t layer);
 void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float bbox_bottom, float bbox_right, float bbox_top);
 
 struct HudInventory

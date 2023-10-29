@@ -14,6 +14,7 @@
 #include "entities_mounts.hpp"       // for Mount
 #include "entity.hpp"                // for to_id, Entity, get_entity_ptr
 #include "entity_lookup.hpp"         //
+#include "game_api.hpp"              //
 #include "game_manager.hpp"          // for get_game_manager, GameManager
 #include "illumination.hpp"          //
 #include "items.hpp"                 // for Items
@@ -84,7 +85,8 @@ void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
 }
 float UI::get_zoom_level()
 {
-    return State::get_zoom_level();
+    auto game_api = GameAPI::get();
+    return game_api->get_current_zoom();
 }
 void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 {

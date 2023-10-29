@@ -36,6 +36,7 @@
 #include "entities_items.hpp"                      // for Container, Player...
 #include "entity.hpp"                              // for get_entity_ptr
 #include "entity_lookup.hpp"                       //
+#include "game_api.hpp"                            //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
 #include "illumination.hpp"                        //
@@ -671,27 +672,26 @@ end
     lua["read_prng"] = []() -> std::vector<int64_t>
     { return read_prng(); };
 
-    using Toast = void(const char16_t*);
-    using Say = void(size_t, Entity*, const char16_t*, int, bool);
-
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::u16string message)
     {
+        using Toast = void(const char16_t*);
         static Toast* toast_fun = (Toast*)get_address("toast");
         toast_fun(message.c_str());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::u16string message, int sound_type, bool top)
     {
+        using Say = void(HudData*, Entity*, const char16_t*, int, bool);
         static auto say = (Say*)get_address("speech_bubble_fun");
-        static const auto say_context = get_address("say_context");
+        const auto hud = get_hud();
 
         auto entity = get_entity_ptr(entity_uid);
 
         if (entity == nullptr)
             return;
 
-        say(say_context, entity, message.c_str(), sound_type, top);
+        say(hud, entity, message.c_str(), sound_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
@@ -1108,7 +1108,7 @@ end
     /// Set the `more_flags` field from entity by uid
     lua["set_entity_flags2"] = set_entity_flags2;
     /// Deprecated
-    /// As the name is misleading. use entity `move_state` field instead
+    /// As the name is misleading. use Movable.`move_state` field instead
     lua["get_entity_ai_state"] = get_entity_ai_state;
     /// Get `state.level_flags`
     lua["get_level_flags"] = get_level_flags;
@@ -1118,7 +1118,10 @@ end
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
     lua["get_zoom_level"] = []() -> float
-    { return State::get_zoom_level(); };
+    {
+        auto game_api = GameAPI::get();
+        return game_api->get_current_zoom();
+    };
     /// Get the game coordinates at the screen position (`x`, `y`)
     lua["game_position"] = [](float x, float y) -> std::pair<float, float>
     { return State::click_position(x, y); };

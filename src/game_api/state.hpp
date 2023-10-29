@@ -293,8 +293,7 @@ struct StateMemory
     int8_t unknown41; // other character related (hired hand, basecamp characters)
     uint8_t unknown42;
     uint8_t unknown43;
-    uint32_t unknown44;
-    uint64_t unknown45;
+    uint32_t unknown44; // probably padding
 
     /// This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     void force_current_theme(uint32_t t);
@@ -336,8 +335,6 @@ struct State
     void godmode_companions(bool g);
     void darkmode(bool g);
 
-    static size_t get_zoom_level_address();
-    static float get_zoom_level();
     void zoom(float level);
 
     static std::pair<float, float> click_position(float x, float y);
