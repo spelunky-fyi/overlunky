@@ -1,4 +1,5 @@
-const char* themes[]{
+
+std::array themes{
     "1: Dwelling",
     "2: Jungle",
     "2: Volcana",
@@ -18,7 +19,7 @@ const char* themes[]{
     "0: Base camp",
 };
 
-const char* themes_short[]{
+std::array themes_short{
     "Dwelling",
     "Jungle",
     "Volcana",
@@ -38,7 +39,7 @@ const char* themes_short[]{
     "Base camp",
 };
 
-const char* entity_flags[]{
+std::array entity_flags{
     "1: Invisible",
     "2: Indestructable/special floor",
     "3: Solid (wall)",
@@ -73,7 +74,7 @@ const char* entity_flags[]{
     "32: Use overlay draw depth",
 };
 
-const char* more_flags[]{
+std::array more_flags{
     "1: Take damage on collision after throw",
     "2: Revived (HH)",
     "3: Blocks shield",
@@ -108,7 +109,7 @@ const char* more_flags[]{
     "32: ",
 };
 
-const char* entity_type_properties_flags[]{
+std::array entity_type_properties_flags{
     "1: Apply solid block beautification",
     "2: Treat as FLOORSTYLED",
     "3: ",
@@ -143,7 +144,7 @@ const char* entity_type_properties_flags[]{
     "32: Unused",
 };
 
-const char* level_flags[]{
+std::array level_flags{
     "1: Upbeat dwelling intro music played",
     "2: ",
     "3: Running tutorial speedrun",
@@ -178,7 +179,7 @@ const char* level_flags[]{
     "32: ",
 };
 
-const char* journal_flags[]{
+std::array journal_flags{
     "1: I was a pacifist",
     "2: I was a vegan",
     "3: I was a vegetarian",
@@ -213,7 +214,7 @@ const char* journal_flags[]{
     "32: ",
 };
 
-const char* quest_flags[]{
+std::array quest_flags{
     "1: Reset",
     "2: Dark level spawned in world",
     "3: Vault spawned in world",
@@ -248,7 +249,7 @@ const char* quest_flags[]{
     "32: ",
 };
 
-const char* presence_flags[]{
+std::array presence_flags{
     "1: Udjat eye",
     "2: Black market",
     "3: Vlad's castle/drill",
@@ -283,7 +284,7 @@ const char* presence_flags[]{
     "32: ",
 };
 
-const char* illumination_flags[]{
+std::array illumination_flags{
     "1: Disable light1",
     "2: Enable light2",
     "3: Enable light3",
@@ -294,7 +295,7 @@ const char* illumination_flags[]{
     "8: Unknown",
 };
 
-const char* special_visibility_flags[]{
+std::array special_visibility_flags{
     "1: Crust embedded items shown",
     "2: Crust embedded items shown (level transition)",
     "3: ",
@@ -321,7 +322,7 @@ const char* special_visibility_flags[]{
     "24: ",
 };
 
-const char* basecamp_dialogue_win_flags[]{
+std::array basecamp_dialogue_win_flags{
     "1: Ana Spelunky saved",
     "2: Margaret Tunnel saved",
     "3: Colin Northward saved",
@@ -356,7 +357,7 @@ const char* basecamp_dialogue_win_flags[]{
     "32: ",
 };
 
-const char* places_flags[]{
+std::array places_flags{
     "Dwelling",
     "Jungle",
     "Volcana",
@@ -375,7 +376,7 @@ const char* places_flags[]{
     "Cosmic Ocean",
 };
 
-const char* people_flags[]{
+std::array people_flags{
     "Ana Spelunky",
     "Margaret Tunnel",
     "Colin Northward",
@@ -416,7 +417,7 @@ const char* people_flags[]{
     "Eggplant King",
 };
 
-const char* bestiary_flags[]{
+std::array bestiary_flags{
     "Snake",
     "Spider",
     "Bat",
@@ -497,7 +498,7 @@ const char* bestiary_flags[]{
     "Mech Rider",
 };
 
-const char* items_flags[]{
+std::array items_flags{
     "Rope Pile",
     "Bomb Bag",
     "Bomb Box",
@@ -554,7 +555,7 @@ const char* items_flags[]{
     "Four-Leaf Clover",
 };
 
-const char* traps_flags[]{
+std::array traps_flags{
     "Spikes",
     "Arrow Trap",
     "Totem Trap",
@@ -581,7 +582,7 @@ const char* traps_flags[]{
     "Egg Sac",
 };
 
-const char* shortcut_flags[]{
+std::array shortcut_flags{
     "None",
     "Met Terra",
     "1-4: $2,000",
@@ -595,7 +596,7 @@ const char* shortcut_flags[]{
     "5-1: Golden Key (Unlocked)",
 };
 
-/*const char *empty_flags[]{
+/*std::array empty_flags{
     "1: ",
 "2: ",
 "3: ",
@@ -629,7 +630,7 @@ const char* shortcut_flags[]{
 "31: ",
 "32: ",};*/
 
-const char* button_flags[]{
+std::array button_flags{
     "Jp",
     "Wp",
     "Bm",
@@ -637,14 +638,14 @@ const char* button_flags[]{
     "Rn",
     "Dr",
 };
-const char* direction_flags[]{
+std::array direction_flags{
     "Left",
     "Down",
     "Up",
     "Right",
 };
 
-const char* liquid_pool_names[]{
+std::array liquid_pool_names{
     "Water",
     "Coarse Water",
     "Lava",
@@ -652,7 +653,7 @@ const char* liquid_pool_names[]{
     "Stagnant Lava",
 };
 
-const char* mask_names[]{
+std::array mask_names{
     "Player",
     "Mount",
     "Monster",
@@ -670,7 +671,7 @@ const char* mask_names[]{
     "Lava",
 };
 
-const char* char_states[]{
+std::array char_states{
     "Flailing",
     "Standing",
     "Sitting",
@@ -696,7 +697,7 @@ const char* char_states[]{
     "Dying",
 };
 
-const char* screen_names[]{
+std::array screen_names{
     "Logo",
     "Intro",
     "Prologue",
@@ -729,7 +730,7 @@ const char* screen_names[]{
     "Online Lobby",
 };
 
-const char* pause_types[]{
+std::array pause_types{
     "1: Menu",
     "2: Fade (janky camera, default)",
     "4: Cutscene",
@@ -739,7 +740,7 @@ const char* pause_types[]{
     "Freeze on PRE_UPDATE", // this is not a real state.pause flag, it's only used by ui.cpp for magic
 };
 
-const char* levelgen_flags[]{
+std::array levelgen_flags{
     "1: Should generate path",
     "2: Can spawn vault",
     "3: Can spawn shops",
@@ -750,7 +751,7 @@ const char* levelgen_flags[]{
     "8: unknown",
 };
 
-const char* levelgen_flags2[]{
+std::array levelgen_flags2{
     "1: Spawns background decorations on ground (ceiling if false)",
     "2: Spawns fake ladder/chain midbg?",
     "3: Spawn entrance door background (Ignored in 7-1 to 7-2 transition)",
@@ -761,7 +762,7 @@ const char* levelgen_flags2[]{
     "8: Has ghost",
 };
 
-const char* levelgen_flags3[]{
+std::array levelgen_flags3{
     "1: Can spawn angry NPCs",
     "2: Can echo",
     "3: Can spawn Dead are Restless",
@@ -772,7 +773,7 @@ const char* levelgen_flags3[]{
     "8: unknown",
 };
 
-const char* level_chances[]{
+std::array level_chances{
     "backroom",
     "backroom interconnect",
     "backroom hidden door",

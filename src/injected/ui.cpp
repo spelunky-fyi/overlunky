@@ -3480,6 +3480,23 @@ void render_light(const char* name, LightParams* light)
     ImGui::PopID();
 }
 
+template <std::size_t SIZE, typename T>
+void render_flags(const std::array<const char*, SIZE> names_array, T* flag_field)
+{
+    for (int idx{0}; idx < SIZE && idx < sizeof(T) * 8; ++idx)
+    {
+        // just simplified version of CheckboxFlagsT
+
+        T value = (T)std::pow(2, idx);
+        bool on = (*flag_field & value) == value;
+
+        if (ImGui::Checkbox(names_array[idx], &on))
+        {
+            *flag_field ^= value;
+        }
+    }
+}
+
 void render_illumination(Illumination* light, const char* sect = "")
 {
     ImGui::PushID(sect);
@@ -3498,10 +3515,7 @@ void render_illumination(Illumination* light, const char* sect = "")
     ImGui::InputFloat("Offset X##LightPosX", &light->offset_x);
     ImGui::InputFloat("Offset Y##LightPosY", &light->offset_y);
     ImGui::DragFloat("Distortion##LightDistortion", &light->distortion, 0.01f);
-    for (int i = 0; i < 11; i++)
-    {
-        ImGui::CheckboxFlags(illumination_flags[i], &light->flags, (int)std::pow(2, i));
-    }
+    render_flags(illumination_flags, &light->flags);
     ImGui::PopID();
 }
 
@@ -5792,10 +5806,7 @@ void render_options()
     if (submenu("Frame advance / Engine pause type"))
     {
         ImGui::PushID("PauseType");
-        for (int i = 1; i < 7; i++)
-        {
-            ImGui::CheckboxFlags(pause_types[i], &g_pause_type, (int)std::pow(2, i));
-        }
+        render_flags(pause_types, &g_pause_type);
         ImGui::PopID();
         endmenu();
     }
@@ -7119,10 +7130,7 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
         if (submenu("Properties flags"))
         {
-            for (int i = 0; i < 32; i++)
-            {
-                ImGui::CheckboxFlags(entity_type_properties_flags[i], &entity->type->properties_flags, (int)std::pow(2, i));
-            }
+            render_flags(entity_type_properties_flags, &entity->type->properties_flags);
             endmenu();
         }
         endmenu();
@@ -7316,18 +7324,12 @@ void render_entity_props(int uid, bool detached = false)
     }
     if (submenu("Flags"))
     {
-        for (int i = 0; i < 32; i++)
-        {
-            ImGui::CheckboxFlags(entity_flags[i], &entity->flags, (int)std::pow(2, i));
-        }
+        render_flags(entity_flags, &entity->flags);
         endmenu();
     }
     if (submenu("More Flags"))
     {
-        for (int i = 0; i < 32; i++)
-        {
-            ImGui::CheckboxFlags(more_flags[i], &entity->more_flags, (int)std::pow(2, i));
-        }
+        render_flags(more_flags, &entity->more_flags);
         endmenu();
     }
     if (is_movable && submenu("Input Display"))
@@ -8083,67 +8085,37 @@ void render_game_props()
     }
     if (submenu("Level flags"))
     {
-        for (int i = 0; i < 32; i++)
-        {
-            ImGui::CheckboxFlags(level_flags[i], &g_state->level_flags, (int)std::pow(2, i));
-        }
+        render_flags(level_flags, &g_state->level_flags);
         endmenu();
     }
     if (submenu("Quest flags"))
     {
-        for (int i = 0; i < 32; i++)
-        {
-            ImGui::CheckboxFlags(quest_flags[i], &g_state->quest_flags, (int)std::pow(2, i));
-        }
+        render_flags(quest_flags, &g_state->quest_flags);
         endmenu();
     }
     if (submenu("Journal flags"))
     {
-        for (int i = 0; i < 21; i++)
-        {
-            ImGui::CheckboxFlags(journal_flags[i], &g_state->journal_flags, (int)std::pow(2, i));
-        }
+        render_flags(journal_flags, &g_state->journal_flags);
         endmenu();
     }
     if (submenu("Presence flags"))
     {
-        for (int i = 0; i < 11; i++)
-        {
-            ImGui::CheckboxFlags(presence_flags[i], &g_state->presence_flags, (int)std::pow(2, i));
-        }
+        render_flags(presence_flags, &g_state->presence_flags);
         endmenu();
     }
     if (submenu("Special visibility flags"))
     {
-        for (int i = 0; i < 32; i++)
-        {
-            ImGui::CheckboxFlags(special_visibility_flags[i], &g_state->special_visibility_flags, (int)std::pow(2, i));
-        }
+        render_flags(special_visibility_flags, &g_state->special_visibility_flags);
         endmenu();
     }
     if (submenu("Level generation flags"))
     {
-        auto flags = (int)g_state->level_gen->flags;
-        auto flags2 = (int)g_state->level_gen->flags2;
-        auto flags3 = (int)g_state->level_gen->flags3;
         ImGui::SeparatorText("Flags 1");
-        for (int i = 0; i < 8; i++)
-        {
-            ImGui::CheckboxFlags(levelgen_flags[i], &flags, (int)std::pow(2, i));
-        }
+        render_flags(levelgen_flags, &g_state->level_gen->flags);
         ImGui::SeparatorText("Flags 2");
-        for (int i = 0; i < 8; i++)
-        {
-            ImGui::CheckboxFlags(levelgen_flags2[i], &flags2, (int)std::pow(2, i));
-        }
+        render_flags(levelgen_flags2, &g_state->level_gen->flags2);
         ImGui::SeparatorText("Flags 3");
-        for (int i = 0; i < 8; i++)
-        {
-            ImGui::CheckboxFlags(levelgen_flags3[i], &flags3, (int)std::pow(2, i));
-        }
-        g_state->level_gen->flags = (uint8_t)flags;
-        g_state->level_gen->flags2 = (uint8_t)flags2;
-        g_state->level_gen->flags3 = (uint8_t)flags3;
+        render_flags(levelgen_flags3, &g_state->level_gen->flags3);
         if (g_state->current_theme)
         {
             ImGui::SeparatorText("Theme flags");

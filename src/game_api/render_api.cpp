@@ -64,7 +64,7 @@ void render_loading(size_t param_1)
 }
 
 std::optional<TEXTURE> g_forced_lut_textures[2]{};
-float g_layer_zoom_offset[2];
+float g_layer_zoom_offset[2]{0};
 
 using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, const char**, const char**);
 RenderLayer* g_render_layer_trampoline{nullptr};
@@ -110,9 +110,9 @@ void render_game(StateMemory* state)
     trigger_vanilla_render_callbacks(ON::RENDER_POST_GAME);
 }
 
-float get_layer_transition_zoom_offset(uint8_t l)
+float get_layer_transition_zoom_offset(uint8_t layer)
 {
-    return g_layer_zoom_offset[l];
+    return g_layer_zoom_offset[layer];
 }
 
 void RenderAPI::set_lut(TEXTURE texture_id, uint8_t layer)
