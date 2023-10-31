@@ -3481,7 +3481,7 @@ void render_light(const char* name, LightParams* light)
 }
 
 template <std::size_t SIZE, typename T>
-void render_flags(const std::array<const char*, SIZE> names_array, T* flag_field)
+void render_flags(const std::array<const char*, SIZE> names_array, T* flag_field, bool show_number = true)
 {
     for (int idx{0}; idx < SIZE && idx < sizeof(T) * 8; ++idx)
     {
@@ -3490,7 +3490,8 @@ void render_flags(const std::array<const char*, SIZE> names_array, T* flag_field
         T value = (T)std::pow(2, idx);
         bool on = (*flag_field & value) == value;
 
-        if (ImGui::Checkbox(names_array[idx], &on))
+        if (names_array[idx][0] != '\0' &&
+            ImGui::Checkbox(show_number ? fmt::format("{}: {}", idx + 1, names_array[idx]).c_str() : names_array[idx], &on))
         {
             *flag_field ^= value;
         }
@@ -5806,7 +5807,7 @@ void render_options()
     if (submenu("Frame advance / Engine pause type"))
     {
         ImGui::PushID("PauseType");
-        render_flags(pause_types, &g_pause_type);
+        render_flags(pause_types, &g_pause_type, false);
         ImGui::PopID();
         endmenu();
     }
