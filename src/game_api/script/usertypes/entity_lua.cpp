@@ -53,6 +53,7 @@ void register_usertypes(sol::state& lua)
     color_type["set_rgba"] = &Color::set_rgba;
     color_type["get_ucolor"] = &Color::get_ucolor;
     color_type["set_ucolor"] = &Color::set_ucolor;
+    color_type["set"] = &Color::set;
 
     /// Used in EntityDB
     lua.new_usertype<Animation>(

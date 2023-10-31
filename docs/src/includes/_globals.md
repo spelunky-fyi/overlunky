@@ -1735,8 +1735,7 @@ function change_layer(layer_to, load_time)
     
     state.layer_transition_timer = load_time
     state.transition_to_layer = layer_to
-    -- actual layer change after time delay
-    set_timeout(function() state.camera_layer = layer_to end, load_time)
+    state.camera_layer = layer_to
 end
 
 ```
@@ -3676,7 +3675,7 @@ Use `get_entities_overlapping_hitbox` instead
 
 #### int get_entity_ai_state(int uid)
 
-As the name is misleading. use entity `move_state` field instead
+As the name is misleading. use [Movable](#Movable).`move_state` field instead
 
 ### set_arrowtrap_projectile
 

@@ -22,6 +22,12 @@ struct LightParams // it's probably just Color
     float green;
     float blue;
     float size;
+
+    /// Returns LightParams as Color, note that size = alpha
+    Color* as_color()
+    {
+        return reinterpret_cast<Color*>(this);
+    };
 };
 
 struct Illumination

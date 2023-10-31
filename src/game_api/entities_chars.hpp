@@ -8,7 +8,6 @@
 #include <vector>     // for vector
 
 #include "aliases.hpp"               // for ENT_TYPE
-#include "color.hpp"                 // for Color
 #include "containers/custom_map.hpp" //
 #include "movable.hpp"               // for Movable
 
@@ -16,6 +15,7 @@ struct Illumination;
 struct PlayerInputs;
 struct Inventory;
 struct PlayerSlot;
+struct Color;
 class Entity;
 
 class Ai

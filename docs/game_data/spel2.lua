@@ -1992,12 +1992,12 @@ do
     ---@field pools LiquidPool[] @size: 5
 
 ---@class StateMemory
-    ---@field screen_last integer @Previous SCREEN, used to check where we're coming from when loading another SCREEN
-    ---@field screen integer @Current SCREEN, generally read-only or weird things will happen
-    ---@field screen_next integer @Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
+    ---@field screen_last SCREEN @Previous SCREEN, used to check where we're coming from when loading another SCREEN
+    ---@field screen SCREEN @Current SCREEN, generally read-only or weird things will happen
+    ---@field screen_next SCREEN @Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
     ---@field ingame integer @Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
     ---@field playing integer @Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
-    ---@field pause PAUSE @8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
+    ---@field pause PAUSE @8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controlled by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
     ---@field width integer @level width in rooms (number of rooms horizontally)
     ---@field height integer @level height in rooms (number of rooms vertically)
     ---@field kali_favor integer
@@ -2014,7 +2014,7 @@ do
     ---@field level_start integer @Level number to start new runs in
     ---@field theme THEME @Current THEME number, used to pick the music and by some game logic like choosing the next level on transition
     ---@field theme_next THEME @Next THEME number, used when loading a new level or transition
-    ---@field theme_start integer @THEME to start new runs in
+    ---@field theme_start THEME @THEME to start new runs in
     ---@field current_theme ThemeInfo @Points to the current ThemeInfo
     ---@field force_current_theme fun(self, t: integer): nil @This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     ---@field shoppie_aggro integer @Current shoppie aggro
@@ -2041,7 +2041,7 @@ do
     ---@field win_state integer @0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     ---@field illumination Illumination @The global level illumination, very big and bright.
     ---@field money_last_levels integer
-    ---@field money_shop_total integer @Total negative amount spent in shops during the run<br><br/>The total money currently available (in single player) is `players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total`
+    ---@field money_shop_total integer @Total amount spent in shops and sold idols during the run<br><br/>The total money currently available is `loop (players[].inventory.money + players[].inventory.collected_money_total) + state.money_shop_total`
     ---@field player_inputs PlayerInputs @Access the player inputs even when no player entities are available
     ---@field quests QuestsInfo @NPC quest states
     ---@field camera Camera @Camera bounds and position
@@ -2096,7 +2096,7 @@ do
     ---@field journal_progress_stain_count integer
     ---@field journal_progress_stain_slots JournalProgressStainSlot[] @size: 30 @blood splats and paw prints in journal progress page
     ---@field journal_progress_theme_count integer
-    ---@field journal_progress_theme_slots integer[] @size: 9 @visited themes in journal progress page
+    ---@field journal_progress_theme_slots THEME[] @size: 9 @visited themes in journal progress page
     ---@field theme_info ThemeInfo @Points to the current ThemeInfo
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
@@ -2108,6 +2108,7 @@ do
     ---@field green number
     ---@field blue number
     ---@field size number
+    ---@field as_color fun(self): Color @Returns LightParams as Color, note that size = alpha
 
 ---@class Illumination
     ---@field lights LightParams[] @size: 4 @Table of light1, light2, ... etc.
@@ -2266,6 +2267,7 @@ function PRNG:random(min, max) end
     ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
     ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
     ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
+    ---@field set fun(self, other: Color): Color @Copies the values of different Color to this one
 
 ---@class Animation
     ---@field id integer

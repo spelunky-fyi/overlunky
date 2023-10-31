@@ -51,13 +51,15 @@ void fix_liquid_out_of_bounds();
 #pragma pack(push, 1) // disable struct padding
 struct StateMemory
 {
+    using SCREEN = uint32_t;
+
     size_t p00;
     /// Previous SCREEN, used to check where we're coming from when loading another SCREEN
-    uint32_t screen_last;
+    SCREEN screen_last;
     /// Current SCREEN, generally read-only or weird things will happen
-    uint32_t screen;
+    SCREEN screen;
     /// Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
-    uint32_t screen_next;
+    SCREEN screen_next;
     /// Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
     uint32_t loading;
     /// The global level illumination, very big and bright.
@@ -75,7 +77,7 @@ struct StateMemory
     /// Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
     uint8_t playing;
     /// 8bit flags, multiple might be active at the same time
-    /// 1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.
+    /// 1: Menu: Pauses the level timer and engine. Can't set, controlled by the menu.
     /// 2: Fade/Loading: Pauses all timers and engine.
     /// 4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.
     /// 8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.
@@ -106,15 +108,15 @@ struct StateMemory
     /// 0 - none, 1 - item, 3 - kapala
     int8_t kali_gifts;
     int32_t outposts_spawned;
-    /// Total negative amount spent in shops during the run<br>
-    /// The total money currently available (in single player) is `players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total`
+    /// Total amount spent in shops and sold idols during the run<br>
+    /// The total money currently available is `loop (players[].inventory.money + players[].inventory.collected_money_total) + state.money_shop_total`
     int32_t money_shop_total;
     /// World number to start new runs in
     uint8_t world_start;
     /// Level number to start new runs in
     uint8_t level_start;
     /// THEME to start new runs in
-    uint8_t theme_start;
+    THEME theme_start;
     uint8_t b5f;
     /// Current seed in seeded mode, just set to a funny value and does nothing in adventure mode
     uint32_t seed;
@@ -172,7 +174,7 @@ struct StateMemory
     std::array<JournalProgressStainSlot, 30> journal_progress_stain_slots;
     uint8_t journal_progress_theme_count;
     /// visited themes in journal progress page
-    std::array<uint8_t, 9> journal_progress_theme_slots;
+    std::array<THEME, 9> journal_progress_theme_slots;
     uint8_t unknown3;
     uint8_t unknown4;
     uint8_t unknown5a;

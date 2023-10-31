@@ -412,7 +412,9 @@ void register_usertypes(sol::state& lua)
         "blue",
         &LightParams::blue,
         "size",
-        &LightParams::size);
+        &LightParams::size,
+        "as_color",
+        &LightParams::as_color);
 
     /// Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
     /// Used in StateMemory, Player, PlayerGhost, BurningRopeEffect ...

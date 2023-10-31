@@ -6,13 +6,13 @@
 
 struct Renderer
 {
-    uint32_t render_width; // sam as window size unless resolution scale is set
+    uint32_t render_width; // same as window size unless resolution scale is set
     uint32_t render_height;
 
     uint32_t fps; // changing it doesn't seam to do anything
     uint32_t fps_denominator;
 
-    uint32_t render_width2; // repeat
+    uint32_t render_width2; // repeat?
     uint32_t render_height2;
 
     uint8_t flags1;
@@ -36,7 +36,7 @@ struct Renderer
 
     size_t swap_chain;
 
-    // somewhere there should be shareds stored
+    // somewhere there should be shaders stored
 
     // added just to have the vtable
     virtual ~Renderer() = 0;
