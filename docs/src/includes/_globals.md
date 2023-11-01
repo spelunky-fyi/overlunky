@@ -2417,7 +2417,7 @@ Extinguish a particle emitter (use the return value of `generate_world_particles
 
 > Search script examples for [generate_screen_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_screen_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_screen_particles(int particle_emitter_id, float x, float y)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_screen_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, float x, float y)
 
 Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
 
@@ -2426,7 +2426,7 @@ Generate particles of the specified type at a certain screen coordinate (use e.g
 
 > Search script examples for [generate_world_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_world_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_world_particles(int particle_emitter_id, int uid)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_world_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
 
 Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
 
@@ -2435,7 +2435,7 @@ Generate particles of the specified type around the specified entity uid (use e.
 
 > Search script examples for [get_particle_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 
-#### [ParticleDB](#ParticleDB) get_particle_type(int id)
+#### [ParticleDB](#ParticleDB) get_particle_type([PARTICLEEMITTER](#PARTICLEEMITTER) id)
 
 Get the [ParticleDB](#ParticleDB) details of the specified ID
 
@@ -3946,7 +3946,7 @@ Use this only when no other approach works, this call can be expensive if overus
 
 > Search script examples for [generate_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles(int particle_emitter_id, int uid)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
 
 Use `generate_world_particles`
 

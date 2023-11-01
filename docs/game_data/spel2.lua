@@ -1371,16 +1371,16 @@ function set_character_heart_color(type_id, color) end
 ---@return CustomMovableBehavior
 function make_custom_behavior(behavior_name, state_id, base_behavior) end
 ---Get the [ParticleDB](https://spelunky-fyi.github.io/overlunky/#ParticleDB) details of the specified ID
----@param id integer
+---@param id PARTICLEEMITTER
 ---@return ParticleDB
 function get_particle_type(id) end
 ---Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
----@param particle_emitter_id integer
+---@param particle_emitter_id PARTICLEEMITTER
 ---@param uid integer
 ---@return ParticleEmitterInfo
 function generate_world_particles(particle_emitter_id, uid) end
 ---Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
----@param particle_emitter_id integer
+---@param particle_emitter_id PARTICLEEMITTER
 ---@param x number
 ---@param y number
 ---@return ParticleEmitterInfo
@@ -3610,7 +3610,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field emitted_light Illumination
 
 ---@class FlameSize : Flame
-    ---@field flame_size number @if changed, gradually goes down (0.03 per frame) to the default size
+    ---@field flame_size number @if changed, gradually goes down (0.03 per frame) to the default size, it's the base value for `entity.width` and `entity.height`
 
 ---@class ClimbableRope : Movable
     ---@field segment_nr_inverse integer
@@ -4367,7 +4367,7 @@ function MovableBehavior:get_state_id() end
     ---@field set_get_next_state_id fun(self, get_next_state_id: fun(movable: Movable, base_fun: function): integer): nil @Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature<br/>of the function is `int get_next_state_id(Movable movable, function base_fun))`, use this to move to another state, return `nil`.<br/>or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
 
 ---@class ParticleDB
-    ---@field id integer
+    ---@field id PARTICLEEMITTER
     ---@field spawn_count_min integer
     ---@field spawn_count integer
     ---@field lifespan_min integer
@@ -4400,6 +4400,7 @@ function MovableBehavior:get_state_id() end
 
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
+    ---@field particle_type2 ParticleDB
     ---@field particle_count integer
     ---@field particle_count_back_layer integer
     ---@field entity_uid integer
@@ -4407,6 +4408,8 @@ function MovableBehavior:get_state_id() end
     ---@field y number
     ---@field offset_x number
     ---@field offset_y number
+    ---@field layer integer
+    ---@field draw_depth integer
     ---@field emitted_particles Particle[]
     ---@field emitted_particles_back_layer Particle[]
 
@@ -5348,6 +5351,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field y number
     ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
     ---@field distance_to fun(self, other: Vec2): number @Just simple pythagoras theorem
+    ---@field set fun(self, other: Vec2): Vec2
     ---@field split fun(self): number, number
 
 ---@class AABB
@@ -5362,6 +5366,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field center fun(self): number, number @Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
     ---@field width fun(self): number @Short for `aabb.right - aabb.left`.
     ---@field height fun(self): number @Short for `aabb.top - aabb.bottom`.
+    ---@field set fun(self, other: AABB): AABB
     ---@field split fun(self): number, number, number, number
 local AABB = nil
 ---Grows or shrinks the AABB by the given amount in all directions.
@@ -5393,6 +5398,7 @@ function AABB:is_point_inside(x, y) end
     ---@field get_angles fun(self): number, number, number @Returns ABC, BCA, CAB angles in radians
     ---@field scale fun(self, scale: number): Triangle
     ---@field area fun(self): number
+    ---@field set fun(self, other: Triangle): Triangle
     ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corner points
 local Triangle = nil
 ---@param off Vec2
@@ -5428,6 +5434,7 @@ function Triangle:is_point_inside(x, y, epsilon) end
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad @Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
+    ---@field set fun(self, other: Quad): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 local Quad = nil
 ---Check if point lies inside of triangle
@@ -5833,7 +5840,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field page_timer integer
     ---@field fade_timer integer
     ---@field opacity integer
-    ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
@@ -6338,6 +6345,14 @@ function EntityDB:new(other) end
 ---@param other ENT_TYPE
 ---@return EntityDB
 function EntityDB:new(other) end
+
+ParticleDB = nil
+---@param other ParticleDB
+---@return ParticleDB
+function ParticleDB:new(other) end
+---@param particle_id PARTICLEEMITTER
+---@return ParticleDB
+function ParticleDB:new(particle_id) end
 
 CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).

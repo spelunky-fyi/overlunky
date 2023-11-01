@@ -571,6 +571,7 @@ float | [width()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width
 float | [height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Short for `aabb.top - aabb.bottom`.
 bool | [is_point_inside(Vec2 p)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Checks if point lies between left/right and top/bottom
 bool | [is_point_inside(float x, float y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
+[AABB](#AABB) | [set(AABB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;float, float, float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ### BackgroundMusic
@@ -810,6 +811,7 @@ float | [top_left_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=to
 [Quad](#Quad) | [flip_vertically()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_vertically) | 
 bool | [is_point_inside(Vec2 p, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
 bool | [is_point_inside(float x, float y, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
+[Quad](#Quad) | [set(Quad other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 
 ### RenderInfo
@@ -925,6 +927,7 @@ tuple&lt;float, float, float&gt; | [get_angles()](https://github.com/spelunky-fy
 float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) | 
 bool | [is_point_inside(Vec2 p, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.0001`
 bool | [is_point_inside(float x, float y, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
+[Triangle](#Triangle) | [set(Triangle other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corner points
 
 ### UdpServer
@@ -946,6 +949,7 @@ float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) |
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 [Vec2](#Vec2) | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
 float | [distance_to(Vec2 other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance_to) | Just simple pythagoras theorem
+[Vec2](#Vec2) | [set(Vec2 other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ## Input types
@@ -1661,7 +1665,9 @@ Used in [ParticleDB](#ParticleDB), [get_particle_type](#get_particle_type)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
+[ParticleDB](#ParticleDB) | [new(ParticleDB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ParticleDB) | 
+[ParticleDB](#ParticleDB) | [new(PARTICLEEMITTER particle_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ParticleDB) | 
+[PARTICLEEMITTER](#PARTICLEEMITTER) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
 int | [spawn_count_min](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) | 
 int | [spawn_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count) | 
 int | [lifespan_min](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lifespan_min) | 
@@ -1700,6 +1706,7 @@ Used in [ScreenCharacterSelect](#ScreenCharacterSelect), [ScreenTitle](#ScreenTi
 Type | Name | Description
 ---- | ---- | -----------
 [ParticleDB](#ParticleDB) | [particle_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type) | 
+[ParticleDB](#ParticleDB) | [particle_type2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type2) | 
 int | [particle_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count) | 
 int | [particle_count_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count_back_layer) | 
 int | [entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) | 
@@ -1707,6 +1714,8 @@ float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) |
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) | 
 float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
+int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
+int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
 array&lt;[Particle](#Particle)&gt; | [emitted_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_particles) | 
 array&lt;[Particle](#Particle)&gt; | [emitted_particles_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_particles_back_layer) | 
 
@@ -1849,7 +1858,7 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
 int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
 int | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
-vector&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+vector&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ### OnlineLobbyScreenPlayer
 
@@ -6037,7 +6046,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Flame](#Flame)
 
 Type | Name | Description
 ---- | ---- | -----------
-float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down (0.03 per frame) to the default size
+float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down (0.03 per frame) to the default size, it's the base value for `entity.width` and `entity.height`
 
 ### Fly
 
