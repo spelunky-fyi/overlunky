@@ -67,6 +67,8 @@ void register_usertypes(sol::state& lua)
         &Vec2::rotate,
         "distance_to",
         &Vec2::distance_to,
+        "set",
+        &Vec2::set,
         "split",
         // &Vec2::split); // for the autodoc
         &Vec2::operator std::pair<float, float>);
@@ -108,6 +110,8 @@ void register_usertypes(sol::state& lua)
         &AABB::height,
         "is_point_inside",
         is_point_inside,
+        "set",
+        &AABB::set,
         "split",
         // &Vec2::split); // for the autodoc
         &AABB::operator std::tuple<float, float, float, float>);
@@ -144,6 +148,8 @@ void register_usertypes(sol::state& lua)
         &Triangle::area,
         "is_point_inside",
         is_point_inside_triangle,
+        "set",
+        &Triangle::set,
         "split",
         // &Triangle::split); // for the autodoc
         &Triangle::operator std::tuple<Vec2, Vec2, Vec2>);
@@ -185,6 +191,8 @@ void register_usertypes(sol::state& lua)
         &Quad::flip_vertically,
         "is_point_inside",
         is_point_inside_quad,
+        "set",
+        &Quad::set,
         "split",
         // &Quad::split); // for the autodoc
         &Quad::operator std::tuple<Vec2, Vec2, Vec2, Vec2>);

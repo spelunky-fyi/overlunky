@@ -154,7 +154,7 @@ struct Color
         return set_rgba(red, green, blue, alpha);
     }
     /// Copies the values of different Color to this one
-    Color& set(Color other)
+    Color& set(Color& other)
     {
         *this = other;
         return *this;

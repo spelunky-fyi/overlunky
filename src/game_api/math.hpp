@@ -41,6 +41,11 @@ struct Vec2
         diff *= diff; // pow
         return (float)std::sqrt(diff.x + diff.y);
     }
+    Vec2& set(Vec2& other)
+    {
+        *this = other;
+        return *this;
+    }
 
     Vec2 operator+(const Vec2& a) const
     {
@@ -271,6 +276,11 @@ struct AABB
 
         return false;
     }
+    AABB& set(AABB& other)
+    {
+        *this = other;
+        return *this;
+    }
     /*
     std::tuple<float, float, float, float> split()
     {} // just for the autodoc
@@ -382,7 +392,11 @@ struct Triangle
     {
         return is_point_inside(Vec2{x, y}, epsilon);
     }
-
+    Triangle& set(Triangle& other)
+    {
+        *this = other;
+        return *this;
+    }
     /* // just for the autodoc
     /// Returns the corner points
     std::tuple<Vec2, Vec2, Vec2> split();
@@ -520,6 +534,11 @@ struct Quad
     bool is_point_inside(float x, float y, float epsilon) const
     {
         return is_point_inside(Vec2{x, y}, epsilon);
+    }
+    Quad& set(Quad& other)
+    {
+        *this = other;
+        return *this;
     }
 
     /* // just for the autodoc
