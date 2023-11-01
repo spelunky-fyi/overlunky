@@ -1074,7 +1074,7 @@ struct JournalUI
     uint8_t unknown1;
     uint16_t unknown2;
     /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
-    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
     custom_vector<JournalPage*> pages;
     custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transfered to the pages vector
     uint32_t current_page;
