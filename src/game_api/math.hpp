@@ -41,7 +41,7 @@ struct Vec2
         diff *= diff; // pow
         return (float)std::sqrt(diff.x + diff.y);
     }
-    Vec2& set(Vec2& other)
+    Vec2& set(const Vec2& other)
     {
         *this = other;
         return *this;
@@ -276,7 +276,7 @@ struct AABB
 
         return false;
     }
-    AABB& set(AABB& other)
+    AABB& set(const AABB& other)
     {
         *this = other;
         return *this;
@@ -379,11 +379,11 @@ struct Triangle
     {
         return std::abs((A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2.0f);
     }
-    bool is_point_inside(Vec2 p) const
+    bool is_point_inside(const Vec2 p) const
     {
         return is_point_inside(p, 0.0001f);
     }
-    bool is_point_inside(Vec2 p, float epsilon) const;
+    bool is_point_inside(const Vec2 p, float epsilon) const;
     bool is_point_inside(float x, float y) const
     {
         return is_point_inside(Vec2{x, y}, 0.0001f);
@@ -392,7 +392,7 @@ struct Triangle
     {
         return is_point_inside(Vec2{x, y}, epsilon);
     }
-    Triangle& set(Triangle& other)
+    Triangle& set(const Triangle& other)
     {
         *this = other;
         return *this;
@@ -522,11 +522,11 @@ struct Quad
         return *this;
     }
 
-    bool is_point_inside(Vec2 p) const
+    bool is_point_inside(const Vec2 p) const
     {
         return is_point_inside(p, 0.00001f);
     }
-    bool is_point_inside(Vec2 p, float epsilon) const;
+    bool is_point_inside(const Vec2 p, float epsilon) const;
     bool is_point_inside(float x, float y) const
     {
         return is_point_inside(Vec2{x, y}, 0.00001f);
@@ -535,7 +535,7 @@ struct Quad
     {
         return is_point_inside(Vec2{x, y}, epsilon);
     }
-    Quad& set(Quad& other)
+    Quad& set(const Quad& other)
     {
         *this = other;
         return *this;
@@ -570,7 +570,7 @@ struct Quad
 Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D);
 
 /// Mesures angle between two lines with one common point
-float two_lines_angle(Vec2 A, Vec2 common, Vec2 B);
+float two_lines_angle(const Vec2 A, const Vec2 common, const Vec2 B);
 
 /// Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function
-float two_lines_angle(Vec2 line1_A, Vec2 line1_B, Vec2 line2_A, Vec2 line2_B);
+float two_lines_angle(const Vec2 line1_A, const Vec2 line1_B, const Vec2 line2_A, const Vec2 line2_B);

@@ -120,8 +120,8 @@ void register_usertypes(sol::state& lua)
         static_cast<Triangle& (Triangle::*)(const Vec2&)>(&Triangle::offset),
         static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset));
     auto is_point_inside_triangle = sol::overload(
-        static_cast<bool (Triangle::*)(Vec2) const>(&Triangle::is_point_inside),
-        static_cast<bool (Triangle::*)(Vec2, float) const>(&Triangle::is_point_inside),
+        static_cast<bool (Triangle::*)(const Vec2) const>(&Triangle::is_point_inside),
+        static_cast<bool (Triangle::*)(const Vec2, float) const>(&Triangle::is_point_inside),
         static_cast<bool (Triangle::*)(float, float) const>(&Triangle::is_point_inside),
         static_cast<bool (Triangle::*)(float, float, float) const>(&Triangle::is_point_inside));
 
@@ -155,14 +155,14 @@ void register_usertypes(sol::state& lua)
         &Triangle::operator std::tuple<Vec2, Vec2, Vec2>);
 
     auto is_point_inside_quad = sol::overload(
-        static_cast<bool (Quad::*)(Vec2) const>(&Quad::is_point_inside),
-        static_cast<bool (Quad::*)(Vec2, float) const>(&Quad::is_point_inside),
+        static_cast<bool (Quad::*)(const Vec2) const>(&Quad::is_point_inside),
+        static_cast<bool (Quad::*)(const Vec2, float) const>(&Quad::is_point_inside),
         static_cast<bool (Quad::*)(float, float) const>(&Quad::is_point_inside),
         static_cast<bool (Quad::*)(float, float, float) const>(&Quad::is_point_inside));
 
     lua.new_usertype<Quad>(
         "Quad",
-        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float), Quad(Vec2&, Vec2&, Vec2&, Vec2&)>{},
+        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float), Quad(const Vec2&, const Vec2&, const Vec2&, const Vec2&)>{},
         "bottom_left_x",
         &Quad::bottom_left_x,
         "bottom_left_y",
@@ -198,8 +198,8 @@ void register_usertypes(sol::state& lua)
         &Quad::operator std::tuple<Vec2, Vec2, Vec2, Vec2>);
 
     auto two_lines_angle = sol::overload(
-        static_cast<float (*)(Vec2, Vec2, Vec2)>(::two_lines_angle),
-        static_cast<float (*)(Vec2, Vec2, Vec2, Vec2)>(::two_lines_angle));
+        static_cast<float (*)(const Vec2, const Vec2, const Vec2)>(::two_lines_angle),
+        static_cast<float (*)(const Vec2, const Vec2, const Vec2, const Vec2)>(::two_lines_angle));
     lua["intersection"] = intersection;
     lua["two_lines_angle"] = two_lines_angle;
 }

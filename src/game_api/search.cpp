@@ -488,6 +488,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "game_free"sv,
+        // it's function that decides to use game_free or custom_free by the address
         PatternCommandBuffer{}
             .find_inst("\x48\x83\x7e\x18\x00"sv)
             .offset(-0x10)
