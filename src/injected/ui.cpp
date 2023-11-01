@@ -248,7 +248,7 @@ static ImFont *font, *bigfont, *hugefont;
 float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f;
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
-    g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1, g_pause_time = -1,
+    g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
 unsigned int g_level_width = 0, grid_x = 0, grid_y = 0, g_pause_type = 0x2;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
@@ -268,7 +268,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, pause_updates = true, death_disable = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -2102,52 +2102,40 @@ void force_kits()
 bool toggle_pause()
 {
     g_pause_at = -1;
-    g_pause_time = -1;
-    if (g_pause_type & 0x40)
-    {
-        if (!paused)
-        {
-            g_pause_time = g_state->time_startup;
-            pause_updates = true;
-            paused = true;
-        }
-        else
-        {
-            g_pause_time = -1;
-            pause_updates = false;
-            paused = false;
-        }
-        g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
-    }
-    else
-    {
-        if (g_state->pause == 0)
-        {
-            g_state->pause = (uint8_t)g_pause_type;
-            paused = true;
-        }
-        else
-        {
-            g_state->pause = 0;
-            paused = false;
-        }
-    }
+    g_state->pause ^= ((uint8_t)g_pause_type & ~0x40);
+    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false", g_pause_type, paused));
     return paused;
 }
 
 void frame_advance()
 {
-    if (g_pause_type & 0x40)
+    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
     {
-        g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+        g_state->pause = (uint8_t)g_pause_type & ~0x40;
+        g_pause_at = -1;
     }
-    else
+    if ((g_pause_type & 0x40) == 0)
     {
-        if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
+        paused = g_state->pause & (uint8_t)g_pause_type;
+    }
+    auto set_type = g_ui_scripts["pause"]->execute("return exports and exports.set_type or nil");
+    if (set_type != "")
+    {
+        g_ui_scripts["pause"]->execute("exports.set_type = nil");
+        try
         {
-            g_state->pause = (uint8_t)g_pause_type;
-            g_pause_at = -1;
+            g_pause_type = std::stoi(set_type);
         }
+        catch (...)
+        {
+        };
+    }
+    auto set_paused = g_ui_scripts["pause"]->execute("if exports then return exports.set_paused else return nil end");
+    if (set_paused != "")
+    {
+        g_ui_scripts["pause"]->execute("exports.set_paused = nil");
+        paused = set_paused == "true";
+        toggle_pause();
     }
 }
 
@@ -2940,6 +2928,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("toggle_pause", wParam))
     {
+        paused = !paused;
         toggle_pause();
     }
     else if (pressed("toggle_hud", wParam))
@@ -2954,10 +2943,9 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (g_pause_type & 0x40)
         {
-            if (pause_updates)
+            if (paused)
             {
-                g_pause_time = g_state->time_startup + 1;
-                g_ui_scripts["pause"]->execute(fmt::format("pause_at = {}", g_pause_time));
+                g_ui_scripts["pause"]->execute("exports.skip = true");
             }
         }
         else
@@ -8753,7 +8741,35 @@ void imgui_init(ImGuiContext*)
     {
         SpelunkyScript* script = new SpelunkyScript(
             R"(
-set_callback(function() return pause_at and pause_at ~= -1 and state.time_startup >= pause_at end, ON.PRE_UPDATE)
+meta = {
+    name = "pause",
+    author = "overlunky",
+}
+exports = {
+    type = 0,
+    paused = false,
+    skip = false,
+}
+set_callback(function()
+    if test_mask(exports.type, 0x40) then
+        if exports.paused and exports.skip then
+            exports.skip = false
+            state.pause = clr_mask(state.pause, exports.type)
+            return false
+        elseif exports.paused then
+            state.pause = set_mask(state.pause, clr_mask(exports.type, 0x40))
+        end
+        return exports.paused
+    else
+        if exports.set_paused ~= nil then
+            if exports.set_paused then
+                state.pause = set_mask(state.pause, exports.type)
+            else
+                state.pause = clr_mask(state.pause, exports.type)
+            end
+        end
+    end
+end, ON.PRE_UPDATE)
             )",
             "pause",
             g_SoundManager.get(),
