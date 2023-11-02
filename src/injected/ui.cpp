@@ -4441,6 +4441,11 @@ std::string entity_tooltip(Entity* hovered)
         if (chest->leprechaun)
             coords += " (LEPRECHAUN)";
     }
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_BOMB"))
+    {
+        auto bomb = hovered->as<Bomb>();
+        coords += fmt::format(" ({} FUSE)", 150 - bomb->idle_counter);
+    }
     else if (hovered->type->search_flags & 7)
     {
         auto ent = hovered->as<Movable>();
