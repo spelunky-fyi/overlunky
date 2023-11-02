@@ -1565,12 +1565,24 @@ void spawn_entity_over()
         {
             int spawned = UI::spawn_entity_over(item.id, g_over_id, g_dx, g_dy);
             auto ent = get_entity_ptr(spawned);
-            ent->set_draw_depth(9);
-            ent->flags = set_flag(ent->flags, 4);  // pass thru objects
-            ent->flags = set_flag(ent->flags, 10); // no gravity
-            ent->flags = clr_flag(ent->flags, 13); // collides walls
-            if (!test_flag(g_state->special_visibility_flags, 1))
-                ent->flags = set_flag(ent->flags, 1); // invisible
+            if (g_dx == 0 && g_dy == 0)
+            {
+                ent->set_draw_depth(9);
+                ent->flags = set_flag(ent->flags, 4);  // pass thru objects
+                ent->flags = set_flag(ent->flags, 10); // no gravity
+                ent->flags = clr_flag(ent->flags, 13); // collides walls
+                if (!test_flag(g_state->special_visibility_flags, 1))
+                    ent->flags = set_flag(ent->flags, 1); // invisible
+            }
+            if (item.id == to_id("ENT_TYPE_ITEM_EGGSAC"))
+            {
+                if (g_dx == -1 and g_dy == 0)
+                    ent->angle = 3.14159265358979323846f / 2.0f;
+                else if (g_dx == 1 and g_dy == 0)
+                    ent->angle = 3.0f * 3.14159265358979323846f / 2.0f;
+                else if (g_dx == 0 and g_dy == -1)
+                    ent->angle = 3.14159265358979323846f;
+            }
             if (!lock_entity)
                 g_last_id = spawned;
         }
