@@ -5443,7 +5443,7 @@ void render_keyconfig()
             s += ',';
         }
         s.pop_back();
-        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: The following keys have been disabled by scripts:");
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "The following keys are disabled by scripts:");
         ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "%s", s.c_str());
     }
     if (g_bucket->overlunky->ignore_keycodes.size())
@@ -5455,7 +5455,7 @@ void render_keyconfig()
             s += ',';
         }
         s.pop_back();
-        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: The following keycodes have been disabled by scripts:");
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "The following keycodes are disabled by scripts:");
         ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "%s", s.c_str());
     }
     ImGui::BeginTable("##keyconfig", 4);
@@ -9233,17 +9233,27 @@ std::unordered_set<std::string> legal_options{
     "mouse_control",
     "noclip",
     "smooth_camera",
+    "pause_type",
 };
 
 void update_bucket()
 {
     g_bucket->overlunky->keys = keys;
-    g_bucket->overlunky->options = options;
+    for (auto [k, v] : options)
+    {
+        g_bucket->overlunky->options[k] = options[k];
+    }
+    g_bucket->overlunky->options["pause_type"] = g_pause_type;
+
     for (auto [k, v] : g_bucket->overlunky->set_options)
     {
         if (!legal_options.contains(k))
             continue;
-        options[k] = v;
+
+        if (options.contains(k))
+            if (auto* val = std::get_if<bool>(&v))
+                options[k] = *val;
+
         if (k == "disable_ghost_timer")
         {
             UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
@@ -9265,6 +9275,11 @@ void update_bucket()
         else if (k == "lights")
         {
             toggle_lights();
+        }
+        else if (k == "pause_type")
+        {
+            if (auto* val = std::get_if<int64_t>(&v))
+                g_pause_type = (uint32_t)*val;
         }
     }
     g_bucket->overlunky->set_options.clear();

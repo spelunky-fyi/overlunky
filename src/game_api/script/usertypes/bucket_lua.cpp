@@ -19,6 +19,7 @@ void register_usertypes(sol::state& lua)
     bucket_type["data"] = &Bucket::data;
     bucket_type["overlunky"] = sol::readonly(&Bucket::overlunky);
 
+    /// Returns a shared pointer to the Bucket
     lua["get_bucket"] = Bucket::get;
 }
 }; // namespace NBucket
