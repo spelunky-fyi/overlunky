@@ -8791,6 +8791,7 @@ void imgui_init(ImGuiContext*)
 
     if (g_ui_scripts.find("pause") == g_ui_scripts.end())
     {
+        // TODO: Revert this weird example
         SpelunkyScript* script = new SpelunkyScript(
             R"(
 meta = {

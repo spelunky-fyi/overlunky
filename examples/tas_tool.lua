@@ -1,13 +1,6 @@
 meta.name = "TAS Tool"
-meta.version = "WIP"
-meta.description = [[DISCLAIMER:
-- STILL BUGGY AND NOTHING WORKS PERFECTLY
-- SAVES MIGHT NOT WORK BECAUSE OF STUPID JSON SERIALIZER
-- SAVES WILL PROBABLY BREAK IN A LATER UPDATE BECAUSE OF ^
-- TELEPORT DESYNC FOR UNKNOWN REASONS IN LATER STAGES LIKE TIAMAT IS VERY POSSIBLE
-- SHOPPIE AGGRO AND STATUS EFFECTS ETC ARE NOT FULLY IMPLEMENTED ON RERECORD
-
-This is the Tool for Tool Assisted Speedrunning Spelunky 2, to be used in seeded runs with Overlunky frame advance features. In a TAS, you record your inputs frame by frame, with the ability to rerecord your steps if you screw up. The resulting inputs are then played back in real time to recreate the perfect inhuman run. Using unsafe mode to save and load files at will. (Saves .json files to game root.)]]
+meta.version = "OBSOLETE"
+meta.description = "Discontinued in favor of TAS Wizard by Cosine. Still a good script example but a bad TAS tool."
 meta.author = "Dregu"
 meta.unsafe = true
 
