@@ -13,7 +13,7 @@ This script works in both Overlunky and Playlunky. When Overlunky is loaded, it 
 
 ]],
     author = "Dregu",
-    version = "1.1"
+    version = "1.0"
 }
 
 control = {
@@ -37,8 +37,8 @@ override_keys = {
 }
 
 set_global_interval(function()
-    if KEY and get_bucket and get_bucket().overlunky then
-        local ol = get_bucket().overlunky
+    local ol = get_bucket().overlunky
+    if ol then
         for _, v in pairs(override_keys) do
             ol.ignore_keycodes:insert(nil, v)
             ol.ignore_keycodes:insert(nil, KEY.OL_MOD_CTRL | v)
@@ -87,45 +87,45 @@ end, ON.PRE_UPDATE)
 set_callback(function(ctx)
     local iio = get_io()
     if iio.keyctrl then
-        if iio.keypressed(0x20, false) then --SPACE
+        if iio.keypressed(KEY.SPACE, false) then
             control.paused = not control.paused
             if control.paused then
                 state.pause = set_mask(state.pause, control.type)
             else
                 state.pause = clr_mask(state.pause, control.type)
             end
-        elseif iio.keypressed(0x21, true) then --PGUP
+        elseif iio.keypressed(KEY.PGUP, true) then
             control.zoom = control.zoom - 1
             if control.zoom < 1 then control.zoom = 1 end
             zoom(control.zoom)
-        elseif iio.keypressed(0x22, true) then --PGDN
+        elseif iio.keypressed(KEY.PGDN, true) then
             control.zoom = control.zoom + 1
             zoom(control.zoom)
-        elseif iio.keypressed(0x24, false) then --HOME
+        elseif iio.keypressed(KEY.HOME, false) then
             control.zoom = 13.5
             zoom(control.zoom)
-        elseif iio.keypressed(0x23, false) then --END
+        elseif iio.keypressed(KEY.END, false) then
             control.zoom = 0
             zoom(control.zoom)
         end
-    elseif iio.keypressed(0x20, true) and control.paused then --SPACE
+    elseif iio.keypressed(KEY.SPACE, true) and control.paused then
         control.skip = true
-    elseif iio.keypressed(0x21, true) then --PGUP
+    elseif iio.keypressed(KEY.PGUP, true) then
         control.frametime = control.frametime / 1.2
         set_frametime(control.frametime)
-    elseif iio.keypressed(0x22, true) then --PGDN
+    elseif iio.keypressed(KEY.PGDN, true) then
         control.frametime = control.frametime * 1.2
         if control.frametime > 1 then control.frametime = 1 end
         set_frametime(control.frametime)
-    elseif iio.keypressed(0x24, false) then --HOME
+    elseif iio.keypressed(KEY.HOME, false) then
         control.frametime = 1/60
         set_frametime()
-    elseif iio.keypressed(0x23, false) then --END
+    elseif iio.keypressed(KEY.END, false) then
         control.frametime = 1/12
         set_frametime(control.frametime)
-    elseif iio.keypressed(0x2D, false) then --INS
+    elseif iio.keypressed(KEY.INSERT, false) then
         control.level = not control.level
-    elseif iio.keypressed(0x2E, false) then --DEL
+    elseif iio.keypressed(KEY.DELETE, false) then
         control.fade = not control.fade
     end
 end, ON.GUIFRAME)
