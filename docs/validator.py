@@ -50,6 +50,7 @@ replace_table = {
     "ImVec2": "Vec2",
     "SoundCallbackFunction": "function",
     "object ": "any ",
+    "BucketItem": "any",
 }
 
 def replace_all(text):
@@ -120,7 +121,7 @@ for lf in ps.funcs + ps.deprecated_funcs:
             ret = m.group(2) or "nil"
         if m or m2:
             param = (m or m2).group(1)
-            
+
         check_types(ret)
         check_types(param)
 

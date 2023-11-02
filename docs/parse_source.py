@@ -63,6 +63,7 @@ header_files = [
     "../src/game_api/script/usertypes/gui_lua.cpp",
     "../src/game_api/steam_api.hpp",
     "../src/game_api/search.hpp",
+    "../src/game_api/bucket.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -106,6 +107,7 @@ api_files = [
     "../src/game_api/script/usertypes/socket_lua.cpp",
     "../src/game_api/script/usertypes/steam_lua.cpp",
     "../src/game_api/script/usertypes/logic_lua.cpp",
+    "../src/game_api/script/usertypes/bucket_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
@@ -169,8 +171,8 @@ def camel_case_to_snake_case(name):
 
 def fix_spaces(thing):
     thing = thing.strip()
-    thing = re.sub("\s{2,}", " ", thing)           # change double spaces into single
-    thing = re.sub("(?<=\(|\<)\s", "", thing)      # remove spaces after ( or < 
+    thing = re.sub(r"\s{2,}", " ", thing)          # change double spaces into single
+    thing = re.sub(r"(?<=\(|\<)\s", "", thing)     # remove spaces after ( or <
     return thing.replace("*", "").replace("&", "") # remove * and &
 
 def getfunc(name):
@@ -412,6 +414,9 @@ def run_parse():
                         (item for item in classes if item["name"] == cpp_type), dict()
                     )
 
+                    if "member_funs" not in underlying_cpp_type:
+                        underlying_cpp_type["member_funs"] = {}
+
                     if name not in underlying_cpp_type["member_funs"]:
                         underlying_cpp_type["member_funs"][name] = []
 
@@ -650,7 +655,7 @@ def run_parse():
                 if var[0].startswith("sol::constructors"):
                     for fun in underlying_cpp_type["member_funs"][cpp_type]:
                         param = fun["param"]
-                        
+
                         if cpp_type not in constructors:
                             constructors[cpp_type] = []
                         constructors[cpp_type].append(

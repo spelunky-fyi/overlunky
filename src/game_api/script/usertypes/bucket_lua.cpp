@@ -20,11 +20,16 @@ void register_usertypes(sol::state& lua)
     bucket_type["data"] = &Bucket::data;
     bucket_type["overlunky"] = sol::readonly(&Bucket::overlunky);
 
-    /// Returns a shared pointer to the Bucket
+    /// Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
+    // lua["get_bucket"] = []() -> Bucket*
     lua["get_bucket"] = Bucket::get;
 
     /// Keycodes to be used in various input functions. Most are standard, but the OL_ prefixed keys are specific to Overlunky::ignore_keycodes.
-    lua.create_named_table("KEY");
+    lua.create_named_table("KEY"
+                           //, "A", 65
+                           //, "", ...check__[lua_enums.txt]\[game_data/lua_enums.txt\]...
+    );
+
     lua["KEY"]["OL_MOD_CTRL"] = 0x100;
     lua["KEY"]["OL_MOD_SHIFT"] = 0x200;
     lua["KEY"]["OL_MOD_ALT"] = 0x800;

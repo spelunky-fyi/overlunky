@@ -57,6 +57,7 @@ replace_table = {
     "ImVec2": "Vec2",
     "SoundCallbackFunction": "function",
     "object ": "any ",
+    "BucketItem": "any",
 }
 
 def replace_all(text):

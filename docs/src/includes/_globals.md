@@ -1371,6 +1371,15 @@ Force the journal to open on a chapter and entry# when pressing the journal butt
 
 Get the current adventure seed pair
 
+### get_bucket
+
+
+> Search script examples for [get_bucket](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bucket)
+
+#### [Bucket](#Bucket) get_bucket()
+
+Returns the [Bucket](#Bucket) of data stored in shared memory between [Overlunky](#Overlunky) and Playlunky
+
 ### get_character_heart_color
 
 
@@ -1995,7 +2004,7 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 
 - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+- Note: [Overlunky](#Overlunky)/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 - Note: [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 
 ### mouse_position

@@ -9,9 +9,8 @@
 using BucketItem = std::variant<bool, int64_t, float, std::string>;
 using KEY = int64_t;
 
-class Overlunky
+struct Overlunky
 {
-  public:
     /// Current Overlunky options. Read only.
     std::map<std::string, BucketItem> options;
     /// Write some select options here to change Overlunky options. Just use the same keys as in options.

@@ -609,6 +609,17 @@ Name | Data | Description
 [GREAT_PARTY_HUH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JUNGLESISTERS.GREAT_PARTY_HUH) | 5 | 
 [I_WISH_BROUGHT_A_JACKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JUNGLESISTERS.I_WISH_BROUGHT_A_JACKET) | 6 | 
 
+## KEY
+
+
+> Search script examples for [KEY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY.A) | 65 | 
+...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
+
 ## LAYER
 
 
