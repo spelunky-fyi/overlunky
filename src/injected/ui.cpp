@@ -39,6 +39,7 @@
 #include "entities_mounts.hpp"
 #include "file_api.hpp"
 #include "flags.hpp"
+#include "game_api.hpp"
 #include "game_manager.hpp"
 #include "illumination.hpp"
 #include "items.hpp"
@@ -8163,6 +8164,13 @@ void render_game_props()
             ImGui::Checkbox("Allow beehives##ThemeBeeHive", &g_state->current_theme->allow_beehive);
             ImGui::Checkbox("Allow leprechauns##ThemeLeprechaun", &g_state->current_theme->allow_leprechaun);
         }
+        endmenu();
+    }
+    if (submenu("Renderer flags"))
+    {
+        auto game_api = GameAPI::get();
+        ImGui::SeparatorText("Flags 1");
+        render_flags(renderer_flags1, &game_api->renderer->flags1);
         endmenu();
     }
     if (submenu("Procedural chances"))
