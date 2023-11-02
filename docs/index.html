@@ -879,6 +879,9 @@
                             <a href="#set_adventure_seed" class="toc-h3 toc-link" data-title="set_adventure_seed">set_adventure_seed</a>
                           </li>
                           <li>
+                            <a href="#set_camera_layer_control_enabled" class="toc-h3 toc-link" data-title="set_camera_layer_control_enabled">set_camera_layer_control_enabled</a>
+                          </li>
+                          <li>
                             <a href="#set_character_heart_color" class="toc-h3 toc-link" data-title="set_character_heart_color">set_character_heart_color</a>
                           </li>
                           <li>
@@ -3637,6 +3640,9 @@
                     <a href="#LEVEL_CONFIG" class="toc-h2 toc-link" data-title="LEVEL_CONFIG">LEVEL_CONFIG</a>
                   </li>
                   <li>
+                    <a href="#LIGHT_TYPE" class="toc-h2 toc-link" data-title="LIGHT_TYPE">LIGHT_TYPE</a>
+                  </li>
+                  <li>
                     <a href="#LIQUID_POOL" class="toc-h2 toc-link" data-title="LIQUID_POOL">LIQUID_POOL</a>
                   </li>
                   <li>
@@ -4045,7 +4051,7 @@
 </tr>
 <tr>
 <td>int</td>
-<td>aLL:size()</td>
+<td>all:size()</td>
 <td>Same as <code>#container</code></td>
 </tr>
 <tr>
@@ -5156,6 +5162,38 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 </blockquote>
 <h4 id='nil-set_adventure_seed-int-first-int-second'>nil set_adventure_seed(int first, int second)</h4>
 <p>Set the current adventure seed pair</p>
+<h3 id='set_camera_layer_control_enabled'>set_camera_layer_control_enabled</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_camera_layer_control_enabled</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
+
+<span class="n">g_current_timer</span> <span class="o">=</span> <span class="kc">nil</span>
+<span class="c1">-- default load_time 36</span>
+<span class="k">function</span> <span class="nf">change_layer</span><span class="p">(</span><span class="n">layer_to</span><span class="p">,</span> <span class="n">load_time</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">camera_layer</span> <span class="o">==</span> <span class="n">layer_to</span> <span class="k">then</span>
+        <span class="k">return</span>
+    <span class="k">end</span>
+    <span class="k">if</span> <span class="n">g_current_timer</span> <span class="o">~=</span> <span class="kc">nil</span> <span class="k">then</span>
+        <span class="n">clear_callback</span><span class="p">(</span><span class="n">g_current_timer</span><span class="p">)</span>
+        <span class="n">g_current_timer</span> <span class="o">=</span> <span class="kc">nil</span>
+    <span class="k">end</span>
+    <span class="c1">-- if we don't want the load time, we can just change the actual layer</span>
+    <span class="k">if</span> <span class="n">load_time</span> <span class="o">==</span> <span class="kc">nil</span> <span class="ow">or</span> <span class="n">load_time</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">then</span>
+        <span class="n">state</span><span class="p">.</span><span class="n">camera_layer</span> <span class="o">=</span> <span class="n">layer_to</span>
+        <span class="k">return</span>
+    <span class="k">end</span>
+
+    <span class="n">state</span><span class="p">.</span><span class="n">layer_transition_timer</span> <span class="o">=</span> <span class="n">load_time</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">transition_to_layer</span> <span class="o">=</span> <span class="n">layer_to</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">camera_layer</span> <span class="o">=</span> <span class="n">layer_to</span>
+<span class="k">end</span>
+
+</code></pre></div>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_camera_layer_control_enabled">set_camera_layer_control_enabled</a></p>
+</blockquote>
+<h4 id='nil-set_camera_layer_control_enabled-bool-enable'>nil set_camera_layer_control_enabled(bool enable)</h4>
+<p>This disables the <code>state.camera_layer</code> to be forced to the <code>(leader player).layer</code> and setting of the <code>state.layer_transition_timer</code> &amp; <code>state.transition_to_layer</code> when player enters layer door.
+Letting you control those manually.
+Look at the example on how to mimic game layer switching behavior</p>
 <h3 id='set_character_heart_color'>set_character_heart_color</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_character_heart_color">set_character_heart_color</a></p>
@@ -5390,14 +5428,14 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_illumination">create_illumination</a></p>
 </blockquote>
-<h4 id='Illumination-create_illumination-Color-color-float-size-float-x-float-y'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, float x, float y)</h4><h4 id='Illumination-create_illumination-Color-color-float-size-int-uid'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, int uid)</h4>
-<p>Creates a new <a href="#Illumination">Illumination</a>. Don&#39;t forget to continuously call <a href="#refresh_illumination">refresh_illumination</a>, otherwise your light emitter fades out! Check out the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua">illumination.lua</a> script for an example</p>
+<h4 id='Illumination-create_illumination-Vec2-pos-Color-color-LIGHT_TYPE-type-float-size-int-flags-int-uid-LAYER-layer'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Vec2">Vec2</a> pos, <a href="#Color">Color</a> color, <a href="#LIGHT_TYPE">LIGHT_TYPE</a> type, float size, int flags, int uid, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='Illumination-create_illumination-Color-color-float-size-float-x-float-y'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, float x, float y)</h4><h4 id='Illumination-create_illumination-Color-color-float-size-int-uid'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, int uid)</h4>
+<p>Creates a new <a href="#Illumination">Illumination</a>. Don&#39;t forget to continuously call <a href="#refresh_illumination">refresh_illumination</a>, otherwise your light emitter fades out! Check out the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua">illumination.lua</a> script for an example.</p>
 <h3 id='refresh_illumination'>refresh_illumination</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=refresh_illumination">refresh_illumination</a></p>
 </blockquote>
 <h4 id='nil-refresh_illumination-Illumination-illumination'>nil refresh_illumination(<a href="#Illumination">Illumination</a> illumination)</h4>
-<p>Refreshes an <a href="#Illumination">Illumination</a>, keeps it from fading out</p>
+<p>Refreshes an <a href="#Illumination">Illumination</a>, keeps it from fading out (updates the timer, keeping it in sync with the game render)</p>
 <h2 id='Message-functions'>Message functions</h2><h3 id='cancel_speechbubble'>cancel_speechbubble</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=cancel_speechbubble">cancel_speechbubble</a></p>
@@ -5599,19 +5637,19 @@ limits, you can override them in the UI with double click.</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generate_screen_particles">generate_screen_particles</a></p>
 </blockquote>
-<h4 id='ParticleEmitterInfo-generate_screen_particles-int-particle_emitter_id-float-x-float-y'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_screen_particles(int particle_emitter_id, float x, float y)</h4>
+<h4 id='ParticleEmitterInfo-generate_screen_particles-PARTICLEEMITTER-particle_emitter_id-float-x-float-y'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_screen_particles(<a href="#PARTICLEEMITTER">PARTICLEEMITTER</a> particle_emitter_id, float x, float y)</h4>
 <p>Generate particles of the specified type at a certain screen coordinate (use e.g. <code>local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)</code>). See the <code>particles.lua</code> example script for more details.</p>
 <h3 id='generate_world_particles'>generate_world_particles</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generate_world_particles">generate_world_particles</a></p>
 </blockquote>
-<h4 id='ParticleEmitterInfo-generate_world_particles-int-particle_emitter_id-int-uid'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_world_particles(int particle_emitter_id, int uid)</h4>
+<h4 id='ParticleEmitterInfo-generate_world_particles-PARTICLEEMITTER-particle_emitter_id-int-uid'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_world_particles(<a href="#PARTICLEEMITTER">PARTICLEEMITTER</a> particle_emitter_id, int uid)</h4>
 <p>Generate particles of the specified type around the specified entity uid (use e.g. <code>local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)</code>). You can then decouple the emitter from the entity with <code>emitter.entity_uid = -1</code> and freely move it around. See the <code>particles.lua</code> example script for more details.</p>
 <h3 id='get_particle_type'>get_particle_type</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_particle_type">get_particle_type</a></p>
 </blockquote>
-<h4 id='ParticleDB-get_particle_type-int-id'><a href="#ParticleDB">ParticleDB</a> get_particle_type(int id)</h4>
+<h4 id='ParticleDB-get_particle_type-PARTICLEEMITTER-id'><a href="#ParticleDB">ParticleDB</a> get_particle_type(<a href="#PARTICLEEMITTER">PARTICLEEMITTER</a> id)</h4>
 <p>Get the <a href="#ParticleDB">ParticleDB</a> details of the specified ID</p>
 <h3 id='render_screen_particles'>render_screen_particles</h3>
 <blockquote>
@@ -6434,7 +6472,7 @@ Set level flag 18 on post room generation instead, to properly force every level
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_ai_state">get_entity_ai_state</a></p>
 </blockquote>
 <h4 id='int-get_entity_ai_state-int-uid'>int get_entity_ai_state(int uid)</h4>
-<p>As the name is misleading. use entity <code>move_state</code> field instead</p>
+<p>As the name is misleading. use <a href="#Movable">Movable</a>.<code>move_state</code> field instead</p>
 <h3 id='set_arrowtrap_projectile'>set_arrowtrap_projectile</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_arrowtrap_projectile">set_arrowtrap_projectile</a></p>
@@ -6672,7 +6710,7 @@ Use this only when no other approach works, this call can be expensive if overus
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generate_particles">generate_particles</a></p>
 </blockquote>
-<h4 id='ParticleEmitterInfo-generate_particles-int-particle_emitter_id-int-uid'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_particles(int particle_emitter_id, int uid)</h4>
+<h4 id='ParticleEmitterInfo-generate_particles-PARTICLEEMITTER-particle_emitter_id-int-uid'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_particles(<a href="#PARTICLEEMITTER">PARTICLEEMITTER</a> particle_emitter_id, int uid)</h4>
 <p>Use <code>generate_world_particles</code></p>
 <h3 id='draw_line'>draw_line</h3>
 <blockquote>
@@ -8821,6 +8859,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 <tr>
+<td><a href="#AABB">AABB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set">set(AABB other)</a></td>
+<td></td>
+</tr>
+<tr>
 <td>tuple&lt;float, float, float, float&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
 <td></td>
@@ -9067,6 +9110,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="#Color">Color</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_ucolor">set_ucolor(uColor color)</a></td>
 <td>Changes color based on given <a href="#Aliases">uColor</a></td>
+</tr>
+<tr>
+<td><a href="#Color">Color</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set">set(Color other)</a></td>
+<td>Copies the values of different <a href="#Color">Color</a> to this one</td>
 </tr>
 </tbody></table>
 <h3 id='CutsceneBehavior'>CutsceneBehavior</h3>
@@ -9550,6 +9598,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td><a href="#Quad">Quad</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set">set(Quad other)</a></td>
+<td></td>
+</tr>
+<tr>
 <td>tuple&lt;<a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
 <td>Returns the corners in order: bottom_left, bottom_right, top_right, top_left</td>
@@ -9909,6 +9962,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td><a href="#Triangle">Triangle</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set">set(Triangle other)</a></td>
+<td></td>
+</tr>
+<tr>
 <td>tuple&lt;<a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>, <a href="#Vec2">Vec2</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=split">split()</a></td>
 <td>Returns the corner points</td>
@@ -9967,6 +10025,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance_to">distance_to(Vec2 other)</a></td>
 <td>Just simple pythagoras theorem</td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set">set(Vec2 other)</a></td>
+<td></td>
 </tr>
 <tr>
 <td>tuple&lt;float, float&gt;</td>
@@ -10985,13 +11048,18 @@ Used in <a href="#StateMemory">StateMemory</a>, <a href="#Player">Player</a>, <a
 </tr>
 <tr>
 <td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flags">flags</a></td>
 <td>see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp">flags.hpp</a> illumination_flags</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#LIGHT_TYPE">LIGHT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=type_flags">type_flags</a></td>
-<td>Only one can be set: 1 - Follow camera, 2 - Follow <a href="#Entity">Entity</a>, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it&#39;s disabled in flags</td>
+<td></td>
 </tr>
 <tr>
 <td>bool</td>
@@ -11033,6 +11101,11 @@ Used in <a href="#StateMemory">StateMemory</a>, <a href="#Player">Player</a>, <a
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=size">size</a></td>
 <td></td>
+</tr>
+<tr>
+<td><a href="#Color">Color</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=as_color">as_color()</a></td>
+<td>Returns <a href="#LightParams">LightParams</a> as <a href="#Color">Color</a>, note that size = alpha</td>
 </tr>
 </tbody></table>
 <h2 id='Liquid-types'>Liquid types</h2><h3 id='LiquidPhysics'>LiquidPhysics</h3>
@@ -11926,7 +11999,17 @@ Derived from <a href="#Logic">Logic</a></p>
 </tr>
 </thead><tbody>
 <tr>
-<td>int</td>
+<td><a href="#ParticleDB">ParticleDB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ParticleDB">new(ParticleDB other)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ParticleDB">ParticleDB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ParticleDB">new(PARTICLEEMITTER particle_id)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#PARTICLEEMITTER">PARTICLEEMITTER</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=id">id</a></td>
 <td></td>
 </tr>
@@ -12093,6 +12176,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td></td>
 </tr>
 <tr>
+<td><a href="#ParticleDB">ParticleDB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle_type2">particle_type2</a></td>
+<td></td>
+</tr>
+<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle_count">particle_count</a></td>
 <td></td>
@@ -12125,6 +12213,16 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset_y">offset_y</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=layer">layer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_depth">draw_depth</a></td>
 <td></td>
 </tr>
 <tr>
@@ -12663,7 +12761,7 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>vector&lt;<a href="#JournalPage">JournalPage</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pages">pages</a></td>
-<td>Stores pages loaded into memeory. It&#39;s not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use <code>:get_type()</code> to chcek page type and cast it correctly (see ON.<a href="#ON-RENDER_PRE_JOURNAL_PAGE">RENDER_POST_DRAW_DEPTH</a>)</td>
+<td>Stores pages loaded into memeory. It&#39;s not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use <code>:get_type()</code> to chcek page type and cast it correctly (see ON.<a href="#ON-RENDER_PRE_JOURNAL_PAGE">RENDER_PRE_JOURNAL_PAGE</a>)</td>
 </tr>
 </tbody></table>
 <h3 id='OnlineLobbyScreenPlayer'>OnlineLobbyScreenPlayer</h3>
@@ -14152,6 +14250,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
 <td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_till_death_screen">time_till_death_screen</a></td>
+<td>Delay after player death to open the death screen</td>
 </tr>
 </tbody></table>
 <h3 id='ScreenLogo'>ScreenLogo</h3>
@@ -16122,17 +16225,17 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>int</td>
+<td><a href="#SCREEN">SCREEN</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_last">screen_last</a></td>
 <td>Previous <a href="#SCREEN">SCREEN</a>, used to check where we&#39;re coming from when loading another <a href="#SCREEN">SCREEN</a></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#SCREEN">SCREEN</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen">screen</a></td>
 <td>Current <a href="#SCREEN">SCREEN</a>, generally read-only or weird things will happen</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#SCREEN">SCREEN</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_next">screen_next</a></td>
 <td>Next <a href="#SCREEN">SCREEN</a>, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see <code>state.loading</code>.</td>
 </tr>
@@ -16149,7 +16252,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td><a href="#PAUSE">PAUSE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></td>
-<td>8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can&#39;t set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.</td>
+<td>8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can&#39;t set, controlled by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -16232,7 +16335,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>Next <a href="#THEME">THEME</a> number, used when loading a new level or transition</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#THEME">THEME</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme_start">theme_start</a></td>
 <td><a href="#THEME">THEME</a> to start new runs in</td>
 </tr>
@@ -16369,7 +16472,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money_shop_total">money_shop_total</a></td>
-<td>Total negative amount spent in shops during the run<br><br/>The total money currently available (in single player) is <code>players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total</code></td>
+<td>Total amount spent in shops and sold idols during the run<br><br/>The total money currently available is <code>loop (players[].inventory.money + players[].inventory.collected_money_total) + state.money_shop_total</code></td>
 </tr>
 <tr>
 <td><a href="#PlayerInputs">PlayerInputs</a></td>
@@ -16434,11 +16537,16 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=camera_layer">camera_layer</a></td>
-<td>The currently drawn layer, can&#39;t be changed</td>
+<td></td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=layer_transition_timer">layer_transition_timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=transition_to_layer">transition_to_layer</a></td>
 <td></td>
 </tr>
 <tr>
@@ -16637,7 +16745,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>array&lt;int, 9&gt;</td>
+<td>array&lt;<a href="#THEME">THEME</a>, 9&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_progress_theme_slots">journal_progress_theme_slots</a></td>
 <td>visited themes in journal progress page</td>
 </tr>
@@ -25042,7 +25150,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flame_size">flame_size</a></td>
-<td>if changed, gradually goes down (0.03 per frame) to the default size</td>
+<td>if changed, gradually goes down (0.03 per frame) to the default size, it&#39;s the base value for <code>entity.width</code> and <code>entity.height</code></td>
 </tr>
 </tbody></table>
 <h3 id='Fly'>Fly</h3>
@@ -30714,6 +30822,39 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=LEVEL_CONFIG.FLAGGED_LIQUID_ROOMS">FLAGGED_LIQUID_ROOMS</a></td>
 <td>16</td>
 <td></td>
+</tr>
+</tbody></table>
+<h2 id='LIGHT_TYPE'>LIGHT_TYPE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=LIGHT_TYPE">LIGHT_TYPE</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=LIGHT_TYPE.NONE">NONE</a></td>
+<td>LIGHT_TYPE::NONE</td>
+<td>Normal static light, position can be edited to move it around<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=LIGHT_TYPE.FOLLOW_CAMERA">FOLLOW_CAMERA</a></td>
+<td>LIGHT_TYPE::FOLLOW_CAMERA</td>
+<td>Position is updated to the camera position, can be moved around via offset<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=LIGHT_TYPE.FOLLOW_ENTITY">FOLLOW_ENTITY</a></td>
+<td>LIGHT_TYPE::FOLLOW_ENTITY</td>
+<td>Position is updated to the entity position (from the uid field), if the uid is not found it will behave as <a href="#LIGHT_TYPE">LIGHT_TYPE</a>.NONE, can be moved around via offset<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=LIGHT_TYPE.ROOM_LIGHT">ROOM_LIGHT</a></td>
+<td>LIGHT_TYPE::ROOM_LIGHT</td>
+<td>Rectangle, full brightness always uses light1, disabling light1 does nothing<br/></td>
 </tr>
 </tbody></table>
 <h2 id='LIQUID_POOL'>LIQUID_POOL</h2>
