@@ -5978,6 +5978,106 @@ std::string gen_random(const int len)
     return tmp_s;
 }
 
+void set_default_path(IFileDialog* dialog, std::wstring pathStr)
+{
+    const wchar_t* defaultPathW = pathStr.c_str();
+
+    IShellItem* folder;
+    HRESULT result = SHCreateItemFromParsingName(defaultPathW, NULL, IID_PPV_ARGS(&folder));
+
+    // Valid non results.
+    if (result == HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) || result == HRESULT_FROM_WIN32(ERROR_INVALID_DRIVE))
+        return;
+
+    if (!SUCCEEDED(result))
+        return;
+
+    dialog->SetFolder(folder);
+    folder->Release();
+}
+
+std::vector<std::wstring> select_files(std::wstring default_path, DWORD type = 0)
+{
+    HRESULT hr = S_OK;
+    std::vector<std::wstring> filePaths;
+
+    IFileOpenDialog* fileDlg = NULL;
+    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDlg));
+    if (FAILED(hr))
+        return filePaths;
+    ON_SCOPE_EXIT([&]
+                  { fileDlg->Release(); });
+    set_default_path(fileDlg, default_path);
+
+    IKnownFolderManager* pkfm = NULL;
+    hr = CoCreateInstance(CLSID_KnownFolderManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pkfm));
+    if (FAILED(hr))
+        return filePaths;
+    ON_SCOPE_EXIT([&]
+                  { pkfm->Release(); });
+
+    IKnownFolder* pKnownFolder = NULL;
+    hr = pkfm->GetFolder(FOLDERID_PublicMusic, &pKnownFolder);
+    if (FAILED(hr))
+        return filePaths;
+    ON_SCOPE_EXIT([&]
+                  { pKnownFolder->Release(); });
+
+    IShellItem* psi = NULL;
+    hr = pKnownFolder->GetShellItem(0, IID_PPV_ARGS(&psi));
+    if (FAILED(hr))
+        return filePaths;
+    ON_SCOPE_EXIT([&]
+                  { psi->Release(); });
+
+    hr = fileDlg->AddPlace(psi, FDAP_BOTTOM);
+
+    DWORD dwOptions;
+    fileDlg->GetOptions(&dwOptions);
+    fileDlg->SetOptions(dwOptions | type);
+    hr = fileDlg->Show(NULL);
+    if (SUCCEEDED(hr))
+    {
+        IShellItemArray* pRets;
+        hr = fileDlg->GetResults(&pRets);
+        if (SUCCEEDED(hr))
+        {
+            DWORD count;
+            pRets->GetCount(&count);
+            for (DWORD i = 0; i < count; i++)
+            {
+                IShellItem* pRet;
+                LPWSTR nameBuffer;
+                pRets->GetItemAt(i, &pRet);
+                pRet->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &nameBuffer);
+                filePaths.push_back(std::wstring(nameBuffer));
+                pRet->Release();
+                CoTaskMemFree(nameBuffer);
+            }
+            pRets->Release();
+        }
+    }
+    return filePaths;
+}
+
+void set_script_dir()
+{
+    TCHAR buffer[MAX_PATH] = {0};
+    GetModuleFileName(NULL, buffer, MAX_PATH);
+    auto path = std::filesystem::path(std::string(buffer)).parent_path();
+    DEBUG("def {}", path.string());
+    ShowCursor(true);
+    auto folder = select_files(path.wstring(), FOS_PICKFOLDERS);
+    if (!folder.empty())
+    {
+        scriptpath = std::string(cvt.to_bytes(folder.at(0)));
+        std::replace(scriptpath.begin(), scriptpath.end(), '\\', '/');
+        save_config(cfgfile);
+        refresh_script_files();
+    }
+    ShowCursor(false);
+}
+
 void render_script_files()
 {
     ImGui::PushID("files");
@@ -6014,6 +6114,9 @@ void render_script_files()
     {
         ImGui::TextWrapped("All scripts found in '%s' are already loaded.", abspath.c_str());
     }
+    if (ImGui::Button("Select script directory##SelectScriptDir"))
+        set_script_dir();
+    tooltip(scriptpath.c_str());
     if (ImGui::Button("Reload config and refresh scripts##RefreshScripts"))
     {
         load_config(cfgfile);
@@ -6041,8 +6144,12 @@ void render_scripts()
     ImGui::SameLine();
     ImGui::Checkbox("to console##ConsoleScriptMessages", &options["console_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
-    if (ImGui::Checkbox("Load scripts from default directory##LoadScriptsDefault", &load_script_dir))
+    if (ImGui::Checkbox("Load scripts from script directory##LoadScriptsDefault", &load_script_dir))
         refresh_script_files();
+    ImGui::SameLine();
+    if (ImGui::Button("Set##SetScriptDir"))
+        set_script_dir();
+    tooltip(scriptpath.c_str());
     if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
         refresh_script_files();
     if (ImGui::Button("Create new quick script"))
