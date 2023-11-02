@@ -2135,25 +2135,6 @@ void frame_advance()
     {
         paused = g_state->pause & (uint8_t)g_pause_type;
     }
-    auto set_type = g_ui_scripts["pause"]->execute("return exports and exports.set_type or nil");
-    if (set_type != "")
-    {
-        g_ui_scripts["pause"]->execute("exports.set_type = nil");
-        try
-        {
-            g_pause_type = std::stoi(set_type);
-        }
-        catch (...)
-        {
-        };
-    }
-    auto set_paused = g_ui_scripts["pause"]->execute("if exports then return exports.set_paused else return nil end");
-    if (set_paused != "")
-    {
-        g_ui_scripts["pause"]->execute("exports.set_paused = nil");
-        paused = set_paused == "true";
-        toggle_pause();
-    }
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -6017,30 +5998,26 @@ std::vector<std::wstring> select_files(std::wstring default_path, DWORD type = 0
     hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&fileDlg));
     if (FAILED(hr))
         return filePaths;
-    ON_SCOPE_EXIT([&]
-                  { fileDlg->Release(); });
+    ON_SCOPE_EXIT(fileDlg->Release());
     set_default_path(fileDlg, default_path);
 
     IKnownFolderManager* pkfm = NULL;
     hr = CoCreateInstance(CLSID_KnownFolderManager, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pkfm));
     if (FAILED(hr))
         return filePaths;
-    ON_SCOPE_EXIT([&]
-                  { pkfm->Release(); });
+    ON_SCOPE_EXIT(pkfm->Release());
 
     IKnownFolder* pKnownFolder = NULL;
     hr = pkfm->GetFolder(FOLDERID_PublicMusic, &pKnownFolder);
     if (FAILED(hr))
         return filePaths;
-    ON_SCOPE_EXIT([&]
-                  { pKnownFolder->Release(); });
+    ON_SCOPE_EXIT(pKnownFolder->Release());
 
     IShellItem* psi = NULL;
     hr = pKnownFolder->GetShellItem(0, IID_PPV_ARGS(&psi));
     if (FAILED(hr))
         return filePaths;
-    ON_SCOPE_EXIT([&]
-                  { psi->Release(); });
+    ON_SCOPE_EXIT(psi->Release());
 
     hr = fileDlg->AddPlace(psi, FDAP_BOTTOM);
 
@@ -8982,14 +8959,6 @@ set_callback(function()
             state.pause = set_mask(state.pause, clr_mask(exports.type, 0x40))
         end
         return exports.paused
-    else
-        if exports.set_paused ~= nil then
-            if exports.set_paused then
-                state.pause = set_mask(state.pause, exports.type)
-            else
-                state.pause = clr_mask(state.pause, exports.type)
-            end
-        end
     end
 end, ON.PRE_UPDATE))");
     add_ui_script("camera_hack", false, R"(
