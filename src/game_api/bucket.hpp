@@ -23,6 +23,16 @@ struct Overlunky
     std::unordered_set<KEY> ignore_keycodes;
     /// TODO: Disable Overlunky features. Doesn't do anything yet.
     std::unordered_set<std::string> ignore_features;
+    /// Currently selected uid in the entity picker or -1 if nothing is selected.
+    int32_t selected_uid;
+    /// Set currently selected uid in the entity picker or -1 to clear selection.
+    std::optional<int32_t> set_selected_uid;
+    /// Currently hovered entity uid or -1 if nothing is hovered.
+    int32_t hovered_uid;
+    /// Currently selected uids in the entity finder.
+    std::vector<uint32_t> selected_uids;
+    /// Set currently selected uids in the entity finder.
+    std::optional<std::vector<uint32_t>> set_selected_uids;
 };
 
 class Bucket

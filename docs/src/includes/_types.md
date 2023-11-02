@@ -787,6 +787,12 @@ map&lt;string, [KEY](#KEY)&gt; | [keys](https://github.com/spelunky-fyi/overlunk
 set&lt;string&gt; | [ignore_keys](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_keys) | Disable some key bindings in [Overlunky](#Overlunky), whatever key they are actually bound to. Remember this might not be bound to the default any more, so only use this if you also plan on overriding the current keybinding, or just need to disable some feature and don't care what key it is bound on.
 set&lt;[KEY](#KEY)&gt; | [ignore_keycodes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_keycodes) | Disable keys that may or may not be used by [Overlunky](#Overlunky). You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
 set&lt;string&gt; | [ignore_features](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_features) | TODO: Disable [Overlunky](#Overlunky) features. Doesn't do anything yet.
+int | [selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_uid) | Currently selected uid in the entity picker or -1 if nothing is selected.
+optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
+vector&lt;int&gt; | [selected_uids](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_uids) | Currently selected uids in the entity finder.
+int | [hovered_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hovered_uid) | Currently hovered entity uid or -1 if nothing is hovered.
+optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
+optional&lt;vector&lt;int&gt;&gt; | [set_selected_uids](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uids) | Set currently selected uids in the entity finder.
 
 ### PRNG
 

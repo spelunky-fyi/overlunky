@@ -98,7 +98,8 @@ std::map<std::string, int64_t> default_keys{
     {"toggle_disable_pause", OL_KEY_CTRL | OL_KEY_SHIFT | 'P'},
     {"toggle_grid", OL_KEY_CTRL | OL_KEY_SHIFT | 'G'},
     {"toggle_hitboxes", OL_KEY_CTRL | OL_KEY_SHIFT | 'H'},
-    {"toggle_entityinfo", OL_KEY_CTRL | OL_KEY_SHIFT | 'E'},
+    {"toggle_entity_info", OL_KEY_CTRL | OL_KEY_SHIFT | 'E'},
+    {"toggle_entity_tooltip", OL_KEY_CTRL | OL_KEY_SHIFT | 'Y'},
     {"toggle_hud", OL_KEY_CTRL | 'H'},
     {"toggle_lights", OL_KEY_CTRL | 'L'},
     {"toggle_ghost", OL_KEY_CTRL | 'O'},
@@ -335,7 +336,8 @@ std::map<std::string, bool> options = {
     {"disable_pause", false},
     {"draw_grid", false},
     {"draw_hitboxes", false},
-    {"draw_entityinfo", false},
+    {"draw_entity_info", false},
+    {"draw_entity_tooltip", false},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
     {"warp_transition", false},
@@ -2944,9 +2946,13 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["draw_hitboxes"] = !options["draw_hitboxes"];
     }
-    else if (pressed("toggle_entityinfo", wParam))
+    else if (pressed("toggle_entity_info", wParam))
     {
-        options["draw_entityinfo"] = !options["draw_entityinfo"];
+        options["draw_entity_info"] = !options["draw_entity_info"];
+    }
+    else if (pressed("toggle_entity_tooltip", wParam))
+    {
+        options["draw_entity_tooltip"] = !options["draw_entity_tooltip"];
     }
     else if (pressed("toggle_grid", wParam))
     {
@@ -4505,7 +4511,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
     else
         draw_list->AddRect(fix_pos(sboxa), fix_pos(sboxb), color, rounded ? 5.0f : 0.0f, 0, 2.0f);
 
-    if (options["draw_entityinfo"] && !cross && !filled)
+    if (options["draw_entity_info"] && !cross && !filled)
         draw_list->AddText(fix_pos(ImVec2(sboxa.x, sboxb.y)), ImColor(1.0f, 1.0f, 1.0f, 0.8f), entity_tooltip(ent).c_str());
 
     if ((g_hitbox_mask & 0x8000) == 0)
@@ -4861,23 +4867,32 @@ void render_clickhandler()
             grids = screenify({gridline.first, gridline.second});
             draw_list->AddLine(fix_pos(ImVec2(base->Pos.x, grids.y)), fix_pos(ImVec2(base->Pos.x + base->Size.x, grids.y)), ImColor(255, 0, 0, 150), 2.0f);
         }
+    }
 
-        if (ImGui::IsMousePosValid())
+    if (ImGui::IsMousePosValid())
+    {
+        ImVec2 mpos = normalize(mouse_pos());
+        std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
+        std::string coords = fmt::format("{:.2f}, {:.2f} ({:.2f}, {:.2f})", cpos.first, cpos.second, mpos.x, mpos.y);
+        unsigned int mask = safe_entity_mask;
+        if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
         {
-            ImVec2 mpos = normalize(mouse_pos());
-            std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
-            std::string coords = fmt::format("{:.2f}, {:.2f} ({:.2f}, {:.2f})", cpos.first, cpos.second, mpos.x, mpos.y);
-            unsigned int mask = safe_entity_mask;
-            if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
-            {
-                mask = unsafe_entity_mask;
-            }
-            auto hovered = UI::get_entity_at(cpos.first, cpos.second, false, 2, mask);
-            if (hovered != nullptr)
-            {
+            mask = unsafe_entity_mask;
+        }
+        auto hovered = UI::get_entity_at(cpos.first, cpos.second, false, 2, mask);
+        if (hovered)
+        {
+            if (options["draw_hitboxes"])
                 render_hitbox(hovered, true, ImColor(50, 50, 255, 200));
-                coords += "\n" + entity_tooltip(hovered);
-            }
+            coords += "\n" + entity_tooltip(hovered);
+            g_bucket->overlunky->hovered_uid = hovered->uid;
+        }
+        else
+        {
+            g_bucket->overlunky->hovered_uid = -1;
+        }
+        if (options["draw_entity_tooltip"])
+        {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
             ImGui::PopStyleVar();
@@ -5784,8 +5799,10 @@ void render_options()
         ImGui::SameLine();
         ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
         tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
-        ImGui::Checkbox("Draw entity info##DrawEntityInfo", &options["draw_entityinfo"]);
-        tooltip("Draw entity names, uids and some random stuff next to the hitboxes.", "toggle_entityinfo");
+        ImGui::Checkbox("Draw hovered entity tooltip##DrawEntityTooltip", &options["draw_entity_tooltip"]);
+        tooltip("Draw entity names, uids and some random stuff for hovered entitites.", "toggle_entity_tooltip");
+        ImGui::Checkbox("Draw all entity info##DrawEntityInfo", &options["draw_entity_info"]);
+        tooltip("Draw entity names, uids and some random stuff next to all entities.", "toggle_entity_info");
         ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
         tooltip("Smooth camera movement when dragging, unless paused.");
         ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
@@ -9330,7 +9347,8 @@ void check_focus()
 std::unordered_set<std::string> legal_options{
     "disable_ghost_timer",
     "disable_pause",
-    "draw_entityinfo",
+    "draw_entity_info",
+    "draw_entity_tooltip",
     "draw_grid",
     "draw_hitboxes",
     "draw_hitboxes_interpolated",
@@ -9354,6 +9372,19 @@ std::unordered_set<std::string> legal_options{
 
 void update_bucket()
 {
+    if (g_bucket->overlunky->set_selected_uid.has_value())
+    {
+        g_last_id = g_bucket->overlunky->set_selected_uid.value();
+        g_entity = get_entity_ptr(g_last_id);
+        g_bucket->overlunky->set_selected_uid = std::nullopt;
+    }
+    if (g_bucket->overlunky->set_selected_uids.has_value())
+    {
+        g_selected_ids = g_bucket->overlunky->set_selected_uids.value();
+        g_bucket->overlunky->set_selected_uids = std::nullopt;
+    }
+    g_bucket->overlunky->selected_uid = g_last_id;
+    g_bucket->overlunky->selected_uids = g_selected_ids;
     g_bucket->overlunky->keys = keys;
     for (auto [k, v] : options)
     {

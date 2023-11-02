@@ -6300,6 +6300,12 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field ignore_keys unordered_Array<string> @Disable some key bindings in Overlunky, whatever key they are actually bound to. Remember this might not be bound to the default any more, so only use this if you also plan on overriding the current keybinding, or just need to disable some feature and don't care what key it is bound on.
     ---@field ignore_keycodes unordered_Array<KEY> @Disable keys that may or may not be used by Overlunky. You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
     ---@field ignore_features unordered_Array<string> @TODO: Disable Overlunky features. Doesn't do anything yet.
+    ---@field selected_uid integer @Currently selected uid in the entity picker or -1 if nothing is selected.
+    ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
+    ---@field selected_uids integer[] @Currently selected uids in the entity finder.
+    ---@field hovered_uid integer @Currently hovered entity uid or -1 if nothing is hovered.
+    ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
+    ---@field set_selected_uids integer[] @size: ? @Set currently selected uids in the entity finder.
 
 ---@class Bucket
     ---@field data table<string, any> @You can store arbitrary simple values here in Playlunky to be read in on Overlunky script for example.
