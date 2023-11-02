@@ -271,7 +271,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false, camera_hack = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -3962,6 +3962,14 @@ void render_narnia()
     tooltip("Simulate natural level progression even more.");
 }
 
+void set_camera_hack(bool enable)
+{
+    camera_hack = enable;
+    if (g_ui_scripts.find("camera_hack") == g_ui_scripts.end())
+        return;
+    g_ui_scripts["camera_hack"]->set_enabled(camera_hack);
+}
+
 void render_camera()
 {
     if (set_focus_zoom)
@@ -4040,31 +4048,33 @@ void render_camera()
     ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Real X##CameraRealX", &g_state->camera->adjusted_focus_x, 0.2f, 1.0f);
     ImGui::InputFloat("Camera Real Y##CameraRealY", &g_state->camera->adjusted_focus_y, 0.2f, 1.0f);
-    if (submenu("Camera Bounds"))
+    ImGui::SeparatorText("Camera bounds");
+    ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2f, 1.0f);
+    ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
+    ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
+    ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
+    if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
+        set_camera_bounds(enable_camera_bounds);
+    tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.", "camera_reset");
+    if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
     {
-        ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2f, 1.0f);
-        ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
-        ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
-        ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
-        if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
+        UI::set_camp_camera_bounds_enabled(enable_camp_camera);
+        if (!enable_camp_camera && g_state->screen == 11)
         {
-            set_camera_bounds(enable_camera_bounds);
+            g_state->camera->bounds_left = 0.5;
+            g_state->camera->bounds_right = 74.5;
+            g_state->camera->bounds_top = 124.5;
+            g_state->camera->bounds_bottom = 56.5;
         }
-        tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.", "camera_reset");
-        if (ImGui::Checkbox("Enable camp camera bounds##CameraBoundsCamp", &enable_camp_camera))
-        {
-            UI::set_camp_camera_bounds_enabled(enable_camp_camera);
-            if (!enable_camp_camera && g_state->screen == 11)
-            {
-                g_state->camera->bounds_left = 0.5;
-                g_state->camera->bounds_right = 74.5;
-                g_state->camera->bounds_top = 124.5;
-                g_state->camera->bounds_bottom = 56.5;
-            }
-        }
-        tooltip("Disable to free the camera in camp.\nAutomatically disabled when zooming.");
-        endmenu();
     }
+    tooltip("Disable to free the camera in camp.\nAutomatically disabled when zooming.");
+    if (ImGui::Checkbox("Follow focused entity absolutely##CameraForcePlayer", &camera_hack))
+    {
+        set_camera_hack(camera_hack);
+        enable_camera_bounds = !camera_hack;
+        set_camera_bounds(enable_camera_bounds);
+    }
+    tooltip("Enable to remove camera bounds and always center the entity instantly without rubberbanding.");
 }
 
 void render_arrow()
@@ -8742,6 +8752,20 @@ void imgui_pre_init(ImGuiContext*)
     io.ConfigViewportsNoTaskBarIcon = true;
 }
 
+void add_ui_script(std::string name, bool enable, std::string code)
+{
+    if (g_ui_scripts.find(name) == g_ui_scripts.end())
+    {
+        SpelunkyScript* script = new SpelunkyScript(
+            code,
+            name,
+            g_SoundManager.get(),
+            g_Console.get(),
+            enable);
+        g_ui_scripts[name] = std::unique_ptr<SpelunkyScript>(script);
+    }
+}
+
 void imgui_init(ImGuiContext*)
 {
     if (std::setlocale(LC_CTYPE, ".UTF-8") == nullptr)
@@ -8771,11 +8795,7 @@ void imgui_init(ImGuiContext*)
     windows["tool_texture"] = new Window({"Texture viewer", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
     // windows["tool_sound"] = new Window({"Sound player", is_tab_detached("tool_sound"), is_tab_open("tool_sound")});
 
-    if (g_ui_scripts.find("pause") == g_ui_scripts.end())
-    {
-        // TODO: Revert this weird example
-        SpelunkyScript* script = new SpelunkyScript(
-            R"(
+    add_ui_script("pause", true, R"(
 meta = {
     name = "pause",
     author = "overlunky",
@@ -8804,38 +8824,27 @@ set_callback(function()
             end
         end
     end
-end, ON.PRE_UPDATE)
-            )",
-            "pause",
-            g_SoundManager.get(),
-            g_Console.get(),
-            true);
-        g_ui_scripts["pause"] = std::unique_ptr<SpelunkyScript>(script);
-    }
-    if (g_ui_scripts.find("dark") == g_ui_scripts.end())
-    {
-        SpelunkyScript* script = new SpelunkyScript(
-            "set_callback(function() state.level_flags = set_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)",
-            "dark",
-            g_SoundManager.get(),
-            g_Console.get(),
-            false);
-        g_ui_scripts["dark"] = std::unique_ptr<SpelunkyScript>(script);
-    }
-    if (g_ui_scripts.find("light") == g_ui_scripts.end())
-    {
-        SpelunkyScript* script = new SpelunkyScript(
-            "set_callback(function() state.level_flags = clr_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)",
-            "light",
-            g_SoundManager.get(),
-            g_Console.get(),
-            false);
-        g_ui_scripts["light"] = std::unique_ptr<SpelunkyScript>(script);
-    }
-    if (g_ui_scripts.find("void") == g_ui_scripts.end())
-    {
-        SpelunkyScript* script = new SpelunkyScript(
-            R"(
+end, ON.PRE_UPDATE))");
+    add_ui_script("camera_hack", false, R"(
+lastpos = Vec2:new()
+set_callback(function()
+    local e = get_entity(state.camera.focused_entity_uid)
+    if not e then return end
+    local x,y,l = get_render_position(e.uid)
+    local pos = Vec2:new(x, y)
+    if pos:distance_to(lastpos) > 1 then x,y,l = get_position(e.uid) end
+    lastpos = pos
+    state.camera.focus_x, state.camera.focus_y = x, y
+    state.camera.adjusted_focus_x, state.camera.adjusted_focus_y = x, y
+    state.camera.calculated_focus_x, state.camera.calculated_focus_y = x, y
+    state.camera.bounds_top = math.huge
+    state.camera.bounds_bottom = -math.huge
+    state.camera.bounds_left = -math.huge
+    state.camera.bounds_right = math.huge
+end, ON.RENDER_PRE_GAME))");
+    add_ui_script("dark", false, "set_callback(function() state.level_flags = set_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)");
+    add_ui_script("light", false, "set_callback(function() state.level_flags = clr_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)");
+    add_ui_script("void", false, R"(
 qflags = {2,3,5,17,18,19,25,26,27}
 disable_virts = {2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,19,20}
 hooks = {}
@@ -8903,23 +8912,8 @@ end
 set_callback(init_hooks, ON.LOAD)
 set_callback(init_hooks, ON.SCRIPT_ENABLE)
 set_callback(clear_hooks, ON.SCRIPT_DISABLE)
-)",
-            "void",
-            g_SoundManager.get(),
-            g_Console.get(),
-            false);
-        g_ui_scripts["void"] = std::unique_ptr<SpelunkyScript>(script);
-    }
-    if (g_ui_scripts.find("level_size") == g_ui_scripts.end())
-    {
-        SpelunkyScript* script = new SpelunkyScript(
-            "",
-            "level_size",
-            g_SoundManager.get(),
-            g_Console.get(),
-            false);
-        g_ui_scripts["level_size"] = std::unique_ptr<SpelunkyScript>(script);
-    }
+)");
+    add_ui_script("level_size", false, "");
 }
 
 void imgui_draw()
@@ -9217,6 +9211,7 @@ std::unordered_set<std::string> legal_options{
     "noclip",
     "smooth_camera",
     "pause_type",
+    "camera_hack",
 };
 
 void update_bucket()
@@ -9263,6 +9258,14 @@ void update_bucket()
         {
             if (auto* val = std::get_if<int64_t>(&v))
                 g_pause_type = (uint32_t)*val;
+        }
+        else if (k == "camera_hack")
+        {
+            if (auto* val = std::get_if<int64_t>(&v))
+            {
+                camera_hack = (uint32_t)*val;
+                set_camera_hack(camera_hack);
+            }
         }
     }
     g_bucket->overlunky->set_options.clear();
