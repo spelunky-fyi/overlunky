@@ -24,7 +24,7 @@ class Screen
     uint32_t unknown_zero;
 
     virtual void init() = 0;
-    virtual void handle_player() = 0; // for normal level: death, camera zoom, camera bounds, some save data stuff
+    virtual void handle_player() = 0; // for normal level: death, camera zoom (level/shop), camera bounds, some save data stuff
     virtual ~Screen() = 0;
     virtual void render() = 0; // mostly used by the non gameplay screens to draw textures and text
 
@@ -484,6 +484,8 @@ class ScreenLevel : public Screen // ID: 12
 {
   public:
     uint8_t buttons;
+    /// Delay after player death to open the death screen
+    int8_t time_till_death_screen;
 };
 
 class ScreenTransition : public Screen // ID: 13
@@ -1072,7 +1074,7 @@ struct JournalUI
     uint8_t unknown1;
     uint16_t unknown2;
     /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
-    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
     custom_vector<JournalPage*> pages;
     custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transfered to the pages vector
     uint32_t current_page;

@@ -400,7 +400,7 @@ Type | Name | Description
 ---- | ---- | -----------"""
 )
 print("bool | all:empty() | Returns true if container is empty, false otherwise")
-print("int | aLL:size() | Same as `#container`")
+print("int | all:size() | Same as `#container`")
 
 print("any | vector:at(int index) | Same as `vector[index]`")
 print("any | span:at(int index) | Same as `span[index]`")

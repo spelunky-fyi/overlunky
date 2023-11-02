@@ -20,28 +20,31 @@
 #include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
 #include <utility>          // for min, max, pair, find
 
-#include "custom_types.hpp"     // for get_custom_entity_types, CUSTOM_TYPE
-#include "entities_chars.hpp"   // for Player (ptr only), PowerupCapable
-#include "entities_floors.hpp"  // for ExitDoor, Door
-#include "entities_items.hpp"   // for StretchChain, PunishBall, Container
-#include "entities_liquids.hpp" // for Liquid
-#include "entities_mounts.hpp"  // for Mount
-#include "entity.hpp"           // for get_entity_ptr, to_id, Entity, EntityDB
-#include "entity_lookup.hpp"    //
-#include "game_manager.hpp"     //
-#include "game_patches.hpp"     //
-#include "items.hpp"            // for Items
-#include "layer.hpp"            // for EntityList, EntityList::Range, Layer
-#include "logger.h"             // for DEBUG
-#include "math.hpp"             // for AABB
-#include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
-#include "movable.hpp"          // for Movable
-#include "particles.hpp"        // for ParticleEmitterInfo
-#include "search.hpp"           // for get_address, find_inst
-#include "state.hpp"            // for State, get_state_ptr, enum_to_layer
-#include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"     // for OnHeapPointer
-#include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
+#include "containers/custom_vector.hpp" //
+#include "custom_types.hpp"             // for get_custom_entity_types, CUSTOM_TYPE
+#include "entities_chars.hpp"           // for Player (ptr only), PowerupCapable
+#include "entities_floors.hpp"          // for ExitDoor, Door
+#include "entities_items.hpp"           // for StretchChain, PunishBall, Container
+#include "entities_liquids.hpp"         // for Liquid
+#include "entities_mounts.hpp"          // for Mount
+#include "entity.hpp"                   // for get_entity_ptr, to_id, Entity, EntityDB
+#include "entity_lookup.hpp"            //
+#include "game_manager.hpp"             //
+#include "game_patches.hpp"             //
+#include "illumination.hpp"             //
+#include "items.hpp"                    // for Items
+#include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
+#include "logger.h"                     // for DEBUG
+#include "math.hpp"                     // for AABB
+#include "memory.hpp"                   // for write_mem_prot, write_mem_recoverable
+#include "movable.hpp"                  // for Movable
+#include "particles.hpp"                // for ParticleEmitterInfo
+#include "screen.hpp"                   //
+#include "search.hpp"                   // for get_address, find_inst
+#include "state.hpp"                    // for State, get_state_ptr, enum_to_layer
+#include "state_structs.hpp"            // for ShopRestrictedItem, Illumination
+#include "thread_utils.hpp"             // for OnHeapPointer
+#include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
 
 uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {
@@ -612,7 +615,7 @@ void unequip_backitem(uint32_t who_uid)
 
 int32_t worn_backitem(uint32_t who_uid)
 {
-    static const std::unordered_set<uint32_t> backitem_types = {
+    static const auto backitem_types = {
         to_id("ENT_TYPE_ITEM_JETPACK"),
         to_id("ENT_TYPE_ITEM_HOVERPACK"),
         to_id("ENT_TYPE_ITEM_POWERPACK"),
@@ -622,14 +625,13 @@ int32_t worn_backitem(uint32_t who_uid)
     };
 
     auto ent = get_entity_ptr(who_uid)->as<PowerupCapable>();
-    if (ent != nullptr)
+    if (ent != nullptr && !ent->powerups.empty())
     {
-        for (const auto& [powerup_type, powerup_entity] : ent->powerups)
+        for (auto powerup_type : backitem_types)
         {
-            if (backitem_types.count(powerup_type) > 0)
-            {
-                return powerup_entity->uid;
-            }
+            auto it = ent->powerups.find(powerup_type);
+            if (it != ent->powerups.end())
+                return it->second->uid;
         }
     }
     return -1;
@@ -757,6 +759,8 @@ void set_time_jelly_enabled(bool b)
 
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
 {
+    // this functions just calculates the room index and then loops thru state->room_owners->owned_rooms and compares the room index
+    // TODO: we could probably get rid of this pattern and write that ourselves
     static size_t offset = get_address("coord_inside_active_shop_room");
     if (offset != 0)
     {
@@ -769,143 +773,23 @@ bool is_inside_active_shop_room(float x, float y, LAYER layer)
 
 bool is_inside_shop_zone(float x, float y, LAYER layer)
 {
-    static size_t offset = 0;
-    static void* rcx = nullptr;
-    if (offset == 0)
-    {
-        offset = get_address("coord_inside_shop_zone");
-        size_t* tmp = (size_t*)get_address("coord_inside_shop_zone_rcx");
-        auto heap_ptr = OnHeapPointer<void*>(*tmp);
-        rcx = heap_ptr.decode();
-    }
+    // this function is weird, the main check does this (where rax is the room_template):
+    // ecx = rax - 0x41
+    // cmp cx, 0x17
+    // ja return 0
+    //
+    // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
+
+    static size_t offset = get_address("coord_inside_shop_zone");
+    auto state = State::get().ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
+
     if (offset != 0)
     {
-        typedef bool coord_inside_shop_zone_func(void*, uint32_t layer, float x, float y);
-        static coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
-        return ciszf(rcx, enum_to_layer(layer), x, y);
+        typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
+        coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
+        return ciszf(state->level_gen, enum_to_layer(layer), x, y);
     }
     return false;
-}
-
-ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid)
-{
-    static size_t offset = get_address("generate_world_particles");
-
-    if (offset != 0)
-    {
-        auto entity = get_entity_ptr(uid);
-        if (entity != nullptr)
-        {
-            auto state = get_state_ptr();
-            typedef ParticleEmitterInfo* generate_particles_func(std::vector<ParticleEmitterInfo*>*, uint32_t, Entity*);
-            static generate_particles_func* gpf = (generate_particles_func*)(offset);
-            return gpf(state->particle_emitters, particle_emitter_id, entity);
-        }
-    }
-    return nullptr;
-}
-
-ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, float x, float y)
-{
-    static size_t offset = get_address("generate_screen_particles");
-
-    if (offset != 0)
-    {
-        typedef ParticleEmitterInfo* generate_particles_func(uint32_t, float, float, size_t);
-        static generate_particles_func* gpf = (generate_particles_func*)(offset);
-        return gpf(particle_emitter_id, x, y, 0);
-    }
-    return nullptr;
-}
-
-void advance_screen_particles(ParticleEmitterInfo* particle_emitter)
-{
-    static size_t offset = get_address("advance_screen_particles");
-
-    if (offset != 0)
-    {
-        typedef void advance_particles_func(ParticleEmitterInfo*);
-        static advance_particles_func* apf = (advance_particles_func*)(offset);
-        apf(particle_emitter);
-    }
-}
-
-void render_screen_particles(ParticleEmitterInfo* particle_emitter)
-{
-    static size_t offset = get_address("render_screen_particles");
-
-    if (offset != 0)
-    {
-        typedef void render_particles_func(ParticleEmitterInfo*, size_t, size_t, size_t);
-        static render_particles_func* rpf = (render_particles_func*)(offset);
-        rpf(particle_emitter, 0, 0, 0);
-    }
-}
-
-void extinguish_particles(ParticleEmitterInfo* particle_emitter)
-{
-    // removing from state only applies to world emitters, but it just won't find the screen one in the vector, so no big deal
-    auto state = get_state_ptr();
-    std::erase(*state->particle_emitters, particle_emitter);
-
-    using generic_free_func = void(void*);
-    static generic_free_func* generic_free = (generic_free_func*)get_address("generic_free");
-
-    if (particle_emitter != nullptr)
-    {
-        generic_free(particle_emitter->emitted_particles.memory);
-        generic_free(particle_emitter->emitted_particles_back_layer.memory);
-        generic_free(particle_emitter);
-    }
-}
-
-Illumination* create_illumination_internal(Color color, float size, float x, float y, int32_t uid)
-{
-    static size_t offset = get_address("generate_illumination");
-
-    if (offset != 0)
-    {
-        auto state = get_state_ptr();
-
-        float position[] = {x, y};
-
-        typedef Illumination* create_illumination_func(std::vector<Illumination*>*, float*, Color*, uint32_t r9, float size, uint8_t flags, uint32_t uid, uint8_t);
-        static create_illumination_func* cif = (create_illumination_func*)(offset);
-        auto emitted_light = cif(state->lightsources, position, &color, 0x2, size, 32, uid, 0x0);
-
-        // turn on Enabled flag
-        emitted_light->flags = emitted_light->flags | (1U << (25 - 1));
-
-        return emitted_light;
-    }
-    return nullptr;
-}
-
-Illumination* create_illumination(Color color, float size, float x, float y)
-{
-    return create_illumination_internal(color, size, x, y, -1);
-}
-
-Illumination* create_illumination(Color color, float size, uint32_t uid)
-{
-    auto entity = get_entity_ptr(uid);
-    if (entity != nullptr)
-    {
-        return create_illumination_internal(color, size, entity->abs_x, entity->abs_y, uid);
-    }
-    return nullptr;
-}
-
-void refresh_illumination(Illumination* illumination)
-{
-    static uint32_t* offset = 0;
-    if (offset == 0)
-    {
-        size_t** heap_offset = (size_t**)get_address("refresh_illumination_heap_offset");
-        auto illumination_counter = OnHeapPointer<uint32_t>(**heap_offset);
-        offset = illumination_counter.decode();
-    }
-    illumination->timer = *offset;
 }
 
 void set_journal_enabled(bool b)
@@ -1411,14 +1295,14 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                auto state = State::get();
+                auto state = State::get().ptr();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
-                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
-                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
+                state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
+                state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
 
                 ItemOwnerDetails iod{shop_owner_uid, owner->type->id};
-                state.ptr()->room_owners.owned_items.insert({item->uid, iod});
+                state->room_owners.owned_items.insert({item->uid, iod});
                 return;
             }
         }
@@ -1510,11 +1394,10 @@ void game_log(std::string message)
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
 }
 
-void call_death_screen()
+void load_death_screen()
 {
-    using DeathScreen = void();
-    static auto death_screen = (DeathScreen*)get_address("death_screen");
-    death_screen();
+    auto state = State::get().ptr();
+    state->screen_death->init();
 }
 
 void save_progress()
@@ -1938,18 +1821,34 @@ void create_level()
     create_layer(1);
 }
 
-void set_death_enabled(bool enable)
+void set_level_logic_enabled(bool enable)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("dead_players");
-    }
+    auto state = State::get().ptr();
+    static size_t offset = get_virtual_function_address(state->screen_level, 1);
+
     if (offset != 0)
     {
         if (!enable)
-            write_mem_recoverable("death_disable", offset, "\xC3\x90"sv, true);
+            write_mem_recoverable("set_level_logic_enabled", offset, "\xC3\x90"sv, true);
         else
-            recover_mem("death_disable");
+            recover_mem("set_level_logic_enabled");
+    }
+}
+
+void set_camera_layer_control_enabled(bool enable)
+{
+    static auto offset = get_address("camera_layer_controll");
+    static auto offset2 = get_address("player_behavior_layer_switch");
+    if (!offset || !offset2)
+        return;
+
+    if (enable)
+    {
+        recover_mem("set_camera_layer_control");
+    }
+    else
+    {
+        write_mem_recoverable("set_camera_layer_control", offset, get_nop(7), true);
+        write_mem_recoverable("set_camera_layer_control", offset2, get_nop(18), true);
     }
 }

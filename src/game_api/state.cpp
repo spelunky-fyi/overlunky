@@ -13,6 +13,7 @@
 #include "entities_chars.hpp"                    // for Player
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
 #include "entity_hooks_info.hpp"                 // for Player
+#include "game_api.hpp"                          //
 #include "game_manager.hpp"                      // for get_game_manager, GameManager, SaveR...
 #include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
@@ -280,6 +281,7 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
+        get_is_init() = true;
 
         if (get_do_hooks())
         {
@@ -310,7 +312,6 @@ State& State::get()
                 DEBUG("Not applying patches, someone has already done it");
             }
         }
-        get_is_init() = true;
     }
     return STATE;
 }
@@ -332,6 +333,12 @@ StateMemory* State::ptr_local() const
     return p.decode_local();
 }
 
+float get_zoom_level()
+{
+    auto game_api = GameAPI::get();
+    return game_api->get_current_zoom();
+}
+
 std::pair<float, float> State::click_position(float x, float y)
 {
     float cz = get_zoom_level();
@@ -348,40 +355,6 @@ std::pair<float, float> State::screen_position(float x, float y)
     float rx = (x - cx) / cz / ZF;
     float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
-}
-
-size_t State::get_zoom_level_address()
-{
-    static const size_t obj1 = get_address("zoom_level");
-    static const size_t zoom_level_offset = get_address("zoom_level_offset");
-    size_t obj2 = memory_read<uint64_t>(obj1);
-    if (obj2 == 0)
-    {
-        return 0;
-    }
-
-    size_t obj3 = memory_read<uint64_t>(obj2 + 0x10);
-    if (obj3 == 0)
-    {
-        return 0;
-    }
-    return obj3 + zoom_level_offset;
-}
-
-float State::get_zoom_level()
-{
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto addr = get_zoom_level_address();
-        if (addr == 0)
-        {
-            return 13.5;
-        }
-        offset = addr - 4;
-    }
-    auto state = State::get().ptr();
-    return memory_read<float>(offset) + get_layer_zoom_offset(state->camera_layer);
 }
 
 void State::zoom(float level)
@@ -434,11 +407,8 @@ void State::zoom(float level)
     write_mem_prot(zoom_telescope, level_str, true);
 
     // overwrite the current value
-    auto zla = get_zoom_level_address();
-    if (zla != 0)
-    {
-        write_mem_prot(zla, level_str, true);
-    }
+    auto game_api = GameAPI::get();
+    game_api->set_zoom(std::nullopt, level);
 }
 
 void StateMemory::force_current_theme(uint32_t t)
@@ -724,7 +694,7 @@ uint8_t enum_to_layer(const LAYER layer)
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
-            return player->layer;
+            return player->layer > 1 ? 0 : player->layer;
         }
     }
     return 0;

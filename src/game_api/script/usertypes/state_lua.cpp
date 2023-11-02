@@ -14,6 +14,7 @@
 
 #include "entities_chars.hpp" // IWYU pragma: keep
 #include "entity.hpp"         // IWYU pragma: keep
+#include "illumination.hpp"   // IWYU pragma: keep
 #include "items.hpp"          // for Items, SelectPlayerSlot, Items::is...
 #include "level_api.hpp"      // IWYU pragma: keep
 #include "online.hpp"         // for OnlinePlayer, OnlineLobby, Online
@@ -347,7 +348,8 @@ void register_usertypes(sol::state& lua)
     statememory_type["correct_ushabti"] = &StateMemory::correct_ushabti;
     statememory_type["items"] = &StateMemory::items;
     statememory_type["camera_layer"] = &StateMemory::camera_layer;
-    statememory_type["layer_transition_timer"] = &StateMemory::layer_transition_effect_timer;
+    statememory_type["layer_transition_timer"] = &StateMemory::layer_transition_timer;
+    statememory_type["transition_to_layer"] = &StateMemory::transition_to_layer;
     statememory_type["screen_team_select"] = &StateMemory::screen_team_select;
     statememory_type["screen_character_select"] = &StateMemory::screen_character_select;
     statememory_type["screen_transition"] = &StateMemory::screen_transition;
@@ -410,7 +412,9 @@ void register_usertypes(sol::state& lua)
         "blue",
         &LightParams::blue,
         "size",
-        &LightParams::size);
+        &LightParams::size,
+        "as_color",
+        &LightParams::as_color);
 
     /// Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
     /// Used in StateMemory, Player, PlayerGhost, BurningRopeEffect ...
@@ -428,10 +432,24 @@ void register_usertypes(sol::state& lua)
     illumination_type["offset_y"] = &Illumination::offset_y;
     illumination_type["distortion"] = &Illumination::distortion;
     illumination_type["entity_uid"] = &Illumination::entity_uid;
+    illumination_type["timer"] = &Illumination::timer;
     illumination_type["flags"] = &Illumination::flags;
     illumination_type["type_flags"] = &Illumination::type_flags;
     illumination_type["enabled"] = &Illumination::enabled;
     illumination_type["layer"] = &Illumination::layer;
+
+    lua.create_named_table("LIGHT_TYPE", "NONE", LIGHT_TYPE::NONE, "FOLLOW_CAMERA", LIGHT_TYPE::FOLLOW_CAMERA, "FOLLOW_ENTITY", LIGHT_TYPE::FOLLOW_ENTITY, "ROOM_LIGHT", LIGHT_TYPE::ROOM_LIGHT);
+
+    /* LIGHT_TYPE
+    // NONE
+    // Normal static light, position can be edited to move it around
+    // FOLLOW_CAMERA
+    // Position is updated to the camera position, can be moved around via offset
+    // FOLLOW_ENTITY
+    // Position is updated to the entity position (from the uid field), if the uid is not found it will behave as LIGHT_TYPE.NONE, can be moved around via offset
+    // ROOM_LIGHT
+    // Rectangle, full brightness always uses light1, disabling light1 does nothing
+    */
 
     auto camera_type = lua.new_usertype<Camera>("Camera");
     camera_type["bounds_left"] = &Camera::bounds_left;

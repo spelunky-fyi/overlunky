@@ -67,6 +67,8 @@ void register_usertypes(sol::state& lua)
         &Vec2::rotate,
         "distance_to",
         &Vec2::distance_to,
+        "set",
+        &Vec2::set,
         "split",
         // &Vec2::split); // for the autodoc
         &Vec2::operator std::pair<float, float>);
@@ -108,6 +110,8 @@ void register_usertypes(sol::state& lua)
         &AABB::height,
         "is_point_inside",
         is_point_inside,
+        "set",
+        &AABB::set,
         "split",
         // &Vec2::split); // for the autodoc
         &AABB::operator std::tuple<float, float, float, float>);
@@ -116,8 +120,8 @@ void register_usertypes(sol::state& lua)
         static_cast<Triangle& (Triangle::*)(const Vec2&)>(&Triangle::offset),
         static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset));
     auto is_point_inside_triangle = sol::overload(
-        static_cast<bool (Triangle::*)(Vec2) const>(&Triangle::is_point_inside),
-        static_cast<bool (Triangle::*)(Vec2, float) const>(&Triangle::is_point_inside),
+        static_cast<bool (Triangle::*)(const Vec2) const>(&Triangle::is_point_inside),
+        static_cast<bool (Triangle::*)(const Vec2, float) const>(&Triangle::is_point_inside),
         static_cast<bool (Triangle::*)(float, float) const>(&Triangle::is_point_inside),
         static_cast<bool (Triangle::*)(float, float, float) const>(&Triangle::is_point_inside));
 
@@ -144,19 +148,21 @@ void register_usertypes(sol::state& lua)
         &Triangle::area,
         "is_point_inside",
         is_point_inside_triangle,
+        "set",
+        &Triangle::set,
         "split",
         // &Triangle::split); // for the autodoc
         &Triangle::operator std::tuple<Vec2, Vec2, Vec2>);
 
     auto is_point_inside_quad = sol::overload(
-        static_cast<bool (Quad::*)(Vec2) const>(&Quad::is_point_inside),
-        static_cast<bool (Quad::*)(Vec2, float) const>(&Quad::is_point_inside),
+        static_cast<bool (Quad::*)(const Vec2) const>(&Quad::is_point_inside),
+        static_cast<bool (Quad::*)(const Vec2, float) const>(&Quad::is_point_inside),
         static_cast<bool (Quad::*)(float, float) const>(&Quad::is_point_inside),
         static_cast<bool (Quad::*)(float, float, float) const>(&Quad::is_point_inside));
 
     lua.new_usertype<Quad>(
         "Quad",
-        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float), Quad(Vec2&, Vec2&, Vec2&, Vec2&)>{},
+        sol::constructors<Quad(), Quad(const Quad&), Quad(const AABB&), Quad(float, float, float, float, float, float, float, float), Quad(const Vec2&, const Vec2&, const Vec2&, const Vec2&)>{},
         "bottom_left_x",
         &Quad::bottom_left_x,
         "bottom_left_y",
@@ -185,13 +191,15 @@ void register_usertypes(sol::state& lua)
         &Quad::flip_vertically,
         "is_point_inside",
         is_point_inside_quad,
+        "set",
+        &Quad::set,
         "split",
         // &Quad::split); // for the autodoc
         &Quad::operator std::tuple<Vec2, Vec2, Vec2, Vec2>);
 
     auto two_lines_angle = sol::overload(
-        static_cast<float (*)(Vec2, Vec2, Vec2)>(::two_lines_angle),
-        static_cast<float (*)(Vec2, Vec2, Vec2, Vec2)>(::two_lines_angle));
+        static_cast<float (*)(const Vec2, const Vec2, const Vec2)>(::two_lines_angle),
+        static_cast<float (*)(const Vec2, const Vec2, const Vec2, const Vec2)>(::two_lines_angle));
     lua["intersection"] = intersection;
     lua["two_lines_angle"] = two_lines_angle;
 }

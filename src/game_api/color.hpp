@@ -153,6 +153,12 @@ struct Color
         uint8_t alpha = (color >> 24U) & 0xFF;
         return set_rgba(red, green, blue, alpha);
     }
+    /// Copies the values of different Color to this one
+    Color& set(Color& other)
+    {
+        *this = other;
+        return *this;
+    }
 
     float r{0.0f};
     float g{0.0f};

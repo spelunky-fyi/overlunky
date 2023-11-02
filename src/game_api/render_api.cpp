@@ -12,6 +12,7 @@
 #include <vector>       // for vector
 
 #include "entity.hpp"             // for Entity, EntityDB
+#include "game_api.hpp"           //
 #include "level_api.hpp"          // for ThemeInfo
 #include "logger.h"               // for DEBUG
 #include "memory.hpp"             // for memory_read, to_le_bytes, write_mem_prot
@@ -31,21 +32,20 @@ struct Layer;
 
 RenderAPI& RenderAPI::get()
 {
-    static RenderAPI render_api = []()
-    {
-        return RenderAPI{(size_t*)get_address("render_api_callback"sv), get_address("render_api_offset"sv)};
-    }();
+    static RenderAPI render_api;
     return render_api;
 }
 
-size_t RenderAPI::renderer() const
+Renderer* RenderAPI::renderer() const
 {
-    return memory_read<uint64_t>(*api + 0x10);
+    auto game_api = GameAPI::get();
+    return game_api->renderer;
 }
 
 size_t RenderAPI::swap_chain() const
 {
-    return memory_read<uint64_t>(renderer() + swap_chain_off);
+    return renderer()->swap_chain;
+    // return memory_read<uint64_t>(renderer() + swap_chain_off); // swap_chain_off from pattern: render_api_offset
 }
 
 void (*g_post_render_game)(){nullptr};
@@ -73,16 +73,9 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     if (trigger_vanilla_render_layer_callbacks(ON::RENDER_PRE_LAYER, layer))
         return;
 
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto addr = State::get_zoom_level_address();
-        offset = addr + 8;
-    }
-    if (offset != 0)
-    {
-        g_layer_zoom_offset[layer] = memory_read<float>(offset);
-    }
+    auto game_api = GameAPI::get();
+    g_layer_zoom_offset[layer] = game_api->renderer->current_zoom_offset;
+
     // The lhs and rhs LUTs are blended in the shader, but we don't know where that value is CPU side so we can only override
     // with a single LUT for now
     if (g_forced_lut_textures[layer])
@@ -117,7 +110,7 @@ void render_game(StateMemory* state)
     trigger_vanilla_render_callbacks(ON::RENDER_POST_GAME);
 }
 
-float get_layer_zoom_offset(uint8_t layer)
+float get_layer_transition_zoom_offset(uint8_t layer)
 {
     return g_layer_zoom_offset[layer];
 }
@@ -482,7 +475,7 @@ void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Col
             dest.top_left_y,
             unknown};
 
-        typedef void render_func(size_t, WorldShader, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
+        typedef void render_func(Renderer*, WorldShader, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         auto texture_name = texture->name;
         rf(renderer(), shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);
@@ -500,7 +493,7 @@ void RenderAPI::set_advanced_hud()
 
 void RenderAPI::reload_shaders()
 {
-    using ReloadShadersFun = void(size_t);
+    using ReloadShadersFun = void(Renderer*);
     static ReloadShadersFun* reload_shaders_impl = (ReloadShadersFun*)get_address("reload_shaders"sv);
     reload_shaders_impl(renderer());
 }

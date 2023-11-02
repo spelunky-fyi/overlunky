@@ -10,8 +10,8 @@
 
 #include "entities_monsters.hpp" // for CritterSlime, Hundun, Tiamat, Critt...
 #include "entity.hpp"            // for Entity
-#include "sound_manager.hpp"     //
-#include "state_structs.hpp"     // IWYU pragma: keep
+#include "illumination.hpp"      // IWYU pragma: keep
+#include "sound_manager.hpp"     // IWYU pragma: keep
 
 class Movable;
 class PowerupCapable;

@@ -1060,20 +1060,30 @@ function add_item_to_shop(item_uid, shop_owner_uid) end
 ---@param frames integer
 ---@return nil
 function change_poison_timer(frames) end
----Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---@param pos Vec2
+---@param color Color
+---@param type LIGHT_TYPE
+---@param size number
+---@param flags integer
+---@param uid integer
+---@param layer LAYER
+---@return Illumination
+function create_illumination(pos, color, type, size, flags, uid, layer) end
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
 ---@param color Color
 ---@param size number
 ---@param x number
 ---@param y number
 ---@return Illumination
 function create_illumination(color, size, x, y) end
----Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
 ---@param color Color
 ---@param size number
 ---@param uid integer
 ---@return Illumination
 function create_illumination(color, size, uid) end
----Refreshes an Illumination, keeps it from fading out
+---Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
@@ -1310,6 +1320,12 @@ function buttons_to_inputs(x, y, buttons) end
 ---@param enable boolean
 ---@return nil
 function set_infinite_loop_detection_enabled(enable) end
+---This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+---Letting you control those manually.
+---Look at the example on how to mimic game layer switching behavior
+---@param enable boolean
+---@return nil
+function set_camera_layer_control_enabled(enable) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1355,16 +1371,16 @@ function set_character_heart_color(type_id, color) end
 ---@return CustomMovableBehavior
 function make_custom_behavior(behavior_name, state_id, base_behavior) end
 ---Get the [ParticleDB](https://spelunky-fyi.github.io/overlunky/#ParticleDB) details of the specified ID
----@param id integer
+---@param id PARTICLEEMITTER
 ---@return ParticleDB
 function get_particle_type(id) end
 ---Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
----@param particle_emitter_id integer
+---@param particle_emitter_id PARTICLEEMITTER
 ---@param uid integer
 ---@return ParticleEmitterInfo
 function generate_world_particles(particle_emitter_id, uid) end
 ---Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
----@param particle_emitter_id integer
+---@param particle_emitter_id PARTICLEEMITTER
 ---@param x number
 ---@param y number
 ---@return ParticleEmitterInfo
@@ -1976,12 +1992,12 @@ do
     ---@field pools LiquidPool[] @size: 5
 
 ---@class StateMemory
-    ---@field screen_last integer @Previous SCREEN, used to check where we're coming from when loading another SCREEN
-    ---@field screen integer @Current SCREEN, generally read-only or weird things will happen
-    ---@field screen_next integer @Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
+    ---@field screen_last SCREEN @Previous SCREEN, used to check where we're coming from when loading another SCREEN
+    ---@field screen SCREEN @Current SCREEN, generally read-only or weird things will happen
+    ---@field screen_next SCREEN @Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
     ---@field ingame integer @Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
     ---@field playing integer @Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
-    ---@field pause PAUSE @8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
+    ---@field pause PAUSE @8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controlled by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
     ---@field width integer @level width in rooms (number of rooms horizontally)
     ---@field height integer @level height in rooms (number of rooms vertically)
     ---@field kali_favor integer
@@ -1998,7 +2014,7 @@ do
     ---@field level_start integer @Level number to start new runs in
     ---@field theme THEME @Current THEME number, used to pick the music and by some game logic like choosing the next level on transition
     ---@field theme_next THEME @Next THEME number, used when loading a new level or transition
-    ---@field theme_start integer @THEME to start new runs in
+    ---@field theme_start THEME @THEME to start new runs in
     ---@field current_theme ThemeInfo @Points to the current ThemeInfo
     ---@field force_current_theme fun(self, t: integer): nil @This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     ---@field shoppie_aggro integer @Current shoppie aggro
@@ -2025,7 +2041,7 @@ do
     ---@field win_state integer @0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
     ---@field illumination Illumination @The global level illumination, very big and bright.
     ---@field money_last_levels integer
-    ---@field money_shop_total integer @Total negative amount spent in shops during the run<br><br/>The total money currently available (in single player) is `players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total`
+    ---@field money_shop_total integer @Total amount spent in shops and sold idols during the run<br><br/>The total money currently available is `loop (players[].inventory.money + players[].inventory.collected_money_total) + state.money_shop_total`
     ---@field player_inputs PlayerInputs @Access the player inputs even when no player entities are available
     ---@field quests QuestsInfo @NPC quest states
     ---@field camera Camera @Camera bounds and position
@@ -2038,8 +2054,9 @@ do
     ---@field level_gen LevelGenSystem @Entrance and exit coordinates, shop types and all themes
     ---@field correct_ushabti integer @See `get_correct_ushabti`. == anim_frame - (2 * floor(anim_frame/12))
     ---@field items Items @Has the current player count, player inventories and character selections
-    ---@field camera_layer integer @The currently drawn layer, can't be changed
+    ---@field camera_layer integer
     ---@field layer_transition_timer integer
+    ---@field transition_to_layer integer
     ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
     ---@field screen_transition ScreenTransition
@@ -2079,7 +2096,7 @@ do
     ---@field journal_progress_stain_count integer
     ---@field journal_progress_stain_slots JournalProgressStainSlot[] @size: 30 @blood splats and paw prints in journal progress page
     ---@field journal_progress_theme_count integer
-    ---@field journal_progress_theme_slots integer[] @size: 9 @visited themes in journal progress page
+    ---@field journal_progress_theme_slots THEME[] @size: 9 @visited themes in journal progress page
     ---@field theme_info ThemeInfo @Points to the current ThemeInfo
     ---@field logic LogicList @Level logic like dice game and cutscenes
     ---@field liquid LiquidPhysics
@@ -2091,6 +2108,7 @@ do
     ---@field green number
     ---@field blue number
     ---@field size number
+    ---@field as_color fun(self): Color @Returns LightParams as Color, note that size = alpha
 
 ---@class Illumination
     ---@field lights LightParams[] @size: 4 @Table of light1, light2, ... etc.
@@ -2106,8 +2124,9 @@ do
     ---@field offset_y number
     ---@field distortion number
     ---@field entity_uid integer
+    ---@field timer integer
     ---@field flags integer @see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
-    ---@field type_flags integer @Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
+    ---@field type_flags LIGHT_TYPE
     ---@field enabled boolean
     ---@field layer integer
 
@@ -2248,6 +2267,7 @@ function PRNG:random(min, max) end
     ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
     ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
     ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
+    ---@field set fun(self, other: Color): Color @Copies the values of different Color to this one
 
 ---@class Animation
     ---@field id integer
@@ -3590,7 +3610,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field emitted_light Illumination
 
 ---@class FlameSize : Flame
-    ---@field flame_size number @if changed, gradually goes down (0.03 per frame) to the default size
+    ---@field flame_size number @if changed, gradually goes down (0.03 per frame) to the default size, it's the base value for `entity.width` and `entity.height`
 
 ---@class ClimbableRope : Movable
     ---@field segment_nr_inverse integer
@@ -4347,7 +4367,7 @@ function MovableBehavior:get_state_id() end
     ---@field set_get_next_state_id fun(self, get_next_state_id: fun(movable: Movable, base_fun: function): integer): nil @Set the `get_next_state_id` function of a `CustomMovableBehavior`, this will be called every frame when<br/>the movable is updated. If an `get_next_state_id` is already set it will be overridden. The signature<br/>of the function is `int get_next_state_id(Movable movable, function base_fun))`, use this to move to another state, return `nil`.<br/>or this behaviors `state_id` to remain in this behavior. If no base behavior is set `base_fun` will be `nil`.
 
 ---@class ParticleDB
-    ---@field id integer
+    ---@field id PARTICLEEMITTER
     ---@field spawn_count_min integer
     ---@field spawn_count integer
     ---@field lifespan_min integer
@@ -4380,6 +4400,7 @@ function MovableBehavior:get_state_id() end
 
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
+    ---@field particle_type2 ParticleDB
     ---@field particle_count integer
     ---@field particle_count_back_layer integer
     ---@field entity_uid integer
@@ -4387,6 +4408,8 @@ function MovableBehavior:get_state_id() end
     ---@field y number
     ---@field offset_x number
     ---@field offset_y number
+    ---@field layer integer
+    ---@field draw_depth integer
     ---@field emitted_particles Particle[]
     ---@field emitted_particles_back_layer Particle[]
 
@@ -5328,6 +5351,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field y number
     ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
     ---@field distance_to fun(self, other: Vec2): number @Just simple pythagoras theorem
+    ---@field set fun(self, other: Vec2): Vec2
     ---@field split fun(self): number, number
 
 ---@class AABB
@@ -5342,6 +5366,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field center fun(self): number, number @Short for `(aabb.left + aabb.right) / 2.0f, (aabb.top + aabb.bottom) / 2.0f`.
     ---@field width fun(self): number @Short for `aabb.right - aabb.left`.
     ---@field height fun(self): number @Short for `aabb.top - aabb.bottom`.
+    ---@field set fun(self, other: AABB): AABB
     ---@field split fun(self): number, number, number, number
 local AABB = nil
 ---Grows or shrinks the AABB by the given amount in all directions.
@@ -5373,6 +5398,7 @@ function AABB:is_point_inside(x, y) end
     ---@field get_angles fun(self): number, number, number @Returns ABC, BCA, CAB angles in radians
     ---@field scale fun(self, scale: number): Triangle
     ---@field area fun(self): number
+    ---@field set fun(self, other: Triangle): Triangle
     ---@field split fun(self): Vec2, Vec2, Vec2 @Returns the corner points
 local Triangle = nil
 ---@param off Vec2
@@ -5408,6 +5434,7 @@ function Triangle:is_point_inside(x, y, epsilon) end
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad @Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
+    ---@field set fun(self, other: Quad): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 local Quad = nil
 ---Check if point lies inside of triangle
@@ -5643,6 +5670,7 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class ScreenLevel : Screen
     ---@field buttons integer
+    ---@field time_till_death_screen integer @Delay after player death to open the death screen
 
 ---@class ScreenTransition : Screen
     ---@field woodpanel_pos number
@@ -5812,7 +5840,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field page_timer integer
     ---@field fade_timer integer
     ---@field opacity integer
-    ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo
@@ -6317,6 +6345,14 @@ function EntityDB:new(other) end
 ---@param other ENT_TYPE
 ---@return EntityDB
 function EntityDB:new(other) end
+
+ParticleDB = nil
+---@param other ParticleDB
+---@return ParticleDB
+function ParticleDB:new(other) end
+---@param particle_id PARTICLEEMITTER
+---@return ParticleDB
+function ParticleDB:new(particle_id) end
 
 CustomTheme = nil
 ---Create a new theme with an id and base theme, overriding defaults. Check [theme functions that are default enabled here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/script/usertypes/level_lua.cpp).

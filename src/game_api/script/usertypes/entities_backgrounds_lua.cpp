@@ -10,7 +10,7 @@
 
 #include "entities_backgrounds.hpp" // for BGEggshipRoom, BGShootingStar
 #include "entity.hpp"               // for Entity
-#include "state_structs.hpp"        // IWYU pragma: keep
+#include "illumination.hpp"         // IWYU pragma: keep
 
 namespace NEntitiesBG
 {

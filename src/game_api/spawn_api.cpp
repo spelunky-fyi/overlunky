@@ -12,23 +12,25 @@
 #include <utility>     // for pair, identity, min, _Find_fn, find
 #include <vector>      // for vector, allocator, _Vector_iterator
 
-#include "entities_chars.hpp"    // for Player
-#include "entities_items.hpp"    // for ClimbableRope
-#include "entities_liquids.hpp"  // for Lava
-#include "entities_monsters.hpp" // for Shopkeeper, RoomOwner
-#include "entity.hpp"            // for to_id, Entity, get_entity_ptr, Enti...
-#include "items.hpp"             //
-#include "layer.hpp"             // for Layer, g_level_max_y, g_level_max_x
-#include "level_api.hpp"         // for LevelGenSystem, ThemeInfo
-#include "logger.h"              // for DEBUG
-#include "math.hpp"              // for AABB
-#include "memory.hpp"            // for write_mem_prot, memory_read
-#include "prng.hpp"              // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
-#include "script/events.hpp"     // for post_entity_spawn, pre_entity_spawn
-#include "search.hpp"            // for get_address
-#include "state.hpp"             // for enum_to_layer, State, StateMemory
-#include "state_structs.hpp"     // for LiquidTileSpawnData, LiquidPhysics
-#include "util.hpp"              // for OnScopeExit
+#include "containers/custom_vector.hpp" //
+#include "entities_chars.hpp"           // for Player
+#include "entities_items.hpp"           // for ClimbableRope
+#include "entities_liquids.hpp"         // for Lava
+#include "entities_monsters.hpp"        // for Shopkeeper, RoomOwner
+#include "entity.hpp"                   // for to_id, Entity, get_entity_ptr, Enti...
+#include "illumination.hpp"             //
+#include "items.hpp"                    //
+#include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x
+#include "level_api.hpp"                // for LevelGenSystem, ThemeInfo
+#include "logger.h"                     // for DEBUG
+#include "math.hpp"                     // for AABB
+#include "memory.hpp"                   // for write_mem_prot, memory_read
+#include "prng.hpp"                     // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
+#include "script/events.hpp"            // for post_entity_spawn, pre_entity_spawn
+#include "search.hpp"                   // for get_address
+#include "state.hpp"                    // for enum_to_layer, State, StateMemory
+#include "state_structs.hpp"            // for LiquidTileSpawnData, LiquidPhysics
+#include "util.hpp"                     // for OnScopeExit
 
 struct Items;
 
@@ -70,15 +72,20 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 
         for (Lava* lava : lavas)
         {
-            float position[2] = {lava->x, lava->y};
-            float color[4] = {1.782f, 0.575262f, 0.0f, 0.0f}; // green value is randomized!
-            float light_size = 1.0f;
-            uint32_t flags = 0x63;
+            Vec2 position{lava->x, lava->y};
+            Color color{1.782f, 0.575262f, 0.0f, 0.0f};
+            // green value is randomized in game
+            // uses PRNG_CLASS::LEVEL_DECO
+            // green = (PRNG::random_float / 1000 * 0.3 + 0.2) / 1.62
 
-            using construct_illumination_ptr_fun_t = Illumination*(std::vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
-            static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("generate_illumination");
+            float light_size = 0.6f; // should be 0.8f for dark level
+            uint8_t flags = 0x63;
 
-            auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);
+            // using construct_illumination_ptr_fun_t = Illumination*(custom_vector<Illumination*>*, float*, float*, uint8_t, float, uint32_t, uint32_t, uint8_t);
+            // static auto construct_illumination_ptr_call = (construct_illumination_ptr_fun_t*)get_address("generate_illumination");
+
+            // auto ill_ptr = construct_illumination_ptr_call(state->lightsources, position, color, 2, light_size, flags, lava->uid, lava->layer);
+            auto ill_ptr = create_illumination(position, color, LIGHT_TYPE::FOLLOW_ENTITY, light_size, flags, lava->uid, (LAYER)lava->layer);
             lava->emitted_light = ill_ptr;
         }
     }
@@ -166,7 +173,7 @@ int32_t spawn_entity_abs(ENT_TYPE entity_type, float x, float y, LAYER layer, fl
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
+    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
 }
 
 int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -178,7 +185,7 @@ int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
+    return State::get().layer(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
 }
 
 int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -190,7 +197,7 @@ int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER 
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
+    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
 }
 
 int32_t spawn_entity_abs_nonreplaceable(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
@@ -215,7 +222,7 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     if (layer > 1)
         return -1;
 
-    return state.layer_local(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
+    return state.layer(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
 int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint8_t t)
@@ -227,7 +234,7 @@ int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
+    return State::get().layer(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
 }
 
 void spawn_backdoor_abs(float x, float y)
@@ -238,8 +245,8 @@ void spawn_backdoor_abs(float x, float y)
 
     auto state = State::get();
     DEBUG("Spawning backdoor on {}, {}", x, y);
-    Layer* front_layer = state.layer_local(0);
-    Layer* back_layer = state.layer_local(1);
+    Layer* front_layer = state.layer(0);
+    Layer* back_layer = state.layer(1);
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
@@ -255,7 +262,7 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     std::pair<float, float> offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer_local(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
+    return State::get().layer(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
 int32_t spawn_tree(float x, float y, LAYER layer)
@@ -274,7 +281,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     x = std::roundf(x + offset_position.first);
     y = std::roundf(y + offset_position.second);
 
-    Layer* layer_ptr = State::get().layer_local(actual_layer);
+    Layer* layer_ptr = State::get().layer(actual_layer);
 
     // Needs some space on top
     if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 1 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
@@ -358,7 +365,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
 
     std::pair<float, float> offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(l, offset);
-    const auto layer_ptr = State::get().layer_local(actual_layer);
+    const auto layer_ptr = State::get().layer(actual_layer);
     const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
     uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
     static const auto base = to_id("ENT_TYPE_FLOOR_MUSHROOM_BASE");
@@ -427,7 +434,7 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
 
     std::pair<float, float> offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(layer, offset);
-    const auto layer_ptr = State::get().layer_local(actual_layer);
+    const auto layer_ptr = State::get().layer(actual_layer);
     const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
     const uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
     const float g_x = static_cast<float>(i_x);

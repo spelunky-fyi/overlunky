@@ -14,7 +14,9 @@
 #include "entities_mounts.hpp"       // for Mount
 #include "entity.hpp"                // for to_id, Entity, get_entity_ptr
 #include "entity_lookup.hpp"         //
+#include "game_api.hpp"              //
 #include "game_manager.hpp"          // for get_game_manager, GameManager
+#include "illumination.hpp"          //
 #include "items.hpp"                 // for Items
 #include "layer.hpp"                 // for Layer, EntityList::Range, Entit...
 #include "level_api.hpp"             // for LevelGenSystem
@@ -38,7 +40,7 @@ void UI::godmode_companions(bool g)
 }
 void UI::death_enabled(bool g)
 {
-    set_death_enabled(g);
+    set_level_logic_enabled(g);
 }
 std::pair<float, float> UI::click_position(float x, float y)
 {
@@ -83,7 +85,8 @@ void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
 }
 float UI::get_zoom_level()
 {
-    return State::get_zoom_level();
+    auto game_api = GameAPI::get();
+    return game_api->get_current_zoom();
 }
 void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 {
@@ -767,5 +770,5 @@ std::pair<float, float> UI::spawn_position()
 
 void UI::load_death_screen()
 {
-    call_death_screen();
+    ::load_death_screen();
 }
