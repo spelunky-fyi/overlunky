@@ -4073,6 +4073,8 @@ void render_camera()
         set_camera_hack(camera_hack);
         enable_camera_bounds = !camera_hack;
         set_camera_bounds(enable_camera_bounds);
+        enable_camp_camera = !camera_hack;
+        UI::set_camp_camera_bounds_enabled(enable_camp_camera);
     }
     tooltip("Enable to remove camera bounds and always center the entity instantly without rubberbanding.");
 }
@@ -8834,6 +8836,8 @@ set_callback(function()
     local pos = Vec2:new(x, y)
     if pos:distance_to(lastpos) > 1 then x,y,l = get_position(e.uid) end
     lastpos = pos
+    x = x + state.camera.focus_offset_x
+    y = y + state.camera.vertical_pan + state.camera.focus_offset_y
     state.camera.focus_x, state.camera.focus_y = x, y
     state.camera.adjusted_focus_x, state.camera.adjusted_focus_y = x, y
     state.camera.calculated_focus_x, state.camera.calculated_focus_y = x, y
