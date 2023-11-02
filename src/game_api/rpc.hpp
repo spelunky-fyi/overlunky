@@ -139,3 +139,4 @@ void destroy_level();
 void create_layer(uint8_t layer);
 void create_level();
 void set_death_enabled(bool enable);
+void set_start_level_paused(bool enable);

@@ -1841,6 +1841,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        // ^ writes to state.pause on state.loading == 3
+        "unpause_level"sv,
+        PatternCommandBuffer{}
+            .find_inst("\x44\x0F\x29\xBD\x20\x02\x00\x00"sv)
+            .find_next_inst("c7 46 14 00 00 00 00 24 fd"_gh)
+            .offset(9)
+            .at_exe(),
+    },
+    {
         /* it's a static double, just find something that reads it
            this+0x08 is clearly some kind of framerate related double, cause it's 60, but don't know what it does
            this+0x10 is hopefully unfocused frametime for the other function, but maybe it needs own pattern

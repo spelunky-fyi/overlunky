@@ -1296,6 +1296,10 @@ function create_layer(layer) end
 ---@param enable boolean
 ---@return nil
 function set_level_logic_enabled(enable) end
+---Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
+---@param enable boolean
+---@return nil
+function set_start_level_paused(enable) end
 ---Converts INPUTS to (x, y, BUTTON)
 ---@param inputs INPUTS
 ---@return number, number, BUTTON
@@ -10994,3 +10998,4 @@ local MAX_PLAYERS = 4
 ---@alias SHORT_TILE_CODE integer;
 ---@alias STRINGID integer;
 ---@alias FEAT integer;
+---@alias KEY integer;

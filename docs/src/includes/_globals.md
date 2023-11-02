@@ -1851,6 +1851,15 @@ end, ON.PRE_LOAD_SCREEN)
 
 Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
 
+### set_start_level_paused
+
+
+> Search script examples for [set_start_level_paused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_start_level_paused)
+
+#### nil set_start_level_paused(bool enable)
+
+Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == [PAUSE](#PAUSE).FADE on the first frame to do what you want.
+
 ### set_storage_layer
 
 

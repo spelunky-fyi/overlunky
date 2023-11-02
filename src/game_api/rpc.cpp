@@ -1953,3 +1953,19 @@ void set_death_enabled(bool enable)
             recover_mem("death_disable");
     }
 }
+
+void set_start_level_paused(bool enable)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unpause_level");
+    }
+    if (offset != 0)
+    {
+        if (enable)
+            write_mem_recoverable("start_level_paused", offset, get_nop(3), true);
+        else
+            recover_mem("start_level_paused");
+    }
+}

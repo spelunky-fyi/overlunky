@@ -2159,6 +2159,9 @@ end
     /// Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
     lua["set_level_logic_enabled"] = set_death_enabled;
 
+    /// Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
+    lua["set_start_level_paused"] = set_start_level_paused;
+
     /// Converts INPUTS to (x, y, BUTTON)
     lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
     {
