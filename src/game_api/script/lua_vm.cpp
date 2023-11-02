@@ -62,6 +62,7 @@
 #include "strings.hpp"                             // for change_string
 #include "thread_utils.hpp"                        // for OnHeapPointer
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
+#include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes
 #include "usertypes/drops_lua.hpp"                 // for register_usertypes
 #include "usertypes/entities_activefloors_lua.hpp" // for register_usertypes
@@ -295,6 +296,7 @@ end
     NSteam::register_usertypes(lua);
     NVTables::register_usertypes(lua);
     NLogic::register_usertypes(lua);
+    NBucket::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
 

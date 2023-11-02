@@ -29,6 +29,7 @@
 
 #include "olfont.h"
 
+#include "bucket.hpp"
 #include "console.hpp"
 #include "custom_types.hpp"
 #include "entities_chars.hpp"
@@ -275,6 +276,7 @@ Entity* g_held_entity = 0;
 StateMemory* g_state = 0;
 SaveData* g_save = 0;
 GameManager* g_game_manager = 0;
+Bucket* g_bucket = 0;
 std::map<int, std::string> entity_names;
 std::map<int, std::string> entity_full_names;
 std::string active_tab = "", activate_tab = "", detach_tab = "", focused_tool = "", g_load_void = "";
@@ -2319,6 +2321,9 @@ void respawn()
 
 bool pressed(std::string keyname, WPARAM wParam)
 {
+    if (g_bucket->overlunky->ignore_keys.contains(keyname))
+        return false;
+
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -2336,11 +2341,14 @@ bool pressed(std::string keyname, WPARAM wParam)
     {
         wParam += OL_KEY_ALT;
     }
-    return wParam == (unsigned)keycode;
+    return wParam == (unsigned)keycode && !g_bucket->overlunky->ignore_keycodes.contains(keycode);
 }
 
 bool pressing(std::string keyname)
 {
+    if (g_bucket->overlunky->ignore_keys.contains(keyname))
+        return false;
+
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
         return false;
@@ -2361,11 +2369,14 @@ bool pressing(std::string keyname)
     {
         wParam += OL_KEY_ALT;
     }
-    return wParam == (unsigned)keycode && (GetKeyState(key) & 0x8000);
+    return wParam == (unsigned)keycode && (GetKeyState(key) & 0x8000) && !g_bucket->overlunky->ignore_keycodes.contains(keycode);
 }
 
 bool clicked(std::string keyname)
 {
+    if (g_bucket->overlunky->ignore_keys.contains(keyname))
+        return false;
+
     int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
@@ -2406,11 +2417,14 @@ bool clicked(std::string keyname)
             }
         }
     }
-    return wParam == keycode;
+    return wParam == keycode && !g_bucket->overlunky->ignore_keycodes.contains(keycode);
 }
 
 bool dblclicked(std::string keyname)
 {
+    if (g_bucket->overlunky->ignore_keys.contains(keyname))
+        return false;
+
     int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
@@ -2437,11 +2451,14 @@ bool dblclicked(std::string keyname)
             break;
         }
     }
-    return wParam == keycode;
+    return wParam == keycode && !g_bucket->overlunky->ignore_keycodes.contains(keycode);
 }
 
 bool held(std::string keyname)
 {
+    if (g_bucket->overlunky->ignore_keys.contains(keyname))
+        return false;
+
     int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
@@ -2468,11 +2485,14 @@ bool held(std::string keyname)
             break;
         }
     }
-    return wParam == keycode;
+    return wParam == keycode && !g_bucket->overlunky->ignore_keycodes.contains(keycode);
 }
 
 bool released(std::string keyname)
 {
+    if (g_bucket->overlunky->ignore_keys.contains(keyname))
+        return false;
+
     int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
@@ -2499,11 +2519,14 @@ bool released(std::string keyname)
             break;
         }
     }
-    return wParam == keycode;
+    return wParam == keycode && !g_bucket->overlunky->ignore_keycodes.contains(keycode);
 }
 
 bool dragging(std::string keyname)
 {
+    if (g_bucket->overlunky->ignore_keys.contains(keyname))
+        return false;
+
     int wParam = OL_BUTTON_MOUSE;
     if (keys.find(keyname) == keys.end() || (keys[keyname] & 0xff) == 0)
     {
@@ -2530,7 +2553,7 @@ bool dragging(std::string keyname)
             break;
         }
     }
-    return wParam == keycode;
+    return wParam == keycode && !g_bucket->overlunky->ignore_keycodes.contains(keycode);
 }
 
 bool dragged(std::string keyname) // unused
@@ -2644,6 +2667,20 @@ void set_selected_type(uint32_t id)
         }
     }
     g_last_type = id;
+}
+
+void toggle_lights()
+{
+    if (options["lights"] && g_state->illumination)
+    {
+        g_state->illumination->flags |= (1U << 24);
+    }
+    else if (!options["lights"] && g_state->illumination)
+    {
+        g_state->illumination->flags &= ~(1U << 16);
+        if ((g_state->level_flags & (1U << 17)) > 0)
+            g_state->illumination->flags &= ~(1U << 24);
+    }
 }
 
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
@@ -2965,16 +3002,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("toggle_lights", wParam))
     {
         options["lights"] = !options["lights"];
-        if (options["lights"] && g_state->illumination)
-        {
-            g_state->illumination->flags |= (1U << 24);
-        }
-        else if (!options["lights"] && g_state->illumination)
-        {
-            g_state->illumination->flags &= ~(1U << 16);
-            if ((g_state->level_flags & (1U << 17)) > 0)
-                g_state->illumination->flags &= ~(1U << 24);
-        }
+        toggle_lights();
     }
     else if (pressed("toggle_ghost", wParam))
     {
@@ -5405,6 +5433,30 @@ void render_keyconfig()
     {
         keys = default_keys;
         save_config(cfgfile);
+    }
+    if (g_bucket->overlunky->ignore_keys.size())
+    {
+        std::string s;
+        for (auto const& e : g_bucket->overlunky->ignore_keys)
+        {
+            s += e;
+            s += ',';
+        }
+        s.pop_back();
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: The following keys have been disabled by scripts:");
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "%s", s.c_str());
+    }
+    if (g_bucket->overlunky->ignore_keycodes.size())
+    {
+        std::string s;
+        for (auto const& e : g_bucket->overlunky->ignore_keycodes)
+        {
+            s += fmt::format("0x{:x}", e);
+            s += ',';
+        }
+        s.pop_back();
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: The following keycodes have been disabled by scripts:");
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "%s", s.c_str());
     }
     ImGui::BeginTable("##keyconfig", 4);
     ImGui::TableSetupColumn("Tool");
@@ -9160,6 +9212,64 @@ void check_focus()
     }
 }
 
+std::unordered_set<std::string> legal_options{
+    "disable_ghost_timer",
+    "disable_pause",
+    "draw_entityinfo",
+    "draw_grid",
+    "draw_hitboxes",
+    "draw_hitboxes_interpolated",
+    "draw_hotbar",
+    "draw_hud",
+    "draw_path",
+    "draw_script_messages",
+    "fade_script_messages",
+    "fly_mode",
+    "god_mode",
+    "god_mode_companions",
+    "hd_cursor",
+    "keyboard_control",
+    "lights",
+    "mouse_control",
+    "noclip",
+    "smooth_camera",
+};
+
+void update_bucket()
+{
+    g_bucket->overlunky->keys = keys;
+    g_bucket->overlunky->options = options;
+    for (auto [k, v] : g_bucket->overlunky->set_options)
+    {
+        if (!legal_options.contains(k))
+            continue;
+        options[k] = v;
+        if (k == "disable_ghost_timer")
+        {
+            UI::set_time_ghost_enabled(!options["disable_ghost_timer"]);
+            UI::set_time_jelly_enabled(!options["disable_ghost_timer"]);
+            UI::set_cursepot_ghost_enabled(!options["disable_ghost_timer"]);
+        }
+        else if (k == "god_mode")
+        {
+            UI::godmode(options["god_mode"]);
+        }
+        else if (k == "god_mode")
+        {
+            UI::godmode_companions(options["god_mode_companions"]);
+        }
+        else if (k == "noclip")
+        {
+            toggle_noclip();
+        }
+        else if (k == "lights")
+        {
+            toggle_lights();
+        }
+    }
+    g_bucket->overlunky->set_options.clear();
+}
+
 void post_draw()
 {
     check_focus();
@@ -9171,6 +9281,7 @@ void post_draw()
     force_cheats();
     force_lights();
     frame_advance();
+    update_bucket();
 }
 
 void create_box(std::vector<EntityItem> items)
@@ -9216,6 +9327,8 @@ void init_ui()
     g_state = State::get().ptr_main();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();
+    g_bucket = Bucket::get();
+    g_bucket->overlunky = new Overlunky();
 
     g_Console = std::make_unique<SpelunkyConsole>(g_SoundManager.get());
     g_Console->set_max_history_size(1000);
