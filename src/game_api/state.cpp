@@ -393,22 +393,27 @@ void State::zoom(float level)
         }
     }
 
-    const auto level_str = to_le_bytes(level);
-
     static const auto zoom_level = get_address("default_zoom_level");
     static const auto zoom_shop = get_address("default_zoom_level_shop");
     static const auto zoom_camp = get_address("default_zoom_level_camp");
     static const auto zoom_telescope = get_address("default_zoom_level_telescope");
 
     // overwrite the defaults
-    write_mem_prot(zoom_level, level_str, true);
-    write_mem_prot(zoom_shop, level_str, true);
-    write_mem_prot(zoom_camp, level_str, true);
-    write_mem_prot(zoom_telescope, level_str, true);
+    write_mem_recoverable<float>("zoom", zoom_level, level, true);
+    write_mem_recoverable<float>("zoom", zoom_shop, level, true);
+    write_mem_recoverable<float>("zoom", zoom_camp, level, true);
+    write_mem_recoverable<float>("zoom", zoom_telescope, level, true);
 
     // overwrite the current value
     auto game_api = GameAPI::get();
     game_api->set_zoom(std::nullopt, level);
+}
+
+void State::zoom_reset()
+{
+    recover_mem("zoom");
+    auto game_api = GameAPI::get();
+    game_api->set_zoom(std::nullopt, 13.5f);
 }
 
 void StateMemory::force_current_theme(uint32_t t)

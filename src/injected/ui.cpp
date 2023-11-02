@@ -157,7 +157,8 @@ std::map<std::string, int64_t> default_keys{
     {"switch_ui", VK_F12},
     {"zoom_in", OL_KEY_CTRL | VK_OEM_COMMA},
     {"zoom_out", OL_KEY_CTRL | VK_OEM_PERIOD},
-    {"zoom_default", OL_KEY_CTRL | '2'},
+    {"zoom_reset", OL_KEY_CTRL | '1'},
+    {"zoom_2x", OL_KEY_CTRL | '2'},
     {"zoom_3x", OL_KEY_CTRL | '3'},
     {"zoom_4x", OL_KEY_CTRL | '4'},
     {"zoom_5x", OL_KEY_CTRL | '5'},
@@ -2886,9 +2887,14 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         g_zoom -= 1.0f;
         set_zoom();
     }
-    else if (pressed("zoom_default", wParam))
+    else if (pressed("zoom_reset", wParam))
     {
         g_zoom = 13.5f;
+        UI::zoom_reset();
+    }
+    else if (pressed("zoom_2x", wParam))
+    {
+        g_zoom = 16.324f;
         set_zoom();
     }
     else if (pressed("zoom_3x", wParam))
@@ -3987,9 +3993,16 @@ void render_camera()
     if (ImGui::Button("Default"))
     {
         g_zoom = 13.5f;
+        UI::zoom_reset();
+    }
+    tooltip("Default zoom level.", "zoom_reset");
+    ImGui::SameLine();
+    if (ImGui::Button("2x"))
+    {
+        g_zoom = 16.324f;
         set_zoom();
     }
-    tooltip("Default zoom level.", "zoom_default");
+    tooltip("2 room wide zoom level.", "zoom_2x");
     ImGui::SameLine();
     if (ImGui::Button("3x"))
     {

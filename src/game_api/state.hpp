@@ -338,6 +338,7 @@ struct State
     void darkmode(bool g);
 
     void zoom(float level);
+    void zoom_reset();
 
     static std::pair<float, float> click_position(float x, float y);
     static std::pair<float, float> screen_position(float x, float y);

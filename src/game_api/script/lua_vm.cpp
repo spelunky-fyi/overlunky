@@ -966,9 +966,12 @@ end
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     lua["force_dark_level"] = [](bool g)
     { State::get().darkmode(g); };
-    /// Set the zoom level used in levels and shops. 13.5 is the default.
+    /// Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
     lua["zoom"] = [](float level)
     { State::get().zoom(level); };
+    /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
+    lua["zoom_reset"] = []()
+    { State::get().zoom_reset(); };
     /// Pause/unpause the game.
     /// This is just short for `state.pause == 32`, but that produces an audio bug
     /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
