@@ -488,6 +488,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "game_free"sv,
+        // it's function that decides to use game_free or custom_free by the address
         PatternCommandBuffer{}
             .find_inst("\x48\x83\x7e\x18\x00"sv)
             .offset(-0x10)
@@ -530,6 +531,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "state_location"sv,
+        // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
         PatternCommandBuffer{}
             .find_inst("\x49\x0F\x44\xC0"sv)
             .find_next_inst("\x49\x0F\x44\xC0"sv)
@@ -571,25 +573,25 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc(4)
             .at_exe(),
     },
-    {
-        "render_api_callback"sv,
-        // Break at startup on SteamAPI_RegisterCallback, it gets called twice, second time
-        // to hook the Steam overlay, at the beginning of that function is the pointer we need
-        PatternCommandBuffer{}
-            .find_inst("\x70\x08\x00\x00\xFE\xFF\xFF\xFF\x48\x8B\x05"sv)
-            .offset(0x8)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        // Find reference to SetWindowPos or SetWindowLongA, below one of the references you should see a few instructions like:
-        // mov rcx,qword ptr ds:[rsi+80FD0]
-        "render_api_offset"sv,
-        PatternCommandBuffer{}
-            .find_inst("\xBA\xF0\xFF\xFF\xFF\x41\xB8\x00\x00\x00\x90"sv)
-            .offset(0x11)
-            .decode_imm(),
-    },
+    //{
+    //    "render_api_callback"sv,
+    //    // Break at startup on SteamAPI_RegisterCallback, it gets called twice, second time
+    //    // to hook the Steam overlay, at the beginning of that function is the pointer we need
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x70\x08\x00\x00\xFE\xFF\xFF\xFF\x48\x8B\x05"sv)
+    //        .offset(0x8)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
+    //{
+    //    // Find reference to SetWindowPos or SetWindowLongA, below one of the references you should see a few instructions like:
+    //    // mov rcx,qword ptr ds:[rsi+80FD0]
+    //    "render_api_offset"sv,
+    //    PatternCommandBuffer{}
+    //        .find_inst("\xBA\xF0\xFF\xFF\xFF\x41\xB8\x00\x00\x00\x90"sv)
+    //        .offset(0x11)
+    //        .decode_imm(),
+    //},
     {
         // in load_item it's written to RCX and then calls spawn_entity
         "entity_factory"sv,
@@ -1043,30 +1045,30 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_pc(2)
             .at_exe(),
     },
-    {
-        "zoom_level"sv,
-        // Go stand in a level next to a shop. In Cheat Engine, search for float 13.5
-        // Go into the shop, search for 12.5, put a write bp on that address.
-        // In 1.23.3 the default shop and level zoom levels aren't hardcoded in the exe, they are
-        // in variables (loaded into xmm6)
-        // Note that xmm6 (the new zoom level) gets written at a huge offset of rax. Rax is the
-        // return value of the call just above, so look in that function at the bottom. There will
-        // be a hardcoded value loaded in rax. At offset 0x10 in rax is another pointer that is the
-        // base for the big offset.
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x05****\x48\x81\xC4\xF8\x08\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
-    {
-        "zoom_level_offset"sv,
-        // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
-        // That instruction contains the offset, the memory is: {current_zoom, target_zoom} and both offset will be present
-        // current solution uses the target_zoom offset
-        PatternCommandBuffer{}
-            .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
-            .decode_imm(4),
-    },
+    //{
+    //    "zoom_level"sv,
+    //    // Go stand in a level next to a shop. In Cheat Engine, search for float 13.5
+    //    // Go into the shop, search for 12.5, put a write bp on that address.
+    //    // In 1.23.3 the default shop and level zoom levels aren't hardcoded in the exe, they are
+    //    // in variables (loaded into xmm6)
+    //    // Note that xmm6 (the new zoom level) gets written at a huge offset of rax. Rax is the
+    //    // return value of the call just above, so look in that function at the bottom. There will
+    //    // be a hardcoded value loaded in rax. At offset 0x10 in rax is another pointer that is the
+    //    // base for the big offset.
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x48\x8B\x05****\x48\x81\xC4\xF8\x08\x00\x00"sv)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
+    //{
+    //    "zoom_level_offset"sv,
+    //    // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
+    //    // That instruction contains the offset, the memory is: {current_zoom, target_zoom} and both offset will be present
+    //    // current solution uses the target_zoom offset
+    //    PatternCommandBuffer{}
+    //        .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
+    //        .decode_imm(4),
+    //},
     {
         "default_zoom_level"sv,
         // Follow the same logic as in `zoom_level` to get to the point where the zoom level is written.
@@ -1114,6 +1116,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "coord_inside_active_shop_room"sv,
         // Same pattern as default_zoom_level_shop, check the condition before the jump that decides whether to activate
         // the shop zoom level or regular zoom level
+        // Found at second to last function inside screen level -> handle players (second) virtual function
         PatternCommandBuffer{}
             .find_inst("\xF3\x0F\x11\xB0****\x49"sv)
             .offset(-0x24)
@@ -1123,20 +1126,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "coord_inside_shop_zone"sv,
         // Can be found in same function as default_zoom_level_shop, check the condition higher up
+        // Also found in screen level -> handle players (second) virtual function but more like in the middle of it
         PatternCommandBuffer{}
             .find_inst("\x40\x8A\xBB\xA0\x00\x00\x00\x89\xFA\xE8"sv)
             .offset(0x9)
             .decode_call()
-            .at_exe(),
-    },
-    {
-        "coord_inside_shop_zone_rcx"sv,
-        // See coord_inside_shop_zone, a little higher up rcx gets set to an on heap pointer
-        PatternCommandBuffer{}
-            .find_inst("\x0F\x84****\x48\x8B\x05****\x4A\x8D\x0C\x08"sv)
-            .find_next_inst("\x0F\x84****\x48\x8B\x05****\x4A\x8D\x0C\x08"sv)
-            .offset(0x6)
-            .decode_pc()
             .at_exe(),
     },
     {
@@ -1264,6 +1258,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "show_journal"sv,
         // aka render_journal / open journal chapter
         // Break on GameManager.journal_ui.state, open the journal
+        // Or go to state->death screen, to first virtul function, the second call in that virtual is the function
         PatternCommandBuffer{}
             .find_inst("88 5F 04 80 FB 0B 0F"_gh)
             .at_exe()
@@ -1539,15 +1534,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x48\x8D\x55\xD0\x41\xB8\x21\x00\x00\x00\xE8"sv)
             .at_exe()
             .function_start(),
-    },
-    {
-        "say_context"sv,
-        // Find the pattern for `say`, go one up higher in the callstack and look what writes to rcx
-        PatternCommandBuffer{}
-            .find_after_inst("\xC6\x44\x24\x20\x01\x48\x8D\x0D"sv)
-            .offset(-0x3)
-            .decode_pc()
-            .at_exe(),
     },
     {
         "force_dark_level"sv,
@@ -1887,16 +1873,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // Set write bp on write_to_file, take a death in game, return from write_to_file, then from the next function as well
-        // you should be now in the death_screen function, the first call is also the save_progress function
-        "death_screen"sv,
-        PatternCommandBuffer{}
-            .find_inst("4D 0F 44 C1 49 8B 88 F0 12 00 00"_gh)
-            .at_exe()
-            .function_start(),
-    },
-    {
-        // see death_screen
+        // go to state->death screen, to first virtual, this is the first call in that virtual
         "save_progress"sv,
         PatternCommandBuffer{}
             .find_inst("48 8B 90 F0 12 00 00 8B 5A 28"_gh)
@@ -2078,45 +2055,30 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         //.from_exe_base(0x228b58f0),
     },
     {
-        "dead_players"sv,
-        // I guess it writes 14 to screen_next before the death screen pops up. Apparently it's a SCREEN_LEVEL virtual too.
+        "camera_layer_controll"sv,
+        // overwrites state.camera_layer every frame
         PatternCommandBuffer{}
-            .find_inst("4c 8b b8 e8 12 00 00 48 8b 80 f0 12 00 00"_gh)
-            .at_exe()
-            .function_start(),
-        //.from_exe_base(0x22c061d0),
+            .get_address("state_refresh"sv)
+            .find_after_inst("8A 80 A0 00 00 00"_gh)
+            .at_exe(),
     },
     {
-        "spawn_transition"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
+        "player_behavior_layer_switch"sv,
+        // function in player behavior (index 7), we need instruction that sets state.layer_transition_timer = 0x24 and state.transition_to_layer = (dest layer)
         PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_DWELLING, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .find_after_inst("41 80 FC 01 0F 95 C1"_gh)
+            .find_inst("\xE8"sv)
+            .offset(0x5)
             .at_exe(),
-        //.from_exe_base(0x22afe5c0),
     },
     {
-        "spawn_transition_cosmic"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
+        "get_game_api"sv,
+        // can be found together with get_feat function
         PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_COSMICOCEAN, VIRT_FUNC::THEME_SPAWN_TRANSITION)
+            .find_after_inst("49 89 CE 4C 8B 79 08"_gh)
+            .find_inst("\xE8"sv)
+            .decode_call()
             .at_exe(),
-        //.from_exe_base(0x22b373b0),
-    },
-    {
-        "spawn_transition_duat"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_CITY_OF_GOLD, VIRT_FUNC::THEME_SPAWN_TRANSITION)
-            .at_exe(),
-        //.from_exe_base(0x22b34940),
-    },
-    {
-        "spawn_transition_olmecship"sv,
-        // These functions are hooked separately cause hooking the vtable just didn't work right for POST_LEVEL_GENERATION
-        PatternCommandBuffer{}
-            .get_virtual_function_address(VTABLE_OFFSET::THEME_BASECAMP, VIRT_FUNC::THEME_SPAWN_TRANSITION)
-            .at_exe(),
-        //.from_exe_base(0x22b2d350),
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
@@ -2129,6 +2091,13 @@ void preload_addresses()
     {
         if (auto address = rule(mem, exe, address_name))
         {
+            for (auto& [k, v] : g_cached_addresses)
+            {
+                if (v == address.value() && k != address_name)
+                {
+                    DEBUG("Two patterns refer to the same address: {} & {}", k, address_name);
+                }
+            }
             g_cached_addresses[address_name] = address.value();
         }
     }

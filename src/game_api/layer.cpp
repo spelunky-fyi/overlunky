@@ -149,7 +149,7 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
 {
     static const auto head_id = to_id("ENT_TYPE_MONS_APEP_HEAD");
     static const auto body_id = to_id("ENT_TYPE_MONS_APEP_BODY");
-    static const auto facing_left_flag = 1 << 16;
+    constexpr auto facing_left_flag = 1 << 16;
 
     Entity* apep_head = spawn_entity(head_id, x, y, false, 0.0f, 0.0f, true);
     const bool facing_left = apep_head->flags & facing_left_flag;

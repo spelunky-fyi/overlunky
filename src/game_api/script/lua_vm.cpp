@@ -36,8 +36,10 @@
 #include "entities_items.hpp"                      // for Container, Player...
 #include "entity.hpp"                              // for get_entity_ptr
 #include "entity_lookup.hpp"                       //
+#include "game_api.hpp"                            //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
+#include "illumination.hpp"                        //
 #include "items.hpp"                               // for Inventory
 #include "layer.hpp"                               // for g_level_max_x
 #include "lua_backend.hpp"                         // for LuaBackend, ON
@@ -97,7 +99,7 @@
 #include "usertypes/texture_lua.hpp"               // for register_usertypes
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 #include "usertypes/vtables_lua.hpp"               // for register_usertypes
-#include "virtual_table.hpp"
+#include "virtual_table.hpp"                       //
 
 struct Illumination;
 
@@ -673,26 +675,26 @@ end
     { return read_prng(); };
 
     using Toast = void(const char16_t*);
-    using Say = void(size_t, Entity*, const char16_t*, int, bool);
+    using Say = void(HudData*, Entity*, const char16_t*, int, bool);
 
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::u16string message)
     {
-        static Toast* toast_fun = (Toast*)get_address("toast");
+        static auto toast_fun = (Toast*)get_address("toast");
         toast_fun(message.c_str());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::u16string message, int sound_type, bool top)
     {
         static auto say = (Say*)get_address("speech_bubble_fun");
-        static const auto say_context = get_address("say_context");
+        const auto hud = get_hud();
 
         auto entity = get_entity_ptr(entity_uid);
 
         if (entity == nullptr)
             return;
 
-        say(say_context, entity, message.c_str(), sound_type, top);
+        say(hud, entity, message.c_str(), sound_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
@@ -1109,7 +1111,7 @@ end
     /// Set the `more_flags` field from entity by uid
     lua["set_entity_flags2"] = set_entity_flags2;
     /// Deprecated
-    /// As the name is misleading. use entity `move_state` field instead
+    /// As the name is misleading. use Movable.`move_state` field instead
     lua["get_entity_ai_state"] = get_entity_ai_state;
     /// Get `state.level_flags`
     lua["get_level_flags"] = get_level_flags;
@@ -1119,7 +1121,10 @@ end
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
     lua["get_zoom_level"] = []() -> float
-    { return State::get_zoom_level(); };
+    {
+        auto game_api = GameAPI::get();
+        return game_api->get_current_zoom();
+    };
     /// Get the game coordinates at the screen position (`x`, `y`)
     lua["game_position"] = [](float x, float y) -> std::pair<float, float>
     { return State::click_position(x, y); };
@@ -1800,11 +1805,12 @@ end
     lua["change_poison_timer"] = change_poison_timer;
 
     auto create_illumination = sol::overload(
-        static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
-        static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
-    /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+        static_cast<Illumination* (*)(Color, float, float, float)>(::create_illumination),
+        static_cast<Illumination* (*)(Color, float, int32_t)>(::create_illumination),
+        static_cast<Illumination* (*)(Vec2, Color, LIGHT_TYPE, float, uint8_t, int32_t, LAYER)>(::create_illumination));
+    /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
     lua["create_illumination"] = create_illumination;
-    /// Refreshes an Illumination, keeps it from fading out
+    /// Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
     lua["refresh_illumination"] = refresh_illumination;
 
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
@@ -1912,20 +1918,20 @@ end
     /// Get the rva for a pattern name, used for debugging.
     lua["get_rva"] = [](std::string_view address_name) -> std::string
     {
-        return fmt::format("{:x}", get_address(address_name) - Memory::get().at_exe(0));
+        return fmt::format("{:X}", get_address(address_name) - Memory::get().at_exe(0));
     };
 
     /// Get the rva for a vtable offset and index, used for debugging.
     lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index) -> std::string
     {
-        return fmt::format("{:x}", get_virtual_function_address(offset, index));
+        return fmt::format("{:X}", get_virtual_function_address(offset, index));
     };
 
     /// Log to spelunky.log
     lua["log_print"] = game_log;
 
     /// Immediately ends the run with the death screen, also calls the [save_progress](#save_progress)
-    lua["load_death_screen"] = call_death_screen;
+    lua["load_death_screen"] = load_death_screen;
 
     /// Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
     lua["save_progress"] = []() -> bool
@@ -2157,7 +2163,7 @@ end
     lua["create_layer"] = create_layer;
 
     /// Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
-    lua["set_level_logic_enabled"] = set_death_enabled;
+    lua["set_level_logic_enabled"] = set_level_logic_enabled;
 
     /// Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
     lua["set_start_level_paused"] = set_start_level_paused;
@@ -2200,6 +2206,11 @@ end
         auto backend = LuaBackend::get_calling_backend();
         backend->infinite_loop_detection = enable;
     };
+
+    /// This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+    /// Letting you control those manually.
+    /// Look at the example on how to mimic game layer switching behavior
+    lua["set_camera_layer_control_enabled"] = set_camera_layer_control_enabled;
 
     lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
 

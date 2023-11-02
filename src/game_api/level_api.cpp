@@ -848,65 +848,6 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
     g_levels_to_load.clear();
 }
 
-using TransGenFun = void(ThemeInfo*);
-TransGenFun* g_trans_gen_trampoline{nullptr};
-TransGenFun* g_trans_gen2_trampoline{nullptr};
-using TransGenFun3 = void(size_t, size_t, ThemeInfo*);
-TransGenFun3* g_trans_gen3_trampoline{nullptr};
-using TransGenFun4 = void(size_t, size_t, size_t, size_t, size_t, size_t);
-TransGenFun4* g_trans_gen4_trampoline{nullptr};
-// generic transition hook
-void trans_gen(ThemeInfo* theme)
-{
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
-
-    if (pre_level_generation())
-        return;
-    g_trans_gen_trampoline(theme);
-    post_level_generation();
-}
-// cosmic transition hook
-void trans_gen2(ThemeInfo* theme)
-{
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
-
-    if (pre_level_generation())
-        return;
-    g_trans_gen2_trampoline(theme);
-    post_level_generation();
-}
-// cog-duat transition hook
-void trans_gen3(size_t a, size_t b, ThemeInfo* theme)
-{
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
-
-    auto state = State::get().ptr();
-    // trampoline will call the generic trans_gen if not going to duat
-    if (state->theme_next == 12 && pre_level_generation())
-        return;
-    g_trans_gen3_trampoline(a, b, theme);
-    if (state->theme_next == 12)
-        post_level_generation();
-}
-// olmecship transition hook
-void trans_gen4(size_t a, size_t b, size_t c, size_t d, size_t e, size_t f)
-{
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
-
-    if (pre_level_generation())
-        return;
-    g_trans_gen4_trampoline(a, b, c, d, e, f);
-    post_level_generation();
-}
-
 using LoadScreenFun = void(StateMemory*, size_t, size_t);
 LoadScreenFun* g_load_screen_trampoline{nullptr};
 void load_screen(StateMemory* state, size_t param_2, size_t param_3)
@@ -1337,7 +1278,7 @@ bool handle_chance(SpawnInfo* spawn_info)
     auto level_gen_data = State::get().ptr()->level_gen->data;
 
     uint8_t layer = 0;
-    auto* layer_ptr = State::get().layer_local(layer);
+    auto* layer_ptr = State::get().layer(layer);
     for (const CommunityChance& community_chance : g_community_chances)
     {
         if (community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
@@ -1560,10 +1501,6 @@ void LevelGenData::init()
         g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_func"sv);
         g_unload_layer_trampoline = (UnloadLayerFun*)get_address("unload_layer"sv);
         g_init_layer_trampoline = (InitLayerFun*)get_address("init_layer"sv);
-        g_trans_gen_trampoline = (TransGenFun*)get_address("spawn_transition"sv);
-        g_trans_gen2_trampoline = (TransGenFun*)get_address("spawn_transition_cosmic"sv);
-        g_trans_gen3_trampoline = (TransGenFun3*)get_address("spawn_transition_duat"sv);
-        g_trans_gen4_trampoline = (TransGenFun4*)get_address("spawn_transition_olmecship"sv);
 
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
@@ -1581,15 +1518,11 @@ void LevelGenData::init()
         DetourAttach((void**)&g_load_screen_trampoline, load_screen);
         DetourAttach((void**)&g_unload_layer_trampoline, unload_layer);
         DetourAttach((void**)&g_init_layer_trampoline, load_layer);
-        DetourAttach((void**)&g_trans_gen_trampoline, trans_gen);
-        DetourAttach((void**)&g_trans_gen2_trampoline, trans_gen2);
-        DetourAttach((void**)&g_trans_gen3_trampoline, trans_gen3);
-        DetourAttach((void**)&g_trans_gen4_trampoline, trans_gen4);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)
         {
-            DEBUG("Failed hooking HandleTileCode: {}\n", error);
+            DEBUG("Failed hooking LevelGenData stuff: {}\n", error);
         }
     }
 
@@ -1731,7 +1664,7 @@ std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_
     {
         provider.is_valid = [](float x, float y, uint8_t layer)
         {
-            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+            return g_DefaultTestFunc(x, y, State::get().layer(layer));
         };
     }
 
@@ -1755,7 +1688,7 @@ std::uint32_t LevelGenData::define_extra_spawn(std::uint32_t num_spawns_front_la
     {
         provider.is_valid = [](float x, float y, uint8_t layer)
         {
-            return g_DefaultTestFunc(x, y, State::get().layer_local(layer));
+            return g_DefaultTestFunc(x, y, State::get().layer(layer));
         };
     }
 
@@ -1880,6 +1813,26 @@ uint32_t ThemeInfo::get_aux_id()
 void LevelGenSystem::init()
 {
     data->init();
+
+    for (auto theme : themes)
+    {
+        if (theme == theme_arena) // no reason to?
+            continue;
+
+        hook_vtable<void(ThemeInfo*), 0x15>( // spawn_transition
+            theme,
+            [](ThemeInfo* th, void (*original)(ThemeInfo*))
+            {
+                push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
+                OnScopeExit pop{[]
+                                { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
+
+                if (pre_level_generation())
+                    return;
+                original(th);
+                post_level_generation();
+            });
+    }
 }
 
 void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
@@ -1897,12 +1850,15 @@ void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint
 
     original(self, param_2, param_3, param_4);
 }
-void LevelGenSystem::populate_transition_hook(ThemeInfo* self, PopulateTransitionFun* original)
-{
-    pre_level_generation();
-    original(self);
-    post_level_generation();
-}
+// void LevelGenSystem::populate_transition_hook([[maybe_unused]] ThemeInfo* self, [[maybe_unused]] PopulateTransitionFun* original)
+//{
+//     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
+//     OnScopeExit pop{[]
+//                     { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
+//     pre_level_generation();
+//     original(self);
+//     post_level_generation();
+// }
 void LevelGenSystem::do_procedural_spawn_hook(ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
 {
     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
@@ -2146,13 +2102,13 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
 bool default_spawn_is_valid(float x, float y, LAYER layer)
 {
     uint8_t correct_layer = enum_to_layer(layer);
-    return g_DefaultTestFunc(x, y, State::get().layer_local(correct_layer));
+    return g_DefaultTestFunc(x, y, State::get().layer(correct_layer));
 }
 
 bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags)
 {
     uint8_t correct_layer = enum_to_layer(layer);
-    return g_PositionTestFunc(x, y, State::get().layer_local(correct_layer), (uint32_t)flags);
+    return g_PositionTestFunc(x, y, State::get().layer(correct_layer), (uint32_t)flags);
 }
 
 void override_next_levels(std::vector<std::string> next_levels)

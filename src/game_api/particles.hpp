@@ -14,9 +14,11 @@
 
 struct Texture;
 
+using PARTICLEEMITTER = uint32_t;
+
 struct ParticleDB
 {
-    uint32_t id;
+    PARTICLEEMITTER id;
     int32_t spawn_count_min;            // minimum amount of particles to spawn in an iteration, actual value is random between this value and spawn_count (-1 = no lower bound, uses spawn_count)
     uint32_t spawn_count;               // total amount of particles to spawn for 1 iteration (check with PETTING_PET or MOUNT_TAMED, amount of hearts shown)
     int32_t lifespan_min;               // minimum lifespan of a particle, actual value is random between this value and lifespan (-1 = no lower bound, uses lifespan)
@@ -66,6 +68,9 @@ struct ParticleDB
     uint8_t unknown41;
     uint32_t unknown42;
 
+    ParticleDB(const ParticleDB& other) = default;
+    ParticleDB(const PARTICLEEMITTER particle_id);
+
     std::uint64_t get_texture();
     bool set_texture(std::uint32_t texture_id);
 };
@@ -104,8 +109,8 @@ struct EmittedParticlesInfo
     void* memory;
     uint16_t* max_lifetimes;
     uint16_t* lifetimes;
-    size_t unknown7;
-    size_t unknown8;
+    float* unknown7;
+    float* unknown8;
     float* x_positions;
     float* y_positions;
     float* unknown_x_positions;
@@ -115,12 +120,12 @@ struct EmittedParticlesInfo
     float* heights;
     float* x_velocities;
     float* y_velocities;
-    size_t unknown18;
-    size_t unknown19;
-    size_t unknown20;
-    size_t unknown21;
-    size_t unknown22;
-    size_t unknown23;
+    uint8_t* unknown18;
+    uint8_t* unknown19;
+    uint8_t* unknown20;
+    uint8_t* unknown21;
+    uint8_t* unknown22;
+    uint8_t* unknown23;
 
     template <class T>
     class IteratorImpl : public neo::iterator_facade<IteratorImpl<T>>
@@ -200,10 +205,9 @@ struct ParticleEmitterInfo
     float offset_x;
     float offset_y;
 
-    uint8_t unknown54a; // layer?
-    uint8_t unknown54b;
-    uint8_t unknown54c;
-    uint8_t unknown54d;
+    uint8_t layer;
+    uint8_t draw_depth;
+    uint8_t padding_probably[2];
     float unknown55;
     uint32_t unknown56;
     uint32_t total_particles;
@@ -212,5 +216,10 @@ struct ParticleEmitterInfo
     uint32_t unknown60;
 };
 
-ParticleDB* get_particle_type(uint32_t id);
+ParticleDB* get_particle_type(PARTICLEEMITTER id);
 const std::vector<ParticleEmitter>& list_particles();
+ParticleEmitterInfo* generate_world_particles(PARTICLEEMITTER particle_emitter_id, uint32_t uid);
+ParticleEmitterInfo* generate_screen_particles(PARTICLEEMITTER particle_emitter_id, float x, float y);
+void advance_screen_particles(ParticleEmitterInfo* particle_emitter);
+void render_screen_particles(ParticleEmitterInfo* particle_emitter);
+void extinguish_particles(ParticleEmitterInfo* particle_emitter);

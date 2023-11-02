@@ -102,7 +102,7 @@ void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
 
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
 {
-    auto state = State::get();
+    auto state = State::get().ptr();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
 
@@ -124,25 +124,27 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
 
     if (layer == LAYER::BOTH)
     {
+        auto layer_front = state->layers[0];
+        auto layer_back = state->layers[1];
         if (proper_types.empty() || proper_types[0] == 0)
         {
             if (mask == 0) // all entities
             {
                 // this exception for small improvments with calling reserve once
-                found.reserve(found.size() + (size_t)state.layer(0)->all_entities.size + (size_t)state.layer(1)->all_entities.size);
-                found.insert(found.end(), state.layer(0)->all_entities.uids().begin(), state.layer(0)->all_entities.uids().end());
-                found.insert(found.end(), state.layer(1)->all_entities.uids().begin(), state.layer(1)->all_entities.uids().end());
+                found.reserve(found.size() + (size_t)layer_front->all_entities.size + (size_t)layer_back->all_entities.size);
+                found.insert(found.end(), layer_front->all_entities.uids().begin(), layer_front->all_entities.uids().end());
+                found.insert(found.end(), layer_back->all_entities.uids().begin(), layer_back->all_entities.uids().end());
             }
             else // all types
             {
-                foreach_mask(mask, state.layer(0), insert_all_uids);
-                foreach_mask(mask, state.layer(1), insert_all_uids);
+                foreach_mask(mask, layer_front, insert_all_uids);
+                foreach_mask(mask, layer_back, insert_all_uids);
             }
         }
         else
         {
-            foreach_mask(mask, state.layer(0), push_matching_types);
-            foreach_mask(mask, state.layer(1), push_matching_types);
+            foreach_mask(mask, layer_front, push_matching_types);
+            foreach_mask(mask, layer_back, push_matching_types);
         }
     }
     else
@@ -150,11 +152,11 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
         uint8_t correct_layer = enum_to_layer(layer);
         if (proper_types.empty() || proper_types[0] == 0) // all types
         {
-            foreach_mask(mask, state.layer(correct_layer), insert_all_uids);
+            foreach_mask(mask, state->layers[correct_layer], insert_all_uids);
         }
         else
         {
-            foreach_mask(mask, state.layer(correct_layer), push_matching_types);
+            foreach_mask(mask, state->layers[correct_layer], push_matching_types);
         }
     }
     return found;
@@ -167,6 +169,7 @@ std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER
 
 std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
+    // TODO: use entitie regions?
     auto state = State::get();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
@@ -175,7 +178,7 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
         for (auto& item : entities.entities())
         {
             auto [ix, iy] = item->position();
-            float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
+            float distance = (float)std::sqrt(std::pow(x - ix, 2) + std::pow(y - iy, 2));
             if (distance < radius && entity_type_check(proper_types, item->type->id))
             {
                 found.push_back(item->uid);
@@ -201,6 +204,7 @@ std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float
 
 std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
 {
+    // TODO: use entitie regions?
     auto state = State::get();
     std::vector<uint32_t> result;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));

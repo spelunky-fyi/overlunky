@@ -158,7 +158,7 @@ They come with some extra functionality:
 Type | Name | Description
 ---- | ---- | -----------
 bool | all:empty() | Returns true if container is empty, false otherwise
-int | aLL:size() | Same as `#container`
+int | all:size() | Same as `#container`
 any | vector:at(int index) | Same as `vector[index]`
 any | span:at(int index) | Same as `span[index]`
 any | set:at(int order) | Returns elements in order, it's not an index as sets don't have one
@@ -1719,6 +1719,45 @@ Seed the game prng.
 
 Set the current adventure seed pair
 
+### set_camera_layer_control_enabled
+
+
+```lua
+set_camera_layer_control_enabled(false)
+
+g_current_timer = nil
+-- default load_time 36
+function change_layer(layer_to, load_time)
+    
+    if state.camera_layer == layer_to then
+        return
+    end
+    if g_current_timer ~= nil then
+        clear_callback(g_current_timer)
+        g_current_timer = nil
+    end
+    -- if we don't want the load time, we can just change the actual layer
+    if load_time == nil or load_time == 0 then
+        state.camera_layer = layer_to
+        return
+    end
+    
+    state.layer_transition_timer = load_time
+    state.transition_to_layer = layer_to
+    state.camera_layer = layer_to
+end
+
+```
+
+
+> Search script examples for [set_camera_layer_control_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_layer_control_enabled)
+
+#### nil set_camera_layer_control_enabled(bool enable)
+
+This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+Letting you control those manually.
+Look at the example on how to mimic game layer switching behavior
+
 ### set_character_heart_color
 
 
@@ -2060,11 +2099,13 @@ Steal input from a [Player](#Player), HiredHand or [PlayerGhost](#PlayerGhost)
 
 > Search script examples for [create_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 
+#### [Illumination](#Illumination) create_illumination([Vec2](#Vec2) pos, [Color](#Color) color, [LIGHT_TYPE](#LIGHT_TYPE) type, float size, int flags, int uid, [LAYER](#LAYER) layer)
+
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, float x, float y)
 
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, int uid)
 
-Creates a new [Illumination](#Illumination). Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+Creates a new [Illumination](#Illumination). Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
 
 ### refresh_illumination
 
@@ -2073,7 +2114,7 @@ Creates a new [Illumination](#Illumination). Don't forget to continuously call [
 
 #### nil refresh_illumination([Illumination](#Illumination) illumination)
 
-Refreshes an [Illumination](#Illumination), keeps it from fading out
+Refreshes an [Illumination](#Illumination), keeps it from fading out (updates the timer, keeping it in sync with the game render)
 
 ## Message functions
 
@@ -2394,7 +2435,7 @@ Extinguish a particle emitter (use the return value of `generate_world_particles
 
 > Search script examples for [generate_screen_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_screen_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_screen_particles(int particle_emitter_id, float x, float y)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_screen_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, float x, float y)
 
 Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
 
@@ -2403,7 +2444,7 @@ Generate particles of the specified type at a certain screen coordinate (use e.g
 
 > Search script examples for [generate_world_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_world_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_world_particles(int particle_emitter_id, int uid)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_world_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
 
 Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
 
@@ -2412,7 +2453,7 @@ Generate particles of the specified type around the specified entity uid (use e.
 
 > Search script examples for [get_particle_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 
-#### [ParticleDB](#ParticleDB) get_particle_type(int id)
+#### [ParticleDB](#ParticleDB) get_particle_type([PARTICLEEMITTER](#PARTICLEEMITTER) id)
 
 Get the [ParticleDB](#ParticleDB) details of the specified ID
 
@@ -3652,7 +3693,7 @@ Use `get_entities_overlapping_hitbox` instead
 
 #### int get_entity_ai_state(int uid)
 
-As the name is misleading. use entity `move_state` field instead
+As the name is misleading. use [Movable](#Movable).`move_state` field instead
 
 ### set_arrowtrap_projectile
 
@@ -3923,7 +3964,7 @@ Use this only when no other approach works, this call can be expensive if overus
 
 > Search script examples for [generate_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles(int particle_emitter_id, int uid)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
 
 Use `generate_world_particles`
 

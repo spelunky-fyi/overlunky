@@ -571,6 +571,7 @@ float | [width()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width
 float | [height()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Short for `aabb.top - aabb.bottom`.
 bool | [is_point_inside(Vec2 p)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Checks if point lies between left/right and top/bottom
 bool | [is_point_inside(float x, float y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
+[AABB](#AABB) | [set(AABB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;float, float, float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ### BackgroundMusic
@@ -649,6 +650,7 @@ tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/o
 [Color](#Color) | [set_rgba(int red, int green, int blue, int alpha)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_rgba) | Changes color based on given RGBA colors in 0..255 range
 [uColor](#Aliases) | [get_ucolor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_ucolor) | Returns the `uColor` used in `GuiDrawContext` drawing functions
 [Color](#Color) | [set_ucolor(uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
+[Color](#Color) | [set(Color other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | Copies the values of different [Color](#Color) to this one
 
 ### CutsceneBehavior
 
@@ -831,6 +833,7 @@ float | [top_left_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=to
 [Quad](#Quad) | [flip_vertically()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_vertically) | 
 bool | [is_point_inside(Vec2 p, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
 bool | [is_point_inside(float x, float y, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
+[Quad](#Quad) | [set(Quad other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 
 ### RenderInfo
@@ -946,6 +949,7 @@ tuple&lt;float, float, float&gt; | [get_angles()](https://github.com/spelunky-fy
 float | [area()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=area) | 
 bool | [is_point_inside(Vec2 p, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | Check if point lies inside of triangle<br/>Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.0001`
 bool | [is_point_inside(float x, float y, optional<float> epsilon)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_point_inside) | 
+[Triangle](#Triangle) | [set(Triangle other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | Returns the corner points
 
 ### UdpServer
@@ -967,6 +971,7 @@ float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) |
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 [Vec2](#Vec2) | [rotate(float angle, float px, float py)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotate) | 
 float | [distance_to(Vec2 other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distance_to) | Just simple pythagoras theorem
+[Vec2](#Vec2) | [set(Vec2 other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | 
 tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=split) | 
 
 ## Input types
@@ -1309,8 +1314,9 @@ float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offs
 float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
 float | [distortion](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=distortion) | 
 int | [entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) | 
+int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
-int | [type_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type_flags) | Only one can be set: 1 - Follow camera, 2 - Follow [Entity](#Entity), 3 - Rectangle, full brightness<br/>Rectangle always uses light1, even when it's disabled in flags
+[LIGHT_TYPE](#LIGHT_TYPE) | [type_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type_flags) | 
 bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
 
@@ -1324,6 +1330,7 @@ float | [red](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red) |
 float | [green](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) | 
 float | [blue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) | 
 float | [size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=size) | 
+[Color](#Color) | [as_color()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=as_color) | Returns [LightParams](#LightParams) as [Color](#Color), note that size = alpha
 
 ## Liquid types
 
@@ -1680,7 +1687,9 @@ Used in [ParticleDB](#ParticleDB), [get_particle_type](#get_particle_type)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
+[ParticleDB](#ParticleDB) | [new(ParticleDB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ParticleDB) | 
+[ParticleDB](#ParticleDB) | [new(PARTICLEEMITTER particle_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ParticleDB) | 
+[PARTICLEEMITTER](#PARTICLEEMITTER) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
 int | [spawn_count_min](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count_min) | 
 int | [spawn_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_count) | 
 int | [lifespan_min](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lifespan_min) | 
@@ -1719,6 +1728,7 @@ Used in [ScreenCharacterSelect](#ScreenCharacterSelect), [ScreenTitle](#ScreenTi
 Type | Name | Description
 ---- | ---- | -----------
 [ParticleDB](#ParticleDB) | [particle_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type) | 
+[ParticleDB](#ParticleDB) | [particle_type2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_type2) | 
 int | [particle_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count) | 
 int | [particle_count_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_count_back_layer) | 
 int | [entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_uid) | 
@@ -1726,6 +1736,8 @@ float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) |
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) | 
 float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
+int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | 
+int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
 array&lt;[Particle](#Particle)&gt; | [emitted_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_particles) | 
 array&lt;[Particle](#Particle)&gt; | [emitted_particles_back_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=emitted_particles_back_layer) | 
 
@@ -1868,7 +1880,7 @@ int | [max_page_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [page_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_timer) | 
 int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | 
 int | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
-vector&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+vector&lt;[JournalPage](#JournalPage)&gt; | [pages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pages) | Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ### OnlineLobbyScreenPlayer
 
@@ -2283,6 +2295,7 @@ Derived from [Screen](#Screen)
 Type | Name | Description
 ---- | ---- | -----------
 int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+int | [time_till_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_till_death_screen) | Delay after player death to open the death screen
 
 ### ScreenLogo
 
@@ -2839,12 +2852,12 @@ Can be accessed via global [state](#state)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | Previous [SCREEN](#SCREEN), used to check where we're coming from when loading another [SCREEN](#SCREEN)
-int | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | Current [SCREEN](#SCREEN), generally read-only or weird things will happen
-int | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | Next [SCREEN](#SCREEN), used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
+[SCREEN](#SCREEN) | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | Previous [SCREEN](#SCREEN), used to check where we're coming from when loading another [SCREEN](#SCREEN)
+[SCREEN](#SCREEN) | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | Current [SCREEN](#SCREEN), generally read-only or weird things will happen
+[SCREEN](#SCREEN) | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | Next [SCREEN](#SCREEN), used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
 int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
 int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
-[PAUSE](#PAUSE) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controller by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
+[PAUSE](#PAUSE) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controlled by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
 int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | level width in rooms (number of rooms horizontally)
 int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | level height in rooms (number of rooms vertically)
 int | [kali_favor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kali_favor) | 
@@ -2861,7 +2874,7 @@ int | [level_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leve
 int | [level_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_start) | Level number to start new runs in
 [THEME](#THEME) | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | Current [THEME](#THEME) number, used to pick the music and by some game logic like choosing the next level on transition
 [THEME](#THEME) | [theme_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_next) | Next [THEME](#THEME) number, used when loading a new level or transition
-int | [theme_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) | [THEME](#THEME) to start new runs in
+[THEME](#THEME) | [theme_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) | [THEME](#THEME) to start new runs in
 [ThemeInfo](#ThemeInfo) | [current_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_theme) | Points to the current [ThemeInfo](#ThemeInfo)
 nil | [force_current_theme(int t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) | This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
 int | [shoppie_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro) | Current shoppie aggro
@@ -2888,7 +2901,7 @@ int | [saved_hamsters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [win_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_state) | 0 = no win 1 = tiamat win 2 = hundun win 3 = CO win; set this and next doorway leads to victory scene
 [Illumination](#Illumination) | [illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=illumination) | The global level illumination, very big and bright.
 int | [money_last_levels](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_last_levels) | 
-int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | Total negative amount spent in shops during the run<br><br/>The total money currently available (in single player) is `players[1].inventory.money + players[1].inventory.collected_money_total + state.money_shop_total`
+int | [money_shop_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_shop_total) | Total amount spent in shops and sold idols during the run<br><br/>The total money currently available is `loop (players[].inventory.money + players[].inventory.collected_money_total) + state.money_shop_total`
 [PlayerInputs](#PlayerInputs) | [player_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_inputs) | Access the player inputs even when no player entities are available
 [QuestsInfo](#QuestsInfo) | [quests](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quests) | [NPC](#NPC) quest states
 [Camera](#Camera) | [camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera) | [Camera](#Camera) bounds and position
@@ -2901,8 +2914,9 @@ int | [speechbubble_owner](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 [LevelGenSystem](#LevelGenSystem) | [level_gen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_gen) | Entrance and exit coordinates, shop types and all themes
 int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=correct_ushabti) | See `get_correct_ushabti`. == anim_frame - (2 * floor(anim_frame/12))
 [Items](#Items) | [items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items) | Has the current player count, player inventories and character selections
-int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | The currently drawn layer, can't be changed
+int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
 int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
+int | [transition_to_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_to_layer) | 
 [ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 
@@ -2942,7 +2956,7 @@ array&lt;[JournalProgressStickerSlot](#JournalProgressStickerSlot), 40&gt; | [jo
 int | [journal_progress_stain_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_count) | 
 array&lt;[JournalProgressStainSlot](#JournalProgressStainSlot), 30&gt; | [journal_progress_stain_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_stain_slots) | blood splats and paw prints in journal progress page
 int | [journal_progress_theme_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_count) | 
-array&lt;int, 9&gt; | [journal_progress_theme_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_slots) | visited themes in journal progress page
+array&lt;[THEME](#THEME), 9&gt; | [journal_progress_theme_slots](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_progress_theme_slots) | visited themes in journal progress page
 [ThemeInfo](#ThemeInfo) | [theme_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_info) | Points to the current [ThemeInfo](#ThemeInfo)
 [LogicList](#LogicList) | [logic](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=logic) | Level logic like dice game and cutscenes
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
@@ -6054,7 +6068,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Flame](#Flame)
 
 Type | Name | Description
 ---- | ---- | -----------
-float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down (0.03 per frame) to the default size
+float | [flame_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_size) | if changed, gradually goes down (0.03 per frame) to the default size, it's the base value for `entity.width` and `entity.height`
 
 ### Fly
 

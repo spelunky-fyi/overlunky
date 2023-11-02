@@ -19,55 +19,6 @@ struct RobinHoodTableEntry
     Entity* entity;
 };
 
-struct LightParams
-{
-    float red; // default = 1.0 (can go over 1.0 for oversaturation)
-    float green;
-    float blue;
-    float size;
-};
-
-struct Illumination
-{
-    union
-    {
-        /// Table of light1, light2, ... etc.
-        std::array<LightParams, 4> lights;
-        struct
-        {
-            LightParams light1;
-            LightParams light2;
-            LightParams light3;
-            /// It's rendered on objects around, not as an actual bright spot
-            LightParams light4;
-        };
-    };
-    float brightness;
-    float brightness_multiplier;
-    float light_pos_x;
-    float light_pos_y;
-    float offset_x;
-    float offset_y;
-    float distortion;
-    int32_t entity_uid;
-    uint32_t timer;
-    union
-    {
-        /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
-        uint32_t flags;
-        struct
-        {
-            uint8_t light_flags; // no reason to expose this
-
-            /// Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
-            /// Rectangle always uses light1, even when it's disabled in flags
-            uint8_t type_flags;
-            uint8_t layer;
-            bool enabled;
-        };
-    };
-};
-
 struct InputMapping
 {
     uint8_t jump;

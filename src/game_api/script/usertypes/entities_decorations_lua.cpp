@@ -10,7 +10,7 @@
 
 #include "entities_decorations.hpp" // for PalaceSign, CrossBeam, DecoRegen...
 #include "entity.hpp"               // for Entity
-#include "state_structs.hpp"        // IWYU pragma: keep
+#include "illumination.hpp"         // IWYU pragma: keep
 
 namespace NEntitiesDecorations
 {

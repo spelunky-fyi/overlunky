@@ -8,8 +8,8 @@
 #include <type_traits>   // for hash, move, conditional_t
 #include <unordered_set> // for unordered_set, _Uset_traits<>::allocator_type
 
-#include "render_api.hpp" // for RenderAPI
-#include "search.hpp"     // for get_address
+#include "game_api.hpp" //
+#include "search.hpp"   // for get_address
 
 union SettingValue
 {
@@ -102,8 +102,11 @@ std::optional<std::uint32_t> get_setting(GAME_SETTING setting)
 {
     if ((setting == GAME_SETTING::FREQUENCY_NUMERATOR || setting == GAME_SETTING::FREQUENCY_DENOMINATOR) && get_setting(GAME_SETTING::WINDOW_MODE) == 1u)
     {
-        size_t renderer = RenderAPI::get().renderer();
-        return *reinterpret_cast<std::uint32_t*>(renderer + (setting == GAME_SETTING::FREQUENCY_NUMERATOR ? 0x10 : 0x14));
+        auto game_api = GameAPI::get();
+        if (setting == GAME_SETTING::FREQUENCY_NUMERATOR)
+            return game_api->renderer->fps;
+        else
+            return game_api->renderer->fps_denominator;
     }
 
     if (SettingData* data = get_setting_data(setting))

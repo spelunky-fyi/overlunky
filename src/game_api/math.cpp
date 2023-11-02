@@ -1,6 +1,6 @@
 #include "math.hpp"
 
-bool Triangle::is_point_inside(Vec2 p, float epsilon) const
+bool Triangle::is_point_inside(const Vec2 p, float epsilon) const
 {
     // you can compare it eather by area or by angle
     // not sure if one if faster thne the order, so i left code for both
@@ -35,19 +35,19 @@ Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D)
     return Vec2{(b1 * c - b * c1) / det, (a * c1 - a1 * c) / det};
 }
 
-float two_lines_angle(Vec2 A, Vec2 common, Vec2 B)
+float two_lines_angle(const Vec2 A, const Vec2 common, const Vec2 B)
 {
     Vec2 ab = common - B;
     Vec2 bc = A - common;
     return std::atan2((bc.y * ab.x - bc.x * ab.y), (bc.x * ab.x + bc.y * ab.y));
 };
 
-float two_lines_angle(Vec2 line1_A, Vec2 line1_B, Vec2 line2_A, Vec2 line2_B)
+float two_lines_angle(const Vec2 line1_A, const Vec2 line1_B, const Vec2 line2_A, const Vec2 line2_B)
 {
     return two_lines_angle(line1_A, intersection(line1_A, line1_B, line2_A, line2_B), line2_B);
 };
 
-bool Quad::is_point_inside(Vec2 p, float epsilon) const
+bool Quad::is_point_inside(const Vec2 p, float epsilon) const
 {
     std::tuple<Vec2, Vec2, Vec2, Vec2> points = *this;
 
