@@ -5984,6 +5984,11 @@ void render_script_files()
     int num = 0;
     for (auto file : g_script_files)
     {
+        auto id = file.string();
+        std::replace(id.begin(), id.end(), '\\', '/');
+        if (g_scripts.count(id) > 0)
+            continue;
+
         ImGui::PushID(num++);
         auto buttpath = file.parent_path().filename() / file.filename();
         std::wstring wbuttstr = buttpath.wstring();
@@ -5995,21 +6000,37 @@ void render_script_files()
         }
         ImGui::PopID();
     }
+    std::filesystem::path path = scriptpath;
+    std::string abspath = scriptpath;
+    if (std::filesystem::exists(abspath) && std::filesystem::is_directory(abspath))
+    {
+        abspath = std::filesystem::absolute(path).string();
+    }
     if (g_script_files.size() == 0)
     {
-        std::filesystem::path path = scriptpath;
-        std::string abspath = scriptpath;
-        if (std::filesystem::exists(abspath) && std::filesystem::is_directory(abspath))
-        {
-            abspath = std::filesystem::absolute(path).string();
-        }
         ImGui::TextWrapped("No scripts found. Put .lua files in '%s' or change script_dir in the ini file and reload.", abspath.c_str());
     }
-    if (ImGui::Button("Refresh##RefreshScripts"))
+    else if (g_script_files.size() > 0 && num == 0)
     {
+        ImGui::TextWrapped("All scripts found in '%s' are already loaded.", abspath.c_str());
+    }
+    if (ImGui::Button("Reload config and refresh scripts##RefreshScripts"))
+    {
+        load_config(cfgfile);
         refresh_script_files();
     }
     ImGui::PopID();
+}
+
+bool lower_test(char l, char r)
+{
+    return (std::tolower(l) == std::tolower(r));
+}
+
+bool find_match(std::string needle, std::string haystack)
+{
+    std::string::iterator fpos = std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), lower_test);
+    return fpos != haystack.end();
 }
 
 void render_scripts()
@@ -6040,6 +6061,11 @@ void render_scripts()
     ImGui::SameLine();
     static bool enabled_only{false};
     ImGui::Checkbox("Hide disabled##EnabledScriptsOnly", &enabled_only);
+    static std::string script_filter;
+    ImGui::InputText("Search##ScriptFilter", &script_filter);
+    ImGui::SameLine();
+    if (ImGui::Button("Clear##ClearScriptFilter"))
+        script_filter.clear();
     ImGui::PushItemWidth(-1);
     int i = 0;
     std::vector<std::string> unload_scripts;
@@ -6051,6 +6077,8 @@ void render_scripts()
     for (auto& [script_name, script] : g_scripts)
     {
         if (enabled_only && !script->is_enabled())
+            continue;
+        if (!script_filter.empty() && !find_match(script_filter, script->get_name() + " " + script->get_path() + " " + script->get_id()))
             continue;
         ImGui::PushID(i);
         ImGui::PushID(script_name.c_str());
