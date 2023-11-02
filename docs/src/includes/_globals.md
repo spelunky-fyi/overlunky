@@ -2727,7 +2727,16 @@ Enables or disables the default position based camp camera bounds, to set them m
 
 #### nil zoom(float level)
 
-Set the zoom level used in levels and shops. 13.5 is the default.
+Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
+
+### zoom_reset
+
+
+> Search script examples for [zoom_reset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoom_reset)
+
+#### nil zoom_reset()
+
+Reset the default zoom levels for all areas and sets current zoom level to 13.5.
 
 ## Room functions
 
