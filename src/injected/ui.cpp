@@ -1292,11 +1292,11 @@ std::optional<EntityItem> get_spawn_item()
     auto to_spawn = g_items[g_filtered_items[g_current_item]];
     if (g_current_item == 0 && (unsigned)g_filtered_count == g_items.size())
     {
-        if (g_entity)
+        if (g_entity && g_entity->type->id <= to_id("ENT_TYPE_LIQUID_COARSE_LAVA"))
         {
             to_spawn = EntityItem{entity_full_names[g_entity->type->id], g_entity->type->id};
         }
-        else if (g_last_type >= 0)
+        else if (g_last_type >= 0 && g_last_type <= (int)to_id("ENT_TYPE_LIQUID_COARSE_LAVA"))
         {
             to_spawn = EntityItem{entity_full_names[g_last_type], (uint32_t)g_last_type};
         }
