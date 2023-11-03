@@ -2757,13 +2757,18 @@ Type | Name | Description
 [JournalUI](#JournalUI) | [journal_ui](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) | 
 [SaveRelated](#SaveRelated) | [save_related](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) | 
 [BackgroundSound](#BackgroundSound) | [main_menu_music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_menu_music) | 
+array&lt;int, MAX_PLAYERS&gt; | [buttons_controls](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_controls) | Yet another place to get player inputs, in some format
+array&lt;int, MAX_PLAYERS&gt; | [buttons_movement](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_movement) | Yet another place to get player inputs, in some format
 
 ### GameProps
 
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | Might be used for some menu inputs not found in buttons_menu
+int | [buttons_extra](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_extra) | Might be used for some menu inputs not found in buttons_menu
+[MENU_INPUT](#MENU_INPUT) | [buttons_menu_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu_previous) | Previous state of buttons_menu
+[MENU_INPUT](#MENU_INPUT) | [buttons_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu) | Inputs used to control all the menus, independent from player inputs. You can probably capture and edit this in [ON](#ON).PRE_UPDATE.
 bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) | 
 
 ### Items

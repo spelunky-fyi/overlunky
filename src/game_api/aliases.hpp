@@ -10,6 +10,7 @@ using VANILLA_SOUND_PARAM = uint32_t;         // NoAlias
 using VANILLA_SOUND_CALLBACK_TYPE = uint32_t; // NoAlias
 using TEXTURE = int64_t;                      // NoAlias
 using INPUTS = uint16_t;                      // NoAlias
+using MENU_INPUT = uint16_t;                  // NoAlias
 using BUTTON = uint8_t;                       // NoAlias
 using ENT_TYPE = uint32_t;                    // NoAlias
 using ROOM_TEMPLATE = uint16_t;               // NoAlias

@@ -2233,6 +2233,8 @@ do
     ---@field journal_ui JournalUI
     ---@field save_related SaveRelated
     ---@field main_menu_music BackgroundSound
+    ---@field buttons_controls integer[] @size: MAX_PLAYERS @Yet another place to get player inputs, in some format
+    ---@field buttons_movement integer[] @size: MAX_PLAYERS @Yet another place to get player inputs, in some format
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
@@ -2248,7 +2250,10 @@ do
     ---@field slide_position number
 
 ---@class GameProps
-    ---@field buttons integer
+    ---@field buttons integer @Might be used for some menu inputs not found in buttons_menu
+    ---@field buttons_extra integer @Might be used for some menu inputs not found in buttons_menu
+    ---@field buttons_menu_previous MENU_INPUT @Previous state of buttons_menu
+    ---@field buttons_menu MENU_INPUT @Inputs used to control all the menus, independent from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
     ---@field game_has_focus boolean
 
 ---@class PRNG

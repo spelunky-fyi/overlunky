@@ -11,6 +11,56 @@ CACHE_FILE = None
 if not os.path.exists(".db"):
     os.makedirs(".db")
 
+replace_table = {
+    # standard basic types
+    "uint8_t": "int",
+    "uint16_t": "int",
+    "uint32_t": "int",
+    "uint64_t": "int",
+    "int8_t": "int",
+    "int16_t": "int",
+    "int32_t": "int",
+    "int64_t": "int",
+    "ImU32": "int",
+    "in_port_t": "int",
+    "size_t": "int",
+    "char*": "string",
+    "wstring": "string",
+    "u16string": "string",
+    "string_view": "string",
+    "char16_t*": "string",
+    "char16_t": "char",
+    "pair<": "tuple<",
+    # std containers
+    "custom_vector<": "vector<",
+    "custom_map<": "map<",
+    "custom_unordered_map<": "map<",
+    "custom_set<": "set<",
+    "custom_unordered_set<": "set<",
+    "game_vector<": "vector<",
+    "game_map<": "map<",
+    "game_unordered_map<": "map<",
+    "game_set<": "set<",
+    "game_unordered_set<": "set<",
+    "unordered_map<": "map<", # doesn't seam to matter for lua if it's ordered or not
+    "unordered_set<": "set<", # doesn't seam to matter for lua if it's ordered or not
+    # removers
+    ", identity_hasher<>": "",
+    "std::": "",
+    "sol::": "",
+    "void": "",
+    "constexpr": "",
+    "const": "",
+    "static": "",
+    # special
+    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
+    "EmittedParticlesInfo": "array<Particle>",
+    "ImVec2": "Vec2",
+    "SoundCallbackFunction": "function",
+    "object ": "any ",
+    "BucketItem": "any",
+}
+
 header_files = [
     "../src/game_api/math.hpp",
     "../src/game_api/rpc.hpp",
