@@ -106,6 +106,9 @@ void register_usertypes(sol::state& lua)
         "buttons_menu",
         &GameProps::buttons_menu,
         "game_has_focus",
-        &GameProps::game_has_focus);
+        &GameProps::game_has_focus,
+        "modal_open",
+        sol::property([](GameProps& gp)
+                      { return gp.modal_open == 0; }));
 }
 }; // namespace NGM

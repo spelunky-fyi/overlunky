@@ -86,7 +86,7 @@ struct GameProps
     MENU_INPUT buttons_menu_previous;
     /// Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
     MENU_INPUT buttons_menu;
-    int8_t unknown8;
+    int8_t modal_open;
     bool game_has_focus;
     bool unknown9;
     bool unknown10;

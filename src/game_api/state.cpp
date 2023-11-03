@@ -36,6 +36,8 @@
 #include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
 #include "vtable_hook.hpp"                       // for hook_vtable
 
+static int64_t global_frame_count{0};
+
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
     return (correct_ushabti + (correct_ushabti / 10) * 2);
@@ -628,6 +630,10 @@ uint32_t State::get_frame_count() const
 {
     return memory_read<uint32_t>((size_t)ptr() - 0xd0);
 }
+int64_t get_global_frame_count()
+{
+    return global_frame_count;
+};
 
 std::vector<int64_t> State::read_prng() const
 {
@@ -643,6 +649,15 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
+    auto state = State::get();
+    if (s == state.ptr_main())
+    {
+        if (global_frame_count < state.get_frame_count())
+            global_frame_count = state.get_frame_count_main();
+        else
+            global_frame_count++;
+    }
+
     if (!pre_state_update())
     {
         g_state_update_trampoline(s);
