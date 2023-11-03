@@ -4525,6 +4525,8 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
     static const auto mine = to_id("ENT_TYPE_ITEM_LANDMINE");
     static const auto keg = to_id("ENT_TYPE_ACTIVEFLOOR_POWDERKEG");
     static const auto keg2 = to_id("ENT_TYPE_ACTIVEFLOOR_TIMEDPOWDERKEG");
+    static const auto sun_generator = to_id("ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR");
+    static const auto shoppie_generator = to_id("ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR");
 
     if (type == spark_trap && ent->animation_frame == 7)
     {
@@ -4534,6 +4536,28 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
         auto [radx, rady] = UI::screen_position(render_position.first + distance, render_position.second + distance);
         auto srad = screenify({radx, rady});
         draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, ImColor(255, 0, 0, 40), 0, sthick);
+    }
+    else if ((type == sun_generator || type == shoppie_generator) && !g_players.empty())
+    {
+        auto gen = ent->as<Generator>();
+        float rad = 8.0f;
+        float min_dist = 100.0f;
+        for (auto p : g_players)
+        {
+            auto [x, y] = UI::get_position(p);
+            auto a = Vec2(x, y);
+            auto b = Vec2(gen->x, gen->y);
+            auto dist = a.distance_to(b);
+            if (dist < min_dist)
+                min_dist = dist;
+        }
+        bool enabled = min_dist < 8.0f && (type != sun_generator || gen->on_off);
+        if (cross || enabled || min_dist < 8.0f)
+        {
+            auto [radx, rady] = UI::screen_position(render_position.first + rad, render_position.second + rad);
+            auto srad = screenify({radx, rady});
+            draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, enabled ? ImColor(255, 0, 0, 80) : ImColor(0, 200, 128, 60), 0, 2.0f);
+        }
     }
     else if (type == bomb)
     {
@@ -4838,6 +4862,9 @@ void render_clickhandler()
                 to_id("ENT_TYPE_FLOOR_TENTACLE_BOTTOM"),
                 to_id("ENT_TYPE_FLOOR_TELEPORTINGBORDER"),
                 to_id("ENT_TYPE_FLOOR_SPIKES"),
+                to_id("ENT_TYPE_FLOOR_FACTORY_GENERATOR"),
+                to_id("ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR"),
+                to_id("ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR"),
             };
             for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // FLOOR | ACTIVEFLOOR
             {
