@@ -11,6 +11,7 @@ CACHE_FILE = None
 if not os.path.exists(".db"):
     os.makedirs(".db")
 
+# this is common for generator.py and validator.py, not actually used nor should it be used here
 replace_table = {
     # standard basic types
     "uint8_t": "int",
