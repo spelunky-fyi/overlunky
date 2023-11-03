@@ -98,6 +98,20 @@ struct Renderer
     virtual void some_dx_stuff() = 0; // it actually has a ton of parameters
 };
 
+struct UnknownAPIStuff
+{
+    uint32_t unknown1;
+    int32_t unknown2; // -1
+
+    uint8_t unknown3;
+    uint8_t unknown4;
+    uint8_t unknown5;
+    uint8_t unknown6;
+    uint32_t unknown7; // padding?
+
+
+};
+
 struct GameAPI // size 0x60
 {
     static GameAPI* get();
@@ -108,7 +122,7 @@ struct GameAPI // size 0x60
     void set_zoom(std::optional<float> current, std::optional<float> target);
 
     bool unknown1;
-    size_t unknown2; // pointer
+    UnknownAPIStuff* unknown2;
     Renderer* renderer;
     uint32_t window_width;
     uint32_t window_height;
