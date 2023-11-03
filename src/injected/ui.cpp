@@ -4081,7 +4081,13 @@ void render_camera()
     }
     tooltip("Disable to free the camera in camp.\nAutomatically disabled when zooming.");
     if (ImGui::Checkbox("Follow focused entity absolutely##CameraForcePlayer", &camera_hack))
+    {
         set_camera_hack(camera_hack);
+        enable_camera_bounds = !camera_hack;
+        set_camera_bounds(enable_camera_bounds);
+        enable_camp_camera = !camera_hack;
+        UI::set_camp_camera_bounds_enabled(enable_camp_camera);
+    }
     tooltip("Enable to remove camera bounds and always center the entity instantly without rubberbanding.");
 }
 
