@@ -1279,8 +1279,7 @@ end
     {
         return State::get_camera_position();
     };
-    /// Deprecated
-    /// this doesn't actually work at all. See State -> Camera the for proper camera handling
+    /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
     lua["set_camera_position"] = set_camera_position;
 
     /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.

@@ -2711,6 +2711,15 @@ Translate a distance of `x` tiles to screen distance to be be used in drawing fu
 
 Translate an entity position to screen position to be used in drawing functions
 
+### set_camera_position
+
+
+> Search script examples for [set_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
+
+#### nil set_camera_position(float cx, float cy)
+
+Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in [ON](#ON).RENDER_PRE_GAME or similar. See [Camera](#Camera) for proper camera handling with bounds and rubberbanding.
+
 ### set_camp_camera_bounds_enabled
 
 
@@ -3722,15 +3731,6 @@ Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow
 
 This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
-
-### set_camera_position
-
-
-> Search script examples for [set_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
-
-#### nil set_camera_position(float cx, float cy)
-
-this doesn't actually work at all. See State -> [Camera](#Camera) the for proper camera handling
 
 ### setflag
 

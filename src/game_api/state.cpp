@@ -451,10 +451,16 @@ std::pair<float, float> State::get_camera_position()
 
 void State::set_camera_position(float cx, float cy)
 {
+    static const auto addr = (float*)get_address("camera_position");
     auto camera = ptr()->camera;
-    camera->focused_entity_uid = -1;
     camera->focus_x = cx;
     camera->focus_y = cy;
+    camera->adjusted_focus_x = cx;
+    camera->adjusted_focus_y = cy;
+    camera->calculated_focus_x = cx;
+    camera->calculated_focus_y = cy;
+    *addr = cx;
+    *(addr + 1) = cy;
 }
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)

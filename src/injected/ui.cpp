@@ -4081,13 +4081,7 @@ void render_camera()
     }
     tooltip("Disable to free the camera in camp.\nAutomatically disabled when zooming.");
     if (ImGui::Checkbox("Follow focused entity absolutely##CameraForcePlayer", &camera_hack))
-    {
         set_camera_hack(camera_hack);
-        enable_camera_bounds = !camera_hack;
-        set_camera_bounds(enable_camera_bounds);
-        enable_camp_camera = !camera_hack;
-        UI::set_camp_camera_bounds_enabled(enable_camp_camera);
-    }
     tooltip("Enable to remove camera bounds and always center the entity instantly without rubberbanding.");
 }
 
@@ -5342,11 +5336,8 @@ void render_clickhandler()
 
                 g_state->camera->focus_x -= (current_pos.first - oryginal_pos.first) * g_camera_speed;
                 g_state->camera->focus_y -= (current_pos.second - oryginal_pos.second) * g_camera_speed;
-                if (g_state->pause != 0 || !options["smooth_camera"])
-                {
-                    g_state->camera->adjusted_focus_x = g_state->camera->focus_x;
-                    g_state->camera->adjusted_focus_y = g_state->camera->focus_y;
-                }
+                if (g_state->pause != 0 || paused || !options["smooth_camera"])
+                    State::get().set_camera_position(g_state->camera->focus_x, g_state->camera->focus_y);
                 startpos = normalize(mouse_pos());
                 enable_camera_bounds = false;
                 set_camera_bounds(enable_camera_bounds);
@@ -8989,13 +8980,7 @@ set_callback(function()
     lastpos = pos
     x = x + state.camera.focus_offset_x
     y = y + state.camera.vertical_pan + state.camera.focus_offset_y
-    state.camera.focus_x, state.camera.focus_y = x, y
-    state.camera.adjusted_focus_x, state.camera.adjusted_focus_y = x, y
-    state.camera.calculated_focus_x, state.camera.calculated_focus_y = x, y
-    state.camera.bounds_top = math.huge
-    state.camera.bounds_bottom = -math.huge
-    state.camera.bounds_left = -math.huge
-    state.camera.bounds_right = math.huge
+    set_camera_position(x, y)
 end, ON.RENDER_PRE_GAME))");
     add_ui_script("dark", false, "set_callback(function() state.level_flags = set_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)");
     add_ui_script("light", false, "set_callback(function() state.level_flags = clr_flag(state.level_flags, 18) end, ON.POST_ROOM_GENERATION)");
