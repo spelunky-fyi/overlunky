@@ -1406,7 +1406,7 @@ short for state->money_shop_total + loop[inventory.money + inventory.collected_m
 
 #### int get_frame()
 
-Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
 
 ### get_frametime
 
@@ -1425,6 +1425,15 @@ Get engine target frametime (1/framerate, default 1/60).
 #### optional&lt;double&gt; get_frametime_unfocused()
 
 Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+
+### get_global_frame
+
+
+> Search script examples for [get_global_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_global_frame)
+
+#### int get_global_frame()
+
+Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
 
 ### get_hud
 

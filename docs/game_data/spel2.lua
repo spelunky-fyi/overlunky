@@ -738,9 +738,12 @@ function lock_door_at(x, y) end
 ---@param y number
 ---@return nil
 function unlock_door_at(x, y) end
----Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+---Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
 ---@return integer
 function get_frame() end
+---Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+---@return integer
+function get_global_frame() end
 ---Get the current timestamp in milliseconds since the Unix Epoch.
 ---@return nil
 function get_ms() end
@@ -2253,8 +2256,9 @@ do
     ---@field buttons integer @Might be used for some menu inputs not found in buttons_menu
     ---@field buttons_extra integer @Might be used for some menu inputs not found in buttons_menu
     ---@field buttons_menu_previous MENU_INPUT @Previous state of buttons_menu
-    ---@field buttons_menu MENU_INPUT @Inputs used to control all the menus, independent from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
+    ---@field buttons_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
     ---@field game_has_focus boolean
+    ---@field modal_open integer
 
 ---@class PRNG
     ---@field seed fun(self, seed: integer): nil @Same as `seed_prng`

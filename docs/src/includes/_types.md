@@ -2768,8 +2768,9 @@ Type | Name | Description
 int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | Might be used for some menu inputs not found in buttons_menu
 int | [buttons_extra](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_extra) | Might be used for some menu inputs not found in buttons_menu
 [MENU_INPUT](#MENU_INPUT) | [buttons_menu_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu_previous) | Previous state of buttons_menu
-[MENU_INPUT](#MENU_INPUT) | [buttons_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu) | Inputs used to control all the menus, independent from player inputs. You can probably capture and edit this in [ON](#ON).PRE_UPDATE.
+[MENU_INPUT](#MENU_INPUT) | [buttons_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).PRE_UPDATE.
 bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) | 
+int | [modal_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modal_open) | 
 
 ### Items
 
