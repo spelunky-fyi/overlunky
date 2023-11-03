@@ -1320,7 +1320,8 @@ end
     lua["get_window_size"] = []() -> std::tuple<int, int>
     { return {(int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y}; };
 
-    /// Steal input from a Player, HiredHand or PlayerGhost
+    /// Deprecated
+    /// Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.
     lua["steal_input"] = [](int uid)
     {
         static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
@@ -1359,6 +1360,7 @@ end
             backend->script_input[uid] = newinput;
         }
     };
+    /// Deprecated
     /// Return input previously stolen with [steal_input](#steal_input)
     lua["return_input"] = [](int uid)
     {
@@ -1383,6 +1385,7 @@ end
         }
         backend->script_input.erase(uid);
     };
+    /// Deprecated
     /// Send input to entity, has to be previously stolen with [steal_input](#steal_input)
     lua["send_input"] = [](int uid, INPUTS buttons)
     {

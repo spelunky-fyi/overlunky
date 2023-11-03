@@ -2073,33 +2073,6 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 
 Current mouse cursor position in screen coordinates.
 
-### return_input
-
-
-> Search script examples for [return_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
-
-#### nil return_input(int uid)
-
-Return input previously stolen with [steal_input](#steal_input)
-
-### send_input
-
-
-> Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
-
-#### nil send_input(int uid, [INPUTS](#INPUTS) buttons)
-
-Send input to entity, has to be previously stolen with [steal_input](#steal_input)
-
-### steal_input
-
-
-> Search script examples for [steal_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
-
-#### nil steal_input(int uid)
-
-Steal input from a [Player](#Player), HiredHand or [PlayerGhost](#PlayerGhost)
-
 ## Lighting functions
 
 
@@ -3761,6 +3734,30 @@ This function never worked properly as too many places in the game individually 
 > Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 
 `nil testflag()`<br/>
+
+### steal_input
+
+
+> Search script examples for [steal_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
+
+`nil steal_input(int uid)`<br/>
+Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.
+
+### return_input
+
+
+> Search script examples for [return_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
+
+`nil return_input(int uid)`<br/>
+Return input previously stolen with [steal_input](#steal_input)
+
+### send_input
+
+
+> Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
+
+`nil send_input(int uid, INPUTS buttons)`<br/>
+Send input to entity, has to be previously stolen with [steal_input](#steal_input)
 
 ### read_input
 

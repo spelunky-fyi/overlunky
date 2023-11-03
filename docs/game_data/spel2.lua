@@ -932,19 +932,6 @@ function test_mask(flags, mask) end
 ---Gets the resolution (width and height) of the screen
 ---@return integer, integer
 function get_window_size() end
----Steal input from a Player, HiredHand or PlayerGhost
----@param uid integer
----@return nil
-function steal_input(uid) end
----Return input previously stolen with [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input)
----@param uid integer
----@return nil
-function return_input(uid) end
----Send input to entity, has to be previously stolen with [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input)
----@param uid integer
----@param buttons INPUTS
----@return nil
-function send_input(uid, buttons) end
 ---Clears a callback that is specific to a screen.
 ---@param screen_id integer
 ---@param cb_id CallbackId
