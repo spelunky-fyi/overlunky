@@ -103,13 +103,11 @@ struct UnknownAPIStuff
     uint32_t unknown1;
     int32_t unknown2; // -1
 
-    uint8_t unknown3;
+    uint8_t unknown3; // controller input flags related maybe?
     uint8_t unknown4;
     uint8_t unknown5;
     uint8_t unknown6;
     uint32_t unknown7; // padding?
-
-
 };
 
 struct GameAPI // size 0x60
