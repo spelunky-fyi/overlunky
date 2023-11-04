@@ -2220,6 +2220,8 @@ set_callback(function()
 
 ```
 
+Derived from [Screen](#Screen)
+
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2227,6 +2229,8 @@ int | [sequence_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [animation_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_timer) | 
 float | [constellation_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text_opacity) | 
 float | [constellation_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text) | 
+[SoundMeta](#SoundMeta) | [explosion_and_loop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_and_loop) | 
+[SoundMeta](#SoundMeta) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
 
 ### ScreenCredits
 

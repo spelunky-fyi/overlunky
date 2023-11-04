@@ -5750,11 +5750,13 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field animation_timer integer
     ---@field woodpanel_slidedown_timer number
 
----@class ScreenConstellation
+---@class ScreenConstellation : Screen
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
     ---@field constellation_text number
+    ---@field explosion_and_loop SoundMeta
+    ---@field music SoundMeta
 
 ---@class ScreenRecap : Screen
 
