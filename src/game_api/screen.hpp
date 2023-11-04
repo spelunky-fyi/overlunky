@@ -492,7 +492,7 @@ class ScreenStateLevel : public Screen // ID: 12 StateMemory
   public:
     uint8_t buttons;
     /// Delay after player death to open the death screen
-    int8_t time_till_death_screen;
+    uint8_t time_till_death_screen;
 };
 
 class ScreenLevel : public Screen // ID: 12 GameManager
