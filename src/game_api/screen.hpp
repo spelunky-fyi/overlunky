@@ -24,9 +24,9 @@ class Screen
     uint32_t unknown_zero;
 
     virtual void init() = 0;
-    virtual void handle_player() = 0; // for normal level: death, camera zoom (level/shop), camera bounds, some save data stuff
+    virtual void update() = 0; // runs each frame, for level screens: death, camera zoom (level/shop), camera bounds, some save data stuff
     virtual ~Screen() = 0;
-    virtual void render() = 0; // mostly used by the non gameplay screens to draw textures and text
+    virtual void render() = 0; // mostly used by the non gameplay screens to draw textures, text, UI
 
     std::uint32_t reserve_callback_id();
     void unhook(std::uint32_t id);
