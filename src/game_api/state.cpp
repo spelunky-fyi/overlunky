@@ -9,6 +9,7 @@
 #include <string>      // for allocator, operator""sv, operator""s
 #include <type_traits> // for move
 
+#include "bucket.hpp"                            // for Bucket
 #include "containers/custom_allocator.hpp"       //
 #include "entities_chars.hpp"                    // for Player
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
@@ -296,11 +297,9 @@ State& State::get()
             strings_init();
             init_state_update_hook();
 
-            auto watermark_offset = get_address("destroy_game_manager") - 8; // pulled this out of a hat, its just a random place with some CCCC hopefully
-            auto watermark = memory_read<uint32_t>(watermark_offset);
-            if (watermark != 0x4C4F4C4F)
+            auto bucket = Bucket::get();
+            if (!bucket->patches_applied)
             {
-                write_mem_prot(watermark_offset, "\x4F\x4C\x4F\x4C", true);
                 DEBUG("Applying patches");
                 patch_tiamat_kill_crash();
                 patch_orbs_limit();
@@ -308,6 +307,7 @@ State& State::get()
                 patch_liquid_OOB();
                 patch_ushabti_error();
                 patch_entering_closed_door_crash();
+                bucket->patches_applied = true;
             }
             else
             {

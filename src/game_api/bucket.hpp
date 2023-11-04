@@ -44,4 +44,6 @@ class Bucket
     std::unordered_map<std::string, BucketItem> data;
     /// Access Overlunky options here, nil if Overlunky is not loaded.
     Overlunky* overlunky{nullptr};
+    // Used by state.cpp to determine if patches should still be applied.
+    bool patches_applied{false};
 };
