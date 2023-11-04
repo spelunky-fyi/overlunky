@@ -22,7 +22,7 @@ class ScreenCharacterSelect;
 class ScreenConstellation;
 class ScreenCredits;
 class ScreenDeath;
-class ScreenLevel;
+class ScreenStateLevel;
 class ScreenRecap;
 class ScreenScores;
 class ScreenTeamSelect;
@@ -217,7 +217,7 @@ struct StateMemory
     ScreenCharacterSelect* screen_character_select;
     ScreenTeamSelect* screen_team_select;
     ScreenCamp* screen_camp;
-    ScreenLevel* screen_level;
+    ScreenStateLevel* screen_level;
     ScreenTransition* screen_transition;
     ScreenDeath* screen_death;
     size_t unknown_screen_spaceship; // potentially ScreenSpaceship, but is nullptr (there is no UI rendering on spaceship anyway)

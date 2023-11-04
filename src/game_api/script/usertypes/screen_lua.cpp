@@ -49,6 +49,7 @@ void register_usertypes(sol::state& lua)
     lua["Screen"]["as_screen_team_select"] = &Screen::as<ScreenTeamSelect>;
     lua["Screen"]["as_screen_camp"] = &Screen::as<ScreenCamp>;
     lua["Screen"]["as_screen_level"] = &Screen::as<ScreenLevel>;
+    lua["Screen"]["as_screen_state_level"] = &Screen::as<ScreenStateLevel>;
     lua["Screen"]["as_screen_transition"] = &Screen::as<ScreenTransition>;
     lua["Screen"]["as_screen_death"] = &Screen::as<ScreenDeath>;
     lua["Screen"]["as_screen_win"] = &Screen::as<ScreenWin>;
@@ -347,8 +348,15 @@ void register_usertypes(sol::state& lua)
         "ScreenLevel",
         "buttons",
         &ScreenLevel::buttons,
+        sol::base_classes,
+        sol::bases<Screen>());
+
+    lua.new_usertype<ScreenStateLevel>(
+        "ScreenStateLevel",
+        "buttons",
+        &ScreenStateLevel::buttons,
         "time_till_death_screen",
-        &ScreenLevel::time_till_death_screen,
+        &ScreenStateLevel::time_till_death_screen,
         sol::base_classes,
         sol::bases<Screen>());
 

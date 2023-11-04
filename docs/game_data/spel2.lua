@@ -2059,6 +2059,7 @@ do
     ---@field transition_to_layer integer
     ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
+    ---@field screen_level ScreenStateLevel
     ---@field screen_transition ScreenTransition
     ---@field screen_death ScreenDeath
     ---@field screen_win ScreenWin
@@ -5669,6 +5670,9 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field buttons integer
 
 ---@class ScreenLevel : Screen
+    ---@field buttons integer
+
+---@class ScreenStateLevel : Screen
     ---@field buttons integer
     ---@field time_till_death_screen integer @Delay after player death to open the death screen
 
