@@ -130,7 +130,7 @@ struct GameManager
     size_t unknown_screen_team_select;      // available in State
     ScreenCamp* screen_camp;
     ScreenLevel* screen_level;
-    size_t screen_transition;            // available in State, but it's a different object! this one only has a render_timer
+    size_t* screen_transition;           // available in State, but it's a different object! this one only has a render_timer
     size_t unknown_screen_death;         // available in State
     size_t unknown_screen_spaceship;     // (also not) available in State
     size_t unknown_screen_win;           // available in State
@@ -143,8 +143,8 @@ struct GameManager
     size_t unknown_screen_arena_items;   // available in State
     size_t unknown_screen_arena_select;  // available in State
     size_t unknown_screen_arena_intro;   // available in State
-    size_t screen_arena_level;           // also available in State, but it's a different object! this one only has a render_timer, no UI parts
-    size_t unknown_screen_arena_score;   // available in State
+    size_t* screen_arena_level;          // also available in State, but it's a different object! this one only has a render_timer, no UI parts
+    size_t* unknown_screen_arena_score;  // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;
     PauseUI* pause_ui;

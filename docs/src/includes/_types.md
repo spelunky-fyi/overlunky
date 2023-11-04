@@ -2503,6 +2503,15 @@ float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/ov
 [TextureRenderingInfo](#TextureRenderingInfo) | [start_sidepanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel) | 
 float | [start_sidepanel_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel_slidein_timer) | 
 
+### ScreenStateCamp
+
+Derived from [Screen](#Screen)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [time_till_reset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_till_reset) | Delay after player death to reset camp
+
 ### ScreenStateLevel
 
 Derived from [Screen](#Screen)
@@ -2904,8 +2913,9 @@ int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
 int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
 int | [transition_to_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_to_layer) | 
-[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
+[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
+[ScreenStateCamp](#ScreenStateCamp) | [screen_camp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) | 
 [ScreenStateLevel](#ScreenStateLevel) | [screen_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 
 [ScreenDeath](#ScreenDeath) | [screen_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_death) | 

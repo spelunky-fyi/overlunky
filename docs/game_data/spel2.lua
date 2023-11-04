@@ -2057,8 +2057,9 @@ do
     ---@field camera_layer integer
     ---@field layer_transition_timer integer
     ---@field transition_to_layer integer
-    ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
+    ---@field screen_team_select ScreenTeamSelect
+    ---@field screen_camp ScreenStateCamp
     ---@field screen_level ScreenStateLevel
     ---@field screen_transition ScreenTransition
     ---@field screen_death ScreenDeath
@@ -5668,6 +5669,9 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class ScreenCamp : Screen
     ---@field buttons integer
+
+---@class ScreenStateCamp : Screen
+    ---@field time_till_reset integer @Delay after player death to reset camp
 
 ---@class ScreenLevel : Screen
     ---@field buttons integer
