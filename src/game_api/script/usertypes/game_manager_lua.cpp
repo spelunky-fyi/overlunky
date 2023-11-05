@@ -129,11 +129,9 @@ void register_usertypes(sol::state& lua)
         &GameProps::buttons_menu_previous,
         "game_has_focus",
         &GameProps::game_has_focus,
-        "modal_open",
-        sol::property([](GameProps& gp)
-                      { return gp.menu_icon_slot != 0xff; }),
-        "menu_icon_slot",
-        &GameProps::menu_icon_slot,
+        "menu_open",
+        sol::property([](GameProps& gp) -> bool
+                      { return gp.menu_icon_slot != -1; }),
         "input_index",
         &GameProps::input_index);
     lua.new_usertype<RawInput>(

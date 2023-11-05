@@ -113,7 +113,7 @@ struct InputDevice
 
 struct GameProps
 {
-    /// Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT
+    /// Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     std::array<uint32_t, MAX_PLAYERS> buttons;
     std::array<uint32_t, MAX_PLAYERS> buttons_previous;
     /// Previous state of buttons_menu

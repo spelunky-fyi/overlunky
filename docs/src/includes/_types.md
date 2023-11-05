@@ -1047,6 +1047,14 @@ float | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mo
  | [gamepads](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepads) | [Gamepad](#Gamepad) gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/> 
 bool | [showcursor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=showcursor) | 
 
+### InputDevice
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | 
+int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+
 ### InputMapping
 
 Used in [PlayerSlot](#PlayerSlot)
@@ -1090,15 +1098,6 @@ Type | Name | Description
 ---- | ---- | -----------
 array&lt;[KeyboardKey](#KeyboardKey), 112&gt; | [keyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyboard) | State of all keyboard buttons in a random game order as usual
 array&lt;[ControllerInput](#ControllerInput), 12&gt; | [controller](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller) | State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
-
-### SomeInput
-
-
-Type | Name | Description
----- | ---- | -----------
-bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
-int | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | 
-int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 
 ## Journal types
 
@@ -2826,13 +2825,16 @@ array&lt;int, MAX_PLAYERS&gt; | [buttons_movement](https://github.com/spelunky-f
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | Might be used for some menu inputs not found in buttons_menu
-int | [buttons_extra](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_extra) | Might be used for some menu inputs not found in buttons_menu
+int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+int | [buttons_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_previous) | 
+[MENU_INPUT](#MENU_INPUT) | [buttons_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).POST_PROCESS_INPUT
 [MENU_INPUT](#MENU_INPUT) | [buttons_menu_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu_previous) | Previous state of buttons_menu
-[MENU_INPUT](#MENU_INPUT) | [buttons_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).PRE_UPDATE.
+array&lt;int, MAX_PLAYERS&gt; | [input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input) | Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in [ON](#ON).POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
+array&lt;int, MAX_PLAYERS&gt; | [input_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_previous) | 
+[MENU_INPUT](#MENU_INPUT) | [input_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).POST_PROCESS_INPUT
+[MENU_INPUT](#MENU_INPUT) | [input_menu_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_menu_previous) | Previous state of buttons_menu
 bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) | 
-int | [modal_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modal_open) | 
-array&lt;[SomeInput](#SomeInput), 12&gt; | [some_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_input) | Yet another place for some buttons in some random order, too tired to make another enum for them
+int | [menu_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_open) | 
 array&lt;int, 5&gt; | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ### Items
