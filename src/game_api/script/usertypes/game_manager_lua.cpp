@@ -132,9 +132,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<KeyboardKey>(
         "KeyboardKey",
         "down",
-        &KeyboardKey::down,
-        "unknown",
-        &KeyboardKey::unknown);
+        &KeyboardKey::down);
     lua.new_usertype<ControllerInput>(
         "ControllerInput",
         "buttons",
@@ -148,7 +146,7 @@ void register_usertypes(sol::state& lua)
 
     lua["get_raw_input"] = []() -> RawInput*
     {
-        // TODO:temp
+        // TODO:temp, move to rpc or something
         static auto offset = get_address("input_table");
         return reinterpret_cast<RawInput*>(offset);
     };

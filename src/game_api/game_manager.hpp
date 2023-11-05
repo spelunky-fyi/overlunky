@@ -72,13 +72,16 @@ struct BackgroundMusic
 
 struct KeyboardKey
 {
+    /// Key is being held
     bool down;
     size_t unknown;
 };
 
 struct ControllerButton
 {
+    /// Button is being held
     bool down;
+    /// Button was just pressed down this frame
     bool pressed;
 };
 

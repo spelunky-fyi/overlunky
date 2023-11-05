@@ -296,6 +296,7 @@ State& State::get()
             hook_godmode_functions();
             strings_init();
             init_state_update_hook();
+            init_process_input_hook();
 
             auto bucket = Bucket::get();
             if (!bucket->patches_applied)
@@ -676,6 +677,31 @@ void init_state_update_hook()
     if (error != NO_ERROR)
     {
         DEBUG("Failed hooking state_refresh stuff: {}\n", error);
+    }
+}
+
+using OnProcessInput = void(void*);
+OnProcessInput* g_process_input_trampoline{nullptr};
+void ProcessInput(void* s)
+{
+    if (!pre_process_input())
+    {
+        g_process_input_trampoline(s);
+    }
+    post_process_input();
+}
+
+void init_process_input_hook()
+{
+    g_process_input_trampoline = (OnProcessInput*)get_address("process_input");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach((void**)&g_process_input_trampoline, &ProcessInput);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking process_input stuff: {}\n", error);
     }
 }
 
