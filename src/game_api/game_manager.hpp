@@ -104,16 +104,21 @@ struct SomeInput
 
 struct GameProps
 {
+    /// Might be used for some menu inputs not found in buttons_menu
     uint32_t buttons;
     uint32_t unknown1;
     uint32_t unknown2;
     uint32_t unknown3;
-    uint32_t buttons_dupe;
+    /// Might be used for some menu inputs not found in buttons_menu
+    uint32_t buttons_extra;
     uint32_t unknown4;
     uint32_t unknown5;
     uint32_t unknown6;
-    uint32_t buttons_dupe_but_different;
-    int8_t unknown8;
+    /// Previous state of buttons_menu
+    MENU_INPUT buttons_menu_previous;
+    /// Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
+    MENU_INPUT buttons_menu;
+    int8_t modal_open;
     bool game_has_focus;
     bool unknown9;
     bool unknown10;
@@ -143,7 +148,9 @@ struct GameManager
 {
     BackgroundMusic* music;
     SaveRelated* save_related;
+    /// Yet another place to get player inputs, in some format
     std::array<uint8_t, MAX_PLAYERS> buttons_controls;
+    /// Yet another place to get player inputs, in some format
     std::array<uint8_t, MAX_PLAYERS> buttons_movement;
     GameProps* game_props;
 
@@ -162,7 +169,7 @@ struct GameManager
     size_t unknown_screen_team_select;      // available in State
     ScreenCamp* screen_camp;
     ScreenLevel* screen_level;
-    size_t screen_transition;            // available in State, but it's a different object! this one only has a render_timer
+    size_t* screen_transition;           // available in State, but it's a different object! this one only has a render_timer
     size_t unknown_screen_death;         // available in State
     size_t unknown_screen_spaceship;     // (also not) available in State
     size_t unknown_screen_win;           // available in State
@@ -175,8 +182,8 @@ struct GameManager
     size_t unknown_screen_arena_items;   // available in State
     size_t unknown_screen_arena_select;  // available in State
     size_t unknown_screen_arena_intro;   // available in State
-    size_t screen_arena_level;           // also available in State, but it's a different object! this one only has a render_timer, no UI parts
-    size_t unknown_screen_arena_score;   // available in State
+    size_t* screen_arena_level;          // also available in State, but it's a different object! this one only has a render_timer, no UI parts
+    size_t* unknown_screen_arena_score;  // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;
     PauseUI* pause_ui;

@@ -596,6 +596,15 @@ Type | Name | Description
 [BackgroundSound](#BackgroundSound) | [pause_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_menu) | 
 [BackgroundSound](#BackgroundSound) | [death_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=death_transition) | 
 
+### Bucket
+
+Shared memory structure used for Playlunky-[Overlunky](#Overlunky) interoperability
+
+Type | Name | Description
+---- | ---- | -----------
+map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data) | You can store arbitrary simple values here in Playlunky to be read in on [Overlunky](#Overlunky) script for example.
+[Overlunky](#Overlunky) | [overlunky](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlunky) | Access [Overlunky](#Overlunky) options here, nil if [Overlunky](#Overlunky) is not loaded.
+
 ### Color
 
 
@@ -765,6 +774,25 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state_id) | 
 int | [get_state_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state_id) | Get the `state_id` of a behavior, this is the id that needs to be returned from a behavior's<br/>`get_next_state_id` to enter this state, given that the behavior is added to the movable.
+
+### Overlunky
+
+Used to get and set [Overlunky](#Overlunky) settings in [Bucket](#Bucket)
+
+Type | Name | Description
+---- | ---- | -----------
+map&lt;string, any&gt; | [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options) | Current [Overlunky](#Overlunky) options. Read only.
+map&lt;string, any&gt; | [set_options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_options) | Write some select options here to change [Overlunky](#Overlunky) options. Just use the same keys as in options.
+map&lt;string, [KEY](#KEY)&gt; | [keys](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | Current [Overlunky](#Overlunky) key bindings. Read only. You can use this to bind some custom feature to the same unknown key as currently bound by the user.
+set&lt;string&gt; | [ignore_keys](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_keys) | Disable some key bindings in [Overlunky](#Overlunky), whatever key they are actually bound to. Remember this might not be bound to the default any more, so only use this if you also plan on overriding the current keybinding, or just need to disable some feature and don't care what key it is bound on.
+set&lt;[KEY](#KEY)&gt; | [ignore_keycodes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_keycodes) | Disable keys that may or may not be used by [Overlunky](#Overlunky). You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
+set&lt;string&gt; | [ignore_features](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_features) | TODO: Disable [Overlunky](#Overlunky) features. Doesn't do anything yet.
+int | [selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_uid) | Currently selected uid in the entity picker or -1 if nothing is selected.
+optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
+vector&lt;int&gt; | [selected_uids](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_uids) | Currently selected uids in the entity finder.
+int | [hovered_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hovered_uid) | Currently hovered entity uid or -1 if nothing is hovered.
+optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
+optional&lt;vector&lt;int&gt;&gt; | [set_selected_uids](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uids) | Set currently selected uids in the entity finder.
 
 ### PRNG
 
@@ -2220,6 +2248,8 @@ set_callback(function()
 
 ```
 
+Derived from [Screen](#Screen)
+
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2227,6 +2257,8 @@ int | [sequence_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [animation_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_timer) | 
 float | [constellation_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text_opacity) | 
 float | [constellation_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text) | 
+[SoundMeta](#SoundMeta) | [explosion_and_loop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_and_loop) | 
+[SoundMeta](#SoundMeta) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
 
 ### ScreenCredits
 
@@ -2503,6 +2535,15 @@ float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/ov
 [TextureRenderingInfo](#TextureRenderingInfo) | [start_sidepanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel) | 
 float | [start_sidepanel_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel_slidein_timer) | 
 
+### ScreenStateCamp
+
+Derived from [Screen](#Screen)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [time_till_reset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_till_reset) | Delay after player death to reset camp
+
 ### ScreenStateLevel
 
 Derived from [Screen](#Screen)
@@ -2738,14 +2779,20 @@ Type | Name | Description
 [JournalUI](#JournalUI) | [journal_ui](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_ui) | 
 [SaveRelated](#SaveRelated) | [save_related](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_related) | 
 [BackgroundSound](#BackgroundSound) | [main_menu_music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_menu_music) | 
+array&lt;int, MAX_PLAYERS&gt; | [buttons_controls](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_controls) | Yet another place to get player inputs, in some format
+array&lt;int, MAX_PLAYERS&gt; | [buttons_movement](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_movement) | Yet another place to get player inputs, in some format
 
 ### GameProps
 
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | Might be used for some menu inputs not found in buttons_menu
+int | [buttons_extra](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_extra) | Might be used for some menu inputs not found in buttons_menu
+[MENU_INPUT](#MENU_INPUT) | [buttons_menu_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu_previous) | Previous state of buttons_menu
+[MENU_INPUT](#MENU_INPUT) | [buttons_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).PRE_UPDATE.
 bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) | 
+int | [modal_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modal_open) | 
 
 ### Items
 
@@ -2904,8 +2951,9 @@ int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
 int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
 int | [transition_to_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_to_layer) | 
-[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
+[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
+[ScreenStateCamp](#ScreenStateCamp) | [screen_camp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) | 
 [ScreenStateLevel](#ScreenStateLevel) | [screen_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 
 [ScreenDeath](#ScreenDeath) | [screen_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_death) | 

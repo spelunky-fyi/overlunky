@@ -756,3 +756,14 @@ std::array level_chances{
     "tallroom",
     "rewardroom",
 };
+
+std::array renderer_flags1{
+    "Floor background shadows",
+    "Emissive lighting",
+    "Shockwaves, some shadows",
+    "unknown",
+    "unknown",
+    "unknown",
+    "Liquid smoothing",
+    "unknown",
+};

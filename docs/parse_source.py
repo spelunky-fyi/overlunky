@@ -11,6 +11,57 @@ CACHE_FILE = None
 if not os.path.exists(".db"):
     os.makedirs(".db")
 
+# this is common for generator.py and validator.py, not actually used nor should it be used here
+replace_table = {
+    # standard basic types
+    "uint8_t": "int",
+    "uint16_t": "int",
+    "uint32_t": "int",
+    "uint64_t": "int",
+    "int8_t": "int",
+    "int16_t": "int",
+    "int32_t": "int",
+    "int64_t": "int",
+    "ImU32": "int",
+    "in_port_t": "int",
+    "size_t": "int",
+    "char*": "string",
+    "wstring": "string",
+    "u16string": "string",
+    "string_view": "string",
+    "char16_t*": "string",
+    "char16_t": "char",
+    "pair<": "tuple<",
+    # std containers
+    "custom_vector<": "vector<",
+    "custom_map<": "map<",
+    "custom_unordered_map<": "map<",
+    "custom_set<": "set<",
+    "custom_unordered_set<": "set<",
+    "game_vector<": "vector<",
+    "game_map<": "map<",
+    "game_unordered_map<": "map<",
+    "game_set<": "set<",
+    "game_unordered_set<": "set<",
+    "unordered_map<": "map<", # doesn't seam to matter for lua if it's ordered or not
+    "unordered_set<": "set<", # doesn't seam to matter for lua if it's ordered or not
+    # removers
+    ", identity_hasher<>": "",
+    "std::": "",
+    "sol::": "",
+    "void": "",
+    "constexpr": "",
+    "const": "",
+    "static": "",
+    # special
+    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
+    "EmittedParticlesInfo": "array<Particle>",
+    "ImVec2": "Vec2",
+    "SoundCallbackFunction": "function",
+    "object ": "any ",
+    "BucketItem": "any",
+}
+
 header_files = [
     "../src/game_api/math.hpp",
     "../src/game_api/rpc.hpp",
@@ -64,6 +115,7 @@ header_files = [
     "../src/game_api/script/usertypes/gui_lua.cpp",
     "../src/game_api/steam_api.hpp",
     "../src/game_api/search.hpp",
+    "../src/game_api/bucket.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -107,6 +159,7 @@ api_files = [
     "../src/game_api/script/usertypes/socket_lua.cpp",
     "../src/game_api/script/usertypes/steam_lua.cpp",
     "../src/game_api/script/usertypes/logic_lua.cpp",
+    "../src/game_api/script/usertypes/bucket_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
@@ -170,8 +223,8 @@ def camel_case_to_snake_case(name):
 
 def fix_spaces(thing):
     thing = thing.strip()
-    thing = re.sub("\s{2,}", " ", thing)           # change double spaces into single
-    thing = re.sub("(?<=\(|\<)\s", "", thing)      # remove spaces after ( or < 
+    thing = re.sub(r"\s{2,}", " ", thing)          # change double spaces into single
+    thing = re.sub(r"(?<=\(|\<)\s", "", thing)     # remove spaces after ( or <
     return thing.replace("*", "").replace("&", "") # remove * and &
 
 def getfunc(name):
@@ -413,6 +466,9 @@ def run_parse():
                         (item for item in classes if item["name"] == cpp_type), dict()
                     )
 
+                    if "member_funs" not in underlying_cpp_type:
+                        underlying_cpp_type["member_funs"] = {}
+
                     if name not in underlying_cpp_type["member_funs"]:
                         underlying_cpp_type["member_funs"][name] = []
 
@@ -651,7 +707,7 @@ def run_parse():
                 if var[0].startswith("sol::constructors"):
                     for fun in underlying_cpp_type["member_funs"][cpp_type]:
                         param = fun["param"]
-                        
+
                         if cpp_type not in constructors:
                             constructors[cpp_type] = []
                         constructors[cpp_type].append(

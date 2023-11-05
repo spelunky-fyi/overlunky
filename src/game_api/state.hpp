@@ -17,7 +17,7 @@ class ScreenArenaLevel;
 class ScreenArenaMenu;
 class ScreenArenaScore;
 class ScreenArenaStagesSelect;
-class ScreenCamp;
+class ScreenStateCamp;
 class ScreenCharacterSelect;
 class ScreenConstellation;
 class ScreenCredits;
@@ -216,7 +216,7 @@ struct StateMemory
     // screens that are available in GameManager
     ScreenCharacterSelect* screen_character_select;
     ScreenTeamSelect* screen_team_select;
-    ScreenCamp* screen_camp;
+    ScreenStateCamp* screen_camp;
     ScreenStateLevel* screen_level;
     ScreenTransition* screen_transition;
     ScreenDeath* screen_death;
@@ -229,7 +229,7 @@ struct StateMemory
     ScreenArenaMenu* screen_arena_menu;
     ScreenArenaStagesSelect* screen_arena_stages_select1;
     ScreenArenaItems* screen_arena_items;
-    ScreenArenaStagesSelect* screen_arena_stages_select2;
+    ScreenArenaStagesSelect* screen_arena_stages_select2; // same pointer as screen_arena_stages_select1
     ScreenArenaIntro* screen_arena_intro;
     ScreenArenaLevel* screen_arena_level;
     ScreenArenaScore* screen_arena_score;
@@ -338,6 +338,7 @@ struct State
     void darkmode(bool g);
 
     void zoom(float level);
+    void zoom_reset();
 
     static std::pair<float, float> click_position(float x, float y);
     static std::pair<float, float> screen_position(float x, float y);
@@ -379,3 +380,5 @@ uint8_t enum_to_layer(const LAYER layer);
 
 uint32_t lowbias32(uint32_t x);
 uint32_t lowbias32_r(uint32_t x);
+
+int64_t get_global_frame_count();

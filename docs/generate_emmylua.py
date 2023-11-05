@@ -35,16 +35,17 @@ replace_table = {
     "...va:": "...ent_type:",
     "set<": "Array<",
     "span<": "Array<",
-    
+
     "game_table": "table",
     "custom_table": "table",
     "game_Array": "Array",
     "custom_Array": "Array",
-    
+
     "const ": "",
     "EmittedParticlesInfo": "Array<Particle>",
     "object": "any",
     "ImVec2": "Vec2",
+    "BucketItem": "any",
 }
 
 reFloat = re.compile(r"\bfloat\b")

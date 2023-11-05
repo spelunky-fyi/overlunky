@@ -438,10 +438,13 @@ function god(g) end
 ---@param g boolean
 ---@return nil
 function god_companions(g) end
----Set the zoom level used in levels and shops. 13.5 is the default.
+---Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
 ---@param level number
 ---@return nil
 function zoom(level) end
+---Reset the default zoom levels for all areas and sets current zoom level to 13.5.
+---@return nil
+function zoom_reset() end
 ---Pause/unpause the game.
 ---This is just short for `state.pause == 32`, but that produces an audio bug
 ---I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](https://spelunky-fyi.github.io/overlunky/#set_global_interval) will still work
@@ -735,9 +738,12 @@ function lock_door_at(x, y) end
 ---@param y number
 ---@return nil
 function unlock_door_at(x, y) end
----Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+---Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
 ---@return integer
 function get_frame() end
+---Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+---@return integer
+function get_global_frame() end
 ---Get the current timestamp in milliseconds since the Unix Epoch.
 ---@return nil
 function get_ms() end
@@ -878,6 +884,11 @@ function get_aabb_bounds() end
 ---Gets the current camera position in the level
 ---@return number, number
 function get_camera_position() end
+---Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
+---@param cx number
+---@param cy number
+---@return nil
+function set_camera_position(cx, cy) end
 ---Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
@@ -921,19 +932,6 @@ function test_mask(flags, mask) end
 ---Gets the resolution (width and height) of the screen
 ---@return integer, integer
 function get_window_size() end
----Steal input from a Player, HiredHand or PlayerGhost
----@param uid integer
----@return nil
-function steal_input(uid) end
----Return input previously stolen with [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input)
----@param uid integer
----@return nil
-function return_input(uid) end
----Send input to entity, has to be previously stolen with [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input)
----@param uid integer
----@param buttons INPUTS
----@return nil
-function send_input(uid, buttons) end
 ---Clears a callback that is specific to a screen.
 ---@param screen_id integer
 ---@param cb_id CallbackId
@@ -1306,6 +1304,10 @@ function create_layer(layer) end
 ---@param enable boolean
 ---@return nil
 function set_level_logic_enabled(enable) end
+---Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
+---@param enable boolean
+---@return nil
+function set_start_level_paused(enable) end
 ---Converts INPUTS to (x, y, BUTTON)
 ---@param inputs INPUTS
 ---@return number, number, BUTTON
@@ -1798,6 +1800,9 @@ function set_feat_hidden(feat, hidden) end
 ---@param description string
 ---@return nil
 function change_feat(feat, hidden, name, description) end
+---Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
+---@return Bucket
+function get_bucket() end
 
 --## Types
 do
@@ -2057,8 +2062,9 @@ do
     ---@field camera_layer integer
     ---@field layer_transition_timer integer
     ---@field transition_to_layer integer
-    ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
+    ---@field screen_team_select ScreenTeamSelect
+    ---@field screen_camp ScreenStateCamp
     ---@field screen_level ScreenStateLevel
     ---@field screen_transition ScreenTransition
     ---@field screen_death ScreenDeath
@@ -2219,6 +2225,8 @@ do
     ---@field journal_ui JournalUI
     ---@field save_related SaveRelated
     ---@field main_menu_music BackgroundSound
+    ---@field buttons_controls integer[] @size: MAX_PLAYERS @Yet another place to get player inputs, in some format
+    ---@field buttons_movement integer[] @size: MAX_PLAYERS @Yet another place to get player inputs, in some format
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
@@ -2234,8 +2242,12 @@ do
     ---@field slide_position number
 
 ---@class GameProps
-    ---@field buttons integer
+    ---@field buttons integer @Might be used for some menu inputs not found in buttons_menu
+    ---@field buttons_extra integer @Might be used for some menu inputs not found in buttons_menu
+    ---@field buttons_menu_previous MENU_INPUT @Previous state of buttons_menu
+    ---@field buttons_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
     ---@field game_has_focus boolean
+    ---@field modal_open integer
 
 ---@class PRNG
     ---@field seed fun(self, seed: integer): nil @Same as `seed_prng`
@@ -5669,6 +5681,9 @@ function Quad:is_point_inside(x, y, epsilon) end
 ---@class ScreenCamp : Screen
     ---@field buttons integer
 
+---@class ScreenStateCamp : Screen
+    ---@field time_till_reset integer @Delay after player death to reset camp
+
 ---@class ScreenLevel : Screen
     ---@field buttons integer
 
@@ -5746,11 +5761,13 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field animation_timer integer
     ---@field woodpanel_slidedown_timer number
 
----@class ScreenConstellation
+---@class ScreenConstellation : Screen
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
     ---@field constellation_text number
+    ---@field explosion_and_loop SoundMeta
+    ---@field music SoundMeta
 
 ---@class ScreenRecap : Screen
 
@@ -6287,6 +6304,24 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field y integer
     ---@field timer integer
 
+---@class Overlunky
+    ---@field options table<string, any> @Current Overlunky options. Read only.
+    ---@field set_options table<string, any> @Write some select options here to change Overlunky options. Just use the same keys as in options.
+    ---@field keys table<string, KEY> @Current Overlunky key bindings. Read only. You can use this to bind some custom feature to the same unknown key as currently bound by the user.
+    ---@field ignore_keys unordered_Array<string> @Disable some key bindings in Overlunky, whatever key they are actually bound to. Remember this might not be bound to the default any more, so only use this if you also plan on overriding the current keybinding, or just need to disable some feature and don't care what key it is bound on.
+    ---@field ignore_keycodes unordered_Array<KEY> @Disable keys that may or may not be used by Overlunky. You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
+    ---@field ignore_features unordered_Array<string> @TODO: Disable Overlunky features. Doesn't do anything yet.
+    ---@field selected_uid integer @Currently selected uid in the entity picker or -1 if nothing is selected.
+    ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
+    ---@field selected_uids integer[] @Currently selected uids in the entity finder.
+    ---@field hovered_uid integer @Currently hovered entity uid or -1 if nothing is hovered.
+    ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
+    ---@field set_selected_uids integer[] @size: ? @Set currently selected uids in the entity finder.
+
+---@class Bucket
+    ---@field data table<string, any> @You can store arbitrary simple values here in Playlunky to be read in on Overlunky script for example.
+    ---@field overlunky Overlunky @Access Overlunky options here, nil if Overlunky is not loaded.
+
 end
 --## Static class functions
 
@@ -6801,29 +6836,56 @@ DYNAMIC_TEXTURE = {
 ---@alias DYNAMIC_TEXTURE integer
 ENTITY_OVERRIDE = {
   ACTIVATE = 25,
-  APPLY_MOVEMENT = 71,
+  APPLY_FRICTION = 84,
   CAN_BE_PUSHED = 10,
-  CHECK_IS_FALLING = 75,
+  CAN_ENTER = 46,
+  CAN_JUMP = 37,
+  CHECK_OUT_OF_BOUNDS = 58,
+  CLONED_TO = 63,
+  COLLECT_TREASURE = 70,
   CREATE_RENDERING_INFO = 1,
+  CRUSH = 90,
   DAMAGE = 48,
   DESTROY = 5,
+  DROP = 69,
   DTOR = 0,
+  ENTER = 42,
+  ENTER_ATTEMPT = 40,
+  FALL = 83,
   FLOOR_UPDATE = 38,
+  FREEZE = 52,
   FRICTION = 17,
   GET_HELD_ENTITY = 22,
+  HIDE_HUD = 41,
   INIT = 36,
+  INITIALIZE = 75,
   IS_IN_LIQUID = 12,
+  IS_ON_FIRE = 45,
+  IS_UNLOCKED = 45,
   KILL = 3,
   LEDGE_GRAB = 31,
+  LIGHT_LEVEL = 44,
+  LIGHT_ON_FIRE = 53,
   ON_COLLISION1 = 4,
   ON_COLLISION2 = 26,
-  PROCESS_INPUT = 77,
+  ON_HIT = 49,
+  PICKED_UP = 80,
+  PICKED_UP_BY = 68,
+  PICK_UP = 67,
+  PROCESS_INPUT = 78,
+  SET_CURSED = 54,
   SET_INVISIBLE = 15,
+  STANDING_ON = 60,
+  STOMPED_BY = 61,
+  STOMP_DAMAGE = 43,
   STOOD_ON = 32,
+  STUN = 51,
+  THROWN_BY = 62,
   TRIGGER_ACTION = 24,
   UPDATE_STATE_MACHINE = 2,
   WALKED_OFF = 30,
-  WALKED_ON = 29
+  WALKED_ON = 29,
+  WEB_COLLISION = 55
 }
 ---@alias ENTITY_OVERRIDE integer
 ENT_FLAG = {
@@ -8333,6 +8395,137 @@ JUNGLESISTERS = {
   WARNING_ONE_WAY_DOOR = 4
 }
 ---@alias JUNGLESISTERS integer
+KEY = {
+  ["0"] = 48,
+  ["1"] = 49,
+  ["2"] = 50,
+  ["3"] = 51,
+  ["4"] = 52,
+  ["5"] = 53,
+  ["6"] = 54,
+  ["7"] = 55,
+  ["8"] = 56,
+  A = 65,
+  ADD = 107,
+  ALT = 18,
+  B = 66,
+  BACKSPACE = 8,
+  C = 67,
+  CAPS = 20,
+  CLEAR = 12,
+  COMMA = 188,
+  CTRL = 17,
+  D = 68,
+  DECIMAL = 110,
+  DELETE = 46,
+  DIVIDE = 111,
+  DOWN = 40,
+  E = 69,
+  END = 35,
+  ESCAPE = 27,
+  EXECUTE = 43,
+  F = 70,
+  F1 = 112,
+  F2 = 113,
+  F3 = 114,
+  F4 = 115,
+  F5 = 116,
+  F6 = 117,
+  F7 = 118,
+  F8 = 119,
+  F9 = 120,
+  F10 = 121,
+  F11 = 122,
+  F12 = 123,
+  F13 = 124,
+  F14 = 125,
+  F15 = 126,
+  F16 = 127,
+  F17 = 128,
+  F18 = 129,
+  F19 = 130,
+  F20 = 131,
+  F21 = 132,
+  F22 = 133,
+  F23 = 134,
+  F24 = 135,
+  G = 71,
+  H = 72,
+  HOME = 36,
+  I = 73,
+  INSERT = 45,
+  J = 74,
+  K = 75,
+  L = 76,
+  LALT = 164,
+  LCONTROL = 162,
+  LEFT = 37,
+  LSHIFT = 160,
+  M = 77,
+  MINUS = 189,
+  MULTIPLY = 106,
+  N = 78,
+  NUMPAD0 = 96,
+  NUMPAD1 = 97,
+  NUMPAD2 = 98,
+  NUMPAD3 = 99,
+  NUMPAD4 = 100,
+  NUMPAD5 = 101,
+  NUMPAD6 = 102,
+  NUMPAD7 = 103,
+  NUMPAD8 = 104,
+  NUMPAD9 = 105,
+  O = 79,
+  OEM_1 = 186,
+  OEM_2 = 191,
+  OEM_3 = 192,
+  OEM_4 = 219,
+  OEM_5 = 220,
+  OEM_6 = 221,
+  OEM_7 = 222,
+  OEM_8 = 223,
+  OEM_102 = 226,
+  OL_MOD_ALT = 2048,
+  OL_MOD_CTRL = 256,
+  OL_MOD_SHIFT = 512,
+  OL_MOUSE_1 = 1025,
+  OL_MOUSE_2 = 1026,
+  OL_MOUSE_3 = 1027,
+  OL_MOUSE_4 = 1028,
+  OL_MOUSE_5 = 1029,
+  OL_MOUSE_WHEEL_DOWN = 1041,
+  OL_MOUSE_WHEEL_UP = 1042,
+  P = 80,
+  PAUSE = 19,
+  PERIOD = 190,
+  PGDN = 34,
+  PGUP = 33,
+  PLUS = 187,
+  PRINT = 42,
+  Q = 81,
+  R = 82,
+  RALT = 165,
+  RCONTROL = 163,
+  RETURN = 13,
+  RIGHT = 39,
+  RSHIFT = 161,
+  S = 83,
+  SELECT = 41,
+  SEPARATOR = 108,
+  SHIFT = 16,
+  SNAPSHOT = 44,
+  SPACE = 32,
+  SUBTRACT = 109,
+  T = 84,
+  TAB = 9,
+  U = 85,
+  UP = 38,
+  V = 86,
+  W = 87,
+  X = 88,
+  Y = 89
+}
+---@alias KEY integer
 LAYER = {
   BACK = 1,
   BOTH = -128,
@@ -8372,6 +8565,37 @@ LIQUID_POOL = {
   WATER = 1
 }
 ---@alias LIQUID_POOL integer
+LOGIC = {
+  APEP = 15,
+  ARENA_1 = 23,
+  ARENA_2 = 24,
+  ARENA_3 = 25,
+  ARENA_ALIEN_BLAST = 26,
+  ARENA_LOOSE_BOMBS = 27,
+  BLACK_MARKET = 21,
+  BUBBLER = 18,
+  COG_SACRIFICE = 16,
+  DICESHOP = 6,
+  DISCOVERY_INFO = 20,
+  DUAT_BOSSES = 17,
+  GHOST = 3,
+  GHOST_TOAST = 4,
+  JELLYFISH = 22,
+  MAGMAMAN_SPAWN = 11,
+  MOON_CHALLENGE = 8,
+  OLMEC_CUTSCENE = 13,
+  OUROBOROS = 1,
+  PLEASURE_PALACE = 19,
+  PRE_CHALLENGE = 7,
+  SPEEDRUN = 2,
+  STAR_CHALLENGE = 9,
+  SUN_CHALLENGE = 10,
+  TIAMAT_CUTSCENE = 14,
+  TUN_AGGRO = 5,
+  TUTORIAL = 0,
+  WATER_BUBBLES = 12
+}
+---@alias LOGIC integer
 MASK = {
   ACTIVEFLOOR = 128,
   ANY = 0,
@@ -8420,6 +8644,10 @@ ON = {
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
   PLAYER_PROFILE = 6,
+  POST_LAYER_CREATION = 148,
+  POST_LAYER_DESTRUCTION = 152,
+  POST_LEVEL_CREATION = 146,
+  POST_LEVEL_DESTRUCTION = 150,
   POST_LEVEL_GENERATION = 112,
   POST_LOAD_JOURNAL_CHAPTER = 139,
   POST_LOAD_SCREEN = 136,
@@ -8428,6 +8656,10 @@ ON = {
   PRE_GET_FEAT = 140,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
+  PRE_LAYER_CREATION = 147,
+  PRE_LAYER_DESTRUCTION = 151,
+  PRE_LEVEL_CREATION = 145,
+  PRE_LEVEL_DESTRUCTION = 149,
   PRE_LEVEL_GENERATION = 110,
   PRE_LOAD_JOURNAL_CHAPTER = 138,
   PRE_LOAD_LEVEL_FILES = 109,
@@ -8853,6 +9085,12 @@ QUEST_FLAG = {
   WADDLER_AGGROED = 10
 }
 ---@alias QUEST_FLAG integer
+RECURSIVE_MODE = {
+  EXCLUSIVE = 0,
+  INCLUSIVE = 1,
+  NONE = 2
+}
+---@alias RECURSIVE_MODE integer
 RENDER_INFO_OVERRIDE = {
   DTOR = 0,
   RENDER = 3
@@ -9731,7 +9969,11 @@ TILE_CODE = {
   APEP = 379,
   APEP_LEFT = 380,
   APEP_RIGHT = 381,
+  ARROW_METAL = 393,
+  ARROW_METAL_POISON = 395,
   ARROW_TRAP = 55,
+  ARROW_WOODEN = 392,
+  ARROW_WOODEN_POISON = 394,
   ASSASSIN = 254,
   AUTOWALLTORCH = 100,
   BABYLON_FLOOR = 18,
@@ -9751,7 +9993,7 @@ TILE_CODE = {
   BOMB_BOX = 284,
   BONE_BLOCK = 6,
   BONE_KEY = 305,
-  BOOMBOX = 392,
+  BOOMBOX = 397,
   BOOMERANG = 318,
   BOULDER = 378,
   BUBBLE_PLATFORM = 369,
@@ -9834,7 +10076,7 @@ TILE_CODE = {
   EGGPLANT_CHILD = 159,
   EGGPLANT_CROWN = 302,
   EGGPLANT_DOOR = 179,
-  EGGPLUP = 407,
+  EGGPLUP = 412,
   EGGSAC = 344,
   EGGSAC_BOTTOM = 348,
   EGGSAC_LEFT = 345,
@@ -9862,19 +10104,19 @@ TILE_CODE = {
   FORCEFIELD = 217,
   FORCEFIELD_HORIZONTAL = 333,
   FORCEFIELD_HORIZONTAL_TOP = 334,
-  FORCEFIELD_TIMED = 411,
+  FORCEFIELD_TIMED = 416,
   FORCEFIELD_TOP = 70,
   FOUNTAIN_DRAIN = 143,
   FOUNTAIN_HEAD = 142,
   FROG = 259,
   FROG_ORANGE = 260,
-  FURNITURE_CHAIR_LOOKING_LEFT = 400,
-  FURNITURE_CHAIR_LOOKING_RIGHT = 401,
-  FURNITURE_CONSTRUCTION_SIGN = 397,
-  FURNITURE_DININGTABLE = 402,
-  FURNITURE_DRESSER = 393,
-  FURNITURE_SIDETABLE = 404,
-  FURNITURE_SINGLEBED = 398,
+  FURNITURE_CHAIR_LOOKING_LEFT = 405,
+  FURNITURE_CHAIR_LOOKING_RIGHT = 406,
+  FURNITURE_CONSTRUCTION_SIGN = 402,
+  FURNITURE_DININGTABLE = 407,
+  FURNITURE_DRESSER = 398,
+  FURNITURE_SIDETABLE = 409,
+  FURNITURE_SINGLEBED = 403,
   GHIST_DOOR2 = 48,
   GHIST_PRESENT = 358,
   GHIST_SHOPKEEPER = 220,
@@ -9907,7 +10149,7 @@ TILE_CODE = {
   HOUYIBOW = 205,
   HUMPHEAD = 331,
   HUNDUN = 261,
-  HUNDUN_SPIKES = 403,
+  HUNDUN_SPIKES = 408,
   ICEFLOOR = 152,
   IDOL = 186,
   IDOL_FLOOR = 187,
@@ -9957,7 +10199,7 @@ TILE_CODE = {
   MOUNT_AXOLOTL = 329,
   MOUNT_QILIN = 330,
   MOUNT_ROCKDOG = 328,
-  MOVABLE_SPIKES = 391,
+  MOVABLE_SPIKES = 396,
   MUMMY = 133,
   MUSHROOM_BASE = 103,
   NECROMANCER = 136,
@@ -9982,7 +10224,7 @@ TILE_CODE = {
   PALACE_SIGN = 359,
   PALACE_TABLE = 167,
   PALACE_TABLE_TRAY = 168,
-  PANGXIE = 410,
+  PANGXIE = 415,
   PARACHUTE = 297,
   PASTE = 294,
   PEN_FLOOR = 224,
@@ -9999,9 +10241,9 @@ TILE_CODE = {
   POT = 108,
   POTOFGOLD = 90,
   POWDER_KEG = 54,
-  POWDER_KEG_TIMED = 412,
+  POWDER_KEG_TIMED = 417,
   PRESENT = 332,
-  PROTO_GENERATOR = 406,
+  PROTO_GENERATOR = 411,
   PROTO_SHOPKEEPER = 355,
   PUNISHBALL = 370,
   PUNISHBALL_ATTACH = 371,
@@ -10011,7 +10253,7 @@ TILE_CODE = {
   PUNISHBALL_ATTACH_TOP = 387,
   PUSH_BLOCK = 53,
   QUICKSAND = 66,
-  QUILLBACK = 396,
+  QUILLBACK = 401,
   REDSKELETON = 244,
   REGENERATING_BLOCK = 31,
   ROBOT = 123,
@@ -10044,7 +10286,7 @@ TILE_CODE = {
   SINGLEBED = 73,
   SISTER = 226,
   SKELETON = 243,
-  SKELETON_KEY = 395,
+  SKELETON_KEY = 400,
   SKULL = 390,
   SKULL_DROP_TRAP = 353,
   SLEEPING_HIREDHAND = 222,
@@ -10055,7 +10297,7 @@ TILE_CODE = {
   SNAP_TRAP = 112,
   SORCERESS = 134,
   SPARK_TRAP = 163,
-  SPARROW = 405,
+  SPARROW = 410,
   SPECS = 289,
   SPIDER = 350,
   SPIDER_FALLING = 351,
@@ -10064,7 +10306,7 @@ TILE_CODE = {
   SPIKEBALL_NO_BOUNCE = 377,
   SPIKEBALL_TRAP = 376,
   SPIKES = 51,
-  SPIKES_UPSIDEDOWN = 413,
+  SPIKES_UPSIDEDOWN = 418,
   SPRING_TRAP = 151,
   STARTING_EXIT = 44,
   STICKY_TRAP = 177,
@@ -10082,7 +10324,7 @@ TILE_CODE = {
   TEMPLE_FLOOR = 16,
   THIEF = 228,
   THINICE = 153,
-  THIN_ICE = 394,
+  THIN_ICE = 399,
   THORN_VINE = 56,
   TIAMAT = 172,
   TIKIMAN = 118,
@@ -10095,12 +10337,12 @@ TILE_CODE = {
   TREASURE_VAULTCHEST = 89,
   TREE_BASE = 102,
   TRUE_CROWN = 303,
-  TUN = 408,
+  TUN = 413,
   TURKEY = 104,
   TUTORIAL_MENU_SIGN = 274,
   TUTORIAL_SPEEDRUN_SIGN = 273,
   TV = 81,
-  UDJAT_CHEST = 399,
+  UDJAT_CHEST = 404,
   UDJAT_EYE = 298,
   UDJAT_KEY = 272,
   UDJAT_SOCKET = 194,
@@ -10110,8 +10352,9 @@ TILE_CODE = {
   USHABTI = 71,
   VAMPIRE = 249,
   VAMPIRE_FLYING = 250,
-  VAN_HORSING = 409,
+  VAN_HORSING = 414,
   VAULT_WALL = 195,
+  VENOM = 391,
   VINE = 34,
   VLAD = 126,
   VLADS_CAPE = 308,
@@ -10811,3 +11054,4 @@ local MAX_PLAYERS = 4
 ---@alias SHORT_TILE_CODE integer;
 ---@alias STRINGID integer;
 ---@alias FEAT integer;
+---@alias KEY integer;
