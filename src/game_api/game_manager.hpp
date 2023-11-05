@@ -91,6 +91,25 @@ struct GameProps
     bool unknown9;
     bool unknown10;
     // there's more stuff here
+    std::array<size_t*, 12> unknown11; // pointers to something
+
+    int8_t input_index[5]; // not sure, just came up with this name, if not used it's -1
+    // for example if you just run the game and use OL to warp somewhere immediately there will be no controller setup, so all of those will be -1
+
+    // uint8_t padding_probably1[3];
+
+    int32_t unknown12; // -1
+    int8_t unknown13;  // -1
+
+    // uint8_t padding_probably2[3];
+
+    size_t unknown14; // probably not one thig
+    uint32_t unknown15;
+
+    // uint32_t padding_probably3;
+    size_t* unknown16;
+    size_t unknwon17;
+    double unknown18; // counts time or something? only active when the game window is active
 };
 
 struct GameManager
@@ -118,7 +137,7 @@ struct GameManager
     size_t unknown_screen_team_select;      // available in State
     ScreenCamp* screen_camp;
     ScreenLevel* screen_level;
-    size_t screen_transition;            // available in State, but it's a different object! this one only has a render_timer
+    size_t* screen_transition;           // available in State, but it's a different object! this one only has a render_timer
     size_t unknown_screen_death;         // available in State
     size_t unknown_screen_spaceship;     // (also not) available in State
     size_t unknown_screen_win;           // available in State
@@ -131,8 +150,8 @@ struct GameManager
     size_t unknown_screen_arena_items;   // available in State
     size_t unknown_screen_arena_select;  // available in State
     size_t unknown_screen_arena_intro;   // available in State
-    size_t screen_arena_level;           // also available in State, but it's a different object! this one only has a render_timer, no UI parts
-    size_t unknown_screen_arena_score;   // available in State
+    size_t* screen_arena_level;          // also available in State, but it's a different object! this one only has a render_timer, no UI parts
+    size_t* unknown_screen_arena_score;  // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;
     PauseUI* pause_ui;

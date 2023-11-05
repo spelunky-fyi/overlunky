@@ -2248,6 +2248,8 @@ set_callback(function()
 
 ```
 
+Derived from [Screen](#Screen)
+
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2255,6 +2257,8 @@ int | [sequence_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 int | [animation_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_timer) | 
 float | [constellation_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text_opacity) | 
 float | [constellation_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text) | 
+[SoundMeta](#SoundMeta) | [explosion_and_loop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_and_loop) | 
+[SoundMeta](#SoundMeta) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
 
 ### ScreenCredits
 
@@ -2301,7 +2305,6 @@ Derived from [Screen](#Screen)
 Type | Name | Description
 ---- | ---- | -----------
 int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
-int | [time_till_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_till_death_screen) | Delay after player death to open the death screen
 
 ### ScreenLogo
 
@@ -2531,6 +2534,25 @@ float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/ov
 [TextureRenderingInfo](#TextureRenderingInfo) | [topleft_woodpanel_esc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [start_sidepanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel) | 
 float | [start_sidepanel_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel_slidein_timer) | 
+
+### ScreenStateCamp
+
+Derived from [Screen](#Screen)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [time_till_reset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_till_reset) | Delay after player death to reset camp
+
+### ScreenStateLevel
+
+Derived from [Screen](#Screen)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+int | [time_till_death_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_till_death_screen) | Delay after player death to open the death screen
 
 ### ScreenTeamSelect
 
@@ -2929,8 +2951,10 @@ int | [correct_ushabti](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=camera_layer) | 
 int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
 int | [transition_to_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_to_layer) | 
-[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
+[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
+[ScreenStateCamp](#ScreenStateCamp) | [screen_camp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) | 
+[ScreenStateLevel](#ScreenStateLevel) | [screen_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 
 [ScreenDeath](#ScreenDeath) | [screen_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_death) | 
 [ScreenWin](#ScreenWin) | [screen_win](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_win) | 

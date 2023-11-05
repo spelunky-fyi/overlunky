@@ -350,8 +350,10 @@ void register_usertypes(sol::state& lua)
     statememory_type["camera_layer"] = &StateMemory::camera_layer;
     statememory_type["layer_transition_timer"] = &StateMemory::layer_transition_timer;
     statememory_type["transition_to_layer"] = &StateMemory::transition_to_layer;
-    statememory_type["screen_team_select"] = &StateMemory::screen_team_select;
     statememory_type["screen_character_select"] = &StateMemory::screen_character_select;
+    statememory_type["screen_team_select"] = &StateMemory::screen_team_select;
+    statememory_type["screen_camp"] = &StateMemory::screen_camp;
+    statememory_type["screen_level"] = &StateMemory::screen_level;
     statememory_type["screen_transition"] = &StateMemory::screen_transition;
     statememory_type["screen_death"] = &StateMemory::screen_death;
     statememory_type["screen_win"] = &StateMemory::screen_win;

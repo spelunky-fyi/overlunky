@@ -24,9 +24,9 @@ class Screen
     uint32_t unknown_zero;
 
     virtual void init() = 0;
-    virtual void handle_player() = 0; // for normal level: death, camera zoom (level/shop), camera bounds, some save data stuff
+    virtual void update() = 0; // runs each frame, for level screens: death, camera zoom (level/shop), camera bounds, some save data stuff
     virtual ~Screen() = 0;
-    virtual void render() = 0; // mostly used by the non gameplay screens to draw textures and text
+    virtual void render() = 0; // mostly used by the non gameplay screens to draw textures, text, UI
 
     std::uint32_t reserve_callback_id();
     void unhook(std::uint32_t id);
@@ -474,18 +474,32 @@ class ScreenTeamSelect : public Screen // ID: 10
     uint32_t unknown7;
 };
 
-class ScreenCamp : public Screen // ID: 11
+class ScreenCamp : public Screen // ID: 11 GameManager
 {
   public:
     uint8_t buttons;
 };
 
-class ScreenLevel : public Screen // ID: 12
+class ScreenStateCamp : public Screen // ID: 11 StateMemory
+{
+  public:
+    /// Delay after player death to reset camp
+    uint8_t time_till_reset;
+};
+
+class ScreenStateLevel : public Screen // ID: 12 StateMemory
 {
   public:
     uint8_t buttons;
     /// Delay after player death to open the death screen
-    int8_t time_till_death_screen;
+    uint8_t time_till_death_screen;
+};
+
+class ScreenLevel : public Screen // ID: 12 GameManager
+{
+  public:
+    uint8_t buttons;
+    // garbage here ?
 };
 
 class ScreenTransition : public Screen // ID: 13

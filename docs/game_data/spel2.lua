@@ -2062,8 +2062,10 @@ do
     ---@field camera_layer integer
     ---@field layer_transition_timer integer
     ---@field transition_to_layer integer
-    ---@field screen_team_select ScreenTeamSelect
     ---@field screen_character_select ScreenCharacterSelect
+    ---@field screen_team_select ScreenTeamSelect
+    ---@field screen_camp ScreenStateCamp
+    ---@field screen_level ScreenStateLevel
     ---@field screen_transition ScreenTransition
     ---@field screen_death ScreenDeath
     ---@field screen_win ScreenWin
@@ -5679,7 +5681,13 @@ function Quad:is_point_inside(x, y, epsilon) end
 ---@class ScreenCamp : Screen
     ---@field buttons integer
 
+---@class ScreenStateCamp : Screen
+    ---@field time_till_reset integer @Delay after player death to reset camp
+
 ---@class ScreenLevel : Screen
+    ---@field buttons integer
+
+---@class ScreenStateLevel : Screen
     ---@field buttons integer
     ---@field time_till_death_screen integer @Delay after player death to open the death screen
 
@@ -5753,11 +5761,13 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field animation_timer integer
     ---@field woodpanel_slidedown_timer number
 
----@class ScreenConstellation
+---@class ScreenConstellation : Screen
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
     ---@field constellation_text number
+    ---@field explosion_and_loop SoundMeta
+    ---@field music SoundMeta
 
 ---@class ScreenRecap : Screen
 

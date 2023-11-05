@@ -48,7 +48,9 @@ void register_usertypes(sol::state& lua)
     lua["Screen"]["as_screen_character_select"] = &Screen::as<ScreenCharacterSelect>;
     lua["Screen"]["as_screen_team_select"] = &Screen::as<ScreenTeamSelect>;
     lua["Screen"]["as_screen_camp"] = &Screen::as<ScreenCamp>;
+    lua["Screen"]["as_screen_state_camp"] = &Screen::as<ScreenStateCamp>; // probably not needed
     lua["Screen"]["as_screen_level"] = &Screen::as<ScreenLevel>;
+    lua["Screen"]["as_screen_state_level"] = &Screen::as<ScreenStateLevel>; // probably not needed
     lua["Screen"]["as_screen_transition"] = &Screen::as<ScreenTransition>;
     lua["Screen"]["as_screen_death"] = &Screen::as<ScreenDeath>;
     lua["Screen"]["as_screen_win"] = &Screen::as<ScreenWin>;
@@ -343,12 +345,26 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Screen>());
 
+    lua.new_usertype<ScreenStateCamp>(
+        "ScreenStateCamp",
+        "time_till_reset",
+        &ScreenStateCamp::time_till_reset,
+        sol::base_classes,
+        sol::bases<Screen>());
+
     lua.new_usertype<ScreenLevel>(
         "ScreenLevel",
         "buttons",
         &ScreenLevel::buttons,
+        sol::base_classes,
+        sol::bases<Screen>());
+
+    lua.new_usertype<ScreenStateLevel>(
+        "ScreenStateLevel",
+        "buttons",
+        &ScreenStateLevel::buttons,
         "time_till_death_screen",
-        &ScreenLevel::time_till_death_screen,
+        &ScreenStateLevel::time_till_death_screen,
         sol::base_classes,
         sol::bases<Screen>());
 
@@ -459,11 +475,11 @@ void register_usertypes(sol::state& lua)
         "constellation_text",
         sol::property([](ScreenConstellation& s) -> std::u16string_view
                       {
-                          std::u16string_view str(s.constellation_text);
+                          std::u16string_view str(s.constellation_text) /**/;
                           return str; },
                       [](ScreenConstellation& s, std::u16string new_str)
                       {
-                          const char16_t* src = new_str.c_str();
+                          const char16_t* src = new_str.c_str() /**/;
                           char16_t* temp = s.constellation_text;
                           unsigned int n = 0;
                           while ((*temp++ = *src++) != 0)
