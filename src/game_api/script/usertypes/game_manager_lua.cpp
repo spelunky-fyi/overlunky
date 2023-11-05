@@ -97,31 +97,51 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::timer,
         "slide_position",
         &JournalPopupUI::slide_position);
-    lua.new_usertype<SomeInput>(
-        "SomeInput",
+    lua.new_usertype<InputDevice>(
+        "InputDevice",
+        "disabled",
+        &InputDevice::disabled,
         "enabled",
-        &SomeInput::enabled,
+        &InputDevice::enabled,
+        "menu_input",
+        &InputDevice::menu_input,
+        "connected",
+        &InputDevice::connected,
         "input_index",
-        &SomeInput::input_index,
+        &InputDevice::input_index,
         "buttons",
-        &SomeInput::buttons);
+        &InputDevice::buttons);
     lua.new_usertype<GameProps>(
         "GameProps",
         "buttons",
-        &GameProps::buttons,
-        "buttons_extra",
-        &GameProps::buttons_extra,
-        "buttons_menu_previous",
-        &GameProps::buttons_menu_previous,
+        [](GameProps& gp) -> uint32_t
+        {
+            return gp.buttons[1];
+        },
+        "buttons_previous",
+        [](GameProps& gp) -> uint32_t
+        {
+            return gp.buttons_previous[1];
+        },
         "buttons_menu",
         &GameProps::buttons_menu,
+        "buttons_menu_previous",
+        &GameProps::buttons_menu_previous,
+        "input",
+        &GameProps::buttons,
+        "input_previous",
+        &GameProps::buttons_previous,
+        "input_menu",
+        &GameProps::buttons_menu,
+        "input_menu_previous",
+        &GameProps::buttons_menu_previous,
         "game_has_focus",
         &GameProps::game_has_focus,
         "modal_open",
         sol::property([](GameProps& gp)
                       { return gp.modal_open == 0; }),
-        "some_input",
-        &GameProps::some_input,
+        "input_device",
+        &GameProps::input_device,
         "input_index",
         &GameProps::input_index);
     lua.new_usertype<RawInput>(

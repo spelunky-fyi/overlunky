@@ -98,10 +98,12 @@ struct RawInput
     std::array<ControllerInput, 12> controller;
 };
 
-struct SomeInput
+struct InputDevice
 {
+    bool disabled;
     bool enabled;
-    uint8_t padding1[3];
+    bool menu_input;
+    bool connected;
     int8_t input_index;
     uint8_t padding2[3];
     uint32_t buttons;
@@ -109,26 +111,19 @@ struct SomeInput
 
 struct GameProps
 {
-    /// Might be used for some menu inputs not found in buttons_menu
-    uint32_t buttons;
-    uint32_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
-    /// Might be used for some menu inputs not found in buttons_menu
-    uint32_t buttons_extra;
-    uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
+    /// Might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.PRE_UPDATE or ON.POST_PROCESS_INPUT.
+    std::array<uint32_t, MAX_PLAYERS> buttons;
+    std::array<uint32_t, MAX_PLAYERS> buttons_previous;
     /// Previous state of buttons_menu
     MENU_INPUT buttons_menu_previous;
-    /// Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
+    /// Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE or ON.POST_PROCESS_INPUT.
     MENU_INPUT buttons_menu;
     int8_t modal_open;
     bool game_has_focus;
     bool unknown9;
     bool unknown10;
     /// Yet another place for some buttons in some random order, too tired to make another enum for them
-    std::array<SomeInput*, 12> some_input;
+    std::array<InputDevice*, 12> input_device;
 
     /// Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
     std::array<int8_t, 5> input_index;
