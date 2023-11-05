@@ -1913,6 +1913,9 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
         g_game_manager->main_menu_music->kill(false);
         g_game_manager->main_menu_music = nullptr;
     }
+
+    // TODO: this doesn't quite work, loads intro after character selection
+    g_state->screen_character_select->available_mine_entrances = 4;
 }
 
 std::string get_clipboard()

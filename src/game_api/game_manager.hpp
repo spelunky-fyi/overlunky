@@ -195,3 +195,4 @@ struct GameManager
 };
 
 GameManager* get_game_manager();
+RawInput* get_raw_input();

@@ -144,11 +144,7 @@ void register_usertypes(sol::state& lua)
         "pressed",
         &ControllerButton::pressed);
 
-    lua["get_raw_input"] = []() -> RawInput*
-    {
-        // TODO:temp, move to rpc or something
-        static auto offset = get_address("input_table");
-        return reinterpret_cast<RawInput*>(offset);
-    };
+    /// Returns RawInput, a game structure for raw keyboard and controller state
+    lua["get_raw_input"] = get_raw_input;
 }
 }; // namespace NGM
