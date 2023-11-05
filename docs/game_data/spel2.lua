@@ -2249,10 +2249,6 @@ do
     ---@field buttons integer
 
 ---@class GameProps
-    ---@field buttons integer
-    ---@field buttons_previous integer
-    ---@field buttons_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
-    ---@field buttons_menu_previous MENU_INPUT @Previous state of buttons_menu
     ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input_previous integer[] @size: MAX_PLAYERS
     ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT

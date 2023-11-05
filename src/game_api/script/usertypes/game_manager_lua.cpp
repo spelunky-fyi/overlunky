@@ -105,20 +105,12 @@ void register_usertypes(sol::state& lua)
         &InputDevice::buttons);
     lua.new_usertype<GameProps>(
         "GameProps",
+        /// NoDoc
         "buttons",
         [](GameProps& gp) -> uint32_t
         {
-            return gp.buttons[1];
+            return gp.buttons[0];
         },
-        "buttons_previous",
-        [](GameProps& gp) -> uint32_t
-        {
-            return gp.buttons_previous[1];
-        },
-        "buttons_menu",
-        &GameProps::buttons_menu,
-        "buttons_menu_previous",
-        &GameProps::buttons_menu_previous,
         "input",
         &GameProps::buttons,
         "input_previous",
@@ -134,6 +126,7 @@ void register_usertypes(sol::state& lua)
                       { return gp.menu_icon_slot != -1; }),
         "input_index",
         &GameProps::input_index);
+
     lua.new_usertype<RawInput>(
         "RawInput",
         "keyboard",
