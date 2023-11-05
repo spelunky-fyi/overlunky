@@ -962,6 +962,9 @@
                             <a href="#get_io" class="toc-h3 toc-link" data-title="get_io">get_io</a>
                           </li>
                           <li>
+                            <a href="#get_raw_input" class="toc-h3 toc-link" data-title="get_raw_input">get_raw_input</a>
+                          </li>
+                          <li>
                             <a href="#mouse_position" class="toc-h3 toc-link" data-title="mouse_position">mouse_position</a>
                           </li>
                       </ul>
@@ -1751,6 +1754,9 @@
                             <a href="#Color" class="toc-h3 toc-link" data-title="Color">Color</a>
                           </li>
                           <li>
+                            <a href="#ControllerButton" class="toc-h3 toc-link" data-title="ControllerButton">ControllerButton</a>
+                          </li>
+                          <li>
                             <a href="#CutsceneBehavior" class="toc-h3 toc-link" data-title="CutsceneBehavior">CutsceneBehavior</a>
                           </li>
                           <li>
@@ -1770,6 +1776,9 @@
                           </li>
                           <li>
                             <a href="#ItemOwnerDetails" class="toc-h3 toc-link" data-title="ItemOwnerDetails">ItemOwnerDetails</a>
+                          </li>
+                          <li>
+                            <a href="#KeyboardKey" class="toc-h3 toc-link" data-title="KeyboardKey">KeyboardKey</a>
                           </li>
                           <li>
                             <a href="#Letter" class="toc-h3 toc-link" data-title="Letter">Letter</a>
@@ -1822,16 +1831,25 @@
                     <a href="#Input-types" class="toc-h2 toc-link" data-title="Input types">Input types</a>
                       <ul class="toc-list-h3">
                           <li>
+                            <a href="#ControllerInput" class="toc-h3 toc-link" data-title="ControllerInput">ControllerInput</a>
+                          </li>
+                          <li>
                             <a href="#Gamepad" class="toc-h3 toc-link" data-title="Gamepad">Gamepad</a>
                           </li>
                           <li>
                             <a href="#ImGuiIO" class="toc-h3 toc-link" data-title="ImGuiIO">ImGuiIO</a>
                           </li>
                           <li>
+                            <a href="#InputDevice" class="toc-h3 toc-link" data-title="InputDevice">InputDevice</a>
+                          </li>
+                          <li>
                             <a href="#InputMapping" class="toc-h3 toc-link" data-title="InputMapping">InputMapping</a>
                           </li>
                           <li>
                             <a href="#PlayerInputs" class="toc-h3 toc-link" data-title="PlayerInputs">PlayerInputs</a>
+                          </li>
+                          <li>
+                            <a href="#RawInput" class="toc-h3 toc-link" data-title="RawInput">RawInput</a>
                           </li>
                       </ul>
                   </li>
@@ -3564,6 +3582,12 @@
                   </li>
                   <li>
                     <a href="#ON-POST_LAYER_DESTRUCTION" class="toc-h2 toc-link" data-title="ON.POST_LAYER_DESTRUCTION">ON.POST_LAYER_DESTRUCTION</a>
+                  </li>
+                  <li>
+                    <a href="#ON-PRE_PROCESS_INPUT" class="toc-h2 toc-link" data-title="ON.PRE_PROCESS_INPUT">ON.PRE_PROCESS_INPUT</a>
+                  </li>
+                  <li>
+                    <a href="#ON-POST_PROCESS_INPUT" class="toc-h2 toc-link" data-title="ON.POST_PROCESS_INPUT">ON.POST_PROCESS_INPUT</a>
                   </li>
               </ul>
           </li>
@@ -5452,6 +5476,12 @@ Look at the example on how to mimic game layer switching behavior</p>
 <li>Note: <a href="#Overlunky">Overlunky</a>/etc will eat all keys it is currently configured to use, your script will only get leftovers.</li>
 <li>Note: <a href="#Gamepad">Gamepad</a> is basically <a href="https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad">XINPUT_GAMEPAD</a> but variables are renamed and values are normalized to -1.0..1.0 range.</li>
 </ul>
+<h3 id='get_raw_input'>get_raw_input</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_raw_input">get_raw_input</a></p>
+</blockquote>
+<h4 id='RawInput-get_raw_input'><a href="#RawInput">RawInput</a> get_raw_input()</h4>
+<p>Returns <a href="#RawInput">RawInput</a>, a game structure for raw keyboard and controller state</p>
 <h3 id='mouse_position'>mouse_position</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mouse_position">mouse_position</a></p>
@@ -9199,6 +9229,25 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Copies the values of different <a href="#Color">Color</a> to this one</td>
 </tr>
 </tbody></table>
+<h3 id='ControllerButton'>ControllerButton</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=down">down</a></td>
+<td><a href="#Button">Button</a> is being held</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pressed">pressed</a></td>
+<td><a href="#Button">Button</a> was just pressed down this frame</td>
+</tr>
+</tbody></table>
 <h3 id='CutsceneBehavior'>CutsceneBehavior</h3>
 <table><thead>
 <tr>
@@ -9419,6 +9468,20 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=owner_uid">owner_uid</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='KeyboardKey'>KeyboardKey</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=down">down</a></td>
+<td>Key is being held</td>
 </tr>
 </tbody></table>
 <h3 id='Letter'>Letter</h3>
@@ -10190,7 +10253,21 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 </tbody></table>
-<h2 id='Input-types'>Input types</h2><h3 id='Gamepad'>Gamepad</h3>
+<h2 id='Input-types'>Input types</h2><h3 id='ControllerInput'>ControllerInput</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>array&lt;<a href="#ControllerButton">ControllerButton</a>, 16&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='Gamepad'>Gamepad</h3>
 <p>Used in <a href="#ImGuiIO">ImGuiIO</a></p>
 
 <table><thead>
@@ -10352,6 +10429,25 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='InputDevice'>InputDevice</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_index">input_index</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='InputMapping'>InputMapping</h3>
 <p>Used in <a href="#PlayerSlot">PlayerSlot</a></p>
 
@@ -10482,6 +10578,25 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td><a href="#PlayerSlotSettings">PlayerSlotSettings</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_slot_4_settings">player_slot_4_settings</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='RawInput'>RawInput</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>array&lt;<a href="#KeyboardKey">KeyboardKey</a>, 112&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyboard">keyboard</a></td>
+<td>State of all keyboard buttons in a random game order as usual</td>
+</tr>
+<tr>
+<td>array&lt;<a href="#ControllerInput">ControllerInput</a>, 12&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=controller">controller</a></td>
+<td>State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.</td>
 </tr>
 </tbody></table>
 <h2 id='Journal-types'>Journal types</h2><h3 id='JournalPage'>JournalPage</h3>
@@ -16140,24 +16255,24 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
-<td>Might be used for some menu inputs not found in buttons_menu</td>
+<td>array&lt;int, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input">input</a></td>
+<td>Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in <a href="#ON">ON</a>.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.</td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_extra">buttons_extra</a></td>
-<td>Might be used for some menu inputs not found in buttons_menu</td>
+<td>array&lt;int, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_previous">input_previous</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="#MENU_INPUT">MENU_INPUT</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_menu_previous">buttons_menu_previous</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_menu">input_menu</a></td>
+<td>Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in <a href="#ON">ON</a>.POST_PROCESS_INPUT</td>
+</tr>
+<tr>
+<td><a href="#MENU_INPUT">MENU_INPUT</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_menu_previous">input_menu_previous</a></td>
 <td>Previous state of buttons_menu</td>
-</tr>
-<tr>
-<td><a href="#MENU_INPUT">MENU_INPUT</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_menu">buttons_menu</a></td>
-<td>Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in <a href="#ON">ON</a>.PRE_UPDATE.</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -16166,8 +16281,13 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 <tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modal_open">modal_open</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=menu_open">menu_open</a></td>
 <td></td>
+</tr>
+<tr>
+<td>array&lt;int, 5&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_index">input_index</a></td>
+<td>Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers</td>
 </tr>
 </tbody></table>
 <h3 id='Items'>Items</h3>
@@ -28953,6 +29073,18 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </blockquote>
 
 <p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<h2 id='ON-PRE_PROCESS_INPUT'>ON.PRE_PROCESS_INPUT</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_PROCESS_INPUT">ON.PRE_PROCESS_INPUT</a></p>
+</blockquote>
+
+<p>Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.<br/></p>
+<h2 id='ON-POST_PROCESS_INPUT'>ON.POST_PROCESS_INPUT</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_PROCESS_INPUT">ON.POST_PROCESS_INPUT</a></p>
+</blockquote>
+
+<p>Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/></p>
 <h1 id='Enums'>Enums</h1>
 <p>Enums are like numbers but in text that&#39;s easier to remember.</p>
 <div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -31895,6 +32027,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_DESTRUCTION">POST_LAYER_DESTRUCTION</a></td>
 <td>ON::POST_LAYER_DESTRUCTION</td>
 <td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_PROCESS_INPUT">PRE_PROCESS_INPUT</a></td>
+<td>ON::PRE_PROCESS_INPUT</td>
+<td>Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_PROCESS_INPUT">POST_PROCESS_INPUT</a></td>
+<td>ON::POST_PROCESS_INPUT</td>
+<td>Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>
