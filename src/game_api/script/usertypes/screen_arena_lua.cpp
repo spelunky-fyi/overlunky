@@ -61,6 +61,9 @@ void register_usertypes(sol::state& lua)
     screenarenamenu_type["esc_next_panels_slide_timer"] = &ScreenArenaMenu::esc_next_panels_slide_timer;
     screenarenamenu_type["main_panel_vertical_scroll_position"] = &ScreenArenaMenu::main_panel_vertical_scroll_position;
     screenarenamenu_type["selected_option_index"] = &ScreenArenaMenu::selected_option_index;
+    screenarenamenu_type["direction_input"] = &ScreenArenaMenu::direction_input;
+    screenarenamenu_type["hold_down_timer"] = &ScreenArenaMenu::hold_down_timer;
+    screenarenamenu_type["fast_scroll_timer"] = &ScreenArenaMenu::fast_scroll_timer;
 
     lua.new_usertype<ScreenZoomAnimation>(
         "ScreenZoomAnimation",

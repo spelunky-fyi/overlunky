@@ -98,18 +98,30 @@ struct GameProps
 
     // uint8_t padding_probably1[3];
 
-    int32_t unknown12; // -1
-    int8_t unknown13;  // -1
+    int32_t next_player_entrence;
+    int8_t unknown13; // -1 (leader player slot?)
+    int8_t unknown13;
 
-    // uint8_t padding_probably2[3];
+    // uint8_t padding_probably2[2];
 
-    size_t unknown14; // probably not one thig
+    uint32_t unknown14a;
+    int8_t unknown14b; // -1
+
+    // uint8_t padding_probably3[3];
+
     uint32_t unknown15;
 
-    // uint32_t padding_probably3;
+    // uint32_t padding_probably4;
     size_t* unknown16;
     size_t unknwon17;
-    double unknown18; // counts time or something? only active when the game window is active
+    std::array<double, 4> unknown18; // counts time or something? only active when the game window is active when there is a player choosen?
+    int32_t unknown19;
+    int32_t unknown20; // -1
+    size_t unknown21;
+    size_t unknown22;
+    bool unknown23;
+
+    // seam like only garbage below
 };
 
 struct GameManager

@@ -76,6 +76,13 @@ class ScreenArenaMenu : public Screen // ID: 21
     float esc_next_panels_slide_timer;
     float main_panel_vertical_scroll_position;
     uint32_t selected_option_index;
+    uint32_t unknown53;
+    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    uint32_t direction_input;
+    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    uint32_t hold_down_timer;
+    uint32_t fast_scroll_timer;
+    uint8_t unknown57[3]; // last one is 16 unless you go in level/item select screen, then it turns 17
 };
 
 class ScreenArenaStagesSelect : public Screen // ID: 22 and 24

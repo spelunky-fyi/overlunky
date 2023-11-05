@@ -2063,16 +2063,16 @@ do
     ---@field layer_transition_timer integer
     ---@field transition_to_layer integer
     ---@field screen_character_select ScreenCharacterSelect
-    ---@field screen_team_select ScreenTeamSelect
+    ---@field screen_team_select ScreenTeamSelect @For the arena
     ---@field screen_camp ScreenStateCamp
     ---@field screen_level ScreenStateLevel
     ---@field screen_transition ScreenTransition
     ---@field screen_death ScreenDeath
     ---@field screen_win ScreenWin
-    ---@field screen_credits ScreenCredits
-    ---@field screen_scores ScreenScores
+    ---@field screen_credits ScreenCredits @The spaceship minigame
+    ---@field screen_scores ScreenScores @Landing on the moon after win
     ---@field screen_constellation ScreenConstellation
-    ---@field screen_recap ScreenRecap
+    ---@field screen_recap ScreenRecap @Journal after CO win
     ---@field screen_arena_stages_select ScreenArenaStagesSelect
     ---@field screen_arena_intro ScreenArenaIntro
     ---@field screen_arena_level ScreenArenaLevel
@@ -5672,6 +5672,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field left_arrow TextureRenderingInfo
     ---@field right_arrow TextureRenderingInfo
     ---@field start_panel TextureRenderingInfo
+    ---@field go_back_wooden_panel TextureRenderingInfo
     ---@field start_panel_slide_timer number
     ---@field pulsating_arrows_timer number
     ---@field selected_player integer
@@ -6012,6 +6013,9 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field esc_next_panels_slide_timer number
     ---@field main_panel_vertical_scroll_position number
     ---@field selected_option_index integer
+    ---@field direction_input integer @-1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    ---@field hold_down_timer integer @Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    ---@field fast_scroll_timer integer
 
 ---@class ScreenZoomAnimation
     ---@field zoom_target number

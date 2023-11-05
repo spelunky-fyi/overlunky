@@ -2050,6 +2050,9 @@ float | [center_panels_hor_slide_position](https://github.com/spelunky-fyi/overl
 float | [esc_next_panels_slide_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=esc_next_panels_slide_timer) | 
 float | [main_panel_vertical_scroll_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_panel_vertical_scroll_position) | 
 int | [selected_option_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_option_index) | 
+int | [direction_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_input) | -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+int | [hold_down_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hold_down_timer) | Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+int | [fast_scroll_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fast_scroll_timer) | 
 
 ### ScreenArenaScore
 
@@ -2570,6 +2573,7 @@ Type | Name | Description
 [TextureRenderingInfo](#TextureRenderingInfo) | [left_arrow](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_arrow) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [right_arrow](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_arrow) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [start_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_panel) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [go_back_wooden_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=go_back_wooden_panel) | 
 float | [start_panel_slide_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_panel_slide_timer) | 
 float | [pulsating_arrows_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pulsating_arrows_timer) | 
 int | [selected_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_player) | 
@@ -2952,16 +2956,16 @@ int | [camera_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ca
 int | [layer_transition_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer_transition_timer) | 
 int | [transition_to_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transition_to_layer) | 
 [ScreenCharacterSelect](#ScreenCharacterSelect) | [screen_character_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_character_select) | 
-[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | 
+[ScreenTeamSelect](#ScreenTeamSelect) | [screen_team_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_team_select) | For the arena
 [ScreenStateCamp](#ScreenStateCamp) | [screen_camp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) | 
 [ScreenStateLevel](#ScreenStateLevel) | [screen_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) | 
 [ScreenTransition](#ScreenTransition) | [screen_transition](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_transition) | 
 [ScreenDeath](#ScreenDeath) | [screen_death](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_death) | 
 [ScreenWin](#ScreenWin) | [screen_win](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_win) | 
-[ScreenCredits](#ScreenCredits) | [screen_credits](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_credits) | 
-[ScreenScores](#ScreenScores) | [screen_scores](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_scores) | 
+[ScreenCredits](#ScreenCredits) | [screen_credits](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_credits) | The spaceship minigame
+[ScreenScores](#ScreenScores) | [screen_scores](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_scores) | Landing on the moon after win
 [ScreenConstellation](#ScreenConstellation) | [screen_constellation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_constellation) | 
-[ScreenRecap](#ScreenRecap) | [screen_recap](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_recap) | 
+[ScreenRecap](#ScreenRecap) | [screen_recap](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_recap) | Journal after CO win
 [ScreenArenaStagesSelect](#ScreenArenaStagesSelect) | [screen_arena_stages_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_stages_select) | 
 [ScreenArenaIntro](#ScreenArenaIntro) | [screen_arena_intro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_intro) | 
 [ScreenArenaLevel](#ScreenArenaLevel) | [screen_arena_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_arena_level) | 

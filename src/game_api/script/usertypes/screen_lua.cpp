@@ -332,6 +332,7 @@ void register_usertypes(sol::state& lua)
     screenteamselect_type["left_arrow"] = &ScreenTeamSelect::left_arrow;
     screenteamselect_type["right_arrow"] = &ScreenTeamSelect::right_arrow;
     screenteamselect_type["start_panel"] = &ScreenTeamSelect::start_panel;
+    screenteamselect_type["go_back_wooden_panel"] = &ScreenTeamSelect::go_back_wooden_panel;
     screenteamselect_type["start_panel_slide_timer"] = &ScreenTeamSelect::start_panel_slide_timer;
     screenteamselect_type["pulsating_arrows_timer"] = &ScreenTeamSelect::pulsating_arrows_timer;
     screenteamselect_type["selected_player"] = &ScreenTeamSelect::selected_player;

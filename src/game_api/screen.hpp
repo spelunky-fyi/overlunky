@@ -463,15 +463,13 @@ class ScreenTeamSelect : public Screen // ID: 10
     TextureRenderingInfo left_arrow;
     TextureRenderingInfo right_arrow;
     TextureRenderingInfo start_panel;
+    TextureRenderingInfo go_back_wooden_panel;
+    float unknown2;
     float start_panel_slide_timer;
     float pulsating_arrows_timer;
     uint8_t selected_player;
     uint8_t buttons;
     bool ready;
-    uint8_t unknown4d;
-    uint32_t unknown5;
-    uint32_t unknown6;
-    uint32_t unknown7;
 };
 
 class ScreenCamp : public Screen // ID: 11 GameManager
@@ -600,6 +598,7 @@ class ScreenTransition : public Screen // ID: 13
 /// The POST render call will only be visible in the polaroid area on the left of the book. The book is apparently drawn on top of that.
 class ScreenDeath : public Screen // ID: 14
 {
+    size_t unknown;
 };
 
 class ScreenWin : public Screen // ID: 16
