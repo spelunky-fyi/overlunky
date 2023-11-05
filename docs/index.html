@@ -2131,6 +2131,12 @@
                             <a href="#ScreenSeedInput" class="toc-h3 toc-link" data-title="ScreenSeedInput">ScreenSeedInput</a>
                           </li>
                           <li>
+                            <a href="#ScreenStateCamp" class="toc-h3 toc-link" data-title="ScreenStateCamp">ScreenStateCamp</a>
+                          </li>
+                          <li>
+                            <a href="#ScreenStateLevel" class="toc-h3 toc-link" data-title="ScreenStateLevel">ScreenStateLevel</a>
+                          </li>
+                          <li>
                             <a href="#ScreenTeamSelect" class="toc-h3 toc-link" data-title="ScreenTeamSelect">ScreenTeamSelect</a>
                           </li>
                           <li>
@@ -14286,6 +14292,8 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
   <span class="k">end</span><span class="p">,</span> <span class="n">ON</span><span class="p">.</span><span class="n">PRE_LOAD_SCREEN</span><span class="p">)</span>
 
 </code></pre></div>
+<p>Derived from <a href="#Screen">Screen</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -14311,6 +14319,16 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=constellation_text">constellation_text</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=explosion_and_loop">explosion_and_loop</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SoundMeta">SoundMeta</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=music">music</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -14397,11 +14415,6 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
 <td></td>
-</tr>
-<tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_till_death_screen">time_till_death_screen</a></td>
-<td>Delay after player death to open the death screen</td>
 </tr>
 </tbody></table>
 <h3 id='ScreenLogo'>ScreenLogo</h3>
@@ -15257,6 +15270,43 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=start_sidepanel_slidein_timer">start_sidepanel_slidein_timer</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='ScreenStateCamp'>ScreenStateCamp</h3>
+<p>Derived from <a href="#Screen">Screen</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_till_reset">time_till_reset</a></td>
+<td>Delay after player death to reset camp</td>
+</tr>
+</tbody></table>
+<h3 id='ScreenStateLevel'>ScreenStateLevel</h3>
+<p>Derived from <a href="#Screen">Screen</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_till_death_screen">time_till_death_screen</a></td>
+<td>Delay after player death to open the death screen</td>
 </tr>
 </tbody></table>
 <h3 id='ScreenTeamSelect'>ScreenTeamSelect</h3>
@@ -16727,13 +16777,23 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
+<td><a href="#ScreenCharacterSelect">ScreenCharacterSelect</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_character_select">screen_character_select</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#ScreenTeamSelect">ScreenTeamSelect</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_team_select">screen_team_select</a></td>
 <td></td>
 </tr>
 <tr>
-<td><a href="#ScreenCharacterSelect">ScreenCharacterSelect</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_character_select">screen_character_select</a></td>
+<td><a href="#ScreenStateCamp">ScreenStateCamp</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_camp">screen_camp</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ScreenStateLevel">ScreenStateLevel</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_level">screen_level</a></td>
 <td></td>
 </tr>
 <tr>
