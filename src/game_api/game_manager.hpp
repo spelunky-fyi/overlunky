@@ -100,25 +100,27 @@ struct RawInput
 
 struct InputDevice
 {
-    bool disabled;
-    bool enabled;
+    // No idea what these actually do, better not to expose this anyway
+    bool unknown1;
+    bool unknown2;
     bool menu_input;
-    bool connected;
+    bool lost_connection;
     int8_t input_index;
     uint8_t padding2[3];
     uint32_t buttons;
+    // a lot more stuff
 };
 
 struct GameProps
 {
-    /// Might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.PRE_UPDATE or ON.POST_PROCESS_INPUT.
+    /// Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT
     std::array<uint32_t, MAX_PLAYERS> buttons;
     std::array<uint32_t, MAX_PLAYERS> buttons_previous;
     /// Previous state of buttons_menu
     MENU_INPUT buttons_menu_previous;
-    /// Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE or ON.POST_PROCESS_INPUT.
+    /// Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
     MENU_INPUT buttons_menu;
-    int8_t modal_open;
+    int8_t menu_icon_slot;
     bool game_has_focus;
     bool unknown9;
     bool unknown10;

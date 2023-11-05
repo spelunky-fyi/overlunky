@@ -99,14 +99,6 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::slide_position);
     lua.new_usertype<InputDevice>(
         "InputDevice",
-        "disabled",
-        &InputDevice::disabled,
-        "enabled",
-        &InputDevice::enabled,
-        "menu_input",
-        &InputDevice::menu_input,
-        "connected",
-        &InputDevice::connected,
         "input_index",
         &InputDevice::input_index,
         "buttons",
@@ -139,9 +131,9 @@ void register_usertypes(sol::state& lua)
         &GameProps::game_has_focus,
         "modal_open",
         sol::property([](GameProps& gp)
-                      { return gp.modal_open == 0; }),
-        "input_device",
-        &GameProps::input_device,
+                      { return gp.menu_icon_slot != 0xff; }),
+        "menu_icon_slot",
+        &GameProps::menu_icon_slot,
         "input_index",
         &GameProps::input_index);
     lua.new_usertype<RawInput>(
