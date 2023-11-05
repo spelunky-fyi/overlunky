@@ -70,6 +70,8 @@ void register_usertypes(sol::state& lua)
     gamemanager_type["journal_ui"] = &GameManager::journal_ui;
     gamemanager_type["save_related"] = &GameManager::save_related;
     gamemanager_type["main_menu_music"] = &GameManager::main_menu_music;
+    gamemanager_type["buttons_controls"] = &GameManager::buttons_controls;
+    gamemanager_type["buttons_movement"] = &GameManager::buttons_movement;
 
     lua.new_usertype<SaveRelated>(
         "SaveRelated",
@@ -97,7 +99,16 @@ void register_usertypes(sol::state& lua)
         "GameProps",
         "buttons",
         &GameProps::buttons,
+        "buttons_extra",
+        &GameProps::buttons_extra,
+        "buttons_menu_previous",
+        &GameProps::buttons_menu_previous,
+        "buttons_menu",
+        &GameProps::buttons_menu,
         "game_has_focus",
-        &GameProps::game_has_focus);
+        &GameProps::game_has_focus,
+        "modal_open",
+        sol::property([](GameProps& gp)
+                      { return gp.modal_open == 0; }));
 }
 }; // namespace NGM

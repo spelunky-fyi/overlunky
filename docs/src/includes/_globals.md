@@ -1371,6 +1371,15 @@ Force the journal to open on a chapter and entry# when pressing the journal butt
 
 Get the current adventure seed pair
 
+### get_bucket
+
+
+> Search script examples for [get_bucket](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bucket)
+
+#### [Bucket](#Bucket) get_bucket()
+
+Returns the [Bucket](#Bucket) of data stored in shared memory between [Overlunky](#Overlunky) and Playlunky
+
 ### get_character_heart_color
 
 
@@ -1397,7 +1406,7 @@ short for state->money_shop_total + loop[inventory.money + inventory.collected_m
 
 #### int get_frame()
 
-Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
 
 ### get_frametime
 
@@ -1416,6 +1425,15 @@ Get engine target frametime (1/framerate, default 1/60).
 #### optional&lt;double&gt; get_frametime_unfocused()
 
 Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+
+### get_global_frame
+
+
+> Search script examples for [get_global_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_global_frame)
+
+#### int get_global_frame()
+
+Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
 
 ### get_hud
 
@@ -1881,6 +1899,15 @@ end, ON.PRE_LOAD_SCREEN)
 
 Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
 
+### set_start_level_paused
+
+
+> Search script examples for [set_start_level_paused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_start_level_paused)
+
+#### nil set_start_level_paused(bool enable)
+
+Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == [PAUSE](#PAUSE).FADE on the first frame to do what you want.
+
 ### set_storage_layer
 
 
@@ -2034,7 +2061,7 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 
 - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+- Note: [Overlunky](#Overlunky)/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 - Note: [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 
 ### mouse_position
@@ -2045,33 +2072,6 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 #### tuple&lt;float, float&gt; mouse_position()
 
 Current mouse cursor position in screen coordinates.
-
-### return_input
-
-
-> Search script examples for [return_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
-
-#### nil return_input(int uid)
-
-Return input previously stolen with [steal_input](#steal_input)
-
-### send_input
-
-
-> Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
-
-#### nil send_input(int uid, [INPUTS](#INPUTS) buttons)
-
-Send input to entity, has to be previously stolen with [steal_input](#steal_input)
-
-### steal_input
-
-
-> Search script examples for [steal_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
-
-#### nil steal_input(int uid)
-
-Steal input from a [Player](#Player), HiredHand or [PlayerGhost](#PlayerGhost)
 
 ## Lighting functions
 
@@ -2693,6 +2693,15 @@ Translate a distance of `x` tiles to screen distance to be be used in drawing fu
 
 Translate an entity position to screen position to be used in drawing functions
 
+### set_camera_position
+
+
+> Search script examples for [set_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
+
+#### nil set_camera_position(float cx, float cy)
+
+Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in [ON](#ON).RENDER_PRE_GAME or similar. See [Camera](#Camera) for proper camera handling with bounds and rubberbanding.
+
 ### set_camp_camera_bounds_enabled
 
 
@@ -2709,7 +2718,16 @@ Enables or disables the default position based camp camera bounds, to set them m
 
 #### nil zoom(float level)
 
-Set the zoom level used in levels and shops. 13.5 is the default.
+Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
+
+### zoom_reset
+
+
+> Search script examples for [zoom_reset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoom_reset)
+
+#### nil zoom_reset()
+
+Reset the default zoom levels for all areas and sets current zoom level to 13.5.
 
 ## Room functions
 
@@ -3696,15 +3714,6 @@ Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow
 This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
 
-### set_camera_position
-
-
-> Search script examples for [set_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
-
-#### nil set_camera_position(float cx, float cy)
-
-this doesn't actually work at all. See State -> [Camera](#Camera) the for proper camera handling
-
 ### setflag
 
 
@@ -3725,6 +3734,30 @@ this doesn't actually work at all. See State -> [Camera](#Camera) the for proper
 > Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 
 `nil testflag()`<br/>
+
+### steal_input
+
+
+> Search script examples for [steal_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
+
+`nil steal_input(int uid)`<br/>
+Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.
+
+### return_input
+
+
+> Search script examples for [return_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
+
+`nil return_input(int uid)`<br/>
+Return input previously stolen with [steal_input](#steal_input)
+
+### send_input
+
+
+> Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
+
+`nil send_input(int uid, INPUTS buttons)`<br/>
+Send input to entity, has to be previously stolen with [steal_input](#steal_input)
 
 ### read_input
 

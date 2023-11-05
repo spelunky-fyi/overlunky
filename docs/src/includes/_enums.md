@@ -465,19 +465,19 @@ Name | Data | Description
 
 Name | Data | Description
 ---- | ---- | -----------
-[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.NONE) | 0 | 
-[JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JUMP) | 1 | 
-[WHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.WHIP) | 2 | 
-[BOMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.BOMB) | 4 | 
-[ROPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.ROPE) | 8 | 
-[RUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RUN) | 16 | 
-[DOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOOR) | 32 | 
-[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.MENU) | 64 | 
-[JOURNAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JOURNAL) | 128 | 
-[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.LEFT) | 256 | 
-[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RIGHT) | 512 | 
-[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.UP) | 1024 | 
-[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOWN) | 2048 | 
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.NONE) | 0x0 | 
+[JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JUMP) | 0x1 | 
+[WHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.WHIP) | 0x2 | 
+[BOMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.BOMB) | 0x4 | 
+[ROPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.ROPE) | 0x8 | 
+[RUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RUN) | 0x10 | 
+[DOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOOR) | 0x20 | 
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.MENU) | 0x40 | 
+[JOURNAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JOURNAL) | 0x80 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.LEFT) | 0x100 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RIGHT) | 0x200 | 
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.UP) | 0x400 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOWN) | 0x800 | 
 
 ## INPUT_FLAG
 
@@ -608,6 +608,17 @@ Name | Data | Description
 [WARNING_ONE_WAY_DOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JUNGLESISTERS.WARNING_ONE_WAY_DOOR) | 4 | 
 [GREAT_PARTY_HUH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JUNGLESISTERS.GREAT_PARTY_HUH) | 5 | 
 [I_WISH_BROUGHT_A_JACKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JUNGLESISTERS.I_WISH_BROUGHT_A_JACKET) | 6 | 
+
+## KEY
+
+
+> Search script examples for [KEY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY.A) | 65 | 
+...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
 
 ## LAYER
 
@@ -747,6 +758,26 @@ Name | Data | Description
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) | 0x4000 | Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA<br/>Various types, all `Entity`<br/>
 [LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER &#124; [MASK](#MASK).LAVA)<br/>
 [ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) | 0x0 | Value of 0, treated by all the functions as ANY mask<br/>
+
+## MENU_INPUT
+
+
+> Search script examples for [MENU_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.NONE) | 0x0 | 
+[SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.SELECT) | 0x1 | 
+[BACK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.BACK) | 0x2 | 
+[DELETE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.DELETE) | 0x4 | 
+[RANDOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.RANDOM) | 0x8 | 
+[JOURNAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.JOURNAL) | 0x10 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.LEFT) | 0x20 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.RIGHT) | 0x40 | 
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.UP) | 0x80 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.DOWN) | 0x100 | 
 
 ## ON
 

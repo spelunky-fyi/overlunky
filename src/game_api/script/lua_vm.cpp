@@ -64,6 +64,7 @@
 #include "strings.hpp"                             // for change_string
 #include "thread_utils.hpp"                        // for OnHeapPointer
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
+#include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes
 #include "usertypes/drops_lua.hpp"                 // for register_usertypes
 #include "usertypes/entities_activefloors_lua.hpp" // for register_usertypes
@@ -297,6 +298,7 @@ end
     NSteam::register_usertypes(lua);
     NVTables::register_usertypes(lua);
     NLogic::register_usertypes(lua);
+    NBucket::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
 
@@ -964,9 +966,12 @@ end
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     lua["force_dark_level"] = [](bool g)
     { State::get().darkmode(g); };
-    /// Set the zoom level used in levels and shops. 13.5 is the default.
+    /// Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
     lua["zoom"] = [](float level)
     { State::get().zoom(level); };
+    /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
+    lua["zoom_reset"] = []()
+    { State::get().zoom_reset(); };
     /// Pause/unpause the game.
     /// This is just short for `state.pause == 32`, but that produces an audio bug
     /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
@@ -1176,8 +1181,10 @@ end
     lua["lock_door_at"] = lock_door_at;
     /// Try to unlock the exit at coordinates
     lua["unlock_door_at"] = unlock_door_at;
-    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+    /// Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
     lua["get_frame"] = get_frame_count;
+    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+    lua["get_global_frame"] = get_global_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.
     lua["get_ms"] = []()
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
@@ -1274,8 +1281,7 @@ end
     {
         return State::get_camera_position();
     };
-    /// Deprecated
-    /// this doesn't actually work at all. See State -> Camera the for proper camera handling
+    /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
     lua["set_camera_position"] = set_camera_position;
 
     /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
@@ -1314,7 +1320,8 @@ end
     lua["get_window_size"] = []() -> std::tuple<int, int>
     { return {(int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y}; };
 
-    /// Steal input from a Player, HiredHand or PlayerGhost
+    /// Deprecated
+    /// Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.
     lua["steal_input"] = [](int uid)
     {
         static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
@@ -1353,6 +1360,7 @@ end
             backend->script_input[uid] = newinput;
         }
     };
+    /// Deprecated
     /// Return input previously stolen with [steal_input](#steal_input)
     lua["return_input"] = [](int uid)
     {
@@ -1377,6 +1385,7 @@ end
         }
         backend->script_input.erase(uid);
     };
+    /// Deprecated
     /// Send input to entity, has to be previously stolen with [steal_input](#steal_input)
     lua["send_input"] = [](int uid, INPUTS buttons)
     {
@@ -2163,6 +2172,9 @@ end
     /// Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
     lua["set_level_logic_enabled"] = set_level_logic_enabled;
 
+    /// Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
+    lua["set_start_level_paused"] = set_start_level_paused;
+
     /// Converts INPUTS to (x, y, BUTTON)
     lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
     {
@@ -2207,7 +2219,9 @@ end
     /// Look at the example on how to mimic game layer switching behavior
     lua["set_camera_layer_control_enabled"] = set_camera_layer_control_enabled;
 
-    lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
+    lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
+
+    lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);
 
     lua.create_named_table(
         "ON",

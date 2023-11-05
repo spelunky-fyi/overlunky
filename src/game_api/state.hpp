@@ -338,6 +338,7 @@ struct State
     void darkmode(bool g);
 
     void zoom(float level);
+    void zoom_reset();
 
     static std::pair<float, float> click_position(float x, float y);
     static std::pair<float, float> screen_position(float x, float y);
@@ -379,3 +380,5 @@ uint8_t enum_to_layer(const LAYER layer);
 
 uint32_t lowbias32(uint32_t x);
 uint32_t lowbias32_r(uint32_t x);
+
+int64_t get_global_frame_count();

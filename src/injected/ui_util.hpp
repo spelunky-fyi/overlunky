@@ -40,6 +40,7 @@ class UI
     static void death_enabled(bool g);
     static std::pair<float, float> click_position(float x, float y);
     static void zoom(float level);
+    static void zoom_reset();
     static uint32_t get_frame_count();
     static void warp(uint8_t world, uint8_t level, uint8_t theme);
     static void transition(uint8_t world, uint8_t level, uint8_t theme);

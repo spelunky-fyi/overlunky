@@ -469,14 +469,7 @@ void Movable::set_position(float to_x, float to_y)
         rendering_info->y_dupe4 += dy;
     }
     if (State::get().ptr()->camera->focused_entity_uid == uid)
-    {
-        State::get().ptr()->camera->focus_x += dx;
-        State::get().ptr()->camera->focus_y += dy;
-        State::get().ptr()->camera->adjusted_focus_x += dx;
-        State::get().ptr()->camera->adjusted_focus_y += dy;
-        State::get().ptr()->camera->calculated_focus_x += dx;
-        State::get().ptr()->camera->calculated_focus_y += dy;
-    }
+        State::get().set_camera_position(dx, dy);
 }
 
 template <typename F>

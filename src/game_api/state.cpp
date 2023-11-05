@@ -9,6 +9,7 @@
 #include <string>      // for allocator, operator""sv, operator""s
 #include <type_traits> // for move
 
+#include "bucket.hpp"                            // for Bucket
 #include "containers/custom_allocator.hpp"       //
 #include "entities_chars.hpp"                    // for Player
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
@@ -35,6 +36,8 @@
 #include "thread_utils.hpp"                      // for OnHeapPointer
 #include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
 #include "vtable_hook.hpp"                       // for hook_vtable
+
+static int64_t global_frame_count{0};
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -294,11 +297,9 @@ State& State::get()
             strings_init();
             init_state_update_hook();
 
-            auto watermark_offset = get_address("destroy_game_manager") - 8; // pulled this out of a hat, its just a random place with some CCCC hopefully
-            auto watermark = memory_read<uint32_t>(watermark_offset);
-            if (watermark != 0x4C4F4C4F)
+            auto bucket = Bucket::get();
+            if (!bucket->patches_applied)
             {
-                write_mem_prot(watermark_offset, "\x4F\x4C\x4F\x4C", true);
                 DEBUG("Applying patches");
                 patch_tiamat_kill_crash();
                 patch_orbs_limit();
@@ -306,6 +307,7 @@ State& State::get()
                 patch_liquid_OOB();
                 patch_ushabti_error();
                 patch_entering_closed_door_crash();
+                bucket->patches_applied = true;
             }
             else
             {
@@ -393,22 +395,27 @@ void State::zoom(float level)
         }
     }
 
-    const auto level_str = to_le_bytes(level);
-
     static const auto zoom_level = get_address("default_zoom_level");
     static const auto zoom_shop = get_address("default_zoom_level_shop");
     static const auto zoom_camp = get_address("default_zoom_level_camp");
     static const auto zoom_telescope = get_address("default_zoom_level_telescope");
 
     // overwrite the defaults
-    write_mem_prot(zoom_level, level_str, true);
-    write_mem_prot(zoom_shop, level_str, true);
-    write_mem_prot(zoom_camp, level_str, true);
-    write_mem_prot(zoom_telescope, level_str, true);
+    write_mem_recoverable<float>("zoom", zoom_level, level, true);
+    write_mem_recoverable<float>("zoom", zoom_shop, level, true);
+    write_mem_recoverable<float>("zoom", zoom_camp, level, true);
+    write_mem_recoverable<float>("zoom", zoom_telescope, level, true);
 
     // overwrite the current value
     auto game_api = GameAPI::get();
     game_api->set_zoom(std::nullopt, level);
+}
+
+void State::zoom_reset()
+{
+    recover_mem("zoom");
+    auto game_api = GameAPI::get();
+    game_api->set_zoom(std::nullopt, 13.5f);
 }
 
 void StateMemory::force_current_theme(uint32_t t)
@@ -446,10 +453,16 @@ std::pair<float, float> State::get_camera_position()
 
 void State::set_camera_position(float cx, float cy)
 {
+    static const auto addr = (float*)get_address("camera_position");
     auto camera = ptr()->camera;
-    camera->focused_entity_uid = -1;
     camera->focus_x = cx;
     camera->focus_y = cy;
+    camera->adjusted_focus_x = cx;
+    camera->adjusted_focus_y = cy;
+    camera->calculated_focus_x = cx;
+    camera->calculated_focus_y = cy;
+    *addr = cx;
+    *(addr + 1) = cy;
 }
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
@@ -617,6 +630,10 @@ uint32_t State::get_frame_count() const
 {
     return memory_read<uint32_t>((size_t)ptr() - 0xd0);
 }
+int64_t get_global_frame_count()
+{
+    return global_frame_count;
+};
 
 std::vector<int64_t> State::read_prng() const
 {
@@ -632,6 +649,15 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
+    auto state = State::get();
+    if (s == state.ptr_main())
+    {
+        if (global_frame_count < state.get_frame_count())
+            global_frame_count = state.get_frame_count_main();
+        else
+            global_frame_count++;
+    }
+
     if (!pre_state_update())
     {
         g_state_update_trampoline(s);

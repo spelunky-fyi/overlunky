@@ -50,6 +50,10 @@ void UI::zoom(float level)
 {
     State::get().zoom(level);
 }
+void UI::zoom_reset()
+{
+    State::get().zoom_reset();
+}
 uint32_t UI::get_frame_count()
 {
     return State::get().get_frame_count();
