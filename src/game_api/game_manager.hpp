@@ -70,6 +70,38 @@ struct BackgroundMusic
     uint32_t unknown22;
 };
 
+struct KeyboardKey
+{
+    bool down;
+    size_t unknown;
+};
+
+struct ControllerButton
+{
+    bool down;
+    bool pressed;
+};
+
+struct ControllerInput
+{
+    std::array<ControllerButton, 16> buttons;
+};
+
+struct RawInput
+{
+    std::array<KeyboardKey, 112> keyboard;
+    std::array<ControllerInput, 12> controller;
+};
+
+struct SomeInput
+{
+    bool enabled;
+    uint8_t padding1[3];
+    int8_t input_index;
+    uint8_t padding2[3];
+    uint32_t buttons;
+};
+
 struct GameProps
 {
     uint32_t buttons;
@@ -85,10 +117,10 @@ struct GameProps
     bool game_has_focus;
     bool unknown9;
     bool unknown10;
-    // there's more stuff here
-    std::array<size_t*, 12> unknown11; // pointers to something
+    /// Yet another place for some buttons in some random order, too tired to make another enum for them
+    std::array<SomeInput*, 12> some_input;
 
-    int8_t input_index[5]; // not sure, just came up with this name, if not used it's -1
+    std::array<int8_t, 5> input_index; // 0-3 keyboards, 4->controllers, if not used it's -1
     // for example if you just run the game and use OL to warp somewhere immediately there will be no controller setup, so all of those will be -1
 
     // uint8_t padding_probably1[3];

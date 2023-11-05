@@ -9,6 +9,7 @@
 #include <utility>     // for min, max
 
 #include "game_manager.hpp" // for GameManager, JournalPopupUI, GameProps
+#include "memory.hpp"       // for memory_read TODO:temp
 #include "screen.hpp"       // IWYU pragma: keep
 
 namespace NGM
@@ -93,11 +94,52 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::timer,
         "slide_position",
         &JournalPopupUI::slide_position);
+    lua.new_usertype<SomeInput>(
+        "SomeInput",
+        "enabled",
+        &SomeInput::enabled,
+        "input_index",
+        &SomeInput::input_index,
+        "buttons",
+        &SomeInput::buttons);
     lua.new_usertype<GameProps>(
         "GameProps",
         "buttons",
         &GameProps::buttons,
         "game_has_focus",
-        &GameProps::game_has_focus);
+        &GameProps::game_has_focus,
+        "some_input",
+        &GameProps::some_input,
+        "input_index",
+        &GameProps::input_index);
+    lua.new_usertype<RawInput>(
+        "RawInput",
+        "keyboard",
+        &RawInput::keyboard,
+        "controller",
+        &RawInput::controller);
+    lua.new_usertype<KeyboardKey>(
+        "KeyboardKey",
+        "down",
+        &KeyboardKey::down,
+        "unknown",
+        &KeyboardKey::unknown);
+    lua.new_usertype<ControllerInput>(
+        "ControllerInput",
+        "buttons",
+        &ControllerInput::buttons);
+    lua.new_usertype<ControllerButton>(
+        "ControllerButton",
+        "down",
+        &ControllerButton::down,
+        "pressed",
+        &ControllerButton::pressed);
+
+    lua["get_raw_input"] = []() -> RawInput*
+    {
+        // TODO:temp
+        static auto offset = get_address("input_table");
+        return reinterpret_cast<RawInput*>(offset);
+    };
 }
 }; // namespace NGM
