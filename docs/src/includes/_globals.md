@@ -2064,6 +2064,15 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 - Note: [Overlunky](#Overlunky)/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 - Note: [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 
+### get_raw_input
+
+
+> Search script examples for [get_raw_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_raw_input)
+
+#### [RawInput](#RawInput) get_raw_input()
+
+Returns [RawInput](#RawInput), a game structure for raw keyboard and controller state
+
 ### mouse_position
 
 

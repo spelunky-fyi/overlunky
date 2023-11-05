@@ -2080,6 +2080,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
+    {
+        "input_table"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x22e1c940) // TODO
+    },
+    {
+        "process_input"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x22c42ae0) // TODO
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

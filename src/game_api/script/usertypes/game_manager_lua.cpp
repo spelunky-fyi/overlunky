@@ -8,8 +8,10 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
-#include "game_manager.hpp" // for GameManager, JournalPopupUI, GameProps
-#include "screen.hpp"       // IWYU pragma: keep
+#include "game_manager.hpp"      // for GameManager, JournalPopupUI, GameProps
+#include "memory.hpp"            // for memory_read TODO:temp
+#include "screen.hpp"            // IWYU pragma: keep
+#include "script/sol_helper.hpp" //
 
 namespace NGM
 {
@@ -95,20 +97,60 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::timer,
         "slide_position",
         &JournalPopupUI::slide_position);
+    lua.new_usertype<InputDevice>(
+        "InputDevice",
+        "input_index",
+        &InputDevice::input_index,
+        "buttons",
+        &InputDevice::buttons);
     lua.new_usertype<GameProps>(
         "GameProps",
+        /// NoDoc
         "buttons",
+        [](GameProps& gp) -> uint32_t
+        {
+            return gp.buttons[0];
+        },
+        "input",
         &GameProps::buttons,
-        "buttons_extra",
-        &GameProps::buttons_extra,
-        "buttons_menu_previous",
-        &GameProps::buttons_menu_previous,
-        "buttons_menu",
+        "input_previous",
+        &GameProps::buttons_previous,
+        "input_menu",
         &GameProps::buttons_menu,
+        "input_menu_previous",
+        &GameProps::buttons_menu_previous,
         "game_has_focus",
         &GameProps::game_has_focus,
-        "modal_open",
-        sol::property([](GameProps& gp)
-                      { return gp.modal_open == 0; }));
+        "menu_open",
+        sol::property([](GameProps& gp) -> bool
+                      { return gp.menu_icon_slot != -1; }),
+        "input_index",
+        &GameProps::input_index);
+
+    lua.new_usertype<RawInput>(
+        "RawInput",
+        "keyboard",
+        &RawInput::keyboard,
+        "controller",
+        //&RawInput::controller,
+        sol::property([](RawInput& r)
+                      { return ZeroIndexArray<ControllerInput>(r.controller) /**/; }));
+    lua.new_usertype<KeyboardKey>(
+        "KeyboardKey",
+        "down",
+        &KeyboardKey::down);
+    lua.new_usertype<ControllerInput>(
+        "ControllerInput",
+        "buttons",
+        &ControllerInput::buttons);
+    lua.new_usertype<ControllerButton>(
+        "ControllerButton",
+        "down",
+        &ControllerButton::down,
+        "pressed",
+        &ControllerButton::pressed);
+
+    /// Returns RawInput, a game structure for raw keyboard and controller state
+    lua["get_raw_input"] = get_raw_input;
 }
 }; // namespace NGM
