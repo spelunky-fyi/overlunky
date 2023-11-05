@@ -1856,3 +1856,54 @@ void LuaBackend::on_set_user_data(Entity* ent)
         }
     }
 }
+
+bool LuaBackend::on_pre_process_input()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+    std::lock_guard lock{global_lua_lock};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_PROCESS_INPUT)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (handle_function<bool>(this, callback.func).value_or(false))
+            {
+                clear_current_callback();
+                return true;
+            }
+            clear_current_callback();
+        }
+    }
+    return false;
+}
+
+void LuaBackend::on_post_process_input()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    std::lock_guard lock{global_lua_lock};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_PROCESS_INPUT)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func);
+            clear_current_callback();
+        }
+    }
+}

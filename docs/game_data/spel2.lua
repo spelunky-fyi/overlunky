@@ -1336,6 +1336,9 @@ function speechbubble_visible() end
 function cancel_toast() end
 ---@return nil
 function cancel_speechbubble() end
+---Returns RawInput, a game structure for raw keyboard and controller state
+---@return RawInput
+function get_raw_input() end
 ---Seed the game prng.
 ---@param seed integer
 ---@return nil
@@ -2241,13 +2244,32 @@ do
     ---@field timer integer
     ---@field slide_position number
 
+---@class InputDevice
+    ---@field input_index integer
+    ---@field buttons integer
+
 ---@class GameProps
-    ---@field buttons integer @Might be used for some menu inputs not found in buttons_menu
-    ---@field buttons_extra integer @Might be used for some menu inputs not found in buttons_menu
-    ---@field buttons_menu_previous MENU_INPUT @Previous state of buttons_menu
-    ---@field buttons_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.PRE_UPDATE.
+    ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
+    ---@field input_previous integer[] @size: MAX_PLAYERS
+    ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
+    ---@field input_menu_previous MENU_INPUT @Previous state of buttons_menu
     ---@field game_has_focus boolean
-    ---@field modal_open integer
+    ---@field menu_open integer
+    ---@field input_index integer[] @size: 5 @Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
+
+---@class RawInput
+    ---@field keyboard KeyboardKey[] @size: 112 @State of all keyboard buttons in a random game order as usual
+    ---@field controller ControllerInput[] @size: 12 @State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
+
+---@class KeyboardKey
+    ---@field down boolean @Key is being held
+
+---@class ControllerInput
+    ---@field buttons ControllerButton[] @size: 16
+
+---@class ControllerButton
+    ---@field down boolean @Button is being held
+    ---@field pressed boolean @Button was just pressed down this frame
 
 ---@class PRNG
     ---@field seed fun(self, seed: integer): nil @Same as `seed_prng`

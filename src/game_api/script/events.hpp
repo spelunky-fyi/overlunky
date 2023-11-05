@@ -22,6 +22,7 @@ bool pre_init_level();
 bool pre_init_layer(LAYER layer);
 bool pre_unload_level();
 bool pre_unload_layer(LAYER layer);
+bool pre_process_input();
 
 void post_room_generation();
 void post_level_generation();
@@ -30,6 +31,7 @@ void post_init_level();
 void post_init_layer(LAYER layer);
 void post_unload_level();
 void post_unload_layer(LAYER layer);
+void post_process_input();
 
 void on_death_message(STRINGID stringid);
 std::optional<bool> pre_get_feat(FEAT feat);
