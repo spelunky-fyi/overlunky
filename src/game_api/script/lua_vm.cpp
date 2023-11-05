@@ -2628,6 +2628,10 @@ end
     // POST_LAYER_DESTRUCTION
     // Params: LAYER layer
     // Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // PRE_PROCESS_INPUT
+    // Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.
+    // POST_PROCESS_INPUT
+    // Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.
     */
 
     lua.create_named_table(

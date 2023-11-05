@@ -767,3 +767,19 @@ std::array renderer_flags1{
     "Liquid smoothing",
     "unknown",
 };
+
+std::array player_inputs{
+    "Disabled",
+    "Keyboard 1",
+    "Keyboard 2",
+    "Keyboard 3",
+    "Keyboard 4",
+    "XInput 1",
+    "XInput 2",
+    "XInput 3",
+    "XInput 4",
+    "Controller 1",
+    "Controller 2",
+    "Controller 3",
+    "Controller 4",
+};

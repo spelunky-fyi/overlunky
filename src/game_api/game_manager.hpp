@@ -92,7 +92,9 @@ struct ControllerInput
 
 struct RawInput
 {
+    /// State of all keyboard buttons in a random game order as usual
     std::array<KeyboardKey, 112> keyboard;
+    /// State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
     std::array<ControllerInput, 12> controller;
 };
 
@@ -128,8 +130,8 @@ struct GameProps
     /// Yet another place for some buttons in some random order, too tired to make another enum for them
     std::array<SomeInput*, 12> some_input;
 
-    std::array<int8_t, 5> input_index; // 0-3 keyboards, 4->controllers, if not used it's -1
-    // for example if you just run the game and use OL to warp somewhere immediately there will be no controller setup, so all of those will be -1
+    /// Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
+    std::array<int8_t, 5> input_index;
 
     // uint8_t padding_probably1[3];
 

@@ -652,6 +652,14 @@ tuple&lt;int, int, int, int&gt; | [get_rgba()](https://github.com/spelunky-fyi/o
 [Color](#Color) | [set_ucolor(uColor color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_ucolor) | Changes color based on given [uColor](#Aliases)
 [Color](#Color) | [set(Color other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set) | Copies the values of different [Color](#Color) to this one
 
+### ControllerButton
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | [Button](#Button) is being held
+bool | [pressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pressed) | [Button](#Button) was just pressed down this frame
+
 ### CutsceneBehavior
 
 
@@ -743,6 +751,13 @@ Type | Name | Description
 ---- | ---- | -----------
 [ENT_TYPE](#ENT_TYPE) | [owner_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_type) | 
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
+
+### KeyboardKey
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | Key is being held
 
 ### Letter
 
@@ -983,6 +998,13 @@ tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/
 ## Input types
 
 
+### ControllerInput
+
+
+Type | Name | Description
+---- | ---- | -----------
+array&lt;[ControllerButton](#ControllerButton), 16&gt; | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+
 ### Gamepad
 
 Used in [ImGuiIO](#ImGuiIO)
@@ -1060,6 +1082,23 @@ array&lt;[PlayerSlotSettings](#PlayerSlotSettings), MAX_PLAYERS&gt; | [player_se
 [PlayerSlotSettings](#PlayerSlotSettings) | [player_slot_2_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_2_settings) | 
 [PlayerSlotSettings](#PlayerSlotSettings) | [player_slot_3_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_3_settings) | 
 [PlayerSlotSettings](#PlayerSlotSettings) | [player_slot_4_settings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot_4_settings) | 
+
+### RawInput
+
+
+Type | Name | Description
+---- | ---- | -----------
+array&lt;[KeyboardKey](#KeyboardKey), 112&gt; | [keyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyboard) | State of all keyboard buttons in a random game order as usual
+array&lt;[ControllerInput](#ControllerInput), 12&gt; | [controller](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller) | State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
+
+### SomeInput
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=enabled) | 
+int | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | 
+int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 
 ## Journal types
 
@@ -2793,6 +2832,8 @@ int | [buttons_extra](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b
 [MENU_INPUT](#MENU_INPUT) | [buttons_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).PRE_UPDATE.
 bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) | 
 int | [modal_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modal_open) | 
+array&lt;[SomeInput](#SomeInput), 12&gt; | [some_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=some_input) | Yet another place for some buttons in some random order, too tired to make another enum for them
+array&lt;int, 5&gt; | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ### Items
 

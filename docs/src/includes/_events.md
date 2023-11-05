@@ -605,3 +605,17 @@ Params: [LAYER](#LAYER) layer<br/>Runs right before a layer is unloaded and any 
 > Search script examples for [ON.POST_LAYER_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LAYER_DESTRUCTION)
 
 Params: [LAYER](#LAYER) layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+
+## ON.PRE_PROCESS_INPUT
+
+
+> Search script examples for [ON.PRE_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_PROCESS_INPUT)
+
+Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.<br/>
+
+## ON.POST_PROCESS_INPUT
+
+
+> Search script examples for [ON.POST_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_PROCESS_INPUT)
+
+Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/>

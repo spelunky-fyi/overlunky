@@ -8,9 +8,10 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
-#include "game_manager.hpp" // for GameManager, JournalPopupUI, GameProps
-#include "memory.hpp"       // for memory_read TODO:temp
-#include "screen.hpp"       // IWYU pragma: keep
+#include "game_manager.hpp"      // for GameManager, JournalPopupUI, GameProps
+#include "memory.hpp"            // for memory_read TODO:temp
+#include "screen.hpp"            // IWYU pragma: keep
+#include "script/sol_helper.hpp" //
 
 namespace NGM
 {
@@ -128,7 +129,9 @@ void register_usertypes(sol::state& lua)
         "keyboard",
         &RawInput::keyboard,
         "controller",
-        &RawInput::controller);
+        //&RawInput::controller,
+        sol::property([](RawInput& r)
+                      { return ZeroIndexArray<ControllerInput>(r.controller) /**/; }));
     lua.new_usertype<KeyboardKey>(
         "KeyboardKey",
         "down",

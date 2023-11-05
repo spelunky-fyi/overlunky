@@ -1914,6 +1914,11 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
         g_game_manager->main_menu_music = nullptr;
     }
 
+    if (g_game_manager->game_props->input_index[0] == -1)
+        g_game_manager->game_props->input_index[0] = 0;
+    if (g_game_manager->game_props->input_index[4] == -1)
+        g_game_manager->game_props->input_index[0] = 0;
+
     // TODO: this doesn't quite work, loads intro after character selection
     g_state->screen_character_select->available_mine_entrances = 4;
 }
@@ -8033,6 +8038,8 @@ void render_players()
     update_players();
     for (auto player : g_players)
     {
+        ImGui::Text("%d:", player->input_ptr->player_slot + 1);
+        ImGui::SameLine();
         render_uid(player->uid, "players");
     }
 }
@@ -8281,7 +8288,6 @@ void render_game_props()
     {
         if (ImGui::MenuItem("Respawn dead players"))
             respawn();
-        ImGui::TextWrapped("New players spawned here can't be controlled, but can be used to test some things that require multiple players.");
         if (ImGui::SliderScalar("Number of players##SetNumPlayers", ImGuiDataType_U8, &g_state->items->player_count, &u8_one, &u8_four, "%d", ImGuiSliderFlags_AlwaysClamp))
         {
             std::array<bool, 4> active_players{false, false, false, false};
@@ -8320,7 +8326,34 @@ void render_game_props()
                 }
             }
         }
+        ImGui::SeparatorText("Players");
         render_players();
+        ImGui::SeparatorText("Player inputs");
+        ImGui::PushID("PlayerInputIndex");
+        for (unsigned int i = 0; i < 5; ++i)
+        {
+            ImGui::PushID(i);
+            auto label = i < 4 ? fmt::format("Player {}##PlayerInput{}", i + 1, i) : "Menu?";
+            auto index = g_game_manager->game_props->input_index[i];
+            if (ImGui::BeginCombo(label.c_str(), player_inputs[index + 1]))
+            {
+                for (int8_t j = -1; j < 12; j++)
+                {
+                    const bool item_selected = (j == index);
+                    const char* item_text = player_inputs[j + 1];
+
+                    ImGui::PushID(j);
+                    if (ImGui::Selectable(item_text, item_selected))
+                        g_game_manager->game_props->input_index[i] = j;
+                    if (item_selected)
+                        ImGui::SetItemDefaultFocus();
+                    ImGui::PopID();
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::PopID();
+        }
+        ImGui::PopID();
         endmenu();
     }
     if (submenu("Level flags"))
