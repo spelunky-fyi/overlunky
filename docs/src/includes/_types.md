@@ -2830,7 +2830,7 @@ array&lt;int, MAX_PLAYERS&gt; | [input_previous](https://github.com/spelunky-fyi
 [MENU_INPUT](#MENU_INPUT) | [input_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).POST_PROCESS_INPUT
 [MENU_INPUT](#MENU_INPUT) | [input_menu_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_menu_previous) | Previous state of buttons_menu
 bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) | 
-int | [menu_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_open) | 
+bool | [menu_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_open) | 
 array&lt;int, 5&gt; | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ### Items

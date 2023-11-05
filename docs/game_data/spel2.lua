@@ -2254,7 +2254,7 @@ do
     ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
     ---@field input_menu_previous MENU_INPUT @Previous state of buttons_menu
     ---@field game_has_focus boolean
-    ---@field menu_open integer
+    ---@field menu_open boolean
     ---@field input_index integer[] @size: 5 @Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ---@class RawInput

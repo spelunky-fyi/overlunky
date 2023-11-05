@@ -121,7 +121,7 @@ void register_usertypes(sol::state& lua)
         &GameProps::buttons_menu_previous,
         "game_has_focus",
         &GameProps::game_has_focus,
-        "menu_open",
+        "menu_open", // -> bool
         sol::property([](GameProps& gp) -> bool
                       { return gp.menu_icon_slot != -1; }),
         "input_index",
