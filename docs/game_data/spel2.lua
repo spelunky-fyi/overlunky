@@ -5989,6 +5989,15 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field sticker_count integer
     ---@field stickers TextureRenderingInfo[] @size: 20
 
+---@class ScreenControls
+    ---@field up boolean
+    ---@field down boolean
+    ---@field left boolean
+    ---@field right boolean
+    ---@field direction_input integer @-1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    ---@field hold_down_timer integer @Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    ---@field fast_scroll_timer integer
+
 ---@class ScreenArenaMenu : Screen
     ---@field brick_background_animation ScreenZoomAnimation
     ---@field blurry_border_animation ScreenZoomAnimation
@@ -6035,9 +6044,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field esc_next_panels_slide_timer number
     ---@field main_panel_vertical_scroll_position number
     ---@field selected_option_index integer
-    ---@field direction_input integer @-1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
-    ---@field hold_down_timer integer @Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
-    ---@field fast_scroll_timer integer
+    ---@field contols ScreenControls
 
 ---@class ScreenZoomAnimation
     ---@field zoom_target number
@@ -6082,6 +6089,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field players_turn_scroll_handle TextureRenderingInfo
     ---@field grid_player_icon TextureRenderingInfo
     ---@field selected_stage_index integer
+    ---@field contols ScreenControls
 
 ---@class ScreenArenaItems : Screen
     ---@field woodpanel_top_slidein_timer number
@@ -6116,6 +6124,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field center_panels_horizontal_slide_position number
     ---@field esc_panel_slide_timer number
     ---@field selected_item_index integer
+    ---@field controls ScreenControls
 
 ---@class ScreenArenaIntro : Screen
     ---@field players TextureRenderingInfo
@@ -6162,7 +6171,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field unknown25 TextureRenderingInfo
     ---@field score_counter TextureRenderingInfo
     ---@field unknown27 TextureRenderingInfo
-    ---@field lava_bubbles TextureRenderingInfo
+    ---@field lava_bubbles ScreenArenaScoreLavaBubble[] @size: 15
     ---@field player_won boolean[] @size: MAX_PLAYERS
     ---@field victory_jump_y_pos number
     ---@field victory_jump_velocity number

@@ -472,7 +472,7 @@ class ScreenTeamSelect : public Screen // ID: 10
     bool ready;
 };
 
-class ScreenCamp : public Screen // ID: 11 GameManager
+class ScreenCamp : public Screen // ID: 11 GameManager, same as ScreenLevel
 {
   public:
     uint8_t buttons;
@@ -591,8 +591,6 @@ class ScreenTransition : public Screen // ID: 13
     uint32_t unknown45;
     uint32_t unknown46;
     uint32_t unknown47;
-    uint32_t unknown48;
-    uint32_t unknown49;
 };
 
 /// The POST render call will only be visible in the polaroid area on the left of the book. The book is apparently drawn on top of that.
@@ -615,8 +613,6 @@ class ScreenWin : public Screen // ID: 16
     Entity* rescuing_ship_entity;
 
     size_t unknown8;
-    uint32_t unknown9;
-    uint32_t unknown10;
 };
 
 class ScreenCredits : public Screen // ID: 17
@@ -650,11 +646,14 @@ class ScreenConstellation : public Screen // ID: 19
     float* credits_progression;
     SoundMeta* explosion_and_loop;
     SoundMeta* music;
+    size_t unknown; // not sure if it's something actually there, or it's some allocator aliment to memory page or something, seam to happen a lot with the screens
 };
 
 /// The recap book is drawn on top of the POST render event
 class ScreenRecap : public Screen // ID: 20
 {
+    uint32_t unknown1;
+    uint32_t unknown2;
 };
 
 struct ScreenZoomAnimation

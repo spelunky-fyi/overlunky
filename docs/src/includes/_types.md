@@ -2024,6 +2024,7 @@ bool | [woodpanels_toggle](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 float | [center_panels_horizontal_slide_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center_panels_horizontal_slide_position) | 
 float | [esc_panel_slide_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=esc_panel_slide_timer) | 
 int | [selected_item_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_item_index) | 
+[ScreenControls](#ScreenControls) | [controls](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controls) | 
 
 ### ScreenArenaLevel
 
@@ -2088,9 +2089,7 @@ float | [center_panels_hor_slide_position](https://github.com/spelunky-fyi/overl
 float | [esc_next_panels_slide_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=esc_next_panels_slide_timer) | 
 float | [main_panel_vertical_scroll_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_panel_vertical_scroll_position) | 
 int | [selected_option_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_option_index) | 
-int | [direction_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_input) | -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
-int | [hold_down_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hold_down_timer) | Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
-int | [fast_scroll_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fast_scroll_timer) | 
+[ScreenControls](#ScreenControls) | [contols](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=contols) | 
 
 ### ScreenArenaScore
 
@@ -2123,7 +2122,7 @@ int | [animation_sequence](https://github.com/spelunky-fyi/overlunky/search?l=Lu
 [TextureRenderingInfo](#TextureRenderingInfo) | [unknown25](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown25) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [score_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=score_counter) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [unknown27](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown27) | 
-[TextureRenderingInfo](#TextureRenderingInfo) | [lava_bubbles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lava_bubbles) | 
+array&lt;ScreenArenaScoreLavaBubble, 15&gt; | [lava_bubbles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lava_bubbles) | 
 array&lt;bool, MAX_PLAYERS&gt; | [player_won](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_won) | 
 float | [victory_jump_y_pos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=victory_jump_y_pos) | 
 float | [victory_jump_velocity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=victory_jump_velocity) | 
@@ -2182,6 +2181,7 @@ int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons
 [TextureRenderingInfo](#TextureRenderingInfo) | [players_turn_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_turn_scroll_handle) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [grid_player_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_player_icon) | 
 int | [selected_stage_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_stage_index) | 
+[ScreenControls](#ScreenControls) | [contols](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=contols) | 
 
 ### ScreenCamp
 
@@ -2300,6 +2300,19 @@ float | [constellation_text_opacity](https://github.com/spelunky-fyi/overlunky/s
 float | [constellation_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=constellation_text) | 
 [SoundMeta](#SoundMeta) | [explosion_and_loop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_and_loop) | 
 [SoundMeta](#SoundMeta) | [music](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=music) | 
+
+### ScreenControls
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) | 
+bool | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | 
+bool | [left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) | 
+bool | [right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) | 
+int | [direction_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_input) | -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+int | [hold_down_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hold_down_timer) | Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+int | [fast_scroll_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fast_scroll_timer) | 
 
 ### ScreenCredits
 

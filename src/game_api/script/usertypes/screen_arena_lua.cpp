@@ -15,6 +15,23 @@ namespace NScreenArena
 {
 void register_usertypes(sol::state& lua)
 {
+    lua.new_usertype<ScreenControls>(
+        "ScreenControls",
+        "up",
+        &ScreenControls::up,
+        "down",
+        &ScreenControls::down,
+        "left",
+        &ScreenControls::left,
+        "right",
+        &ScreenControls::right,
+        "direction_input",
+        &ScreenControls::direction_input,
+        "hold_down_timer",
+        &ScreenControls::hold_down_timer,
+        "fast_scroll_timer",
+        &ScreenControls::fast_scroll_timer);
+
     auto screenarenamenu_type = lua.new_usertype<ScreenArenaMenu>("ScreenArenaMenu", sol::base_classes, sol::bases<Screen>());
     screenarenamenu_type["brick_background_animation"] = &ScreenArenaMenu::brick_background_animation;
     screenarenamenu_type["blurry_border_animation"] = &ScreenArenaMenu::blurry_border_animation;
@@ -61,9 +78,7 @@ void register_usertypes(sol::state& lua)
     screenarenamenu_type["esc_next_panels_slide_timer"] = &ScreenArenaMenu::esc_next_panels_slide_timer;
     screenarenamenu_type["main_panel_vertical_scroll_position"] = &ScreenArenaMenu::main_panel_vertical_scroll_position;
     screenarenamenu_type["selected_option_index"] = &ScreenArenaMenu::selected_option_index;
-    screenarenamenu_type["direction_input"] = &ScreenArenaMenu::direction_input;
-    screenarenamenu_type["hold_down_timer"] = &ScreenArenaMenu::hold_down_timer;
-    screenarenamenu_type["fast_scroll_timer"] = &ScreenArenaMenu::fast_scroll_timer;
+    screenarenamenu_type["contols"] = &ScreenArenaMenu::contols;
 
     lua.new_usertype<ScreenZoomAnimation>(
         "ScreenZoomAnimation",
@@ -110,6 +125,7 @@ void register_usertypes(sol::state& lua)
     screenarenastagesselect_type["players_turn_scroll_handle"] = &ScreenArenaStagesSelect::players_turn_scroll_handle;
     screenarenastagesselect_type["grid_player_icon"] = &ScreenArenaStagesSelect::grid_player_icon;
     screenarenastagesselect_type["selected_stage_index"] = &ScreenArenaStagesSelect::selected_stage_index;
+    screenarenastagesselect_type["contols"] = &ScreenArenaStagesSelect::contols;
 
     auto screenarenaitems_type = lua.new_usertype<ScreenArenaItems>("ScreenArenaItems", sol::base_classes, sol::bases<Screen>());
     screenarenaitems_type["woodpanel_top_slidein_timer"] = &ScreenArenaItems::woodpanel_top_slidein_timer;
@@ -144,6 +160,7 @@ void register_usertypes(sol::state& lua)
     screenarenaitems_type["center_panels_horizontal_slide_position"] = &ScreenArenaItems::center_panels_horizontal_slide_position;
     screenarenaitems_type["esc_panel_slide_timer"] = &ScreenArenaItems::esc_panel_slide_timer;
     screenarenaitems_type["selected_item_index"] = &ScreenArenaItems::selected_item_index;
+    screenarenaitems_type["controls"] = &ScreenArenaItems::controls;
 
     auto screenarenaintro_type = lua.new_usertype<ScreenArenaIntro>("ScreenArenaIntro", sol::base_classes, sol::bases<Screen>());
     screenarenaintro_type["players"] = &ScreenArenaIntro::players;

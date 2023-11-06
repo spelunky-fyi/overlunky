@@ -1,5 +1,6 @@
 #pragma once
 
+#include "containers/custom_unordered_map.hpp"
 #include "screen.hpp"
 
 struct ArenaRulesString
@@ -14,6 +15,20 @@ struct ArenaRulesString
     uint8_t unknown4;
     uint32_t unknown5;
     size_t some_offset;
+};
+
+struct ScreenControls
+{
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    uint32_t direction_input;
+    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    uint32_t hold_down_timer;
+    uint32_t fast_scroll_timer;
+    uint8_t unknown57[3]; // some states, like screen depth
 };
 
 class ScreenArenaMenu : public Screen // ID: 21
@@ -64,25 +79,15 @@ class ScreenArenaMenu : public Screen // ID: 21
     TextureRenderingInfo bottom_left_bricks;
     TextureRenderingInfo top_left_esc_panel;
     TextureRenderingInfo next_panel;
-    ArenaRulesString* option_captions; // 17 in total
-    size_t unknown46;
-    size_t unknown47;
-    bool unknown48;
-    uint8_t unknown49;
-    uint8_t unknown50;
-    uint8_t unknown51;
+    custom_vector<ArenaRulesString> option_captions; // I assume it's custom, it's filled with the screen construction
+
+    uint32_t unknown48; // load state?
     uint32_t unknown52;
     float center_panels_hor_slide_position;
     float esc_next_panels_slide_timer;
     float main_panel_vertical_scroll_position;
     uint32_t selected_option_index;
-    uint32_t unknown53;
-    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
-    uint32_t direction_input;
-    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
-    uint32_t hold_down_timer;
-    uint32_t fast_scroll_timer;
-    uint8_t unknown57[3]; // last one is 16 unless you go in level/item select screen, then it turns 17
+    ScreenControls contols;
 };
 
 class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
@@ -134,29 +139,17 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     TextureRenderingInfo players_turn_scroll;
     TextureRenderingInfo players_turn_scroll_handle;
     TextureRenderingInfo grid_player_icon;
-    float unknown30;
-    float unknown31;
-    float unknown32;
-    uint32_t unknown33;
-    uint32_t unknown34;
-    uint32_t unknown35;
-    uint32_t unknown36;
-    uint32_t unknown37;
-    uint32_t unknown38;
-    uint32_t unknown39;
-    uint32_t unknown40;
-    uint32_t unknown41;
-    uint32_t unknown42;
-    uint32_t unknown43;
-    uint32_t unknown44;
-    uint32_t unknown45;
-    uint32_t unknown46;
-    uint32_t unknown47;
+    float unknown30;                                         // padding probably
+    custom_unordered_map<uint32_t, float> stages_to_gay_out; // key is the stage, float is how gray out it is
+
+    uint32_t unknown47; // load state?
     uint32_t unknown48;
-    uint32_t unknown49;
-    uint32_t unknown50;
-    uint32_t unknown51;
+    uint8_t unknown49;
+    uint8_t padding_probably[3];
+    float panels_slide_from_both_sides;
+    float visibility_all_stages;
     uint32_t selected_stage_index;
+    ScreenControls contols;
 };
 
 class ScreenArenaItems : public Screen // ID: 23
@@ -197,24 +190,13 @@ class ScreenArenaItems : public Screen // ID: 23
     TextureRenderingInfo item_off_gray_overlay;
     TextureRenderingInfo esc_woodpanel;
 
-    float unknown22;
-    float unknown23;
-    size_t powerup_deactivation_related;
-    uint8_t powerup_deactivation_counter; /* unsure */
-    uint8_t padding1;
-    uint16_t padding2;
-    uint32_t unknown25;
-    size_t unknown26;
-    size_t unknown27;
-    size_t unknown28;
-    uint32_t unknown29;
-    uint32_t unknown30;
-    uint32_t unknown31;
-    uint32_t unknown32;
-    uint32_t unknown33;
+    custom_unordered_map<uint32_t, float> items_to_gay_out;
+
+    float unknown33;
     float center_panels_horizontal_slide_position;
     float esc_panel_slide_timer;
     uint32_t selected_item_index;
+    ScreenControls controls;
 };
 
 class ScreenArenaIntro : public Screen // ID: 25
@@ -227,6 +209,7 @@ class ScreenArenaIntro : public Screen // ID: 25
     TextureRenderingInfo unknown_all_forced;
     TextureRenderingInfo left_scroll;
     TextureRenderingInfo right_scroll;
+    TextureRenderingInfo unknown1;
     float scroll_unfurl_timer;
     bool waiting; // when false, the cutscene ends and gameplay starts
     uint8_t unknown10b;
@@ -241,6 +224,9 @@ class ScreenArenaIntro : public Screen // ID: 25
     uint8_t unknown14c;
     uint8_t unknown14d;
     uint32_t countdown; // when 0, continues to gameplay
+    // uint32_t padding_probably
+
+    std::array<ParticleEmitterInfo*, 9> particles;
 };
 
 class ScreenArenaLevel : public Screen // ID: 26
@@ -298,6 +284,33 @@ class ScreenArenaLevel : public Screen // ID: 26
     TextureRenderingInfo unknown51;
     TextureRenderingInfo unknown52;
     TextureRenderingInfo unknown53;
+    std::array<ParticleEmitterInfo*, 11> particles;
+};
+
+struct ScreenArenaScoreLavaBubble
+{
+    float x;
+    float y;
+    int16_t timer1;
+    uint8_t timer2; // counts down the the timer1 = -1
+    bool unknown;
+};
+
+struct ScreenArenaScoreUnknown
+{
+    // this is mostly a guess
+    TextureRenderingInfo texture;
+    float some_x; // when not in use set to 9999.0
+    float some_y; // when not in use set to 9999.0
+    float unknown4;
+    float unknown5;
+    float unknown6;
+    float unknown7;
+    float unknown8; // when not in use set to float max
+    float unknown9; // when not in use set to float max
+    float unknown10;
+    float unknown11;
+    float unknown12;
 };
 
 class ScreenArenaScore : public Screen // ID: 27
@@ -338,7 +351,7 @@ class ScreenArenaScore : public Screen // ID: 27
     TextureRenderingInfo unknown25;
     TextureRenderingInfo score_counter;
     TextureRenderingInfo unknown27;
-    TextureRenderingInfo lava_bubbles; /* unsure */
+    TextureRenderingInfo unknown28;
 
     std::array<bool, MAX_PLAYERS> player_won;
     float victory_jump_y_pos;
@@ -355,4 +368,8 @@ class ScreenArenaScore : public Screen // ID: 27
     std::array<float, MAX_PLAYERS> player_crushing_pillar_height;
     std::array<bool, MAX_PLAYERS> player_create_giblets;
     float next_sidepanel_slidein_timer;
+    // uint32_t padding_probably;
+    std::array<ParticleEmitterInfo*, 13> particles;
+    std::array<ScreenArenaScoreLavaBubble, 15> lava_bubbles;
+    std::array<ScreenArenaScoreUnknown, 160> unknown45; // only used if one of the players win, probably the flying down confetti/featers
 };

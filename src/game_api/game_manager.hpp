@@ -43,6 +43,11 @@ struct SaveRelated
     JournalPopupUI journal_popup_ui;
 };
 
+struct BGMUnknown
+{
+    std::array<float, 40> unknown; // probably wrong size
+};
+
 struct BackgroundMusic
 {
     BackgroundSound* game_startup;
@@ -64,10 +69,10 @@ struct BackgroundMusic
     uint8_t unknown17;
     uint8_t unknown18;
     uint8_t unknown19;
-    uint8_t unknown20;
-    int8_t skip[2400]; // 600 floats, mostly seem to be 1.0
-    float idle_counter;
-    uint32_t unknown22;
+    uint8_t padding_probably;
+    std::array<BGMUnknown, 15> unknown21; // They continously go from 1 to 0 and back as a one big table, from first one to the last one, each change is one tick counted by the unknown22
+    float idle_counter;                   // counts down at the start of a level, then reacts to the player movement controls
+    uint32_t unknown22;                   // some timer (counts continuously)
 };
 
 struct KeyboardKey
@@ -101,14 +106,14 @@ struct RawInput
 struct InputDevice
 {
     // No idea what these actually do, better not to expose this anyway
-    bool unknown1;
-    bool unknown2;
-    bool menu_input;
+    bool unknown1;   // is_keyboard ?
+    bool unknown2;   // is_controller ?
+    bool menu_input; // keyboard doesn't seam to care about this
     bool lost_connection;
     int8_t input_index;
     uint8_t padding2[3];
     uint32_t buttons;
-    // a lot more stuff
+    uint8_t controller_index; // for XInput used in XInputSetState
 };
 
 struct GameProps
@@ -133,22 +138,22 @@ struct GameProps
     // uint8_t padding_probably1[3];
 
     int32_t next_player_entrence;
-    int8_t unknown13; // -1 (leader player slot?)
-    int8_t unknown13;
+    int8_t unknown13a; // -1 (leader player slot?)
+    int8_t unknown13b;
 
     // uint8_t padding_probably2[2];
 
     uint32_t unknown14a;
-    int8_t unknown14b; // -1
+    int8_t unknown14b[3]; // -1
 
-    // uint8_t padding_probably3[3];
+    // uint8_t padding_probably3;
 
     uint32_t unknown15;
 
     // uint32_t padding_probably4;
     size_t* unknown16;
     size_t unknwon17;
-    std::array<double, 4> unknown18; // counts time or something? only active when the game window is active when there is a player choosen?
+    std::array<double, MAX_PLAYERS> unknown18; // counts time or something? only active when the game window is active when there is a player choosen?
     int32_t unknown19;
     int32_t unknown20; // -1
     size_t unknown21;
