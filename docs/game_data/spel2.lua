@@ -6334,7 +6334,6 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field ignore_keycodes unordered_Array<KEY> @Disable keys that may or may not be used by Overlunky. You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
     ---@field ignore_features unordered_Array<string> @TODO: Disable Overlunky features. Doesn't do anything yet.
     ---@field selected_uid integer @Currently selected uid in the entity picker or -1 if nothing is selected.
-    ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
     ---@field selected_uids integer[] @Currently selected uids in the entity finder.
     ---@field hovered_uid integer @Currently hovered entity uid or -1 if nothing is hovered.
     ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.

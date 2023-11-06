@@ -2395,7 +2395,11 @@ end
         "PRE_PROCESS_INPUT",
         ON::PRE_PROCESS_INPUT,
         "POST_PROCESS_INPUT",
-        ON::POST_PROCESS_INPUT);
+        ON::POST_PROCESS_INPUT,
+        "PRE_MAIN_LOOP",
+        ON::PRE_MAIN_LOOP,
+        "POST_MAIN_LOOP",
+        ON::POST_MAIN_LOOP);
 
     /* ON
     // LOGO
@@ -2632,6 +2636,12 @@ end
     // Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.
     // POST_PROCESS_INPUT
     // Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.
+    // PRE_MAIN_LOOP
+    // Params: float deltatime
+    // Runs right before the main engine loop. Return true to disable.
+    // POST_MAIN_LOOP
+    // Params: float deltatime
+    // Runs right after the main engine loop.
     */
 
     lua.create_named_table(

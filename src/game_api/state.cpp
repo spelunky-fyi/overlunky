@@ -297,6 +297,7 @@ State& State::get()
             strings_init();
             init_state_update_hook();
             init_process_input_hook();
+            init_main_loop_hook();
 
             auto bucket = Bucket::get();
             if (!bucket->patches_applied)
@@ -702,6 +703,31 @@ void init_process_input_hook()
     if (error != NO_ERROR)
     {
         DEBUG("Failed hooking process_input stuff: {}\n", error);
+    }
+}
+
+using OnMainLoop = void(void* a, float b, void* c);
+OnMainLoop* g_main_loop_trampoline{nullptr};
+void MainLoop(void* a, float b, void* c)
+{
+    if (!pre_main_loop())
+    {
+        g_main_loop_trampoline(a, b, c);
+    }
+    post_main_loop();
+}
+
+void init_main_loop_hook()
+{
+    g_main_loop_trampoline = (OnMainLoop*)get_address("main_loop");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach((void**)&g_main_loop_trampoline, &MainLoop);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking main_loop stuff: {}\n", error);
     }
 }
 

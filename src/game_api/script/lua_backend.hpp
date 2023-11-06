@@ -130,6 +130,8 @@ enum class ON
     POST_LAYER_DESTRUCTION,
     PRE_PROCESS_INPUT,
     POST_PROCESS_INPUT,
+    PRE_MAIN_LOOP,
+    POST_MAIN_LOOP,
 };
 
 struct IntOption
@@ -439,6 +441,8 @@ class LuaBackend
     void load_user_data();
     bool on_pre_process_input();
     void on_post_process_input();
+    bool on_pre_main_loop();
+    void on_post_main_loop();
 };
 
 template <class Inheriting>

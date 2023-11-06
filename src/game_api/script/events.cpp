@@ -512,3 +512,29 @@ void post_process_input()
             return true;
         });
 }
+
+bool pre_main_loop()
+{
+    bool return_val = false;
+    LuaBackend::for_each_backend(
+        [=, &return_val](LuaBackend::LockedBackend backend)
+        {
+            if (backend->on_pre_main_loop())
+            {
+                return_val = true;
+                return false;
+            }
+            return true;
+        });
+    return return_val;
+}
+
+void post_main_loop()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->on_post_main_loop();
+            return true;
+        });
+}

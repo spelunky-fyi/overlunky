@@ -15,7 +15,6 @@ void register_usertypes(sol::state& lua)
     ol_type["ignore_keycodes"] = &Overlunky::ignore_keycodes;
     ol_type["ignore_features"] = &Overlunky::ignore_features;
     ol_type["selected_uid"] = &Overlunky::selected_uid;
-    ol_type["set_selected_uid"] = &Overlunky::set_selected_uid;
     ol_type["selected_uids"] = &Overlunky::selected_uids;
     ol_type["hovered_uid"] = &Overlunky::hovered_uid;
     ol_type["set_selected_uid"] = &Overlunky::set_selected_uid;
