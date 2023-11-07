@@ -170,7 +170,7 @@ void register_usertypes(sol::state& lua)
     screenmenu_type["menu_text_opacity"] = &ScreenMenu::menu_text_opacity;
     screenmenu_type["spear_position"] = &ScreenMenu::spear_position;
     screenmenu_type["spear_dangler"] = &ScreenMenu::spear_dangler;
-    screenmenu_type["play_scroll_descend_timer"] = &ScreenMenu::play_scroll_descend_timer;
+    screenmenu_type["play_scroll_descend_timer"] = &ScreenMenu::play_scroll_descend;
     screenmenu_type["scroll_text"] = &ScreenMenu::scroll_text;
 
     auto screenoptions_type = lua.new_usertype<ScreenOptions>("ScreenOptions", sol::base_classes, sol::bases<Screen>());

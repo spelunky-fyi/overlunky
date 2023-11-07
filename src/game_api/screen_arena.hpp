@@ -17,20 +17,6 @@ struct ArenaRulesString
     size_t some_offset;
 };
 
-struct ScreenControls
-{
-    bool up;
-    bool down;
-    bool left;
-    bool right;
-    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
-    uint32_t direction_input;
-    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
-    uint32_t hold_down_timer;
-    uint32_t fast_scroll_timer;
-    uint8_t unknown57[3]; // some states, like screen depth
-};
-
 class ScreenArenaMenu : public Screen // ID: 21
 {
   public:
@@ -88,6 +74,7 @@ class ScreenArenaMenu : public Screen // ID: 21
     float main_panel_vertical_scroll_position;
     uint32_t selected_option_index;
     ScreenControls contols;
+    uint8_t unknown57[3]; // some states, like screen depth
 };
 
 class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
@@ -150,6 +137,7 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     float visibility_all_stages;
     uint32_t selected_stage_index;
     ScreenControls contols;
+    uint8_t unknown57[3]; // some states, like screen depth
 };
 
 class ScreenArenaItems : public Screen // ID: 23
@@ -197,6 +185,7 @@ class ScreenArenaItems : public Screen // ID: 23
     float esc_panel_slide_timer;
     uint32_t selected_item_index;
     ScreenControls controls;
+    uint8_t unknown57[3]; // some states, like screen depth
 };
 
 class ScreenArenaIntro : public Screen // ID: 25

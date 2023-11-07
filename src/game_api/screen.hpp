@@ -48,6 +48,9 @@ class ScreenLogo : public Screen // ID: 0
     TextureRenderingInfo logo_mossmouth;
     TextureRenderingInfo logo_blitworks;
     TextureRenderingInfo logo_fmod;
+    /// 0 - mossmouth, 1 - blitworks, 2 - fmod, 3 - end (next screen)
+    uint32_t state;
+    uint32_t timer;
 };
 
 class ScreenIntro : public Screen // ID: 1
@@ -85,8 +88,8 @@ class ScreenTitle : public Screen // ID: 3
     ParticleEmitterInfo* particle_torchflame_backflames_animated;
     ParticleEmitterInfo* particle_torchflame_flames_animated;
     ParticleEmitterInfo* particle_torchflame_ash;
-    uint32_t unknown7;
-    float unknown8;
+    uint8_t unknown7a; // random very short timer that doesn't seam to do anything
+    float brightness;
     SoundMeta* music;
     SoundMeta* torch_sound;
 };
@@ -97,19 +100,64 @@ struct SpearDanglerAnimFrames
     uint32_t row;
 };
 
+struct ScreenControls
+{
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    uint32_t direction_input;
+    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    uint32_t hold_down_timer;
+    uint32_t fast_scroll_timer;
+};
+
+struct MenuOption
+{
+    // return and first param are the same, pointer on stack, it really seam to be just two 32bit fields
+    // int is normally set to 0x2B and float to 0, if the third parameter is not 2, then the function sets first to 0, and the float to float max,
+    using OptionSelect = std::pair<uint32_t, float>&(std::pair<uint32_t, float>&, Screen* src, uint8_t);
+
+    STRINGID option_name;
+    float y_position;
+    float brigthness; // 1.0 for selected item, 0 for non selected
+    bool enabled;     // only visual thing, locks brigthness at 0
+    // uint8_t padding_probably[3]
+
+    OptionSelect* select; // called as soon as you hit enter on the selected option
+    // function is expected to play the select sound
+    // for main menu it also stops the cthulhu_sound (call kill(true) and set the pointer to null) when leaving the menu to different screen
+};
+
 class ScreenMenu : public Screen // ID: 4
 {
   public:
-    float unknown4;
-    float unknown5;
+    using ScreenTransition = void();
+
+    float backlayer_transition_speed;
+    float frontlayer_transition_speed;
     float unknown6;
     float unknown7;
-    float unknown8;
-    float unknown9;
+    float unknown8;              // middle layer related?
+    uint32_t some_unknown_state; // 5 in main menu, 1 when going to different screen
     float unknown10;
-    float unknown11;
-    float unknown12;
-    uint32_t unknown13;
+    float zoom_in_progress;
+    float zoom_limit;
+    /*
+    0: "cthulhu_pre_movement",
+    1: "cthulhu_rotating",
+    2: "cthulhu_separating",
+    3: "cthulhu_lowering",
+    4: "cthulhu_transition_to_menu",
+    5: "return_from_backlayer",
+    6: "highlight_selection",
+    7: "idle",
+    8: "to_submenu",
+    9: "to_backlayer",
+    10: "backlayer_idle"
+    */
+    uint32_t state;
     TextureRenderingInfo tunnel_background;
     TextureRenderingInfo cthulhu_disc;
     TextureRenderingInfo tunnel_ring_darkbrown;
@@ -124,42 +172,49 @@ class ScreenMenu : public Screen // ID: 4
     TextureRenderingInfo spear_dangler_related;
     TextureRenderingInfo play_scroll;
     TextureRenderingInfo info_toast;
-    TextureRenderingInfo unknown15;
+    TextureRenderingInfo unknown15; // probably xbox username scroll
 
     uint32_t unknown16a;
-    uint32_t unknown16b;
+    uint32_t unknown16b; // padding probably
     SoundMeta* cthulhu_sound;
-    size_t unknown16e; // std::list ?
-    size_t unknown16f; //
-    float unknown16g;
-    float unknown16h;
-    float unknown16i;
-    float unknown16j;
-    size_t unknown16k;
-    std::vector<size_t> unknown17;   // pointers, vector of vectors? menu options?
-    std::vector<uint32_t> unknown20; // unsure what's inside
-    size_t buttons;
-    uint32_t unknown23;
-    uint32_t unknown24;
+    ParticleEmitterInfo* particle_smoke;
+    ParticleEmitterInfo* particle_rubble;
+    float cthulhu_disc_ring_angle;
+    float cthulhu_disc_split_progress;
+    float cthulhu_disc_y;
+    float cthulhu_timer;
+    ScreenTransition* screen_transition; // called when you leave the menu, just sets the state.screen_next and stuff
+
+    // game many times have pointer to this point, hoping this is some common struct for the menu :)
+
+    std::vector<std::vector<MenuOption>> menu_tree; // always have the vector of the main menu, and then any deeper level menu, like Play or Online
+    std::vector<uint32_t> menu_index_order;         // to go back to
+    ScreenControls controls;
     uint32_t selected_menu_index;
-    uint32_t unknown26;
-    uint32_t unknown27;
-    uint32_t unknown28;
-    uint32_t unknown29a;
-    uint32_t unknown29b;
+    uint8_t sides_hold_down_timer;
+    uint8_t sides_fast_scroll_timer;
+
+    // uint8_t padding_probably[2];
+
+    uint32_t unknown27; // pressed direction? 1 = left, 0 = right, no neutral, stays at the last state
+    bool loop;          // allow going up from first to last option
+
+    // uint8_t padding_probably[3];
+
+    uint32_t menu_id; // 0 = main menu, 1 = play, 2 = online
+    uint32_t transfer_to_menu_id;
     float menu_text_opacity;
     std::array<float, 6> spear_position;
     std::array<SpearDanglerAnimFrames, 6> spear_dangler;
     std::array<uint32_t, 6> spear_dangle_momentum;
     std::array<uint32_t, 6> spear_dangle_angle;
 
-    float play_scroll_descend_timer;
+    float play_scroll_descend;
     STRINGID scroll_text;
-
-    float cthulhu_disc_ring_angle;
-    float cthulhu_disc_split_progress;
-    float cthulhu_disc_y;
-    float cthulhu_timer;
+    float shake_offset_x;
+    float shake_offset_y;
+    bool unknown30;
+    // maybe two more 32bit values? hard to tell
 };
 
 class ScreenOptions : public Screen // ID: 5
@@ -596,6 +651,7 @@ class ScreenTransition : public Screen // ID: 13
 /// The POST render call will only be visible in the polaroid area on the left of the book. The book is apparently drawn on top of that.
 class ScreenDeath : public Screen // ID: 14
 {
+  public:
     size_t unknown;
 };
 
@@ -652,6 +708,7 @@ class ScreenConstellation : public Screen // ID: 19
 /// The recap book is drawn on top of the POST render event
 class ScreenRecap : public Screen // ID: 20
 {
+  public:
     uint32_t unknown1;
     uint32_t unknown2;
 };
