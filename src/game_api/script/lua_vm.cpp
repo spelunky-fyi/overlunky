@@ -680,14 +680,12 @@ end
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::u16string message)
     {
-        State::get().ptr()->toast = 0;
         static auto toast_fun = (Toast*)get_address("toast");
         toast_fun(message.c_str());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::u16string message, int sound_type, bool top)
     {
-        State::get().ptr()->speechbubble = 0;
         static auto say = (Say*)get_address("speech_bubble_fun");
         const auto hud = get_hud();
 
