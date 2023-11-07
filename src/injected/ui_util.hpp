@@ -93,4 +93,6 @@ class UI
     static bool get_start_level_paused();
     static void speedhack(float multiplier);
     static float get_speedhack();
+    static void init_adventure();
+    static void init_seeded(uint32_t seed);
 };

@@ -1973,3 +1973,34 @@ float get_speedhack()
 {
     return g_speedhack_multiplier;
 }
+
+void init_adventure()
+{
+    // TODO: I didn't check exactly what this does, but it fixes issues with character select being broken after quick start
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("init_adventure");
+    }
+    if (offset != 0)
+    {
+        typedef void init_func();
+        static init_func* iaf = (init_func*)(offset);
+        iaf();
+    }
+}
+
+void init_seeded(uint32_t seed)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("init_seeded");
+    }
+    if (offset != 0)
+    {
+        typedef void init_func(void*, uint32_t);
+        static init_func* isf = (init_func*)(offset);
+        isf(State::get().ptr(), seed);
+    }
+}

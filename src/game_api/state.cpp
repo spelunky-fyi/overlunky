@@ -496,8 +496,6 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     {
         ptr()->screen_next = 11;
     }
-    ptr()->fadeout = 5;
-    ptr()->fadein = 5;
     ptr()->win_state = 0;
     ptr()->loading = 1;
 
@@ -522,8 +520,6 @@ void State::set_seed(uint32_t seed)
     ptr()->theme_next = 1;
     ptr()->quest_flags = 0x1e | 0x41;
     ptr()->screen_next = 12;
-    ptr()->fadeout = 5;
-    ptr()->fadein = 5;
     ptr()->loading = 1;
 }
 

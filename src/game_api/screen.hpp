@@ -423,7 +423,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     uint8_t unknown66;
     size_t reset_func; /* unsure*/
     uint32_t buttons;
-    TextureRenderingInfo unknown69;
+    TextureRenderingInfo unknown69; // TODO: this is wrong, there's just a bunch of other stuff here, like some run type flags probably (seeded/adventure/daily) and the next screen (camp/level)
 
     float opacity;
     bool start_pressed;

@@ -273,7 +273,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false, camera_hack = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -331,6 +331,8 @@ std::map<std::string, bool> options = {
     {"noclip", false},
     {"fly_mode", false},
     {"speedhack", false},
+    {"skip_fades", false},
+    {"camera_hack", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
     {"disable_pause", false},
@@ -1717,7 +1719,7 @@ void toggle_noclip()
 
 bool should_speedhack()
 {
-    return (g_state->screen != 11 && g_state->screen != 12 && g_state->screen != 5 && g_state->screen != 4) || (g_state->screen != 5 && g_game_manager->pause_ui && g_game_manager->pause_ui->visibility > 0) || ((g_state->level_flags & (1U << 20)) > 0) || g_state->loading > 0;
+    return (g_state->screen != 11 && g_state->screen != 12 && g_state->screen != 5 && g_state->screen != 4) || (g_state->screen != 5 && g_game_manager->pause_ui && g_game_manager->pause_ui->visibility > 0) || ((g_state->level_flags & (1U << 20)) > 0) || g_state->loading > 0 || (g_state->screen == 4 && g_game_manager->screen_menu->menu_text_opacity < 1.0f);
 }
 
 void force_cheats()
@@ -1790,8 +1792,14 @@ void force_cheats()
     }
 }
 
-void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
+void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, std::optional<uint32_t> seed = std::nullopt)
 {
+    if (seed.has_value())
+        UI::init_seeded(seed.value());
+    else if (g_state->screen < 11)
+        UI::init_adventure();
+    g_state->screen_character_select->available_mine_entrances = 4;
+
     static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
     const auto ana_texture = get_type(ana_spelunky)->texture_id;
 
@@ -1812,7 +1820,9 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->world_next = world;
     g_state->level_next = level;
     g_state->theme_next = theme;
-    g_state->quest_flags = g_state->quest_flags | 1;
+    g_state->quest_flags |= 1;
+    if (seed.has_value())
+        g_state->quest_flags |= 0x40;
     g_state->loading = 1;
 
     if (g_game_manager->main_menu_music)
@@ -1825,9 +1835,6 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
         g_game_manager->game_props->input_index[0] = 0;
     if (g_game_manager->game_props->input_index[4] == -1)
         g_game_manager->game_props->input_index[4] = 0;
-
-    // TODO: this doesn't quite work, loads intro after character selection
-    g_state->screen_character_select->available_mine_entrances = 4;
 }
 
 std::string get_clipboard()
@@ -3889,10 +3896,10 @@ void render_narnia()
 
 void set_camera_hack(bool enable)
 {
-    camera_hack = enable;
+    options["camera_hack"] = enable;
     if (g_ui_scripts.find("camera_hack") == g_ui_scripts.end())
         return;
-    g_ui_scripts["camera_hack"]->set_enabled(camera_hack);
+    g_ui_scripts["camera_hack"]->set_enabled(options["camera_hack"]);
 }
 
 void render_camera()
@@ -4000,12 +4007,12 @@ void render_camera()
         }
     }
     tooltip("Disable to free the camera in camp.\nAutomatically disabled when zooming.");
-    if (ImGui::Checkbox("Follow focused entity absolutely##CameraForcePlayer", &camera_hack))
+    if (ImGui::Checkbox("Follow focused entity absolutely##CameraForcePlayer", &options["camera_hack"]))
     {
-        set_camera_hack(camera_hack);
-        enable_camera_bounds = !camera_hack;
+        set_camera_hack(options["camera_hack"]);
+        enable_camera_bounds = !options["camera_hack"];
         set_camera_bounds(enable_camera_bounds);
-        enable_camp_camera = !camera_hack;
+        enable_camp_camera = !options["camera_hack"];
         UI::set_camp_camera_bounds_enabled(enable_camp_camera);
     }
     tooltip("Enable to remove camera bounds and always center the entity instantly without rubberbanding.");
@@ -5687,6 +5694,10 @@ void render_options()
 
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
+
+        if (ImGui::Checkbox("Skip fades##SkipFades", &options["skip_fades"]))
+            g_ui_scripts["skip_fades"]->set_enabled(options["skip_fades"]);
+        tooltip("Skips all fade to black transitions.");
 
         ImGui::Checkbox("Uncap unfocused FPS on start", &options["uncap_unfocused_fps"]);
         tooltip("Sets the unfocused FPS to unlimited automatically.");
@@ -7974,6 +7985,24 @@ void render_game_props()
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
     if (submenu("State"))
     {
+        if (ImGui::Button("Adventure"))
+        {
+            UI::init_adventure();
+            g_state->quest_flags = 1;
+            quick_start(12, 1, 1, 1);
+        }
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(-ImGui::GetWindowWidth() * 0.31f);
+        auto seed_str = fmt::format("{:08X}", g_state->seed);
+        if (ImGui::InputText("Seed", &seed_str, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            uint32_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << seed_str;
+            ss >> new_seed;
+            if (new_seed != g_state->seed)
+                quick_start(12, 1, 1, 1, new_seed);
+        }
         render_screen("Current screen", g_state->screen);
         render_screen("Last screen", g_state->screen_last);
         render_screen("Next screen", g_state->screen_next);
@@ -9111,6 +9140,11 @@ set_callback(init_hooks, ON.SCRIPT_ENABLE)
 set_callback(clear_hooks, ON.SCRIPT_DISABLE)
 )");
     add_ui_script("level_size", false, "");
+    add_ui_script("skip_fades", options["skip_fades"], R"(
+set_callback(function()
+    state.fadeout = 0
+    state.fadevalue = 0
+end, ON.PRE_UPDATE))");
 }
 
 void imgui_draw()
@@ -9448,8 +9482,8 @@ void update_bucket()
         {
             if (auto* val = std::get_if<int64_t>(&v))
             {
-                camera_hack = (uint32_t)*val;
-                set_camera_hack(camera_hack);
+                options["camera_hack"] = (uint32_t)*val;
+                set_camera_hack(options["camera_hack"]);
             }
         }
     }

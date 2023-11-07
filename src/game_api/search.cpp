@@ -2095,6 +2095,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .from_exe_base(0x22aa9580) // TODO
     },
+    {
+        "init_adventure"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x22c0d340) // TODO
+    },
+    {
+        "init_seeded"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x22c02260) // TODO
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
