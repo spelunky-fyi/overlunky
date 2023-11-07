@@ -8821,6 +8821,15 @@ void render_prohud()
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
+    if (paused)
+    {
+        buf = "||";
+        ImGui::PushFont(bigfont);
+        textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, ImColor(1.0f, 1.0f, 1.0f, .7f), buf.c_str());
+        ImGui::PopFont();
+    }
+
     static std::array<int, 4> inputs{0};
     static uint32_t last_input_frame = 0;
     if (g_state->time_level != last_input_frame)
@@ -8957,35 +8966,47 @@ kb = get_raw_input().keyboard
 gp = game_manager.game_props
 ol = get_bucket().overlunky
 
-set_callback(function()
-    if test_mask(exports.type, 0x40) then
+function apply_pause()
+    return state.screen == SCREEN.INTRO
+        or state.screen == SCREEN.CAMP
+        or state.screen == SCREEN.LEVEL
+        or state.screen == SCREEN.DEATH
+        or state.screen == SCREEN.TRANSITION
+end
+
+function not_loading()
+    local ret = state.loading > 0
+        or state.fadevalue > 0
+        or (state.screen == SCREEN.MENU and game_manager.screen_menu.menu_text_opacity < 1)
+        or (state.screen == SCREEN.CHARACTER_SELECT and (state.screen_character_select.topleft_woodpanel_esc_slidein_timer == 0 or state.screen_character_select.start_pressed))
+    if state.loading == 3 and state.fadevalue < 0.03 then
+        ret = false
+    end
+    return not ret
+end
+
+function block_update(pause_type)
+    if test_mask(exports.type, pause_type) then
         if exports.paused and exports.skip then
-            --exports.skip = false
             state.pause = clr_mask(state.pause, exports.type)
             return false
-        elseif exports.paused then
+        elseif exports.paused and apply_pause() then
             state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
         end
-        skipped = exports.paused and (exports.loading or state.loading == 0 or state.fadevalue < 0.03)
-        return skipped
+        return exports.paused and (exports.loading or not_loading())
     end
+    return false
+end
+
+set_callback(function()
+    return block_update(0x40)
 end, ON.PRE_UPDATE)
 
 set_callback(function()
-    if not exports.paused and state.pause == 2 and test_mask(state.pause, exports.type) and get_start_level_paused() and state.time_level == 1 then
+    if not exports.paused and state.pause == 2 and test_mask(state.pause, exports.type) and get_start_level_paused() and state.time_level == 1 and apply_pause() then
         exports.paused = true
     end
-    if test_mask(exports.type, 0x80) then
-        if exports.paused and exports.skip then
-            --exports.skip = false
-            state.pause = clr_mask(state.pause, exports.type)
-            return false
-        elseif exports.paused then
-            state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
-        end
-        skipped = exports.paused and (exports.loading or state.loading == 0 or state.fadevalue < 0.03)
-        return skipped
-    end
+    return block_update(0x80)
 end, ON.PRE_GAME_LOOP)
 
 set_callback(function()
