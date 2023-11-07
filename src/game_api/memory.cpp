@@ -102,8 +102,7 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
     return new_array;
 }
 
-std::unordered_map<std::string, std::vector<RecoverableMemory>> original_memory;
-std::unordered_set<std::string> edited_memory;
+std::unordered_map<std::string, EditedMemory> original_memory;
 
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
 {
@@ -114,13 +113,13 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
         if (old_data)
         {
             memcpy(old_data, (char*)addr, payload.size());
-            original_memory.emplace(name, std::vector<RecoverableMemory>{{addr, old_data, payload.size(), prot}});
+            original_memory.emplace(name, EditedMemory{{{addr, old_data, payload.size(), prot}}, true});
         }
     }
     else
     {
         bool new_addr = true;
-        for (auto& it : map_it->second)
+        for (auto& it : map_it->second.mem)
         {
             if (it.address == addr)
             {
@@ -134,28 +133,34 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
             if (old_data)
             {
                 memcpy(old_data, (char*)addr, payload.size());
-                map_it->second.emplace_back(addr, old_data, payload.size(), prot);
+                map_it->second.mem.emplace_back(addr, old_data, payload.size(), prot);
             }
         }
     }
+    original_memory[name].dirty = true;
     write_mem_prot(addr, payload, prot);
-    edited_memory.insert(name);
 }
 
 void recover_mem(std::string name, size_t addr)
 {
     if (original_memory.contains(name))
     {
-        for (auto& it : original_memory[name])
+        size_t fixed = 0;
+        for (auto& it : original_memory[name].mem)
+        {
             if (!addr || addr == it.address)
+            {
                 write_mem_prot(it.address, std::string_view{it.old_data, it.size}, it.prot_used);
-        edited_memory.erase(name);
+                if (++fixed == original_memory[name].mem.size())
+                    original_memory[name].dirty = false;
+            }
+        }
     }
 }
 
 bool mem_written(std::string name)
 {
-    return edited_memory.contains(name);
+    return original_memory.contains(name) && original_memory[name].dirty;
 }
 
 size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_view payload, bool just_nop, size_t return_to_addr, bool game_code_first)

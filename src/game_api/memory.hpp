@@ -80,12 +80,19 @@ struct Memory
         return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
     }
 };
+
 struct RecoverableMemory
 {
     size_t address;
     char* old_data;
     size_t size;
     bool prot_used;
+};
+
+struct EditedMemory
+{
+    std::vector<RecoverableMemory> mem;
+    bool dirty;
 };
 
 LPVOID alloc_mem_rel32(size_t addr, size_t size);
