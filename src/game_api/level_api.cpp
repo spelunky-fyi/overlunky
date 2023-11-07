@@ -852,10 +852,10 @@ using LoadScreenFun = void(StateMemory*, size_t, size_t);
 LoadScreenFun* g_load_screen_trampoline{nullptr};
 void load_screen(StateMemory* state, size_t param_2, size_t param_3)
 {
-    if (pre_event(ON::PRE_LOAD_SCREEN))
+    if (pre_load_screen())
         return;
     g_load_screen_trampoline(state, param_2, param_3);
-    post_event(ON::POST_LOAD_SCREEN);
+    post_load_screen();
 }
 
 using UnloadLayerFun = void(Layer*);
@@ -2368,8 +2368,8 @@ void do_load_screen()
 {
     static auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
     const auto state = State::get().ptr();
-    if (pre_event(ON::PRE_LOAD_SCREEN))
+    if (pre_load_screen())
         return;
     load_screen_fun(state, 0, 0);
-    post_event(ON::POST_LOAD_SCREEN);
+    post_load_screen();
 }
