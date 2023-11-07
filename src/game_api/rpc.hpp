@@ -133,3 +133,5 @@ void set_start_level_paused(bool enable);
 bool get_start_level_paused();
 void set_level_logic_enabled(bool enable);
 void set_camera_layer_control_enabled(bool enable);
+void set_speedhack(std::optional<float> multiplier);
+float get_speedhack();

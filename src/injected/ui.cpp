@@ -366,102 +366,8 @@ std::map<std::string, bool> options = {
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
 double fps_min = 0, fps_max = 600.0;
-
-bool g_speedhack_hooked = false;
-float g_speedhack_multiplier = 1.0;
+float g_speedhack_ui_multiplier = 1.0;
 float g_speedhack_old_multiplier = 1.0;
-LARGE_INTEGER g_speedhack_prev;
-LARGE_INTEGER g_speedhack_current;
-LARGE_INTEGER g_speedhack_fake;
-PVOID g_oldqpc;
-
-#define PtrFromRva(base, rva) (((PBYTE)base) + rva)
-
-// I didn't write this one, I just found it in the shady parts of the internet
-// This could probably be done with detours and speedhack should be part of the api anyway...
-BOOL HookIAT(const char* szModuleName, const char* szFuncName, PVOID pNewFunc, PVOID* pOldFunc)
-{
-    PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)GetModuleHandle(NULL);
-    PIMAGE_NT_HEADERS pNtHeader = (PIMAGE_NT_HEADERS)PtrFromRva(pDosHeader, pDosHeader->e_lfanew);
-
-    // Make sure we have valid data
-    if (pNtHeader->Signature != IMAGE_NT_SIGNATURE)
-        return FALSE;
-
-    // Grab a pointer to the import data directory
-    PIMAGE_IMPORT_DESCRIPTOR pImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)PtrFromRva(pDosHeader, pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
-
-    for (UINT uIndex = 0; pImportDescriptor[uIndex].Characteristics != 0; uIndex++)
-    {
-        char* szDllName = (char*)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].Name);
-
-        // Is this our module?
-        if (_strcmpi(szDllName, szModuleName) != 0)
-            continue;
-
-        if (!pImportDescriptor[uIndex].FirstThunk || !pImportDescriptor[uIndex].OriginalFirstThunk)
-            return FALSE;
-
-        PIMAGE_THUNK_DATA pThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].FirstThunk);
-        PIMAGE_THUNK_DATA pOrigThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].OriginalFirstThunk);
-
-        for (; pOrigThunk->u1.Function != NULL; pOrigThunk++, pThunk++)
-        {
-            // We can't process ordinal imports just named
-            if (pOrigThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG)
-                continue;
-
-            PIMAGE_IMPORT_BY_NAME import = (PIMAGE_IMPORT_BY_NAME)PtrFromRva(pDosHeader, pOrigThunk->u1.AddressOfData);
-
-            // Is this our function?
-            if (_strcmpi(szFuncName, (char*)import->Name) != 0)
-                continue;
-
-            DWORD dwJunk = 0;
-            MEMORY_BASIC_INFORMATION mbi;
-
-            // Make the memory section writable
-            VirtualQuery(pThunk, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
-            if (!VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &mbi.Protect))
-                return FALSE;
-
-            // Save the old pointer
-            *pOldFunc = (PVOID*)(DWORD_PTR)pThunk->u1.Function;
-
-// Write the new pointer based on CPU type
-#ifdef _WIN64
-            pThunk->u1.Function = (ULONGLONG)(DWORD_PTR)pNewFunc;
-#else
-            pThunk->u1.Function = (DWORD)(DWORD_PTR)pNewFunc;
-#endif
-
-            if (VirtualProtect(mbi.BaseAddress, mbi.RegionSize, mbi.Protect, &dwJunk))
-                return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-bool __stdcall QueryPerformanceCounterHook(LARGE_INTEGER* counter)
-{
-    QueryPerformanceCounter(&g_speedhack_current);
-    g_speedhack_fake.QuadPart += (long long)((g_speedhack_current.QuadPart - g_speedhack_prev.QuadPart) * g_speedhack_multiplier);
-    g_speedhack_prev = g_speedhack_current;
-    *counter = g_speedhack_fake;
-    return true;
-}
-
-void speedhack(float multiplier = g_speedhack_multiplier)
-{
-    g_speedhack_multiplier = multiplier;
-    if (!g_speedhack_hooked)
-    {
-        QueryPerformanceCounter(&g_speedhack_prev);
-        g_speedhack_fake = g_speedhack_prev;
-        HookIAT("kernel32.dll", "QueryPerformanceCounter", QueryPerformanceCounterHook, &g_oldqpc);
-        g_speedhack_hooked = true;
-    }
-}
 
 void hook_savegame()
 {
@@ -1878,9 +1784,9 @@ void force_cheats()
     if (options["speedhack"])
     {
         if (should_speedhack())
-            speedhack(10.0f);
-        else if (g_speedhack_multiplier == 10.0f && !should_speedhack())
-            speedhack(1.0f);
+            UI::speedhack(10.0f);
+        else if (g_speedhack_ui_multiplier == 10.0f && !should_speedhack())
+            UI::speedhack(1.0f);
     }
 }
 
@@ -2702,12 +2608,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (pressed("speedhack_turbo", wParam))
         {
-            speedhack(g_speedhack_old_multiplier);
+            UI::speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
         else if (pressed("speedhack_slow", wParam))
         {
-            speedhack(g_speedhack_old_multiplier);
+            UI::speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
         else if (pressed("peek_layer", wParam))
@@ -2724,6 +2630,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     int repeat = (lParam >> 30) & 1U;
     auto& io = ImGui::GetIO();
     ImGuiWindow* current = g.NavWindow;
+    g_speedhack_ui_multiplier = UI::get_speedhack();
 
     if (current != nullptr && current == ImGui::FindWindowByName("KeyCapture"))
         return false;
@@ -3294,93 +3201,93 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_multiplier += 0.1f;
-        if (g_speedhack_multiplier > 10.f)
-            g_speedhack_multiplier = 10.f;
-        speedhack();
+        g_speedhack_ui_multiplier += 0.1f;
+        if (g_speedhack_ui_multiplier > 10.f)
+            g_speedhack_ui_multiplier = 10.f;
+        UI::speedhack(g_speedhack_ui_multiplier);
     }
     else if (pressed("speedhack_decrease", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_multiplier -= 0.1f;
-        if (g_speedhack_multiplier < 0.1f)
-            g_speedhack_multiplier = 0.1f;
-        speedhack();
+        g_speedhack_ui_multiplier -= 0.1f;
+        if (g_speedhack_ui_multiplier < 0.1f)
+            g_speedhack_ui_multiplier = 0.1f;
+        UI::speedhack(g_speedhack_ui_multiplier);
     }
     else if (pressed("speedhack_10pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.1f);
+        UI::speedhack(0.1f);
     }
     else if (pressed("speedhack_20pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.2f);
+        UI::speedhack(0.2f);
     }
     else if (pressed("speedhack_30pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.3f);
+        UI::speedhack(0.3f);
     }
     else if (pressed("speedhack_40pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.4f);
+        UI::speedhack(0.4f);
     }
     else if (pressed("speedhack_50pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.5f);
+        UI::speedhack(0.5f);
     }
     else if (pressed("speedhack_60pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.6f);
+        UI::speedhack(0.6f);
     }
     else if (pressed("speedhack_70pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.7f);
+        UI::speedhack(0.7f);
     }
     else if (pressed("speedhack_80pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.8f);
+        UI::speedhack(0.8f);
     }
     else if (pressed("speedhack_90pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.9f);
+        UI::speedhack(0.9f);
     }
     else if (pressed("speedhack_normal", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(1.0f);
+        UI::speedhack(1.0f);
     }
     else if (pressed("speedhack_turbo", wParam) && !repeat)
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_old_multiplier = g_speedhack_multiplier;
-        speedhack(5.f); // TODO: configurable
+        g_speedhack_old_multiplier = g_speedhack_ui_multiplier;
+        UI::speedhack(5.f); // TODO: configurable
     }
     else if (pressed("speedhack_slow", wParam) && !repeat)
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_old_multiplier = g_speedhack_multiplier;
-        speedhack(0.2f); // TODO: configurable
+        g_speedhack_old_multiplier = g_speedhack_ui_multiplier;
+        UI::speedhack(0.2f); // TODO: configurable
     }
     else if (pressed("destroy_grabbed", wParam))
     {
@@ -5784,18 +5691,19 @@ void render_options()
         ImGui::Checkbox("Uncap unfocused FPS on start", &options["uncap_unfocused_fps"]);
         tooltip("Sets the unfocused FPS to unlimited automatically.");
 
-        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 10.f, "%.2fx"))
+        g_speedhack_ui_multiplier = UI::get_speedhack();
+        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_ui_multiplier, 0.1f, 10.f, "%.2fx"))
         {
             if (should_speedhack())
                 options["speedhack"] = false;
-            speedhack();
+            UI::speedhack(g_speedhack_ui_multiplier);
         }
         tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
         ImGui::SameLine();
         if (ImGui::Button("Reset##ResetSpeedhack"))
         {
-            g_speedhack_multiplier = 1.0f;
-            speedhack();
+            g_speedhack_ui_multiplier = 1.0f;
+            UI::speedhack(g_speedhack_ui_multiplier);
         }
         if (ImGui::SliderScalar("Engine FPS##EngineFPS", ImGuiDataType_Double, &g_engine_fps, &fps_min, &fps_max, "%f"))
             update_frametimes();
@@ -5934,7 +5842,7 @@ void render_options()
         if (ImGui::Checkbox("Auto (fade) pause on level start", &pause_level))
             UI::set_start_level_paused(pause_level);
         ImGui::Separator();
-        ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
+        ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let you unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
         ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce the selected normal pause flags");
         ImGui::TextWrapped("- Using only the freeze options will induce weird camera flickering and you're adviced to use them along with a normal (fade) pause type");
         endmenu();
@@ -8892,6 +8800,7 @@ void render_prohud()
         last_frame = this_frame;
         last_time = this_time;
     }
+    g_speedhack_ui_multiplier = UI::get_speedhack();
 
     auto io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
@@ -8903,7 +8812,7 @@ void render_prohud()
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{:.2f} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{:.2f}x ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{:.2f} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_ui_multiplier != 1.0 ? fmt::format("SPEEDHACK:{:.2f}x ", g_speedhack_ui_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 

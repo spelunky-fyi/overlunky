@@ -786,3 +786,13 @@ bool UI::get_start_level_paused()
 {
     return ::get_start_level_paused();
 }
+
+void UI::speedhack(float multiplier)
+{
+    ::set_speedhack(multiplier);
+}
+
+float UI::get_speedhack()
+{
+    return ::get_speedhack();
+}

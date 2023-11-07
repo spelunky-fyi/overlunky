@@ -2117,7 +2117,7 @@ end
     /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
     lua["update_state"] = update_state;
 
-    /// Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+    /// Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
     lua["set_frametime"] = set_frametime;
 
     /// Get engine target frametime (1/framerate, default 1/60).
@@ -2221,6 +2221,12 @@ end
     /// Letting you control those manually.
     /// Look at the example on how to mimic game layer switching behavior
     lua["set_camera_layer_control_enabled"] = set_camera_layer_control_enabled;
+
+    /// Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
+    lua["set_speedhack"] = set_speedhack;
+
+    /// Get the current speedhack multiplier
+    lua["get_speedhack"] = get_speedhack;
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 

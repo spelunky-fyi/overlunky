@@ -91,4 +91,6 @@ class UI
     static void load_death_screen();
     static void set_start_level_paused(bool enable);
     static bool get_start_level_paused();
+    static void speedhack(float multiplier);
+    static float get_speedhack();
 };
