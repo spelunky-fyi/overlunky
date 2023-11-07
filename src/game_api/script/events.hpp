@@ -25,6 +25,7 @@ bool pre_init_layer(LAYER layer);
 bool pre_unload_level();
 bool pre_unload_layer(LAYER layer);
 
+void post_load_screen();
 void post_init_layer(LAYER layer);
 void post_unload_layer(LAYER layer);
 void post_room_generation();

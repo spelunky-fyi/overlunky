@@ -855,7 +855,7 @@ void load_screen(StateMemory* state, size_t param_2, size_t param_3)
     if (pre_event(ON::PRE_LOAD_SCREEN))
         return;
     g_load_screen_trampoline(state, param_2, param_3);
-    post_event(ON::POST_LOAD_SCREEN);
+    post_load_screen();
 }
 
 using UnloadLayerFun = void(Layer*);
@@ -2371,5 +2371,5 @@ void do_load_screen()
     if (pre_event(ON::PRE_LOAD_SCREEN))
         return;
     load_screen_fun(state, 0, 0);
-    post_event(ON::POST_LOAD_SCREEN);
+    post_load_screen();
 }
