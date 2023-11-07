@@ -2646,10 +2646,8 @@ end
     // POST_PROCESS_INPUT
     // Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.
     // PRE_GAME_LOOP
-    // Params: float deltatime
-    // Runs right before the main engine loop. Return true to disable.
+    // Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.
     // POST_GAME_LOOP
-    // Params: float deltatime
     // Runs right after the main engine loop.
     */
 

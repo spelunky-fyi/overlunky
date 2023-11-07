@@ -9365,32 +9365,6 @@ void check_focus()
     }
 }
 
-std::unordered_set<std::string> legal_options{
-    "disable_ghost_timer",
-    "disable_pause",
-    "draw_entity_info",
-    "draw_entity_tooltip",
-    "draw_grid",
-    "draw_hitboxes",
-    "draw_hitboxes_interpolated",
-    "draw_hotbar",
-    "draw_hud",
-    "draw_path",
-    "draw_script_messages",
-    "fade_script_messages",
-    "fly_mode",
-    "god_mode",
-    "god_mode_companions",
-    "hd_cursor",
-    "keyboard_control",
-    "lights",
-    "mouse_control",
-    "noclip",
-    "smooth_camera",
-    "pause_type",
-    "camera_hack",
-};
-
 void update_bucket()
 {
     if (g_bucket->overlunky->set_selected_uid.has_value())

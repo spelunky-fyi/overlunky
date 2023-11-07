@@ -619,3 +619,17 @@ Runs right before the game gets input from various devices and writes to a bunch
 > Search script examples for [ON.POST_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_PROCESS_INPUT)
 
 Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/>
+
+## ON.PRE_GAME_LOOP
+
+
+> Search script examples for [ON.PRE_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GAME_LOOP)
+
+Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.<br/>
+
+## ON.POST_GAME_LOOP
+
+
+> Search script examples for [ON.POST_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_GAME_LOOP)
+
+Runs right after the main engine loop.<br/>

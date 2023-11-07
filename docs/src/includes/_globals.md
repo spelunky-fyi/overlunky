@@ -1497,6 +1497,24 @@ Get the current timestamp in milliseconds since the Unix Epoch.
 
 Gets the specified setting, values might need to be interpreted differently per setting
 
+### get_speedhack
+
+
+> Search script examples for [get_speedhack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_speedhack)
+
+#### float get_speedhack()
+
+Get the current speedhack multiplier
+
+### get_start_level_paused
+
+
+> Search script examples for [get_start_level_paused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_start_level_paused)
+
+#### bool get_start_level_paused()
+
+Returns true if the level pause hack is enabled
+
 ### god
 
 
@@ -1809,7 +1827,7 @@ Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0
 
 #### nil set_frametime(optional<double> frametime)
 
-Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
 
 ### set_frametime_unfocused
 
@@ -1898,6 +1916,15 @@ end, ON.PRE_LOAD_SCREEN)
 #### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
 
 Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
+
+### set_speedhack
+
+
+> Search script examples for [set_speedhack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_speedhack)
+
+#### nil set_speedhack(optional<float> multiplier)
+
+Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
 
 ### set_start_level_paused
 

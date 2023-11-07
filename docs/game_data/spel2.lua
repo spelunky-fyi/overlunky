@@ -1234,7 +1234,7 @@ function set_boss_door_control_enabled(enable) end
 ---Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
 ---@return nil
 function update_state() end
----Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+---Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
 ---@param frametime double?
 ---@return nil
 function set_frametime(frametime) end
@@ -1308,6 +1308,9 @@ function set_level_logic_enabled(enable) end
 ---@param enable boolean
 ---@return nil
 function set_start_level_paused(enable) end
+---Returns true if the level pause hack is enabled
+---@return boolean
+function get_start_level_paused() end
 ---Converts INPUTS to (x, y, BUTTON)
 ---@param inputs INPUTS
 ---@return number, number, BUTTON
@@ -1328,6 +1331,13 @@ function set_infinite_loop_detection_enabled(enable) end
 ---@param enable boolean
 ---@return nil
 function set_camera_layer_control_enabled(enable) end
+---Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
+---@param multiplier number?
+---@return nil
+function set_speedhack(multiplier) end
+---Get the current speedhack multiplier
+---@return number
+function get_speedhack() end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -6328,7 +6338,7 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
 
 ---@class Overlunky
     ---@field options table<string, any> @Current Overlunky options. Read only.
-    ---@field set_options table<string, any> @Write some select options here to change Overlunky options. Just use the same keys as in options.
+    ---@field set_options table<string, any> @Write [some select options](https://github.com/search?q=repo%3Aspelunky-fyi%2Foverlunky+legal_options+language%3AC%2B%2B&type=code&l=C%2B%2B) here to change Overlunky options.
     ---@field keys table<string, KEY> @Current Overlunky key bindings. Read only. You can use this to bind some custom feature to the same unknown key as currently bound by the user.
     ---@field ignore_keys unordered_Array<string> @Disable some key bindings in Overlunky, whatever key they are actually bound to. Remember this might not be bound to the default any more, so only use this if you also plan on overriding the current keybinding, or just need to disable some feature and don't care what key it is bound on.
     ---@field ignore_keycodes unordered_Array<KEY> @Disable keys that may or may not be used by Overlunky. You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
