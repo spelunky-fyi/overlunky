@@ -89,4 +89,6 @@ class UI
     static void spawn_player(uint8_t player_slot, std::optional<float> x = std::nullopt, std::optional<float> y = std::nullopt, std::optional<LAYER> layer = std::nullopt);
     static std::pair<float, float> spawn_position();
     static void load_death_screen();
+    static void set_start_level_paused(bool enable);
+    static bool get_start_level_paused();
 };

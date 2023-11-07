@@ -776,3 +776,13 @@ void UI::load_death_screen()
 {
     ::load_death_screen();
 }
+
+void UI::set_start_level_paused(bool enable)
+{
+    ::set_start_level_paused(enable);
+}
+
+bool UI::get_start_level_paused()
+{
+    return ::get_start_level_paused();
+}

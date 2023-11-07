@@ -1868,3 +1868,8 @@ void set_start_level_paused(bool enable)
             recover_mem("start_level_paused");
     }
 }
+
+bool get_start_level_paused()
+{
+    return mem_written("start_level_paused");
+}

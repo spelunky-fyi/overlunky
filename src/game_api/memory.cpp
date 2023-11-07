@@ -103,6 +103,7 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
 }
 
 std::unordered_map<std::string, std::vector<RecoverableMemory>> original_memory;
+std::unordered_set<std::string> edited_memory;
 
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
 {
@@ -138,6 +139,7 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
         }
     }
     write_mem_prot(addr, payload, prot);
+    edited_memory.insert(name);
 }
 
 void recover_mem(std::string name, size_t addr)
@@ -147,7 +149,13 @@ void recover_mem(std::string name, size_t addr)
         for (auto& it : original_memory[name])
             if (!addr || addr == it.address)
                 write_mem_prot(it.address, std::string_view{it.old_data, it.size}, it.prot_used);
+        edited_memory.erase(name);
     }
+}
+
+bool mem_written(std::string name)
+{
+    return edited_memory.contains(name);
 }
 
 size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_view payload, bool just_nop, size_t return_to_addr, bool game_code_first)

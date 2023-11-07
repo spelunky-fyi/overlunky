@@ -361,7 +361,8 @@ std::map<std::string, bool> options = {
     {"borders", false},
     {"console_alt_keys", false},
     {"vsync", true},
-    {"uncap_unfocused_fps", true}};
+    {"uncap_unfocused_fps", true},
+    {"pause_loading", false}};
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
 double fps_min = 0, fps_max = 600.0;
@@ -2129,8 +2130,8 @@ void force_kits()
 bool toggle_pause()
 {
     g_pause_at = -1;
-    g_state->pause ^= ((uint8_t)g_pause_type & ~0x40);
-    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false", g_pause_type, paused));
+    g_state->pause ^= ((uint8_t)g_pause_type & ~0xC0);
+    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false exports.loading = {}", g_pause_type, paused, options["pause_loading"]));
     return paused;
 }
 
@@ -2138,12 +2139,16 @@ void frame_advance()
 {
     if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
     {
-        g_state->pause = (uint8_t)g_pause_type & ~0x40;
+        g_state->pause = (uint8_t)g_pause_type & ~0xC0;
         g_pause_at = -1;
     }
-    if ((g_pause_type & 0x40) == 0)
+    if ((g_pause_type & 0xc0) == 0)
     {
         paused = g_state->pause & (uint8_t)g_pause_type;
+    }
+    else
+    {
+        paused = g_ui_scripts["pause"]->execute("return exports.paused") == "true";
     }
 }
 
@@ -2993,7 +2998,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_pause_type & 0x40)
+        if (g_pause_type & 0xC0)
         {
             if (paused)
             {
@@ -5922,6 +5927,16 @@ void render_options()
         ImGui::PushID("PauseType");
         render_flags(pause_types, &g_pause_type, false);
         ImGui::PopID();
+        ImGui::Separator();
+        if (ImGui::Checkbox("Freeze during loading screens", &options["pause_loading"]))
+            g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]));
+        bool pause_level = UI::get_start_level_paused();
+        if (ImGui::Checkbox("Auto (fade) pause on level start", &pause_level))
+            UI::set_start_level_paused(pause_level);
+        ImGui::Separator();
+        ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
+        ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce the selected normal pause flags");
+        ImGui::TextWrapped("- Using only the freeze options will induce weird camera flickering and you're adviced to use them along with a normal (fade) pause type");
         endmenu();
     }
 
@@ -9021,23 +9036,66 @@ meta = {
     name = "pause",
     author = "overlunky",
 }
+
 exports = {
     type = 0,
     paused = false,
     skip = false,
+    loading = true,
 }
+
+kb = get_raw_input().keyboard
+gp = game_manager.game_props
+ol = get_bucket().overlunky
+
 set_callback(function()
     if test_mask(exports.type, 0x40) then
         if exports.paused and exports.skip then
-            exports.skip = false
+            --exports.skip = false
             state.pause = clr_mask(state.pause, exports.type)
             return false
         elseif exports.paused then
-            state.pause = set_mask(state.pause, clr_mask(exports.type, 0x40))
+            state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
         end
-        return exports.paused
+        skipped = exports.paused and (exports.loading or state.loading == 0 or state.fadevalue < 0.03)
+        return skipped
     end
-end, ON.PRE_UPDATE))");
+end, ON.PRE_UPDATE)
+
+set_callback(function()
+    if not exports.paused and state.pause == 2 and test_mask(state.pause, exports.type) and get_start_level_paused() and state.time_level == 1 then
+        exports.paused = true
+    end
+    if test_mask(exports.type, 0x80) then
+        if exports.paused and exports.skip then
+            --exports.skip = false
+            state.pause = clr_mask(state.pause, exports.type)
+            return false
+        elseif exports.paused then
+            state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
+        end
+        skipped = exports.paused and (exports.loading or state.loading == 0 or state.fadevalue < 0.03)
+        return skipped
+    end
+end, ON.PRE_MAIN_LOOP)
+
+set_callback(function()
+    exports.skip = false
+end, ON.POST_MAIN_LOOP)
+
+set_callback(function()
+    if exports.paused and not exports.skip then
+        return true
+    end
+end, ON.PRE_PROCESS_INPUT)
+
+set_callback(function()
+    if kb[40].down and not kb[33].down then
+        gp.input_menu = clr_mask(gp.input_menu, MENU_INPUT.SELECT)
+    end
+end, ON.POST_PROCESS_INPUT)
+)");
+    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]));
     add_ui_script("camera_hack", false, R"(
 lastpos = Vec2:new()
 set_callback(function()
