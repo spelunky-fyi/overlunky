@@ -651,7 +651,7 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    if (!pre_state_update())
+    if (!pre_event(ON::PRE_UPDATE))
     {
         g_state_update_trampoline(s);
     }
@@ -676,11 +676,11 @@ using OnProcessInput = void(void*);
 OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
-    if (!pre_process_input())
+    if (!pre_event(ON::PRE_PROCESS_INPUT))
     {
         g_process_input_trampoline(s);
     }
-    post_process_input();
+    post_event(ON::POST_PROCESS_INPUT);
 }
 
 void init_process_input_hook()
@@ -707,11 +707,11 @@ void GameLoop(void* a, float b, void* c)
     else
         global_frame_count++;
 
-    if (!pre_game_loop())
+    if (!pre_event(ON::PRE_GAME_LOOP))
     {
         g_game_loop_trampoline(a, b, c);
     }
-    post_game_loop();
+    post_event(ON::POST_GAME_LOOP);
 }
 
 void init_game_loop_hook()

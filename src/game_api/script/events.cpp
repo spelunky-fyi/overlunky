@@ -27,17 +27,6 @@ void pre_load_level_files()
             return true;
         });
 }
-bool pre_level_generation()
-{
-    bool block{false};
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            block = backend->pre_level_generation();
-            return !block;
-        });
-    return block;
-}
 bool pre_load_screen()
 {
     static int64_t prev_seed = 0;
@@ -152,30 +141,12 @@ void post_init_layer(LAYER layer)
             return true;
         });
 }
-void post_init_level()
-{
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            backend->post_init_level();
-            return true;
-        });
-}
 void post_load_screen()
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
             backend->post_load_screen();
-            return true;
-        });
-}
-void post_unload_level()
-{
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            backend->post_unload_level();
             return true;
         });
 }
@@ -408,22 +379,6 @@ void update_backends()
         });
 }
 
-bool pre_state_update()
-{
-    bool return_val = false;
-    LuaBackend::for_each_backend(
-        [=, &return_val](LuaBackend::LockedBackend backend)
-        {
-            if (backend->on_pre_state_update())
-            {
-                return_val = true;
-                return false;
-            }
-            return true;
-        });
-    return return_val;
-}
-
 bool pre_load_journal_chapter(uint8_t chapter)
 {
     bool return_value = false;
@@ -487,13 +442,13 @@ bool pre_set_feat(FEAT feat)
     return block;
 }
 
-bool pre_process_input()
+bool pre_event(ON event)
 {
     bool return_val = false;
     LuaBackend::for_each_backend(
         [=, &return_val](LuaBackend::LockedBackend backend)
         {
-            if (backend->on_pre_process_input())
+            if (backend->on_pre(event))
             {
                 return_val = true;
                 return false;
@@ -503,38 +458,12 @@ bool pre_process_input()
     return return_val;
 }
 
-void post_process_input()
+void post_event(ON event)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->on_post_process_input();
-            return true;
-        });
-}
-
-bool pre_game_loop()
-{
-    bool return_val = false;
-    LuaBackend::for_each_backend(
-        [=, &return_val](LuaBackend::LockedBackend backend)
-        {
-            if (backend->on_pre_game_loop())
-            {
-                return_val = true;
-                return false;
-            }
-            return true;
-        });
-    return return_val;
-}
-
-void post_game_loop()
-{
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            backend->on_post_game_loop();
+            backend->on_post(event);
             return true;
         });
 }
