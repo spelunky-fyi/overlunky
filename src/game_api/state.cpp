@@ -297,7 +297,7 @@ State& State::get()
             strings_init();
             init_state_update_hook();
             init_process_input_hook();
-            init_main_loop_hook();
+            init_game_loop_hook();
 
             auto bucket = Bucket::get();
             if (!bucket->patches_applied)
@@ -651,15 +651,6 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    auto state = State::get();
-    if (s == state.ptr_main())
-    {
-        if (global_frame_count < state.get_frame_count())
-            global_frame_count = state.get_frame_count_main();
-        else
-            global_frame_count++;
-    }
-
     if (!pre_state_update())
     {
         g_state_update_trampoline(s);
@@ -706,28 +697,34 @@ void init_process_input_hook()
     }
 }
 
-using OnMainLoop = void(void* a, float b, void* c);
-OnMainLoop* g_main_loop_trampoline{nullptr};
-void MainLoop(void* a, float b, void* c)
+using OnGameLoop = void(void* a, float b, void* c);
+OnGameLoop* g_game_loop_trampoline{nullptr};
+void GameLoop(void* a, float b, void* c)
 {
-    if (!pre_main_loop())
+    auto state = State::get();
+    if (global_frame_count < state.get_frame_count_main())
+        global_frame_count = state.get_frame_count_main();
+    else
+        global_frame_count++;
+
+    if (!pre_game_loop())
     {
-        g_main_loop_trampoline(a, b, c);
+        g_game_loop_trampoline(a, b, c);
     }
-    post_main_loop();
+    post_game_loop();
 }
 
-void init_main_loop_hook()
+void init_game_loop_hook()
 {
-    g_main_loop_trampoline = (OnMainLoop*)get_address("main_loop");
+    g_game_loop_trampoline = (OnGameLoop*)get_address("game_loop");
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
-    DetourAttach((void**)&g_main_loop_trampoline, &MainLoop);
+    DetourAttach((void**)&g_game_loop_trampoline, &GameLoop);
 
     const LONG error = DetourTransactionCommit();
     if (error != NO_ERROR)
     {
-        DEBUG("Failed hooking main_loop stuff: {}\n", error);
+        DEBUG("Failed hooking game_loop stuff: {}\n", error);
     }
 }
 

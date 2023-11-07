@@ -375,7 +375,7 @@ struct State
 };
 void init_state_update_hook();
 void init_process_input_hook();
-void init_main_loop_hook();
+void init_game_loop_hook();
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 uint8_t enum_to_layer(const LAYER layer);

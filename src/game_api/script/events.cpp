@@ -513,13 +513,13 @@ void post_process_input()
         });
 }
 
-bool pre_main_loop()
+bool pre_game_loop()
 {
     bool return_val = false;
     LuaBackend::for_each_backend(
         [=, &return_val](LuaBackend::LockedBackend backend)
         {
-            if (backend->on_pre_main_loop())
+            if (backend->on_pre_game_loop())
             {
                 return_val = true;
                 return false;
@@ -529,12 +529,12 @@ bool pre_main_loop()
     return return_val;
 }
 
-void post_main_loop()
+void post_game_loop()
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->on_post_main_loop();
+            backend->on_post_game_loop();
             return true;
         });
 }

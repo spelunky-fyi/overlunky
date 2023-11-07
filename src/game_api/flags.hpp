@@ -704,7 +704,7 @@ std::array pause_types{
     "16: ?",
     "32: Ankh (smooth camera, janky audio)",
     "Freeze on PRE_UPDATE",    // this is not a real state.pause flag, it's only used by ui.cpp for magic
-    "Freeze on PRE_MAIN_LOOP", // this is not a real state.pause flag, it's only used by ui.cpp for magic
+    "Freeze on PRE_GAME_LOOP", // this is not a real state.pause flag, it's only used by ui.cpp for magic
 };
 
 std::array levelgen_flags{

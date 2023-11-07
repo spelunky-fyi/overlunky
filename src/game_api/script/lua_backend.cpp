@@ -1908,7 +1908,7 @@ void LuaBackend::on_post_process_input()
     }
 }
 
-bool LuaBackend::on_pre_main_loop()
+bool LuaBackend::on_pre_game_loop()
 {
     if (!get_enabled())
         return false;
@@ -1921,7 +1921,7 @@ bool LuaBackend::on_pre_main_loop()
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::PRE_MAIN_LOOP)
+        if (callback.screen == ON::PRE_GAME_LOOP)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
@@ -1936,7 +1936,7 @@ bool LuaBackend::on_pre_main_loop()
     return false;
 }
 
-void LuaBackend::on_post_main_loop()
+void LuaBackend::on_post_game_loop()
 {
     if (!get_enabled())
         return;
@@ -1949,7 +1949,7 @@ void LuaBackend::on_post_main_loop()
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::POST_MAIN_LOOP)
+        if (callback.screen == ON::POST_GAME_LOOP)
         {
             callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);

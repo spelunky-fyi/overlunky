@@ -2091,7 +2091,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .from_exe_base(0x22c42ae0) // TODO
     },
     {
-        "main_loop"sv,
+        "game_loop"sv,
         PatternCommandBuffer{}
             .from_exe_base(0x22aa9580) // TODO
     },
