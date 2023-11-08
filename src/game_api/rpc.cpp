@@ -529,16 +529,9 @@ void set_kapala_blood_threshold(uint8_t threshold)
 
 void set_kapala_hud_icon(int8_t icon_index)
 {
-    static size_t instruction_offset = 0;
-    static size_t icon_index_offset = 0;
-    static uint32_t distance = 0;
-
-    if (instruction_offset == 0)
-    {
-        instruction_offset = get_address("kapala_hud_icon");
-        icon_index_offset = instruction_offset + 0x12;
-        distance = static_cast<uint32_t>(icon_index_offset - (instruction_offset + 7));
-    }
+    static const size_t instruction_offset = get_address("kapala_hud_icon");
+    static const size_t icon_index_offset = instruction_offset + 0x12;
+    static const uint32_t distance = static_cast<uint32_t>(icon_index_offset - (instruction_offset + 7));
 
     if (icon_index < 0) // reset to original
     {
@@ -594,21 +587,18 @@ void drop(uint32_t who_uid, uint32_t what_uid)
 
 void unequip_backitem(uint32_t who_uid)
 {
-    static size_t offset = get_address("unequip");
+    static const size_t offset = get_address("unequip");
 
-    if (offset != 0)
+    auto backitem_uid = worn_backitem(who_uid);
+    if (backitem_uid != -1)
     {
-        auto backitem_uid = worn_backitem(who_uid);
-        if (backitem_uid != -1)
+        Movable* ent = (Movable*)get_entity_ptr(who_uid);
+        Entity* backitem_ent = get_entity_ptr(backitem_uid);
+        if (ent != nullptr && backitem_ent != nullptr)
         {
-            Movable* ent = (Movable*)get_entity_ptr(who_uid);
-            Entity* backitem_ent = get_entity_ptr(backitem_uid);
-            if (ent != nullptr && backitem_ent != nullptr)
-            {
-                typedef size_t unequip_func(Entity*, uint32_t);
-                static unequip_func* uf = (unequip_func*)(offset);
-                uf(ent, backitem_ent->type->id);
-            }
+            typedef size_t unequip_func(Entity*, uint32_t);
+            static unequip_func* uf = (unequip_func*)(offset);
+            uf(ent, backitem_ent->type->id);
         }
     }
 }
@@ -691,16 +681,12 @@ void set_olmec_phase_y_level(uint8_t phase, float y)
 
 void force_olmec_phase_0(bool b)
 {
-    static size_t offset = get_address("olmec_transition_phase_1");
+    static const size_t offset = get_address("olmec_transition_phase_1");
 
     if (b)
-    {
         write_mem_recoverable("force_olmec_phase_0", offset, "\xEB\x2E"s, true); // jbe -> jmp
-    }
     else
-    {
         recover_mem("force_olmec_phase_0");
-    }
 }
 
 void set_ghost_spawn_times(uint32_t normal, uint32_t cursed)
@@ -741,34 +727,22 @@ void set_time_ghost_enabled(bool b)
 
 void set_time_jelly_enabled(bool b)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto memory = Memory::get();
-        offset = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_COSMIC_OCEAN, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
-    }
+    auto memory = Memory::get();
+    static const size_t offset = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_COSMIC_OCEAN, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
     if (b)
-    {
         recover_mem("set_time_jelly_enabled");
-    }
     else
-    {
         write_mem_recoverable("set_time_jelly_enabled", offset, "\xC3\x90\x90\x90"s, true);
-    }
 }
 
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
 {
     // this functions just calculates the room index and then loops thru state->room_owners->owned_rooms and compares the room index
     // TODO: we could probably get rid of this pattern and write that ourselves
-    static size_t offset = get_address("coord_inside_active_shop_room");
-    if (offset != 0)
-    {
-        typedef bool coord_inside_shop_func(StateMemory*, uint32_t layer, float x, float y);
-        static coord_inside_shop_func* cisf = (coord_inside_shop_func*)(offset);
-        return cisf(get_state_ptr(), enum_to_layer(layer), x, y);
-    }
-    return false;
+    static const size_t offset = get_address("coord_inside_active_shop_room");
+    typedef bool coord_inside_shop_func(StateMemory*, uint32_t layer, float x, float y);
+    static coord_inside_shop_func* cisf = (coord_inside_shop_func*)(offset);
+    return cisf(get_state_ptr(), enum_to_layer(layer), x, y);
 }
 
 bool is_inside_shop_zone(float x, float y, LAYER layer)
@@ -780,16 +754,11 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     //
     // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
 
-    static size_t offset = get_address("coord_inside_shop_zone");
+    static const size_t offset = get_address("coord_inside_shop_zone");
     auto state = State::get().ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
-
-    if (offset != 0)
-    {
-        typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
-        coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
-        return ciszf(state->level_gen, enum_to_layer(layer), x, y);
-    }
-    return false;
+    typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
+    coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
+    return ciszf(state->level_gen, enum_to_layer(layer), x, y);
 }
 
 void set_journal_enabled(bool b)
@@ -801,26 +770,18 @@ void set_camp_camera_bounds_enabled(bool b)
 {
     static const size_t offset = get_address("enforce_camp_camera_bounds");
     if (b)
-    {
         recover_mem("camp_camera_bounds");
-    }
     else
-    {
         write_mem_recoverable("camp_camera_bounds", offset, "\xC3\x90\x90"s, true);
-    }
 }
 
 void set_explosion_mask(int32_t mask)
 {
     static const size_t addr = get_address("explosion_mask");
     if (mask == -1)
-    {
         recover_mem("explosion_mask");
-    }
     else
-    {
         write_mem_recoverable("explosion_mask", addr, mask, true);
-    }
 }
 
 void set_max_rope_length(uint8_t length)
@@ -1192,7 +1153,7 @@ void poison_entity(int32_t entity_uid)
 void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
 {
     static size_t offsets[4];
-    static auto size_minus_one = get_address("ankh_health");
+    static const auto size_minus_one = get_address("ankh_health");
     if (!health)
     {
         recover_mem("ankh_health");
@@ -1328,21 +1289,14 @@ void change_poison_timer(int16_t frames)
 void set_adventure_seed(int64_t first, int64_t second)
 {
     static const size_t offset = get_address("adventure_seed");
-    if (offset != 0)
-    {
-        write_mem_prot(offset, first, true);
-        write_mem_prot(offset + 8, second, true);
-    }
+    write_mem_prot(offset, first, true);
+    write_mem_prot(offset + 8, second, true);
 }
 
 std::pair<int64_t, int64_t> get_adventure_seed()
 {
     static const size_t offset = get_address("adventure_seed");
-    if (offset != 0)
-    {
-        return {memory_read<int64_t>(offset), memory_read<int64_t>(offset + 8)};
-    }
-    return {0, 0};
+    return {memory_read<int64_t>(offset), memory_read<int64_t>(offset + 8)};
 }
 
 void update_liquid_collision_at(float x, float y, bool add)
@@ -1363,13 +1317,9 @@ bool disable_floor_embeds(bool disable)
     static const auto address = get_address("spawn_floor_embeds");
     const bool current_value = memory_read<uint8_t>(address) == 0xc3;
     if (disable)
-    {
         write_mem_recoverable("disable_floor_embeds", address, "\xC3"sv, true);
-    }
     else
-    {
         recover_mem("disable_floor_embeds");
-    }
     return current_value;
 }
 
@@ -1377,13 +1327,9 @@ void set_cursepot_ghost_enabled(bool enable)
 {
     static const auto address = get_address("ghost_jar_ghost_spawn");
     if (!enable)
-    {
         write_mem_recoverable("ghost_jar_ghost_spawn", address, "\x90\x90\x90\x90\x90"sv, true);
-    }
     else
-    {
         recover_mem("ghost_jar_ghost_spawn");
-    }
 }
 
 void game_log(std::string message)
@@ -1663,66 +1609,41 @@ void set_boss_door_control_enabled(bool enable)
 
 void update_state()
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("state_refresh");
-    }
-    if (offset != 0)
-    {
-        auto state = State::get().ptr();
-        typedef void refresh_func(StateMemory*);
-        static refresh_func* rf = (refresh_func*)(offset);
-        rf(state);
-    }
+    static const size_t offset = get_address("state_refresh");
+    auto state = State::get().ptr();
+    typedef void refresh_func(StateMemory*);
+    static refresh_func* rf = (refresh_func*)(offset);
+    rf(state);
 }
 
 void set_frametime(std::optional<double> frametime)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-        offset = get_address("engine_frametime");
-    if (offset != 0)
-    {
-        if (frametime.has_value())
-            write_mem_recoverable("engine_frametime", offset, frametime.value(), true);
-        else
-            recover_mem("engine_frametime");
-    }
+    static const size_t offset = get_address("engine_frametime");
+    if (frametime.has_value())
+        write_mem_recoverable("engine_frametime", offset, frametime.value(), true);
+    else
+        recover_mem("engine_frametime");
 }
 
-std::optional<double> get_frametime()
+double get_frametime()
 {
-    static size_t offset = 0;
-    if (offset == 0)
-        offset = get_address("engine_frametime");
-    if (offset != 0)
-        return memory_read<double>(offset);
-    return std::nullopt;
+    static const size_t offset = get_address("engine_frametime");
+    return memory_read<double>(offset);
 }
 
 void set_frametime_inactive(std::optional<double> frametime)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-        offset = get_address("engine_frametime") + 0x10;
-    if (offset != 0)
-    {
-        if (frametime.has_value())
-            write_mem_recoverable("engine_frametime_inactive", offset, frametime.value(), true);
-        else
-            recover_mem("engine_frametime_inactive");
-    }
+    static const size_t offset = get_address("engine_frametime") + 0x10;
+    if (frametime.has_value())
+        write_mem_recoverable("engine_frametime_inactive", offset, frametime.value(), true);
+    else
+        recover_mem("engine_frametime_inactive");
 }
 
-std::optional<double> get_frametime_inactive()
+double get_frametime_inactive()
 {
-    static size_t offset = 0;
-    if (offset == 0)
-        offset = get_address("engine_frametime") + 0x10;
-    if (offset != 0)
-        return memory_read<double>(offset);
-    return std::nullopt;
+    static const size_t offset = get_address("engine_frametime") + 0x10;
+    return memory_read<double>(offset);
 }
 
 ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types)
@@ -1773,24 +1694,17 @@ int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_
 
 void destroy_layer(uint8_t layer)
 {
-    static size_t offset = 0;
-    if (offset == 0)
+    static const size_t offset = get_address("unload_layer");
+    auto state = State::get().ptr();
+    for (auto i = 0; i < MAX_PLAYERS; ++i)
     {
-        offset = get_address("unload_layer");
+        if (state->items->players[i] && state->items->players[i]->layer == layer)
+            state->items->players[i] = nullptr;
     }
-    if (offset != 0)
-    {
-        auto state = State::get().ptr();
-        for (auto i = 0; i < MAX_PLAYERS; ++i)
-        {
-            if (state->items->players[i] && state->items->players[i]->layer == layer)
-                state->items->players[i] = nullptr;
-        }
-        auto* layer_ptr = State::get().layer(layer);
-        typedef void destroy_func(Layer*);
-        static destroy_func* df = (destroy_func*)(offset);
-        df(layer_ptr);
-    }
+    auto* layer_ptr = State::get().layer(layer);
+    typedef void destroy_func(Layer*);
+    static destroy_func* df = (destroy_func*)(offset);
+    df(layer_ptr);
 }
 
 void destroy_level()
@@ -1801,18 +1715,11 @@ void destroy_level()
 
 void create_layer(uint8_t layer)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("init_layer");
-    }
-    if (offset != 0)
-    {
-        auto* layer_ptr = State::get().layer(layer);
-        typedef void init_func(Layer*);
-        static init_func* ilf = (init_func*)(offset);
-        ilf(layer_ptr);
-    }
+    static const size_t offset = get_address("init_layer");
+    auto* layer_ptr = State::get().layer(layer);
+    typedef void init_func(Layer*);
+    static init_func* ilf = (init_func*)(offset);
+    ilf(layer_ptr);
 }
 
 void create_level()
@@ -1824,23 +1731,18 @@ void create_level()
 void set_level_logic_enabled(bool enable)
 {
     auto state = State::get().ptr();
-    static size_t offset = get_virtual_function_address(state->screen_level, 1);
+    static const size_t offset = get_virtual_function_address(state->screen_level, 1);
 
-    if (offset != 0)
-    {
-        if (!enable)
-            write_mem_recoverable("set_level_logic_enabled", offset, "\xC3\x90"sv, true);
-        else
-            recover_mem("set_level_logic_enabled");
-    }
+    if (!enable)
+        write_mem_recoverable("set_level_logic_enabled", offset, "\xC3\x90"sv, true);
+    else
+        recover_mem("set_level_logic_enabled");
 }
 
 void set_camera_layer_control_enabled(bool enable)
 {
-    static auto offset = get_address("camera_layer_controll");
-    static auto offset2 = get_address("player_behavior_layer_switch");
-    if (!offset || !offset2)
-        return;
+    static const size_t offset = get_address("camera_layer_controll");
+    static const size_t offset2 = get_address("player_behavior_layer_switch");
 
     if (enable)
     {
@@ -1855,18 +1757,11 @@ void set_camera_layer_control_enabled(bool enable)
 
 void set_start_level_paused(bool enable)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("unpause_level");
-    }
-    if (offset != 0)
-    {
-        if (enable)
-            write_mem_recoverable("start_level_paused", offset, get_nop(3), true);
-        else
-            recover_mem("start_level_paused");
-    }
+    static const size_t offset = get_address("unpause_level");
+    if (enable)
+        write_mem_recoverable("start_level_paused", offset, get_nop(3), true);
+    else
+        recover_mem("start_level_paused");
 }
 
 bool get_start_level_paused()
@@ -1977,30 +1872,16 @@ float get_speedhack()
 void init_adventure()
 {
     // TODO: I didn't check exactly what this does, but it fixes issues with character select being broken after quick start
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("init_adventure");
-    }
-    if (offset != 0)
-    {
-        typedef void init_func();
-        static init_func* iaf = (init_func*)(offset);
-        iaf();
-    }
+    static const size_t offset = get_address("init_adventure");
+    typedef void init_func();
+    static init_func* iaf = (init_func*)(offset);
+    iaf();
 }
 
 void init_seeded(uint32_t seed)
 {
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        offset = get_address("init_seeded");
-    }
-    if (offset != 0)
-    {
-        typedef void init_func(void*, uint32_t);
-        static init_func* isf = (init_func*)(offset);
-        isf(State::get().ptr(), seed);
-    }
+    static const size_t offset = get_address("init_seeded");
+    typedef void init_func(void*, uint32_t);
+    static init_func* isf = (init_func*)(offset);
+    isf(State::get().ptr(), seed);
 }
