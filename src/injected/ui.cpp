@@ -250,7 +250,7 @@ std::vector<Callback> callbacks;
 
 static ImFont *font, *bigfont, *hugefont;
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f, g_camera_inertia = -FLT_MAX;
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1,
@@ -270,7 +270,7 @@ std::vector<uint32_t> saved_hotbar;
 std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
+bool set_focus_entity = false, set_focus_world = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
      enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
@@ -1676,6 +1676,8 @@ void force_zoom()
         enable_camp_camera = true;
         UI::set_camp_camera_bounds_enabled(true);
     }
+    if (g_camera_inertia != -FLT_MAX)
+        g_state->camera->inertia = g_camera_inertia;
 }
 
 void force_hud_flags()
@@ -3913,10 +3915,18 @@ void set_camera_hack(bool enable)
 
 void render_camera()
 {
-    if (set_focus_zoom)
+    if (submenu("Focus and bounds"))
     {
-        ImGui::SetKeyboardFocusHere();
-        set_focus_zoom = false;
+        auto [cx, cy] = State::get_camera_position();
+        float cpos[2]{cx, cy};
+        ImGui::InputFloat2("Position##CameraPos", cpos);
+        ImGui::InputFloat2("Focus##CameraFocus", &g_state->camera->focus_x);
+        ImGui::InputFloat2("Adjusted Focus##CameraAdjusted", &g_state->camera->adjusted_focus_x);
+        ImGui::InputFloat2("Calculated Focus##CameraCalculated", &g_state->camera->calculated_focus_x);
+        ImGui::InputFloat2("Focus Offset##CameraOffset", &g_state->camera->focus_offset_x);
+        ImGui::InputFloat("Vertical Pan##CameraOffset", &g_state->camera->vertical_pan);
+        ImGui::InputFloat4("Bounds##CameraBounds", &g_state->camera->bounds_left);
+        endmenu();
     }
     ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
     if (ImGui::DragFloat("Zoom##ZoomLevel", &g_zoom, 0.5f, 0.5, 60.0, "%.2f"))
@@ -3992,15 +4002,6 @@ void render_camera()
             g_state->camera->focused_entity_uid = g_last_id;
         tooltip("Focus the selected entity");
     }
-    ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2f, 1.0f);
-    ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
-    ImGui::InputFloat("Camera Real X##CameraRealX", &g_state->camera->adjusted_focus_x, 0.2f, 1.0f);
-    ImGui::InputFloat("Camera Real Y##CameraRealY", &g_state->camera->adjusted_focus_y, 0.2f, 1.0f);
-    ImGui::SeparatorText("Camera bounds");
-    ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2f, 1.0f);
-    ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
-    ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
-    ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
     if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
         set_camera_bounds(enable_camera_bounds);
     tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.", "camera_reset");
@@ -4024,7 +4025,21 @@ void render_camera()
         enable_camp_camera = !options["camera_hack"];
         UI::set_camp_camera_bounds_enabled(enable_camp_camera);
     }
-    tooltip("Enable to remove camera bounds and always center the entity instantly without rubberbanding.");
+    tooltip("Enable to remove camera bounds and always center\nthe entity instantly in 0 frames without rubberbanding.");
+    static bool lock_inertia{false};
+    if (ImGui::Checkbox("Lock current camera inertia##LockInertia", &lock_inertia))
+    {
+        if (lock_inertia)
+            g_camera_inertia = g_state->camera->inertia;
+        else
+            g_camera_inertia = -FLT_MAX;
+    }
+    tooltip("Force currently selected inertia on the next level too.");
+    ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
+    if (ImGui::DragFloat("Inertia##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f) && lock_inertia)
+        g_camera_inertia = g_state->camera->inertia;
+    tooltip("Lower values moves slower and smoother,\nhigher values reduce camera lagging behind.\n5 = basically 1-frame delay");
+    ImGui::PopItemWidth();
 }
 
 void render_arrow()
