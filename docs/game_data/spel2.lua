@@ -1239,14 +1239,14 @@ function update_state() end
 ---@return nil
 function set_frametime(frametime) end
 ---Get engine target frametime (1/framerate, default 1/60).
----@return double?
+---@return double
 function get_frametime() end
 ---Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
 ---@param frametime double?
 ---@return nil
 function set_frametime_unfocused(frametime) end
 ---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
----@return double?
+---@return double
 function get_frametime_unfocused() end
 ---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
 ---Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
@@ -5496,6 +5496,7 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class Screen
     ---@field render_timer number
+    ---@field init fun(self): nil @Initializes the screen.
 
 ---@class ScreenLogo : Screen
     ---@field logo_mossmouth TextureRenderingInfo
@@ -5617,6 +5618,9 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field start_sidepanel TextureRenderingInfo
     ---@field start_sidepanel_slidein_timer number
+    ---@field seed_length integer @Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
+    ---@field get_seed integer?
+    ---@field set_seed any @[](ScreenSeedInput&s
 
 ---@class ScreenCharacterSelect : Screen
     ---@field main_background_zoom_target number

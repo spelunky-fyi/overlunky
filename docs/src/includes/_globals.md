@@ -1413,7 +1413,7 @@ Get the current frame count since the game was started. You can use this to make
 
 > Search script examples for [get_frametime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime)
 
-#### optional&lt;double&gt; get_frametime()
+#### double get_frametime()
 
 Get engine target frametime (1/framerate, default 1/60).
 
@@ -1422,7 +1422,7 @@ Get engine target frametime (1/framerate, default 1/60).
 
 > Search script examples for [get_frametime_unfocused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime_unfocused)
 
-#### optional&lt;double&gt; get_frametime_unfocused()
+#### double get_frametime_unfocused()
 
 Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 
