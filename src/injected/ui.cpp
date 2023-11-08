@@ -2207,7 +2207,7 @@ void warp_next_level(size_t num)
 
 void respawn()
 {
-    if (g_state->screen != 11 && g_state->screen != 12)
+    if (g_state->screen != 11 && g_state->screen != 12 && g_state->screen != 14)
     {
         if (g_state->screen > 11)
         {
@@ -2218,6 +2218,14 @@ void respawn()
             quick_start(12, 1, 1, 1);
         }
         return;
+    }
+    if (g_state->screen == 14)
+    {
+        g_state->screen = 12;
+        g_game_manager->journal_ui->fade_timer = 15;
+        g_game_manager->journal_ui->state = 5;
+        g_state->camera->focus_offset_x = 0;
+        g_state->camera->focus_offset_y = 0;
     }
     for (int8_t i = 0; i < g_state->items->player_count; ++i)
     {
