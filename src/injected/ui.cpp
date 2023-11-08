@@ -2226,6 +2226,7 @@ void respawn()
         g_game_manager->journal_ui->state = 5;
         g_state->camera->focus_offset_x = 0;
         g_state->camera->focus_offset_y = 0;
+        set_camera_bounds(true);
     }
     for (int8_t i = 0; i < g_state->items->player_count; ++i)
     {
