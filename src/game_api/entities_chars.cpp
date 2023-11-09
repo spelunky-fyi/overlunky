@@ -68,7 +68,7 @@ uint8_t Player::kapala_blood_amount()
 void Player::set_jetpack_fuel(uint8_t fuel)
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
-    for (auto item : items.entities())
+    for (auto item : items.entities()) // TODO: should probably change to powerups right?
     {
         if (item->type->id == jetpackID)
         {

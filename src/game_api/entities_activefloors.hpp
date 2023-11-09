@@ -113,7 +113,7 @@ class Drill : public Movable
     Entity* top_chain_piece;
     uint8_t unknown1; // it's forced to 0, for whatever reason
 
-    void trigger();
+    void trigger(std::optional<bool> play_sound_effect);
 };
 
 class ThinIce : public Movable
@@ -154,4 +154,13 @@ class TimedPowderkeg : public PushBlock
   public:
     /// timer till explosion, -1 = pause, counts down
     int32_t timer;
+};
+
+class CrushElevator : public Movable
+{
+  public:
+    /// This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
+    float y_limit;
+    /// This is custom variable, you need [activate_crush_elevator_hack](#activate_crush_elevator_hack) to use it
+    float speed;
 };

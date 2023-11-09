@@ -8,14 +8,15 @@ player_slot_settings = state.player_inputs.player_slot_1_settings
 white = rgba(255, 255, 255, 255)
 red = rgba(230, 60, 45, 255)
 font_size = 16
-up_width, line_height = draw_text_size(font_size, "UP")
-down_width, _ = draw_text_size(font_size, "DOWN")
-left_width, _ = draw_text_size(font_size, "LEFT")
-right_width, _ = draw_text_size(font_size, "RIGHT")
 cross_center_x = -0.70
 cross_center_hor_margin = 0.05
 
 set_callback(function(draw_ctx)
+    up_width, line_height = draw_text_size(font_size, "UP")
+    down_width, _ = draw_text_size(font_size, "DOWN")
+    left_width, _ = draw_text_size(font_size, "LEFT")
+    right_width, _ = draw_text_size(font_size, "RIGHT")
+
     y = -1 - line_height * 9.5;
     x = -0.98
 
@@ -46,17 +47,17 @@ set_callback(function(draw_ctx)
 
     color = test_flag(player_slot.buttons, 5) and red or white
     draw_ctx:draw_text(x, y, font_size, "RUN", color)
-    
+
     y = y + line_height
 
     color = test_flag(player_slot.buttons, 6) and red or white
     draw_ctx:draw_text(x, y, font_size, "USE DOOR/BUY", color)
-    
+
     y = y + line_height
 
     color = test_flag(player_slot.buttons, 7) and red or white
     draw_ctx:draw_text(x, y, font_size, "PAUSE", color)
-    
+
     y = y + line_height
 
     color = test_flag(player_slot.buttons, 8) and red or white

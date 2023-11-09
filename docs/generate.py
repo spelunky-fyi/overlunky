@@ -9,37 +9,7 @@ import parse_source as ps
 if not os.path.exists("src/includes"):
     os.makedirs("src/includes")
 
-
-replace_table = {
-    "uint8_t": "int",
-    "uint16_t": "int",
-    "uint32_t": "int",
-    "uint64_t": "int",
-    "int8_t": "int",
-    "int16_t": "int",
-    "int32_t": "int",
-    "int64_t": "int",
-    "ImU32": "int",
-    "vector<": "array<",
-    "span<": "array<",
-    "unordered_map<": "map<",
-    "game_map<": "map<",
-    ", identity_hasher<>": "",
-    "const char*": "string",
-    "wstring": "string",
-    "u16string": "string",
-    "char16_t": "string",
-    "pair<": "tuple<",
-    "std::": "",
-    "sol::": "",
-    "void": "",
-    "constexpr": "",
-    "static": "",
-    "variadic_args va": "int, int...",
-    "EmittedParticlesInfo": "array<Particle>",
-    "ImVec2": "Vec2",
-}
-
+replace_table = ps.replace_table
 
 def replace_all(text):
     for repl, wth in replace_table.items():
@@ -50,7 +20,6 @@ def replace_all(text):
             continue
         text = text.replace(repl, wth)
     return text
-
 
 ps.configure_parse(replace_all, "slate.pickle")
 ps.run_parse()
@@ -118,11 +87,11 @@ printed_funcs = []
 
 
 def format_af(lf, af):
-    ret = replace_all(af["return"]) or "nil"
+    ret = af["return"] or "nil"
     ret = ret.replace("<", "&lt;").replace(">", "&gt;")
     ret = link_custom_type(ret)
     name = lf["name"]
-    param = replace_all(af["param"])
+    param = af["param"].replace("vector<", "array<")
     param = link_custom_type(param)
     fun = f"{ret} {name}({param})".strip()
     return fun
@@ -196,8 +165,45 @@ print("\n# Lua libraries")
 print(
     "The following Lua libraries and their functions are available. You can read more about them in the [Lua documentation](https://www.lua.org/manual/5.4/manual.html#6). We're using Lua 5.4 with the [Sol C++ binding](https://sol2.readthedocs.io/en/latest/)."
 )
+
+print("\n## io")
+include_example("io")
+print(
+    """
+`meta.unsafe` exposes all [standard library functions](https://www.lua.org/manual/5.4/manual.html#6.8) and removes basedir restrictions from the custom functions.
+
+In safe mode (default) the following standard and custom functions are available:
+
+- `io.type`
+- `io.open_data`: like `io.open` but restricted to base directory `Mods/Data/modname`
+- `io.open_mod`: like `io.open` but restricted to the mod directory
+
+Safely opened files can be used normally through the `file:` handle. Files and folders opened in write mode are automatically created.
+
+Also see [list_dir](#list_dir) and [list_data_dir](#list_data_dir).
+"""
+)
+
+print("\n## os")
+include_example("os")
+print(
+    """
+`meta.unsafe` exposes all [standard library functions](https://www.lua.org/manual/5.4/manual.html#6.9) and removes basedir restrictions from the custom functions.
+
+In safe mode (default) the following standard and custom functions are available:
+
+- `os.clock`
+- `os.date`
+- `os.difftime`
+- `os.time`
+- `os.remove_data`: like `os.remove` but restricted to base directory `Mods/Data/modname`
+- `os.remove_mod`: like `os.remove` but restricted to the mod directory
+"""
+)
+
 for lib in ps.lualibs:
     print("\n## " + lib + "")
+
 print("\n## json")
 include_example("json")
 print(
@@ -269,7 +275,7 @@ end
 
 print("\n# Unsafe mode")
 print(
-    "Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like `io` and `os`, loading dlls with require and `package.loadlib`. Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory."
+    "Setting `meta.unsafe = true` enables the rest of the standard Lua libraries like unrestricted `io`, `os`, `ffi` and `debug`, loading dlls with require, `package.loadlib`, the [network functions](#Network-functions) and some [debug functions](#Debug-functions). Using unsafe scripts requires users to enable the option in the overlunky.ini file which is found in the Spelunky 2 installation directory."
 )
 
 print("\n# Modules")
@@ -331,6 +337,45 @@ for lf in ps.funcs:
             com = link_custom_type(com)
             print(com)
 
+print("# STD Library Containers")
+print(
+    """Sometimes game variables and return of some functions will be of type `map`, `set`, `vector` etc. from the C++ Standard Library.
+
+You don't really need to know much of this as they will behave similar to a lua table, even accept some table functions from the `table` library and support looping thru using `pair` function. You can also use them as parameter for functions that take `array`, Sol will happily convert them for you.
+
+They come with some extra functionality:"""
+)
+print(
+"""
+
+Type | Name | Description
+---- | ---- | -----------"""
+)
+print("bool | all:empty() | Returns true if container is empty, false otherwise")
+print("int | all:size() | Same as `#container`")
+
+print("any | vector:at(int index) | Same as `vector[index]`")
+print("any | span:at(int index) | Same as `span[index]`")
+print("any | set:at(int order) | Returns elements in order, it's not an index as sets don't have one")
+print("any | map:at(int order) | Returns elements in order, it's not an index as maps don't have one")
+
+print("int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable")
+print("int | span:find(any value) | Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable")
+print("any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable")
+print("any | map:find(any key) | Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable")
+
+print("nil | vector:erase(int index) | Removes element at given index, the rest of elements shift down so that the vector stays contiguous")
+print("nil | set:erase(any value) | Removes element from set")
+print("nil | map:erase(any key) | Removes element from map by key")
+
+print("nil | vector:clear() | Removes all elements from vector")
+print("nil | set:clear() | Removes all elements from set")
+print("nil | map:clear() | Removes all elements from map")
+
+print("nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up in index")
+print("nil | set:insert(int order, any element) | The order param doesn't acutally matter and can be set to nil")
+print("nil | map:insert(any key, any value) | unsure, probably easier to just use `map[key] = value`")
+
 
 print("# Functions")
 print(
@@ -356,7 +401,14 @@ for func in ps.funcs:
         cat = "Message functions"
     elif any(
         subs in func["name"]
-        for subs in ["get_address", "get_rva", "raise", "dump_network"]
+        for subs in [
+            "get_rva",
+            "get_virtual_rva",
+            "raise",
+            "dump_network",
+            "dump",
+            "dump_string",
+        ]
     ):
         cat = "Debug functions"
     elif any(subs in func["name"] for subs in ["_option"]):
@@ -437,7 +489,7 @@ for func in ps.funcs:
         cat = "Particle functions"
     elif any(subs in func["name"] for subs in ["string", "_name"]):
         cat = "String functions"
-    elif any(subs in func["name"] for subs in ["udp_"]):
+    elif any(subs in func["name"] for subs in ["udp_", "http_"]):
         cat = "Network functions"
     elif any(subs in func["name"] for subs in ["illuminati"]):
         cat = "Lighting functions"
@@ -460,10 +512,9 @@ for cat in sorted(func_cats):
             ret = "nil"
             param = ""
             if m:
-                ret = replace_all(m.group(2)).strip() or "nil"
+                ret = m.group(2) or "nil"
             if m or m2:
                 param = (m or m2).group(1)
-                param = replace_all(param).strip()
             name = lf["name"]
             ret = link_custom_type(ret)
             ret = ret.replace("<", "&lt;").replace(">", "&gt;")
@@ -505,10 +556,9 @@ for lf in ps.deprecated_funcs:
         ret = "nil"
         param = ""
         if m:
-            ret = replace_all(m.group(2)).strip() or "nil"
+            ret = m.group(2) or "nil"
         if m or m2:
             param = (m or m2).group(1)
-            param = replace_all(param).strip()
         name = lf["name"]
         fun = f"{ret} {name}({param})".strip()
         search_link = "https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=" + name
@@ -592,6 +642,8 @@ for type in ps.types:
             "Camera",
             "QuestsInfo",
             "PlayerSlot",
+            "JournalProgressStickerSlot",
+            "JournalProgressStainSlot",
         ]
     ):
         cat = "State types"
@@ -616,7 +668,7 @@ for type_cat in type_cats:
     for cat in sorted(type_cats[type_cat], key=lambda x: x):
         print("\n## " + cat + "\n")
         for type in sorted(type_cats[type_cat][cat], key=lambda x: x["name"]):
-            if type["comment"] and "NoDoc" in type["comment"]:
+            if "comment" in type and "NoDoc" in type["comment"]:
                 continue
             type_name = type["name"]
             print("\n### " + type_name + "\n")
@@ -625,7 +677,7 @@ for type_cat in type_cats:
                 for com in type["comment"]:
                     com = link_custom_type(com)
                     print(com)
-            if type["base"]:
+            if "base" in type and type["base"]:
                 print("Derived from", end="")
                 bases = type["base"].split(",")
                 for base in bases:
@@ -665,13 +717,13 @@ Type | Name | Description
                         if n:
                             name = n.group(1)
                             if n.group(2):
-                                param = replace_all(n.group(2).strip()) + ")"
+                                param = n.group(2) + ")"
                             signature = name + param
                         elif m:
-                            ret = replace_all(m.group(1)) or "nil"
+                            ret = m.group(1) or "nil"
                             name = m.group(2)
                             if m.group(3):
-                                param = replace_all(m.group(3).strip()) + ")"
+                                param = m.group(3).strip().replace("vector<", "array<") + ")"
                             signature = name + param
                     signature = signature.strip()
                     ret = ret.replace("<", "&lt;").replace(">", "&gt;")

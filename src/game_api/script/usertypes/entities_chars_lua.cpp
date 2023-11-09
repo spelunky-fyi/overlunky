@@ -11,6 +11,7 @@
 
 #include "entities_chars.hpp" // for Ai, Player, PowerupCapable, get_charac...
 #include "entity.hpp"         // for Entity
+#include "illumination.hpp"   // IWYU pragma: keep
 #include "items.hpp"          // for Inventory, Inventory::acquired_powerups
 #include "state_structs.hpp"  // IWYU pragma: keep
 

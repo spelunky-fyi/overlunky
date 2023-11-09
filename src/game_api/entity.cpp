@@ -15,7 +15,9 @@
 
 #include "containers/custom_map.hpp" // for custom_map
 #include "entities_chars.hpp"        // for Player
+#include "entities_monsters.hpp"     //
 #include "entity_hooks_info.hpp"     // for EntityHooksInfo
+#include "entity_lookup.hpp"         //
 #include "memory.hpp"                // for write_mem_prot
 #include "movable.hpp"               // for Movable
 #include "movable_behavior.hpp"      // for MovableBehavior
@@ -467,12 +469,83 @@ void Movable::set_position(float to_x, float to_y)
         rendering_info->y_dupe4 += dy;
     }
     if (State::get().ptr()->camera->focused_entity_uid == uid)
+        State::get().set_camera_position(dx, dy);
+}
+
+template <typename F>
+bool recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode, F func)
+{
+    auto acutal_mask = [](uint32_t m) -> uint32_t // for the MASK.ANY
+    { return m == 0 ? 0xFFFF : m; };
+
+    if (rec_mode == RECURSIVE_MODE::EXCLUSIVE)
     {
-        State::get().ptr()->camera->focus_x += dx;
-        State::get().ptr()->camera->focus_y += dy;
-        State::get().ptr()->camera->adjusted_focus_x += dx;
-        State::get().ptr()->camera->adjusted_focus_y += dy;
-        State::get().ptr()->camera->calculated_focus_x += dx;
-        State::get().ptr()->camera->calculated_focus_y += dy;
+        if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) != 0)
+            return false;
+
+        if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) != ent_types.end())
+            return false;
     }
+    else if (rec_mode == RECURSIVE_MODE::INCLUSIVE)
+    {
+        if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) == 0)
+        {
+            if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) == ent_types.end())
+                return false;
+        }
+        else if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) == ent_types.end())
+            return false;
+    }
+    const std::vector<Entity*> items{ent->items.entities().begin(), ent->items.entities().end()};
+    for (auto entity : items)
+    {
+        recursive(entity, mask, ent_types, rec_mode, func);
+    }
+
+    {
+        static const ENT_TYPE jellys[] = {
+            to_id("ENT_TYPE_MONS_MEGAJELLYFISH"),
+            to_id("ENT_TYPE_MONS_MEGAJELLYFISH_BACKGROUND"),
+        };
+        static const ENT_TYPE jellys_tails[] = {
+            to_id("ENT_TYPE_FX_MEGAJELLYFISH_TAIL"),
+            to_id("ENT_TYPE_FX_MEGAJELLYFISH_TAIL_BG"),
+        };
+
+        if (ent->type->id == jellys[0] || ent->type->id == jellys[1]) // special only for MEGAJELLYFISH
+        {
+            auto true_type = (MegaJellyfish*)ent;
+            auto currend_uid = true_type->tail_bg_uid;
+            for (int idx = 0; idx < 8; ++idx)
+            {
+                auto tail_ent = get_entity_ptr(currend_uid + idx);
+                if (tail_ent != nullptr && (tail_ent->type->id == jellys_tails[0] || tail_ent->type->id == jellys_tails[1])) // only kill the tail
+                {
+                    recursive(tail_ent, mask, ent_types, rec_mode, func);
+                }
+            }
+        }
+    }
+    func(ent);
+    return true;
+}
+
+void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
+{
+    auto kill_func = [destroy_corpse, &responsible](Entity* ent) -> void
+    {
+        ent->kill(destroy_corpse, responsible);
+    };
+    if (!recursive(this, mask, get_proper_types(ent_types), rec_mode, kill_func))
+        kill(destroy_corpse, responsible);
+}
+
+void Entity::destroy_recursive(std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
+{
+    auto destroy_func = [](Entity* ent) -> void
+    {
+        ent->destroy();
+    };
+    if (!recursive(this, mask, get_proper_types(ent_types), rec_mode, destroy_func))
+        destroy();
 }

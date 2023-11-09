@@ -83,6 +83,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_crittersnail
 - as_crocman
 - as_crossbeam
+- as_crushelevator
 - as_crushtrap
 - as_cursedeffect
 - as_cursedpot

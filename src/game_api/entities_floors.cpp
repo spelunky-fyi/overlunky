@@ -728,7 +728,7 @@ void ForceField::activate_laserbeam(bool turn_on)
 
 void Door::unlock(bool unlock)
 {
-    // TODO: DOOR_EGGSHIP, DOOR_EGGSHIP_ATREZZO, DOOR_EGGSHIP_ROOM ?
+    // TODO: DOOR_EGGSHIP, DOOR_EGGSHIP_ATREZZO, DOOR_EGGSHIP_ROOM, HUNDUN ?
     static const ENT_TYPE entrence_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static const ENT_TYPE locked_door = to_id("ENT_TYPE_FLOOR_DOOR_LOCKED");
     static const ENT_TYPE COG_door = to_id("ENT_TYPE_FLOOR_DOOR_COG");
@@ -801,7 +801,7 @@ void Door::unlock(bool unlock)
             {
                 if (!main_door->door_blocker)
                 {
-                    main_door->door_blocker = state.layer_local(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
+                    main_door->door_blocker = state.layer(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
                     main_door->door_blocker->animation_frame = 1;
                 }
             }

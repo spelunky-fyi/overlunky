@@ -97,7 +97,7 @@ EntityDB* get_type(uint32_t id)
     // Special case: map_ptr might be 0 if it's not initialized.
     // This only occurs in list_entities; for others, do not check the pointer
     // to see if this assumption works.
-    if (!entity_factory_ptr)
+    if (!entity_factory_ptr || id > 0x393)
         return nullptr;
 
     return entity_factory_ptr->types + id;

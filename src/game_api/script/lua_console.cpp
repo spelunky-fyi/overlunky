@@ -52,6 +52,7 @@ LuaConsole::LuaConsole(SoundManager* soundmanager)
             {"RegenBlock", "as_movable"},
             {"ThinIce", "as_movable"},
             {"TimedPowderkeg", "as_pushblock"},
+            {"CrushElevator", "as_movable"},
             {"UnchainedSpikeBall", "as_movable"},
             {"WoodenlogTrap", "as_movable"},
             {"BGSurfaceStar", "as_entity"},
@@ -907,6 +908,16 @@ bool LuaConsole::pre_draw()
                 {
                     set_enabled(false);
                 }
+                else if (console_input == "safe"sv)
+                {
+                    hide_unsafe_libraries(lua);
+                    unsafe = false;
+                }
+                else if (console_input == "unsafe"sv)
+                {
+                    expose_unsafe_libraries(lua);
+                    unsafe = true;
+                }
                 else
                 {
                     std::size_t messages_before = messages.size();
@@ -970,7 +981,7 @@ bool LuaConsole::get_enabled() const
 }
 bool LuaConsole::get_unsafe() const
 {
-    return true;
+    return unsafe;
 }
 const char* LuaConsole::get_name() const
 {
@@ -1035,8 +1046,10 @@ std::string LuaConsole::execute_raw(std::string code)
         }
         else
         {
-            sol::function serpent = lua["serpent"]["block"];
-            return serpent(ret);
+            // sol::function serpent = lua["serpent"]["block"];
+            // return serpent(ret);
+            sol::function dump_string = lua["dump_string"];
+            return dump_string(ret, 2);
         }
     }
     catch (const sol::error& e)

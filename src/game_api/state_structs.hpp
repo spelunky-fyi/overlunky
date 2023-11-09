@@ -1,68 +1,22 @@
 #pragma once
 
 #include "aliases.hpp"
+#include "containers/custom_map.hpp"
 #include "containers/custom_vector.hpp"
+#include "layer.hpp"
 #include "render_api.hpp"
 #include <array>
 #include <cstdint>
-#include <set>
+#include <map>
 
 class Entity;
+struct SoundMeta;
 
 struct RobinHoodTableEntry
 {
     uint32_t uid_plus_one;
     uint32_t padding;
     Entity* entity;
-};
-
-struct LightParams
-{
-    float red; // default = 1.0 (can go over 1.0 for oversaturation)
-    float green;
-    float blue;
-    float size;
-};
-
-struct Illumination
-{
-    union
-    {
-        /// Table of light1, light2, ... etc.
-        std::array<LightParams, 4> lights;
-        struct
-        {
-            LightParams light1;
-            LightParams light2;
-            LightParams light3;
-            /// It's rendered on objects around, not as an actual bright spot
-            LightParams light4;
-        };
-    };
-    float brightness;
-    float brightness_multiplier;
-    float light_pos_x;
-    float light_pos_y;
-    float offset_x;
-    float offset_y;
-    float distortion;
-    int32_t entity_uid;
-    uint32_t timer;
-    union
-    {
-        /// see [flags.hpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/flags.hpp) illumination_flags
-        uint32_t flags;
-        struct
-        {
-            uint8_t light_flags; // no reason to expose this
-
-            /// Only one can be set: 1 - Follow camera, 2 - Follow Entity, 3 - Rectangle, full brightness
-            /// Rectangle always uses light1, even when it's disabled in flags
-            uint8_t type_flags;
-            uint8_t layer;
-            bool enabled;
-        };
-    };
 };
 
 struct InputMapping
@@ -187,22 +141,28 @@ struct Camera
     uint32_t unknown7;
 };
 
-struct JournalProgressionSlot
+struct JournalProgressStickerSlot
 {
-    uint8_t unknown1;
+    uint8_t theme;
     int8_t grid_position; // -1 = unassigned, will be assigned when opening the journal and gets the zoom effect
     uint8_t unknown3;
     uint8_t unknown4;
-    ENT_TYPE entity;
+    ENT_TYPE entity_type;
     float x;
     float y;
     float angle;
 };
 
-struct ThemeProgression
+struct JournalProgressStainSlot
 {
-    uint8_t count;
-    uint8_t visited_themes[9];
+    float x;
+    float y;
+    float angle;
+    float scale;
+    int32_t texture_column;
+    int32_t texture_row;
+    uint8_t texture_range; // when stain is first displayed, rolls [0, texture_range] and adds it to texture_column
+    uint8_t padding[3];
 };
 
 struct ArenaConfigArenas // size: 40 bytes
@@ -380,99 +340,106 @@ struct ArenaState
     bool punish_ball;
 };
 
+enum class LOGIC : uint32_t
+{
+    TUTORIAL = 0,
+    OUROBOROS,
+    SPEEDRUN,
+    GHOST,
+    GHOST_TOAST,
+    TUN_AGGRO,
+    DICESHOP,
+    PRE_CHALLENGE,
+    MOON_CHALLENGE,
+    STAR_CHALLENGE,
+    SUN_CHALLENGE,
+    MAGMAMAN_SPAWN,
+    WATER_BUBBLES,
+    OLMEC_CUTSCENE,
+    TIAMAT_CUTSCENE,
+    APEP,
+    COG_SACRIFICE,
+    DUAT_BOSSES,
+    BUBBLER,
+    PLEASURE_PALACE,
+    DISCOVERY_INFO,
+    BLACK_MARKET,
+    JELLYFISH,
+    ARENA_1,
+    ARENA_2,
+    ARENA_3,
+    ARENA_ALIEN_BLAST,
+    ARENA_LOOSE_BOMBS,
+};
+
 class Logic
 {
   public:
-    uint32_t logic_index; // array index into state.logic, where this instance resides
-    uint32_t padding;
+    LOGIC logic_index;
+    uint32_t unused_padding;
 
     virtual ~Logic() = 0;
 
     // Continuously performs the main functionality of the logic instance
-    // Tutorial: handles dropping of the torch and rope in intro routine
-    // Ouroboros: transitions to level when music finished
-    // Basecamp speedrun: keep track of time, player position passing official
-    // Ghost trigger: spawns ghost when time is up (checks cursed for earlier ghost)
-    // Ghost toast trigger: shows the 'A terrible chill...' toast after 90 frames
-    // Tun aggro: spawns Tun after 30 seconds
-    // Dice shop: runs the logic of the dice shop
-    // Tun pre challenge: unknown
-    // Moon challenge: handles waitroom forcefields + tracks mattock breakage
-    // Star challenge: handles waitroom forcefields + tracks torches/timer
-    // Sun challenge: handles waitroom forcefields + tracks timer
-    // Volcana/Lava: spawns magmamen at random (and does other things)
-    // Water: unknown
-    // Olmec cutscene: runs the cutscene
-    // Tiamat cutscene: runs the cutscene
-    // Apep trigger: tracks player position, spawns APEP_HEAD
-    // COG Ankh sacrifice: countdown timer (100 frames) from the moment you die, triggers transitioning to duat
-    // Duat bosses trigger: tracks player position, spawns ANUBIS2 and OSIRIS_HEAD
-    // Tiamat: spawns bubbles
-    // Tusk pleasure palace: triggers aggro on everyone when non-high roller enters door
-    // Discovery: shows the toast
-    // Black market: lifts camera bounds restrictions
-    // Cosmic ocean: spawns jelly when time is up
-    // Arena 1: handles crate spawning
-    // Arena 3: handles death mist
-    virtual void perform() = 0;
+    // If it returns false, game will call deconstructor next in most cases
+    virtual bool perform() = 0;
 };
 
 class LogicOuroboros : public Logic
 {
   public:
-    size_t unknown3; // sound related?
-    uint16_t timer;
-
-    virtual ~LogicOuroboros() = 0;
+    SoundMeta* sound;
+    uint32_t timer;
 };
 
 class LogicBasecampSpeedrun : public Logic
 {
   public:
-    uint32_t official; // entity uid of the character that keeps the time
-    uint32_t crate;    // entity uid; you must break this crate for the run to be valid, otherwise you're cheating
-    uint32_t unknown3;
-    uint32_t unknown4;
-
-    virtual ~LogicBasecampSpeedrun() = 0;
+    /// entity uid of the character that keeps the time
+    uint32_t administrator;
+    /// entity uid. you must break this crate for the run to be valid, otherwise you're cheating
+    uint32_t crate;
 };
 
 class LogicGhostToast : public Logic
 {
   public:
+    ///  default 90
     uint32_t toast_timer;
-
-    virtual ~LogicGhostToast() = 0;
 };
 
 class LogicDiceShop : public Logic
 {
   public:
-    uint32_t boss; // entity uid; either tusk or the shopkeeper
-    uint32_t unknown4;
-    uint32_t bet_machine; // entity uid
-    uint32_t die1;        // entity uid
-    uint32_t die2;        // entity uid
+    uint32_t boss_uid;
+    ENT_TYPE boss_type;
+    /// entity uid
+    uint32_t bet_machine;
+    /// entity uid
+    uint32_t die1;
+    /// entity uid
+    uint32_t die2;
     int8_t die_1_value;
     int8_t die_2_value;
     uint16_t unknown8;
-    uint32_t prize_dispenser; // entity uid
-    uint32_t prize;           // entity uid
-    uint32_t forcefield;      // entity uid
+    /// entity uid
+    uint32_t prize_dispenser;
+    /// entity uid
+    uint32_t prize;
+    /// entity uid
+    uint32_t forcefield;
     bool bet_active;
     bool forcefield_deactivated;
-    bool boss_angry;
-    uint8_t result_announcement_timer; // the time the boss waits after your second die throw to announce the results
-    uint8_t won_prizes_count;          // to see whether you achieved high roller status
-    uint8_t unknown14;
-    uint8_t unknown15;
-    uint8_t unknown16;
-    int32_t balance; // cash balance of all the games
-
-    virtual ~LogicDiceShop() = 0;
+    bool unknown;
+    /// the time the boss waits after your second die throw to announce the results
+    uint8_t result_announcement_timer;
+    uint8_t won_prizes_count;
+    uint8_t padding[3];
+    /// cash balance of all the games
+    int32_t balance;
 };
 
-class LogicMoonChallenge : public Logic
+class LogicChallenge : public Logic
 {
   public:
     uint32_t unknown3;
@@ -481,81 +448,90 @@ class LogicMoonChallenge : public Logic
     uint32_t floor_challenge_waitroom_uid;
     bool challenge_active;
     uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint16_t unknown8a;
-    uint16_t unknown8b;
-    uint32_t mattock; // entity uid
-
-    virtual ~LogicMoonChallenge() = 0;
+    uint16_t padding1;
+    uint32_t padding2;
 };
 
-class LogicStarChallenge : public Logic
+class LogicMoonChallenge : public LogicChallenge
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint32_t floor_challenge_entrance_uid;
-    uint32_t floor_challenge_waitroom_uid;
-    bool challenge_active;
-    uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint32_t unknown8;
-    std::vector<Entity*> torches;
-    uint32_t start_countdown;
-
-    virtual ~LogicStarChallenge() = 0;
+    /// entity uid
+    int32_t mattock_uid;
 };
 
-class LogicSunChallenge : public Logic
+class LogicStarChallenge : public LogicChallenge
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint32_t floor_challenge_entrance_uid;
-    uint32_t floor_challenge_waitroom_uid;
-    bool challenge_active;
-    uint8_t forcefield_countdown; // waiting area forcefield activation timer (the one that locks you in)
-    uint16_t unknown7;
-    uint32_t unknown8;
+    std::vector<Entity*> torches; // TODO: check if custom vector (probably yes)
     uint8_t start_countdown;
+    uint8_t padding[3];
+    uint32_t unknown9;
+    float unknown10; // position in front of tun and one tile higher, dunno what for?
+    float unknown11; // kind of would make sense for the wanted poster, but you get this struct after you buy the challenge, not possible when tun is angry?
+};
 
-    virtual ~LogicSunChallenge() = 0;
+class LogicSunChallenge : public LogicChallenge
+{
+  public:
+    uint8_t start_countdown;
+    uint8_t padding[3];
+    uint32_t unknown9;
+    float unknown10; // same as for LogicStarChallenge
+    float unknown11;
+};
+
+class MagmamanSpawnPosition
+{
+  public:
+    uint32_t x;
+    uint32_t y;
+    uint32_t timer;
+
+    MagmamanSpawnPosition(uint32_t x_, uint32_t y_);
+};
+
+class LogicMagmamanSpawn : public Logic
+{
+  public:
+    custom_vector<MagmamanSpawnPosition> magmaman_positions;
+
+    void add_spawn(uint32_t x, uint32_t y);
+    void add_spawn(MagmamanSpawnPosition ms)
+    {
+        add_spawn(ms.x, ms.y);
+    };
+    void remove_spawn(uint32_t x, uint32_t y);
+    void remove_spawn(MagmamanSpawnPosition ms)
+    {
+        remove_spawn(ms.x, ms.y);
+    };
 };
 
 class LogicOlmecCutscene : public Logic
 {
   public:
-    uint8_t unknown6a;
-    uint8_t unknown6b;
-    uint8_t unknown6c;
-    uint8_t unknown6d;
-    uint8_t unknown7a;
-    uint8_t unknown7b;
-    uint8_t unknown7c;
-    uint8_t unknown7d;
+    /// Copied over [buttons_gameplay](#PlayerSlot) from the leader, used to skip the cutscene
+    /// You can skip the cutscene if you set it to 1 or 4
+    uint8_t leader_inputs;
+    uint8_t padding[7];
     Entity* fx_olmecpart_large;
     Entity* olmec;
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
-
-    virtual ~LogicOlmecCutscene() = 0;
 };
 
 class LogicTiamatCutscene : public Logic
 {
   public:
-    uint32_t unknown3;
-    uint32_t unknown4;
+    /// Copied over [buttons_gameplay](#PlayerSlot) from the leader, used to skip the cutscene
+    /// You can skip the cutscene if you set it to 1 or 4
+    uint8_t leader_inputs;
+    uint8_t padding[7];
     Entity* tiamat;
     Entity* player;
     Entity* cinematic_anchor;
     uint32_t timer;
-    int32_t unknown5;
-    uint32_t unknown6;
-    uint32_t unknown7;
-
-    virtual ~LogicTiamatCutscene() = 0;
 };
 
 class LogicApepTrigger : public Logic
@@ -564,102 +540,135 @@ class LogicApepTrigger : public Logic
     uint32_t spawn_cooldown;
     bool cooling_down;
     bool apep_journal_entry_logged;
-    uint32_t unknown4c;
-    uint32_t unknown4d;
-    uint32_t unknown5;
-    uint32_t unknown6;
-
-    virtual ~LogicApepTrigger() = 0;
 };
 
 class LogicCOGAnkhSacrifice : public Logic
 {
+  public:
     uint8_t unknown3;
     uint8_t timer;
-
-    virtual ~LogicCOGAnkhSacrifice() = 0;
-};
-
-class LogicDuatBossesTrigger : public Logic
-{
-  public:
-    virtual ~LogicDuatBossesTrigger() = 0;
 };
 
 class LogicTiamatBubbles : public Logic
 {
   public:
     uint8_t bubble_spawn_timer;
-
-    virtual ~LogicTiamatBubbles() = 0;
 };
 
 class LogicTuskPleasurePalace : public Logic
 {
   public:
-    uint32_t locked_door; // entity uid
-    uint32_t unknown4;
-
-    virtual ~LogicTuskPleasurePalace() = 0;
+    int32_t locked_door; // entity uid
+    uint32_t unknown4;   // default 1552
+    uint32_t unknown5;   // dunno
+    uint32_t unknown6;   // padding probably
 };
 
 class LogicArena1 : public Logic
 {
   public:
     uint32_t crate_spawn_timer;
-    uint32_t unknown4;
-    uint32_t unknown5;
-    uint32_t unknown6;
-
-    virtual ~LogicArena1() = 0;
 };
 
 class LogicArenaAlienBlast : public Logic
 {
   public:
     uint32_t timer;
-
-    virtual ~LogicArenaAlienBlast() = 0;
 };
 
 class LogicArenaLooseBombs : public Logic
 {
   public:
     uint32_t timer;
+};
 
-    virtual ~LogicArenaLooseBombs() = 0;
+class LogicUnderwaterBubbles : public Logic
+{
+  public:
+    // no idea what does are, messing with them can crash
+    float unknown1; // default: 1.0, excludes liquid from spawning the bubbles by y level from the top to bottom
+                    // is treated like number (calculations to get the right grid entity level)
+                    // it's more like a value in rooms than y coordinates
+
+    int16_t unknown2; // default: 1000
+    bool unknown3;    // default: 1 or 0
+};
+
+class LogicTunPreChallenge : public Logic
+{
+  public:
+    // except for Tun the rest of the values do not make any sense (garbage)
+    // the logic.perform does only ever touches the tun as well, first one always 0?
+    size_t unknown1;
+    size_t unknown2;
+    size_t unknown3;
+    int32_t tun_uid;
+};
+
+class LogicTutorial : public Logic
+{
+  public:
+    Entity* pet_tutorial;
+    uint32_t timer;
 };
 
 struct LogicList
 {
-    Logic* tutorial;
-    LogicOuroboros* ouroboros;
-    LogicBasecampSpeedrun* basecamp_speedrun;
-    Logic* ghost_trigger;
-    LogicGhostToast* ghost_toast_trigger;
-    Logic* tun_aggro;
-    LogicDiceShop* diceshop;
-    Logic* tun_pre_challenge;
-    LogicMoonChallenge* tun_moon_challenge;
-    LogicStarChallenge* tun_star_challenge;
-    LogicSunChallenge* tun_sun_challenge;
-    Logic* volcana_related;
-    Logic* water_related;
-    LogicOlmecCutscene* olmec_cutscene;
-    LogicTiamatCutscene* tiamat_cutscene;
-    LogicApepTrigger* apep_trigger;
-    LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
-    LogicDuatBossesTrigger* duat_bosses_trigger;
-    LogicTiamatBubbles* tiamat;
-    LogicTuskPleasurePalace* tusk_pleasure_palace;
-    Logic* discovery_info; // black market, vlad, wet fur discovery; shows the toast
-    Logic* black_market;
-    Logic* cosmic_ocean;
-    LogicArena1* arena_1;
-    Logic* arena_2;
-    Logic* arena_3;
-    LogicArenaAlienBlast* arena_alien_blast;
-    LogicArenaLooseBombs* arena_loose_bombs;
+    /// This only properly constructs the base class
+    /// you may still need to initialise the parameters correctly
+    Logic* start_logic(LOGIC idx);
+    void stop_logic(LOGIC idx);
+    void stop_logic(Logic* log);
+
+    union
+    {
+        std::array<Logic*, 28> logic_indexed;
+        struct
+        {
+            /// Handles dropping of the torch and rope in intro routine (first time play)
+            LogicTutorial* tutorial;
+            LogicOuroboros* ouroboros;
+            /// Keep track of time, player position passing official
+            LogicBasecampSpeedrun* basecamp_speedrun;
+            /// It's absence is the only reason why ghost doesn't spawn at boss levels or CO
+            Logic* ghost_trigger; // virtual does nothing, all the code elsewhere, the only purpose is to mark if ghost should spawn this level or not
+            LogicGhostToast* ghost_toast_trigger;
+            /// Spawns tun at the door at 30s mark
+            Logic* tun_aggro;
+            LogicDiceShop* diceshop;
+            LogicTunPreChallenge* tun_pre_challenge;
+            LogicMoonChallenge* tun_moon_challenge;
+            LogicStarChallenge* tun_star_challenge;
+            LogicSunChallenge* tun_sun_challenge;
+            LogicMagmamanSpawn* magmaman_spawn;
+            /// Only the bubbles that spawn from the floor
+            /// Even without it, entities moving in water still spawn bubbles
+            LogicUnderwaterBubbles* water_bubbles;
+            LogicOlmecCutscene* olmec_cutscene;
+            LogicTiamatCutscene* tiamat_cutscene;
+            /// Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
+            LogicApepTrigger* apep_spawner;
+            /// All it does is it runs transition to Duat after time delay (sets the state next theme etc. and state.items for proper player respawn)
+            LogicCOGAnkhSacrifice* city_of_gold_ankh_sacrifice;
+            Logic* duat_bosses_spawner;
+            /// Spawn rising bubbles at Tiamat (position hardcoded)
+            LogicTiamatBubbles* bubbler;
+            /// Triggers aggro on everyone when non-high roller enters door
+            LogicTuskPleasurePalace* tusk_pleasure_palace; //  TODO: van helsing?
+            /// black market, vlad, wet fur discovery, logic shows the toast
+            Logic* discovery_info;
+            /// Changes the camera bounds when you reach black market
+            Logic* black_market;
+            Logic* jellyfish_trigger; // same as ghost_trigger
+            /// Handles create spawns and more, is cleared as soon as the winner is decided (on last player alive)
+            LogicArena1* arena_1;
+            Logic* arena_2; // can't trigger
+            /// Handles time end death
+            Logic* arena_3;
+            LogicArenaAlienBlast* arena_alien_blast;
+            LogicArenaLooseBombs* arena_loose_bombs;
+        };
+    };
 };
 
 struct LiquidPhysicsEngine
@@ -834,13 +843,13 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    std::list<uint32_t>* floors;              // pointer to map/list that contains all floor uids that the liquid interact with
-    std::list<uint32_t>* push_blocks;         // pointer to map/list that contains all activefloor uids that the liquid interact with
-    custom_vector<LiquidLake> impostor_lakes; //
-    uint32_t total_liquid_spawned;            // Total number of spawned liquid entities, all types.
-    uint32_t unknown8;                        // padding probably
-    uint8_t* unknown9;                        // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
-                                              // always allocates after the LiquidPhysics
+    std::map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seams to be the same as in push_blocks
+    std::map<uint32_t, size_t*>* push_blocks;               // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
+    custom_vector<LiquidLake> impostor_lakes;               //
+    uint32_t total_liquid_spawned;                          // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;                                      // padding probably
+    uint8_t* unknown9;                                      // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
+                                                            // always allocates after the LiquidPhysics
 
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
     bool unknown12;
@@ -965,27 +974,27 @@ struct Dialogue
     uint32_t unknown18;
 };
 
-struct ShopRestrictedItem
+struct ItemOwnerDetails
 {
-    int32_t item_uid;
     int32_t owner_uid;
     ENT_TYPE owner_type;
 };
 
-struct ShopOwnerDetails
+struct RoomOwnerDetails
 {
     uint8_t layer;
     uint8_t padding1;
     uint8_t padding2;
     uint8_t padding3;
     uint32_t room_index;
-    uint32_t shop_owner_uid;
+    int32_t owner_uid;
 };
 
-struct ShopsInfo
+struct RoomOwnersInfo
 {
-    std::set<ShopRestrictedItem> items; // could also be a map
-    std::vector<ShopOwnerDetails> shop_owners;
+    /// key/index is the uid of an item
+    custom_map<int32_t, ItemOwnerDetails> owned_items;
+    std::vector<RoomOwnerDetails> owned_rooms;
 };
 
 struct MultiLineTextRendering
@@ -994,4 +1003,16 @@ struct MultiLineTextRendering
     std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
     float x;                               // center of the text box?
     float z;                               // center of the text box?
+};
+
+struct EntityLookup
+{
+    std::array<EntityList, 4> unknown1;
+
+    // this is either very strange vector or something unrelated
+    // if this is vector, then it's just holds list of pointers to the elements from array above
+    // the result of the lookup would then be last element: (unknown3 - 1)
+    EntityList** unknown2; // always points to the first one?
+    EntityList** unknown3; // if lookup is not used, it's the same as unknown4
+    EntityList** unknown4; // capacity? points to nullptr after all the other pointers
 };

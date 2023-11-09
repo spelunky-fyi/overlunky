@@ -30,10 +30,13 @@ class ShootingStarSpawner : public Entity
 class LogicalDoor : public Entity
 {
   public:
+    /// Spawns this entity when not covered by floor. Must be initialized to valid ENT_TYPE before revealed, or crashes the game.
     ENT_TYPE door_type;
-    ENT_TYPE platform_type; // always 37? yeah, that's the floor platform...
+    /// Spawns this entity below when tile below is uncovered. Doesn't spawn anything if it was never covered by floor, unless platform_spawned is set to false. Must be initialized to valid ENT_TYPE before revealed, or crashes the game.
+    ENT_TYPE platform_type;
+    /// Set automatically when not covered by floor.
     bool not_hidden;
-    /// Is set true when you bomb the door, no matter what door, can't be reset
+    /// Set automatically when tile below is not covered by floor. Unset to force the platform to spawn if it was never covered in the first place.
     bool platform_spawned;
     bool unk5;
     bool unk6;

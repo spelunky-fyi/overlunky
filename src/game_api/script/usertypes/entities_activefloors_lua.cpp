@@ -10,9 +10,9 @@
 
 #include "entities_activefloors.hpp" // for Olmec, ClamBase, Crushtrap, Ele...
 #include "entity.hpp"                // for Entity
+#include "illumination.hpp"          // IWYU pragma: keep
 #include "particles.hpp"             // IWYU pragma: keep
-#include "sound_manager.hpp"         //
-#include "state_structs.hpp"         // IWYU pragma: keep
+#include "sound_manager.hpp"         // IWYU pragma: keep
 
 class Movable;
 
@@ -36,6 +36,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_clambase"] = &Entity::as<ClamBase>;
     lua["Entity"]["as_regenblock"] = &Entity::as<RegenBlock>;
     lua["Entity"]["as_timedpowderkeg"] = &Entity::as<TimedPowderkeg>;
+    lua["Entity"]["as_crushelevator"] = &Entity::as<CrushElevator>;
 
     lua.new_usertype<Crushtrap>(
         "Crushtrap",
@@ -200,5 +201,14 @@ void register_usertypes(sol::state& lua)
         &TimedPowderkeg::timer,
         sol::base_classes,
         sol::bases<Entity, Movable, PushBlock>());
+
+    lua.new_usertype<CrushElevator>(
+        "CrushElevator",
+        "y_limit",
+        &CrushElevator::y_limit,
+        "speed",
+        &CrushElevator::speed,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
 }
 } // namespace NEntitiesActiveFloors

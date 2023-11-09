@@ -14,6 +14,7 @@
 #include "constants.hpp"                    // for no_return_str
 #include "entities_chars.hpp"               // for Player
 #include "entity.hpp"                       // for Entity, get_entity_ptr
+#include "entity_lookup.hpp"                //
 #include "handle_lua_function.hpp"          // for handle_function
 #include "items.hpp"                        // for Inventory
 #include "level_api.hpp"                    // for LevelGenData, LevelGenSy...
@@ -751,10 +752,10 @@ void LuaBackend::pre_load_level_files()
         }
     }
 }
-void LuaBackend::pre_level_generation()
+bool LuaBackend::pre_level_generation()
 {
     if (!get_enabled())
-        return;
+        return false;
 
     auto now = get_frame_count();
 
@@ -766,11 +767,62 @@ void LuaBackend::pre_level_generation()
         if (callback.screen == ON::PRE_LEVEL_GENERATION)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func);
+            auto return_value = handle_function<bool>(this, callback.func).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
+            if (return_value)
+                return return_value;
         }
     }
+    return false;
+}
+bool LuaBackend::pre_init_level()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LEVEL_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+    return false;
+}
+bool LuaBackend::pre_init_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LAYER_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func, layer).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+    return false;
 }
 bool LuaBackend::pre_load_screen()
 {
@@ -843,7 +895,7 @@ bool LuaBackend::pre_load_screen()
                 saved.mount = get_user_data(ent->overlay->uid);
                 should_save = true;
             }
-            for (auto [type, powerup] : ent->powerups)
+            for (auto& [type, powerup] : ent->powerups)
             {
                 if (user_datas.contains(powerup->uid))
                 {
@@ -865,6 +917,58 @@ bool LuaBackend::pre_load_screen()
 
     return false;
 }
+
+bool LuaBackend::pre_unload_level()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LEVEL_DESTRUCTION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+
+    return false;
+}
+bool LuaBackend::pre_unload_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LAYER_DESTRUCTION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func, layer).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+
+    return false;
+}
+
 void LuaBackend::post_room_generation()
 {
     if (!get_enabled())
@@ -919,7 +1023,7 @@ void LuaBackend::load_user_data()
                 set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
             if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
                 set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
-            for (auto [type, powerup] : ent->powerups)
+            for (auto& [type, powerup] : ent->powerups)
             {
                 if (saved_user_datas[slot].powerups.contains(type))
                     set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
@@ -956,6 +1060,48 @@ void LuaBackend::post_level_generation()
         }
     }
 }
+void LuaBackend::post_init_level()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LEVEL_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_init_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LAYER_CREATION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, layer);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
 void LuaBackend::post_load_screen()
 {
     if (!get_enabled())
@@ -983,6 +1129,49 @@ void LuaBackend::post_load_screen()
         }
     }
 }
+void LuaBackend::post_unload_level()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LEVEL_DESTRUCTION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+void LuaBackend::post_unload_layer(LAYER layer)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LAYER_DESTRUCTION)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, layer);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+
 void LuaBackend::on_death_message(STRINGID stringid)
 {
     if (!get_enabled())
@@ -1141,6 +1330,9 @@ bool LuaBackend::process_vanilla_render_callbacks(ON event)
     bool skip{false};
     if (!get_enabled())
         return skip;
+
+    // used in infinite loop detection to see if game is hanging because a script is hanging
+    frame_counter++;
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
@@ -1399,7 +1591,7 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
                 {
                     new_pages.clear();
                     const auto table = returned_pages.as<sol::table>();
-                    for (auto something : table)
+                    for (auto& something : table)
                     {
                         if (something.second.get_type() == sol::type::number)
                         {
@@ -1661,6 +1853,57 @@ void LuaBackend::on_set_user_data(Entity* ent)
             handle_function<void>(this, callback.func, ent);
             clear_current_callback();
             callback.lastRan = now;
+        }
+    }
+}
+
+bool LuaBackend::on_pre_process_input()
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+    std::lock_guard lock{global_lua_lock};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_PROCESS_INPUT)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            if (handle_function<bool>(this, callback.func).value_or(false))
+            {
+                clear_current_callback();
+                return true;
+            }
+            clear_current_callback();
+        }
+    }
+    return false;
+}
+
+void LuaBackend::on_post_process_input()
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    std::lock_guard lock{global_lua_lock};
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_PROCESS_INPUT)
+        {
+            callback.lastRan = now;
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func);
+            clear_current_callback();
         }
     }
 }

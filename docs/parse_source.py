@@ -11,9 +11,61 @@ CACHE_FILE = None
 if not os.path.exists(".db"):
     os.makedirs(".db")
 
+# this is common for generator.py and validator.py, not actually used nor should it be used here
+replace_table = {
+    # standard basic types
+    "uint8_t": "int",
+    "uint16_t": "int",
+    "uint32_t": "int",
+    "uint64_t": "int",
+    "int8_t": "int",
+    "int16_t": "int",
+    "int32_t": "int",
+    "int64_t": "int",
+    "ImU32": "int",
+    "in_port_t": "int",
+    "size_t": "int",
+    "char*": "string",
+    "wstring": "string",
+    "u16string": "string",
+    "string_view": "string",
+    "char16_t*": "string",
+    "char16_t": "char",
+    "pair<": "tuple<",
+    # std containers
+    "custom_vector<": "vector<",
+    "custom_map<": "map<",
+    "custom_unordered_map<": "map<",
+    "custom_set<": "set<",
+    "custom_unordered_set<": "set<",
+    "game_vector<": "vector<",
+    "game_map<": "map<",
+    "game_unordered_map<": "map<",
+    "game_set<": "set<",
+    "game_unordered_set<": "set<",
+    "unordered_map<": "map<", # doesn't seam to matter for lua if it's ordered or not
+    "unordered_set<": "set<", # doesn't seam to matter for lua if it's ordered or not
+    # removers
+    ", identity_hasher<>": "",
+    "std::": "",
+    "sol::": "",
+    "void": "",
+    "constexpr": "",
+    "const": "",
+    "static": "",
+    # special
+    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
+    "EmittedParticlesInfo": "array<Particle>",
+    "ImVec2": "Vec2",
+    "SoundCallbackFunction": "function",
+    "object ": "any ",
+    "BucketItem": "any",
+}
+
 header_files = [
     "../src/game_api/math.hpp",
     "../src/game_api/rpc.hpp",
+    "../src/game_api/entity_lookup.hpp",
     "../src/game_api/drops.hpp",
     "../src/game_api/spawn_api.hpp",
     "../src/game_api/script.hpp",
@@ -26,6 +78,7 @@ header_files = [
     "../src/game_api/game_manager.hpp",
     "../src/game_api/state.hpp",
     "../src/game_api/state_structs.hpp",
+    "../src/game_api/illumination.hpp",
     "../src/game_api/prng.hpp",
     "../src/game_api/entities_floors.hpp",
     "../src/game_api/entities_activefloors.hpp",
@@ -62,6 +115,7 @@ header_files = [
     "../src/game_api/script/usertypes/gui_lua.cpp",
     "../src/game_api/steam_api.hpp",
     "../src/game_api/search.hpp",
+    "../src/game_api/bucket.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -104,6 +158,8 @@ api_files = [
     "../src/game_api/script/usertypes/screen_arena_lua.cpp",
     "../src/game_api/script/usertypes/socket_lua.cpp",
     "../src/game_api/script/usertypes/steam_lua.cpp",
+    "../src/game_api/script/usertypes/logic_lua.cpp",
+    "../src/game_api/script/usertypes/bucket_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
@@ -124,6 +180,8 @@ constructors = {}
 
 cpp_type_exceptions = [
     "Players",
+    "CutsceneBehavior",
+    "CustomCutsceneBehavior",
 ]
 not_functions = [
     "players",
@@ -136,9 +194,8 @@ not_functions = [
     "prng",
 ]
 
-replace_fun = None
+replace_fun_import = None
 
-reConstructorFix = re.compile(r"const (\w+)(?: \w+)?(&&|&)?")
 reSignature = re.compile(r"(?:\bsignature\b.*is|function) `?([\S]*) (\w*?)\((.*?)\)")
 
 
@@ -164,9 +221,11 @@ def camel_case_to_snake_case(name):
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
-def fix_constructor_param(params_text):
-    return reConstructorFix.sub(r"\1", params_text)
-
+def fix_spaces(thing):
+    thing = thing.strip()
+    thing = re.sub(r"\s{2,}", " ", thing)          # change double spaces into single
+    thing = re.sub(r"(?<=\(|\<)\s", "", thing)     # remove spaces after ( or <
+    return thing.replace("*", "").replace("&", "") # remove * and &
 
 def getfunc(name):
     for func in funcs:
@@ -182,15 +241,17 @@ def rpcfunc(name):
             ret.append(func)
     return ret
 
+def replace_fun(text):
+    return fix_spaces(replace_fun_import(text))
 
 def configure_parse(replace_function, cache_file):
-    global replace_fun, CACHE_FILE
-    replace_fun = replace_function
+    global replace_fun_import, CACHE_FILE
+    replace_fun_import = replace_function
     CACHE_FILE = cache_file
 
 
 def run_parse():
-    if not replace_fun:
+    if not replace_fun_import:
         print_console("Did not run configure_parse, can not parse source files...")
         return
 
@@ -227,7 +288,6 @@ def run_parse():
         data = open(file, "r").read().split("\n")
         skip = 0
         for line in data:
-            line = line.replace("*", "")
             skip += line.count("{") - line.count("}")
             c = re.search(r"/// ?(.*)$", line)
             if c:
@@ -235,11 +295,13 @@ def run_parse():
             m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", line)
             if m:
                 if skip == 0 or file.endswith("script.hpp"):
+                    param = replace_fun(m.group(3))
+                    ret = replace_fun(m.group(1))
                     rpc.append(
                         {
-                            "return": m.group(1),
+                            "return": ret,
                             "name": m.group(2),
-                            "param": m.group(3),
+                            "param": param,
                             "comment": comment,
                         }
                     )
@@ -260,8 +322,6 @@ def run_parse():
         member_funs = {}
         member_vars = []
         for line in data:
-            line = replace_fun(line)
-            line = line.replace("*", "")
             if not class_name and ("struct" in line or "class" in line):
                 m = re.match(r"(struct|class)\s+(\S+)", line)
                 if m and not line.endswith(";"):
@@ -315,9 +375,9 @@ def run_parse():
                                     param = f"{param} {param.lower()}"
                                 member_funs[name].append(
                                     {
-                                        "return": m[2],
+                                        "return": replace_fun(m[2]),
                                         "name": m[3],
-                                        "param": param,
+                                        "param": replace_fun(param),
                                         "comment": comment,
                                     }
                                 )
@@ -340,21 +400,21 @@ def run_parse():
                                 for m_var in re.findall(r"(\w*),", vars_except_last):
                                     member_vars.append(
                                         {
-                                            "type": vars_type,
+                                            "type": replace_fun(vars_type),
                                             "name": m_var,
                                             "comment": comment,
                                         }
                                     )
                                 member_vars.append(
                                     {
-                                        "type": vars_type,
+                                        "type": replace_fun(vars_type),
                                         "name": m[2],
                                         "comment": comment,
                                     }
                                 )
                             else:
                                 member_vars.append(
-                                    {"type": m[1], "name": m[2], "comment": comment}
+                                    {"type": replace_fun(m[1]), "name": m[2], "comment": comment}
                                 )
                             comment = []
                 elif brackets_depth == 0:
@@ -375,7 +435,6 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            line = line.replace("*", "")
             m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\];', line)
             if m:
                 events.append({"name": m.group(1), "comment": comment})
@@ -392,8 +451,6 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            line = line.replace("*", "")
-            line = line.strip()
             if line == "":
                 comment = []
 
@@ -408,6 +465,9 @@ def run_parse():
                     underlying_cpp_type = next(
                         (item for item in classes if item["name"] == cpp_type), dict()
                     )
+
+                    if "member_funs" not in underlying_cpp_type:
+                        underlying_cpp_type["member_funs"] = {}
 
                     if name not in underlying_cpp_type["member_funs"]:
                         underlying_cpp_type["member_funs"][name] = []
@@ -434,10 +494,10 @@ def run_parse():
                         ret = "nil"
                         param = ""
                         if m:
-                            ret = replace_fun(m.group(2)).strip() or "nil"
+                            ret = replace_fun(m.group(2)) or "nil"
                         if m or m2:
                             param = (m or m2).group(1)
-                            param = replace_fun(param).strip()
+                            param = replace_fun(param)
                             param = ", ".join([p.strip() for p in param.split(",")[1:]])
                         underlying_cpp_type["member_funs"][name].append(
                             {
@@ -460,7 +520,7 @@ def run_parse():
                         )
                         func = {
                             "name": m.group(1),
-                            "cpp": m.group(2),
+                            "cpp": replace_fun(m.group(2)),
                             "comment": comment,
                             "cb_signature": cb_signature,
                         }
@@ -514,9 +574,7 @@ def run_parse():
                     index = literal_eval(index.strip())
                     if binds := re.search(r"BackBinder<([^>]*)>", signature_and_binder):
                         binds = binds.group(1)
-                        binds = replace_fun(
-                            "{} {}".format(binds, camel_case_to_snake_case(binds))
-                        )
+                        binds = "{} {}".format(binds, camel_case_to_snake_case(binds))
                     else:
                         binds = None
                     signature = re.sub(
@@ -525,9 +583,9 @@ def run_parse():
                     signature = re.search(
                         r"([_a-zA-Z][_a-zA-Z0-9]*.*)\((.*)\)", signature
                     )
-                    ret = replace_fun(signature.group(1).strip())
+                    ret = signature.group(1)
                     args = [
-                        replace_fun(t.strip()) for t in signature.group(2).split(",")
+                        t for t in signature.group(2).split(",")
                     ]
                     vtable_entries[name] = {
                         "name": name,
@@ -648,8 +706,7 @@ def run_parse():
 
                 if var[0].startswith("sol::constructors"):
                     for fun in underlying_cpp_type["member_funs"][cpp_type]:
-                        param = replace_fun(fun["param"])
-                        param = fix_constructor_param(param)
+                        param = fun["param"]
 
                         if cpp_type not in constructors:
                             constructors[cpp_type] = []
@@ -714,10 +771,11 @@ def run_parse():
                         )
                     else:
                         m_return_type = re.search(
-                            r"->(\w+){", var[1]
+                            r"->([:<>\w]+){", var[1]
                         )  # Use var[1] instead of cpp because it could be replaced on the sol::property stuff
                         if m_return_type:
-                            sig = f"{m_return_type[1]} {var_name}"
+                            type = replace_fun(m_return_type[1])
+                            sig = f"{type} {var_name}"
                             vars.append(
                                 {"name": var_name, "type": cpp, "signature": sig}
                             )
@@ -766,10 +824,10 @@ def run_parse():
                     cpp_comment = []
                     if entry_name in underlying_cpp_type["member_funs"]:
                         for fun in underlying_cpp_type["member_funs"][entry_name]:
-                            ret = fun["return"]
+                            ret = replace_fun(fun["return"])
                             ret = f"optional<{ret}>" if ret else "bool"
                             ret = ret if entry_name != "dtor" else "nil"
-                            args = fun["param"].strip()
+                            args = replace_fun(fun["param"])
                             args = f"{name} self, {args}" if args else f"{name} self"
                             binds = entry["binds"]
                             if binds:
@@ -781,10 +839,10 @@ def run_parse():
                                 cpp_comment = ["Virtual function docs:"] + cpp_comment
                             break
                     else:
-                        ret = entry["ret"]
+                        ret = replace_fun(entry["ret"])
                         ret = f"optional<{ret}>" if ret else "bool"
                         ret = ret if entry_name != "dtor" else "nil"
-                        args = " ".join(entry["args"])
+                        args = replace_fun(" ".join(entry["args"]))
                         args = f"{name} self, {args}" if args else f"{name} self"
                         pre_signature = f"{ret} {entry_name}({args})"
                         post_signature = f"nil {entry_name}({args})"
@@ -834,7 +892,6 @@ def run_parse():
         comment = []
         data = open(file, "r").read().split("\n")
         for line in data:
-            line = line.replace("*", "")
             m = re.findall(r"new_usertype\<(.*?)\>", line)
             if m:
                 type = m[0]
@@ -891,7 +948,8 @@ def run_parse():
                 if not var:
                     continue
                 var = var.split(",")
-                vars.append({"name": var[0], "type": var[1]})
+                if len(var) > 1:
+                    vars.append({"name": var[0], "type": var[1]})
             enums.append({"name": name, "vars": vars})
         data = open(file, "r").read()
         data = data.replace("\n", " ")

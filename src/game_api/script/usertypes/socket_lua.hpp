@@ -16,6 +16,7 @@ class UdpServer
 
     UdpServer(std::string host, in_port_t port, std::function<SocketCb> cb);
     ~UdpServer();
+    void clear();
 
     std::string host;
     in_port_t port;
@@ -23,6 +24,18 @@ class UdpServer
     std::thread thr;
     std::atomic_flag kill_thr;
     sockpp::udp_socket sock;
+};
+
+class HttpRequest
+{
+  public:
+    using HttpCb = void(std::optional<std::string>, std::optional<std::string>);
+
+    HttpRequest(std::string url, std::function<HttpCb> cb);
+    std::string url;
+    std::function<HttpCb> cb;
+    std::string response;
+    std::string error;
 };
 
 namespace NSocket

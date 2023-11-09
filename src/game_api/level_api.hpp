@@ -13,11 +13,14 @@
 #include <vector>      // for vector
 
 #include "aliases.hpp"                       // for LAYER
+#include "containers/custom_vector.hpp"      // for custom_vector
 #include "containers/game_string.hpp"        // for game_string
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/game_vector.hpp"        // for game_vector
 #include "level_api_types.hpp"               // for ShortTileCodeDef
 #include "math.hpp"                          // for AABB (ptr only), Vec2
+
+class Entity;
 
 struct TileCodeDef
 {
@@ -169,8 +172,11 @@ struct DoorCoords
 
 struct SpawnInfo
 {
-    void* ptr0;
-    void* ptr1;
+    ROOM_TEMPLATE room_template;
+    // probably padding here
+
+    /// Grid entity at this position, will only try to spawn procedural if this is nil
+    Entity* grid_entity;
     float x;
     float y;
 };
@@ -358,7 +364,7 @@ class ThemeInfo
     /// Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
     virtual void spawn_extra() = 0;
 
-    /// Spawns a single procedural entity, used in spawn_procedural
+    /// Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
     virtual void do_procedural_spawn(SpawnInfo* info) = 0;
 
     uint32_t get_aux_id();
@@ -393,7 +399,7 @@ class SpecialLevelGeneration
     virtual void procedual_spawns() = 0;
 };
 
-enum class ShopType : uint8_t
+enum class SHOP_TYPE : uint8_t
 {
     General,
     Clothing,
@@ -422,11 +428,16 @@ struct LevelGenSystem
         {
             hook_impl.template hook<PopulateLevelFun, 0xd>(theme, &populate_level_hook);
             hook_impl.template hook<DoProceduralSpawnFun, 0x33>(theme, &do_procedural_spawn_hook);
+            // this didn't work right
+            // hook_impl.template hook<PopulateTransitionFun, 0x15>(theme, &populate_transition_hook);
         }
     }
 
     using PopulateLevelFun = void(ThemeInfo*, uint64_t, uint64_t, uint64_t);
     static void populate_level_hook(ThemeInfo*, uint64_t, uint64_t, uint64_t, PopulateLevelFun*);
+
+    // using PopulateTransitionFun = void(ThemeInfo*);
+    // static void populate_transition_hook(ThemeInfo*, PopulateTransitionFun*);
 
     using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
     static void do_procedural_spawn_hook(ThemeInfo*, SpawnInfo*, DoProceduralSpawnFun*);
@@ -435,7 +446,7 @@ struct LevelGenSystem
     uint64_t unknown2;
     union
     {
-        ThemeInfo* themes[18];
+        std::array<ThemeInfo*, 18> themes;
         struct
         {
             ThemeInfo* theme_dwelling;
@@ -485,7 +496,7 @@ struct LevelGenSystem
     float spawn_y;
     union
     {
-        std::vector<Vec2> exit_doors;
+        custom_vector<Vec2> exit_doors;
         struct
         {
             /// NoDoc
@@ -499,11 +510,11 @@ struct LevelGenSystem
     uint8_t flags3;
     union
     {
-        ShopType shop_types[2];
+        SHOP_TYPE shop_types[2];
         struct
         {
-            ShopType shop_type;
-            ShopType backlayer_shop_type;
+            SHOP_TYPE shop_type;
+            SHOP_TYPE backlayer_shop_type;
         };
     };
     uint8_t frontlayer_shop_music;
@@ -527,10 +538,10 @@ struct LevelGenSystem
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
     bool mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room);
 
-    bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, ShopType shop_type);
+    bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE shop_type);
 
     std::string_view get_room_template_name(uint16_t room_template);
-
+    std::optional<std::string_view> get_procedural_spawn_chance_name(uint32_t chance_id);
     uint32_t get_procedural_spawn_chance(uint32_t chance_id);
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 

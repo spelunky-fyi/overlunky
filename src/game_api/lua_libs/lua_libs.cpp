@@ -796,7 +796,7 @@ local function format(_, str)
          return fmt and string.format(fmt, fn()) or tostring(fn())
       else
          error(err, 0)
-      end         
+      end
    end))
 end
 
@@ -955,4 +955,33 @@ return { _NAME = n, _COPYRIGHT = c, _DESCRIPTION = d, _VERSION = v, serialize = 
   block = function(a, opts) return s(a, merge({indent = '  ', sortkeys = true, comment = true}, opts)) end }
 )serp";
     lua["serpent"] = lua.require_script("serpent", serpent_code);
+
+    lua.script(R"##(
+        function dump(o, d, n)
+            local n = n or 0
+            local t = nil
+            if type(o) == "string" or type(o) == "number" then
+                t = o
+            elseif getmetatable(o) and (not d or n < d) then
+                t = {}
+                if o.pairs then
+                    for k,v in pairs(o) do
+                        t[k] = dump(v, d, n+1)
+                    end
+                else
+                    for k,v in pairs(getmetatable(o)) do
+                        if k:sub(0, 2) ~= "__" and k ~= "class_cast" and k ~= "class_check" and k ~= "new" then
+                            t[k] = dump(o[k], d, n+1)
+                        end
+                    end
+                end
+            else
+                t = o
+            end
+            return t
+        end
+        function dump_string(o, d)
+            return ((type(o) ~= "boolean" and type(o) ~= "string" and type(o) ~= "number" and type(o) ~= "table") and tostring(o)..": " or "") .. serpent.line(dump(o, d), {comment=false, indent="  "})
+        end
+        )##");
 }

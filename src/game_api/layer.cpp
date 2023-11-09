@@ -9,7 +9,7 @@
 #include "entity.hpp"          // for Entity, to_id, EntityDB, entity_factory
 #include "logger.h"            // for DEBUG
 #include "movable.hpp"         // for Movable
-#include "rpc.hpp"             // for entity_get_items_by
+#include "rpc.hpp"             //
 #include "search.hpp"          // for get_address
 #include "state.hpp"           // for State, StateMemory
 
@@ -126,13 +126,11 @@ Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
     {
     case 11:
     {
-        DEBUG("In camp, spawning starting exit");
         door = spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_STARTING_EXIT"), round(x), round(y), false, 0.0, 0.0, true);
         break;
     }
     case 12:
     {
-        DEBUG("In game, spawning regular exit");
         door = spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_EXIT"), round(x), round(y), false, 0.0, 0.0, true);
         break;
     }
@@ -151,7 +149,7 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
 {
     static const auto head_id = to_id("ENT_TYPE_MONS_APEP_HEAD");
     static const auto body_id = to_id("ENT_TYPE_MONS_APEP_BODY");
-    static const auto facing_left_flag = 1 << 16;
+    constexpr auto facing_left_flag = 1 << 16;
 
     Entity* apep_head = spawn_entity(head_id, x, y, false, 0.0f, 0.0f, true);
     const bool facing_left = apep_head->flags & facing_left_flag;
@@ -166,18 +164,17 @@ Entity* Layer::spawn_apep(float x, float y, bool right)
         int current_uid = apep_head->uid;
         do
         {
-            auto body_parts = entity_get_items_by(current_uid, {}, 0);
+            auto body_parts = apep_head->items;
             int temp = current_uid;
-            for (auto body_part_uid : body_parts)
+            for (auto body_part : body_parts.entities())
             {
-                Entity* body_part = get_entity_ptr(body_part_uid);
                 body_part->flags = right
                                        ? body_part->flags & ~facing_left_flag
                                        : body_part->flags | facing_left_flag;
                 body_part->x *= -1.0f;
                 if (body_part->type->id == body_id)
                 {
-                    current_uid = body_part_uid;
+                    current_uid = body_part->uid;
                 }
             }
             if (temp == current_uid)
@@ -215,5 +212,37 @@ void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_la
         {
             move_grid_entity(item_ent, x + item_ent->x, y + item_ent->y, dest_layer);
         }
+    }
+}
+
+void Layer::destroy_grid_entity(Entity* ent)
+{
+    if (ent)
+    {
+        auto items = ent->items.entities();
+        for (auto ptr = items.cend(); ptr != items.cbegin();)
+        {
+            ptr--;
+            Entity* item_ent = *ptr;
+            if (!item_ent->is_player()) // if not player
+            {
+                destroy_grid_entity(item_ent);
+            }
+        }
+
+        const auto pos = ent->position();
+        const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.first));
+        const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.second));
+        if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
+        {
+            if (grid_entities[current_grid_y][current_grid_x] == ent)
+            {
+                grid_entities[current_grid_y][current_grid_x] = nullptr;
+                update_liquid_collision_at(pos.first, pos.second, false);
+            }
+        }
+
+        ent->flags |= 1U << (29 - 1); // set DEAD flag to prevent certain stuff like gold nuggets drop or particles from entities such as spikes
+        ent->destroy();
     }
 }

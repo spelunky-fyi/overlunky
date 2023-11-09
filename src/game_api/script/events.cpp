@@ -16,6 +16,8 @@
 class JournalPage;
 struct AABB;
 
+auto g_level_loaded = false;
+
 void pre_load_level_files()
 {
     LuaBackend::for_each_backend(
@@ -25,14 +27,16 @@ void pre_load_level_files()
             return true;
         });
 }
-void pre_level_generation()
+bool pre_level_generation()
 {
+    bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->pre_level_generation();
-            return true;
+            block = backend->pre_level_generation();
+            return !block;
         });
+    return block;
 }
 bool pre_load_screen()
 {
@@ -72,6 +76,55 @@ bool pre_load_screen()
 
     return block;
 }
+bool pre_unload_level()
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_unload_level();
+            return !block;
+        });
+    if (!block)
+        g_level_loaded = false;
+    return block;
+}
+bool pre_init_level()
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_init_level();
+            return !block;
+        });
+    if (!block)
+        g_level_loaded = true;
+    return block;
+}
+bool pre_unload_layer(LAYER layer)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_unload_layer(layer);
+            return !block;
+        });
+    return block;
+}
+bool pre_init_layer(LAYER layer)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_init_layer(layer);
+            return !block;
+        });
+    return block;
+}
+
 void post_room_generation()
 {
     LuaBackend::for_each_backend(
@@ -90,12 +143,48 @@ void post_level_generation()
             return true;
         });
 }
+void post_init_layer(LAYER layer)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_init_layer(layer);
+            return true;
+        });
+}
+void post_init_level()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_init_level();
+            return true;
+        });
+}
 void post_load_screen()
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
             backend->post_load_screen();
+            return true;
+        });
+}
+void post_unload_level()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_unload_level();
+            return true;
+        });
+}
+void post_unload_layer(LAYER layer)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_unload_layer(layer);
             return true;
         });
 }
@@ -396,4 +485,30 @@ bool pre_set_feat(FEAT feat)
             return !block;
         });
     return block;
+}
+
+bool pre_process_input()
+{
+    bool return_val = false;
+    LuaBackend::for_each_backend(
+        [=, &return_val](LuaBackend::LockedBackend backend)
+        {
+            if (backend->on_pre_process_input())
+            {
+                return_val = true;
+                return false;
+            }
+            return true;
+        });
+    return return_val;
+}
+
+void post_process_input()
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->on_post_process_input();
+            return true;
+        });
 }

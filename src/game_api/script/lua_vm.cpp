@@ -35,8 +35,11 @@
 #include "entities_chars.hpp"                      // for Player
 #include "entities_items.hpp"                      // for Container, Player...
 #include "entity.hpp"                              // for get_entity_ptr
+#include "entity_lookup.hpp"                       //
+#include "game_api.hpp"                            //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
+#include "illumination.hpp"                        //
 #include "items.hpp"                               // for Inventory
 #include "layer.hpp"                               // for g_level_max_x
 #include "lua_backend.hpp"                         // for LuaBackend, ON
@@ -61,6 +64,7 @@
 #include "strings.hpp"                             // for change_string
 #include "thread_utils.hpp"                        // for OnHeapPointer
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
+#include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes
 #include "usertypes/drops_lua.hpp"                 // for register_usertypes
 #include "usertypes/entities_activefloors_lua.hpp" // for register_usertypes
@@ -81,6 +85,7 @@
 #include "usertypes/gui_lua.hpp"                   // for register_usertypes
 #include "usertypes/hitbox_lua.hpp"                // for register_usertypes
 #include "usertypes/level_lua.hpp"                 // for register_usertypes
+#include "usertypes/logic_lua.hpp"                 // for register_usertypes
 #include "usertypes/particles_lua.hpp"             // for register_usertypes
 #include "usertypes/player_lua.hpp"                // for register_usertypes
 #include "usertypes/prng_lua.hpp"                  // for register_usertypes
@@ -94,6 +99,7 @@
 #include "usertypes/texture_lua.hpp"               // for register_usertypes
 #include "usertypes/vanilla_render_lua.hpp"        // for VanillaRenderContext
 #include "usertypes/vtables_lua.hpp"               // for register_usertypes
+#include "virtual_table.hpp"                       //
 
 struct Illumination;
 
@@ -222,15 +228,15 @@ void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
     auto infinite_loop = [](lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
     {
-        static uint32_t last_frame = 0;
-        auto state = State::get().ptr();
-        if (last_frame == state->time_startup)
-            luaL_error(argst, "Hit Infinite Loop Detection of 1bln instructions");
-        last_frame = state->time_startup;
+        static size_t last_frame = 0;
+        auto backend = LuaBackend::get_calling_backend();
+        if (last_frame == backend->frame_counter && backend->infinite_loop_detection)
+            luaL_error(argst, "Hit Infinite Loop Detection of 420 million instructions");
+        last_frame = backend->frame_counter;
     };
 
     lua_sethook(lua.lua_state(), NULL, 0, 0);
-    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 500000000);
+    lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 420000000);
 
     lua.safe_script(R"(
 -- This function walks up the stack until it finds an _ENV that is not _G
@@ -291,6 +297,8 @@ end
     NBehavior::register_usertypes(lua);
     NSteam::register_usertypes(lua);
     NVTables::register_usertypes(lua);
+    NLogic::register_usertypes(lua);
+    NBucket::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
 
@@ -360,20 +368,28 @@ end
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
+
     /// Print a log message on screen.
     lua["print"] = [](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
         backend->messages.push_back({message, std::chrono::system_clock::now(), ImVec4(1.0f, 1.0f, 1.0f, 1.0f)});
-        if (backend->messages.size() > 20)
+        if (backend->messages.size() > 40 && !is_console)
             backend->messages.pop_front();
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to ingame console.
-    lua["console_print"] = [](std::string message) -> void
+    /// Print a log message to ingame console with a comment identifying the script that sent it.
+    lua["console_print"] = [&lua](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
+        bool is_console = !strcmp(backend->get_id(), "dev/lua_console");
+        if (is_console)
+        {
+            lua["print"](std::move(message));
+            return;
+        }
         auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         std::tm time_buf;
         localtime_s(&time_buf, &in_time_t);
@@ -402,6 +418,7 @@ end
     /// Same as `print`
     lua["message"] = [&lua](std::string message) -> void
     { lua["print"](message); };
+
     /// Prints any type of object by first funneling it through `inspect`, no need for a manual `tostring` or `inspect`.
     lua["prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
@@ -419,9 +436,13 @@ end
             lua["print"](std::move(message));
         }
     };
+
     /// Same as `prinspect`
     lua["messpect"] = [&lua](sol::variadic_args objects) -> void
     { lua["prinspect"](objects); };
+
+    /// Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
+    // lua["dump"] = [](object object, optional<int> depth) -> table
 
     /// Adds a command that can be used in the console.
     lua["register_console_command"] = [](std::string name, sol::function cmd)
@@ -435,11 +456,17 @@ end
     };
 
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
-    /// Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+    /// Add per level callback function to be called every `frames` engine frames
+    /// Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+    /// or even be one frame off if called right before the time_level variable is updated
+    /// If you require precise timing, choose the start of your interval in one of those safe callbacks:
+    /// The SCREEN callbacks: from ON.LOGO to ON.ONLINE_LOBBY or custom callbacks ON.FRAME, ON.SCREEN, ON.START, ON.LOADING, ON.RESET, ON.POST_UPDATE
+    /// Timer is paused on pause and cleared on level transition.
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto luaCb = IntervalCallback{cb, frames, -1};
+        auto state = State::get().ptr_main();
+        auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
@@ -648,26 +675,26 @@ end
     { return read_prng(); };
 
     using Toast = void(const char16_t*);
-    using Say = void(size_t, Entity*, const char16_t*, int, bool);
+    using Say = void(HudData*, Entity*, const char16_t*, int, bool);
 
     /// Show a message that looks like a level feeling.
     lua["toast"] = [](std::u16string message)
     {
-        static Toast* toast_fun = (Toast*)get_address("toast");
+        static auto toast_fun = (Toast*)get_address("toast");
         toast_fun(message.c_str());
     };
     /// Show a message coming from an entity
     lua["say"] = [](uint32_t entity_uid, std::u16string message, int sound_type, bool top)
     {
         static auto say = (Say*)get_address("speech_bubble_fun");
-        static const auto say_context = get_address("say_context");
+        const auto hud = get_hud();
 
         auto entity = get_entity_ptr(entity_uid);
 
         if (entity == nullptr)
             return;
 
-        say(say_context, entity, message.c_str(), sound_type, top);
+        say(hud, entity, message.c_str(), sound_type, top);
     };
     /// Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
     /// limits, you can override them in the UI with double click.
@@ -939,9 +966,12 @@ end
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     lua["force_dark_level"] = [](bool g)
     { State::get().darkmode(g); };
-    /// Set the zoom level used in levels and shops. 13.5 is the default.
+    /// Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
     lua["zoom"] = [](float level)
     { State::get().zoom(level); };
+    /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
+    lua["zoom_reset"] = []()
+    { State::get().zoom_reset(); };
     /// Pause/unpause the game.
     /// This is just short for `state.pause == 32`, but that produces an audio bug
     /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
@@ -960,6 +990,12 @@ end
     lua["move_entity"] = move_entity_abs;
     /// Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
     lua["move_grid_entity"] = move_grid_entity;
+    auto destroy_grid = sol::overload(
+        static_cast<void (*)(int32_t uid)>(::destroy_grid),
+        static_cast<void (*)(float x, float y, LAYER layer)>(::destroy_grid));
+    /// Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+    /// Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
+    lua["destroy_grid"] = destroy_grid;
     /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
     lua["set_door_target"] = set_door_target;
     /// Short for [set_door_target](#set_door_target).
@@ -970,7 +1006,7 @@ end
     /// Check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) for what the exact ENT_TYPE's can this function affect
     lua["set_contents"] = set_contents;
     /// Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
-    // lua["get_entity"] = [](uint32_t uid) -> Entity* {};
+    // lua["get_entity"] = [](uint32_t uid) -> Entity*{};
     /// NoDoc
     /// Get the [Entity](#Entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
     lua["get_entity_raw"] = get_entity_ptr;
@@ -1078,7 +1114,7 @@ end
     /// Set the `more_flags` field from entity by uid
     lua["set_entity_flags2"] = set_entity_flags2;
     /// Deprecated
-    /// As the name is misleading. use entity `move_state` field instead
+    /// As the name is misleading. use Movable.`move_state` field instead
     lua["get_entity_ai_state"] = get_entity_ai_state;
     /// Get `state.level_flags`
     lua["get_level_flags"] = get_level_flags;
@@ -1088,7 +1124,10 @@ end
     lua["get_entity_type"] = get_entity_type;
     /// Get the current set zoom level
     lua["get_zoom_level"] = []() -> float
-    { return State::get_zoom_level(); };
+    {
+        auto game_api = GameAPI::get();
+        return game_api->get_current_zoom();
+    };
     /// Get the game coordinates at the screen position (`x`, `y`)
     lua["game_position"] = [](float x, float y) -> std::pair<float, float>
     { return State::click_position(x, y); };
@@ -1142,8 +1181,10 @@ end
     lua["lock_door_at"] = lock_door_at;
     /// Try to unlock the exit at coordinates
     lua["unlock_door_at"] = unlock_door_at;
-    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+    /// Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
     lua["get_frame"] = get_frame_count;
+    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+    lua["get_global_frame"] = get_global_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.
     lua["get_ms"] = []()
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
@@ -1240,8 +1281,7 @@ end
     {
         return State::get_camera_position();
     };
-    /// Deprecated
-    /// this doesn't actually work at all. See State -> Camera the for proper camera handling
+    /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
     lua["set_camera_position"] = set_camera_position;
 
     /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
@@ -1280,7 +1320,8 @@ end
     lua["get_window_size"] = []() -> std::tuple<int, int>
     { return {(int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y}; };
 
-    /// Steal input from a Player, HiredHand or PlayerGhost
+    /// Deprecated
+    /// Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.
     lua["steal_input"] = [](int uid)
     {
         static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
@@ -1319,6 +1360,7 @@ end
             backend->script_input[uid] = newinput;
         }
     };
+    /// Deprecated
     /// Return input previously stolen with [steal_input](#steal_input)
     lua["return_input"] = [](int uid)
     {
@@ -1343,6 +1385,7 @@ end
         }
         backend->script_input.erase(uid);
     };
+    /// Deprecated
     /// Send input to entity, has to be previously stolen with [steal_input](#steal_input)
     lua["send_input"] = [](int uid, INPUTS buttons)
     {
@@ -1405,7 +1448,7 @@ end
 
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right before the screen is drawn, return `true` to skip the default rendering.
-    /// <br/>The callback signature is bool render_screen(Screen* self, VanillaRenderContext render_ctx)
+    /// <br/>The callback signature is bool render_screen(Screen self, VanillaRenderContext render_ctx)
     lua["set_pre_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -1429,7 +1472,7 @@ end
     };
     /// Returns unique id for the callback to be used in [clear_screen_callback](#clear_screen_callback) or `nil` if screen_id is not valid.
     /// Sets a callback that is called right after the screen is drawn.
-    /// <br/>The callback signature is nil render_screen(Screen* self, VanillaRenderContext render_ctx)
+    /// <br/>The callback signature is nil render_screen(Screen self, VanillaRenderContext render_ctx)
     lua["set_post_render_screen"] = [](int screen_id, sol::function fun) -> sol::optional<CallbackId>
     {
         if (Screen* screen = get_screen_ptr(screen_id))
@@ -1769,11 +1812,12 @@ end
     lua["change_poison_timer"] = change_poison_timer;
 
     auto create_illumination = sol::overload(
-        static_cast<Illumination* (*)(Color color, float size, float x, float y)>(::create_illumination),
-        static_cast<Illumination* (*)(Color color, float size, uint32_t uid)>(::create_illumination));
-    /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+        static_cast<Illumination* (*)(Color, float, float, float)>(::create_illumination),
+        static_cast<Illumination* (*)(Color, float, int32_t)>(::create_illumination),
+        static_cast<Illumination* (*)(Vec2, Color, LIGHT_TYPE, float, uint8_t, int32_t, LAYER)>(::create_illumination));
+    /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
     lua["create_illumination"] = create_illumination;
-    /// Refreshes an Illumination, keeps it from fading out
+    /// Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
     lua["refresh_illumination"] = refresh_illumination;
 
     /// Removes all liquid that is about to go out of bounds, which crashes the game.
@@ -1845,7 +1889,7 @@ end
     )");
 
     /// Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](#spawn_roomowner).
-    // lua["spawn_shopkeeper"] = [](float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
+    // lua["spawn_shopkeeper"] = [](float x, float y, LAYER layer, ROOM_TEMPLATE room_template = ROOM_TEMPLATE.SHOP) -> uint32_t
     lua["spawn_shopkeeper"] = sol::overload(
         [](float x, float y, LAYER layer)
         {
@@ -1857,7 +1901,7 @@ end
         });
 
     /// Spawn a RoomOwner (or a few other like [CavemanShopkeeper](#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
-    // lua["spawn_roomowner"] = [](ENT_TYPE owner_type, float x, float, y, LAYER layer, ROOM_TEMPLATE room_template = -1) -> uint32_t
+    // lua["spawn_roomowner"] = [](ENT_TYPE owner_type, float x, float y, LAYER layer, ROOM_TEMPLATE room_template = -1) -> uint32_t
     lua["spawn_roomowner"] = sol::overload(
         [](ENT_TYPE owner_type, float x, float y, LAYER layer)
         {
@@ -1878,20 +1922,23 @@ end
     /// Disable all crust item spawns, returns whether they were already disabled before the call
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
-    /// Get the address for a pattern name
-    lua["get_address"] = get_address;
-
-    /// Get the rva for a pattern name
-    lua["get_rva"] = [](std::string_view address_name) -> size_t
+    /// Get the rva for a pattern name, used for debugging.
+    lua["get_rva"] = [](std::string_view address_name) -> std::string
     {
-        return get_address(address_name) - Memory::get().at_exe(0);
+        return fmt::format("{:X}", get_address(address_name) - Memory::get().at_exe(0));
+    };
+
+    /// Get the rva for a vtable offset and index, used for debugging.
+    lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index) -> std::string
+    {
+        return fmt::format("{:X}", get_virtual_function_address(offset, index));
     };
 
     /// Log to spelunky.log
     lua["log_print"] = game_log;
 
     /// Immediately ends the run with the death screen, also calls the [save_progress](#save_progress)
-    lua["load_death_screen"] = call_death_screen;
+    lua["load_death_screen"] = load_death_screen;
 
     /// Saves the game to savegame.sav, unless game saves are blocked in the settings. Also runs the ON.SAVE callback. Fails and returns false, if you're trying to save too often (2s).
     lua["save_progress"] = []() -> bool
@@ -1941,12 +1988,12 @@ end
     };
 
     /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
-    lua["list_dir"] = [&lua](std::string dir)
+    lua["list_dir"] = [&lua](std::optional<std::string> dir)
     {
         std::vector<std::string> files;
         auto backend = LuaBackend::get_calling_backend();
         auto base = backend->get_root_path();
-        auto path = base / std::filesystem::path(dir);
+        auto path = base / std::filesystem::path(dir.value_or("."));
         if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
             return sol::make_object(lua, sol::lua_nil);
         auto base_check = std::filesystem::relative(path, base).string();
@@ -1966,7 +2013,41 @@ end
         return sol::make_object(lua, sol::as_table(files));
     };
 
-    /// List all char*.png files recursively from Mods/Packs. Returns table of file paths.
+    /// List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.
+    lua["list_data_dir"] = [&lua](std::optional<std::string> dir)
+    {
+        std::vector<std::string> files;
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string moddir = backend->get_root_path().filename().string();
+        std::string luafile = std::filesystem::path(backend->get_path()).filename().string();
+        std::string datadir = "Mods/Data/" + (is_pack ? moddir : luafile);
+        auto base = std::filesystem::path(datadir);
+        std::string fullpath = datadir + "/" + dir.value_or(".");
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        auto is_based = check_safe_io_path(fullpath, datadir);
+        DEBUG("list_data_dir: safe:{} pack:{} based:{} {}", is_safe, is_pack, is_based, fullpath);
+        if (is_safe && !is_based)
+        {
+            luaL_error(lua, "Tried to list files outside data directory");
+            return sol::make_object(lua, sol::lua_nil);
+        }
+        auto path = std::filesystem::path(fullpath);
+        if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+            return sol::make_object(lua, sol::lua_nil);
+        for (const auto& file : std::filesystem::directory_iterator(path))
+        {
+            auto str = std::filesystem::relative(file.path(), base).string();
+            std::replace(str.begin(), str.end(), '\\', '/');
+            if (std::filesystem::is_directory(file.path()))
+                str = str + "/";
+            files.push_back(str);
+        }
+        return sol::make_object(lua, sol::as_table(files));
+    };
+
+    /// List all char_*.png files recursively from Mods/Packs. Returns table of file paths.
     lua["list_char_mods"] = [&lua]()
     {
         std::vector<std::string> files;
@@ -2008,7 +2089,139 @@ end
         return AABB(ax + index * w + 0.02f * f, ay, ax + index * w + w - 0.02f * f, ay - h);
     };
 
-    lua.create_named_table("INPUTS", "NONE", 0, "JUMP", 1, "WHIP", 2, "BOMB", 4, "ROPE", 8, "RUN", 16, "DOOR", 32, "MENU", 64, "JOURNAL", 128, "LEFT", 256, "RIGHT", 512, "UP", 1024, "DOWN", 2048);
+    /// Olmec cutscene moves Olmec and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and Olmec will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with Olmec in the hole.
+    lua["set_olmec_cutscene_enabled"] = set_olmec_cutscene_enabled;
+
+    /// Tiamat cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want Tiamat kill to be required
+    lua["set_tiamat_cutscene_enabled"] = set_tiamat_cutscene_enabled;
+
+    /// Activate custom variables for position used for detecting the player (normally hardcoded)
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending set_post_entity_spawn
+    /// default game values are: attack_x = 17.5 attack_y = 62.5
+    lua["activate_tiamat_position_hack"] = activate_tiamat_position_hack;
+
+    /// Activate custom variables for speed and y coordinate limit for crushing elevator
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending set_post_entity_spawn
+    /// default game values are: speed = 0.0125, y_limit = 98.5
+    lua["activate_crush_elevator_hack"] = activate_crush_elevator_hack;
+
+    /// Activate custom variables for y coordinate limit for hundun and spawn of it's heads
+    /// note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending set_post_entity_spawn
+    /// default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
+    lua["activate_hundun_hack"] = activate_hundun_hack;
+
+    /// Allows you to disable the control over the door for Hundun and Tiamat
+    /// This will also prevent game crashing when there is no exit door when they are in level
+    lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
+
+    /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
+    lua["update_state"] = update_state;
+
+    /// Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+    lua["set_frametime"] = set_frametime;
+
+    /// Get engine target frametime (1/framerate, default 1/60).
+    lua["get_frametime"] = get_frametime;
+
+    /// Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
+    lua["set_frametime_unfocused"] = set_frametime_inactive;
+
+    /// Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+    lua["get_frametime_unfocused"] = get_frametime_inactive;
+
+    auto add_custom_type = sol::overload(
+        static_cast<ENT_TYPE (*)(std::vector<ENT_TYPE>)>(::add_custom_type),
+        static_cast<ENT_TYPE (*)()>(::add_custom_type));
+
+    /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+    /// Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+    lua["add_custom_type"] = add_custom_type;
+
+    auto get_entities_by_draw_depth = sol::overload(
+        static_cast<std::vector<uint32_t> (*)(uint8_t, LAYER)>(::get_entities_by_draw_depth),
+        static_cast<std::vector<uint32_t> (*)(std::vector<uint8_t>, LAYER)>(::get_entities_by_draw_depth));
+
+    /// Get uids of entities by draw_depth. Can also use table of draw_depths.
+    /// You can later use [filter_entities](#filter_entities) if you want specific entity
+    lua["get_entities_by_draw_depth"] = get_entities_by_draw_depth;
+
+    /// Just convenient way of getting the current amount of money
+    /// short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+    lua["get_current_money"] = get_current_money;
+
+    /// Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+    lua["add_money"] = add_money;
+
+    /// Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+    /// Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+    lua["add_money_slot"] = add_money_slot;
+
+    /// Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
+    lua["destroy_level"] = destroy_level;
+
+    /// Destroys a layer and all entities in it.
+    lua["destroy_layer"] = destroy_layer;
+
+    /// Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+    lua["create_level"] = create_level;
+
+    /// Initializes an empty layer that doesn't currently exist.
+    lua["create_layer"] = create_layer;
+
+    /// Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
+    lua["set_level_logic_enabled"] = set_level_logic_enabled;
+
+    /// Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
+    lua["set_start_level_paused"] = set_start_level_paused;
+
+    /// Converts INPUTS to (x, y, BUTTON)
+    lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
+    {
+        float x = 0;
+        float y = 0;
+        if (inputs & 0x100)
+            x = -1;
+        else if (inputs & 0x200)
+            x = 1;
+        if (inputs & 0x400)
+            y = 1;
+        else if (inputs & 0x800)
+            y = -1;
+        BUTTON buttons = (BUTTON)(inputs & 0x3f);
+        return std::make_tuple(x, y, buttons);
+    };
+
+    /// Converts (x, y, BUTTON) to INPUTS
+    lua["buttons_to_inputs"] = [](float x, float y, BUTTON buttons) -> INPUTS
+    {
+        INPUTS inputs = buttons;
+        if (x < 0)
+            inputs |= 0x100;
+        else if (x > 0)
+            inputs |= 0x200;
+        if (y > 0)
+            inputs |= 0x400;
+        else if (y < 0)
+            inputs |= 0x800;
+        return inputs;
+    };
+
+    /// Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you're doing and need to perform some serious calculations that hang the game updates for several seconds.
+    lua["set_infinite_loop_detection_enabled"] = [](bool enable)
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->infinite_loop_detection = enable;
+    };
+
+    /// This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+    /// Letting you control those manually.
+    /// Look at the example on how to mimic game layer switching behavior
+    lua["set_camera_layer_control_enabled"] = set_camera_layer_control_enabled;
+
+    lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
+
+    lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);
 
     lua.create_named_table(
         "ON",
@@ -2162,7 +2375,28 @@ end
         "POST_UPDATE",
         ON::POST_UPDATE,
         "USER_DATA",
-        ON::USER_DATA);
+        ON::USER_DATA,
+        "PRE_LEVEL_CREATION",
+        ON::PRE_LEVEL_CREATION,
+        "POST_LEVEL_CREATION",
+        ON::POST_LEVEL_CREATION,
+        "PRE_LAYER_CREATION",
+        ON::PRE_LAYER_CREATION,
+        "POST_LAYER_CREATION",
+        ON::POST_LAYER_CREATION,
+        "PRE_LEVEL_DESTRUCTION",
+        ON::PRE_LEVEL_DESTRUCTION,
+        "POST_LEVEL_DESTRUCTION",
+        ON::POST_LEVEL_DESTRUCTION,
+        "PRE_LAYER_DESTRUCTION",
+        ON::PRE_LAYER_DESTRUCTION,
+        "POST_LAYER_DESTRUCTION",
+        ON::POST_LAYER_DESTRUCTION,
+        "PRE_PROCESS_INPUT",
+        ON::PRE_PROCESS_INPUT,
+        "POST_PROCESS_INPUT",
+        ON::POST_PROCESS_INPUT);
+
     /* ON
     // LOGO
     // Runs when entering the the mossmouth logo screen.
@@ -2239,7 +2473,7 @@ end
     // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
-    // Runs before any level generation, no entities should exist at this point
+    // Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.
     // POST_ROOM_GENERATION
     // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
@@ -2374,6 +2608,30 @@ end
     // USER_DATA
     // Params: Entity ent
     // Runs on all changes to Entity.user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.
+    // PRE_LEVEL_CREATION
+    // Runs right before the front layer is created. Runs in all screens that usually have entities, or when creating a layer manually.
+    // POST_LEVEL_CREATION
+    // Runs right after the back layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.
+    // PRE_LAYER_CREATION
+    // Params: LAYER layer
+    // Runs right before a layer is created. Runs in all screens that usually have entities, or when creating a layer manually.
+    // POST_LAYER_CREATION
+    // Params: LAYER layer
+    // Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.
+    // PRE_LEVEL_DESTRUCTION
+    // Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // POST_LEVEL_DESTRUCTION
+    // Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // PRE_LAYER_DESTRUCTION
+    // Params: LAYER layer
+    // Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // POST_LAYER_DESTRUCTION
+    // Params: LAYER layer
+    // Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // PRE_PROCESS_INPUT
+    // Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.
+    // POST_PROCESS_INPUT
+    // Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.
     */
 
     lua.create_named_table(
@@ -2468,11 +2726,11 @@ end
 
     /// Paramater to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
-                           //, "DAMSEL_STYLE", 0
+                           //, "WINDOW_SCALE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
                            //, "CROSSPROGRESS_AUTOSYNC", 47
     );
-    for (auto [setting_name_view, setting_index] : get_settings_names_and_indices())
+    for (auto& [setting_name_view, setting_index] : get_settings_names_and_indices())
     {
         std::string setting_name{setting_name_view};
         std::transform(setting_name.begin(), setting_name.end(), setting_name.begin(), [](unsigned char c)
@@ -2525,6 +2783,7 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
             }
         }
 
+        safe_fields.push_back("serpent");
         load_unsafe_libraries(lua_vm);
 
         for (auto& [k, v] : lua_vm["_G"].get<sol::table>())
@@ -2556,6 +2815,20 @@ sol::protected_function_result execute_lua(sol::environment& env, std::string_vi
     return global_vm.safe_script(code, env);
 }
 
+bool check_safe_io_path(const std::string& filepath, const std::string& basepath)
+{
+    if (basepath.empty())
+        return false;
+
+    auto base = std::filesystem::absolute(basepath).lexically_normal();
+    auto path = std::filesystem::absolute(filepath).lexically_normal();
+
+    auto [rootEnd, nothing] =
+        std::mismatch(base.begin(), base.end(), path.begin());
+
+    return rootEnd == base.end();
+}
+
 void populate_lua_env(sol::environment& env)
 {
     static const sol::state& global_vm = get_lua_vm();
@@ -2564,6 +2837,132 @@ void populate_lua_env(sol::environment& env)
         env[field] = global_vm["_G"][field];
     }
     env["_G"] = env;
+    add_partial_safe_libraries(env);
+}
+void add_partial_safe_libraries(sol::environment& env)
+{
+    static const sol::state& global_vm = get_lua_vm();
+
+    auto open_data = [](std::string filename, std::optional<std::string> mode) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string moddir = backend->get_root_path().filename().string();
+        std::string luafile = std::filesystem::path(backend->get_path()).filename().string();
+        std::string datadir = "Mods/Data/" + (is_pack ? moddir : luafile);
+        std::string fullpath = datadir + "/" + filename;
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        auto is_based = check_safe_io_path(fullpath, datadir);
+        if (is_safe && !is_based)
+        {
+            luaL_error(global_vm, "Attempted to open data file outside data directory");
+            return sol::nil;
+        }
+        if (mode.value_or("r") != "r")
+            std::filesystem::create_directories(dirpath);
+        return global_vm["io"]["open"](fullpath, mode.value_or("r"));
+    };
+
+    auto open_mod = [](std::string filename, std::optional<std::string> mode) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string fullpath = std::string(backend->get_root()) + "/" + filename;
+        auto is_based = check_safe_io_path(fullpath, backend->get_root());
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        if (is_safe)
+        {
+            if (!is_based)
+            {
+                luaL_error(global_vm, "Attempted to open mod file outside mod directory");
+                return sol::nil;
+            }
+            if (!is_pack && mode.value_or("r") != "r")
+            {
+                luaL_error(global_vm, "Attempted to write mod file outside Packs directory");
+                return sol::nil;
+            }
+        }
+        if (mode.value_or("r") != "r")
+            std::filesystem::create_directories(dirpath);
+        return global_vm["io"]["open"](fullpath, mode);
+    };
+
+    auto remove_data = [](std::string filename) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string moddir = backend->get_root_path().filename().string();
+        std::string luafile = std::filesystem::path(backend->get_path()).filename().string();
+        std::string datadir = "Mods/Data/" + (is_pack ? moddir : luafile);
+        std::string fullpath = datadir + "/" + filename;
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        auto is_based = check_safe_io_path(fullpath, datadir);
+        if (is_safe && !is_based)
+        {
+            luaL_error(global_vm, "Attempted to remove data file outside data directory");
+            return sol::nil;
+        }
+        return global_vm["os"]["remove"](fullpath);
+    };
+
+    auto remove_mod = [](std::string filename) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto is_pack = check_safe_io_path(backend->get_path(), "Mods/Packs");
+        auto is_safe = !backend->get_unsafe();
+        std::string fullpath = std::string(backend->get_root()) + "/" + filename;
+        auto is_based = check_safe_io_path(fullpath, backend->get_root());
+        std::string dirpath = std::filesystem::path(fullpath).parent_path().string();
+        if (is_safe)
+        {
+            if (!is_based)
+            {
+                luaL_error(global_vm, "Attempted to remove mod file outside mod directory");
+                return sol::nil;
+            }
+            if (!is_pack)
+            {
+                luaL_error(global_vm, "Attempted to remove mod file outside Packs directory");
+                return sol::nil;
+            }
+        }
+        return global_vm["os"]["remove"](fullpath);
+    };
+
+    if (env["os"] == sol::nil)
+    {
+        sol::table os(global_vm, sol::create);
+        os["clock"] = global_vm["os"]["clock"];
+        os["date"] = global_vm["os"]["date"];
+        os["difftime"] = global_vm["os"]["difftime"];
+        os["time"] = global_vm["os"]["time"];
+        os["remove_data"] = remove_data;
+        os["remove_mod"] = remove_mod;
+        env["os"] = os;
+    }
+    else if (env["os"].get_type() == sol::type::table)
+    {
+        env["os"]["remove_data"] = remove_data;
+        env["os"]["remove_mod"] = remove_mod;
+    }
+
+    if (env["io"] == sol::nil)
+    {
+        sol::table io(global_vm, sol::create);
+        io["type"] = global_vm["io"]["type"];
+        io["open_data"] = open_data;
+        io["open_mod"] = open_mod;
+        env["io"] = io;
+    }
+    else if (env["io"].get_type() == sol::type::table)
+    {
+        env["io"]["open_data"] = open_data;
+        env["io"]["open_mod"] = open_mod;
+    }
 }
 void hide_unsafe_libraries(sol::environment& env)
 {
@@ -2571,6 +2970,7 @@ void hide_unsafe_libraries(sol::environment& env)
     {
         env[field] = sol::nil;
     }
+    add_partial_safe_libraries(env);
 }
 void expose_unsafe_libraries(sol::environment& env)
 {
@@ -2579,4 +2979,5 @@ void expose_unsafe_libraries(sol::environment& env)
     {
         env[field] = global_vm["_G"][field];
     }
+    add_partial_safe_libraries(env);
 }

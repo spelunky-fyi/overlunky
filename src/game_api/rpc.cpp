@@ -20,26 +20,31 @@
 #include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
 #include <utility>          // for min, max, pair, find
 
-#include "custom_types.hpp"     // for get_custom_entity_types, CUSTOM_TYPE
-#include "entities_chars.hpp"   // for Player (ptr only), PowerupCapable
-#include "entities_floors.hpp"  // for ExitDoor, Door
-#include "entities_items.hpp"   // for StretchChain, PunishBall, Container
-#include "entities_liquids.hpp" // for Liquid
-#include "entities_mounts.hpp"  // for Mount
-#include "entity.hpp"           // for get_entity_ptr, to_id, Entity, EntityDB
-#include "game_manager.hpp"     //
-#include "items.hpp"            // for Items
-#include "layer.hpp"            // for EntityList, EntityList::Range, Layer
-#include "logger.h"             // for DEBUG
-#include "math.hpp"             // for AABB
-#include "memory.hpp"           // for write_mem_prot, write_mem_recoverable
-#include "movable.hpp"          // for Movable
-#include "particles.hpp"        // for ParticleEmitterInfo
-#include "search.hpp"           // for get_address, find_inst
-#include "state.hpp"            // for State, get_state_ptr, enum_to_layer
-#include "state_structs.hpp"    // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"     // for OnHeapPointer
-#include "virtual_table.hpp"    // for get_virtual_function_address, VIRT_FUNC
+#include "containers/custom_vector.hpp" //
+#include "custom_types.hpp"             // for get_custom_entity_types, CUSTOM_TYPE
+#include "entities_chars.hpp"           // for Player (ptr only), PowerupCapable
+#include "entities_floors.hpp"          // for ExitDoor, Door
+#include "entities_items.hpp"           // for StretchChain, PunishBall, Container
+#include "entities_liquids.hpp"         // for Liquid
+#include "entities_mounts.hpp"          // for Mount
+#include "entity.hpp"                   // for get_entity_ptr, to_id, Entity, EntityDB
+#include "entity_lookup.hpp"            //
+#include "game_manager.hpp"             //
+#include "game_patches.hpp"             //
+#include "illumination.hpp"             //
+#include "items.hpp"                    // for Items
+#include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
+#include "logger.h"                     // for DEBUG
+#include "math.hpp"                     // for AABB
+#include "memory.hpp"                   // for write_mem_prot, write_mem_recoverable
+#include "movable.hpp"                  // for Movable
+#include "particles.hpp"                // for ParticleEmitterInfo
+#include "screen.hpp"                   //
+#include "search.hpp"                   // for get_address, find_inst
+#include "state.hpp"                    // for State, get_state_ptr, enum_to_layer
+#include "state_structs.hpp"            // for ShopRestrictedItem, Illumination
+#include "thread_utils.hpp"             // for OnHeapPointer
+#include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
 
 uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
 {
@@ -139,17 +144,6 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)
             }
         }
     }
-}
-
-int32_t get_grid_entity_at(float x, float y, LAYER layer)
-{
-    auto state = State::get();
-    uint8_t actual_layer = enum_to_layer(layer);
-
-    if (Entity* ent = state.layer(actual_layer)->get_grid_entity_at(x, y))
-        return ent->uid;
-
-    return -1;
 }
 
 void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
@@ -305,204 +299,6 @@ std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::funct
     return filtered_entities;
 }
 
-std::vector<uint32_t> get_entities()
-{
-    return get_entities_by({}, 0, LAYER::BOTH);
-}
-
-std::vector<uint32_t> get_entities_by_layer(LAYER layer)
-{
-    return get_entities_by({}, 0, layer);
-}
-
-std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
-{
-    return get_entities_by(std::move(entity_types), 0, LAYER::BOTH);
-}
-std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type)
-{
-    return get_entities_by(std::vector<ENT_TYPE>{entity_type}, 0, LAYER::BOTH);
-}
-
-std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
-{
-    return get_entities_by({}, mask, LAYER::BOTH);
-}
-
-template <class FunT>
-requires std::is_invocable_v<FunT, const EntityList&>
-void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
-{
-    if (mask == 0)
-    {
-        fun(l->all_entities);
-    }
-    else
-    {
-        for (uint32_t test_flag = 1U; test_flag < 0x8000; test_flag <<= 1U)
-        {
-            if (mask & test_flag)
-            {
-                const auto& it = l->entities_by_mask.find(test_flag);
-                if (it != l->entities_by_mask.end())
-                {
-                    fun(it->second);
-                }
-            }
-        }
-    }
-}
-
-std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
-{
-    auto state = State::get();
-    std::vector<uint32_t> found;
-    const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-
-    auto push_matching_types = [&proper_types, &found](const EntityList& entities)
-    {
-        for (auto& item : entities.entities())
-        {
-            if (entity_type_check(proper_types, item->type->id))
-            {
-                found.push_back(item->uid);
-            }
-        }
-    };
-    auto insert_all_uids = [&found](const EntityList& entities)
-    {
-        const auto uids = entities.uids();
-        found.insert(found.end(), uids.begin(), uids.end());
-    };
-
-    if (layer == LAYER::BOTH)
-    {
-        if (proper_types.empty() || proper_types[0] == 0)
-        {
-            if (mask == 0) // all entities
-            {
-                // this exception for small improvments with calling reserve once
-                found.reserve(found.size() + (size_t)state.layer(0)->all_entities.size + (size_t)state.layer(1)->all_entities.size);
-                found.insert(found.end(), state.layer(0)->all_entities.uids().begin(), state.layer(0)->all_entities.uids().end());
-                found.insert(found.end(), state.layer(1)->all_entities.uids().begin(), state.layer(1)->all_entities.uids().end());
-            }
-            else // all types
-            {
-                foreach_mask(mask, state.layer(0), insert_all_uids);
-                foreach_mask(mask, state.layer(1), insert_all_uids);
-            }
-        }
-        else
-        {
-            foreach_mask(mask, state.layer(0), push_matching_types);
-            foreach_mask(mask, state.layer(1), push_matching_types);
-        }
-    }
-    else
-    {
-        uint8_t correct_layer = enum_to_layer(layer);
-        if (proper_types.empty() || proper_types[0] == 0) // all types
-        {
-            foreach_mask(mask, state.layer(correct_layer), insert_all_uids);
-        }
-        else
-        {
-            foreach_mask(mask, state.layer(correct_layer), push_matching_types);
-        }
-    }
-    return found;
-}
-std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER layer)
-{
-    return get_entities_by(std::vector<ENT_TYPE>{entity_type}, mask, layer);
-}
-
-std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
-{
-    auto state = State::get();
-    std::vector<uint32_t> found;
-    const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-    auto push_entities_at = [&x, &y, &radius, &proper_types, &found](const EntityList& entities)
-    {
-        for (auto& item : entities.entities())
-        {
-            auto [ix, iy] = item->position();
-            float distance = sqrt(pow(x - ix, 2.0f) + pow(y - iy, 2.0f));
-            if (distance < radius && entity_type_check(proper_types, item->type->id))
-            {
-                found.push_back(item->uid);
-            }
-        }
-    };
-    if (layer == LAYER::BOTH)
-    {
-        foreach_mask(mask, state.layer(0), push_entities_at);
-        foreach_mask(mask, state.layer(1), push_entities_at);
-    }
-    else
-    {
-        foreach_mask(mask, state.layer(enum_to_layer(layer)), push_entities_at);
-    }
-    return found;
-}
-std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
-{
-    return get_entities_at(std::vector<ENT_TYPE>{entity_type}, mask, x, y, layer, radius);
-}
-
-std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
-{
-    auto state = State::get();
-    std::vector<uint32_t> result;
-    const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-    if (layer == LAYER::BOTH)
-    {
-        std::vector<uint32_t> result2;
-        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
-        result2 = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
-        result.insert(result.end(), result2.begin(), result2.end());
-    }
-    else
-    {
-        uint8_t actual_layer = enum_to_layer(layer);
-        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
-    }
-    return result;
-}
-std::vector<uint32_t> get_entities_overlapping_hitbox(ENT_TYPE entity_type, uint32_t mask, AABB hitbox, LAYER layer)
-{
-    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, hitbox, layer);
-}
-
-std::vector<uint32_t> get_entities_overlapping(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
-{
-    return get_entities_overlapping_hitbox(std::move(entity_types), mask, {sx, sy2, sx2, sy}, layer);
-}
-std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
-{
-    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, {sx, sy2, sx2, sy}, layer);
-}
-
-std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
-{
-    std::vector<uint32_t> found;
-    foreach_mask(mask, layer, [&entity_types, &found, &sx, &sy, &sx2, &sy2](const EntityList& entities)
-                 {
-                     for (auto& item : entities.entities())
-                     {
-                         if (entity_type_check(std::move(entity_types), item->type->id) && item->overlaps_with(sx, sy, sx2, sy2))
-                         {
-                             found.push_back(item->uid);
-                         }
-                     } });
-
-    return found;
-}
-std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
-{
-    return get_entities_overlapping_by_pointer(std::vector<ENT_TYPE>{entity_type}, mask, sx, sy, sx2, sy2, layer);
-}
-
 void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
 {
     if (auto door = get_entity_ptr(uid)->as<ExitDoor>())
@@ -550,68 +346,6 @@ void entity_remove_item(uint32_t uid, uint32_t item_uid)
     if (entity == nullptr)
         return;
     entity->remove_item(item_uid);
-}
-
-bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
-{
-    Entity* entity = get_entity_ptr(uid);
-    if (entity == nullptr)
-        return false;
-
-    return entity->items.contains(item_uid);
-};
-
-bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
-{
-    Entity* entity = get_entity_ptr(uid);
-    if (entity == nullptr)
-        return false;
-    if (entity->items.size > 0)
-    {
-        const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        for (auto item : entity->items.entities())
-        {
-            if (entity_type_check(proper_types, item->type->id))
-                return true;
-        }
-    }
-    return false;
-}
-bool entity_has_item_type(uint32_t uid, ENT_TYPE entity_type)
-{
-    return entity_has_item_type(uid, std::vector<ENT_TYPE>{entity_type});
-}
-
-std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask)
-{
-    std::vector<uint32_t> found;
-    Entity* entity = get_entity_ptr(uid);
-    if (entity == nullptr)
-        return found;
-    if (entity->items.size > 0)
-    {
-        const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        if ((!proper_types.size() || !proper_types[0]) && !mask) // all items
-        {
-            const auto uids = entity->items.uids();
-            found.insert(found.end(), uids.begin(), uids.end());
-        }
-        else
-        {
-            for (auto item : entity->items.entities())
-            {
-                if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
-                {
-                    found.push_back(item->uid);
-                }
-            }
-        }
-    }
-    return found;
-}
-std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask)
-{
-    return entity_get_items_by(uid, std::vector<ENT_TYPE>{entity_type}, mask);
 }
 
 void lock_door_at(float x, float y)
@@ -881,7 +615,7 @@ void unequip_backitem(uint32_t who_uid)
 
 int32_t worn_backitem(uint32_t who_uid)
 {
-    static const std::unordered_set<uint32_t> backitem_types = {
+    static const auto backitem_types = {
         to_id("ENT_TYPE_ITEM_JETPACK"),
         to_id("ENT_TYPE_ITEM_HOVERPACK"),
         to_id("ENT_TYPE_ITEM_POWERPACK"),
@@ -891,14 +625,13 @@ int32_t worn_backitem(uint32_t who_uid)
     };
 
     auto ent = get_entity_ptr(who_uid)->as<PowerupCapable>();
-    if (ent != nullptr)
+    if (ent != nullptr && !ent->powerups.empty())
     {
-        for (const auto& [powerup_type, powerup_entity] : ent->powerups)
+        for (auto powerup_type : backitem_types)
         {
-            if (backitem_types.count(powerup_type) > 0)
-            {
-                return powerup_entity->uid;
-            }
+            auto it = ent->powerups.find(powerup_type);
+            if (it != ent->powerups.end())
+                return it->second->uid;
         }
     }
     return -1;
@@ -1026,6 +759,8 @@ void set_time_jelly_enabled(bool b)
 
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
 {
+    // this functions just calculates the room index and then loops thru state->room_owners->owned_rooms and compares the room index
+    // TODO: we could probably get rid of this pattern and write that ourselves
     static size_t offset = get_address("coord_inside_active_shop_room");
     if (offset != 0)
     {
@@ -1038,143 +773,23 @@ bool is_inside_active_shop_room(float x, float y, LAYER layer)
 
 bool is_inside_shop_zone(float x, float y, LAYER layer)
 {
-    static size_t offset = 0;
-    static void* rcx = nullptr;
-    if (offset == 0)
-    {
-        offset = get_address("coord_inside_shop_zone");
-        size_t* tmp = (size_t*)get_address("coord_inside_shop_zone_rcx");
-        auto heap_ptr = OnHeapPointer<void*>(*tmp);
-        rcx = heap_ptr.decode();
-    }
+    // this function is weird, the main check does this (where rax is the room_template):
+    // ecx = rax - 0x41
+    // cmp cx, 0x17
+    // ja return 0
+    //
+    // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
+
+    static size_t offset = get_address("coord_inside_shop_zone");
+    auto state = State::get().ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
+
     if (offset != 0)
     {
-        typedef bool coord_inside_shop_zone_func(void*, uint32_t layer, float x, float y);
-        static coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
-        return ciszf(rcx, enum_to_layer(layer), x, y);
+        typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
+        coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
+        return ciszf(state->level_gen, enum_to_layer(layer), x, y);
     }
     return false;
-}
-
-ParticleEmitterInfo* generate_world_particles(uint32_t particle_emitter_id, uint32_t uid)
-{
-    static size_t offset = get_address("generate_world_particles");
-
-    if (offset != 0)
-    {
-        auto entity = get_entity_ptr(uid);
-        if (entity != nullptr)
-        {
-            auto state = get_state_ptr();
-            typedef ParticleEmitterInfo* generate_particles_func(std::vector<ParticleEmitterInfo*>*, uint32_t, Entity*);
-            static generate_particles_func* gpf = (generate_particles_func*)(offset);
-            return gpf(state->particle_emitters, particle_emitter_id, entity);
-        }
-    }
-    return nullptr;
-}
-
-ParticleEmitterInfo* generate_screen_particles(uint32_t particle_emitter_id, float x, float y)
-{
-    static size_t offset = get_address("generate_screen_particles");
-
-    if (offset != 0)
-    {
-        typedef ParticleEmitterInfo* generate_particles_func(uint32_t, float, float, size_t);
-        static generate_particles_func* gpf = (generate_particles_func*)(offset);
-        return gpf(particle_emitter_id, x, y, 0);
-    }
-    return nullptr;
-}
-
-void advance_screen_particles(ParticleEmitterInfo* particle_emitter)
-{
-    static size_t offset = get_address("advance_screen_particles");
-
-    if (offset != 0)
-    {
-        typedef void advance_particles_func(ParticleEmitterInfo*);
-        static advance_particles_func* apf = (advance_particles_func*)(offset);
-        apf(particle_emitter);
-    }
-}
-
-void render_screen_particles(ParticleEmitterInfo* particle_emitter)
-{
-    static size_t offset = get_address("render_screen_particles");
-
-    if (offset != 0)
-    {
-        typedef void render_particles_func(ParticleEmitterInfo*, size_t, size_t, size_t);
-        static render_particles_func* rpf = (render_particles_func*)(offset);
-        rpf(particle_emitter, 0, 0, 0);
-    }
-}
-
-void extinguish_particles(ParticleEmitterInfo* particle_emitter)
-{
-    // removing from state only applies to world emitters, but it just won't find the screen one in the vector, so no big deal
-    auto state = get_state_ptr();
-    std::erase(*state->particle_emitters, particle_emitter);
-
-    using generic_free_func = void(void*);
-    static generic_free_func* generic_free = (generic_free_func*)get_address("generic_free");
-
-    if (particle_emitter != nullptr)
-    {
-        generic_free(particle_emitter->emitted_particles.memory);
-        generic_free(particle_emitter->emitted_particles_back_layer.memory);
-        generic_free(particle_emitter);
-    }
-}
-
-Illumination* create_illumination_internal(Color color, float size, float x, float y, int32_t uid)
-{
-    static size_t offset = get_address("generate_illumination");
-
-    if (offset != 0)
-    {
-        auto state = get_state_ptr();
-
-        float position[] = {x, y};
-
-        typedef Illumination* create_illumination_func(std::vector<Illumination*>*, float*, Color*, uint32_t r9, float size, uint8_t flags, uint32_t uid, uint8_t);
-        static create_illumination_func* cif = (create_illumination_func*)(offset);
-        auto emitted_light = cif(state->lightsources, position, &color, 0x2, size, 32, uid, 0x0);
-
-        // turn on Enabled flag
-        emitted_light->flags = emitted_light->flags | (1U << (25 - 1));
-
-        return emitted_light;
-    }
-    return nullptr;
-}
-
-Illumination* create_illumination(Color color, float size, float x, float y)
-{
-    return create_illumination_internal(color, size, x, y, -1);
-}
-
-Illumination* create_illumination(Color color, float size, uint32_t uid)
-{
-    auto entity = get_entity_ptr(uid);
-    if (entity != nullptr)
-    {
-        return create_illumination_internal(color, size, entity->abs_x, entity->abs_y, uid);
-    }
-    return nullptr;
-}
-
-void refresh_illumination(Illumination* illumination)
-{
-    static uint32_t* offset = 0;
-    if (offset == 0)
-    {
-        size_t** heap_offset = (size_t**)get_address("refresh_illumination_heap_offset");
-        auto illumination_counter = OnHeapPointer<uint32_t>(**heap_offset);
-        offset = illumination_counter.decode();
-    }
-    illumination->timer = *offset;
 }
 
 void set_journal_enabled(bool b)
@@ -1328,37 +943,6 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
         return state->waddler_storage[slot];
     }
     return 0;
-}
-
-bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE find)
-{
-    if (types_array.empty() || types_array[0] == 0 || std::find(types_array.begin(), types_array.end(), find) != types_array.end())
-        return true;
-
-    return false;
-}
-
-std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
-{
-    for (size_t i = 0; i < ent_types.size(); i++)
-    {
-        if (ent_types[i] >= (uint32_t)CUSTOM_TYPE::ACIDBUBBLE)
-        {
-            auto extra_types = get_custom_entity_types(static_cast<CUSTOM_TYPE>(ent_types[i]));
-            if (extra_types.size() == 1)
-            {
-                ent_types[i] = extra_types[0];
-            }
-            else if (!extra_types.empty())
-            {
-                auto it = ent_types.begin() + i;
-                it = ent_types.erase(it);
-                ent_types.insert(it, extra_types.begin(), extra_types.end());
-                i += extra_types.size() - 1;
-            }
-        }
-    }
-    return ent_types;
 }
 
 void enter_door(int32_t player_uid, int32_t door_uid)
@@ -1672,15 +1256,28 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
     }
 }
 
+void destroy_grid(int32_t uid)
+{
+    if (auto entity = get_entity_ptr(uid))
+    {
+        auto state = State::get();
+        state.layer(entity->layer)->destroy_grid_entity(entity);
+    }
+}
+
+void destroy_grid(float x, float y, LAYER layer)
+{
+    auto state = State::get();
+    uint8_t actual_layer = enum_to_layer(layer);
+
+    if (Entity* entity = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    {
+        state.layer(entity->layer)->destroy_grid_entity(entity);
+    }
+}
+
 void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
 {
-    struct dummy // dummy struct
-    {
-        std::set<ShopRestrictedItem>::iterator __omg;
-        int __wow;
-    };
-    using AddRestrictedItemFun = size_t(std::set<ShopRestrictedItem>*, dummy, ShopRestrictedItem);
-
     Movable* item = get_entity_ptr(item_uid)->as<Movable>();
     Entity* owner = get_entity_ptr(shop_owner_uid);
     if (item && owner && item->is_movable())
@@ -1698,21 +1295,14 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                static auto add_to_items_set = (AddRestrictedItemFun*)get_address("add_shopitem");
-                auto state = State::get();
+                auto state = State::get().ptr();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
-                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
-                state.layer_local(item->layer)->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
+                state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
+                state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
 
-                // This function actually only takes iterator and value as argument, but for some reason they need to be passed thru stack
-                // This is probably some standard `insert` function, but the items is a strange one, i would guess it's a map (item uid as a key and array/struct as a value)
-                // but standard function, no matter if i set it to map or set, also adds something at the end of a bucket (key hash?), so it's either very similar container or some special setup for set/map
-                const auto bucket = add_to_items_set(&state.ptr()->shops.items, {state.ptr()->shops.items.end(), 0}, {item_uid, 0, 0});
-
-                auto the_struct = (ShopRestrictedItem*)(bucket + 0x1C); // 0x1C - is just the internal map/set stuff
-                the_struct->owner_uid = shop_owner_uid;
-                the_struct->owner_type = owner->type->id;
+                ItemOwnerDetails iod{shop_owner_uid, owner->type->id};
+                state->room_owners.owned_items.insert({item->uid, iod});
                 return;
             }
         }
@@ -1804,11 +1394,10 @@ void game_log(std::string message)
     game_log_fun(log_stream, message.c_str(), nullptr, LogLevel::Info);
 }
 
-void call_death_screen()
+void load_death_screen()
 {
-    using DeathScreen = void();
-    static auto death_screen = (DeathScreen*)get_address("death_screen");
-    death_screen();
+    auto state = State::get().ptr();
+    state->screen_death->init();
 }
 
 void save_progress()
@@ -1878,5 +1467,404 @@ void set_ending_unlock(ENT_TYPE type)
     else
     {
         recover_mem("ending_unlock");
+    }
+}
+
+void set_olmec_cutscene_enabled(bool enable)
+{
+    set_skip_olmec_cutscene(!enable);
+}
+
+void set_tiamat_cutscene_enabled(bool enable)
+{
+    set_skip_tiamat_cutscene(!enable);
+}
+
+void activate_tiamat_position_hack(bool activate)
+{
+    static const auto code_addr = get_address("tiamat_attack_position");
+
+    static const std::string_view code{"\xF3\x0F\x5C\xBE\x78\x01\x00\x00"sv   // subss  xmm7,DWORD PTR [rsi+0x178]
+                                       "\xF3\x0F\x5C\xB6\x7C\x01\x00\x00"sv}; // subss  xmm6,DWORD PTR [rsi+0x17C]
+
+    if (activate)
+        write_mem_recoverable("activate_tiamat_position_hack", code_addr, code, true);
+    else
+        recover_mem("activate_tiamat_position_hack");
+}
+
+void activate_crush_elevator_hack(bool activate)
+{
+    auto memory = Memory::get();
+    static size_t offsets[3];
+    if (offsets[0] == 0)
+    {
+        auto func_offset = get_virtual_function_address(VTABLE_OFFSET::ACTIVEFLOOR_CRUSHING_ELEVATOR, 78);
+
+        offsets[0] = find_inst(memory.exe(), "\xF3\x0F\x58\xD0"sv, func_offset, func_offset + 0x80, "activate_crush_elevator_hack");
+        if (offsets[0] == 0)
+            return;
+
+        offsets[0] += 4; // pattern size
+        offsets[1] = find_inst(memory.exe(), "\xEB*\x0F\x57\xD2"sv, offsets[0], offsets[0] + 0xF0, "activate_crush_elevator_hack");
+        if (offsets[1] == 0)
+            return;
+
+        offsets[1] += 5; // pattern size
+        offsets[2] = find_inst(memory.exe(), "\xF3\x0F\x58\xC1"sv, offsets[1], offsets[1] + 0x40, "activate_crush_elevator_hack");
+        if (offsets[2] == 0)
+            return;
+
+        offsets[2] += 4; // pattern size
+    }
+
+    if (activate)
+    {
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[0]), "\x0f\x2e\x90\x30\x01\x00\x00"sv, true); // ucomiss xmm2,DWORD PTR [rax+0x130] // limit
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[1]), "\xf3\x0f\x10\x9b\x30\x01\x00"sv, true); // movss  xmm3,DWORD PTR [rbx+0x130]  // limit
+        write_mem_recoverable("activate_crush_elevator_hack", memory.at_exe(offsets[2]), "\xf3\x0f\x58\x83\x34\x01\x00"sv, true); // addss  xmm0,DWORD PTR [rbx+0x134]  // speed
+    }
+    else
+        recover_mem("activate_crush_elevator_hack");
+}
+
+void activate_hundun_hack(bool activate)
+{
+    /*
+     * Pointer to Hundun entity is stored in r13 register. which means we need 8 bytes for ucomiss instruction
+     * but we have 7 available, that's why we jump out to new code with the instruction and back
+     */
+    static size_t offsets[6]; // y_limit, y_limit, bird_head, sneak_head, speed, speed
+    static char new_code[3][8];
+
+    if (offsets[0] == 0)
+    {
+        auto memory = Memory::get();
+        auto func_offset = get_virtual_function_address(VTABLE_OFFSET::MONS_HUNDUN, 78);
+        offsets[0] = find_inst(memory.exe(), "\x41\xF6\x85\x61\x01\x00\x00\x08"sv, func_offset, func_offset + 0x1420, "activate_hundun_hack");
+        if (offsets[0] == 0)
+            return;
+
+        offsets[0] -= 13; // offset, no good pattern above
+        offsets[1] = find_inst(memory.exe(), "\x41\x80\x8D\x61\x01\x00\x00\x04"sv, offsets[0], offsets[0] + 0xF40, "activate_hundun_hack");
+        if (offsets[1] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[1] += 8; // pattern size
+
+        offsets[2] = find_inst(memory.exe(), "\xF3\x41\x0F\x58\x45\x7C"sv, offsets[0], offsets[1], "activate_hundun_hack");
+        if (offsets[2] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[2] += 6; // pattern size
+
+        offsets[3] = find_inst(memory.exe(), "\xF3\x41\x0F\x58\x45\x7C"sv, offsets[2], offsets[1], "activate_hundun_hack");
+        if (offsets[3] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[3] += 6; // pattern size
+
+        offsets[4] = find_inst(memory.exe(), "\x83\x7A\x0C\x0E"sv, offsets[1], offsets[1] + 0xC0, "activate_hundun_hack");
+        if (offsets[4] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[4] += 6; // pattern size plus jump
+
+        offsets[5] = find_inst(memory.exe(), "\xF3\x41\x0F"sv, offsets[4], offsets[4] + 0x58, "activate_hundun_hack");
+        if (offsets[5] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[5] += 9; // instruction size (din't include the whole thing in pattern, very short distance from previous pattern)
+
+        offsets[0] = memory.at_exe(offsets[0]);
+        offsets[1] = memory.at_exe(offsets[1]);
+        offsets[2] = memory.at_exe(offsets[2]);
+        offsets[3] = memory.at_exe(offsets[3]);
+        offsets[4] = memory.at_exe(offsets[4]);
+        offsets[5] = memory.at_exe(offsets[5]);
+
+        char old_code[3][8];
+
+        std::memcpy(old_code[0], (void*)offsets[0], 7);
+        std::memcpy(old_code[1], (void*)offsets[1], 7);
+        std::memcpy(old_code[2], (void*)offsets[5], 8);
+
+        const std::string_view patch_code{"\x41\x0F\x2E\xBD\x64\x01\x00\x00"sv};      // ucomiss xmm7,DWORD PTR [r13+0x164]
+        const std::string_view speed_patch{"\xF3\x41\x0F\x58\x85\x6C\x01\x00\x00"sv}; // addss  xmm0,DWORD PTR [r13+0x16C]
+
+        patch_and_redirect(offsets[0], 7, patch_code, true);
+        patch_and_redirect(offsets[1], 7, patch_code, true);
+        patch_and_redirect(offsets[5], 8, speed_patch, true);
+
+        std::memcpy(new_code[0], (void*)offsets[0], 7);
+        std::memcpy(new_code[1], (void*)offsets[1], 7);
+        std::memcpy(new_code[2], (void*)offsets[5], 8);
+
+        // writing back the old code so we can just use write_mem_recoverable for going from vanilla to the patch
+        write_mem_prot(offsets[0], std::string_view{&old_code[0][0], &old_code[0][7]}, true);
+        write_mem_prot(offsets[1], std::string_view{&old_code[1][0], &old_code[1][7]}, true);
+        write_mem_prot(offsets[5], std::string_view{&old_code[2][0], &old_code[2][8]}, true);
+    }
+
+    if (activate)
+    {
+        static const std::string_view speed_code{"\x49\x8D\x95\x68\x01\x00\x00"sv                           // lea    rdx,[r13+0x168]
+                                                 "\x66\x2E\x0F\x1F\x84\x00\x00\x00\x00\x00\x90\x90\x90"sv}; //  spoiled with space, all nop
+
+        write_mem_recoverable("activate_hundun_hack", offsets[0], std::string_view{&new_code[0][0], &new_code[0][7]}, true); // limit
+        write_mem_recoverable("activate_hundun_hack", offsets[1], std::string_view{&new_code[1][0], &new_code[1][7]}, true); // limit
+        write_mem_recoverable("activate_hundun_hack", offsets[5], std::string_view{&new_code[2][0], &new_code[2][8]}, true); // speed for adding to the y_limit
+
+        write_mem_recoverable("activate_hundun_hack", offsets[4], speed_code, true); // speed (for adding to the x position)
+
+        write_mem_recoverable("activate_hundun_hack", offsets[2], "\x0F\x2E\xB8\x70\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x170] // bird_head
+        write_mem_recoverable("activate_hundun_hack", offsets[3], "\x0F\x2E\xB8\x74\x01\x00\x00"sv, true); // ucomiss xmm7,DWORD PTR [rax+0x174] // snake head
+    }
+    else
+        recover_mem("activate_hundun_hack");
+}
+
+void set_boss_door_control_enabled(bool enable)
+{
+    static size_t offsets[2];
+    if (offsets[0] == 0)
+    {
+        auto memory = Memory::get();
+        offsets[0] = get_address("hundun_door_control");
+        if (offsets[0] == 0)
+            return;
+        // find tiamat door control (the same pattern)
+        offsets[1] = find_inst(memory.exe(), "\x4A\x8B\xB4\xC8\x80\xF4\x00\x00"sv, offsets[0] - memory.exe_ptr + 0x777, std::nullopt, "set_boss_door_control_enabled");
+        if (offsets[1] == 0)
+        {
+            offsets[0] = 0;
+            return;
+        }
+        offsets[1] = function_start(memory.at_exe(offsets[1]));
+    }
+    if (!enable)
+    {
+        write_mem_recoverable("set_boss_door_control_enabled", offsets[0], "\xC3\x90"sv, true);
+        write_mem_recoverable("set_boss_door_control_enabled", offsets[1], "\xC3\x90"sv, true);
+    }
+    else
+        recover_mem("set_boss_door_control_enabled");
+}
+
+void update_state()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("state_refresh");
+    }
+    if (offset != 0)
+    {
+        auto state = State::get().ptr();
+        typedef void refresh_func(StateMemory*);
+        static refresh_func* rf = (refresh_func*)(offset);
+        rf(state);
+    }
+}
+
+void set_frametime(std::optional<double> frametime)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime");
+    if (offset != 0)
+    {
+        if (frametime.has_value())
+            write_mem_recoverable("engine_frametime", offset, frametime.value(), true);
+        else
+            recover_mem("engine_frametime");
+    }
+}
+
+std::optional<double> get_frametime()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime");
+    if (offset != 0)
+        return memory_read<double>(offset);
+    return std::nullopt;
+}
+
+void set_frametime_inactive(std::optional<double> frametime)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime") + 0x10;
+    if (offset != 0)
+    {
+        if (frametime.has_value())
+            write_mem_recoverable("engine_frametime_inactive", offset, frametime.value(), true);
+        else
+            recover_mem("engine_frametime_inactive");
+    }
+}
+
+std::optional<double> get_frametime_inactive()
+{
+    static size_t offset = 0;
+    if (offset == 0)
+        offset = get_address("engine_frametime") + 0x10;
+    if (offset != 0)
+        return memory_read<double>(offset);
+    return std::nullopt;
+}
+
+ENT_TYPE add_custom_type(std::vector<ENT_TYPE> types)
+{
+    return (ENT_TYPE)add_new_custom_type(std::move(types));
+}
+
+ENT_TYPE add_custom_type()
+{
+    return (ENT_TYPE)add_new_custom_type({});
+}
+
+int32_t get_current_money()
+{
+    auto state = State::get().ptr();
+    int32_t money = state->money_shop_total;
+    for (auto& inventory : state->items->player_inventories)
+    {
+        money += inventory.money;
+        money += inventory.collected_money_total;
+    }
+    return money;
+}
+
+int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
+{
+    auto state = State::get().ptr();
+    auto hud = get_hud();
+    state->money_shop_total += amount;
+    hud->money.counter += amount;
+    hud->money.timer = display_time.value_or(0x3C);
+    return get_current_money();
+}
+
+int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_t> display_time)
+{
+    auto state = State::get().ptr();
+    auto hud = get_hud();
+    uint8_t slot = player_slot - 1;
+    if (slot > 3)
+        return get_current_money();
+
+    state->items->player_inventories[slot].money += amount;
+    hud->money.counter += amount;
+    hud->money.timer = display_time.value_or(0x3C);
+    return get_current_money();
+}
+
+void destroy_layer(uint8_t layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unload_layer");
+    }
+    if (offset != 0)
+    {
+        auto state = State::get().ptr();
+        for (auto i = 0; i < MAX_PLAYERS; ++i)
+        {
+            if (state->items->players[i] && state->items->players[i]->layer == layer)
+                state->items->players[i] = nullptr;
+        }
+        auto* layer_ptr = State::get().layer(layer);
+        typedef void destroy_func(Layer*);
+        static destroy_func* df = (destroy_func*)(offset);
+        df(layer_ptr);
+    }
+}
+
+void destroy_level()
+{
+    destroy_layer(0);
+    destroy_layer(1);
+}
+
+void create_layer(uint8_t layer)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("init_layer");
+    }
+    if (offset != 0)
+    {
+        auto* layer_ptr = State::get().layer(layer);
+        typedef void init_func(Layer*);
+        static init_func* ilf = (init_func*)(offset);
+        ilf(layer_ptr);
+    }
+}
+
+void create_level()
+{
+    create_layer(0);
+    create_layer(1);
+}
+
+void set_level_logic_enabled(bool enable)
+{
+    auto state = State::get().ptr();
+    static size_t offset = get_virtual_function_address(state->screen_level, 1);
+
+    if (offset != 0)
+    {
+        if (!enable)
+            write_mem_recoverable("set_level_logic_enabled", offset, "\xC3\x90"sv, true);
+        else
+            recover_mem("set_level_logic_enabled");
+    }
+}
+
+void set_camera_layer_control_enabled(bool enable)
+{
+    static auto offset = get_address("camera_layer_controll");
+    static auto offset2 = get_address("player_behavior_layer_switch");
+    if (!offset || !offset2)
+        return;
+
+    if (enable)
+    {
+        recover_mem("set_camera_layer_control");
+    }
+    else
+    {
+        write_mem_recoverable("set_camera_layer_control", offset, get_nop(7), true);
+        write_mem_recoverable("set_camera_layer_control", offset2, get_nop(18), true);
+    }
+}
+
+void set_start_level_paused(bool enable)
+{
+    static size_t offset = 0;
+    if (offset == 0)
+    {
+        offset = get_address("unpause_level");
+    }
+    if (offset != 0)
+    {
+        if (enable)
+            write_mem_recoverable("start_level_paused", offset, get_nop(3), true);
+        else
+            recover_mem("start_level_paused");
     }
 }

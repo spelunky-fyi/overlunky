@@ -69,6 +69,7 @@ Current features and their *default* keyboard shortcuts.
       + **Ctrl+,**: Zoom in
       + **Ctrl+.**: Zoom out
       + **Ctrl+0**: Auto fit level width to screen
+      + **Ctrl+1**: Reset zoom level to default for all areas
       + **Ctrl+2345**: Zoom to X level width
       + **Shift+IJKL**: Move camera in desired direction
       + **Shift+U**: Reset camera focus and bounds
@@ -159,7 +160,10 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Try toggling the *Capture third-party overlays* option in *Game Capture*. It's possible to hide OL if running the game through Steam.
     + If you have lag or crashes, check previous question.
   - If you **don't have scripts** in the Scripts tab
-    + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts) or use Modlunky2.
+    + You didn't put them in the right place. [Follow](#installation-and-usage) the [instructions](#scripts), use Modlunky2 or change the script directory in the options.
+  - If some of the keyboard shortcuts don't work
+    + Make sure your keyboard is not [ghosting](https://www.microsoft.com/applied-sciences/projects/anti-ghosting-demo) the key combo.
+    + Make sure Windows is not using the keys for [something stupid](https://superuser.com/questions/1367843/how-to-disable-ctrlshift-keyboard-layout-switch-for-the-same-input-language-i).
   - If it still doesn't work
     + Stop by #s2-modding-help on the [community Discord](https://discord.gg/spelunky-community) or [submit an issue](https://github.com/spelunky-fyi/overlunky/issues)
     + We want to know your OS version, are you using the game on Steam, what you have tried, what tools you are using, how you are using them and all the versions. These can be found in the terminal output or ingame overlays. ("Latest" or WHIP is not a version, but 7f0bc94 or 0.6.1 is.)
@@ -181,6 +185,7 @@ The binaries will be in `build/bin/Release/`. You can also try the scripts in `.
 
 ```
 --launch_game [path]    launch ../Spel2.exe, path/Spel2.exe, or a specific exe, and load OL with Detours
+--oldflip               launch the game with -oldflip, may improve performance with external windows
 --console               keep console open to debug scripts etc
 --inject                use the old injection method instead of Detours with --launch_game
 --info_dump             output a bunch of game data to 'Spelunky 2/game_data'

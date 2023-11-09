@@ -23,12 +23,10 @@ class Screen
     float render_timer;
     uint32_t unknown_zero;
 
-    // this first virtual does not appear to be the destructor in the game
-    // but is made one here to appease Clang
+    virtual void init() = 0;
+    virtual void update() = 0; // runs each frame, for level screens: death, camera zoom (level/shop), camera bounds, some save data stuff
     virtual ~Screen() = 0;
-    virtual void v1() = 0;
-    virtual void v2() = 0;
-    virtual void render() = 0;
+    virtual void render() = 0; // mostly used by the non gameplay screens to draw textures, text, UI
 
     std::uint32_t reserve_callback_id();
     void unhook(std::uint32_t id);
@@ -56,6 +54,11 @@ class ScreenIntro : public Screen // ID: 1
 {
   public:
     TextureRenderingInfo unknown4;
+    float darkness;
+    /// ends the intro immediately if set to false
+    bool active;
+    /// skips prologue and goes straight to the title screen after the intro
+    bool skip_prologue;
 };
 
 class ScreenPrologue : public Screen // ID: 2
@@ -471,16 +474,32 @@ class ScreenTeamSelect : public Screen // ID: 10
     uint32_t unknown7;
 };
 
-class ScreenCamp : public Screen // ID: 11
+class ScreenCamp : public Screen // ID: 11 GameManager
 {
   public:
     uint8_t buttons;
 };
 
-class ScreenLevel : public Screen // ID: 12
+class ScreenStateCamp : public Screen // ID: 11 StateMemory
+{
+  public:
+    /// Delay after player death to reset camp
+    uint8_t time_till_reset;
+};
+
+class ScreenStateLevel : public Screen // ID: 12 StateMemory
 {
   public:
     uint8_t buttons;
+    /// Delay after player death to open the death screen
+    uint8_t time_till_death_screen;
+};
+
+class ScreenLevel : public Screen // ID: 12 GameManager
+{
+  public:
+    uint8_t buttons;
+    // garbage here ?
 };
 
 class ScreenTransition : public Screen // ID: 13
@@ -605,7 +624,7 @@ class ScreenCredits : public Screen // ID: 17
 {
   public:
     float* credits_progression;
-    size_t bg_music_info; /* unsure */
+    SoundMeta* bg_music_info;
 };
 
 class ScreenScores : public Screen // ID: 18
@@ -665,6 +684,7 @@ class ScreenOnlineLoading : public Screen // ID: 28
 struct OnlineLobbyScreenPlayer
 {
     uint8_t unknown1;
+    /// 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     uint8_t character;
     bool ready;
     uint8_t unknown2;
@@ -1068,7 +1088,7 @@ struct JournalUI
     uint8_t unknown1;
     uint16_t unknown2;
     /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
-    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_POST_DRAW_DEPTH](#ON-RENDER_PRE_JOURNAL_PAGE))
+    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
     custom_vector<JournalPage*> pages;
     custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transfered to the pages vector
     uint32_t current_page;

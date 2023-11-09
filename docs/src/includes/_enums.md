@@ -227,15 +227,56 @@ Name | Data | Description
 Name | Data | Description
 ---- | ---- | -----------
 [DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DTOR) | 0 | 
+[CREATE_RENDERING_INFO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CREATE_RENDERING_INFO) | 1 | 
 [UPDATE_STATE_MACHINE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.UPDATE_STATE_MACHINE) | 2 | 
 [KILL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.KILL) | 3 | 
 [ON_COLLISION1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION1) | 4 | 
 [DESTROY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DESTROY) | 5 | 
+[CAN_BE_PUSHED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_BE_PUSHED) | 10 | 
+[IS_IN_LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_IN_LIQUID) | 12 | 
+[SET_INVISIBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_INVISIBLE) | 15 | 
+[FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FRICTION) | 17 | 
 [GET_HELD_ENTITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_HELD_ENTITY) | 22 | 
 [TRIGGER_ACTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_ACTION) | 24 | 
+[ACTIVATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ACTIVATE) | 25 | 
 [ON_COLLISION2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION2) | 26 | 
+[WALKED_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.WALKED_ON) | 29 | 
+[WALKED_OFF](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.WALKED_OFF) | 30 | 
+[LEDGE_GRAB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LEDGE_GRAB) | 31 | 
+[STOOD_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOOD_ON) | 32 | 
+[INIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INIT) | 36 | 
+[CAN_JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_JUMP) | 37 | 
+[STOMP_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMP_DAMAGE) | 43 | 
+[IS_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_ON_FIRE) | 45 | 
 [DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
+[ON_HIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_HIT) | 49 | 
+[STUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STUN) | 51 | 
+[FREEZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FREEZE) | 52 | 
+[LIGHT_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_ON_FIRE) | 53 | 
+[SET_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_CURSED) | 54 | 
+[WEB_COLLISION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.WEB_COLLISION) | 55 | 
+[CHECK_OUT_OF_BOUNDS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CHECK_OUT_OF_BOUNDS) | 58 | 
+[STANDING_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STANDING_ON) | 60 | 
+[STOMPED_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMPED_BY) | 61 | 
+[THROWN_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.THROWN_BY) | 62 | 
+[CLONED_TO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CLONED_TO) | 63 | 
+[PICK_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICK_UP) | 67 | 
+[PICKED_UP_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP_BY) | 68 | 
+[DROP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DROP) | 69 | 
+[COLLECT_TREASURE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.COLLECT_TREASURE) | 70 | 
+[INITIALIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INITIALIZE) | 75 | 
+[PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PROCESS_INPUT) | 78 | 
+[PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP) | 80 | 
+[FALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FALL) | 83 | 
+[APPLY_FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_FRICTION) | 84 | 
+[CRUSH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CRUSH) | 90 | 
 [FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
+[ENTER_ATTEMPT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER_ATTEMPT) | 40 | 
+[HIDE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.HIDE_HUD) | 41 | 
+[ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER) | 42 | 
+[LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_LEVEL) | 44 | 
+[IS_UNLOCKED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_UNLOCKED) | 45 | 
+[CAN_ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_ENTER) | 46 | 
 
 ## ENT_FLAG
 
@@ -379,7 +420,7 @@ Name | Data | Description
 
 Name | Data | Description
 ---- | ---- | -----------
-[DAMSEL_STYLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.DAMSEL_STYLE) | 0 | 
+[WINDOW_SCALE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.WINDOW_SCALE) | 0 | 
 ...check [game_settings.txt](game_data/game_settings.txt)... |  | 
 [CROSSPROGRESS_AUTOSYNC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_SETTING.CROSSPROGRESS_AUTOSYNC) | 47 | 
 
@@ -506,19 +547,19 @@ Name | Data | Description
 
 Name | Data | Description
 ---- | ---- | -----------
-[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.NONE) | 0 | 
-[JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JUMP) | 1 | 
-[WHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.WHIP) | 2 | 
-[BOMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.BOMB) | 4 | 
-[ROPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.ROPE) | 8 | 
-[RUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RUN) | 16 | 
-[DOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOOR) | 32 | 
-[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.MENU) | 64 | 
-[JOURNAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JOURNAL) | 128 | 
-[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.LEFT) | 256 | 
-[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RIGHT) | 512 | 
-[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.UP) | 1024 | 
-[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOWN) | 2048 | 
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.NONE) | 0x0 | 
+[JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JUMP) | 0x1 | 
+[WHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.WHIP) | 0x2 | 
+[BOMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.BOMB) | 0x4 | 
+[ROPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.ROPE) | 0x8 | 
+[RUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RUN) | 0x10 | 
+[DOOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOOR) | 0x20 | 
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.MENU) | 0x40 | 
+[JOURNAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.JOURNAL) | 0x80 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.LEFT) | 0x100 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.RIGHT) | 0x200 | 
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.UP) | 0x400 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=INPUTS.DOWN) | 0x800 | 
 
 ## INPUT_FLAG
 
@@ -650,6 +691,17 @@ Name | Data | Description
 [GREAT_PARTY_HUH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JUNGLESISTERS.GREAT_PARTY_HUH) | 5 | 
 [I_WISH_BROUGHT_A_JACKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=JUNGLESISTERS.I_WISH_BROUGHT_A_JACKET) | 6 | 
 
+## KEY
+
+
+> Search script examples for [KEY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY.A) | 65 | 
+...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
+
 ## LAYER
 
 
@@ -695,6 +747,20 @@ Name | Data | Description
 [MAX_LIQUID_PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LEVEL_CONFIG.MAX_LIQUID_PARTICLES) | 15 | 
 [FLAGGED_LIQUID_ROOMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LEVEL_CONFIG.FLAGGED_LIQUID_ROOMS) | 16 | 
 
+## LIGHT_TYPE
+
+
+> Search script examples for [LIGHT_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.NONE) | LIGHT_TYPE::NONE | Normal static light, position can be edited to move it around<br/>
+[FOLLOW_CAMERA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.FOLLOW_CAMERA) | LIGHT_TYPE::FOLLOW_CAMERA | Position is updated to the camera position, can be moved around via offset<br/>
+[FOLLOW_ENTITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.FOLLOW_ENTITY) | LIGHT_TYPE::FOLLOW_ENTITY | Position is updated to the entity position (from the uid field), if the uid is not found it will behave as [LIGHT_TYPE](#LIGHT_TYPE).NONE, can be moved around via offset<br/>
+[ROOM_LIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIGHT_TYPE.ROOM_LIGHT) | LIGHT_TYPE::ROOM_LIGHT | Rectangle, full brightness always uses light1, disabling light1 does nothing<br/>
+
 ## LIQUID_POOL
 
 
@@ -709,6 +775,44 @@ Name | Data | Description
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.LAVA) | 3 | 
 [COARSE_LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.COARSE_LAVA) | 4 | 
 [STAGNANT_LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LIQUID_POOL.STAGNANT_LAVA) | 5 | 
+
+## LOGIC
+
+
+> Search script examples for [LOGIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[TUTORIAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TUTORIAL) | LOGIC::TUTORIAL | 
+[OUROBOROS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.OUROBOROS) | LOGIC::OUROBOROS | 
+[SPEEDRUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.SPEEDRUN) | LOGIC::SPEEDRUN | 
+[GHOST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.GHOST) | LOGIC::GHOST | 
+[GHOST_TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.GHOST_TOAST) | LOGIC::GHOST_TOAST | 
+[TUN_AGGRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TUN_AGGRO) | LOGIC::TUN_AGGRO | 
+[DICESHOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DICESHOP) | LOGIC::DICESHOP | 
+[PRE_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.PRE_CHALLENGE) | LOGIC::PRE_CHALLENGE | 
+[MOON_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MOON_CHALLENGE) | LOGIC::MOON_CHALLENGE | 
+[STAR_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.STAR_CHALLENGE) | LOGIC::STAR_CHALLENGE | 
+[SUN_CHALLENGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.SUN_CHALLENGE) | LOGIC::SUN_CHALLENGE | 
+[MAGMAMAN_SPAWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.MAGMAMAN_SPAWN) | LOGIC::MAGMAMAN_SPAWN | 
+[WATER_BUBBLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.WATER_BUBBLES) | LOGIC::WATER_BUBBLES | 
+[OLMEC_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.OLMEC_CUTSCENE) | LOGIC::OLMEC_CUTSCENE | 
+[TIAMAT_CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.TIAMAT_CUTSCENE) | LOGIC::TIAMAT_CUTSCENE | 
+[APEP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.APEP) | LOGIC::APEP | 
+[COG_SACRIFICE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.COG_SACRIFICE) | LOGIC::COG_SACRIFICE | 
+[DUAT_BOSSES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DUAT_BOSSES) | LOGIC::DUAT_BOSSES | 
+[BUBBLER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.BUBBLER) | LOGIC::BUBBLER | 
+[PLEASURE_PALACE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.PLEASURE_PALACE) | LOGIC::PLEASURE_PALACE | 
+[DISCOVERY_INFO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.DISCOVERY_INFO) | LOGIC::DISCOVERY_INFO | 
+[BLACK_MARKET](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.BLACK_MARKET) | LOGIC::BLACK_MARKET | 
+[JELLYFISH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.JELLYFISH) | LOGIC::JELLYFISH | 
+[ARENA_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_1) | LOGIC::ARENA_1 | 
+[ARENA_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_2) | LOGIC::ARENA_2 | 
+[ARENA_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_3) | LOGIC::ARENA_3 | 
+[ARENA_ALIEN_BLAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_ALIEN_BLAST) | LOGIC::ARENA_ALIEN_BLAST | 
+[ARENA_LOOSE_BOMBS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=LOGIC.ARENA_LOOSE_BOMBS) | LOGIC::ARENA_LOOSE_BOMBS | 
 
 ## MASK
 
@@ -736,6 +840,26 @@ Name | Data | Description
 [LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LAVA) | 0x4000 | Only: LIQUID_LAVA, LIQUID_STAGNANT_LAVA, LIQUID_IMPOSTOR_LAVA, LIQUID_COARSE_LAVA<br/>Various types, all `Entity`<br/>
 [LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.LIQUID) | 0x6000 | Short for ([MASK](#MASK).WATER &#124; [MASK](#MASK).LAVA)<br/>
 [ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MASK.ANY) | 0x0 | Value of 0, treated by all the functions as ANY mask<br/>
+
+## MENU_INPUT
+
+
+> Search script examples for [MENU_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.NONE) | 0x0 | 
+[SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.SELECT) | 0x1 | 
+[BACK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.BACK) | 0x2 | 
+[DELETE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.DELETE) | 0x4 | 
+[RANDOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.RANDOM) | 0x8 | 
+[JOURNAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.JOURNAL) | 0x10 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.LEFT) | 0x20 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.RIGHT) | 0x40 | 
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.UP) | 0x80 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=MENU_INPUT.DOWN) | 0x100 | 
 
 ## ON
 
@@ -786,7 +910,7 @@ Name | Data | Description
 [SAVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SAVE) | ON::SAVE | Params: [SaveContext](#SaveContext) save_ctx<br/>Runs at the same times as [ON](#ON).[SCREEN](#SCREEN), but receives the save_ctx<br/>
 [LOAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.LOAD) | ON::LOAD | Params: [LoadContext](#LoadContext) load_ctx<br/>Runs as soon as your script is loaded, including reloads, then never again<br/>
 [PRE_LOAD_LEVEL_FILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_LEVEL_FILES) | ON::PRE_LOAD_LEVEL_FILES | Params: [PreLoadLevelFilesContext](#PreLoadLevelFilesContext) load_level_ctx<br/>Runs right before level files would be loaded<br/>
-[PRE_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION) | ON::PRE_LEVEL_GENERATION | Runs before any level generation, no entities should exist at this point<br/>
+[PRE_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION) | ON::PRE_LEVEL_GENERATION | Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.<br/>
 [PRE_LOAD_SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_SCREEN) | ON::PRE_LOAD_SCREEN | Runs right before loading a new screen based on screen_next. Return true from callback to block the screen from loading.<br/>
 [POST_ROOM_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_ROOM_GENERATION) | ON::POST_ROOM_GENERATION | Params: [PostRoomGenerationContext](#PostRoomGenerationContext) room_gen_ctx<br/>Runs right after all rooms are generated before entities are spawned<br/>
 [POST_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION) | ON::POST_LEVEL_GENERATION | Runs right after level generation is done, before any entities are updated<br/>
@@ -821,6 +945,16 @@ Name | Data | Description
 [PRE_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_UPDATE) | ON::PRE_UPDATE | Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)<br/>
 [POST_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_UPDATE) | ON::POST_UPDATE | Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>
 [USER_DATA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.USER_DATA) | ON::USER_DATA | Params: [Entity](#Entity) ent<br/>Runs on all changes to [Entity](#Entity).user_data, including after loading saved user_data in the next level and transition. Also runs the first time user_data is set back to nil, but nil won't be saved to bother you on future levels.<br/>
+[PRE_LEVEL_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_CREATION) | ON::PRE_LEVEL_CREATION | Runs right before the front layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+[POST_LEVEL_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_CREATION) | ON::POST_LEVEL_CREATION | Runs right after the back layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+[PRE_LAYER_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LAYER_CREATION) | ON::PRE_LAYER_CREATION | Params: [LAYER](#LAYER) layer<br/>Runs right before a layer is created. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+[POST_LAYER_CREATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LAYER_CREATION) | ON::POST_LAYER_CREATION | Params: [LAYER](#LAYER) layer<br/>Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.<br/>
+[PRE_LEVEL_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_DESTRUCTION) | ON::PRE_LEVEL_DESTRUCTION | Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+[POST_LEVEL_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_DESTRUCTION) | ON::POST_LEVEL_DESTRUCTION | Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+[PRE_LAYER_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LAYER_DESTRUCTION) | ON::PRE_LAYER_DESTRUCTION | Params: [LAYER](#LAYER) layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+[POST_LAYER_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LAYER_DESTRUCTION) | ON::POST_LAYER_DESTRUCTION | Params: [LAYER](#LAYER) layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/>
+[PRE_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_PROCESS_INPUT) | ON::PRE_PROCESS_INPUT | Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.<br/>
+[POST_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_PROCESS_INPUT) | ON::POST_PROCESS_INPUT | Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/>
 
 ## PARTICLEEMITTER
 
@@ -964,6 +1098,19 @@ Name | Data | Description
 [MOON_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.MOON_CHALLENGE_SPAWNED) | 25 | 
 [STAR_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.STAR_CHALLENGE_SPAWNED) | 26 | 
 [SUN_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED) | 27 | 
+
+## RECURSIVE_MODE
+
+
+> Search script examples for [RECURSIVE_MODE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[EXCLUSIVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE.EXCLUSIVE) | RECURSIVE_MODE::EXCLUSIVE | In this mode the provided [ENT_TYPE](#ENT_TYPE) and [MASK](#MASK) will not be affected nor will entities attached to them<br/>
+[INCLUSIVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE.INCLUSIVE) | RECURSIVE_MODE::INCLUSIVE | In this mode the provided [ENT_TYPE](#ENT_TYPE) and [MASK](#MASK) will be the only affected entities, anything outside of the specified mask or type will not be touched including entities attached to them<br/>For this mode you have to specify at least one mask or [ENT_TYPE](#ENT_TYPE), otherwise nothing will be affected<br/>
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RECURSIVE_MODE.NONE) | RECURSIVE_MODE::NONE | Ignores provided [ENT_TYPE](#ENT_TYPE) and [MASK](#MASK) and affects all the entities<br/>
 
 ## RENDER_INFO_OVERRIDE
 

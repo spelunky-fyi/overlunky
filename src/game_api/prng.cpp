@@ -13,7 +13,7 @@ PRNG& PRNG::get_main()
 PRNG& PRNG::get_local()
 {
     const auto& state = State::get();
-    static PRNG* prng = (PRNG*)((size_t)state.ptr_local() - 0xb0);
+    PRNG* prng = (PRNG*)((size_t)state.ptr_local() - 0xb0);
     return *prng;
 }
 

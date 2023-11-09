@@ -207,3 +207,36 @@ const std::filesystem::path& ScriptImpl::get_root_path() const
 {
     return script_folder;
 }
+
+std::string ScriptImpl::execute(std::string str)
+{
+    if (!code.starts_with("return"))
+    {
+        std::string ret = execute_raw("return " + str);
+        if (!ret.starts_with("sol: "))
+        {
+            return ret;
+        }
+    }
+    return execute_raw(std::move(str));
+}
+std::string ScriptImpl::execute_raw(std::string str)
+{
+    try
+    {
+        auto ret = execute_lua(lua, str);
+        if (ret.get_type() == sol::type::nil || ret.get_type() == sol::type::none)
+        {
+            return "";
+        }
+        else
+        {
+            sol::function serpent = lua["serpent"]["block"];
+            return serpent(ret);
+        }
+    }
+    catch (const sol::error& e)
+    {
+        return e.what();
+    }
+}

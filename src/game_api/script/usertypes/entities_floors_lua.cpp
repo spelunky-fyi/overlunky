@@ -11,8 +11,8 @@
 
 #include "entities_floors.hpp" // for MotherStatue, Floor, ExitDoor, Door
 #include "entity.hpp"          // for Entity
-#include "sound_manager.hpp"   //
-#include "state_structs.hpp"   // IWYU pragma: keep
+#include "illumination.hpp"    // IWYU pragma: keep
+#include "sound_manager.hpp"   // IWYU pragma: keep
 
 namespace NEntitiesFloors
 {
@@ -90,8 +90,12 @@ void register_usertypes(sol::state& lua)
         &Door::fx_button,
         "enter",
         &Door::enter,
+        "light_level",
+        &Door::light_level,
         "is_unlocked",
         &Door::is_unlocked,
+        "can_enter",
+        &Door::can_enter,
         "unlock",
         &Door::unlock,
         sol::base_classes,

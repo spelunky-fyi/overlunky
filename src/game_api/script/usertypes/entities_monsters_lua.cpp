@@ -10,8 +10,8 @@
 
 #include "entities_monsters.hpp" // for CritterSlime, Hundun, Tiamat, Critt...
 #include "entity.hpp"            // for Entity
-#include "sound_manager.hpp"     //
-#include "state_structs.hpp"     // IWYU pragma: keep
+#include "illumination.hpp"      // IWYU pragma: keep
+#include "sound_manager.hpp"     // IWYU pragma: keep
 
 class Movable;
 class PowerupCapable;
@@ -947,6 +947,10 @@ void register_usertypes(sol::state& lua)
         &Tiamat::tail_move_speed,
         "right_arm_angle",
         &Tiamat::right_arm_angle,
+        "attack_x",
+        &Tiamat::attack_x,
+        "attack_y",
+        &Tiamat::attack_y,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -1100,6 +1104,16 @@ void register_usertypes(sol::state& lua)
         &Hundun::snakehead_defeated,
         "hundun_flags",
         &Hundun::hundun_flags,
+        "y_limit",
+        &Hundun::y_limit,
+        "rising_speed_x",
+        &Hundun::rising_speed_x,
+        "rising_speed_y",
+        &Hundun::rising_speed_y,
+        "bird_head_spawn_y",
+        &Hundun::bird_head_spawn_y,
+        "snake_head_spawn_y",
+        &Hundun::snake_head_spawn_y,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 

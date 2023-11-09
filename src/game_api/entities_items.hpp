@@ -152,7 +152,7 @@ class Flame : public Movable
 class FlameSize : public Flame
 {
   public:
-    /// if changed, gradually goes down (0.03 per frame) to the default size
+    /// if changed, gradually goes down (0.03 per frame) to the default size, it's the base value for `entity.width` and `entity.height`
     float flame_size;
 };
 
@@ -303,9 +303,9 @@ class Spark : public Flame
     uint8_t size_change_timer;
     uint8_t extra_padding[3];
 
-    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+    /// This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float speed;
-    /// This is cusome variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
+    /// This is custom variable, you need [activate_sparktraps_hack](#activate_sparktraps_hack) to use it
     float distance;
 };
 

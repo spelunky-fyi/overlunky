@@ -147,6 +147,35 @@ end, ON.LEVEL)
 > Search script examples for [prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=prng)
 
 The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
+# STD Library Containers
+Sometimes game variables and return of some functions will be of type `map`, `set`, `vector` etc. from the C++ Standard Library.
+
+You don't really need to know much of this as they will behave similar to a lua table, even accept some table functions from the `table` library and support looping thru using `pair` function. You can also use them as parameter for functions that take `array`, Sol will happily convert them for you.
+
+They come with some extra functionality:
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | all:empty() | Returns true if container is empty, false otherwise
+int | all:size() | Same as `#container`
+any | vector:at(int index) | Same as `vector[index]`
+any | span:at(int index) | Same as `span[index]`
+any | set:at(int order) | Returns elements in order, it's not an index as sets don't have one
+any | map:at(int order) | Returns elements in order, it's not an index as maps don't have one
+int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable
+int | span:find(any value) | Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable
+any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable
+any | map:find(any key) | Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable
+nil | vector:erase(int index) | Removes element at given index, the rest of elements shift down so that the vector stays contiguous
+nil | set:erase(any value) | Removes element from set
+nil | map:erase(any key) | Removes element from map by key
+nil | vector:clear() | Removes all elements from vector
+nil | set:clear() | Removes all elements from set
+nil | map:clear() | Removes all elements from map
+nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up in index
+nil | set:insert(int order, any element) | The order param doesn't acutally matter and can be set to nil
+nil | map:insert(any key, any value) | unsure, probably easier to just use `map[key] = value`
 # Functions
 The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 
@@ -250,7 +279,12 @@ end, 60)
 #### [CallbackId](#Aliases) set_interval(function cb, int frames)
 
 Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
-Add per level callback function to be called every `frames` engine frames. Timer is paused on pause and cleared on level transition.
+Add per level callback function to be called every `frames` engine frames
+Ex. frames = 100 - will call the function on 100th frame from this point. This might differ in the exact timing of first frame depending as in what part of the frame you call this function
+or even be one frame off if called right before the time_level variable is updated
+If you require precise timing, choose the start of your interval in one of those safe callbacks:
+The [SCREEN](#SCREEN) callbacks: from [ON](#ON).LOGO to [ON](#ON).ONLINE_LOBBY or custom callbacks [ON](#ON).FRAME, [ON](#ON).[SCREEN](#SCREEN), [ON](#ON).START, [ON](#ON).LOADING, [ON](#ON).RESET, [ON](#ON).POST_UPDATE
+Timer is paused on pause and cleared on level transition.
 
 ### set_on_player_instagib
 
@@ -337,6 +371,15 @@ If you set such a callback and then play the same sound yourself you have to wai
 ## Debug functions
 
 
+### dump
+
+
+> Search script examples for [dump](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dump)
+
+#### table dump(any object, optional<int> depth)
+
+Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
+
 ### dump_network
 
 
@@ -346,23 +389,23 @@ If you set such a callback and then play the same sound yourself you have to wai
 
 Hook the sendto and recvfrom functions and start dumping network data to terminal
 
-### get_address
-
-
-> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
-
-#### size_t get_address(string_view address_name)
-
-Get the address for a pattern name
-
 ### get_rva
 
 
 > Search script examples for [get_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rva)
 
-#### size_t get_rva(string_view address_name)
+#### string get_rva(string address_name)
 
-Get the rva for a pattern name
+Get the rva for a pattern name, used for debugging.
+
+### get_virtual_rva
+
+
+> Search script examples for [get_virtual_rva](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_virtual_rva)
+
+#### string get_virtual_rva(VTABLE_OFFSET offset, int index)
+
+Get the rva for a vtable offset and index, used for debugging.
 
 ### raise
 
@@ -477,9 +520,9 @@ Calls the enter door function, position doesn't matter, can also enter closed do
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-#### array&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
+#### vector&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
 
-#### array&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, int mask)
+#### vector&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, int mask)
 
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
 
@@ -517,7 +560,7 @@ Remove item by uid from entity
 
 > Search script examples for [filter_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=filter_entities)
 
-#### array&lt;int&gt; filter_entities(array<int> entities, function predicate)
+#### vector&lt;int&gt; filter_entities(vector<int> entities, function predicate)
 
 Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
 
@@ -553,9 +596,9 @@ Get door target `world`, `level`, `theme`
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-#### array&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
+#### vector&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
-#### array&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
+#### vector&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
 Get uids of matching entities inside some radius ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 Recommended to always set the mask, even if you look for one entity type
@@ -576,12 +619,24 @@ end
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-#### array&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
 
-#### array&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [LAYER](#LAYER) layer)
 
 Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
 Recommended to always set the mask, even if you look for one entity type
+
+### get_entities_by_draw_depth
+
+
+> Search script examples for [get_entities_by_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_draw_depth)
+
+#### vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
+
+#### vector&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
+
+Get uids of entities by draw_depth. Can also use table of draw_depths.
+You can later use [filter_entities](#filter_entities) if you want specific entity
 
 ### get_entities_by_type
 
@@ -600,7 +655,7 @@ end, ON.LEVEL)
 
 > Search script examples for [get_entities_by_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_type)
 
-#### array&lt;int&gt; get_entities_by_type(int, int...)
+#### vector&lt;int&gt; get_entities_by_type([ENT_TYPE](#ENT_TYPE), [ENT_TYPE](#ENT_TYPE)...)
 
 Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
 You can even pass a table!
@@ -611,9 +666,9 @@ This function can be slower than the [get_entities_by](#get_entities_by) with th
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-#### array&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
-#### array&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -633,7 +688,7 @@ Get the [Entity](#Entity) behind an uid, converted to the correct type. To see w
 
 #### string get_entity_name([ENT_TYPE](#ENT_TYPE) type, optional<bool> fallback_strategy)
 
-Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.` enum name
+Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 if the entity has no localized name
 
 ### get_entity_type
@@ -785,6 +840,16 @@ Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop([DROP](#DROP).VAN_HORSING_DIAMOND, [ENT_TYPE](#ENT_TYPE).ITEM_PLASMACANNON))
 Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
 
+### set_boss_door_control_enabled
+
+
+> Search script examples for [set_boss_door_control_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_boss_door_control_enabled)
+
+#### nil set_boss_door_control_enabled(bool enable)
+
+Allows you to disable the control over the door for [Hundun](#Hundun) and [Tiamat](#Tiamat)
+This will also prevent game crashing when there is no exit door when they are in level
+
 ### set_contents
 
 
@@ -868,6 +933,15 @@ If you set a Kapala treshold greater than 7, make sure to set the hud icon in th
 #### nil set_max_rope_length(int length)
 
 Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
+
+### set_olmec_cutscene_enabled
+
+
+> Search script examples for [set_olmec_cutscene_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_olmec_cutscene_enabled)
+
+#### nil set_olmec_cutscene_enabled(bool enable)
+
+[Olmec](#Olmec) cutscene moves [Olmec](#Olmec) and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and [Olmec](#Olmec) will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with [Olmec](#Olmec) in the hole.
 
 ### set_olmec_phase_y_level
 
@@ -994,7 +1068,7 @@ Helper function to set the title and description strings for a [FEAT](#Aliases) 
 
 > Search script examples for [get_feat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_feat)
 
-#### tuple&lt;bool, bool, const string, const string&gt; get_feat([FEAT](#Aliases) feat)
+#### tuple&lt;bool, bool, string, string&gt; get_feat([FEAT](#Aliases) feat)
 
 Check if the user has performed a feat (Real Steam achievement or a hooked one). Returns: `bool unlocked, bool hidden, string name, string description`
 
@@ -1112,6 +1186,60 @@ Returns true if the nth bit is set in the number.
 ## Generic functions
 
 
+### activate_crush_elevator_hack
+
+
+> Search script examples for [activate_crush_elevator_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_crush_elevator_hack)
+
+#### nil activate_crush_elevator_hack(bool activate)
+
+Activate custom variables for speed and y coordinate limit for crushing elevator
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [CrushElevator](#CrushElevator) entity, recommending set_post_entity_spawn
+default game values are: speed = 0.0125, y_limit = 98.5
+
+### activate_hundun_hack
+
+
+> Search script examples for [activate_hundun_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_hundun_hack)
+
+#### nil activate_hundun_hack(bool activate)
+
+Activate custom variables for y coordinate limit for hundun and spawn of it's heads
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Hundun](#Hundun) entity, recommending set_post_entity_spawn
+default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
+
+### add_custom_type
+
+
+> Search script examples for [add_custom_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_custom_type)
+
+#### [ENT_TYPE](#ENT_TYPE) add_custom_type(array<[ENT_TYPE](#ENT_TYPE)> types)
+
+#### [ENT_TYPE](#ENT_TYPE) add_custom_type()
+
+Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
+Use empty array or no parameter to get new uniqe [ENT_TYPE](#ENT_TYPE) that can be used for custom [EntityDB](#EntityDB)
+
+### add_money
+
+
+> Search script examples for [add_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money)
+
+#### int add_money(int amount, optional<int> display_time)
+
+Adds money to the state.money_shop_total and displays the effect on the HUD for money change
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+
+### add_money_slot
+
+
+> Search script examples for [add_money_slot](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_money_slot)
+
+#### int add_money_slot(int amount, int player_slot, optional<int> display_time)
+
+Adds money to the state.items.player_inventory[player_slot].money and displays the effect on the HUD for money change
+Can be negative, default display_time = 60 (about 2s). Returns the current money after the transaction
+
 ### change_poison_timer
 
 
@@ -1159,6 +1287,54 @@ Depending on the image size, this can take a moment, preferably don't create the
 Create image from file, cropped to the geometry provided. Returns a tuple containing id, width and height.
 Depending on the image size, this can take a moment, preferably don't create them dynamically, rather create all you need in global scope so it will load them as soon as the game starts
 
+### create_layer
+
+
+> Search script examples for [create_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_layer)
+
+#### nil create_layer(int layer)
+
+Initializes an empty layer that doesn't currently exist.
+
+### create_level
+
+
+> Search script examples for [create_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_level)
+
+#### nil create_level()
+
+Initializes an empty front and back layer that don't currently exist. Does nothing(?) if layers already exist.
+
+### destroy_grid
+
+
+> Search script examples for [destroy_grid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_grid)
+
+#### nil destroy_grid(int uid)
+
+#### nil destroy_grid(float x, float y, [LAYER](#LAYER) layer)
+
+Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes [MASK](#MASK).PLAYER to prevent crashes
+
+### destroy_layer
+
+
+> Search script examples for [destroy_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_layer)
+
+#### nil destroy_layer(int layer)
+
+Destroys a layer and all entities in it.
+
+### destroy_level
+
+
+> Search script examples for [destroy_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_level)
+
+#### nil destroy_level()
+
+Destroys all layers and all entities in the level. Usually a bad idea, unless you also call create_level and spawn the player back in.
+
 ### disable_floor_embeds
 
 
@@ -1195,6 +1371,15 @@ Force the journal to open on a chapter and entry# when pressing the journal butt
 
 Get the current adventure seed pair
 
+### get_bucket
+
+
+> Search script examples for [get_bucket](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bucket)
+
+#### [Bucket](#Bucket) get_bucket()
+
+Returns the [Bucket](#Bucket) of data stored in shared memory between [Overlunky](#Overlunky) and Playlunky
+
 ### get_character_heart_color
 
 
@@ -1204,6 +1389,16 @@ Get the current adventure seed pair
 
 Same as `Player.get_heart_color`
 
+### get_current_money
+
+
+> Search script examples for [get_current_money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_current_money)
+
+#### int get_current_money()
+
+Just convenient way of getting the current amount of money
+short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+
 ### get_frame
 
 
@@ -1211,7 +1406,42 @@ Same as `Player.get_heart_color`
 
 #### int get_frame()
 
-Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps.
+Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
+
+### get_frametime
+
+
+> Search script examples for [get_frametime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime)
+
+#### optional&lt;double&gt; get_frametime()
+
+Get engine target frametime (1/framerate, default 1/60).
+
+### get_frametime_unfocused
+
+
+> Search script examples for [get_frametime_unfocused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime_unfocused)
+
+#### optional&lt;double&gt; get_frametime_unfocused()
+
+Get engine target frametime when game is unfocused (1/framerate, default 1/33).
+
+### get_global_frame
+
+
+> Search script examples for [get_global_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_global_frame)
+
+#### int get_global_frame()
+
+Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+
+### get_hud
+
+
+> Search script examples for [get_hud](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hud)
+
+#### [HudData](#HudData) get_hud()
+
 
 ### get_id
 
@@ -1333,6 +1563,25 @@ Load another script by id "author/name" and import its `exports` table. Returns:
 - `false` if the script was not found but optional is set to true
 - an error if the script was not found and the optional argument was not set
 
+### inputs_to_buttons
+
+
+> Search script examples for [inputs_to_buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inputs_to_buttons)
+
+#### tuple&lt;float, float, [BUTTON](#BUTTON)&gt; inputs_to_buttons([INPUTS](#INPUTS) inputs)
+
+Converts [INPUTS](#INPUTS) to (x, y, BUTTON)
+
+### intersection
+
+
+> Search script examples for [intersection](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=intersection)
+
+#### [Vec2](#Vec2) intersection([Vec2](#Vec2) A, [Vec2](#Vec2) B, [Vec2](#Vec2) C, [Vec2](#Vec2) D)
+
+Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
+
+
 ### is_character_female
 
 
@@ -1349,14 +1598,23 @@ Same as `Player.is_female`
 
 #### nil list_char_mods()
 
-List all char.png files recursively from Mods/Packs. Returns table of file paths.
+List all char_*.png files recursively from Mods/Packs. Returns table of file paths.
+
+### list_data_dir
+
+
+> Search script examples for [list_data_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_data_dir)
+
+#### nil list_data_dir(optional<string> dir)
+
+List files in directory relative to the mods data directory (Mods/Data/...). Returns table of file/directory names or nil if not found.
 
 ### list_dir
 
 
 > Search script examples for [list_dir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list_dir)
 
-#### nil list_dir(string dir)
+#### nil list_dir(optional<string> dir)
 
 List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 
@@ -1470,6 +1728,45 @@ Seed the game prng.
 
 Set the current adventure seed pair
 
+### set_camera_layer_control_enabled
+
+
+```lua
+set_camera_layer_control_enabled(false)
+
+g_current_timer = nil
+-- default load_time 36
+function change_layer(layer_to, load_time)
+    
+    if state.camera_layer == layer_to then
+        return
+    end
+    if g_current_timer ~= nil then
+        clear_callback(g_current_timer)
+        g_current_timer = nil
+    end
+    -- if we don't want the load time, we can just change the actual layer
+    if load_time == nil or load_time == 0 then
+        state.camera_layer = layer_to
+        return
+    end
+    
+    state.layer_transition_timer = load_time
+    state.transition_to_layer = layer_to
+    state.camera_layer = layer_to
+end
+
+```
+
+
+> Search script examples for [set_camera_layer_control_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_layer_control_enabled)
+
+#### nil set_camera_layer_control_enabled(bool enable)
+
+This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+Letting you control those manually.
+Look at the example on how to mimic game layer switching behavior
+
 ### set_character_heart_color
 
 
@@ -1505,6 +1802,33 @@ end, ON.WIN)
 
 Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
 
+### set_frametime
+
+
+> Search script examples for [set_frametime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_frametime)
+
+#### nil set_frametime(optional<double> frametime)
+
+Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+
+### set_frametime_unfocused
+
+
+> Search script examples for [set_frametime_unfocused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_frametime_unfocused)
+
+#### nil set_frametime_unfocused(optional<double> frametime)
+
+Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
+
+### set_infinite_loop_detection_enabled
+
+
+> Search script examples for [set_infinite_loop_detection_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_infinite_loop_detection_enabled)
+
+#### nil set_infinite_loop_detection_enabled(bool enable)
+
+Disable the Infinite Loop Detection of 420 million instructions per frame, if you know what you're doing and need to perform some serious calculations that hang the game updates for several seconds.
+
 ### set_journal_enabled
 
 
@@ -1522,6 +1846,15 @@ Enables or disables the journal
 #### nil set_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config, int value)
 
 Set the value for the specified config
+
+### set_level_logic_enabled
+
+
+> Search script examples for [set_level_logic_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_level_logic_enabled)
+
+#### nil set_level_logic_enabled(bool enable)
+
+Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
 
 ### set_mask
 
@@ -1565,6 +1898,15 @@ end, ON.PRE_LOAD_SCREEN)
 #### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
 
 Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
+
+### set_start_level_paused
+
+
+> Search script examples for [set_start_level_paused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_start_level_paused)
+
+#### nil set_start_level_paused(bool enable)
+
+Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == [PAUSE](#PAUSE).FADE on the first frame to do what you want.
 
 ### set_storage_layer
 
@@ -1619,6 +1961,15 @@ end, "waddler")
 
 Set layer to search for storage items on
 
+### set_tiamat_cutscene_enabled
+
+
+> Search script examples for [set_tiamat_cutscene_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_tiamat_cutscene_enabled)
+
+#### nil set_tiamat_cutscene_enabled(bool enable)
+
+[Tiamat](#Tiamat) cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want [Tiamat](#Tiamat) kill to be required
+
 ### show_journal
 
 
@@ -1646,6 +1997,20 @@ Returns true if a bitmask is set in the number.
 
 Open or close the journal as if pressing the journal button. Will respect visible journal popups and [force_journal](#force_journal).
 
+### two_lines_angle
+
+
+> Search script examples for [two_lines_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=two_lines_angle)
+
+#### float two_lines_angle([Vec2](#Vec2) A, [Vec2](#Vec2) common, [Vec2](#Vec2) B)
+
+Mesures angle between two lines with one common point
+
+#### float two_lines_angle([Vec2](#Vec2) line1_A, [Vec2](#Vec2) line1_B, [Vec2](#Vec2) line2_A, [Vec2](#Vec2) line2_B)
+
+Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function
+
+
 ### update_liquid_collision_at
 
 
@@ -1654,6 +2019,15 @@ Open or close the journal as if pressing the journal button. Will respect visibl
 #### nil update_liquid_collision_at(float x, float y, bool add)
 
 Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+
+### update_state
+
+
+> Search script examples for [update_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_state)
+
+#### nil update_state()
+
+Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
 
 ### warp
 
@@ -1667,6 +2041,15 @@ Warp to a level immediately.
 ## Input functions
 
 
+### buttons_to_inputs
+
+
+> Search script examples for [buttons_to_inputs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_to_inputs)
+
+#### [INPUTS](#INPUTS) buttons_to_inputs(float x, float y, [BUTTON](#BUTTON) buttons)
+
+Converts (x, y, BUTTON) to [INPUTS](#INPUTS)
+
 ### get_io
 
 
@@ -1678,8 +2061,17 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 
 - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
 - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
-- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
+- Note: [Overlunky](#Overlunky)/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 - Note: [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
+
+### get_raw_input
+
+
+> Search script examples for [get_raw_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_raw_input)
+
+#### [RawInput](#RawInput) get_raw_input()
+
+Returns [RawInput](#RawInput), a game structure for raw keyboard and controller state
 
 ### mouse_position
 
@@ -1690,33 +2082,6 @@ Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 
 Current mouse cursor position in screen coordinates.
 
-### return_input
-
-
-> Search script examples for [return_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
-
-#### nil return_input(int uid)
-
-Return input previously stolen with [steal_input](#steal_input)
-
-### send_input
-
-
-> Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
-
-#### nil send_input(int uid, [INPUTS](#INPUTS) buttons)
-
-Send input to entity, has to be previously stolen with [steal_input](#steal_input)
-
-### steal_input
-
-
-> Search script examples for [steal_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
-
-#### nil steal_input(int uid)
-
-Steal input from a [Player](#Player), HiredHand or [PlayerGhost](#PlayerGhost)
-
 ## Lighting functions
 
 
@@ -1725,11 +2090,13 @@ Steal input from a [Player](#Player), HiredHand or [PlayerGhost](#PlayerGhost)
 
 > Search script examples for [create_illumination](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_illumination)
 
+#### [Illumination](#Illumination) create_illumination([Vec2](#Vec2) pos, [Color](#Color) color, [LIGHT_TYPE](#LIGHT_TYPE) type, float size, int flags, int uid, [LAYER](#LAYER) layer)
+
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, float x, float y)
 
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, int uid)
 
-Creates a new [Illumination](#Illumination). Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example
+Creates a new [Illumination](#Illumination). Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
 
 ### refresh_illumination
 
@@ -1738,7 +2105,7 @@ Creates a new [Illumination](#Illumination). Don't forget to continuously call [
 
 #### nil refresh_illumination([Illumination](#Illumination) illumination)
 
-Refreshes an [Illumination](#Illumination), keeps it from fading out
+Refreshes an [Illumination](#Illumination), keeps it from fading out (updates the timer, keeping it in sync with the game render)
 
 ## Message functions
 
@@ -1775,7 +2142,7 @@ Prinspect to ingame console.
 
 #### nil console_print(string message)
 
-Print a log message to ingame console.
+Print a log message to ingame console with a comment identifying the script that sent it.
 
 ### log_print
 
@@ -1893,7 +2260,7 @@ Show a message that looks like a level feeling.
 
 > Search script examples for [make_custom_behavior](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=make_custom_behavior)
 
-#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string_view behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
+#### [CustomMovableBehavior](#CustomMovableBehavior) make_custom_behavior(string behavior_name, int state_id, [VanillaMovableBehavior](#VanillaMovableBehavior) base_behavior)
 
 Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
 behavior functions. If a behavior with `behavior_name` already exists for your script it will
@@ -1902,12 +2269,31 @@ be returned instead.
 ## Network functions
 
 
+### http_get
+
+
+> Search script examples for [http_get](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get)
+
+#### optional&lt;string&gt; http_get(string url)
+
+Send a synchronous HTTP GET request and return response as a string or nil on an error
+
+### http_get_async
+
+
+> Search script examples for [http_get_async](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=http_get_async)
+
+#### nil http_get_async(string url, function on_data)
+
+Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
+The callback signature is nil on_data(string response, string error)
+
 ### udp_listen
 
 
 > Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
 
-#### UdpServer udp_listen(string host, in_port_t port, function cb)
+#### [UdpServer](#UdpServer) udp_listen(string host, int port, function cb)
 
 Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
 The server will be closed once the handle is released.
@@ -1917,7 +2303,7 @@ The server will be closed once the handle is released.
 
 > Search script examples for [udp_send](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_send)
 
-#### nil udp_send(string host, in_port_t port, string msg)
+#### nil udp_send(string host, int port, string msg)
 
 Send data to specified UDP address. Requires unsafe mode.
 
@@ -1960,7 +2346,7 @@ Add a button that the user can click in the UI. Sets the timestamp of last click
 
 > Search script examples for [register_option_callback](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=register_option_callback)
 
-#### nil register_option_callback(string name, object value, function on_render)
+#### nil register_option_callback(string name, any value, function on_render)
 
 Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name.
 `value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
@@ -2040,7 +2426,7 @@ Extinguish a particle emitter (use the return value of `generate_world_particles
 
 > Search script examples for [generate_screen_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_screen_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_screen_particles(int particle_emitter_id, float x, float y)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_screen_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, float x, float y)
 
 Generate particles of the specified type at a certain screen coordinate (use e.g. `local emitter = generate_screen_particles(PARTICLEEMITTER.CHARSELECTOR_TORCHFLAME_FLAMES, 0.0, 0.0)`). See the `particles.lua` example script for more details.
 
@@ -2049,7 +2435,7 @@ Generate particles of the specified type at a certain screen coordinate (use e.g
 
 > Search script examples for [generate_world_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_world_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_world_particles(int particle_emitter_id, int uid)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_world_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
 
 Generate particles of the specified type around the specified entity uid (use e.g. `local emitter = generate_world_particles(PARTICLEEMITTER.PETTING_PET, players[1].uid)`). You can then decouple the emitter from the entity with `emitter.entity_uid = -1` and freely move it around. See the `particles.lua` example script for more details.
 
@@ -2058,7 +2444,7 @@ Generate particles of the specified type around the specified entity uid (use e.
 
 > Search script examples for [get_particle_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_particle_type)
 
-#### [ParticleDB](#ParticleDB) get_particle_type(int id)
+#### [ParticleDB](#ParticleDB) get_particle_type([PARTICLEEMITTER](#PARTICLEEMITTER) id)
 
 Get the [ParticleDB](#ParticleDB) details of the specified ID
 
@@ -2073,6 +2459,30 @@ Renders the particles to the screen. Only used with screen particle emitters. Se
 
 ## Position functions
 
+
+### activate_tiamat_position_hack
+
+
+```lua
+activate_tiamat_position_hack(true);
+
+set_post_entity_spawn(function(ent)
+
+	-- make them same as in the game, but relative to the tiamat entity
+	ent.attack_x = ent.x - 1
+	ent.attack_y = ent.y + 2
+
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_TIAMAT)
+```
+
+
+> Search script examples for [activate_tiamat_position_hack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activate_tiamat_position_hack)
+
+#### nil activate_tiamat_position_hack(bool activate)
+
+Activate custom variables for position used for detecting the player (normally hardcoded)
+note: because those variables are custom and game does not initiate them, you need to do it yourself for each [Tiamat](#Tiamat) entity, recommending set_post_entity_spawn
+default game values are: attack_x = 17.5 attack_y = 62.5
 
 ### distance
 
@@ -2292,6 +2702,15 @@ Translate a distance of `x` tiles to screen distance to be be used in drawing fu
 
 Translate an entity position to screen position to be used in drawing functions
 
+### set_camera_position
+
+
+> Search script examples for [set_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
+
+#### nil set_camera_position(float cx, float cy)
+
+Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in [ON](#ON).RENDER_PRE_GAME or similar. See [Camera](#Camera) for proper camera handling with bounds and rubberbanding.
+
 ### set_camp_camera_bounds_enabled
 
 
@@ -2308,7 +2727,16 @@ Enables or disables the default position based camp camera bounds, to set them m
 
 #### nil zoom(float level)
 
-Set the zoom level used in levels and shops. 13.5 is the default.
+Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
+
+### zoom_reset
+
+
+> Search script examples for [zoom_reset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=zoom_reset)
+
+#### nil zoom_reset()
+
+Reset the default zoom levels for all areas and sets current zoom level to 13.5.
 
 ## Room functions
 
@@ -2354,7 +2782,7 @@ Get the room template given a certain index, returns `nil` if coordinates are ou
 
 > Search script examples for [get_room_template_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_room_template_name)
 
-#### string_view get_room_template_name(int room_template)
+#### string get_room_template_name(int room_template)
 
 For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
 
@@ -2413,7 +2841,7 @@ end, "pet_shop_boys")
 
 > Search script examples for [spawn_roomowner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_roomowner)
 
-#### int spawn_roomowner([ENT_TYPE](#ENT_TYPE) owner_type, float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = -1)
+#### int spawn_roomowner([ENT_TYPE](#ENT_TYPE) owner_type, float x, float y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = -1)
 
 Spawn a [RoomOwner](#RoomOwner) (or a few other like [CavemanShopkeeper](#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the [RoomOwner](#RoomOwner) uid.
 
@@ -2488,7 +2916,7 @@ ctx:set_room_template(rx, ry, l, ROOM_TEMPLATE.SHOP)
 
 > Search script examples for [spawn_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_shopkeeper)
 
-#### int spawn_shopkeeper(float x, float, y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = [ROOM_TEMPLATE](#ROOM_TEMPLATE).SHOP)
+#### int spawn_shopkeeper(float x, float y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template = [ROOM_TEMPLATE](#ROOM_TEMPLATE).SHOP)
 
 Spawn a [Shopkeeper](#Shopkeeper) in the coordinates and make the room their shop. Returns the [Shopkeeper](#Shopkeeper) uid. Also see [spawn_roomowner](#spawn_roomowner).
 
@@ -2807,7 +3235,7 @@ Short for [spawn_entity_over](#spawn_entity_over)
 
 > Search script examples for [spawn_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_player)
 
-#### nil spawn_player(int player_slot, float x, float y)
+#### int spawn_player(int player_slot, optional<float> x, optional<float> y, optional<[LAYER](#LAYER)> layer)
 
 Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
 If you want to respawn a player that is a ghost, set in his [Inventory](#Inventory) `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
@@ -2936,7 +3364,7 @@ Same as `Player.get_short_name`
 
 > Search script examples for [get_string](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_string)
 
-#### const string get_string([STRINGID](#Aliases) string_id)
+#### string get_string([STRINGID](#Aliases) string_id)
 
 Get string behind [STRINGID](#Aliases), don't use stringid diretcly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
 Will return the string of currently choosen language
@@ -3079,7 +3507,7 @@ Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(
 
 > Search script examples for [force_custom_subtheme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_subtheme)
 
-#### nil force_custom_subtheme(customtheme)
+#### nil force_custom_subtheme([CustomTheme](#CustomTheme)|[ThemeInfo](#ThemeInfo)|[THEME](#THEME) customtheme)
 
 Force current subtheme used in the CO theme. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME). Not to be confused with force_co_subtheme.
 
@@ -3088,7 +3516,7 @@ Force current subtheme used in the CO theme. You can pass a [CustomTheme](#Custo
 
 > Search script examples for [force_custom_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_custom_theme)
 
-#### nil force_custom_theme(customtheme)
+#### nil force_custom_theme([CustomTheme](#CustomTheme)|[ThemeInfo](#ThemeInfo)|[THEME](#THEME) customtheme)
 
 Force a theme in PRE_LOAD_LEVEL_FILES, POST_ROOM_GENERATION or PRE_LEVEL_GENERATION to change different aspects of the levelgen. You can pass a [CustomTheme](#CustomTheme), [ThemeInfo](#ThemeInfo) or [THEME](#THEME).
 
@@ -3209,7 +3637,7 @@ Same as import().
 
 > Search script examples for [read_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read_prng)
 
-`array<int> read_prng()`<br/>
+`vector<int> read_prng()`<br/>
 Read the game prng state. Use [prng](#PRNG):get_pair() instead.
 
 ### force_dark_level
@@ -3234,7 +3662,7 @@ Set level flag 18 on post room generation instead, to properly force every level
 
 > Search script examples for [get_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 
-#### array&lt;int&gt; get_entities()
+#### vector&lt;int&gt; get_entities()
 
 Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
@@ -3243,7 +3671,7 @@ Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
 
-#### array&lt;int&gt; get_entities_by_mask(int mask)
+#### vector&lt;int&gt; get_entities_by_mask(int mask)
 
 Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
@@ -3252,7 +3680,7 @@ Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
 
-#### array&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)
 
 Use `get_entities_by(0, MASK.ANY, layer)` instead
 
@@ -3261,9 +3689,9 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### array&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 
-#### array&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 
 Use `get_entities_overlapping_hitbox` instead
 
@@ -3274,7 +3702,7 @@ Use `get_entities_overlapping_hitbox` instead
 
 #### int get_entity_ai_state(int uid)
 
-As the name is misleading. use entity `move_state` field instead
+As the name is misleading. use [Movable](#Movable).`move_state` field instead
 
 ### set_arrowtrap_projectile
 
@@ -3294,15 +3722,6 @@ Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow
 
 This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
-
-### set_camera_position
-
-
-> Search script examples for [set_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_camera_position)
-
-#### nil set_camera_position(float cx, float cy)
-
-this doesn't actually work at all. See State -> [Camera](#Camera) the for proper camera handling
 
 ### setflag
 
@@ -3324,6 +3743,30 @@ this doesn't actually work at all. See State -> [Camera](#Camera) the for proper
 > Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
 
 `nil testflag()`<br/>
+
+### steal_input
+
+
+> Search script examples for [steal_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=steal_input)
+
+`nil steal_input(int uid)`<br/>
+Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.
+
+### return_input
+
+
+> Search script examples for [return_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=return_input)
+
+`nil return_input(int uid)`<br/>
+Return input previously stolen with [steal_input](#steal_input)
+
+### send_input
+
+
+> Search script examples for [send_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send_input)
+
+`nil send_input(int uid, INPUTS buttons)`<br/>
+Send input to entity, has to be previously stolen with [steal_input](#steal_input)
 
 ### read_input
 
@@ -3545,7 +3988,7 @@ Use this only when no other approach works, this call can be expensive if overus
 
 > Search script examples for [generate_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles(int particle_emitter_id, int uid)
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
 
 Use `generate_world_particles`
 

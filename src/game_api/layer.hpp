@@ -1,10 +1,12 @@
 #pragma once
 
+#include <array>
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint32_t, int32_t, uint64_t, uint8_t
 #include <functional> // for less
 #include <map>        // for map
 #include <new>        // for operator new
+#include <set>        //
 #include <utility>    // for find, pair
 #include <vector>     // for allocator, vector
 
@@ -117,6 +119,15 @@ struct EntityList
     }
 };
 
+struct EntityRegions
+{
+    EntityList** entity_lists;
+    // pointers to entities from entities_by_region array
+
+    uint8_t size;
+    uint8_t cap;
+};
+
 struct Layer
 {
     bool is_back_layer;
@@ -125,24 +136,27 @@ struct Layer
     EntityList all_entities;
     // char + fx + mons + item + logical + mount + activefloor + BG (excluding BG_SHOP, BG_LEVEL_*)
     EntityList unknown_entities1;
-    size_t unknown1;
-    // key is the mask
-    std::map<uint32_t, EntityList> entities_by_mask;
+    EntityRegions* unknown1; // players in motion?
 
-    EntityList entities_by_unknown[647]; // could be more, not sure what for, each holds like 1 entity for split second
-    char stuff0[0xB778];                 // unknown, maybe more of the array above?
+    std::map<uint32_t, EntityList> entities_by_mask; // key is the mask
 
-    std::map<int32_t, size_t> unknown_map; // some movable and liquids and something else maybe?, key is uid
+    // 4x4 block areas (the edge ones extend to infinity?), each probably contains diffrent mask entities
+    EntityList entities_by_region1[31][21];
+    EntityList entities_by_region2[31][21]; // Active floors ?
+    EntityList entities_by_region3[31][21];
+    EntityList entities_by_region4[31][21];
+
+    std::map<int32_t, EntityRegions> entity_regions; // key is uid, all entities except FX, FLOOR, DECORATION, BG, SHADOW and LOGICAL
 
     Entity* grid_entities[g_level_max_y][g_level_max_x];
     EntityList entities_overlaping_grid[g_level_max_y][g_level_max_x]; // static entities (like midbg, decorations) that overlap this grid position
 
     EntityList unknown_entities2;
-    EntityList entities_by_draw_depth[53];
+    std::array<EntityList, 53> entities_by_draw_depth;
     EntityList unknown_entities3;        // debris, explosions, laserbeams etc. ?
     EntityList unknown_entities4;        // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
     std::vector<Entity*> unknown_vector; // add_to_layer uses this
-    size_t unknown6;                     // MysteryLayerPointer1 in plugin
+    std::set<float>* unknown6;           // triggered by floor entity destruction? needs more testing
     // List of items that were destroyed and are waiting to have the dtor called
     // and then be returned to the entity pool
     EntityList expired_entities;
@@ -197,4 +211,6 @@ struct Layer
 
     void move_grid_entity(Entity* ent, float x, float y, Layer* dest_layer);
     void move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_layer);
+
+    void destroy_grid_entity(Entity* ent);
 };

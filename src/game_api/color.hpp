@@ -9,7 +9,7 @@ struct Color
 {
     /// Create a new color - defaults to black
     constexpr Color() = default;
-    constexpr Color(const Color&) = default;
+    constexpr Color(const Color& other) = default;
     constexpr Color(Color&&) = default;
     constexpr Color& operator=(const Color&) = default;
     constexpr Color& operator=(Color&&) = default;
@@ -152,6 +152,12 @@ struct Color
         uint8_t blue = (color >> 16U) & 0xFF;
         uint8_t alpha = (color >> 24U) & 0xFF;
         return set_rgba(red, green, blue, alpha);
+    }
+    /// Copies the values of different Color to this one
+    Color& set(Color& other)
+    {
+        *this = other;
+        return *this;
     }
 
     float r{0.0f};

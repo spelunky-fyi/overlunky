@@ -14,3 +14,4 @@ AllowShortFunctionsOnASingleLine: None
 PointerAlignment: Left
 RequiresClausePosition: OwnLine
 IndentRequiresClause: false
+InsertNewlineAtEOF: true

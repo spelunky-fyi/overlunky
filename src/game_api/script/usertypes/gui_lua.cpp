@@ -149,7 +149,7 @@ void GuiDrawContext::draw_poly(std::vector<Vec2> points, float thickness, uColor
     auto draw = [&](ImDrawList* dl)
     {
         dl->PathClear();
-        for (auto point : points)
+        for (auto& point : points)
         {
             ImVec2 a = screenify_fix({point.x, point.y});
             dl->PathLineToMergeDuplicate(a);
@@ -170,7 +170,7 @@ void GuiDrawContext::draw_poly_filled(std::vector<Vec2> points, uColor color)
     auto draw = [&](ImDrawList* dl)
     {
         dl->PathClear();
-        for (auto point : points)
+        for (auto& point : points)
         {
             ImVec2 a = screenify_fix({point.x, point.y});
             dl->PathLineToMergeDuplicate(a);

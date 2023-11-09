@@ -12,14 +12,16 @@
 #include <type_traits>            // for move, declval, decay_t, reference_...
 #include <utility>                // for min, max
 
-#include "entity.hpp"        // IWYU pragma: keep
-#include "items.hpp"         // for Items, SelectPlayerSlot, Items::is...
-#include "level_api.hpp"     // IWYU pragma: keep
-#include "online.hpp"        // for OnlinePlayer, OnlineLobby, Online
-#include "screen.hpp"        // IWYU pragma: keep
-#include "screen_arena.hpp"  // IWYU pragma: keep
-#include "state.hpp"         // for StateMemory, State, StateMemory::a...
-#include "state_structs.hpp" // for ArenaConfigArenas, ArenaConfigItems
+#include "entities_chars.hpp" // IWYU pragma: keep
+#include "entity.hpp"         // IWYU pragma: keep
+#include "illumination.hpp"   // IWYU pragma: keep
+#include "items.hpp"          // for Items, SelectPlayerSlot, Items::is...
+#include "level_api.hpp"      // IWYU pragma: keep
+#include "online.hpp"         // for OnlinePlayer, OnlineLobby, Online
+#include "screen.hpp"         // IWYU pragma: keep
+#include "screen_arena.hpp"   // IWYU pragma: keep
+#include "state.hpp"          // for StateMemory, State, StateMemory::a...
+#include "state_structs.hpp"  // for ArenaConfigArenas, ArenaConfigItems
 
 namespace NState
 {
@@ -156,6 +158,40 @@ void register_usertypes(sol::state& lua)
     arenastate_type["breath_cooldown"] = &ArenaState::breath_cooldown;
     arenastate_type["punish_ball"] = &ArenaState::punish_ball;
 
+    /// Used in StateMemory
+    lua.new_usertype<JournalProgressStickerSlot>(
+        "JournalProgressStickerSlot",
+        "theme",
+        &JournalProgressStickerSlot::theme,
+        "grid_position",
+        &JournalProgressStickerSlot::grid_position,
+        "entity_type",
+        &JournalProgressStickerSlot::entity_type,
+        "x",
+        &JournalProgressStickerSlot::x,
+        "y",
+        &JournalProgressStickerSlot::y,
+        "angle",
+        &JournalProgressStickerSlot::angle);
+
+    /// Used in StateMemory
+    lua.new_usertype<JournalProgressStainSlot>(
+        "JournalProgressStainSlot",
+        "x",
+        &JournalProgressStainSlot::x,
+        "y",
+        &JournalProgressStainSlot::y,
+        "angle",
+        &JournalProgressStainSlot::angle,
+        "scale",
+        &JournalProgressStainSlot::scale,
+        "texture_column",
+        &JournalProgressStainSlot::texture_column,
+        "texture_row",
+        &JournalProgressStainSlot::texture_row,
+        "texture_range",
+        &JournalProgressStainSlot::texture_range);
+
     /// Used in Items
     lua.new_usertype<SelectPlayerSlot>(
         "SelectPlayerSlot",
@@ -165,6 +201,7 @@ void register_usertypes(sol::state& lua)
         &SelectPlayerSlot::character,
         "texture",
         &SelectPlayerSlot::texture_id);
+
     /// Used in StateMemory
     lua.new_usertype<Items>(
         "Items",
@@ -178,27 +215,17 @@ void register_usertypes(sol::state& lua)
         &Items::is_pet_cursed,
         "is_pet_poisoned",
         &Items::is_pet_poisoned,
-
-        // had to be done this way as autodoc doesn't like sol::property stuff
-        /*"leader",
-        &Items::leader,*/
-        /*"player_inventory",
-        &Items::player_inventories,*/
-        /*"player_select",
-        &Items::player_select_slots,*/
-        //); stop autodoc here
-
         "leader",
         sol::property([](Items& s) -> uint8_t
                       { return s.leader + 1; },
                       [](Items& s, uint8_t leader)
                       { s.leader = leader - 1; }),
         "player_select",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_select_slots); }),
+        &Items::player_select_slots,
         "player_inventory",
-        sol::property([](Items& s)
-                      { return std::ref(s.player_inventories); }));
+        &Items::player_inventories,
+        "players",
+        &Items::players);
 
     /// Used in LiquidPool
     lua.new_usertype<LiquidPhysicsEngine>(
@@ -241,8 +268,7 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<LiquidPhysics>(
         "LiquidPhysics",
         "pools",
-        sol::property([](LiquidPhysics& lp)
-                      { return std::ref(lp.pools) /**/; }));
+        &LiquidPhysics::pools);
 
     lua.create_named_table(
         "LIQUID_POOL",
@@ -322,9 +348,12 @@ void register_usertypes(sol::state& lua)
     statememory_type["correct_ushabti"] = &StateMemory::correct_ushabti;
     statememory_type["items"] = &StateMemory::items;
     statememory_type["camera_layer"] = &StateMemory::camera_layer;
-    statememory_type["layer_transition_timer"] = &StateMemory::layer_transition_effect_timer;
-    statememory_type["screen_team_select"] = &StateMemory::screen_team_select;
+    statememory_type["layer_transition_timer"] = &StateMemory::layer_transition_timer;
+    statememory_type["transition_to_layer"] = &StateMemory::transition_to_layer;
     statememory_type["screen_character_select"] = &StateMemory::screen_character_select;
+    statememory_type["screen_team_select"] = &StateMemory::screen_team_select;
+    statememory_type["screen_camp"] = &StateMemory::screen_camp;
+    statememory_type["screen_level"] = &StateMemory::screen_level;
     statememory_type["screen_transition"] = &StateMemory::screen_transition;
     statememory_type["screen_death"] = &StateMemory::screen_death;
     statememory_type["screen_win"] = &StateMemory::screen_win;
@@ -357,10 +386,17 @@ void register_usertypes(sol::state& lua)
     statememory_type["storage_uid"] = &StateMemory::waddler_floor_storage;
     statememory_type["waddler_storage"] = &StateMemory::waddler_storage;
     statememory_type["waddler_metadata"] = &StateMemory::waddler_storage_meta;
+    statememory_type["journal_progress_sticker_count"] = &StateMemory::journal_progress_sticker_count;
+    statememory_type["journal_progress_sticker_slots"] = &StateMemory::journal_progress_sticker_slots;
+    statememory_type["journal_progress_stain_count"] = &StateMemory::journal_progress_stain_count;
+    statememory_type["journal_progress_stain_slots"] = &StateMemory::journal_progress_stain_slots;
+    statememory_type["journal_progress_theme_count"] = &StateMemory::journal_progress_theme_count;
+    statememory_type["journal_progress_theme_slots"] = &StateMemory::journal_progress_theme_slots;
     statememory_type["theme_info"] = &StateMemory::current_theme;
     statememory_type["logic"] = &StateMemory::logic;
     statememory_type["liquid"] = &StateMemory::liquid_physics;
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
+    statememory_type["room_owners"] = &StateMemory::room_owners;
 
     lua.create_named_table("QUEST_FLAG", "RESET", 1, "DARK_LEVEL_SPAWNED", 2, "VAULT_SPAWNED", 3, "SPAWN_OUTPOST", 4, "SHOP_SPAWNED", 5, "SHORTCUT_USED", 6, "SEEDED", 7, "DAILY", 8, "CAVEMAN_SHOPPIE_AGGROED", 9, "WADDLER_AGGROED", 10, "SHOP_BOUGHT_OUT", 11, "EGGPLANT_CROWN_PICKED_UP", 12, "UDJAT_EYE_SPAWNED", 17, "BLACK_MARKET_SPAWNED", 18, "DRILL_SPAWNED", 19, "MOON_CHALLENGE_SPAWNED", 25, "STAR_CHALLENGE_SPAWNED", 26, "SUN_CHALLENGE_SPAWNED", 27);
 
@@ -378,7 +414,9 @@ void register_usertypes(sol::state& lua)
         "blue",
         &LightParams::blue,
         "size",
-        &LightParams::size);
+        &LightParams::size,
+        "as_color",
+        &LightParams::as_color);
 
     /// Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
     /// Used in StateMemory, Player, PlayerGhost, BurningRopeEffect ...
@@ -396,10 +434,24 @@ void register_usertypes(sol::state& lua)
     illumination_type["offset_y"] = &Illumination::offset_y;
     illumination_type["distortion"] = &Illumination::distortion;
     illumination_type["entity_uid"] = &Illumination::entity_uid;
+    illumination_type["timer"] = &Illumination::timer;
     illumination_type["flags"] = &Illumination::flags;
     illumination_type["type_flags"] = &Illumination::type_flags;
     illumination_type["enabled"] = &Illumination::enabled;
     illumination_type["layer"] = &Illumination::layer;
+
+    lua.create_named_table("LIGHT_TYPE", "NONE", LIGHT_TYPE::NONE, "FOLLOW_CAMERA", LIGHT_TYPE::FOLLOW_CAMERA, "FOLLOW_ENTITY", LIGHT_TYPE::FOLLOW_ENTITY, "ROOM_LIGHT", LIGHT_TYPE::ROOM_LIGHT);
+
+    /* LIGHT_TYPE
+    // NONE
+    // Normal static light, position can be edited to move it around
+    // FOLLOW_CAMERA
+    // Position is updated to the camera position, can be moved around via offset
+    // FOLLOW_ENTITY
+    // Position is updated to the entity position (from the uid field), if the uid is not found it will behave as LIGHT_TYPE.NONE, can be moved around via offset
+    // ROOM_LIGHT
+    // Rectangle, full brightness always uses light1, disabling light1 does nothing
+    */
 
     auto camera_type = lua.new_usertype<Camera>("Camera");
     camera_type["bounds_left"] = &Camera::bounds_left;
@@ -456,63 +508,15 @@ void register_usertypes(sol::state& lua)
                       }),
         "get_code",
         &OnlineLobby::get_code);
-    /// Used in StateMemory
-    lua.new_usertype<LogicList>(
-        "LogicList",
-        "olmec_cutscene",
-        &LogicList::olmec_cutscene,
-        "tiamat_cutscene",
-        &LogicList::tiamat_cutscene,
-        "diceshop",
-        &LogicList::diceshop);
-    /// Used in LogicList
-    lua.new_usertype<Logic>(
-        "Logic",
-        "logic_index",
-        &Logic::logic_index);
-    /// Used in LogicList
-    lua.new_usertype<LogicOlmecCutscene>(
-        "LogicOlmecCutscene",
-        "olmec",
-        &LogicOlmecCutscene::olmec,
-        "player",
-        &LogicOlmecCutscene::player,
-        "cinematic_anchor",
-        &LogicOlmecCutscene::cinematic_anchor,
-        "timer",
-        &LogicOlmecCutscene::timer,
-        sol::base_classes,
-        sol::bases<Logic>());
-    /// Used in LogicList
-    lua.new_usertype<LogicTiamatCutscene>(
-        "LogicTiamatCutscene",
-        "tiamat",
-        &LogicTiamatCutscene::tiamat,
-        "player",
-        &LogicTiamatCutscene::player,
-        "cinematic_anchor",
-        &LogicTiamatCutscene::cinematic_anchor,
-        "timer",
-        &LogicTiamatCutscene::timer,
-        sol::base_classes,
-        sol::bases<Logic>());
 
-    /// Used in LogicList
-    auto logicdiceshop_type = lua.new_usertype<LogicDiceShop>("LogicDiceShop", sol::base_classes, sol::bases<Logic>());
-    logicdiceshop_type["bet_machine"] = &LogicDiceShop::bet_machine;
-    logicdiceshop_type["die1"] = &LogicDiceShop::die1;
-    logicdiceshop_type["die2"] = &LogicDiceShop::die2;
-    logicdiceshop_type["die_1_value"] = &LogicDiceShop::die_1_value;
-    logicdiceshop_type["die_2_value"] = &LogicDiceShop::die_2_value;
-    logicdiceshop_type["prize_dispenser"] = &LogicDiceShop::prize_dispenser;
-    logicdiceshop_type["prize"] = &LogicDiceShop::prize;
-    logicdiceshop_type["forcefield"] = &LogicDiceShop::forcefield;
-    logicdiceshop_type["bet_active"] = &LogicDiceShop::bet_active;
-    logicdiceshop_type["forcefield_deactivated"] = &LogicDiceShop::forcefield_deactivated;
-    logicdiceshop_type["boss_angry"] = &LogicDiceShop::boss_angry;
-    logicdiceshop_type["result_announcement_timer"] = &LogicDiceShop::result_announcement_timer;
-    logicdiceshop_type["won_prizes_count"] = &LogicDiceShop::won_prizes_count;
-    logicdiceshop_type["balance"] = &LogicDiceShop::balance;
+    /// Used in StateMemory
+    lua.new_usertype<RoomOwnersInfo>("RoomOwnersInfo", "owned_items", &RoomOwnersInfo::owned_items, "owned_rooms", &RoomOwnersInfo::owned_rooms);
+
+    /// Used in RoomOwnersInfo
+    lua.new_usertype<ItemOwnerDetails>("ItemOwnerDetails", "owner_type", &ItemOwnerDetails::owner_type, "owner_uid", &ItemOwnerDetails::owner_uid);
+
+    /// Used in RoomOwnersInfo
+    lua.new_usertype<RoomOwnerDetails>("RoomOwnerDetails", "layer", &RoomOwnerDetails::layer, "room_index", &RoomOwnerDetails::room_index, "owner_uid", &RoomOwnerDetails::owner_uid);
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 

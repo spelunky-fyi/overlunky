@@ -44,7 +44,7 @@ void register_usertypes(sol::state& lua)
     lua["generate_particles"] = generate_world_particles;
 
     /// Used in ParticleDB, [get_particle_type](#get_particle_type)
-    auto particledb_type = lua.new_usertype<ParticleDB>("ParticleDB");
+    auto particledb_type = lua.new_usertype<ParticleDB>("ParticleDB", sol::constructors<ParticleDB(ParticleDB&), ParticleDB(PARTICLEEMITTER)>());
     particledb_type["id"] = &ParticleDB::id;
     particledb_type["spawn_count_min"] = &ParticleDB::spawn_count_min;
     particledb_type["spawn_count"] = &ParticleDB::spawn_count;
@@ -82,6 +82,8 @@ void register_usertypes(sol::state& lua)
         "ParticleEmitterInfo",
         "particle_type",
         &ParticleEmitterInfo::particle_type,
+        "particle_type2",
+        &ParticleEmitterInfo::particle_type2,
         "particle_count",
         sol::property([](ParticleEmitterInfo& e) -> uint32_t
                       { return e.emitted_particles.particle_count; }),
@@ -98,6 +100,10 @@ void register_usertypes(sol::state& lua)
         &ParticleEmitterInfo::offset_x,
         "offset_y",
         &ParticleEmitterInfo::offset_y,
+        "layer",
+        &ParticleEmitterInfo::layer,
+        "draw_depth",
+        &ParticleEmitterInfo::draw_depth,
         "emitted_particles",
         &ParticleEmitterInfo::emitted_particles,
         "emitted_particles_back_layer",

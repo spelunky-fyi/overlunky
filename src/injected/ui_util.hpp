@@ -37,8 +37,10 @@ class UI
   public:
     static void godmode(bool g);
     static void godmode_companions(bool g);
+    static void death_enabled(bool g);
     static std::pair<float, float> click_position(float x, float y);
     static void zoom(float level);
+    static void zoom_reset();
     static uint32_t get_frame_count();
     static void warp(uint8_t world, uint8_t level, uint8_t theme);
     static void transition(uint8_t world, uint8_t level, uint8_t theme);
@@ -84,6 +86,7 @@ class UI
     static float get_spark_distance(SparkTrap* ent);
     static void save_progress();
     static int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer, float vx, float vy);
-    static void spawn_player(uint8_t player_slot, float x, float y);
+    static void spawn_player(uint8_t player_slot, std::optional<float> x = std::nullopt, std::optional<float> y = std::nullopt, std::optional<LAYER> layer = std::nullopt);
     static std::pair<float, float> spawn_position();
+    static void load_death_screen();
 };

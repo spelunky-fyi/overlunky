@@ -9,7 +9,7 @@
 
 #include "entity.hpp" // for to_id
 
-const std::map<CUSTOM_TYPE, std::string_view> custom_type_names = {
+const std::vector<std::pair<CUSTOM_TYPE, std::string_view>> custom_type_names = {
     {CUSTOM_TYPE::ACIDBUBBLE, "ACIDBUBBLE"},
     {CUSTOM_TYPE::ALIEN, "ALIEN"},
     {CUSTOM_TYPE::ALTAR, "ALTAR"},
@@ -355,6 +355,9 @@ std::span<const ENT_TYPE> make_custom_entity_type_list(StrArgs... ent_type_ids)
     return {s_entity_types.begin(), s_entity_types.end()};
 }
 
+std::map<CUSTOM_TYPE, std::vector<ENT_TYPE>> user_custom_types;
+uint32_t g_last_custom_id = (uint32_t)custom_type_max;
+
 std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
 {
     if (type < CUSTOM_TYPE::ACIDBUBBLE)
@@ -551,7 +554,8 @@ std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
             "ENT_TYPE_ITEM_DMCRATE",
             "ENT_TYPE_ITEM_PRESENT",
             "ENT_TYPE_ITEM_GHIST_PRESENT",
-            "ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE");
+            "ENT_TYPE_ITEM_ALIVE_EMBEDDED_ON_ICE",
+            "ENT_TYPE_ITEM_POT");
     case CUSTOM_TYPE::CONVEYORBELT:
         return make_custom_entity_type_list<CUSTOM_TYPE::CONVEYORBELT>(
             "ENT_TYPE_FLOOR_CONVEYORBELT_LEFT",
@@ -1560,9 +1564,27 @@ std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
         return make_custom_entity_type_list<CUSTOM_TYPE::YETIKING>("ENT_TYPE_MONS_YETIKING");
     case CUSTOM_TYPE::YETIQUEEN:
         return make_custom_entity_type_list<CUSTOM_TYPE::YETIQUEEN>("ENT_TYPE_MONS_YETIQUEEN");
+    default:
+    {
+        auto it = user_custom_types.find(type);
+        if (it != user_custom_types.end())
+        {
+            return {it->second.begin(), it->second.end()};
+        }
     }
-
+    }
     return {};
+}
+
+CUSTOM_TYPE add_new_custom_type(std::vector<ENT_TYPE> types)
+{
+    ++g_last_custom_id;
+    if (types.empty())
+    {
+        types.push_back(g_last_custom_id);
+    }
+    user_custom_types.emplace((CUSTOM_TYPE)g_last_custom_id, std::move(types));
+    return (CUSTOM_TYPE)g_last_custom_id;
 }
 
 bool is_type_movable(ENT_TYPE type)
@@ -1574,7 +1596,7 @@ bool is_type_movable(ENT_TYPE type)
     return false;
 }
 
-const std::map<CUSTOM_TYPE, std::string_view>& get_custom_types_map()
+const std::vector<std::pair<CUSTOM_TYPE, std::string_view>>& get_custom_types_vector()
 {
     return custom_type_names;
 }

@@ -894,17 +894,16 @@ int32_t sound_name_to_id(const VANILLA_SOUND s_name)
     return -1;
 }
 
-SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid)
+SoundMeta* play_sound_by_id(uint32_t sound_id, uint32_t source_uid)
 {
+    if (sound_id == -1)
+        return nullptr;
+
     using play_sound = SoundMeta*(int32_t);
     static auto play_sound_func = (play_sound*)get_address("play_sound");
 
     Entity* source = get_entity_ptr(source_uid);
     SoundMeta* sound_info{nullptr};
-    auto sound_id = sound_name_to_id(sound);
-
-    if (sound_id == -1)
-        return nullptr;
 
     if (source_uid == ~0 || source != nullptr) // don't play the sound if the entity is not valid
     {
@@ -913,4 +912,22 @@ SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid)
             source->set_as_sound_source(sound_info);
     }
     return sound_info;
+}
+
+SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid)
+{
+    auto sound_id = sound_name_to_id(sound);
+    return play_sound_by_id(sound_id, source_uid);
+}
+
+SoundMeta* construct_soundmeta(VANILLA_SOUND sound, bool background_sound)
+{
+    return construct_soundmeta(sound_name_to_id(sound), background_sound);
+}
+
+SoundMeta* construct_soundmeta(uint32_t sound_id, bool background_sound)
+{
+    using construct_soundposition_ptr_fun_t = SoundMeta*(uint32_t id, bool background_sound);
+    static const auto construct_soundposition_ptr_call = (construct_soundposition_ptr_fun_t*)get_address("construct_soundmeta");
+    return construct_soundposition_ptr_call(sound_id, background_sound);
 }

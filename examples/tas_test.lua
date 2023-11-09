@@ -1,6 +1,6 @@
 meta.name = "TAS test"
-meta.version = "WIP"
-meta.description = "Simple test for TASing a seeded run. Works from start to finish, although you might have to wait a frame or two at the start of boss levels because of cutscene skip weirdness. The rerecording stuff is very WIP."
+meta.version = "VERY OBSOLETE"
+meta.description = "Seriously don't use or even read this."
 meta.author = "Dregu"
 
 local seed = 0

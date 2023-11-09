@@ -1,5 +1,6 @@
 #pragma once
 
+#include "containers/custom_set.hpp"
 #include "entities_chars.hpp"
 #include "movable.hpp"
 #include "particles.hpp"
@@ -22,7 +23,7 @@ class Monster : public PowerupCapable
     virtual void on_shop_entered() = 0;
 
     // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
-    // if disabled some monster will stop moving (like bats, jiangshi) some wont attack (crabman), shopkeeper can still kick you but won't fire hes weapon
+    // if disabled some monster will stop moving (like bats, jiangshi) some wont attack (crabman), shopkeeper can still kick you but won't fire his weapon
     virtual void attack_logic_related() = 0;
 
     virtual bool update_target(Entity* ent) = 0;
@@ -243,7 +244,7 @@ class Yang : public RoomOwner
 {
   public:
     /// Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
-    std::set<int32_t> turkeys_in_den; // probably a Map, but the second value is just 1 or 0, not really useful
+    custom_set<int32_t> turkeys_in_den;
     uint8_t unknown4;
     uint8_t unknown5;
     /// I'm looking for turkeys, wanna help?
@@ -796,6 +797,10 @@ class Tiamat : public Monster
     float tail_radian; // Counts from 0 to 2*pi, Used to calculate tail angle
     float tail_move_speed;
     float right_arm_angle;
+    /// This is custom variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
+    float attack_x;
+    /// This is custom variable, you need [activate_tiamat_position_hack](#activate_tiamat_position_hack) to use it
+    float attack_y;
 };
 
 class GiantFrog : public Monster
@@ -913,6 +918,7 @@ class Hundun : public Monster
     float applied_ver_velocity;
     int32_t birdhead_entity_uid;
     int32_t snakehead_entity_uid;
+    /// current floor level
     float y_level;
     uint16_t bounce_timer; // functionality depends on state, determines when it can bounce again, also how long velocity is applied for bouncing
     uint8_t fireball_timer;
@@ -920,6 +926,17 @@ class Hundun : public Monster
     bool snakehead_defeated;
     /// 1:  Will move to the left, 2: Birdhead emerged, 3: Snakehead emerged, 4: Top level arena reached, 5: Birdhead shot last - to alternate the heads shooting fireballs
     uint8_t hundun_flags;
+    uint16_t padding;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float y_limit;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float rising_speed_x;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float rising_speed_y;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float bird_head_spawn_y;
+    /// This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
+    float snake_head_spawn_y;
 };
 
 class HundunHead : public Monster

@@ -12,13 +12,17 @@
 #include <utility>     // for min, max, swap, pair
 #include <vector>      // for _Vector_iterator, vector, _Vector_...
 
-#include "color.hpp"              // for Color, Color::a, Color::b, Color::g
-#include "custom_types.hpp"       // for get_custom_types_map
-#include "entity.hpp"             // for Entity, EntityDB, Animation, Rect
-#include "math.hpp"               // for Quad, AABB
-#include "movable.hpp"            // for Movable, Movable::falling_timer
-#include "render_api.hpp"         // for RenderInfo, RenderInfo::flip_horiz...
-#include "script/lua_backend.hpp" // for LuaBackend
+#include "color.hpp"                     // for Color, Color::a, Color::b, Color::g
+#include "containers/game_allocator.hpp" // for game_allocator
+#include "custom_types.hpp"              // for get_custom_types_map
+#include "entities_chars.hpp"            // for Player
+#include "entity.hpp"                    // for Entity, EntityDB, Animation, Rect
+#include "items.hpp"                     // for Inventory
+#include "math.hpp"                      // for Quad, AABB
+#include "movable.hpp"                   // for Movable, Movable::falling_timer
+#include "render_api.hpp"                // for RenderInfo, RenderInfo::flip_horiz...
+#include "script/lua_backend.hpp"        // for LuaBackend
+#include "script/safe_cb.hpp"            // for make_safe_cb
 
 namespace NEntity
 {
@@ -49,6 +53,7 @@ void register_usertypes(sol::state& lua)
     color_type["set_rgba"] = &Color::set_rgba;
     color_type["get_ucolor"] = &Color::get_ucolor;
     color_type["set_ucolor"] = &Color::set_ucolor;
+    color_type["set"] = &Color::set;
 
     /// Used in EntityDB
     lua.new_usertype<Animation>(
@@ -137,8 +142,36 @@ void register_usertypes(sol::state& lua)
         &RenderInfo::flip_horizontal,
         "render_inactive",
         &RenderInfo::render_inactive,
+        "texture_num",
+        sol::readonly(&RenderInfo::texture_num),
         "get_entity",
-        &RenderInfo::get_entity);
+        &RenderInfo::get_entity,
+        "set_normal_map_texture",
+        &RenderInfo::set_normal_map_texture,
+        "get_second_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.second_texture_name || ri.texture_num < 2)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.second_texture_name)) /**/;
+        },
+        "get_third_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.third_texture_name || ri.texture_num < 3)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.third_texture_name)) /**/;
+        },
+        "set_second_texture",
+        &RenderInfo::set_second_texture,
+        "set_third_texture",
+        &RenderInfo::set_third_texture,
+        "set_texture_num",
+        &RenderInfo::set_texture_num);
 
     auto get_overlay = [&lua](Entity& entity)
     {
@@ -178,6 +211,13 @@ void register_usertypes(sol::state& lua)
         static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
         static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
         static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
+
+    auto kill_recursive = sol::overload(
+        static_cast<void (Entity::*)(bool, Entity*)>(&Entity::kill_recursive),
+        static_cast<void (Entity::*)(bool, Entity*, std::optional<uint32_t>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::kill_recursive));
+    auto destroy_recursive = sol::overload(
+        static_cast<void (Entity::*)()>(&Entity::destroy_recursive),
+        static_cast<void (Entity::*)(std::optional<uint32_t>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::destroy_recursive));
 
     auto entity_type = lua.new_usertype<Entity>("Entity");
     entity_type["type"] = &Entity::type;
@@ -243,6 +283,8 @@ void register_usertypes(sol::state& lua)
     entity_type["get_items"] = &Entity::get_items;
     entity_type["is_in_liquid"] = &Entity::is_in_liquid;
     entity_type["is_cursed"] = &Entity::is_cursed;
+    entity_type["kill_recursive"] = kill_recursive;
+    entity_type["destroy_recursive"] = destroy_recursive;
     /* Entity
     // user_data
     // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.
@@ -255,7 +297,9 @@ void register_usertypes(sol::state& lua)
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
-
+    auto add_money = sol::overload(
+        static_cast<void (Movable::*)(int32_t)>(&Movable::add_money_broken),
+        static_cast<void (Movable::*)(int32_t, uint32_t)>(&Movable::collect_treasure));
     auto movable_type = lua.new_usertype<Movable>("Movable", sol::base_classes, sol::bases<Entity>());
     movable_type["move"] = &Movable::move;
     movable_type["movex"] = &Movable::movex;
@@ -304,7 +348,9 @@ void register_usertypes(sol::state& lua)
     movable_type["pick_up"] = &Movable::pick_up;
     movable_type["can_jump"] = &Movable::can_jump;
     movable_type["standing_on"] = &Movable::standing_on;
-    movable_type["add_money"] = &Movable::add_money;
+    /// NoDoc
+    movable_type["add_money"] = add_money;
+    movable_type["collect_treasure"] = &Movable::collect_treasure;
     movable_type["is_on_fire"] = &Movable::is_on_fire;
     movable_type["damage"] = damage;
     movable_type["get_all_behaviors"] = &Movable::get_all_behaviors;
@@ -313,6 +359,15 @@ void register_usertypes(sol::state& lua)
     movable_type["set_gravity"] = &Movable::set_gravity;
     movable_type["reset_gravity"] = &Movable::reset_gravity;
     movable_type["set_position"] = &Movable::set_position;
+    movable_type["process_input"] = &Movable::process_input;
+    movable_type["cutscene"] = sol::readonly(&Movable::cutscene_behavior);
+    movable_type["clear_cutscene"] = [](Movable& movable)
+    {
+        delete movable.cutscene_behavior;
+        movable.cutscene_behavior = nullptr;
+    };
+
+    lua.new_usertype<CutsceneBehavior>("CutsceneBehavior", sol::no_constructor);
 
     lua["Entity"]["as_entity"] = &Entity::as<Entity>;
     lua["Entity"]["as_movable"] = &Entity::as<Movable>;
@@ -327,10 +382,21 @@ void register_usertypes(sol::state& lua)
         auto name = item.name.substr(9, item.name.size());
         lua["ENT_TYPE"][name] = item.id;
     }
-    for (auto elm : get_custom_types_map())
+    for (auto& elm : get_custom_types_vector())
     {
-        lua["ENT_TYPE"][elm.second] = elm.first;
+        lua["ENT_TYPE"][elm.second] = (uint32_t)elm.first;
     }
+
+    lua.create_named_table("RECURSIVE_MODE", "EXCLUSIVE", RECURSIVE_MODE::EXCLUSIVE, "INCLUSIVE", RECURSIVE_MODE::INCLUSIVE, "NONE", RECURSIVE_MODE::NONE);
+    /* RECURSIVE_MODE
+    // EXCLUSIVE
+    // In this mode the provided ENT_TYPE and MASK will not be affected nor will entities attached to them
+    // INCLUSIVE
+    // In this mode the provided ENT_TYPE and MASK will be the only affected entities, anything outside of the specified mask or type will not be touched including entities attached to them
+    // For this mode you have to specify at least one mask or ENT_TYPE, otherwise nothing will be affected
+    // NONE
+    // Ignores provided ENT_TYPE and MASK and affects all the entities
+    */
 
     lua.create_named_table("REPEAT_TYPE", "NO_REPEAT", REPEAT_TYPE::NoRepeat, "LINEAR", REPEAT_TYPE::Linear, "BACK_AND_FORTH", REPEAT_TYPE::BackAndForth);
     lua.create_named_table("SHAPE", "RECTANGLE", SHAPE::RECTANGLE, "CIRCLE", SHAPE::CIRCLE);

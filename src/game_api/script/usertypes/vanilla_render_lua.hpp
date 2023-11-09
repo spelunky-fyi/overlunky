@@ -14,6 +14,7 @@ class state;
 } // namespace sol
 
 struct TextRenderingInfo;
+struct TextureRenderingInfo;
 
 using VANILLA_TEXT_ALIGNMENT = uint32_t;
 using VANILLA_FONT_STYLE = uint32_t;
@@ -35,9 +36,9 @@ class VanillaRenderContext
     void draw_text(const TextRenderingInfo* tri, Color color);
 
     /// Measure the provided text using the built-in renderer
-    /// If you can, consider creating your own TextureRenderingInfo instead
+    /// If you can, consider creating your own TextRenderingInfo instead
     /// You can then use `:text_size()` and `draw_text` with that one object
-    /// `draw_text_size` works by creating new TextureRenderingInfo just to call `:text_size()`, which is not very optimal
+    /// `draw_text_size` works by creating new TextRenderingInfo just to call `:text_size()`, which is not very optimal
     std::pair<float, float> draw_text_size(const std::string& text, float scale_x, float scale_y, uint32_t fontstyle);
 
     /// Set the prefered way of drawing corners for the non filled shapes
@@ -62,6 +63,10 @@ class VanillaRenderContext
     /// Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer. `source` - the coordinates in the texture, `dest` - the coordinates on the screen
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     void draw_screen_texture(TEXTURE texture_id, const Quad& source, const Quad& dest, Color color);
+
+    /// Draw a texture in screen coordinates using TextureRenderingInfo
+    /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    void draw_screen_texture(TEXTURE texture_id, TextureRenderingInfo tri, Color color);
 
     /// Draws a line on screen using the built-in renderer from point `A` to point `B`.
     /// Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events

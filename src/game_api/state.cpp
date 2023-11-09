@@ -9,10 +9,14 @@
 #include <string>      // for allocator, operator""sv, operator""s
 #include <type_traits> // for move
 
+#include "bucket.hpp"                            // for Bucket
+#include "containers/custom_allocator.hpp"       //
 #include "entities_chars.hpp"                    // for Player
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
 #include "entity_hooks_info.hpp"                 // for Player
+#include "game_api.hpp"                          //
 #include "game_manager.hpp"                      // for get_game_manager, GameManager, SaveR...
+#include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
 #include "level_api.hpp"                         // for LevelGenSystem, LevelGenSystem::(ano...
 #include "logger.h"                              // for DEBUG
@@ -25,12 +29,15 @@
 #include "script/lua_vm.hpp"                     // for get_lua_vm
 #include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
 #include "search.hpp"                            // for get_address
+#include "sound_manager.hpp"                     //
 #include "spawn_api.hpp"                         // for init_spawn_hooks
 #include "steam_api.hpp"                         // for init_achievement_hooks
 #include "strings.hpp"                           // for strings_init
 #include "thread_utils.hpp"                      // for OnHeapPointer
 #include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
 #include "vtable_hook.hpp"                       // for hook_vtable
+
+static int64_t global_frame_count{0};
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -56,7 +63,11 @@ void fix_liquid_out_of_bounds()
         {
             for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
             {
-                if ((it.physics_engine->entity_coordinates + i)->second < 0.1) // 0.1 just to be safe
+                auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
+                if (liquid_coordinates->second < 0                      // y < 0
+                    || liquid_coordinates->first < 0                    // x < 0
+                    || liquid_coordinates->first > g_level_max_x        // x > g_level_max_x
+                    || liquid_coordinates->second > g_level_max_y + 16) // y > g_level_max_y
                 {
                     if (!*(it.physics_engine->unknown61 + i)) // just some bs
                         continue;
@@ -273,6 +284,7 @@ State& State::get()
         }
         auto addr_location = get_address("state_location");
         STATE = State{addr_location};
+        get_is_init() = true;
 
         if (get_do_hooks())
         {
@@ -284,9 +296,25 @@ State& State::get()
             hook_godmode_functions();
             strings_init();
             init_state_update_hook();
-        }
+            init_process_input_hook();
 
-        get_is_init() = true;
+            auto bucket = Bucket::get();
+            if (!bucket->patches_applied)
+            {
+                DEBUG("Applying patches");
+                patch_tiamat_kill_crash();
+                patch_orbs_limit();
+                patch_olmec_kill_crash();
+                patch_liquid_OOB();
+                patch_ushabti_error();
+                patch_entering_closed_door_crash();
+                bucket->patches_applied = true;
+            }
+            else
+            {
+                DEBUG("Not applying patches, someone has already done it");
+            }
+        }
     }
     return STATE;
 }
@@ -308,6 +336,12 @@ StateMemory* State::ptr_local() const
     return p.decode_local();
 }
 
+float get_zoom_level()
+{
+    auto game_api = GameAPI::get();
+    return game_api->get_current_zoom();
+}
+
 std::pair<float, float> State::click_position(float x, float y)
 {
     float cz = get_zoom_level();
@@ -324,40 +358,6 @@ std::pair<float, float> State::screen_position(float x, float y)
     float rx = (x - cx) / cz / ZF;
     float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
-}
-
-size_t State::get_zoom_level_address()
-{
-    static const size_t obj1 = get_address("zoom_level");
-    static const size_t zoom_level_offset = get_address("zoom_level_offset");
-    size_t obj2 = memory_read<uint64_t>(obj1);
-    if (obj2 == 0)
-    {
-        return 0;
-    }
-
-    size_t obj3 = memory_read<uint64_t>(obj2 + 0x10);
-    if (obj3 == 0)
-    {
-        return 0;
-    }
-    return obj3 + zoom_level_offset;
-}
-
-float State::get_zoom_level()
-{
-    static size_t offset = 0;
-    if (offset == 0)
-    {
-        auto addr = get_zoom_level_address();
-        if (addr == 0)
-        {
-            return 13.5;
-        }
-        offset = addr - 4;
-    }
-    auto state = State::get().ptr();
-    return memory_read<float>(offset) + get_layer_zoom_offset(state->camera_layer);
 }
 
 void State::zoom(float level)
@@ -396,25 +396,27 @@ void State::zoom(float level)
         }
     }
 
-    const auto level_str = to_le_bytes(level);
-
     static const auto zoom_level = get_address("default_zoom_level");
     static const auto zoom_shop = get_address("default_zoom_level_shop");
     static const auto zoom_camp = get_address("default_zoom_level_camp");
     static const auto zoom_telescope = get_address("default_zoom_level_telescope");
 
     // overwrite the defaults
-    write_mem_prot(zoom_level, level_str, true);
-    write_mem_prot(zoom_shop, level_str, true);
-    write_mem_prot(zoom_camp, level_str, true);
-    write_mem_prot(zoom_telescope, level_str, true);
+    write_mem_recoverable<float>("zoom", zoom_level, level, true);
+    write_mem_recoverable<float>("zoom", zoom_shop, level, true);
+    write_mem_recoverable<float>("zoom", zoom_camp, level, true);
+    write_mem_recoverable<float>("zoom", zoom_telescope, level, true);
 
     // overwrite the current value
-    auto zla = get_zoom_level_address();
-    if (zla != 0)
-    {
-        write_mem_prot(zla, level_str, true);
-    }
+    auto game_api = GameAPI::get();
+    game_api->set_zoom(std::nullopt, level);
+}
+
+void State::zoom_reset()
+{
+    recover_mem("zoom");
+    auto game_api = GameAPI::get();
+    game_api->set_zoom(std::nullopt, 13.5f);
 }
 
 void StateMemory::force_current_theme(uint32_t t)
@@ -452,10 +454,16 @@ std::pair<float, float> State::get_camera_position()
 
 void State::set_camera_position(float cx, float cy)
 {
+    static const auto addr = (float*)get_address("camera_position");
     auto camera = ptr()->camera;
-    camera->focused_entity_uid = -1;
     camera->focus_x = cx;
     camera->focus_y = cy;
+    camera->adjusted_focus_x = cx;
+    camera->adjusted_focus_y = cy;
+    camera->calculated_focus_x = cx;
+    camera->calculated_focus_y = cy;
+    *addr = cx;
+    *(addr + 1) = cy;
 }
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
@@ -623,6 +631,10 @@ uint32_t State::get_frame_count() const
 {
     return memory_read<uint32_t>((size_t)ptr() - 0xd0);
 }
+int64_t get_global_frame_count()
+{
+    return global_frame_count;
+};
 
 std::vector<int64_t> State::read_prng() const
 {
@@ -638,6 +650,15 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
+    auto state = State::get();
+    if (s == state.ptr_main())
+    {
+        if (global_frame_count < state.get_frame_count())
+            global_frame_count = state.get_frame_count_main();
+        else
+            global_frame_count++;
+    }
+
     if (!pre_state_update())
     {
         g_state_update_trampoline(s);
@@ -656,6 +677,31 @@ void init_state_update_hook()
     if (error != NO_ERROR)
     {
         DEBUG("Failed hooking state_refresh stuff: {}\n", error);
+    }
+}
+
+using OnProcessInput = void(void*);
+OnProcessInput* g_process_input_trampoline{nullptr};
+void ProcessInput(void* s)
+{
+    if (!pre_process_input())
+    {
+        g_process_input_trampoline(s);
+    }
+    post_process_input();
+}
+
+void init_process_input_hook()
+{
+    g_process_input_trampoline = (OnProcessInput*)get_address("process_input");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach((void**)&g_process_input_trampoline, &ProcessInput);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking process_input stuff: {}\n", error);
     }
 }
 
@@ -700,8 +746,254 @@ uint8_t enum_to_layer(const LAYER layer)
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
-            return player->layer;
+            return player->layer > 1 ? 0 : player->layer;
         }
     }
     return 0;
+}
+
+Logic* LogicList::start_logic(LOGIC idx)
+{
+    if ((uint32_t)idx > 27 || logic_indexed[(uint32_t)idx] != nullptr)
+        return nullptr;
+
+    int size = 0;
+    VTABLE_OFFSET offset = VTABLE_OFFSET::NONE;
+    switch (idx)
+    {
+    case LOGIC::GHOST:
+    {
+        offset = VTABLE_OFFSET::LOGIC_GHOST_TRIGGER;
+        size = sizeof(Logic);
+        break;
+    }
+    case LOGIC::TUN_AGGRO:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TUN_AGGRO;
+        size = sizeof(Logic);
+        break;
+    }
+    case LOGIC::DUAT_BOSSES:
+    {
+        offset = VTABLE_OFFSET::LOGIC_DUAT_BOSSES_TRIGGER;
+        size = sizeof(Logic);
+        break;
+    }
+    case LOGIC::DISCOVERY_INFO:
+    {
+        offset = VTABLE_OFFSET::LOGIC_DISCOVERY_INFO;
+        size = sizeof(Logic);
+        break;
+    }
+    case LOGIC::BLACK_MARKET:
+    {
+        offset = VTABLE_OFFSET::LOGIC_BLACK_MARKET;
+        size = sizeof(Logic);
+        break;
+    }
+    case LOGIC::JELLYFISH:
+    {
+        offset = VTABLE_OFFSET::LOGIC_COSMIC_OCEAN;
+        size = sizeof(Logic);
+        break;
+    }
+    case LOGIC::ARENA_3:
+    {
+        offset = VTABLE_OFFSET::LOGIC_ARENA_3;
+        size = sizeof(Logic);
+        break;
+    }
+    case LOGIC::SPEEDRUN:
+    {
+        offset = VTABLE_OFFSET::LOGIC_BASECAMP_SPEEDRUN;
+        size = sizeof(LogicBasecampSpeedrun);
+        break;
+    }
+    case LOGIC::GHOST_TOAST:
+    {
+        offset = VTABLE_OFFSET::LOGIC_GHOST_TOAST_TRIGGER;
+        size = sizeof(LogicGhostToast);
+        break;
+    }
+    case LOGIC::WATER_BUBBLES:
+    {
+        offset = VTABLE_OFFSET::LOGIC_WATER_RELATED;
+        size = sizeof(LogicUnderwaterBubbles);
+        break;
+    }
+    case LOGIC::APEP:
+    {
+        offset = VTABLE_OFFSET::LOGIC_APEP_TRIGGER;
+        size = sizeof(LogicApepTrigger);
+        break;
+    }
+    case LOGIC::COG_SACRIFICE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_CITY_OF_GOLD_ANKH_SACRIFICE;
+        size = sizeof(LogicCOGAnkhSacrifice);
+        break;
+    }
+    case LOGIC::BUBBLER:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TIAMAT;
+        size = sizeof(LogicTiamatBubbles);
+        break;
+    }
+    case LOGIC::ARENA_1:
+    {
+        offset = VTABLE_OFFSET::LOGIC_ARENA_1;
+        size = sizeof(LogicArena1);
+        break;
+    }
+    case LOGIC::ARENA_ALIEN_BLAST:
+    {
+        offset = VTABLE_OFFSET::LOGIC_ARENA_ALIEN_BLAST;
+        size = sizeof(LogicArenaAlienBlast);
+        break;
+    }
+    case LOGIC::ARENA_LOOSE_BOMBS:
+    {
+        offset = VTABLE_OFFSET::LOGIC_ARENA_LOOSE_BOMBS;
+        size = sizeof(LogicArenaLooseBombs);
+        break;
+    }
+    case LOGIC::TUTORIAL:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TUTORIAL;
+        size = sizeof(LogicTutorial);
+        break;
+    }
+    case LOGIC::OUROBOROS:
+    {
+        offset = VTABLE_OFFSET::LOGIC_OUROBOROS;
+        size = sizeof(LogicOuroboros);
+        break;
+    }
+    case LOGIC::PLEASURE_PALACE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TUSK_PLEASURE_PALACE;
+        size = sizeof(LogicTuskPleasurePalace);
+        break;
+    }
+    case LOGIC::MAGMAMAN_SPAWN:
+    {
+        offset = VTABLE_OFFSET::LOGIC_VOLCANA_RELATED;
+        size = sizeof(LogicMagmamanSpawn);
+        break;
+    }
+    case LOGIC::PRE_CHALLENGE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TUN_PRE_CHALLENGE;
+        size = sizeof(LogicTunPreChallenge);
+        break;
+    }
+    case LOGIC::MOON_CHALLENGE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TUN_MOON_CHALLENGE;
+        size = sizeof(LogicMoonChallenge);
+        break;
+    }
+    case LOGIC::SUN_CHALLENGE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TUN_SUN_CHALLENGE;
+        size = sizeof(LogicSunChallenge);
+        break;
+    }
+    case LOGIC::TIAMAT_CUTSCENE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TIAMAT_CUTSCENE;
+        size = sizeof(LogicTiamatCutscene);
+        break;
+    }
+    case LOGIC::DICESHOP:
+    {
+        offset = VTABLE_OFFSET::LOGIC_DICESHOP;
+        size = sizeof(LogicDiceShop);
+        break;
+    }
+    case LOGIC::OLMEC_CUTSCENE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_OLMEC_CUTSCENE;
+        size = sizeof(LogicOlmecCutscene);
+        break;
+    }
+    case LOGIC::STAR_CHALLENGE:
+    {
+        offset = VTABLE_OFFSET::LOGIC_TUN_STAR_CHALLENGE;
+        size = sizeof(LogicStarChallenge);
+        break;
+    }
+    case LOGIC::ARENA_2:
+        // offset = VTABLE_OFFSET::LOGIC_ARENA_2;
+        // size = ?;
+    default:
+        return nullptr;
+    }
+    static auto first_table_entry = get_address("virtual_functions_table");
+
+    auto addr = (size_t*)custom_malloc(size);
+    std::memset(addr, 0, size); // just in case
+
+    *addr = first_table_entry + (size_t)offset * 8; // set up vtable
+    Logic* new_logic = (Logic*)addr;
+    new_logic->logic_index = idx;
+
+    // set up logic that is not possible to initialize thru the API
+    if (idx == LOGIC::WATER_BUBBLES)
+    {
+        auto proper_type = (LogicUnderwaterBubbles*)new_logic;
+        proper_type->unknown1 = 1.0f;
+        proper_type->unknown2 = 1000;
+        proper_type->unknown3 = true;
+    }
+    else if (idx == LOGIC::OUROBOROS)
+    {
+        auto proper_type = (LogicOuroboros*)new_logic;
+        proper_type->sound = construct_soundmeta(0x51, false);
+        // proper_type->sound->start(); // it needs something more
+        // game stores the pointer in a special temp memory or something
+    }
+    else if (idx == LOGIC::PLEASURE_PALACE)
+    {
+        auto proper_type = (LogicTuskPleasurePalace*)new_logic;
+        proper_type->unknown4 = 1552; // magic?
+    }
+
+    logic_indexed[(uint32_t)idx] = new_logic;
+    return new_logic;
+}
+
+void LogicList::stop_logic(LOGIC idx)
+{
+    if ((uint32_t)idx > 27 || logic_indexed[(uint32_t)idx] == nullptr)
+        return;
+
+    delete logic_indexed[(uint32_t)idx];
+    logic_indexed[(uint32_t)idx] = nullptr;
+}
+
+void LogicList::stop_logic(Logic* log)
+{
+    if (log == nullptr)
+        return;
+
+    auto idx = log->logic_index;
+    delete log;
+    logic_indexed[(uint32_t)idx] = nullptr;
+}
+
+void LogicMagmamanSpawn::add_spawn(uint32_t x, uint32_t y)
+{
+    magmaman_positions.emplace_back(x, y);
+}
+
+void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
+{
+    for (auto it = magmaman_positions.begin(); it < magmaman_positions.end(); ++it)
+    {
+        if (it->x == x && it->y == y)
+        {
+            magmaman_positions.erase(it);
+        }
+    }
 }

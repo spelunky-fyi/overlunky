@@ -1,5 +1,6 @@
-from bdb import Breakpoint
+#from bdb import Breakpoint
 import re
+#from generate_util import print_console
 
 import generate_util as gu
 import parse_source as ps
@@ -14,16 +15,16 @@ replace_table = {
     "int32_t": "integer",
     "int64_t": "integer",
     "size_t": "integer",
+    "in_port_t": "integer",
     "ImU32": "integer",
     "vector": "Array",
     "array": "Array",
     "unordered_map": "table",
-    "game_table": "table",
     ", identity_hasher<>": "",
-    "const char*": "string",
+    "char*": "string",
     "wstring": "string",
     "u16string": "string",
-    "char16_t": "string",
+    "char16_t*": "string",
     "string_view": "string",
     "pair": "tuple",
     "std::": "",
@@ -32,15 +33,19 @@ replace_table = {
     "void": "",
     "constexpr": "",
     "...va:": "...ent_type:",
-    "// Access via": "ImGuiIO",
     "set<": "Array<",
     "span<": "Array<",
-    "&": "",
+
+    "game_table": "table",
+    "custom_table": "table",
+    "game_Array": "Array",
+    "custom_Array": "Array",
+
     "const ": "",
-    "ShopType": "SHOP_TYPE",
     "EmittedParticlesInfo": "Array<Particle>",
     "object": "any",
     "ImVec2": "Vec2",
+    "BucketItem": "any",
 }
 
 reFloat = re.compile(r"\bfloat\b")
@@ -88,9 +93,9 @@ ps.configure_parse(replace_all, "emmy_lua.pickle")
 ps.run_parse()
 
 
-reGetParam = re.compile(r"(?!const)(\b[^ ]+) *([^,]+),?")
+reGetParam = re.compile(r"(\b[^ ]+) *([^,]+),?") # this pattern have some issues
 reRemoveDefault = re.compile(r" = .*")
-reHandleConst = re.compile(r"const (\w+) (\w+)")
+reHandleConst = re.compile(r"(\w+) (\w+)")
 
 
 def get_emmylua_signature(cb_signature):
@@ -127,7 +132,7 @@ def cpp_params_to_emmy_lua(params_text, cb_signatures=None):
 
 
 def cpp_params_to_emmy_lua_fun(params_text):
-    params = replace_all(params_text).strip().split(",")
+    params = replace_all(params_text).split(",")
     params = [
         ": ".join([part.strip() for part in param.rsplit(" ", 1)[::-1]])
         for param in params
@@ -173,8 +178,6 @@ def print_af(lf, af):
     ret = replace_all(af["return"]) or "nil"
     name = lf["name"]
     typed_params, params = cpp_params_to_emmy_lua(af["param"])
-    typed_params.strip()
-    typed_params = replace_all(typed_params)
     print_comment(lf if lf["comment"] else af)
     print_func(name, params, ret, typed_params)
 
@@ -183,7 +186,9 @@ def main():
     gu.setup_stdout("game_data/spel2.lua")
 
     print(
-        """---@diagnostic disable: unused-function,lowercase-global,missing-return,duplicate-doc-alias,duplicate-set-field
+        """---@meta
+---@diagnostic disable: duplicate-doc-alias
+
 ---@class Meta
 ---@field name string
 ---@field version string
@@ -236,13 +241,12 @@ function F(f_string) end
             typed_params = ""
             params = ""
             if m:
-                ret = replace_all(m.group(2)).strip() or "nil"
+                ret = m.group(2) or "nil"
             if m or m2:
                 params = (m or m2).group(1)
                 typed_params, params = cpp_params_to_emmy_lua(
                     params, lf["cb_signature"] if "cb_signature" in lf else ""
                 )
-                typed_params = replace_all(typed_params).strip()
             name = lf["name"]
             print_comment(lf)
             print_func(name, params, ret, typed_params)
@@ -376,8 +380,6 @@ function F(f_string) end
             if "comment" in func and func["comment"] and "NoDoc" in func["comment"][0]:
                 continue
             typed_params, params = cpp_params_to_emmy_lua(func["params"])
-            typed_params.strip()
-            typed_params = replace_all(typed_params)
 
             new_name = f"{name}:{func['name']}"
 
@@ -393,8 +395,6 @@ function F(f_string) end
             if "comment" in ctor and ctor["comment"] and "NoDoc" in ctor["comment"][0]:
                 continue
             typed_params, params = cpp_params_to_emmy_lua(ctor["signature"])
-            typed_params.strip()
-            typed_params = replace_all(typed_params)
 
             new_name = f"{name}:new"
 
