@@ -50,6 +50,7 @@
 #include "screen.hpp"
 #include "script.hpp"
 #include "settings_api.hpp"
+#include "socket.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
 #include "steam_api.hpp"
@@ -298,6 +299,7 @@ std::string g_change_key = "";
 const char* inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
+const std::string version_check_url = "https://api.github.com/repos/spelunky-fyi/overlunky/git/ref/tags/whip";
 
 std::string fontfile = "";
 std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
@@ -365,12 +367,145 @@ std::map<std::string, bool> options = {
     {"vsync", true},
     {"uncap_unfocused_fps", true},
     {"pause_loading", false},
-    {"pause_update_camera", false}};
+    {"pause_update_camera", false},
+    {"update_check", true},
+};
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
 double fps_min = 0, fps_max = 600.0;
 float g_speedhack_ui_multiplier = 1.0;
 float g_speedhack_old_multiplier = 1.0;
+
+enum class VERSION_CHECK
+{
+    HIDDEN,
+    DISABLED,
+    CHECKING,
+    FAILED,
+    OLD,
+    LATEST,
+    STABLE,
+};
+struct VersionCheck
+{
+    std::string message;
+    float color[4];
+    float fade;
+};
+struct VersionCheckStatus
+{
+    VERSION_CHECK state;
+    float opacity;
+    int64_t start;
+    float color[4];
+};
+VersionCheckStatus version_check_status{VERSION_CHECK::HIDDEN, 1.0f, 0};
+std::array<VersionCheck, 7> version_check_messages{
+    VersionCheck{"", {0.0f, 0.0f, 0.0f, 0.0f}, 0},
+    VersionCheck{"Automatic update check is disabled...", {0.5f, 0.5f, 0.5f, 0.8f}, 600.0f},
+    VersionCheck{"Checking for updates on GitHub...", {0.3f, 0.6f, 1.0f, 0.9f}, 0},
+    VersionCheck{"Automatic update check failed. Please retry, check GitHub or use Modlunky to update!", {0.8f, 0.0f, 0.0f, 1.0f}, 900.0f},
+    VersionCheck{"This is not the latest build of Overlunky WHIP! Please run the Overlunky launcher or use Modlunky to get the latest build!", {0.8f, 0.0f, 0.0f, 1.0f}, 3600.0f},
+    VersionCheck{"This is the latest build of Overlunky WHIP! Yippee!", {0.0f, 0.8f, 0.2f, 0.8f}, 900.0f},
+    VersionCheck{"This is a stable build of Overlunky. Get the WHIP build for automatic updates!", {0.9f, 0.6f, 0.0f, 0.8f}, 600.0f},
+};
+void render_version_warning()
+{
+    if (version_check_status.state == VERSION_CHECK::HIDDEN)
+        return;
+
+    version_check_status.color[0] = version_check_messages[(int)version_check_status.state].color[0];
+    version_check_status.color[1] = version_check_messages[(int)version_check_status.state].color[1];
+    version_check_status.color[2] = version_check_messages[(int)version_check_status.state].color[2];
+    version_check_status.color[3] = version_check_messages[(int)version_check_status.state].color[3];
+
+    if (version_check_messages[(int)version_check_status.state].fade > 0)
+    {
+        if (version_check_status.start == 0)
+            version_check_status.start = get_global_frame_count();
+
+        auto duration = get_global_frame_count() - version_check_status.start;
+        version_check_status.opacity = 1.0f - duration / version_check_messages[(int)version_check_status.state].fade;
+        if (version_check_status.opacity <= 0.0f)
+        {
+            version_check_status.state = VERSION_CHECK::HIDDEN;
+            return;
+        }
+        version_check_status.color[3] = version_check_status.opacity;
+    }
+
+    auto& render_api = RenderAPI::get();
+    const float scale{0.0004f};
+    static TextRenderingInfo tri{};
+    tri.set_text(version_check_messages[(int)version_check_status.state].message, 0, 0, scale, scale, 1, 0);
+    const auto [w, h] = tri.text_size();
+    tri.y = -1.0f + std::abs(h) / 2.0f + std::abs(h) + 0.005f;
+    render_api.draw_text(&tri, version_check_status.color);
+}
+
+void get_version_info(std::optional<std::string> res, std::optional<std::string> err)
+{
+    // http error
+    if (!res.has_value())
+    {
+        version_check_status.state = VERSION_CHECK::FAILED;
+        if (err.has_value())
+            DEBUG("UpdateCheck: Error: {}", err.value());
+        return;
+    }
+    std::string data = res.value();
+
+    // some github error
+    if (data.find("overlunky") == std::string::npos)
+    {
+        version_check_status.state = VERSION_CHECK::FAILED;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+
+    std::string version = fmt::format("\"sha\": \"{}", get_version());
+
+    // old version
+    if (data.find(version) == std::string::npos)
+    {
+        version_check_status.state = VERSION_CHECK::OLD;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+    // latest version
+    else
+    {
+        version_check_status.state = VERSION_CHECK::LATEST;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+}
+
+void version_check(bool force = false)
+{
+    version_check_status = VersionCheckStatus{VERSION_CHECK::HIDDEN, 1.0f, 0};
+
+    if (!options["update_check"] && !force)
+    {
+        version_check_status.state = VERSION_CHECK::DISABLED;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+
+    auto version = std::string(get_version());
+
+    // not a whip build
+    if (version.find(".") != std::string::npos)
+    {
+        version_check_status.state = VERSION_CHECK::STABLE;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+
+    version_check_status.state = VERSION_CHECK::CHECKING;
+    DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+    new HttpRequest(std::move(version_check_url), get_version_info);
+}
 
 void hook_savegame()
 {
@@ -5831,6 +5966,12 @@ void render_options()
 
         ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
         tooltip("Am I annoying you already :(");
+        if (ImGui::Checkbox("Automatically check for updates", &options["update_check"]))
+        {
+            if (options["update_check"])
+                version_check(true);
+        }
+        tooltip("Check if you're running the latest build of Overlunky WHIP on start.");
         endmenu();
     }
 
@@ -5906,6 +6047,10 @@ void render_options()
     {
         if (ImGui::BeginMenu("Help"))
         {
+            if (ImGui::MenuItem("Check for updates"))
+                version_check(true);
+            if (ImGui::MenuItem("Get latest version here"))
+                ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky/releases/tag/whip", NULL, NULL, SW_SHOWNORMAL);
             if (ImGui::MenuItem("README"))
                 ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
             if (ImGui::MenuItem("API Documentation"))
@@ -8995,6 +9140,7 @@ void imgui_init(ImGuiContext*)
     refresh_script_files();
     autorun_scripts();
     set_colors();
+    version_check();
     windows["tool_entity"] = new Window({"Spawner", is_tab_detached("tool_entity"), is_tab_open("tool_entity")});
     windows["tool_door"] = new Window({"Warp", is_tab_detached("tool_door"), is_tab_open("tool_door")});
     windows["tool_camera"] = new Window({"Camera", is_tab_detached("tool_camera"), is_tab_open("tool_camera")});
@@ -9325,6 +9471,10 @@ void imgui_draw()
                 }
                 if (ImGui::BeginMenu("Help"))
                 {
+                    if (ImGui::MenuItem("Check for updates"))
+                        version_check(true);
+                    if (ImGui::MenuItem("Get latest version here"))
+                        ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky/releases/tag/whip", NULL, NULL, SW_SHOWNORMAL);
                     if (ImGui::MenuItem("README"))
                         ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
                     if (ImGui::MenuItem("API Documentation"))
@@ -9604,7 +9754,7 @@ void init_ui()
     render_api.set_advanced_hud();
 
     const std::string version_string = fmt::format("Overlunky {}", get_version());
-    const float scale{0.00035f};
+    const float scale{0.0004f};
 
     static TextRenderingInfo tri{};
     tri.set_text(version_string, 0, 0, scale, scale, 1, 0);
@@ -9618,6 +9768,7 @@ void init_ui()
             auto& render_api_l = RenderAPI::get();
             static const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
             render_vanilla_stuff();
+            render_version_warning();
             render_api_l.draw_text(&tri, color);
         });
 }
