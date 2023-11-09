@@ -1283,6 +1283,8 @@ end
     };
     /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
     lua["set_camera_position"] = set_camera_position;
+    /// Updates the camera focus according to the params set in Camera, i.e. to apply normal camera movement when paused etc.
+    lua["update_camera_position"] = update_camera_position;
 
     /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags

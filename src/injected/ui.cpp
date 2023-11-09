@@ -364,7 +364,8 @@ std::map<std::string, bool> options = {
     {"console_alt_keys", false},
     {"vsync", true},
     {"uncap_unfocused_fps", true},
-    {"pause_loading", false}};
+    {"pause_loading", false},
+    {"pause_update_camera", false}};
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
 double fps_min = 0, fps_max = 600.0;
@@ -2065,6 +2066,7 @@ void frame_advance()
     {
         paused = g_ui_scripts["pause"]->execute("return exports.paused") == "true";
     }
+    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {} exports.camera = {}", options["pause_loading"], options["pause_update_camera"]));
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -4025,20 +4027,23 @@ void render_camera()
         enable_camp_camera = !options["camera_hack"];
         UI::set_camp_camera_bounds_enabled(enable_camp_camera);
     }
-    tooltip("Enable to remove camera bounds and always center\nthe entity instantly in 0 frames without rubberbanding.");
+    tooltip("Enable to always center the followed entity instantly\nwithout respecting level borders.");
+    if (ImGui::Checkbox("Update camera position during pause##CameraPaused", &options["pause_update_camera"]))
+        g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+    tooltip("Enable to follow the entity smoothly when paused\nor combine with high inertia for instant camera that does respect level borders.");
     static bool lock_inertia{false};
-    if (ImGui::Checkbox("Lock current camera inertia##LockInertia", &lock_inertia))
+    if (ImGui::Checkbox("Lock current camera speed multiplier##LockInertia", &lock_inertia))
     {
         if (lock_inertia)
             g_camera_inertia = g_state->camera->inertia;
         else
             g_camera_inertia = -FLT_MAX;
     }
-    tooltip("Force currently selected inertia on the next level too.");
+    tooltip("Force selected speed multiplier on the next level too.");
     ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
-    if (ImGui::DragFloat("Inertia##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f) && lock_inertia)
+    if (ImGui::DragFloat("Speed multiplier##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f) && lock_inertia)
         g_camera_inertia = g_state->camera->inertia;
-    tooltip("Lower values moves slower and smoother,\nhigher values reduce camera lagging behind.\n5 = basically 1-frame delay");
+    tooltip("Lower values moves slower and smoother,\nhigher values reduce lagging behind.\n5 = instantly move any distance");
     ImGui::PopItemWidth();
 }
 
@@ -5865,7 +5870,7 @@ void render_options()
         endmenu();
     }
 
-    if (submenu("Frame advance / Engine pause type"))
+    if (submenu("Frame advance / Pause options"))
     {
         ImGui::PushID("PauseType");
         render_flags(pause_types, &g_pause_type, false);
@@ -5876,10 +5881,13 @@ void render_options()
         bool pause_level = UI::get_start_level_paused();
         if (ImGui::Checkbox("Auto (fade) pause on level start", &pause_level))
             UI::set_start_level_paused(pause_level);
+        if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &options["pause_update_camera"]))
+            g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+        tooltip("Calls the vanilla camera update when it\nwould be skipped by blocking the state update.");
         ImGui::Separator();
         ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let you unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
-        ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce the selected normal pause flags");
-        ImGui::TextWrapped("- Using only the freeze options will induce weird camera flickering and you're adviced to use them along with a normal (fade) pause type");
+        ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce any selected normal pause flags");
+        ImGui::TextWrapped("- Using the freeze options without a) a camera hack or b) a normal pause flag (use fade) will induce weird camera flickering");
         endmenu();
     }
 
@@ -9013,6 +9021,7 @@ exports = {
     paused = false,
     skip = false,
     loading = true,
+    camera = false,
 }
 
 kb = get_raw_input().keyboard
@@ -9046,7 +9055,11 @@ function block_update(pause_type)
         elseif exports.paused and apply_pause() then
             state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
         end
-        return exports.paused and (exports.loading or not_loading())
+        local block = exports.paused and (exports.loading or not_loading())
+        if block and exports.camera then
+            update_camera_position()
+        end
+        return block
     end
     return false
 end
@@ -9078,7 +9091,6 @@ set_callback(function()
     end
 end, ON.POST_PROCESS_INPUT)
 )");
-    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]));
     add_ui_script("camera_hack", false, R"(
 lastpos = Vec2:new()
 set_callback(function()

@@ -2105,6 +2105,11 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .from_exe_base(0x22c02260) // TODO
     },
+    {
+        "update_camera_position"sv,
+        PatternCommandBuffer{}
+            .from_exe_base(0x22b7ca10) // TODO
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
