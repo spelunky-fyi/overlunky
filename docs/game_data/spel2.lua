@@ -889,6 +889,9 @@ function get_camera_position() end
 ---@param cy number
 ---@return nil
 function set_camera_position(cx, cy) end
+---Updates the camera focus according to the params set in Camera, i.e. to apply normal camera movement when paused etc.
+---@return nil
+function update_camera_position() end
 ---Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
@@ -2171,7 +2174,7 @@ do
     ---@field shake_multiplier_y number
     ---@field uniform_shake boolean
     ---@field focused_entity_uid integer
-    ---@field inertia number
+    ---@field inertia number @This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
 
 ---@class Online
     ---@field online_players OnlinePlayer[] @size: 4

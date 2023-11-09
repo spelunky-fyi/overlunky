@@ -2574,7 +2574,7 @@ float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/ov
 float | [start_sidepanel_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel_slidein_timer) | 
 int | [seed_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_length) | Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
 optional&lt;int&gt; | [get_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_seed) | Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.<br/> 
- | [set_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_seed) | Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.<br/> 
+ | [set_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_seed) | Params: optional<int> seed, optional<int> length<br/>Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.<br/> 
 
 ### ScreenStateCamp
 
@@ -2793,7 +2793,7 @@ float | [shake_multiplier_x](https://github.com/spelunky-fyi/overlunky/search?l=
 float | [shake_multiplier_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_y) | 
 bool | [uniform_shake](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uniform_shake) | 
 int | [focused_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) | 
-float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) | 
+float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) | This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
 
 ### GameManager
 

@@ -2747,6 +2747,15 @@ Sets the absolute current camera position without rubberbanding animation. Ignor
 
 Enables or disables the default position based camp camera bounds, to set them manually yourself
 
+### update_camera_position
+
+
+> Search script examples for [update_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_camera_position)
+
+#### nil update_camera_position()
+
+Updates the camera focus according to the params set in [Camera](#Camera), i.e. to apply normal camera movement when paused etc.
+
 ### zoom
 
 

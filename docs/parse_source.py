@@ -116,6 +116,7 @@ header_files = [
     "../src/game_api/steam_api.hpp",
     "../src/game_api/search.hpp",
     "../src/game_api/bucket.hpp",
+    "../src/game_api/socket.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
