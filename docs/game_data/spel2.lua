@@ -40,6 +40,11 @@ exports = nil
 ---@type Json
 json = nil
 
+io.open_data = io.open
+io.open_mod = io.open
+os.remove_data = os.remove
+os.remove_mod = os.remove
+
 
 -- Functions
 
