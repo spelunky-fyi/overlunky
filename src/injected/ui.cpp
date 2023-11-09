@@ -4030,7 +4030,7 @@ void render_camera()
     tooltip("Enable to always center the followed entity instantly\nwithout respecting level borders.");
     if (ImGui::Checkbox("Update camera position during pause##CameraPaused", &options["pause_update_camera"]))
         g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
-    tooltip("Enable to follow the entity smoothly when paused\nor combine with high inertia for instant camera that does respect level borders.");
+    tooltip("Enable to follow the entity smoothly when paused\nor combine with speed=5 for instant camera that respects level borders.");
     static bool lock_inertia{false};
     if (ImGui::Checkbox("Lock current camera speed multiplier##LockInertia", &lock_inertia))
     {
