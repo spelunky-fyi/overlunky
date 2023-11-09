@@ -211,17 +211,36 @@ savegame = nil
 ---@type any
 options = nil
 ---@type PRNG
-prng = nil"""
-    )
+prng = nil
+
+---Create a global `exports` table and put stuff in it,
+---and other scripts will be able to `import` your script like a library
+---@class Exports
+
+---@type Exports
+exports = nil
+
+---The json library converts tables to json and json to tables
+---Check https://github.com/rxi/json.lua for more information
+---@class Json
+---@field decode fun(str: string): table @Decode a json string into a table
+---@field encode fun(tbl: table): string @Encode a table into a json string
+---@type Json
+json = nil
+""")
 
     print("\n-- Functions\n")
     print(
         """
----Formatting function, use e.g. as f "my_var = {my_var}"
+---Return any type of object or multiple objects as a debug string.
+---@vararg any
+---@return string
+function inspect(...) end
+---Formatting function, use e.g. as f"my_var = {my_var}"
 ---@param f_string string
 ---@return string
 function f(f_string) end
----Formatting function, use e.g. as f "my_var = {my_var}"
+---Formatting function, use e.g. as F"my_var = {my_var}"
 ---@param f_string string
 ---@return string
 function F(f_string) end

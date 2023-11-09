@@ -555,7 +555,7 @@ end
     /// - `nil` if the script was found but has no exports
     /// - `false` if the script was not found but optional is set to true
     /// - an error if the script was not found and the optional argument was not set
-    // lua["import"] = [](string id, string version = "", bool optional = false) -> table
+    // lua["import"] = [](string id, optional<string> version, optional<bool> optional) -> table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {

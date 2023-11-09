@@ -1572,7 +1572,7 @@ Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` 
 
 > Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
 
-#### table import(string id, string version = "", bool optional = false)
+#### table import(string id, optional<string> version, optional<bool> optional)
 
 Load another script by id "author/name" and import its `exports` table. Returns:
 
