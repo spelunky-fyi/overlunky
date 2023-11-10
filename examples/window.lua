@@ -17,6 +17,7 @@ local comboopts = { 'one', 'two', 'three' }
 local inputcheck = false
 local inputcolorrgb = Color:green()
 local inputcolorrgba = Color:new(0.0, 0.0, 1.0, 0.5) -- 50% opacity blue
+local inputdisable = false
 
 local inputtooltip = 'This input\'s value is used as its tooltip.'
 
@@ -172,34 +173,38 @@ set_callback(function(draw_ctx)
 
             draw_ctx:win_separator_text('Section One')
 
-            draw_ctx:win_text(string.format("Geometry: %f,%f %f x %f", pos.x, pos.y, size.x, size.y))
+            -- inputs created in this callback can be conditionally disabled
+            draw_ctx:win_disabled(inputdisable, function()
+                draw_ctx:win_text(string.format("Geometry: %f,%f %f x %f", pos.x, pos.y, size.x, size.y))
 
-            draw_ctx:win_width(0.12)
-            draw_ctx:win_input_text('Width < 1.0 means the fraction of the window width', '')
+                draw_ctx:win_width(0.12)
+                draw_ctx:win_input_text('Width < 1.0 means the fraction of the window width', '')
 
-            draw_ctx:win_width(-0.12)
-            draw_ctx:win_input_text('I\'m short', 'Negative width means width of the description instead')
+                draw_ctx:win_width(-0.12)
+                draw_ctx:win_input_text('I\'m short', 'Negative width means width of the description instead')
 
-            draw_ctx:win_width(100)
-            fixedwidth = draw_ctx:win_input_text('Fixed width textbox knows it only takes 12 characters', fixedwidth and fixedwidth:sub(0, 12) or '')
+                draw_ctx:win_width(100)
+                fixedwidth = draw_ctx:win_input_text('Fixed width textbox knows it only takes 12 characters', fixedwidth and fixedwidth:sub(0, 12) or '')
 
-            -- open another window from this window
-            if draw_ctx:win_button('Open seed dialog') then
-                seeddialogopen = true
-            end
+                -- open another window from this window
+                if draw_ctx:win_button('Open seed dialog') then
+                    seeddialogopen = true
+                end
 
-            -- all the input widgets return the current value always, and expect you to keep feeding it back, or it will just revert to default when you blur the input
-            local stupidexample = draw_ctx:win_input_text('Not like this', '') -- this will just always be empty
+                -- all the input widgets return the current value always, and expect you to keep feeding it back, or it will just revert to default when you blur the input
+                local stupidexample = draw_ctx:win_input_text('Not like this', '') -- this will just always be empty
 
-            -- you need to circulate your value through the widget like this
-            inputtext = draw_ctx:win_input_text('Write text##texthereplease', inputtext)
-            inputnumber = draw_ctx:win_input_int('Write number', inputnumber)
-            inputslider = draw_ctx:win_slider_int('Select number##slider', inputslider, 1, 10)
-            inputdrag = draw_ctx:win_drag_float('Select another number##drag', inputdrag, 1, 10)
-            inputcombo = draw_ctx:win_combo('Combo thing', inputcombo, table.concat(comboopts, '\0')..'\0\0')
-            inputcheck = draw_ctx:win_check('Check this out', inputcheck)
-            inputcolorrgb = draw_ctx:win_color_editor('Color (RGB)', inputcolorrgb, false)
-            inputcolorrgba = draw_ctx:win_color_editor('Color (RGBA)', inputcolorrgba, true)
+                -- you need to circulate your value through the widget like this
+                inputtext = draw_ctx:win_input_text('Write text##texthereplease', inputtext)
+                inputnumber = draw_ctx:win_input_int('Write number', inputnumber)
+                inputslider = draw_ctx:win_slider_int('Select number##slider', inputslider, 1, 10)
+                inputdrag = draw_ctx:win_drag_float('Select another number##drag', inputdrag, 1, 10)
+                inputcombo = draw_ctx:win_combo('Combo thing', inputcombo, table.concat(comboopts, '\0')..'\0\0')
+                inputcheck = draw_ctx:win_check('Check this out', inputcheck)
+                inputcolorrgb = draw_ctx:win_color_editor('Color (RGB)', inputcolorrgb, false)
+                inputcolorrgba = draw_ctx:win_color_editor('Color (RGBA)', inputcolorrgba, true)
+            end)
+            inputdisable = draw_ctx:win_check('Disable widgets above', inputdisable)
 
             draw_ctx:win_separator_text('Section Two')
             -- pseudo table layout

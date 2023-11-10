@@ -636,6 +636,18 @@ void GuiDrawContext::win_width(float width)
         width += ImGui::GetStyle().ItemInnerSpacing.x;
     ImGui::SetNextItemWidth(width);
 }
+void GuiDrawContext::win_disabled(sol::function callback)
+{
+    win_disabled(true, callback);
+}
+void GuiDrawContext::win_disabled(bool disabled, sol::function callback)
+{
+    if (disabled)
+        ImGui::BeginDisabled(true);
+    handle_function<void>(backend, callback);
+    if (disabled)
+        ImGui::EndDisabled();
+}
 void GuiDrawContext::draw_layer(DRAW_LAYER layer)
 {
     drawlist = layer;
@@ -695,6 +707,9 @@ void register_usertypes(sol::state& lua)
     auto win_menu_item = sol::overload(
         static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_menu_item),
         static_cast<bool (GuiDrawContext::*)(std::string, std::optional<std::string>, bool, bool)>(&GuiDrawContext::win_menu_item));
+    auto win_disabled = sol::overload(
+        static_cast<void (GuiDrawContext::*)(sol::function)>(&GuiDrawContext::win_disabled),
+        static_cast<void (GuiDrawContext::*)(bool, sol::function)>(&GuiDrawContext::win_disabled));
 
     /// Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with ON.GUIFRAME
     auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
@@ -744,6 +759,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_menu_item"] = win_menu_item;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
+    guidrawcontext_type["win_disabled"] = win_disabled;
 
     /// Condition for setting a variable on a GUI widget. The variable is not changed if the condition is not met.
     lua.create_named_table("GUI_CONDITION", "ALWAYS", ImGuiCond_Always, "ONCE", ImGuiCond_Once, "FIRST_USE_EVER", ImGuiCond_FirstUseEver, "APPEARING", ImGuiCond_Appearing);

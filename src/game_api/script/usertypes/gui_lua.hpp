@@ -166,6 +166,10 @@ class GuiDrawContext
     void win_indent(float width);
     /// Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
     void win_width(float width);
+    /// Disable user interactions and dim widgets inside callback.
+    void win_disabled(sol::function callback);
+    /// Disable user interactions and dim widgets inside callback. Widgets are not disabled if `disabled` is false.
+    void win_disabled(bool disabled, sol::function callback);
 
   private:
     class LuaBackend* backend;
