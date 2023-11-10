@@ -4176,9 +4176,20 @@ void render_camera()
     }
     tooltip("Force selected speed multiplier on the next level too.");
     ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
-    if (ImGui::DragFloat("Speed multiplier##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f) && lock_inertia)
-        g_camera_inertia = g_state->camera->inertia;
+    if (ImGui::DragFloat("Speed multiplier##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f))
+    {
+        if (lock_inertia)
+            g_camera_inertia = g_state->camera->inertia;
+        else
+            g_camera_inertia = -FLT_MAX;
+    }
     tooltip("Lower values moves slower and smoother,\nhigher values reduce lagging behind.\n5 = instantly move any distance");
+    ImGui::SameLine();
+    if (ImGui::Button("Reset##ResetCameraInertia"))
+    {
+        g_state->camera->inertia = 1.0f;
+        g_camera_inertia = -FLT_MAX;
+    }
     ImGui::PopItemWidth();
 }
 
@@ -9202,23 +9213,31 @@ function block_update(pause_type)
             state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
         end
         local block = exports.paused and (exports.loading or not_loading())
-        if block and exports.camera then
-            update_camera_position()
-        end
         return block
     end
     return false
 end
 
+function move_camera(blocked)
+    if not exports.camera or not exports.paused then return end
+    if ((exports.type & 0xC0) > 0 and blocked) or (exports.type & 0xC0) == 0 then
+        update_camera_position()
+    end
+end
+
 set_callback(function()
-    return block_update(0x40)
+    local block = block_update(0x40)
+    move_camera(block)
+    return block
 end, ON.PRE_UPDATE)
 
 set_callback(function()
     if not exports.paused and state.pause == 2 and test_mask(state.pause, exports.type) and get_start_level_paused() and state.time_level == 1 and apply_pause() then
         exports.paused = true
     end
-    return block_update(0x80)
+    local block = block_update(0x80)
+    move_camera(block)
+    return block
 end, ON.PRE_GAME_LOOP)
 
 set_callback(function()
