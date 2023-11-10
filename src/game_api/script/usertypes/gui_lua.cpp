@@ -641,6 +641,12 @@ bool GuiDrawContext::win_menu_item(std::string label, std::optional<std::string>
 {
     return ImGui::MenuItem(label.c_str(), shortcut ? shortcut.value().c_str() : NULL, checked, enabled);
 }
+void GuiDrawContext::win_group(sol::function callback)
+{
+    ImGui::BeginGroup();
+    handle_function<void>(backend, callback);
+    ImGui::EndGroup();
+}
 void GuiDrawContext::win_indent(float width)
 {
     if (std::abs(width) < 1.0f)
@@ -796,6 +802,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_menu_bar"] = &GuiDrawContext::win_menu_bar;
     guidrawcontext_type["win_menu"] = win_menu;
     guidrawcontext_type["win_menu_item"] = win_menu_item;
+    guidrawcontext_type["win_group"] = &GuiDrawContext::win_group;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
     guidrawcontext_type["win_disabled"] = win_disabled;

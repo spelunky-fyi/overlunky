@@ -172,6 +172,8 @@ class GuiDrawContext
     bool win_menu_item(std::string label);
     /// Add a menu item. Only use this inside a menu callback. Returns true when clicked. Shortcut text is only visual and does not create a shortcut key.
     bool win_menu_item(std::string label, std::optional<std::string> shortcut, bool checked, bool enabled);
+    /// Widgets created in the callback are grouped together into a box starting at the current horizontal position. Calls affecting single items, such as `win_tooltip`, will treat the whole group as one item.
+    void win_group(sol::function callback);
     /// Indent contents, or unindent if negative
     void win_indent(float width);
     /// Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
