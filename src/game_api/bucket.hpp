@@ -13,7 +13,7 @@ struct Overlunky
 {
     /// Current Overlunky options. Read only.
     std::map<std::string, BucketItem> options;
-    /// Write some select options here to change Overlunky options. Just use the same keys as in options.
+    /// Write [some select options](https://github.com/search?q=repo%3Aspelunky-fyi%2Foverlunky+legal_options+language%3AC%2B%2B&type=code&l=C%2B%2B) here to change Overlunky options.
     std::map<std::string, BucketItem> set_options;
     /// Current Overlunky key bindings. Read only. You can use this to bind some custom feature to the same unknown key as currently bound by the user.
     std::map<std::string, KEY> keys;
@@ -46,4 +46,6 @@ class Bucket
     Overlunky* overlunky{nullptr};
     // Used by state.cpp to determine if patches should still be applied.
     bool patches_applied{false};
+    // Used by Overlunky to restart adventure runs with same seed, updated by PRE_LOAD_SCREEN
+    std::pair<int64_t, int64_t> adventure_seed{0, 0};
 };

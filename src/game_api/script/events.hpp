@@ -15,23 +15,21 @@ struct LevelGenRoomData;
 struct HudData;
 struct Hud;
 
+bool pre_event(ON event);
+void post_event(ON event);
+
 void pre_load_level_files();
-bool pre_level_generation();
 bool pre_load_screen();
 bool pre_init_level();
 bool pre_init_layer(LAYER layer);
 bool pre_unload_level();
 bool pre_unload_layer(LAYER layer);
-bool pre_process_input();
 
+void post_load_screen();
+void post_init_layer(LAYER layer);
+void post_unload_layer(LAYER layer);
 void post_room_generation();
 void post_level_generation();
-void post_load_screen();
-void post_init_level();
-void post_init_layer(LAYER layer);
-void post_unload_level();
-void post_unload_layer(LAYER layer);
-void post_process_input();
 
 void on_death_message(STRINGID stringid);
 std::optional<bool> pre_get_feat(FEAT feat);
@@ -59,7 +57,6 @@ std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
 std::u16string pre_toast(char16_t* buffer);
 
 void update_backends();
-bool pre_state_update();
 
 bool pre_load_journal_chapter(uint8_t chapter);
 std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages);

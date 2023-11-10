@@ -1413,7 +1413,7 @@ Get the current frame count since the game was started. You can use this to make
 
 > Search script examples for [get_frametime](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime)
 
-#### optional&lt;double&gt; get_frametime()
+#### double get_frametime()
 
 Get engine target frametime (1/framerate, default 1/60).
 
@@ -1422,7 +1422,7 @@ Get engine target frametime (1/framerate, default 1/60).
 
 > Search script examples for [get_frametime_unfocused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frametime_unfocused)
 
-#### optional&lt;double&gt; get_frametime_unfocused()
+#### double get_frametime_unfocused()
 
 Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 
@@ -1497,6 +1497,24 @@ Get the current timestamp in milliseconds since the Unix Epoch.
 
 Gets the specified setting, values might need to be interpreted differently per setting
 
+### get_speedhack
+
+
+> Search script examples for [get_speedhack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_speedhack)
+
+#### float get_speedhack()
+
+Get the current speedhack multiplier
+
+### get_start_level_paused
+
+
+> Search script examples for [get_start_level_paused](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_start_level_paused)
+
+#### bool get_start_level_paused()
+
+Returns true if the level pause hack is enabled
+
 ### god
 
 
@@ -1554,7 +1572,7 @@ Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` 
 
 > Search script examples for [import](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=import)
 
-#### table import(string id, string version = "", bool optional = false)
+#### table import(string id, optional<string> version, optional<bool> optional)
 
 Load another script by id "author/name" and import its `exports` table. Returns:
 
@@ -1809,7 +1827,7 @@ Force the character unlocked in either ending to [ENT_TYPE](#ENT_TYPE). Set to 0
 
 #### nil set_frametime(optional<double> frametime)
 
-Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
 
 ### set_frametime_unfocused
 
@@ -1898,6 +1916,15 @@ end, ON.PRE_LOAD_SCREEN)
 #### bool set_setting([GAME_SETTING](#GAME_SETTING) setting, int value)
 
 Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset [SAFE_SETTING](#SAFE_SETTING) by default for [Hud](#Hud) and other visuals. Returns false, if setting failed.
+
+### set_speedhack
+
+
+> Search script examples for [set_speedhack](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_speedhack)
+
+#### nil set_speedhack(optional<float> multiplier)
+
+Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
 
 ### set_start_level_paused
 
@@ -2719,6 +2746,15 @@ Sets the absolute current camera position without rubberbanding animation. Ignor
 #### nil set_camp_camera_bounds_enabled(bool b)
 
 Enables or disables the default position based camp camera bounds, to set them manually yourself
+
+### update_camera_position
+
+
+> Search script examples for [update_camera_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_camera_position)
+
+#### nil update_camera_position()
+
+Updates the camera focus according to the params set in [Camera](#Camera), i.e. to apply normal camera movement when paused etc.
 
 ### zoom
 

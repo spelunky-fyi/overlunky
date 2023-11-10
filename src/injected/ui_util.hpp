@@ -89,4 +89,12 @@ class UI
     static void spawn_player(uint8_t player_slot, std::optional<float> x = std::nullopt, std::optional<float> y = std::nullopt, std::optional<LAYER> layer = std::nullopt);
     static std::pair<float, float> spawn_position();
     static void load_death_screen();
+    static void set_start_level_paused(bool enable);
+    static bool get_start_level_paused();
+    static void speedhack(float multiplier);
+    static float get_speedhack();
+    static void init_adventure();
+    static void init_seeded(uint32_t seed);
+    static std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start);
+    static void set_adventure_seed(int64_t first, int64_t second);
 };

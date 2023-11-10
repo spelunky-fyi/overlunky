@@ -555,7 +555,7 @@ end
     /// - `nil` if the script was found but has no exports
     /// - `false` if the script was not found but optional is set to true
     /// - an error if the script was not found and the optional argument was not set
-    // lua["import"] = [](string id, string version = "", bool optional = false) -> table
+    // lua["import"] = [](string id, optional<string> version, optional<bool> optional) -> table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
@@ -1283,6 +1283,8 @@ end
     };
     /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
     lua["set_camera_position"] = set_camera_position;
+    /// Updates the camera focus according to the params set in Camera, i.e. to apply normal camera movement when paused etc.
+    lua["update_camera_position"] = update_camera_position;
 
     /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags
@@ -1912,9 +1914,9 @@ end
             return spawn_roomowner(owner_type, x, y, layer, room_template);
         });
 
-    /// Get the current adventure seed pair
+    /// Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.
     lua["get_adventure_seed"] = get_adventure_seed;
-    /// Set the current adventure seed pair
+    /// Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
     lua["set_adventure_seed"] = set_adventure_seed;
     /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
     lua["update_liquid_collision_at"] = update_liquid_collision_at;
@@ -2117,7 +2119,7 @@ end
     /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
     lua["update_state"] = update_state;
 
-    /// Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+    /// Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
     lua["set_frametime"] = set_frametime;
 
     /// Get engine target frametime (1/framerate, default 1/60).
@@ -2175,6 +2177,9 @@ end
     /// Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
     lua["set_start_level_paused"] = set_start_level_paused;
 
+    /// Returns true if the level pause hack is enabled
+    lua["get_start_level_paused"] = get_start_level_paused;
+
     /// Converts INPUTS to (x, y, BUTTON)
     lua["inputs_to_buttons"] = [](INPUTS inputs) -> std::tuple<float, float, BUTTON>
     {
@@ -2218,6 +2223,12 @@ end
     /// Letting you control those manually.
     /// Look at the example on how to mimic game layer switching behavior
     lua["set_camera_layer_control_enabled"] = set_camera_layer_control_enabled;
+
+    /// Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
+    lua["set_speedhack"] = set_speedhack;
+
+    /// Get the current speedhack multiplier
+    lua["get_speedhack"] = get_speedhack;
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
@@ -2395,7 +2406,11 @@ end
         "PRE_PROCESS_INPUT",
         ON::PRE_PROCESS_INPUT,
         "POST_PROCESS_INPUT",
-        ON::POST_PROCESS_INPUT);
+        ON::POST_PROCESS_INPUT,
+        "PRE_GAME_LOOP",
+        ON::PRE_GAME_LOOP,
+        "POST_GAME_LOOP",
+        ON::POST_GAME_LOOP);
 
     /* ON
     // LOGO
@@ -2632,6 +2647,10 @@ end
     // Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.
     // POST_PROCESS_INPUT
     // Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.
+    // PRE_GAME_LOOP
+    // Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.
+    // POST_GAME_LOOP
+    // Runs right after the main engine loop.
     */
 
     lua.create_named_table(

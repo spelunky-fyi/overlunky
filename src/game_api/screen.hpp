@@ -23,6 +23,7 @@ class Screen
     float render_timer;
     uint32_t unknown_zero;
 
+    /// Initializes the screen.
     virtual void init() = 0;
     virtual void update() = 0; // runs each frame, for level screens: death, camera zoom (level/shop), camera bounds, some save data stuff
     virtual ~Screen() = 0;
@@ -281,7 +282,8 @@ class ScreenSeedInput : public Screen // ID: 8
 
     uint16_t seed_chars[9]; // utf16 chars
 
-    uint16_t unknown38;
+    /// Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
+    uint16_t seed_length;
     uint16_t unknown39;
 
     float topleft_woodpanel_esc_slidein_timer;
@@ -423,7 +425,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     uint8_t unknown66;
     size_t reset_func; /* unsure*/
     uint32_t buttons;
-    TextureRenderingInfo unknown69;
+    TextureRenderingInfo unknown69; // TODO: this is wrong, there's just a bunch of other stuff here, like some run type flags probably (seeded/adventure/daily) and the next screen (camp/level)
 
     float opacity;
     bool start_pressed;

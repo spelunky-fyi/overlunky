@@ -827,7 +827,7 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
     g_CustomShopTypes[0] = {};
     g_CustomShopTypes[1] = {};
 
-    if (pre_level_generation())
+    if (pre_event(ON::PRE_LEVEL_GENERATION))
         return;
     g_level_gen_trampoline(level_gen_sys, param_2, param_3);
     post_level_generation();
@@ -869,7 +869,7 @@ void unload_layer(Layer* layer)
     g_unload_layer_trampoline(layer);
     post_unload_layer((LAYER)layer->is_back_layer);
     if (layer->is_back_layer)
-        post_unload_level();
+        post_event(ON::POST_LEVEL_DESTRUCTION);
 }
 
 using InitLayerFun = void(Layer*);
@@ -882,7 +882,7 @@ void load_layer(Layer* layer)
     g_init_layer_trampoline(layer);
     post_init_layer((LAYER)layer->is_back_layer);
     if (layer->is_back_layer)
-        post_init_level();
+        post_event(ON::POST_LEVEL_CREATION);
 }
 
 using HandleTileCodeFun = void(LevelGenSystem*, std::uint32_t, std::uint64_t, float, float, std::uint8_t);
@@ -1827,10 +1827,10 @@ void LevelGenSystem::init()
                 OnScopeExit pop{[]
                                 { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
 
-                if (pre_level_generation())
+                if (pre_event(ON::PRE_LEVEL_GENERATION))
                     return;
                 original(th);
-                post_level_generation();
+                post_event(ON::POST_LEVEL_GENERATION);
             });
     }
 }

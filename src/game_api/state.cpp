@@ -297,6 +297,7 @@ State& State::get()
             strings_init();
             init_state_update_hook();
             init_process_input_hook();
+            init_game_loop_hook();
 
             auto bucket = Bucket::get();
             if (!bucket->patches_applied)
@@ -495,8 +496,6 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     {
         ptr()->screen_next = 11;
     }
-    ptr()->fadeout = 5;
-    ptr()->fadein = 5;
     ptr()->win_state = 0;
     ptr()->loading = 1;
 
@@ -521,8 +520,6 @@ void State::set_seed(uint32_t seed)
     ptr()->theme_next = 1;
     ptr()->quest_flags = 0x1e | 0x41;
     ptr()->screen_next = 12;
-    ptr()->fadeout = 5;
-    ptr()->fadein = 5;
     ptr()->loading = 1;
 }
 
@@ -650,16 +647,7 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    auto state = State::get();
-    if (s == state.ptr_main())
-    {
-        if (global_frame_count < state.get_frame_count())
-            global_frame_count = state.get_frame_count_main();
-        else
-            global_frame_count++;
-    }
-
-    if (!pre_state_update())
+    if (!pre_event(ON::PRE_UPDATE))
     {
         g_state_update_trampoline(s);
     }
@@ -684,11 +672,11 @@ using OnProcessInput = void(void*);
 OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
-    if (!pre_process_input())
+    if (!pre_event(ON::PRE_PROCESS_INPUT))
     {
         g_process_input_trampoline(s);
     }
-    post_process_input();
+    post_event(ON::POST_PROCESS_INPUT);
 }
 
 void init_process_input_hook()
@@ -702,6 +690,37 @@ void init_process_input_hook()
     if (error != NO_ERROR)
     {
         DEBUG("Failed hooking process_input stuff: {}\n", error);
+    }
+}
+
+using OnGameLoop = void(void* a, float b, void* c);
+OnGameLoop* g_game_loop_trampoline{nullptr};
+void GameLoop(void* a, float b, void* c)
+{
+    auto state = State::get();
+    if (global_frame_count < state.get_frame_count_main())
+        global_frame_count = state.get_frame_count_main();
+    else
+        global_frame_count++;
+
+    if (!pre_event(ON::PRE_GAME_LOOP))
+    {
+        g_game_loop_trampoline(a, b, c);
+    }
+    post_event(ON::POST_GAME_LOOP);
+}
+
+void init_game_loop_hook()
+{
+    g_game_loop_trampoline = (OnGameLoop*)get_address("game_loop");
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach((void**)&g_game_loop_trampoline, &GameLoop);
+
+    const LONG error = DetourTransactionCommit();
+    if (error != NO_ERROR)
+    {
+        DEBUG("Failed hooking game_loop stuff: {}\n", error);
     }
 }
 
