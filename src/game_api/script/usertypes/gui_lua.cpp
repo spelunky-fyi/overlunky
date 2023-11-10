@@ -453,22 +453,42 @@ int GuiDrawContext::win_slider_int(std::string label, int value, int min, int ma
 {
     ImGui::SliderInt(label.c_str(), &value, min, max);
     return value;
-};
+}
+int GuiDrawContext::win_slider_int(std::string label, int value, int min, int max, std::string format, int flags)
+{
+    ImGui::SliderInt(label.c_str(), &value, min, max, format.c_str(), flags);
+    return value;
+}
 int GuiDrawContext::win_drag_int(std::string label, int value, int min, int max)
 {
     ImGui::DragInt(label.c_str(), &value, 0.1f, min, max);
     return value;
-};
+}
+int GuiDrawContext::win_drag_int(std::string label, int value, int min, int max, float speed, std::string format, int flags)
+{
+    ImGui::DragInt(label.c_str(), &value, speed, min, max, format.c_str(), flags);
+    return value;
+}
 float GuiDrawContext::win_slider_float(std::string label, float value, float min, float max)
 {
     ImGui::SliderFloat(label.c_str(), &value, min, max);
     return value;
-};
+}
+float GuiDrawContext::win_slider_float(std::string label, float value, float min, float max, std::string format, int flags)
+{
+    ImGui::SliderFloat(label.c_str(), &value, min, max, format.c_str(), flags);
+    return value;
+}
 float GuiDrawContext::win_drag_float(std::string label, float value, float min, float max)
 {
     ImGui::DragFloat(label.c_str(), &value, 0.1f, min, max);
     return value;
-};
+}
+float GuiDrawContext::win_drag_float(std::string label, float value, float min, float max, float speed, std::string format, int flags)
+{
+    ImGui::DragFloat(label.c_str(), &value, speed, min, max, format.c_str(), flags);
+    return value;
+}
 bool GuiDrawContext::win_check(std::string label, bool value)
 {
     ImGui::Checkbox(label.c_str(), &value);
@@ -689,6 +709,18 @@ void register_usertypes(sol::state& lua)
     auto window = sol::overload(
         static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, sol::function)>(&GuiDrawContext::window),
         static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, GUI_CONDITION, GUI_CONDITION, GUI_CONDITION, int, sol::function)>(&GuiDrawContext::window));
+    auto win_slider_int = sol::overload(
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int)>(&GuiDrawContext::win_slider_int),
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int, std::string, int)>(&GuiDrawContext::win_slider_int));
+    auto win_drag_int = sol::overload(
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int)>(&GuiDrawContext::win_drag_int),
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int, float, std::string, int)>(&GuiDrawContext::win_drag_int));
+    auto win_slider_float = sol::overload(
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float)>(&GuiDrawContext::win_slider_float),
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float, std::string, int)>(&GuiDrawContext::win_slider_float));
+    auto win_drag_float = sol::overload(
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float)>(&GuiDrawContext::win_drag_float),
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float, float, std::string, int)>(&GuiDrawContext::win_drag_float));
     auto win_pushid = sol::overload(
         static_cast<void (GuiDrawContext::*)(int)>(&GuiDrawContext::win_pushid),
         static_cast<void (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_pushid));
@@ -738,10 +770,10 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_input_text"] = &GuiDrawContext::win_input_text;
     guidrawcontext_type["win_input_int"] = &GuiDrawContext::win_input_int;
     guidrawcontext_type["win_input_float"] = &GuiDrawContext::win_input_float;
-    guidrawcontext_type["win_slider_int"] = &GuiDrawContext::win_slider_int;
-    guidrawcontext_type["win_drag_int"] = &GuiDrawContext::win_drag_int;
-    guidrawcontext_type["win_slider_float"] = &GuiDrawContext::win_slider_float;
-    guidrawcontext_type["win_drag_float"] = &GuiDrawContext::win_drag_float;
+    guidrawcontext_type["win_slider_int"] = win_slider_int;
+    guidrawcontext_type["win_drag_int"] = win_drag_int;
+    guidrawcontext_type["win_slider_float"] = win_slider_float;
+    guidrawcontext_type["win_drag_float"] = win_drag_float;
     guidrawcontext_type["win_check"] = &GuiDrawContext::win_check;
     guidrawcontext_type["win_combo"] = &GuiDrawContext::win_combo;
     guidrawcontext_type["win_color_editor"] = &GuiDrawContext::win_color_editor;
@@ -779,6 +811,8 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("GUI_TAB_BAR_FLAG", "NONE", ImGuiTabBarFlags_None, "REORDERABLE", ImGuiTabBarFlags_Reorderable, "AUTO_SELECT_NEW_TABS", ImGuiTabBarFlags_AutoSelectNewTabs, "TAB_LIST_POPUP_BUTTON", ImGuiTabBarFlags_TabListPopupButton, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton, "NO_TAB_LIST_SCROLLING_BUTTONS", ImGuiTabBarFlags_NoTabListScrollingButtons, "NO_TOOLTIP", ImGuiTabBarFlags_NoTooltip, "FITTING_POLICY_RESIZE_DOWN", ImGuiTabBarFlags_FittingPolicyResizeDown, "FITTING_POLICY_SCROLL", ImGuiTabBarFlags_FittingPolicyScroll);
     /// Tab item flags for `win_tab_item` and `win_tab_item_button` in GuiDrawContext.
     lua.create_named_table("GUI_TAB_ITEM_FLAG", "NONE", ImGuiTabItemFlags_None, "UNSAVED_DOCUMENT", ImGuiTabItemFlags_UnsavedDocument, "SET_SELECTED", ImGuiTabItemFlags_SetSelected, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabItemFlags_NoCloseWithMiddleMouseButton, "NO_PUSH_ID", ImGuiTabItemFlags_NoPushId, "NO_TOOLTIP", ImGuiTabItemFlags_NoTooltip, "NO_REORDER", ImGuiTabItemFlags_NoReorder, "LEADING", ImGuiTabItemFlags_Leading, "TRAILING", ImGuiTabItemFlags_Trailing);
+    /// Flags for slider and drag inputs in GuiDrawContext.
+    lua.create_named_table("GUI_SLIDER_FLAG", "NONE", ImGuiSliderFlags_None, "ALWAYS_CLAMP", ImGuiSliderFlags_AlwaysClamp, "LOGARITHMIC", ImGuiSliderFlags_Logarithmic, "NO_ROUND_TO_FORMAT", ImGuiSliderFlags_NoRoundToFormat, "NO_INPUT", ImGuiSliderFlags_NoInput);
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor

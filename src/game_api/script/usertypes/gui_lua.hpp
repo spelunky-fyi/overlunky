@@ -112,14 +112,22 @@ class GuiDrawContext
     int win_input_int(std::string label, int value);
     /// Add a float field
     float win_input_float(std::string label, float value);
-    /// Add an integer slider
+    /// Add an integer slider.
     int win_slider_int(std::string label, int value, int min, int max);
-    /// Add an integer dragfield
+    /// Add an integer slider. `flags` are a mask of GUI_SLIDER_FLAG.
+    int win_slider_int(std::string label, int value, int min, int max, std::string format, int flags);
+    /// Add an integer dragfield.
     int win_drag_int(std::string label, int value, int min, int max);
-    /// Add an float slider
+    /// Add an integer dragfield. `flags` are a mask of GUI_SLIDER_FLAG.
+    int win_drag_int(std::string label, int value, int min, int max, float speed, std::string format, int flags);
+    /// Add a float slider.
     float win_slider_float(std::string label, float value, float min, float max);
-    /// Add an float dragfield
+    /// Add a float slider. `flags` are a mask of GUI_SLIDER_FLAG.
+    float win_slider_float(std::string label, float value, float min, float max, std::string format, int flags);
+    /// Add a float dragfield.
     float win_drag_float(std::string label, float value, float min, float max);
+    /// Add a float dragfield. `flags` are a mask of GUI_SLIDER_FLAG.
+    float win_drag_float(std::string label, float value, float min, float max, float speed, std::string format, int flags);
     /// Add a checkbox
     bool win_check(std::string label, bool value);
     /// Add a combo box

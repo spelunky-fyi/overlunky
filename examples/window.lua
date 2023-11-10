@@ -11,7 +11,8 @@ local menuinputcheck = true
 local inputtext = ''
 local inputnumber = 0
 local inputslider = 6
-local inputdrag = 9
+local inputdragfloat = 9
+local inputdragfloatsmall = 0.0042
 local inputcombo = 1
 local comboopts = { 'one', 'two', 'three' }
 local inputcheck = false
@@ -198,7 +199,8 @@ set_callback(function(draw_ctx)
                 inputtext = draw_ctx:win_input_text('Write text##texthereplease', inputtext)
                 inputnumber = draw_ctx:win_input_int('Write number', inputnumber)
                 inputslider = draw_ctx:win_slider_int('Select number##slider', inputslider, 1, 10)
-                inputdrag = draw_ctx:win_drag_float('Select another number##drag', inputdrag, 1, 10)
+                inputdragfloat = draw_ctx:win_drag_float('Select another number##dragfloat', inputdragfloat, 1, 10)
+                inputdragfloatsmall = draw_ctx:win_drag_float('Select a small number##dragfloatsmall', inputdragfloatsmall, 0, 0.1, 0.0001, "%.4f Units", GUI_SLIDER_FLAG.ALWAYS_CLAMP)
                 inputcombo = draw_ctx:win_combo('Combo thing', inputcombo, table.concat(comboopts, '\0')..'\0\0')
                 inputcheck = draw_ctx:win_check('Check this out', inputcheck)
                 inputcolorrgb = draw_ctx:win_color_editor('Color (RGB)', inputcolorrgb, false)
@@ -234,7 +236,7 @@ set_callback(function(draw_ctx)
             draw_ctx:win_text('Click here:')
             draw_ctx:win_inline()
             if draw_ctx:win_button('Submit') then
-                message(inputtext..' '..tostring(inputnumber)..' '..tostring(inputslider)..' '..tostring(inputdrag)..' '..comboopts[inputcombo]..' '..tostring(inputcheck)
+                message(inputtext..' '..tostring(inputnumber)..' '..tostring(inputslider)..' '..tostring(inputdragfloat)..' '..comboopts[inputcombo]..' '..tostring(inputcheck)
                     ..' '..tostring(inputcolorrgb:get_ucolor())..' '..tostring(inputcolorrgba:get_ucolor()))
             end
 
