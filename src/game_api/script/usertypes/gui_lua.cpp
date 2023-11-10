@@ -426,14 +426,18 @@ void GuiDrawContext::win_sameline(float offset, float spacing)
         offset *= ImGui::GetContentRegionMax().x;
     ImGui::SameLine(offset, spacing);
 };
-bool GuiDrawContext::win_button(std::string text)
+bool GuiDrawContext::win_button(std::string label)
 {
-    if (ImGui::Button(text.c_str()))
-    {
-        return true;
-    }
-    return false;
-};
+    return ImGui::Button(label.c_str());
+}
+bool GuiDrawContext::win_button(std::string label, float width, float height)
+{
+    if (std::abs(width) > 0.0f && std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
+    if (std::abs(height) > 0.0f && std::abs(height) < 1.0f)
+        height *= ImGui::GetContentRegionMax().x;
+    return ImGui::Button(label.c_str(), ImVec2(width, height));
+}
 std::string GuiDrawContext::win_input_text(std::string label, std::string value)
 {
     InputString(label.c_str(), &value, 0, nullptr, nullptr);
@@ -709,6 +713,9 @@ void register_usertypes(sol::state& lua)
     auto window = sol::overload(
         static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, sol::function)>(&GuiDrawContext::window),
         static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, GUI_CONDITION, GUI_CONDITION, GUI_CONDITION, int, sol::function)>(&GuiDrawContext::window));
+    auto win_button = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_button),
+        static_cast<bool (GuiDrawContext::*)(std::string, float, float)>(&GuiDrawContext::win_button));
     auto win_slider_int = sol::overload(
         static_cast<int (GuiDrawContext::*)(std::string, int, int, int)>(&GuiDrawContext::win_slider_int),
         static_cast<int (GuiDrawContext::*)(std::string, int, int, int, std::string, int)>(&GuiDrawContext::win_slider_int));
@@ -766,7 +773,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_separator_text"] = &GuiDrawContext::win_separatortext;
     guidrawcontext_type["win_inline"] = &GuiDrawContext::win_inline;
     guidrawcontext_type["win_sameline"] = &GuiDrawContext::win_sameline;
-    guidrawcontext_type["win_button"] = &GuiDrawContext::win_button;
+    guidrawcontext_type["win_button"] = win_button;
     guidrawcontext_type["win_input_text"] = &GuiDrawContext::win_input_text;
     guidrawcontext_type["win_input_int"] = &GuiDrawContext::win_input_int;
     guidrawcontext_type["win_input_float"] = &GuiDrawContext::win_input_float;

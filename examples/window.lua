@@ -251,6 +251,14 @@ set_callback(function(draw_ctx)
             inputtooltip = draw_ctx:win_input_text('Tooltip text input', inputtooltip)
             draw_ctx:win_tooltip(inputtooltip)
 
+            -- draw some buttons that scale with the window width
+            draw_ctx:win_button('50% width', 0.5, 0.2)
+            draw_ctx:win_inline()
+            draw_ctx:win_button('25% width', 0.25, 0.2)
+
+            -- draw a button that is always a specific size
+            draw_ctx:win_button('200px x 100px', 200, 100)
+
             -- draw the image we loaded before
             if loadingimage > -1 then
                 draw_ctx:win_image(loadingimage, 0, 0)

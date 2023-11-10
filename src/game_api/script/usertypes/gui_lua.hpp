@@ -105,7 +105,9 @@ class GuiDrawContext
     /// Add next thing on the same line, with an offset
     void win_sameline(float offset, float spacing);
     /// Add a button
-    bool win_button(std::string text);
+    bool win_button(std::string label);
+    /// Add a button
+    bool win_button(std::string label, float width, float height);
     /// Add a text field
     std::string win_input_text(std::string label, std::string value);
     /// Add an integer field
