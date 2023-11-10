@@ -1158,10 +1158,11 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
 function spawn_roomowner(owner_type, x, y, layer, room_template) end
----Get the current adventure seed pair
+---Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.
+---@param run_start boolean?
 ---@return integer, integer
-function get_adventure_seed() end
----Set the current adventure seed pair
+function get_adventure_seed(run_start) end
+---Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
 ---@param first integer
 ---@param second integer
 ---@return nil

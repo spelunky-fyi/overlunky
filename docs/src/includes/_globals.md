@@ -1367,9 +1367,9 @@ Force the journal to open on a chapter and entry# when pressing the journal butt
 
 > Search script examples for [get_adventure_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_adventure_seed)
 
-#### tuple&lt;int, int&gt; get_adventure_seed()
+#### tuple&lt;int, int&gt; get_adventure_seed(optional<bool> run_start)
 
-Get the current adventure seed pair
+Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.
 
 ### get_bucket
 
@@ -1744,7 +1744,7 @@ Seed the game prng.
 
 #### nil set_adventure_seed(int first, int second)
 
-Set the current adventure seed pair
+Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
 
 ### set_camera_layer_control_enabled
 
