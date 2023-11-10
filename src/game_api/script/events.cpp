@@ -6,6 +6,7 @@
 #include <type_traits>  // for move
 #include <utility>      // for max, pair, min
 
+#include "bucket.hpp"
 #include "constants.hpp"          // for no_return_str
 #include "level_api_types.hpp"    // for LevelGenRoomData
 #include "rpc.hpp"                // for game_log, get_adventure_seed
@@ -42,10 +43,12 @@ bool pre_load_screen()
         }
         else
         {
-            auto seed = get_adventure_seed();
+            auto seed = get_adventure_seed(false);
             if (seed.second != prev_seed)
                 game_log(fmt::format("{} Seed: {:X} {:X}", ((state->quest_flags & (1U << 7)) > 0 && state->screen == 28) ? "Daily" : "Adventure", (uint64_t)seed.first, (uint64_t)seed.second));
             prev_seed = seed.second;
+            auto bucket = Bucket::get();
+            bucket->adventure_seed = std::make_pair(seed.first, seed.second);
         }
     }
 

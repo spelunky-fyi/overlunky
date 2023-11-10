@@ -804,3 +804,13 @@ void UI::init_seeded(uint32_t seed)
 {
     ::init_seeded(seed);
 }
+
+std::pair<int64_t, int64_t> UI::get_adventure_seed(std::optional<bool> run_start)
+{
+    return ::get_adventure_seed(run_start);
+}
+
+void UI::set_adventure_seed(int64_t first, int64_t second)
+{
+    ::set_adventure_seed(first, second);
+}

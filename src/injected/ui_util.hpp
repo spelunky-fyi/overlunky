@@ -95,4 +95,6 @@ class UI
     static float get_speedhack();
     static void init_adventure();
     static void init_seeded(uint32_t seed);
+    static std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start);
+    static void set_adventure_seed(int64_t first, int64_t second);
 };

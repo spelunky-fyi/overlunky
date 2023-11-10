@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <locale>
 #include <map>
+#include <random>
 #include <string>
 
 #pragma warning(push, 0)
@@ -344,7 +345,7 @@ std::map<std::string, bool> options = {
     {"draw_entity_tooltip", false},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
-    {"warp_transition", false},
+    {"warp_transition", true},
     {"lights", false},
     {"disable_achievements", true},
     {"disable_savegame", true},
@@ -568,8 +569,8 @@ void set_colors()
 
     float col_main_sat = g_sat;
     float col_main_val = options["inverted"] ? 1.0f - g_val : g_val;
-    float col_area_sat = g_sat * 0.77f;
-    float col_area_val = options["inverted"] ? 1.0f - g_val * 0.60f : g_val * 0.60f;
+    float col_area_sat = g_sat * 0.60f;
+    float col_area_val = options["inverted"] ? 1.0f - g_val * 0.55f : g_val * 0.55f;
     float col_back_sat = g_sat * 0.33f;
     float col_back_val = options["inverted"] ? 1.0f - g_val * 0.20f : g_val * 0.20f;
 
@@ -2210,7 +2211,7 @@ void warp_inc(uint8_t w, uint8_t l, uint8_t t)
     {
         g_state->level_count += 1;
     }
-    if (options["warp_transition"])
+    if (options["warp_transition"] && (g_state->quest_flags & 0x40) == 0)
     {
         UI::transition(w, l, t);
     }
@@ -4036,10 +4037,12 @@ void render_narnia()
         UI::spawn_backdoor(g_x, g_y);
     }
     tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
-    ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
+    ImGui::Checkbox("Warp increments level count normally", &options["warp_increments_level_count"]);
     tooltip("Simulate natural level progression when warping.");
-    ImGui::Checkbox("Warp to transition instead", &options["warp_transition"]);
+    ImGui::Checkbox("Warp to transition in adventure mode", &options["warp_transition"]);
     tooltip("Simulate natural level progression even more.");
+    if ((g_state->quest_flags & 0x40) == 0 && !options["warp_transition"])
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: Skipping transition in adventure mode\nwill result in different level generation.");
 }
 
 void set_camera_hack(bool enable)
@@ -8171,18 +8174,40 @@ void render_game_props()
     if (g_state == 0)
         return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    if (submenu("State"))
+    if (submenu("Seed"))
     {
-        if (ImGui::Button("Adventure"))
+        static std::random_device rd;
+        if (ImGui::MenuItem("Restart this run with same seed##RestartWithSeed"))
+        {
+            if (g_state->screen == 12 || g_state->screen == 13 || g_state->screen == 14 || g_state->screen == 16 || g_state->screen == 17 || g_state->screen == 18)
+            {
+                if ((g_state->quest_flags & 0x40) == 0)
+                {
+                    UI::set_adventure_seed(g_bucket->adventure_seed.first, g_bucket->adventure_seed.second);
+                    g_state->world_next = g_state->world_start;
+                    g_state->level_next = g_state->level_start;
+                    g_state->theme_next = g_state->theme_start;
+                    g_state->screen_next = 12;
+                }
+                g_state->quest_flags |= 1;
+                g_state->loading = 1;
+            }
+        }
+        if (ImGui::MenuItem("New random adventure run", key_string(keys["quick_restart"]).c_str()))
         {
             UI::init_adventure();
-            g_state->quest_flags = 1;
+            static std::uniform_int_distribution<uint64_t> dist(1, UINT64_MAX);
+            UI::set_adventure_seed(dist(rd), dist(rd));
             quick_start(12, 1, 1, 1);
         }
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(-ImGui::GetWindowWidth() * 0.31f);
+        if (ImGui::MenuItem("New random seeded run"))
+        {
+            static std::uniform_int_distribution<uint32_t> dist(1, UINT32_MAX);
+            quick_start(12, 1, 1, 1, dist(rd));
+        }
         auto seed_str = fmt::format("{:08X}", g_state->seed);
-        if (ImGui::InputText("Seed", &seed_str, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_EnterReturnsTrue))
+        ImGui::InputText("Seeded seed", &seed_str, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
         {
             uint32_t new_seed;
             std::stringstream ss;
@@ -8191,6 +8216,36 @@ void render_game_props()
             if (new_seed != g_state->seed)
                 quick_start(12, 1, 1, 1, new_seed);
         }
+
+        static bool first_run{true};
+        if (g_bucket->adventure_seed.first == 0 && first_run)
+            UI::get_adventure_seed(true);
+        first_run = false;
+
+        std::string adventure_seed_first = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.first);
+        std::string adventure_seed_second = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.second);
+        ImGui::InputText("Adventure seed##AdventureSeedFirst", &adventure_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            int64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << adventure_seed_first;
+            ss >> new_seed;
+            g_bucket->adventure_seed.first = new_seed;
+        }
+        ImGui::InputText("##AdventureSeedSecond", &adventure_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            int64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << adventure_seed_second;
+            ss >> new_seed;
+            g_bucket->adventure_seed.second = new_seed;
+        }
+        endmenu();
+    }
+    if (submenu("State"))
+    {
         render_screen("Current screen", g_state->screen);
         render_screen("Last screen", g_state->screen_last);
         render_screen("Next screen", g_state->screen_next);

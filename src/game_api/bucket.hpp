@@ -46,4 +46,6 @@ class Bucket
     Overlunky* overlunky{nullptr};
     // Used by state.cpp to determine if patches should still be applied.
     bool patches_applied{false};
+    // Used by Overlunky to restart adventure runs with same seed, updated by PRE_LOAD_SCREEN
+    std::pair<int64_t, int64_t> adventure_seed{0, 0};
 };

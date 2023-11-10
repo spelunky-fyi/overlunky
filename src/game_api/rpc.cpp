@@ -20,6 +20,7 @@
 #include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
 #include <utility>          // for min, max, pair, find
 
+#include "bucket.hpp"
 #include "containers/custom_vector.hpp" //
 #include "custom_types.hpp"             // for get_custom_entity_types, CUSTOM_TYPE
 #include "entities_chars.hpp"           // for Player (ptr only), PowerupCapable
@@ -1293,10 +1294,26 @@ void set_adventure_seed(int64_t first, int64_t second)
     write_mem_prot(offset + 8, second, true);
 }
 
-std::pair<int64_t, int64_t> get_adventure_seed()
+std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start)
 {
-    static const size_t offset = get_address("adventure_seed");
-    return {memory_read<int64_t>(offset), memory_read<int64_t>(offset + 8)};
+    if (run_start.value_or(false))
+    {
+        auto bucket = Bucket::get();
+        if (bucket->adventure_seed.first != 0)
+            return bucket->adventure_seed;
+        auto state = State::get().ptr();
+        auto current = get_adventure_seed(false);
+        for (uint8_t i = 0; i < state->level_count + (state->screen == 12 || state->screen == 14 ? 1 : 0); ++i)
+            current.second -= current.first;
+        bucket->adventure_seed.first = current.first;
+        bucket->adventure_seed.second = current.second;
+        return bucket->adventure_seed;
+    }
+    else
+    {
+        static const size_t offset = get_address("adventure_seed");
+        return {memory_read<int64_t>(offset), memory_read<int64_t>(offset + 8)};
+    }
 }
 
 void update_liquid_collision_at(float x, float y, bool add)

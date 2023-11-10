@@ -100,7 +100,7 @@ void destroy_grid(float x, float y, LAYER layer);
 void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid);
 void change_poison_timer(int16_t frames);
 void set_adventure_seed(int64_t first, int64_t second);
-std::pair<int64_t, int64_t> get_adventure_seed();
+std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start);
 void update_liquid_collision_at(float x, float y, bool add);
 bool disable_floor_embeds(bool disable);
 void set_cursepot_ghost_enabled(bool enable);
