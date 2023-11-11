@@ -2256,8 +2256,8 @@ do
     ---@field screen_title ScreenTitle
     ---@field screen_menu ScreenMenu
     ---@field screen_options ScreenOptions
-    ---@field screen_player_profile ScreenPlayerProfile
-    ---@field screen_leaderboards ScreenLeaderboards
+    ---@field screen_player_profile Screen @It just opens journal
+    ---@field screen_leaderboards Screen @All handled by the Online
     ---@field screen_seed_input ScreenSeedInput
     ---@field screen_camp ScreenCamp
     ---@field screen_level ScreenLevel
@@ -5565,6 +5565,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field row integer
 
 ---@class ScreenMenu : Screen
+    ---@field state integer @0: "cthulhu_pre_movement",<br/>1: "cthulhu_rotating",<br/>2: "cthulhu_separating",<br/>3: "cthulhu_lowering",<br/>4: "cthulhu_transition_to_menu",<br/>5: "return_from_backlayer",<br/>6: "highlight_selection",<br/>7: "idle",<br/>8: "to_submenu",<br/>9: "to_backlayer",<br/>10: "backlayer_idle"
     ---@field tunnel_background TextureRenderingInfo
     ---@field cthulhu_disc TextureRenderingInfo
     ---@field tunnel_ring_darkbrown TextureRenderingInfo
@@ -5580,37 +5581,61 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field play_scroll TextureRenderingInfo
     ---@field info_toast TextureRenderingInfo
     ---@field cthulhu_sound SoundMeta
+    ---@field particle_smoke ParticleEmitterInfo
+    ---@field particle_rubble ParticleEmitterInfo
     ---@field cthulhu_disc_ring_angle number
     ---@field cthulhu_disc_split_progress number
     ---@field cthulhu_disc_y number
     ---@field cthulhu_timer number
+    ---@field controls ScreenControls
     ---@field selected_menu_index integer
----@field menu_text_opacity number
+    ---@field sides_hold_down_timer integer
+    ---@field sides_fast_scroll_timer integer
+    ---@field loop boolean
+    ---@field menu_id integer
+    ---@field transfer_to_menu_id integer
+    ---@field menu_text_opacity number
     ---@field spear_position number[] @size: 6
     ---@field spear_dangler SpearDanglerAnimFrames[] @size: 6
+    ---@field spear_dangle_momentum integer[] @size: 6
+    ---@field spear_dangle_angle integer[] @size: 6
     ---@field play_scroll_descend_timer number
     ---@field scroll_text STRINGID
+    ---@field shake_offset_x number
+    ---@field shake_offset_y number
 
 ---@class ScreenOptions : Screen
+    ---@field DOWN boolean
+    ---@field UP boolean
+    ---@field direction_input integer @-1 = none, 0 = down, 1 = up
+    ---@field UP boolean
+    ---@field hold_down_timer integer
+    ---@field fast_scroll_timer integer
     ---@field selected_menu_index integer
-    ---@field brick_border TextureRenderingInfo
+    ---@field sides_hold_down_timer integer
+    ---@field sides_fast_scroll_timer integer
+    ---@field loop boolean
     ---@field top_bottom_woodpanels_velocity number
     ---@field top_bottom_woodpanels_progress number
     ---@field scroll_unfurl_progress number
-    ---@field bottom_woodpanel_y number
-    ---@field top_bottom_woodpanels_slide_in_related number
+    ---@field bottom_woodpanel_speed_multiplayer number
+    ---@field bottom_woodpanel_y_offset number
     ---@field bottom_woodpanel TextureRenderingInfo
     ---@field top_woodpanel TextureRenderingInfo
+    ---@field scroll TextureRenderingInfo
     ---@field top_woodpanel_left_scrollhandle TextureRenderingInfo
     ---@field top_woodpanel_right_scrollhandle TextureRenderingInfo
-    ---@field button_right_caption STRINGID
-    ---@field button_middle_caption STRINGID
+    ---@field scroll_text STRINGID
+    ---@field bottom_left_text STRINGID
+    ---@field bottom_right_text STRINGID
+    ---@field bottom_middle_text STRINGID
     ---@field top_woodpanel_visible boolean
     ---@field bottom_woodpanel_visible boolean
     ---@field toggle_woodpanel_slidein_animation boolean
     ---@field capitalize_top_woodpanel boolean
-    ---@field current_menu_1 integer
-    ---@field current_menu_2 integer
+    ---@field menu_id integer
+    ---@field transfer_to_menu_id integer
+    ---@field graphic_and_audio GraphicandAudioSettings
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field brick_background TextureRenderingInfo
     ---@field brick_middlelayer TextureRenderingInfo
@@ -5621,29 +5646,45 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field item_option_arrow_right TextureRenderingInfo
     ---@field tooltip_background TextureRenderingInfo
     ---@field progressbar_background TextureRenderingInfo
+    ---@field volume_progressbar_foreground TextureRenderingInfo
     ---@field progressbar_foreground TextureRenderingInfo
-    ---@field progressbar_position_indicator TextureRenderingInfo
+    ---@field volume_progressbar_position_indicator TextureRenderingInfo
     ---@field sectionheader_background TextureRenderingInfo
-    ---@field topleft_woodpanel_esc_slidein_timer number
-    ---@field text_fadein_timer number
-    ---@field vertical_scroll_effect_timer number
+    ---@field text_fadein number
+    ---@field vertical_scroll_effect number
+    ---@field item_visiable boolean
+    ---@field item_highlight boolean
+    ---@field tooltip_text STRINGID[]
 
----@class ScreenPlayerProfile : Screen
-
----@class ScreenLeaderboards : Screen
+---@class GraphicandAudioSettings
+    ---@field fullscreen_resolution_id integer
+    ---@field windowed_resolution_id integer
+    ---@field resolution_scale integer @100 = 1.0
+    ---@field display_mode integer @0 = Fullscreen, 1 = Borderless Windowed, 2 = Windowed
 
 ---@class ScreenSeedInput : Screen
+    ---@field bottom_woodpanel_slideup_speed number
     ---@field bottom_woodpanel_slideup_timer number
-    ---@field bottom_woodpanel_y number
+    ---@field bottom_woodpanel_y_offset number
     ---@field bottom_woodpanel TextureRenderingInfo
-    ---@field buttons_text_id STRINGID
+    ---@field bottom_left_text STRINGID
+    ---@field bottom_right_text STRINGID @The only one actually used
+    ---@field bottom_middle_text STRINGID
+    ---@field show_bottom_woodpanel boolean
+    ---@field slide_in_bottom_woodpanel boolean
+    ---@field allow_random boolean @needs to be set before opening the screen to show the correct text at the bottom
+    ---@field selected_button_index integer
+    ---@field pressed_select boolean
     ---@field topleft_woodpanel_esc_slidein_timer number
     ---@field scroll_text_id STRINGID
     ---@field start_text_id STRINGID
     ---@field main_woodpanel_left_border TextureRenderingInfo
     ---@field main_woodpanel_center TextureRenderingInfo
     ---@field main_woodpanel_right_border TextureRenderingInfo
+    ---@field top_scroll TextureRenderingInfo
     ---@field seed_letter_cutouts TextureRenderingInfo
+    ---@field hand_pointer TextureRenderingInfo
+    ---@field key_background TextureRenderingInfo
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field start_sidepanel TextureRenderingInfo
     ---@field start_sidepanel_slidein_timer number

@@ -666,6 +666,16 @@ bool | [pressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=presse
 Type | Name | Description
 ---- | ---- | -----------
 
+### GraphicandAudioSettings
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [fullscreen_resolution_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fullscreen_resolution_id) | 
+int | [windowed_resolution_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=windowed_resolution_id) | 
+int | [resolution_scale](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=resolution_scale) | 100 = 1.0
+int | [display_mode](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=display_mode) | 0 = Fullscreen, 1 = Borderless Windowed, 2 = Windowed
+
 ### Hud
 
 
@@ -2343,14 +2353,6 @@ float | [darkness](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dark
 bool | [active](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active) | ends the intro immediately if set to false
 bool | [skip_prologue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip_prologue) | skips prologue and goes straight to the title screen after the intro
 
-### ScreenLeaderboards
-
-Derived from [Screen](#Screen)
-
-
-Type | Name | Description
----- | ---- | -----------
-
 ### ScreenLevel
 
 Derived from [Screen](#Screen)
@@ -2378,6 +2380,7 @@ Derived from [Screen](#Screen)
 
 Type | Name | Description
 ---- | ---- | -----------
+int | [state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=state) | 0: "cthulhu_pre_movement",<br/>1: "cthulhu_rotating",<br/>2: "cthulhu_separating",<br/>3: "cthulhu_lowering",<br/>4: "cthulhu_transition_to_menu",<br/>5: "return_from_backlayer",<br/>6: "highlight_selection",<br/>7: "idle",<br/>8: "to_submenu",<br/>9: "to_backlayer",<br/>10: "backlayer_idle"
 [TextureRenderingInfo](#TextureRenderingInfo) | [tunnel_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tunnel_background) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [cthulhu_disc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [tunnel_ring_darkbrown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tunnel_ring_darkbrown) | 
@@ -2393,17 +2396,28 @@ Type | Name | Description
 [TextureRenderingInfo](#TextureRenderingInfo) | [play_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [info_toast](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=info_toast) | 
 [SoundMeta](#SoundMeta) | [cthulhu_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_sound) | 
+[ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_smoke](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_smoke) | 
+[ParticleEmitterInfo](#ParticleEmitterInfo) | [particle_rubble](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle_rubble) | 
 float | [cthulhu_disc_ring_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_ring_angle) | 
 float | [cthulhu_disc_split_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_split_progress) | 
 float | [cthulhu_disc_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_disc_y) | 
 float | [cthulhu_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cthulhu_timer) | 
+[ScreenControls](#ScreenControls) | [controls](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controls) | 
 int | [selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) | 
-float | [menu_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_text_opacity) | 
+int | [sides_hold_down_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sides_hold_down_timer) | 
+int | [sides_fast_scroll_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sides_fast_scroll_timer) | 
+bool | [loop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loop) | 
+int | [menu_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_id) | 
+int | [transfer_to_menu_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transfer_to_menu_id) | 
 float | [menu_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_text_opacity) | 
 array&lt;float, 6&gt; | [spear_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_position) | 
 array&lt;[SpearDanglerAnimFrames](#SpearDanglerAnimFrames), 6&gt; | [spear_dangler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler) | 
+array&lt;int, 6&gt; | [spear_dangle_momentum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangle_momentum) | 
+array&lt;int, 6&gt; | [spear_dangle_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangle_angle) | 
 float | [play_scroll_descend_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll_descend_timer) | 
 [STRINGID](#Aliases) | [scroll_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) | 
+float | [shake_offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_offset_x) | 
+float | [shake_offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_offset_y) | 
 
 ### ScreenOnlineLoading
 
@@ -2484,25 +2498,37 @@ Derived from [Screen](#Screen)
 
 Type | Name | Description
 ---- | ---- | -----------
+bool | [DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DOWN) | 
+bool | [UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UP) | 
+int | [direction_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_input) | -1 = none, 0 = down, 1 = up
+bool | [UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UP) | 
+int | [hold_down_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hold_down_timer) | 
+int | [fast_scroll_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fast_scroll_timer) | 
 int | [selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) | 
-[TextureRenderingInfo](#TextureRenderingInfo) | [brick_border](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_border) | 
+int | [sides_hold_down_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sides_hold_down_timer) | 
+int | [sides_fast_scroll_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sides_fast_scroll_timer) | 
+bool | [loop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loop) | 
 float | [top_bottom_woodpanels_velocity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_bottom_woodpanels_velocity) | 
 float | [top_bottom_woodpanels_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_bottom_woodpanels_progress) | 
 float | [scroll_unfurl_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_unfurl_progress) | 
-float | [bottom_woodpanel_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_y) | 
-float | [top_bottom_woodpanels_slide_in_related](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_bottom_woodpanels_slide_in_related) | 
+float | [bottom_woodpanel_speed_multiplayer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_speed_multiplayer) | 
+float | [bottom_woodpanel_y_offset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_y_offset) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [bottom_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [top_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [top_woodpanel_left_scrollhandle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_left_scrollhandle) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [top_woodpanel_right_scrollhandle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_right_scrollhandle) | 
-[STRINGID](#Aliases) | [button_right_caption](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_right_caption) | 
-[STRINGID](#Aliases) | [button_middle_caption](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=button_middle_caption) | 
+[STRINGID](#Aliases) | [scroll_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) | 
+[STRINGID](#Aliases) | [bottom_left_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_text) | 
+[STRINGID](#Aliases) | [bottom_right_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_right_text) | 
+[STRINGID](#Aliases) | [bottom_middle_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_middle_text) | 
 bool | [top_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_woodpanel_visible) | 
 bool | [bottom_woodpanel_visible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_visible) | 
 bool | [toggle_woodpanel_slidein_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle_woodpanel_slidein_animation) | 
 bool | [capitalize_top_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=capitalize_top_woodpanel) | 
-int | [current_menu_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_menu_1) | 
-int | [current_menu_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_menu_2) | 
+int | [menu_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_id) | 
+int | [transfer_to_menu_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transfer_to_menu_id) | 
+[GraphicandAudioSettings](#GraphicandAudioSettings) | [graphic_and_audio](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=graphic_and_audio) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [topleft_woodpanel_esc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [brick_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_background) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [brick_middlelayer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_middlelayer) | 
@@ -2513,20 +2539,15 @@ int | [current_menu_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 [TextureRenderingInfo](#TextureRenderingInfo) | [item_option_arrow_right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_option_arrow_right) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [tooltip_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tooltip_background) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [progressbar_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=progressbar_background) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [volume_progressbar_foreground](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=volume_progressbar_foreground) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [progressbar_foreground](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=progressbar_foreground) | 
-[TextureRenderingInfo](#TextureRenderingInfo) | [progressbar_position_indicator](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=progressbar_position_indicator) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [volume_progressbar_position_indicator](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=volume_progressbar_position_indicator) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [sectionheader_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sectionheader_background) | 
-float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc_slidein_timer) | 
-float | [text_fadein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_fadein_timer) | 
-float | [vertical_scroll_effect_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vertical_scroll_effect_timer) | 
-
-### ScreenPlayerProfile
-
-Derived from [Screen](#Screen)
-
-
-Type | Name | Description
----- | ---- | -----------
+float | [text_fadein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_fadein) | 
+float | [vertical_scroll_effect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vertical_scroll_effect) | 
+bool | [item_visiable](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_visiable) | 
+bool | [item_highlight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_highlight) | 
+vector&lt;[STRINGID](#Aliases)&gt; | [tooltip_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tooltip_text) | 
 
 ### ScreenPrologue
 
@@ -2574,17 +2595,28 @@ Derived from [Screen](#Screen)
 
 Type | Name | Description
 ---- | ---- | -----------
+float | [bottom_woodpanel_slideup_speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_slideup_speed) | 
 float | [bottom_woodpanel_slideup_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_slideup_timer) | 
-float | [bottom_woodpanel_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_y) | 
+float | [bottom_woodpanel_y_offset](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel_y_offset) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [bottom_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_woodpanel) | 
-[STRINGID](#Aliases) | [buttons_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_text_id) | 
+[STRINGID](#Aliases) | [bottom_left_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_text) | 
+[STRINGID](#Aliases) | [bottom_right_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_right_text) | The only one actually used
+[STRINGID](#Aliases) | [bottom_middle_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_middle_text) | 
+bool | [show_bottom_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_bottom_woodpanel) | 
+bool | [slide_in_bottom_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=slide_in_bottom_woodpanel) | 
+bool | [allow_random](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=allow_random) | needs to be set before opening the screen to show the correct text at the bottom
+int | [selected_button_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_button_index) | 
+bool | [pressed_select](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pressed_select) | 
 float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc_slidein_timer) | 
 [STRINGID](#Aliases) | [scroll_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text_id) | 
 [STRINGID](#Aliases) | [start_text_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_text_id) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [main_woodpanel_left_border](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_left_border) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [main_woodpanel_center](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_center) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [main_woodpanel_right_border](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_right_border) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [top_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_scroll) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [seed_letter_cutouts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_letter_cutouts) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [hand_pointer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hand_pointer) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [key_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_background) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [topleft_woodpanel_esc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [start_sidepanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel) | 
 float | [start_sidepanel_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel_slidein_timer) | 
@@ -2826,8 +2858,8 @@ Type | Name | Description
 [ScreenTitle](#ScreenTitle) | [screen_title](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_title) | 
 [ScreenMenu](#ScreenMenu) | [screen_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_menu) | 
 [ScreenOptions](#ScreenOptions) | [screen_options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_options) | 
-[ScreenPlayerProfile](#ScreenPlayerProfile) | [screen_player_profile](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_player_profile) | 
-[ScreenLeaderboards](#ScreenLeaderboards) | [screen_leaderboards](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_leaderboards) | 
+[Screen](#Screen) | [screen_player_profile](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_player_profile) | It just opens journal
+[Screen](#Screen) | [screen_leaderboards](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_leaderboards) | All handled by the [Online](#Online)
 [ScreenSeedInput](#ScreenSeedInput) | [screen_seed_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_seed_input) | 
 [ScreenCamp](#ScreenCamp) | [screen_camp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_camp) | 
 [ScreenLevel](#ScreenLevel) | [screen_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_level) | 
