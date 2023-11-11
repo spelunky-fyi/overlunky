@@ -42,8 +42,6 @@ void register_usertypes(sol::state& lua)
     lua["Screen"]["as_screen_title"] = &Screen::as<ScreenTitle>;
     lua["Screen"]["as_screen_menu"] = &Screen::as<ScreenMenu>;
     lua["Screen"]["as_screen_options"] = &Screen::as<ScreenOptions>;
-    lua["Screen"]["as_screen_player_profile"] = &Screen::as<ScreenPlayerProfile>;
-    lua["Screen"]["as_screen_leaderboards"] = &Screen::as<ScreenLeaderboards>;
     lua["Screen"]["as_screen_seed_input"] = &Screen::as<ScreenSeedInput>;
     lua["Screen"]["as_screen_character_select"] = &Screen::as<ScreenCharacterSelect>;
     lua["Screen"]["as_screen_team_select"] = &Screen::as<ScreenTeamSelect>;
@@ -247,16 +245,6 @@ void register_usertypes(sol::state& lua)
         &GraphicandAudioSettings::resolution_scale,
         "display_mode",
         &GraphicandAudioSettings::display_mode);
-
-    lua.new_usertype<ScreenPlayerProfile>(
-        "ScreenPlayerProfile",
-        sol::base_classes,
-        sol::bases<Screen>());
-
-    lua.new_usertype<ScreenLeaderboards>(
-        "ScreenLeaderboards",
-        sol::base_classes,
-        sol::bases<Screen>());
 
     auto screenseedinput_type = lua.new_usertype<ScreenSeedInput>("ScreenSeedInput", sol::base_classes, sol::bases<Screen>());
     screenseedinput_type["bottom_woodpanel_slideup_timer"] = &ScreenSeedInput::bottom_woodpanel_slideup_timer;

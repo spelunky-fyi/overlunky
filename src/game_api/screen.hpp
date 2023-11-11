@@ -339,16 +339,6 @@ class ScreenOptions : public Screen // ID: 5
     size_t unknown57;
 };
 
-class ScreenPlayerProfile : public Screen // ID: 6
-{
-  public: // not reverse engineered
-};
-
-class ScreenLeaderboards : public Screen // ID: 7
-{
-  public: // not reverse engineered
-};
-
 class ScreenSeedInput : public Screen // ID: 8
 {
   public:

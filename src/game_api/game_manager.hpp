@@ -11,14 +11,13 @@
 struct SaveData;
 class ScreenCamp;
 class ScreenIntro;
-class ScreenLeaderboards;
+class Screen;
 class ScreenLevel;
 class ScreenLogo;
 class ScreenMenu;
 class ScreenOnlineLoading;
 class ScreenOnlineLobby;
 class ScreenOptions;
-class ScreenPlayerProfile;
 class ScreenPrologue;
 class ScreenSeedInput;
 class ScreenTitle;
@@ -181,8 +180,10 @@ struct GameManager
     ScreenTitle* screen_title;
     ScreenMenu* screen_menu;
     ScreenOptions* screen_options;
-    ScreenPlayerProfile* screen_player_profile;
-    ScreenLeaderboards* screen_leaderboards;
+    /// It just opens journal
+    Screen* screen_player_profile;
+    /// All handled by the Online
+    Screen* screen_leaderboards;
     ScreenSeedInput* screen_seed_input;
     size_t unknown_screen_character_select; // available in State
     size_t unknown_screen_team_select;      // available in State
