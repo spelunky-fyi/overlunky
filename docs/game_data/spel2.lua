@@ -2297,11 +2297,12 @@ do
     ---@field input_index integer[] @size: 5 @Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ---@class RawInput
-    ---@field keyboard KeyboardKey[] @size: 112 @State of all keyboard buttons in a random game order as usual
+    ---@field keyboard KeyboardKey[] @size: 112 @State of all keyboard buttons in a random game order as usual, most key indexes can be found in RAW_KEY.
     ---@field controller ControllerInput[] @size: 12 @State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
 
 ---@class KeyboardKey
     ---@field down boolean @Key is being held
+    ---@field pressed boolean @Key was just pressed down this frame
 
 ---@class ControllerInput
     ---@field buttons ControllerButton[] @size: 16

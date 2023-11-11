@@ -1019,6 +1019,17 @@ Name | Data | Description
 [STAR_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.STAR_CHALLENGE_SPAWNED) | 26 | 
 [SUN_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED) | 27 | 
 
+## RAW_KEY
+
+
+> Search script examples for [RAW_KEY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_KEY)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_KEY.UP) | 1 | 
+...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
+
 ## RECURSIVE_MODE
 
 

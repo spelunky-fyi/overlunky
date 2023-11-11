@@ -138,7 +138,9 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<KeyboardKey>(
         "KeyboardKey",
         "down",
-        &KeyboardKey::down);
+        &KeyboardKey::down,
+        "pressed",
+        &KeyboardKey::pressed);
     lua.new_usertype<ControllerInput>(
         "ControllerInput",
         "buttons",
@@ -152,5 +154,72 @@ void register_usertypes(sol::state& lua)
 
     /// Returns RawInput, a game structure for raw keyboard and controller state
     lua["get_raw_input"] = get_raw_input;
+
+    /// Keycodes used specifically in RawInput.keyboard. There are more keys than this though, but I didn't want to figure out the OEM keys.
+    lua.create_named_table("RAW_KEY"
+                           //, "UP", 1
+                           //, "", ...check__[lua_enums.txt]\[game_data/lua_enums.txt\]...
+    );
+
+    lua["RAW_KEY"]["BACKSPACE"] = 0x29;
+    lua["RAW_KEY"]["TAB"] = 0x07;
+    lua["RAW_KEY"]["RETURN"] = 0x06;
+    lua["RAW_KEY"]["SHIFT"] = 0x24;
+    lua["RAW_KEY"]["CTRL"] = 0x22;
+    lua["RAW_KEY"]["ALT"] = 0x26;
+    lua["RAW_KEY"]["RALT"] = 0x27;
+    lua["RAW_KEY"]["ESCAPE"] = 0x05;
+    lua["RAW_KEY"]["SPACE"] = 0x28;
+    lua["RAW_KEY"]["PGUP"] = 0x6C;
+    lua["RAW_KEY"]["PGDN"] = 0x6A;
+    lua["RAW_KEY"]["END"] = 0x6B;
+    lua["RAW_KEY"]["HOME"] = 0x6D;
+    lua["RAW_KEY"]["LEFT"] = 0x03;
+    lua["RAW_KEY"]["UP"] = 0x01;
+    lua["RAW_KEY"]["RIGHT"] = 0x04;
+    lua["RAW_KEY"]["DOWN"] = 0x02;
+    lua["RAW_KEY"]["INSERT"] = 0x68;
+    lua["RAW_KEY"]["DELETE"] = 0x69;
+    lua["RAW_KEY"]["NUMPAD0"] = 0x4C;
+    lua["RAW_KEY"]["NUMPAD1"] = 0x4D;
+    lua["RAW_KEY"]["NUMPAD2"] = 0x4E;
+    lua["RAW_KEY"]["NUMPAD3"] = 0x4F;
+    lua["RAW_KEY"]["NUMPAD4"] = 0x50;
+    lua["RAW_KEY"]["NUMPAD5"] = 0x51;
+    lua["RAW_KEY"]["NUMPAD6"] = 0x52;
+    lua["RAW_KEY"]["NUMPAD7"] = 0x53;
+    lua["RAW_KEY"]["NUMPAD8"] = 0x54;
+    lua["RAW_KEY"]["NUMPAD9"] = 0x55;
+    lua["RAW_KEY"]["MULTIPLY"] = 0x58;
+    lua["RAW_KEY"]["ADD"] = 0x57;
+    lua["RAW_KEY"]["SUBTRACT"] = 0x56;
+    lua["RAW_KEY"]["DECIMAL"] = 0x5B;
+    lua["RAW_KEY"]["DIVIDE"] = 0x59;
+    lua["RAW_KEY"]["F1"] = 0x2A;
+    lua["RAW_KEY"]["F2"] = 0x2B;
+    lua["RAW_KEY"]["F3"] = 0x2C;
+    lua["RAW_KEY"]["F4"] = 0x2D;
+    lua["RAW_KEY"]["F5"] = 0x2E;
+    lua["RAW_KEY"]["F6"] = 0x2F;
+    lua["RAW_KEY"]["F7"] = 0x30;
+    lua["RAW_KEY"]["F8"] = 0x31;
+    lua["RAW_KEY"]["F9"] = 0x32;
+    lua["RAW_KEY"]["F10"] = 0x33;
+    lua["RAW_KEY"]["F11"] = 0x34;
+    lua["RAW_KEY"]["F12"] = 0x35;
+    lua["RAW_KEY"]["LSHIFT"] = 0x24;
+    lua["RAW_KEY"]["RSHIFT"] = 0x25;
+    lua["RAW_KEY"]["LCONTROL"] = 0x22;
+    lua["RAW_KEY"]["RCONTROL"] = 0x23;
+    lua["RAW_KEY"]["LALT"] = 0x26;
+    lua["RAW_KEY"]["RALT"] = 0x27;
+    lua["RAW_KEY"]["PLUS"] = 0x63;
+    lua["RAW_KEY"]["COMMA"] = 0x5E;
+    lua["RAW_KEY"]["MINUS"] = 0x5D;
+    lua["RAW_KEY"]["PERIOD"] = 0x5F;
+    for (char c = '0'; c <= '9'; c++)
+        lua["RAW_KEY"][std::string{c}] = (int)c + 18;
+    for (char c = 'A'; c <= 'Z'; c++)
+        lua["RAW_KEY"][std::string{c}] = (int)c - 57;
 }
 }; // namespace NGM
