@@ -162,4 +162,3 @@ uColor | int;
 SHORT_TILE_CODE | int;
 STRINGID | int;
 FEAT | int;
-KEY | int;

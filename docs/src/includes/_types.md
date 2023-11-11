@@ -1073,6 +1073,7 @@ int | [left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) |
 int | [right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) | 
 int | [up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) | 
 int | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | 
+array&lt;[RAW_KEY](#RAW_KEY), 12&gt; | [mapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mapping) | Can be indexed with [INPUT_FLAG](#INPUT_FLAG), keyboard uses [RAW_KEY](#RAW_KEY) values, controller just uses button numbers.
 
 ### PlayerInputs
 

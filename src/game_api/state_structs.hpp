@@ -21,18 +21,26 @@ struct RobinHoodTableEntry
 
 struct InputMapping
 {
-    uint8_t jump;
-    uint8_t attack;
-    uint8_t bomb;
-    uint8_t rope;
-    uint8_t walk_run;
-    uint8_t use_door_buy;
-    uint8_t pause_menu;
-    uint8_t journal;
-    uint8_t left;
-    uint8_t right;
-    uint8_t up;
-    uint8_t down;
+    union
+    {
+        struct
+        {
+            int8_t jump;
+            int8_t attack;
+            int8_t bomb;
+            int8_t rope;
+            int8_t walk_run;
+            int8_t use_door_buy;
+            int8_t pause_menu;
+            int8_t journal;
+            int8_t left;
+            int8_t right;
+            int8_t up;
+            int8_t down;
+        };
+        /// Can be indexed with INPUT_FLAG, keyboard uses RAW_KEY values, controller just uses button numbers.
+        std::array<RAW_KEY, 12> mapping;
+    };
 };
 
 struct PlayerSlot

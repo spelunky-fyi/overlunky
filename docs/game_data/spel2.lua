@@ -4920,6 +4920,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field right integer
     ---@field up integer
     ---@field down integer
+    ---@field mapping RAW_KEY[] @size: 12 @Can be indexed with INPUT_FLAG, keyboard uses RAW_KEY values, controller just uses button numbers.
 
 ---@class PlayerInputs
     ---@field player_slots PlayerSlot[] @size: MAX_PLAYERS
@@ -11240,4 +11241,3 @@ local MAX_PLAYERS = 4
 ---@alias SHORT_TILE_CODE integer;
 ---@alias STRINGID integer;
 ---@alias FEAT integer;
----@alias KEY integer;
