@@ -647,6 +647,14 @@ void GuiDrawContext::win_group(sol::function callback)
     handle_function<void>(backend, callback);
     ImGui::EndGroup();
 }
+void GuiDrawContext::win_dummy(float width, float height)
+{
+    if (std::abs(width) > 0.0f && std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
+    if (std::abs(height) > 0.0f && std::abs(height) < 1.0f)
+        height *= ImGui::GetContentRegionMax().x;
+    ImGui::Dummy(ImVec2(width, height));
+}
 void GuiDrawContext::win_indent(float width)
 {
     if (std::abs(width) < 1.0f)
@@ -677,6 +685,40 @@ void GuiDrawContext::win_disabled(bool disabled, sol::function callback)
     handle_function<void>(backend, callback);
     if (disabled)
         ImGui::EndDisabled();
+}
+Vec2 GuiDrawContext::win_get_cursor_pos()
+{
+    return Vec2(ImGui::GetCursorPos());
+}
+void GuiDrawContext::win_set_cursor_pos(float x, float y)
+{
+    ImGui::SetCursorPos(ImVec2(x, y));
+}
+void GuiDrawContext::win_set_cursor_pos(Vec2 p)
+{
+    win_set_cursor_pos(p.x, p.y);
+}
+Vec2 GuiDrawContext::win_get_cursor_screen_pos()
+{
+    return Vec2(ImGui::GetCursorScreenPos());
+}
+void GuiDrawContext::win_set_cursor_screen_pos(float x, float y)
+{
+    ImGui::SetCursorScreenPos(ImVec2(x, y));
+}
+void GuiDrawContext::win_set_cursor_screen_pos(Vec2 p)
+{
+    win_set_cursor_screen_pos(p.x, p.y);
+}
+Vec2 GuiDrawContext::win_get_content_region_max()
+{
+    return Vec2(ImGui::GetContentRegionMax());
+}
+AABB GuiDrawContext::win_get_item_rect()
+{
+    auto rect_min = ImGui::GetItemRectMin();
+    auto rect_max = ImGui::GetItemRectMax();
+    return AABB(rect_min.x, rect_max.y, rect_max.x, rect_min.y);
 }
 void GuiDrawContext::draw_layer(DRAW_LAYER layer)
 {
@@ -755,6 +797,12 @@ void register_usertypes(sol::state& lua)
     auto win_disabled = sol::overload(
         static_cast<void (GuiDrawContext::*)(sol::function)>(&GuiDrawContext::win_disabled),
         static_cast<void (GuiDrawContext::*)(bool, sol::function)>(&GuiDrawContext::win_disabled));
+    auto win_set_cursor_pos = sol::overload(
+        static_cast<void (GuiDrawContext::*)(float, float)>(&GuiDrawContext::win_set_cursor_pos),
+        static_cast<void (GuiDrawContext::*)(Vec2)>(&GuiDrawContext::win_set_cursor_pos));
+    auto win_set_cursor_screen_pos = sol::overload(
+        static_cast<void (GuiDrawContext::*)(float, float)>(&GuiDrawContext::win_set_cursor_screen_pos),
+        static_cast<void (GuiDrawContext::*)(Vec2)>(&GuiDrawContext::win_set_cursor_screen_pos));
 
     /// Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with ON.GUIFRAME
     auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
@@ -803,9 +851,16 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_menu"] = win_menu;
     guidrawcontext_type["win_menu_item"] = win_menu_item;
     guidrawcontext_type["win_group"] = &GuiDrawContext::win_group;
+    guidrawcontext_type["win_dummy"] = &GuiDrawContext::win_dummy;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
     guidrawcontext_type["win_disabled"] = win_disabled;
+    guidrawcontext_type["win_get_cursor_pos"] = &GuiDrawContext::win_get_cursor_pos;
+    guidrawcontext_type["win_set_cursor_pos"] = win_set_cursor_pos;
+    guidrawcontext_type["win_get_cursor_screen_pos"] = &GuiDrawContext::win_get_cursor_screen_pos;
+    guidrawcontext_type["win_set_cursor_screen_pos"] = win_set_cursor_screen_pos;
+    guidrawcontext_type["win_get_content_region_max"] = &GuiDrawContext::win_get_content_region_max;
+    guidrawcontext_type["win_get_item_rect"] = &GuiDrawContext::win_get_item_rect;
 
     /// Condition for setting a variable on a GUI widget. The variable is not changed if the condition is not met.
     lua.create_named_table("GUI_CONDITION", "ALWAYS", ImGuiCond_Always, "ONCE", ImGuiCond_Once, "FIRST_USE_EVER", ImGuiCond_FirstUseEver, "APPEARING", ImGuiCond_Appearing);

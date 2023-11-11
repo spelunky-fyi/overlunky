@@ -174,6 +174,8 @@ class GuiDrawContext
     bool win_menu_item(std::string label, std::optional<std::string> shortcut, bool checked, bool enabled);
     /// Widgets created in the callback are grouped together into a box starting at the current horizontal position. Calls affecting single items, such as `win_tooltip`, will treat the whole group as one item.
     void win_group(sol::function callback);
+    /// Add a dummy item that fills space in the window.
+    void win_dummy(float width, float height);
     /// Indent contents, or unindent if negative
     void win_indent(float width);
     /// Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
@@ -182,6 +184,23 @@ class GuiDrawContext
     void win_disabled(sol::function callback);
     /// Disable user interactions and dim widgets inside callback. Widgets are not disabled if `disabled` is false.
     void win_disabled(bool disabled, sol::function callback);
+    // TODO: "Cursor" may be a confusing name.
+    // TODO: What should I do about the different coordinate systems for these calls?
+    Vec2 win_get_cursor_pos();
+    // TODO
+    void win_set_cursor_pos(float x, float y);
+    // TODO
+    void win_set_cursor_pos(Vec2 p);
+    // TODO
+    Vec2 win_get_cursor_screen_pos();
+    // TODO
+    void win_set_cursor_screen_pos(float x, float y);
+    // TODO
+    void win_set_cursor_screen_pos(Vec2 p);
+    // TODO
+    Vec2 win_get_content_region_max();
+    // TODO
+    AABB win_get_item_rect();
 
   private:
     class LuaBackend* backend;

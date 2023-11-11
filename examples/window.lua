@@ -256,7 +256,9 @@ set_callback(function(draw_ctx)
             draw_ctx:win_button('50% width', 0.5, 0.25)
             draw_ctx:win_inline()
             draw_ctx:win_group(function()
-                draw_ctx:win_button('25% width', 0.25, 0.15)
+                draw_ctx:win_dummy(0.2, 0.15)
+                draw_ctx:win_inline()
+                draw_ctx:win_button('20% width', 0.2, 0.15)
                 draw_ctx:win_button('200px x 100px', 200, 100)
                 for i = 1, 5 do
                     if i ~= 1 then
