@@ -752,30 +752,6 @@ void LuaBackend::pre_load_level_files()
         }
     }
 }
-bool LuaBackend::pre_level_generation()
-{
-    if (!get_enabled())
-        return false;
-
-    auto now = get_frame_count();
-
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == ON::PRE_LEVEL_GENERATION)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            auto return_value = handle_function<bool>(this, callback.func).value_or(false);
-            clear_current_callback();
-            callback.lastRan = now;
-            if (return_value)
-                return return_value;
-        }
-    }
-    return false;
-}
 bool LuaBackend::pre_init_level()
 {
     if (!get_enabled())
@@ -1060,27 +1036,6 @@ void LuaBackend::post_level_generation()
         }
     }
 }
-void LuaBackend::post_init_level()
-{
-    if (!get_enabled())
-        return;
-
-    auto now = get_frame_count();
-
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == ON::POST_LEVEL_CREATION)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func);
-            clear_current_callback();
-            callback.lastRan = now;
-        }
-    }
-}
 void LuaBackend::post_init_layer(LAYER layer)
 {
     if (!get_enabled())
@@ -1121,27 +1076,6 @@ void LuaBackend::post_load_screen()
             continue;
 
         if (callback.screen == ON::POST_LOAD_SCREEN)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func);
-            clear_current_callback();
-            callback.lastRan = now;
-        }
-    }
-}
-void LuaBackend::post_unload_level()
-{
-    if (!get_enabled())
-        return;
-
-    auto now = get_frame_count();
-
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == ON::POST_LEVEL_DESTRUCTION)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func);
@@ -1808,34 +1742,6 @@ void LuaBackend::pop_calling_backend([[maybe_unused]] LuaBackend* calling_backen
  * static functions end
  */
 
-bool LuaBackend::on_pre_state_update()
-{
-    if (!get_enabled())
-        return false;
-
-    auto now = get_frame_count();
-    std::lock_guard lock{global_lua_lock};
-
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == ON::PRE_UPDATE)
-        {
-            callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
-            if (handle_function<bool>(this, callback.func).value_or(false))
-            {
-                clear_current_callback();
-                return true;
-            }
-            clear_current_callback();
-        }
-    }
-    return false;
-}
-
 void LuaBackend::on_set_user_data(Entity* ent)
 {
     if (!get_enabled())
@@ -1857,53 +1763,47 @@ void LuaBackend::on_set_user_data(Entity* ent)
     }
 }
 
-bool LuaBackend::on_pre_process_input()
+bool LuaBackend::on_pre(ON event)
 {
+    bool skip{false};
     if (!get_enabled())
-        return false;
+        return skip;
 
     auto now = get_frame_count();
-    std::lock_guard lock{global_lua_lock};
-
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::PRE_PROCESS_INPUT)
+        if (callback.screen == event)
         {
-            callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
-            if (handle_function<bool>(this, callback.func).value_or(false))
-            {
-                clear_current_callback();
-                return true;
-            }
+            skip |= handle_function<bool>(this, callback.func).value_or(false);
             clear_current_callback();
+            callback.lastRan = now;
         }
     }
-    return false;
+
+    return skip;
 }
 
-void LuaBackend::on_post_process_input()
+void LuaBackend::on_post(ON event)
 {
     if (!get_enabled())
         return;
 
     auto now = get_frame_count();
-    std::lock_guard lock{global_lua_lock};
-
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == ON::POST_PROCESS_INPUT)
+        if (callback.screen == event)
         {
-            callback.lastRan = now;
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func);
             clear_current_callback();
+            callback.lastRan = now;
         }
     }
 }

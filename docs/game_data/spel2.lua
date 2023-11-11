@@ -25,14 +25,39 @@ options = nil
 ---@type PRNG
 prng = nil
 
+---Create a global `exports` table and put stuff in it,
+---and other scripts will be able to `import` your script like a library
+---@class Exports
+
+---@type Exports
+exports = nil
+
+---The json library converts tables to json and json to tables
+---Check https://github.com/rxi/json.lua for more information
+---@class Json
+---@field decode fun(str: string): table @Decode a json string into a table
+---@field encode fun(tbl: table): string @Encode a table into a json string
+---@type Json
+json = nil
+
+io.open_data = io.open
+io.open_mod = io.open
+os.remove_data = os.remove
+os.remove_mod = os.remove
+
+
 -- Functions
 
 
----Formatting function, use e.g. as f "my_var = {my_var}"
+---Return any type of object or multiple objects as a debug string.
+---@vararg any
+---@return string
+function inspect(...) end
+---Formatting function, use e.g. as f"my_var = {my_var}"
 ---@param f_string string
 ---@return string
 function f(f_string) end
----Formatting function, use e.g. as f "my_var = {my_var}"
+---Formatting function, use e.g. as F"my_var = {my_var}"
 ---@param f_string string
 ---@return string
 function F(f_string) end
@@ -129,8 +154,8 @@ function clear_callback(id) end
 ---- `false` if the script was not found but optional is set to true
 ---- an error if the script was not found and the optional argument was not set
 ---@param id string
----@param version string
----@param optional boolean
+---@param version string?
+---@param optional boolean?
 ---@return table
 function import(id, version, optional) end
 ---Check if another script is enabled by id "author/name". You should probably check this after all the other scripts have had a chance to load.
@@ -889,6 +914,9 @@ function get_camera_position() end
 ---@param cy number
 ---@return nil
 function set_camera_position(cx, cy) end
+---Updates the camera focus according to the params set in Camera, i.e. to apply normal camera movement when paused etc.
+---@return nil
+function update_camera_position() end
 ---Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 ---@param flags Flags
 ---@param bit integer
@@ -1130,10 +1158,11 @@ function spawn_shopkeeper(x, y, layer, room_template) end
 ---@param room_template ROOM_TEMPLATE
 ---@return integer
 function spawn_roomowner(owner_type, x, y, layer, room_template) end
----Get the current adventure seed pair
+---Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.
+---@param run_start boolean?
 ---@return integer, integer
-function get_adventure_seed() end
----Set the current adventure seed pair
+function get_adventure_seed(run_start) end
+---Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
 ---@param first integer
 ---@param second integer
 ---@return nil
@@ -1234,19 +1263,19 @@ function set_boss_door_control_enabled(enable) end
 ---Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
 ---@return nil
 function update_state() end
----Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.
+---Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
 ---@param frametime double?
 ---@return nil
 function set_frametime(frametime) end
 ---Get engine target frametime (1/framerate, default 1/60).
----@return double?
+---@return double
 function get_frametime() end
 ---Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
 ---@param frametime double?
 ---@return nil
 function set_frametime_unfocused(frametime) end
 ---Get engine target frametime when game is unfocused (1/framerate, default 1/33).
----@return double?
+---@return double
 function get_frametime_unfocused() end
 ---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
 ---Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
@@ -1308,6 +1337,9 @@ function set_level_logic_enabled(enable) end
 ---@param enable boolean
 ---@return nil
 function set_start_level_paused(enable) end
+---Returns true if the level pause hack is enabled
+---@return boolean
+function get_start_level_paused() end
 ---Converts INPUTS to (x, y, BUTTON)
 ---@param inputs INPUTS
 ---@return number, number, BUTTON
@@ -1328,6 +1360,13 @@ function set_infinite_loop_detection_enabled(enable) end
 ---@param enable boolean
 ---@return nil
 function set_camera_layer_control_enabled(enable) end
+---Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
+---@param multiplier number?
+---@return nil
+function set_speedhack(multiplier) end
+---Get the current speedhack multiplier
+---@return number
+function get_speedhack() end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2161,7 +2200,7 @@ do
     ---@field shake_multiplier_y number
     ---@field uniform_shake boolean
     ---@field focused_entity_uid integer
-    ---@field inertia number
+    ---@field inertia number @This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
 
 ---@class Online
     ---@field online_players OnlinePlayer[] @size: 4
@@ -2254,7 +2293,7 @@ do
     ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
     ---@field input_menu_previous MENU_INPUT @Previous state of buttons_menu
     ---@field game_has_focus boolean
-    ---@field menu_open integer
+    ---@field menu_open boolean
     ---@field input_index integer[] @size: 5 @Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ---@class RawInput
@@ -5486,6 +5525,7 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class Screen
     ---@field render_timer number
+    ---@field init fun(self): nil @Initializes the screen.
 
 ---@class ScreenLogo : Screen
     ---@field logo_mossmouth TextureRenderingInfo
@@ -5607,6 +5647,9 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field start_sidepanel TextureRenderingInfo
     ---@field start_sidepanel_slidein_timer number
+    ---@field seed_length integer @Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
+    ---@field get_seed integer?
+    ---@field set_seed any @[](ScreenSeedInput&s
 
 ---@class ScreenCharacterSelect : Screen
     ---@field main_background_zoom_target number
@@ -6341,13 +6384,12 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
 
 ---@class Overlunky
     ---@field options table<string, any> @Current Overlunky options. Read only.
-    ---@field set_options table<string, any> @Write some select options here to change Overlunky options. Just use the same keys as in options.
+    ---@field set_options table<string, any> @Write [some select options](https://github.com/search?q=repo%3Aspelunky-fyi%2Foverlunky+legal_options+language%3AC%2B%2B&type=code&l=C%2B%2B) here to change Overlunky options.
     ---@field keys table<string, KEY> @Current Overlunky key bindings. Read only. You can use this to bind some custom feature to the same unknown key as currently bound by the user.
     ---@field ignore_keys unordered_Array<string> @Disable some key bindings in Overlunky, whatever key they are actually bound to. Remember this might not be bound to the default any more, so only use this if you also plan on overriding the current keybinding, or just need to disable some feature and don't care what key it is bound on.
     ---@field ignore_keycodes unordered_Array<KEY> @Disable keys that may or may not be used by Overlunky. You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
     ---@field ignore_features unordered_Array<string> @TODO: Disable Overlunky features. Doesn't do anything yet.
     ---@field selected_uid integer @Currently selected uid in the entity picker or -1 if nothing is selected.
-    ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
     ---@field selected_uids integer[] @Currently selected uids in the entity finder.
     ---@field hovered_uid integer @Currently hovered entity uid or -1 if nothing is hovered.
     ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.

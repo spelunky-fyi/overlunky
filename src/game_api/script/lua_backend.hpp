@@ -130,6 +130,8 @@ enum class ON
     POST_LAYER_DESTRUCTION,
     PRE_PROCESS_INPUT,
     POST_PROCESS_INPUT,
+    PRE_GAME_LOOP,
+    POST_GAME_LOOP,
 };
 
 struct IntOption
@@ -373,7 +375,6 @@ class LuaBackend
     void post_tile_code(std::string_view tile_code, float x, float y, int layer, uint16_t room_template);
 
     void pre_load_level_files();
-    bool pre_level_generation();
     bool pre_load_screen();
     bool pre_init_level();
     bool pre_init_layer(LAYER layer);
@@ -383,9 +384,7 @@ class LuaBackend
     void post_room_generation();
     void post_level_generation();
     void post_load_screen();
-    void post_init_level();
     void post_init_layer(LAYER layer);
-    void post_unload_level();
     void post_unload_layer(LAYER layer);
 
     void on_death_message(STRINGID stringid);
@@ -434,11 +433,10 @@ class LuaBackend
     static std::string get_calling_backend_id();
     static void push_calling_backend(LuaBackend*);
     static void pop_calling_backend(LuaBackend*);
-    bool on_pre_state_update();
     void on_set_user_data(Entity* ent);
     void load_user_data();
-    bool on_pre_process_input();
-    void on_post_process_input();
+    bool on_pre(ON event);
+    void on_post(ON event);
 };
 
 template <class Inheriting>

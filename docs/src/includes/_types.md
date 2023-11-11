@@ -797,13 +797,12 @@ Used to get and set [Overlunky](#Overlunky) settings in [Bucket](#Bucket)
 Type | Name | Description
 ---- | ---- | -----------
 map&lt;string, any&gt; | [options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=options) | Current [Overlunky](#Overlunky) options. Read only.
-map&lt;string, any&gt; | [set_options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_options) | Write some select options here to change [Overlunky](#Overlunky) options. Just use the same keys as in options.
+map&lt;string, any&gt; | [set_options](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_options) | Write [some select options](https://github.com/search?q=repo%3Aspelunky-fyi%2Foverlunky+legal_options+language%3AC%2B%2B&type=code&l=C%2B%2B) here to change [Overlunky](#Overlunky) options.
 map&lt;string, [KEY](#KEY)&gt; | [keys](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | Current [Overlunky](#Overlunky) key bindings. Read only. You can use this to bind some custom feature to the same unknown key as currently bound by the user.
 set&lt;string&gt; | [ignore_keys](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_keys) | Disable some key bindings in [Overlunky](#Overlunky), whatever key they are actually bound to. Remember this might not be bound to the default any more, so only use this if you also plan on overriding the current keybinding, or just need to disable some feature and don't care what key it is bound on.
 set&lt;[KEY](#KEY)&gt; | [ignore_keycodes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_keycodes) | Disable keys that may or may not be used by [Overlunky](#Overlunky). You should probably write the keycodes you need here just in case if you think using OL will interfere with your keybinds.
 set&lt;string&gt; | [ignore_features](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_features) | TODO: Disable [Overlunky](#Overlunky) features. Doesn't do anything yet.
 int | [selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_uid) | Currently selected uid in the entity picker or -1 if nothing is selected.
-optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
 vector&lt;int&gt; | [selected_uids](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_uids) | Currently selected uids in the entity finder.
 int | [hovered_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hovered_uid) | Currently hovered entity uid or -1 if nothing is hovered.
 optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
@@ -1963,6 +1962,7 @@ Type | Name | Description
 Type | Name | Description
 ---- | ---- | -----------
 float | [render_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=render_timer) | 
+nil | [init()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=init) | Initializes the screen.
 
 ### ScreenArenaIntro
 
@@ -2588,6 +2588,9 @@ float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/ov
 [TextureRenderingInfo](#TextureRenderingInfo) | [topleft_woodpanel_esc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [start_sidepanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel) | 
 float | [start_sidepanel_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel_slidein_timer) | 
+int | [seed_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_length) | Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
+optional&lt;int&gt; | [get_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_seed) | Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.<br/> 
+ | [set_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_seed) | Params: optional<int> seed, optional<int> length<br/>Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.<br/> 
 
 ### ScreenStateCamp
 
@@ -2807,7 +2810,7 @@ float | [shake_multiplier_x](https://github.com/spelunky-fyi/overlunky/search?l=
 float | [shake_multiplier_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_y) | 
 bool | [uniform_shake](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uniform_shake) | 
 int | [focused_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) | 
-float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) | 
+float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) | This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
 
 ### GameManager
 
@@ -2847,7 +2850,7 @@ array&lt;int, MAX_PLAYERS&gt; | [input_previous](https://github.com/spelunky-fyi
 [MENU_INPUT](#MENU_INPUT) | [input_menu](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_menu) | Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in [ON](#ON).POST_PROCESS_INPUT
 [MENU_INPUT](#MENU_INPUT) | [input_menu_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_menu_previous) | Previous state of buttons_menu
 bool | [game_has_focus](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_has_focus) | 
-int | [menu_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_open) | 
+bool | [menu_open](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_open) | 
 array&lt;int, 5&gt; | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ### Items

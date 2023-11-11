@@ -813,6 +813,12 @@
                             <a href="#get_setting" class="toc-h3 toc-link" data-title="get_setting">get_setting</a>
                           </li>
                           <li>
+                            <a href="#get_speedhack" class="toc-h3 toc-link" data-title="get_speedhack">get_speedhack</a>
+                          </li>
+                          <li>
+                            <a href="#get_start_level_paused" class="toc-h3 toc-link" data-title="get_start_level_paused">get_start_level_paused</a>
+                          </li>
+                          <li>
                             <a href="#god" class="toc-h3 toc-link" data-title="god">god</a>
                           </li>
                           <li>
@@ -921,6 +927,9 @@
                             <a href="#set_setting" class="toc-h3 toc-link" data-title="set_setting">set_setting</a>
                           </li>
                           <li>
+                            <a href="#set_speedhack" class="toc-h3 toc-link" data-title="set_speedhack">set_speedhack</a>
+                          </li>
+                          <li>
                             <a href="#set_start_level_paused" class="toc-h3 toc-link" data-title="set_start_level_paused">set_start_level_paused</a>
                           </li>
                           <li>
@@ -960,6 +969,9 @@
                           </li>
                           <li>
                             <a href="#get_io" class="toc-h3 toc-link" data-title="get_io">get_io</a>
+                          </li>
+                          <li>
+                            <a href="#get_raw_input" class="toc-h3 toc-link" data-title="get_raw_input">get_raw_input</a>
                           </li>
                           <li>
                             <a href="#mouse_position" class="toc-h3 toc-link" data-title="mouse_position">mouse_position</a>
@@ -1175,6 +1187,9 @@
                           </li>
                           <li>
                             <a href="#set_camp_camera_bounds_enabled" class="toc-h3 toc-link" data-title="set_camp_camera_bounds_enabled">set_camp_camera_bounds_enabled</a>
+                          </li>
+                          <li>
+                            <a href="#update_camera_position" class="toc-h3 toc-link" data-title="update_camera_position">update_camera_position</a>
                           </li>
                           <li>
                             <a href="#zoom" class="toc-h3 toc-link" data-title="zoom">zoom</a>
@@ -1751,6 +1766,9 @@
                             <a href="#Color" class="toc-h3 toc-link" data-title="Color">Color</a>
                           </li>
                           <li>
+                            <a href="#ControllerButton" class="toc-h3 toc-link" data-title="ControllerButton">ControllerButton</a>
+                          </li>
+                          <li>
                             <a href="#CutsceneBehavior" class="toc-h3 toc-link" data-title="CutsceneBehavior">CutsceneBehavior</a>
                           </li>
                           <li>
@@ -1770,6 +1788,9 @@
                           </li>
                           <li>
                             <a href="#ItemOwnerDetails" class="toc-h3 toc-link" data-title="ItemOwnerDetails">ItemOwnerDetails</a>
+                          </li>
+                          <li>
+                            <a href="#KeyboardKey" class="toc-h3 toc-link" data-title="KeyboardKey">KeyboardKey</a>
                           </li>
                           <li>
                             <a href="#Letter" class="toc-h3 toc-link" data-title="Letter">Letter</a>
@@ -1822,16 +1843,25 @@
                     <a href="#Input-types" class="toc-h2 toc-link" data-title="Input types">Input types</a>
                       <ul class="toc-list-h3">
                           <li>
+                            <a href="#ControllerInput" class="toc-h3 toc-link" data-title="ControllerInput">ControllerInput</a>
+                          </li>
+                          <li>
                             <a href="#Gamepad" class="toc-h3 toc-link" data-title="Gamepad">Gamepad</a>
                           </li>
                           <li>
                             <a href="#ImGuiIO" class="toc-h3 toc-link" data-title="ImGuiIO">ImGuiIO</a>
                           </li>
                           <li>
+                            <a href="#InputDevice" class="toc-h3 toc-link" data-title="InputDevice">InputDevice</a>
+                          </li>
+                          <li>
                             <a href="#InputMapping" class="toc-h3 toc-link" data-title="InputMapping">InputMapping</a>
                           </li>
                           <li>
                             <a href="#PlayerInputs" class="toc-h3 toc-link" data-title="PlayerInputs">PlayerInputs</a>
+                          </li>
+                          <li>
+                            <a href="#RawInput" class="toc-h3 toc-link" data-title="RawInput">RawInput</a>
                           </li>
                       </ul>
                   </li>
@@ -3565,6 +3595,18 @@
                   <li>
                     <a href="#ON-POST_LAYER_DESTRUCTION" class="toc-h2 toc-link" data-title="ON.POST_LAYER_DESTRUCTION">ON.POST_LAYER_DESTRUCTION</a>
                   </li>
+                  <li>
+                    <a href="#ON-PRE_PROCESS_INPUT" class="toc-h2 toc-link" data-title="ON.PRE_PROCESS_INPUT">ON.PRE_PROCESS_INPUT</a>
+                  </li>
+                  <li>
+                    <a href="#ON-POST_PROCESS_INPUT" class="toc-h2 toc-link" data-title="ON.POST_PROCESS_INPUT">ON.POST_PROCESS_INPUT</a>
+                  </li>
+                  <li>
+                    <a href="#ON-PRE_GAME_LOOP" class="toc-h2 toc-link" data-title="ON.PRE_GAME_LOOP">ON.PRE_GAME_LOOP</a>
+                  </li>
+                  <li>
+                    <a href="#ON-POST_GAME_LOOP" class="toc-h2 toc-link" data-title="ON.POST_GAME_LOOP">ON.POST_GAME_LOOP</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -4969,8 +5011,8 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_adventure_seed">get_adventure_seed</a></p>
 </blockquote>
-<h4 id='tuple-lt-int-int-gt-get_adventure_seed'>tuple&lt;int, int&gt; get_adventure_seed()</h4>
-<p>Get the current adventure seed pair</p>
+<h4 id='tuple-lt-int-int-gt-get_adventure_seed-optional-run_start'>tuple&lt;int, int&gt; get_adventure_seed(optional<bool> run_start)</h4>
+<p>Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.</p>
 <h3 id='get_bucket'>get_bucket</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_bucket">get_bucket</a></p>
@@ -5000,13 +5042,13 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime">get_frametime</a></p>
 </blockquote>
-<h4 id='optional-lt-double-gt-get_frametime'>optional&lt;double&gt; get_frametime()</h4>
+<h4 id='double-get_frametime'>double get_frametime()</h4>
 <p>Get engine target frametime (1/framerate, default 1/60).</p>
 <h3 id='get_frametime_unfocused'>get_frametime_unfocused</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime_unfocused">get_frametime_unfocused</a></p>
 </blockquote>
-<h4 id='optional-lt-double-gt-get_frametime_unfocused'>optional&lt;double&gt; get_frametime_unfocused()</h4>
+<h4 id='double-get_frametime_unfocused'>double get_frametime_unfocused()</h4>
 <p>Get engine target frametime when game is unfocused (1/framerate, default 1/33).</p>
 <h3 id='get_global_frame'>get_global_frame</h3>
 <blockquote>
@@ -5054,6 +5096,18 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 </blockquote>
 <h4 id='optional-lt-int-gt-get_setting-GAME_SETTING-setting'>optional&lt;int&gt; get_setting(<a href="#GAME_SETTING">GAME_SETTING</a> setting)</h4>
 <p>Gets the specified setting, values might need to be interpreted differently per setting</p>
+<h3 id='get_speedhack'>get_speedhack</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_speedhack">get_speedhack</a></p>
+</blockquote>
+<h4 id='float-get_speedhack'>float get_speedhack()</h4>
+<p>Get the current speedhack multiplier</p>
+<h3 id='get_start_level_paused'>get_start_level_paused</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_start_level_paused">get_start_level_paused</a></p>
+</blockquote>
+<h4 id='bool-get_start_level_paused'>bool get_start_level_paused()</h4>
+<p>Returns true if the level pause hack is enabled</p>
 <h3 id='god'>god</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=god">god</a></p>
@@ -5089,7 +5143,7 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
 </blockquote>
-<h4 id='table-import-string-id-string-version-quot-quot-bool-optional-false'>table import(string id, string version = &quot;&quot;, bool optional = false)</h4>
+<h4 id='table-import-string-id-optional-version-optional-optional'>table import(string id, optional<string> version, optional<bool> optional)</h4>
 <p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table. Returns:</p>
 
 <ul>
@@ -5207,7 +5261,7 @@ I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <c
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_adventure_seed">set_adventure_seed</a></p>
 </blockquote>
 <h4 id='nil-set_adventure_seed-int-first-int-second'>nil set_adventure_seed(int first, int second)</h4>
-<p>Set the current adventure seed pair</p>
+<p>Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.</p>
 <h3 id='set_camera_layer_control_enabled'>set_camera_layer_control_enabled</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_camera_layer_control_enabled</span><span class="p">(</span><span class="kc">false</span><span class="p">)</span>
 
 <span class="n">g_current_timer</span> <span class="o">=</span> <span class="kc">nil</span>
@@ -5270,7 +5324,7 @@ Look at the example on how to mimic game layer switching behavior</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_frametime">set_frametime</a></p>
 </blockquote>
 <h4 id='nil-set_frametime-optional-frametime'>nil set_frametime(optional<double> frametime)</h4>
-<p>Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset.</p>
+<p>Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack</p>
 <h3 id='set_frametime_unfocused'>set_frametime_unfocused</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_frametime_unfocused">set_frametime_unfocused</a></p>
@@ -5331,6 +5385,12 @@ Look at the example on how to mimic game layer switching behavior</p>
 </blockquote>
 <h4 id='bool-set_setting-GAME_SETTING-setting-int-value'>bool set_setting(<a href="#GAME_SETTING">GAME_SETTING</a> setting, int value)</h4>
 <p>Sets the specified setting temporarily. These values are not saved and might reset to the users real settings if they visit the options menu. (Check example.) All settings are available in unsafe mode and only a smaller subset <a href="#SAFE_SETTING">SAFE_SETTING</a> by default for <a href="#Hud">Hud</a> and other visuals. Returns false, if setting failed.</p>
+<h3 id='set_speedhack'>set_speedhack</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_speedhack">set_speedhack</a></p>
+</blockquote>
+<h4 id='nil-set_speedhack-optional-multiplier'>nil set_speedhack(optional<float> multiplier)</h4>
+<p>Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime</p>
 <h3 id='set_start_level_paused'>set_start_level_paused</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_start_level_paused">set_start_level_paused</a></p>
@@ -5452,6 +5512,12 @@ Look at the example on how to mimic game layer switching behavior</p>
 <li>Note: <a href="#Overlunky">Overlunky</a>/etc will eat all keys it is currently configured to use, your script will only get leftovers.</li>
 <li>Note: <a href="#Gamepad">Gamepad</a> is basically <a href="https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad">XINPUT_GAMEPAD</a> but variables are renamed and values are normalized to -1.0..1.0 range.</li>
 </ul>
+<h3 id='get_raw_input'>get_raw_input</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_raw_input">get_raw_input</a></p>
+</blockquote>
+<h4 id='RawInput-get_raw_input'><a href="#RawInput">RawInput</a> get_raw_input()</h4>
+<p>Returns <a href="#RawInput">RawInput</a>, a game structure for raw keyboard and controller state</p>
 <h3 id='mouse_position'>mouse_position</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mouse_position">mouse_position</a></p>
@@ -5866,6 +5932,12 @@ you&#39;re standing on, not real level coordinates.</p>
 </blockquote>
 <h4 id='nil-set_camp_camera_bounds_enabled-bool-b'>nil set_camp_camera_bounds_enabled(bool b)</h4>
 <p>Enables or disables the default position based camp camera bounds, to set them manually yourself</p>
+<h3 id='update_camera_position'>update_camera_position</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update_camera_position">update_camera_position</a></p>
+</blockquote>
+<h4 id='nil-update_camera_position'>nil update_camera_position()</h4>
+<p>Updates the camera focus according to the params set in <a href="#Camera">Camera</a>, i.e. to apply normal camera movement when paused etc.</p>
 <h3 id='zoom'>zoom</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=zoom">zoom</a></p>
@@ -9199,6 +9271,25 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Copies the values of different <a href="#Color">Color</a> to this one</td>
 </tr>
 </tbody></table>
+<h3 id='ControllerButton'>ControllerButton</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=down">down</a></td>
+<td><a href="#Button">Button</a> is being held</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pressed">pressed</a></td>
+<td><a href="#Button">Button</a> was just pressed down this frame</td>
+</tr>
+</tbody></table>
 <h3 id='CutsceneBehavior'>CutsceneBehavior</h3>
 <table><thead>
 <tr>
@@ -9421,6 +9512,20 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='KeyboardKey'>KeyboardKey</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=down">down</a></td>
+<td>Key is being held</td>
+</tr>
+</tbody></table>
 <h3 id='Letter'>Letter</h3>
 <table><thead>
 <tr>
@@ -9525,7 +9630,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td>map&lt;string, any&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_options">set_options</a></td>
-<td>Write some select options here to change <a href="#Overlunky">Overlunky</a> options. Just use the same keys as in options.</td>
+<td>Write <a href="https://github.com/search?q=repo%3Aspelunky-fyi%2Foverlunky+legal_options+language%3AC%2B%2B&amp;type=code&amp;l=C%2B%2B">some select options</a> here to change <a href="#Overlunky">Overlunky</a> options.</td>
 </tr>
 <tr>
 <td>map&lt;string, <a href="#KEY">KEY</a>&gt;</td>
@@ -9551,11 +9656,6 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=selected_uid">selected_uid</a></td>
 <td>Currently selected uid in the entity picker or -1 if nothing is selected.</td>
-</tr>
-<tr>
-<td>optional&lt;int&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_selected_uid">set_selected_uid</a></td>
-<td>Set currently selected uid in the entity picker or -1 to clear selection.</td>
 </tr>
 <tr>
 <td>vector&lt;int&gt;</td>
@@ -10190,7 +10290,21 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 </tbody></table>
-<h2 id='Input-types'>Input types</h2><h3 id='Gamepad'>Gamepad</h3>
+<h2 id='Input-types'>Input types</h2><h3 id='ControllerInput'>ControllerInput</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>array&lt;<a href="#ControllerButton">ControllerButton</a>, 16&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='Gamepad'>Gamepad</h3>
 <p>Used in <a href="#ImGuiIO">ImGuiIO</a></p>
 
 <table><thead>
@@ -10352,6 +10466,25 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='InputDevice'>InputDevice</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_index">input_index</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='InputMapping'>InputMapping</h3>
 <p>Used in <a href="#PlayerSlot">PlayerSlot</a></p>
 
@@ -10482,6 +10615,25 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td><a href="#PlayerSlotSettings">PlayerSlotSettings</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_slot_4_settings">player_slot_4_settings</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='RawInput'>RawInput</h3>
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>array&lt;<a href="#KeyboardKey">KeyboardKey</a>, 112&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyboard">keyboard</a></td>
+<td>State of all keyboard buttons in a random game order as usual</td>
+</tr>
+<tr>
+<td>array&lt;<a href="#ControllerInput">ControllerInput</a>, 12&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=controller">controller</a></td>
+<td>State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.</td>
 </tr>
 </tbody></table>
 <h2 id='Journal-types'>Journal types</h2><h3 id='JournalPage'>JournalPage</h3>
@@ -13022,6 +13174,11 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=render_timer">render_timer</a></td>
 <td></td>
 </tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=init">init()</a></td>
+<td>Initializes the screen.</td>
+</tr>
 </tbody></table>
 <h3 id='ScreenArenaIntro'>ScreenArenaIntro</h3>
 <p>Derived from <a href="#Screen">Screen</a></p>
@@ -15271,6 +15428,21 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=start_sidepanel_slidein_timer">start_sidepanel_slidein_timer</a></td>
 <td></td>
 </tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed_length">seed_length</a></td>
+<td>Current input length (0-8). You probably shouldn&#39;t write to this, except to set it to 0.</td>
+</tr>
+<tr>
+<td>optional&lt;int&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_seed">get_seed</a></td>
+<td>Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it&#39;s ready.<br/></td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_seed">set_seed</a></td>
+<td>Params: optional<int> seed, optional<int> length<br/>Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.<br/></td>
+</tr>
 </tbody></table>
 <h3 id='ScreenStateCamp'>ScreenStateCamp</h3>
 <p>Derived from <a href="#Screen">Screen</a></p>
@@ -16012,7 +16184,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inertia">inertia</a></td>
-<td></td>
+<td>This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)</td>
 </tr>
 </tbody></table>
 <h3 id='GameManager'>GameManager</h3>
@@ -16140,24 +16312,24 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </thead><tbody>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
-<td>Might be used for some menu inputs not found in buttons_menu</td>
+<td>array&lt;int, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input">input</a></td>
+<td>Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in <a href="#ON">ON</a>.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.</td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_extra">buttons_extra</a></td>
-<td>Might be used for some menu inputs not found in buttons_menu</td>
+<td>array&lt;int, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_previous">input_previous</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="#MENU_INPUT">MENU_INPUT</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_menu_previous">buttons_menu_previous</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_menu">input_menu</a></td>
+<td>Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in <a href="#ON">ON</a>.POST_PROCESS_INPUT</td>
+</tr>
+<tr>
+<td><a href="#MENU_INPUT">MENU_INPUT</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_menu_previous">input_menu_previous</a></td>
 <td>Previous state of buttons_menu</td>
-</tr>
-<tr>
-<td><a href="#MENU_INPUT">MENU_INPUT</a></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons_menu">buttons_menu</a></td>
-<td>Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in <a href="#ON">ON</a>.PRE_UPDATE.</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -16165,9 +16337,14 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modal_open">modal_open</a></td>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=menu_open">menu_open</a></td>
 <td></td>
+</tr>
+<tr>
+<td>array&lt;int, 5&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input_index">input_index</a></td>
+<td>Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers</td>
 </tr>
 </tbody></table>
 <h3 id='Items'>Items</h3>
@@ -28953,6 +29130,30 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </blockquote>
 
 <p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<h2 id='ON-PRE_PROCESS_INPUT'>ON.PRE_PROCESS_INPUT</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_PROCESS_INPUT">ON.PRE_PROCESS_INPUT</a></p>
+</blockquote>
+
+<p>Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.<br/></p>
+<h2 id='ON-POST_PROCESS_INPUT'>ON.POST_PROCESS_INPUT</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_PROCESS_INPUT">ON.POST_PROCESS_INPUT</a></p>
+</blockquote>
+
+<p>Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/></p>
+<h2 id='ON-PRE_GAME_LOOP'>ON.PRE_GAME_LOOP</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GAME_LOOP">ON.PRE_GAME_LOOP</a></p>
+</blockquote>
+
+<p>Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.<br/></p>
+<h2 id='ON-POST_GAME_LOOP'>ON.POST_GAME_LOOP</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_GAME_LOOP">ON.POST_GAME_LOOP</a></p>
+</blockquote>
+
+<p>Runs right after the main engine loop.<br/></p>
 <h1 id='Enums'>Enums</h1>
 <p>Enums are like numbers but in text that&#39;s easier to remember.</p>
 <div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -31895,6 +32096,26 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_DESTRUCTION">POST_LAYER_DESTRUCTION</a></td>
 <td>ON::POST_LAYER_DESTRUCTION</td>
 <td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_PROCESS_INPUT">PRE_PROCESS_INPUT</a></td>
+<td>ON::PRE_PROCESS_INPUT</td>
+<td>Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_PROCESS_INPUT">POST_PROCESS_INPUT</a></td>
+<td>ON::POST_PROCESS_INPUT</td>
+<td>Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GAME_LOOP">PRE_GAME_LOOP</a></td>
+<td>ON::PRE_GAME_LOOP</td>
+<td>Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_GAME_LOOP">POST_GAME_LOOP</a></td>
+<td>ON::POST_GAME_LOOP</td>
+<td>Runs right after the main engine loop.<br/></td>
 </tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>

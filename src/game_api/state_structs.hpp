@@ -108,7 +108,7 @@ struct Camera
     float bounds_right;
     float bounds_bottom;
     float bounds_top;
-    float adjusted_focus_x; // focus adjusted so camera doesn't show beyond borders
+    float adjusted_focus_x; // focus adjusted so camera doesn't show beyond borders, can be updated manually by setting inertia to 5 and calling update_camera_position()
     float adjusted_focus_y;
     float calculated_focus_x; // forced values
     float calculated_focus_y;
@@ -133,9 +133,10 @@ struct Camera
     uint8_t padding2;
     uint8_t padding3;
     int32_t focused_entity_uid; // if set to -1, you have free control over camera focus through focus_x, focus_y
-    uint32_t unknown3;
+    uint32_t freeze_timer;      // if > 0, disables camera movement for this amount of frames
     uint32_t unknown4;
-    float inertia; // 0 = still; 1 = follow immediately
+    /// This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
+    float inertia;
     uint32_t unknown5;
     uint32_t unknown6;
     uint32_t unknown7;

@@ -80,12 +80,19 @@ struct Memory
         return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
     }
 };
+
 struct RecoverableMemory
 {
     size_t address;
     char* old_data;
     size_t size;
     bool prot_used;
+};
+
+struct EditedMemory
+{
+    std::vector<RecoverableMemory> mem;
+    bool dirty;
 };
 
 LPVOID alloc_mem_rel32(size_t addr, size_t size);
@@ -95,6 +102,7 @@ void write_mem(size_t addr, std::string payload);
 size_t function_start(size_t off, uint8_t outside_byte = '\xcc');
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot);
 void recover_mem(std::string name, size_t addr = NULL);
+bool mem_written(std::string name);
 std::string get_nop(size_t size, bool true_nop = false);
 
 // similar to ExecutableMemory but writes automatic jump from and back, moves the code it replaces etc.

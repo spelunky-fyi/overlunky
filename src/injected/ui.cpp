@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <locale>
 #include <map>
+#include <random>
 #include <string>
 
 #pragma warning(push, 0)
@@ -50,6 +51,7 @@
 #include "screen.hpp"
 #include "script.hpp"
 #include "settings_api.hpp"
+#include "socket.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
 #include "steam_api.hpp"
@@ -250,7 +252,7 @@ std::vector<Callback> callbacks;
 
 static ImFont *font, *bigfont, *hugefont;
 
-float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f;
+float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, g_hue = 0.63f, g_sat = 0.66f, g_val = 0.66f, g_camera_speed = 1.0f, g_camera_inertia = -FLT_MAX;
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1,
@@ -270,10 +272,10 @@ std::vector<uint32_t> saved_hotbar;
 std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
-bool set_focus_entity = false, set_focus_world = false, set_focus_zoom = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
+bool set_focus_entity = false, set_focus_world = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false, camera_hack = false;
+     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -298,6 +300,7 @@ std::string g_change_key = "";
 const char* inifile = "imgui.ini";
 const std::string cfgfile = "overlunky.ini";
 std::string scriptpath = "Overlunky/Scripts";
+const std::string version_check_url = "https://api.github.com/repos/spelunky-fyi/overlunky/git/ref/tags/whip";
 
 std::string fontfile = "";
 std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
@@ -331,6 +334,8 @@ std::map<std::string, bool> options = {
     {"noclip", false},
     {"fly_mode", false},
     {"speedhack", false},
+    {"skip_fades", false},
+    {"camera_hack", false},
     {"snap_to_grid", false},
     {"spawn_floor_decorated", true},
     {"disable_pause", false},
@@ -340,7 +345,7 @@ std::map<std::string, bool> options = {
     {"draw_entity_tooltip", false},
     {"enable_unsafe_scripts", false},
     {"warp_increments_level_count", true},
-    {"warp_transition", false},
+    {"warp_transition", true},
     {"lights", false},
     {"disable_achievements", true},
     {"disable_savegame", true},
@@ -361,105 +366,146 @@ std::map<std::string, bool> options = {
     {"borders", false},
     {"console_alt_keys", false},
     {"vsync", true},
-    {"uncap_unfocused_fps", true}};
+    {"uncap_unfocused_fps", true},
+    {"pause_loading", false},
+    {"pause_update_camera", false},
+    {"update_check", true},
+};
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
 double fps_min = 0, fps_max = 600.0;
-
-bool g_speedhack_hooked = false;
-float g_speedhack_multiplier = 1.0;
+float g_speedhack_ui_multiplier = 1.0;
 float g_speedhack_old_multiplier = 1.0;
-LARGE_INTEGER g_speedhack_prev;
-LARGE_INTEGER g_speedhack_current;
-LARGE_INTEGER g_speedhack_fake;
-PVOID g_oldqpc;
 
-#define PtrFromRva(base, rva) (((PBYTE)base) + rva)
-
-// I didn't write this one, I just found it in the shady parts of the internet
-// This could probably be done with detours and speedhack should be part of the api anyway...
-BOOL HookIAT(const char* szModuleName, const char* szFuncName, PVOID pNewFunc, PVOID* pOldFunc)
+enum class VERSION_CHECK
 {
-    PIMAGE_DOS_HEADER pDosHeader = (PIMAGE_DOS_HEADER)GetModuleHandle(NULL);
-    PIMAGE_NT_HEADERS pNtHeader = (PIMAGE_NT_HEADERS)PtrFromRva(pDosHeader, pDosHeader->e_lfanew);
+    HIDDEN,
+    DISABLED,
+    CHECKING,
+    FAILED,
+    OLD,
+    LATEST,
+    STABLE,
+};
+struct VersionCheck
+{
+    std::string message;
+    float color[4];
+    float fade;
+};
+struct VersionCheckStatus
+{
+    VERSION_CHECK state;
+    float opacity;
+    int64_t start;
+    float color[4];
+};
+VersionCheckStatus version_check_status{VERSION_CHECK::HIDDEN, 1.0f, 0};
+std::array<VersionCheck, 7> version_check_messages{
+    VersionCheck{"", {0.0f, 0.0f, 0.0f, 0.0f}, 0},
+    VersionCheck{"Automatic update check is disabled...", {0.5f, 0.5f, 0.5f, 0.8f}, 600.0f},
+    VersionCheck{"Checking for updates on GitHub...", {0.3f, 0.6f, 1.0f, 0.9f}, 0},
+    VersionCheck{"Automatic update check failed. Please retry, check GitHub or use Modlunky to update!", {0.8f, 0.0f, 0.0f, 1.0f}, 900.0f},
+    VersionCheck{"This is not the latest build of Overlunky WHIP! Please run the Overlunky launcher or use Modlunky to get the latest build!", {0.8f, 0.0f, 0.0f, 1.0f}, 3600.0f},
+    VersionCheck{"This is the latest build of Overlunky WHIP! Yippee!", {0.0f, 0.8f, 0.2f, 0.8f}, 900.0f},
+    VersionCheck{"This is a stable build of Overlunky. Get the WHIP build for automatic updates!", {0.9f, 0.6f, 0.0f, 0.8f}, 600.0f},
+};
+void render_version_warning()
+{
+    if (version_check_status.state == VERSION_CHECK::HIDDEN)
+        return;
 
-    // Make sure we have valid data
-    if (pNtHeader->Signature != IMAGE_NT_SIGNATURE)
-        return FALSE;
+    version_check_status.color[0] = version_check_messages[(int)version_check_status.state].color[0];
+    version_check_status.color[1] = version_check_messages[(int)version_check_status.state].color[1];
+    version_check_status.color[2] = version_check_messages[(int)version_check_status.state].color[2];
+    version_check_status.color[3] = version_check_messages[(int)version_check_status.state].color[3];
 
-    // Grab a pointer to the import data directory
-    PIMAGE_IMPORT_DESCRIPTOR pImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)PtrFromRva(pDosHeader, pNtHeader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
-
-    for (UINT uIndex = 0; pImportDescriptor[uIndex].Characteristics != 0; uIndex++)
+    if (version_check_messages[(int)version_check_status.state].fade > 0)
     {
-        char* szDllName = (char*)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].Name);
+        if (version_check_status.start == 0)
+            version_check_status.start = get_global_frame_count();
 
-        // Is this our module?
-        if (_strcmpi(szDllName, szModuleName) != 0)
-            continue;
-
-        if (!pImportDescriptor[uIndex].FirstThunk || !pImportDescriptor[uIndex].OriginalFirstThunk)
-            return FALSE;
-
-        PIMAGE_THUNK_DATA pThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].FirstThunk);
-        PIMAGE_THUNK_DATA pOrigThunk = (PIMAGE_THUNK_DATA)PtrFromRva(pDosHeader, pImportDescriptor[uIndex].OriginalFirstThunk);
-
-        for (; pOrigThunk->u1.Function != NULL; pOrigThunk++, pThunk++)
+        auto duration = get_global_frame_count() - version_check_status.start;
+        version_check_status.opacity = 1.0f - duration / version_check_messages[(int)version_check_status.state].fade;
+        if (version_check_status.opacity <= 0.0f)
         {
-            // We can't process ordinal imports just named
-            if (pOrigThunk->u1.Ordinal & IMAGE_ORDINAL_FLAG)
-                continue;
-
-            PIMAGE_IMPORT_BY_NAME import = (PIMAGE_IMPORT_BY_NAME)PtrFromRva(pDosHeader, pOrigThunk->u1.AddressOfData);
-
-            // Is this our function?
-            if (_strcmpi(szFuncName, (char*)import->Name) != 0)
-                continue;
-
-            DWORD dwJunk = 0;
-            MEMORY_BASIC_INFORMATION mbi;
-
-            // Make the memory section writable
-            VirtualQuery(pThunk, &mbi, sizeof(MEMORY_BASIC_INFORMATION));
-            if (!VirtualProtect(mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &mbi.Protect))
-                return FALSE;
-
-            // Save the old pointer
-            *pOldFunc = (PVOID*)(DWORD_PTR)pThunk->u1.Function;
-
-// Write the new pointer based on CPU type
-#ifdef _WIN64
-            pThunk->u1.Function = (ULONGLONG)(DWORD_PTR)pNewFunc;
-#else
-            pThunk->u1.Function = (DWORD)(DWORD_PTR)pNewFunc;
-#endif
-
-            if (VirtualProtect(mbi.BaseAddress, mbi.RegionSize, mbi.Protect, &dwJunk))
-                return TRUE;
+            version_check_status.state = VERSION_CHECK::HIDDEN;
+            return;
         }
+        version_check_status.color[3] = version_check_status.opacity;
     }
-    return FALSE;
+
+    auto& render_api = RenderAPI::get();
+    const float scale{0.0004f};
+    static TextRenderingInfo tri{};
+    tri.set_text(version_check_messages[(int)version_check_status.state].message, 0, 0, scale, scale, 1, 0);
+    const auto [w, h] = tri.text_size();
+    tri.y = -1.0f + std::abs(h) / 2.0f + std::abs(h) + 0.005f;
+    render_api.draw_text(&tri, version_check_status.color);
 }
 
-bool __stdcall QueryPerformanceCounterHook(LARGE_INTEGER* counter)
+void get_version_info(std::optional<std::string> res, std::optional<std::string> err)
 {
-    QueryPerformanceCounter(&g_speedhack_current);
-    g_speedhack_fake.QuadPart += (long long)((g_speedhack_current.QuadPart - g_speedhack_prev.QuadPart) * g_speedhack_multiplier);
-    g_speedhack_prev = g_speedhack_current;
-    *counter = g_speedhack_fake;
-    return true;
-}
-
-void speedhack(float multiplier = g_speedhack_multiplier)
-{
-    g_speedhack_multiplier = multiplier;
-    if (!g_speedhack_hooked)
+    // http error
+    if (!res.has_value())
     {
-        QueryPerformanceCounter(&g_speedhack_prev);
-        g_speedhack_fake = g_speedhack_prev;
-        HookIAT("kernel32.dll", "QueryPerformanceCounter", QueryPerformanceCounterHook, &g_oldqpc);
-        g_speedhack_hooked = true;
+        version_check_status.state = VERSION_CHECK::FAILED;
+        if (err.has_value())
+            DEBUG("UpdateCheck: Error: {}", err.value());
+        return;
     }
+    std::string data = res.value();
+
+    // some github error
+    if (data.find("overlunky") == std::string::npos)
+    {
+        version_check_status.state = VERSION_CHECK::FAILED;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+
+    std::string version = fmt::format("\"sha\": \"{}", get_version());
+
+    // old version
+    if (data.find(version) == std::string::npos)
+    {
+        version_check_status.state = VERSION_CHECK::OLD;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+    // latest version
+    else
+    {
+        version_check_status.state = VERSION_CHECK::LATEST;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+}
+
+void version_check(bool force = false)
+{
+    version_check_status = VersionCheckStatus{VERSION_CHECK::HIDDEN, 1.0f, 0};
+
+    if (!options["update_check"] && !force)
+    {
+        version_check_status.state = VERSION_CHECK::DISABLED;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+
+    auto version = std::string(get_version());
+
+    // not a whip build
+    if (version.find(".") != std::string::npos)
+    {
+        version_check_status.state = VERSION_CHECK::STABLE;
+        DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+        return;
+    }
+
+    version_check_status.state = VERSION_CHECK::CHECKING;
+    DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
+    new HttpRequest(std::move(version_check_url), get_version_info);
 }
 
 void hook_savegame()
@@ -523,8 +569,8 @@ void set_colors()
 
     float col_main_sat = g_sat;
     float col_main_val = options["inverted"] ? 1.0f - g_val : g_val;
-    float col_area_sat = g_sat * 0.77f;
-    float col_area_val = options["inverted"] ? 1.0f - g_val * 0.60f : g_val * 0.60f;
+    float col_area_sat = g_sat * 0.60f;
+    float col_area_val = options["inverted"] ? 1.0f - g_val * 0.55f : g_val * 0.55f;
     float col_back_sat = g_sat * 0.33f;
     float col_back_val = options["inverted"] ? 1.0f - g_val * 0.20f : g_val * 0.20f;
 
@@ -1767,6 +1813,8 @@ void force_zoom()
         enable_camp_camera = true;
         UI::set_camp_camera_bounds_enabled(true);
     }
+    if (g_camera_inertia != -FLT_MAX)
+        g_state->camera->inertia = g_camera_inertia;
 }
 
 void force_hud_flags()
@@ -1810,7 +1858,7 @@ void toggle_noclip()
 
 bool should_speedhack()
 {
-    return (g_state->screen != 11 && g_state->screen != 12 && g_state->screen != 5 && g_state->screen != 4) || (g_state->screen != 5 && g_game_manager->pause_ui && g_game_manager->pause_ui->visibility > 0) || ((g_state->level_flags & (1U << 20)) > 0) || g_state->loading > 0;
+    return (g_state->screen != 11 && g_state->screen != 12 && g_state->screen != 5 && g_state->screen != 4) || (g_state->screen != 5 && g_game_manager->pause_ui && g_game_manager->pause_ui->visibility > 0) || ((g_state->level_flags & (1U << 20)) > 0) || g_state->loading > 0 || (g_state->screen == 4 && g_game_manager->screen_menu->menu_text_opacity < 1.0f);
 }
 
 void force_cheats()
@@ -1877,14 +1925,20 @@ void force_cheats()
     if (options["speedhack"])
     {
         if (should_speedhack())
-            speedhack(10.0f);
-        else if (g_speedhack_multiplier == 10.0f && !should_speedhack())
-            speedhack(1.0f);
+            UI::speedhack(10.0f);
+        else if (g_speedhack_ui_multiplier == 10.0f && !should_speedhack())
+            UI::speedhack(1.0f);
     }
 }
 
-void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
+void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, std::optional<uint32_t> seed = std::nullopt)
 {
+    if (seed.has_value())
+        UI::init_seeded(seed.value());
+    else if (g_state->screen < 11)
+        UI::init_adventure();
+    g_state->screen_character_select->available_mine_entrances = 4;
+
     static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
     const auto ana_texture = get_type(ana_spelunky)->texture_id;
 
@@ -1905,7 +1959,9 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
     g_state->world_next = world;
     g_state->level_next = level;
     g_state->theme_next = theme;
-    g_state->quest_flags = g_state->quest_flags | 1;
+    g_state->quest_flags |= 1;
+    if (seed.has_value())
+        g_state->quest_flags |= 0x40;
     g_state->loading = 1;
 
     if (g_game_manager->main_menu_music)
@@ -1918,9 +1974,6 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme)
         g_game_manager->game_props->input_index[0] = 0;
     if (g_game_manager->game_props->input_index[4] == -1)
         g_game_manager->game_props->input_index[4] = 0;
-
-    // TODO: this doesn't quite work, loads intro after character selection
-    g_state->screen_character_select->available_mine_entrances = 4;
 }
 
 std::string get_clipboard()
@@ -2129,8 +2182,8 @@ void force_kits()
 bool toggle_pause()
 {
     g_pause_at = -1;
-    g_state->pause ^= ((uint8_t)g_pause_type & ~0x40);
-    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false", g_pause_type, paused));
+    g_state->pause ^= ((uint8_t)g_pause_type & ~0xC0);
+    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false exports.loading = {}", g_pause_type, paused, options["pause_loading"]));
     return paused;
 }
 
@@ -2138,13 +2191,18 @@ void frame_advance()
 {
     if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
     {
-        g_state->pause = (uint8_t)g_pause_type & ~0x40;
+        g_state->pause = (uint8_t)g_pause_type & ~0xC0;
         g_pause_at = -1;
     }
-    if ((g_pause_type & 0x40) == 0)
+    if ((g_pause_type & 0xc0) == 0)
     {
         paused = g_state->pause & (uint8_t)g_pause_type;
     }
+    else
+    {
+        paused = g_ui_scripts["pause"]->execute("return exports.paused") == "true";
+    }
+    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {} exports.camera = {}", options["pause_loading"], options["pause_update_camera"]));
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -2153,7 +2211,7 @@ void warp_inc(uint8_t w, uint8_t l, uint8_t t)
     {
         g_state->level_count += 1;
     }
-    if (options["warp_transition"])
+    if (options["warp_transition"] && (g_state->quest_flags & 0x40) == 0)
     {
         UI::transition(w, l, t);
     }
@@ -2289,7 +2347,7 @@ void warp_next_level(size_t num)
 
 void respawn()
 {
-    if (g_state->screen != 11 && g_state->screen != 12)
+    if (g_state->screen != 11 && g_state->screen != 12 && g_state->screen != 14)
     {
         if (g_state->screen > 11)
         {
@@ -2300,6 +2358,15 @@ void respawn()
             quick_start(12, 1, 1, 1);
         }
         return;
+    }
+    if (g_state->screen == 14)
+    {
+        g_state->screen = 12;
+        g_game_manager->journal_ui->fade_timer = 15;
+        g_game_manager->journal_ui->state = 5;
+        g_state->camera->focus_offset_x = 0;
+        g_state->camera->focus_offset_y = 0;
+        set_camera_bounds(true);
     }
     for (int8_t i = 0; i < g_state->items->player_count; ++i)
     {
@@ -2697,12 +2764,12 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (pressed("speedhack_turbo", wParam))
         {
-            speedhack(g_speedhack_old_multiplier);
+            UI::speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
         else if (pressed("speedhack_slow", wParam))
         {
-            speedhack(g_speedhack_old_multiplier);
+            UI::speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
         else if (pressed("peek_layer", wParam))
@@ -2719,6 +2786,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     int repeat = (lParam >> 30) & 1U;
     auto& io = ImGui::GetIO();
     ImGuiWindow* current = g.NavWindow;
+    g_speedhack_ui_multiplier = UI::get_speedhack();
 
     if (current != nullptr && current == ImGui::FindWindowByName("KeyCapture"))
         return false;
@@ -2993,7 +3061,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_pause_type & 0x40)
+        if (g_pause_type & 0xC0)
         {
             if (paused)
             {
@@ -3289,93 +3357,93 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_multiplier += 0.1f;
-        if (g_speedhack_multiplier > 10.f)
-            g_speedhack_multiplier = 10.f;
-        speedhack();
+        g_speedhack_ui_multiplier += 0.1f;
+        if (g_speedhack_ui_multiplier > 10.f)
+            g_speedhack_ui_multiplier = 10.f;
+        UI::speedhack(g_speedhack_ui_multiplier);
     }
     else if (pressed("speedhack_decrease", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_multiplier -= 0.1f;
-        if (g_speedhack_multiplier < 0.1f)
-            g_speedhack_multiplier = 0.1f;
-        speedhack();
+        g_speedhack_ui_multiplier -= 0.1f;
+        if (g_speedhack_ui_multiplier < 0.1f)
+            g_speedhack_ui_multiplier = 0.1f;
+        UI::speedhack(g_speedhack_ui_multiplier);
     }
     else if (pressed("speedhack_10pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.1f);
+        UI::speedhack(0.1f);
     }
     else if (pressed("speedhack_20pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.2f);
+        UI::speedhack(0.2f);
     }
     else if (pressed("speedhack_30pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.3f);
+        UI::speedhack(0.3f);
     }
     else if (pressed("speedhack_40pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.4f);
+        UI::speedhack(0.4f);
     }
     else if (pressed("speedhack_50pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.5f);
+        UI::speedhack(0.5f);
     }
     else if (pressed("speedhack_60pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.6f);
+        UI::speedhack(0.6f);
     }
     else if (pressed("speedhack_70pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.7f);
+        UI::speedhack(0.7f);
     }
     else if (pressed("speedhack_80pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.8f);
+        UI::speedhack(0.8f);
     }
     else if (pressed("speedhack_90pct", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(0.9f);
+        UI::speedhack(0.9f);
     }
     else if (pressed("speedhack_normal", wParam))
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        speedhack(1.0f);
+        UI::speedhack(1.0f);
     }
     else if (pressed("speedhack_turbo", wParam) && !repeat)
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_old_multiplier = g_speedhack_multiplier;
-        speedhack(5.f); // TODO: configurable
+        g_speedhack_old_multiplier = g_speedhack_ui_multiplier;
+        UI::speedhack(5.f); // TODO: configurable
     }
     else if (pressed("speedhack_slow", wParam) && !repeat)
     {
         if (should_speedhack())
             options["speedhack"] = false;
-        g_speedhack_old_multiplier = g_speedhack_multiplier;
-        speedhack(0.2f); // TODO: configurable
+        g_speedhack_old_multiplier = g_speedhack_ui_multiplier;
+        UI::speedhack(0.2f); // TODO: configurable
     }
     else if (pressed("destroy_grabbed", wParam))
     {
@@ -3969,26 +4037,36 @@ void render_narnia()
         UI::spawn_backdoor(g_x, g_y);
     }
     tooltip("Spawn a door to back layer.\nTip: You can instantly switch layers with (Shift+Tab).", "spawn_layer_door");
-    ImGui::Checkbox("Increment level count on warp", &options["warp_increments_level_count"]);
+    ImGui::Checkbox("Warp increments level count normally", &options["warp_increments_level_count"]);
     tooltip("Simulate natural level progression when warping.");
-    ImGui::Checkbox("Warp to transition instead", &options["warp_transition"]);
+    ImGui::Checkbox("Warp to transition in adventure mode", &options["warp_transition"]);
     tooltip("Simulate natural level progression even more.");
+    if ((g_state->quest_flags & 0x40) == 0 && !options["warp_transition"])
+        ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: Skipping transition in adventure mode\nwill result in different level generation.");
 }
 
 void set_camera_hack(bool enable)
 {
-    camera_hack = enable;
+    options["camera_hack"] = enable;
     if (g_ui_scripts.find("camera_hack") == g_ui_scripts.end())
         return;
-    g_ui_scripts["camera_hack"]->set_enabled(camera_hack);
+    g_ui_scripts["camera_hack"]->set_enabled(options["camera_hack"]);
 }
 
 void render_camera()
 {
-    if (set_focus_zoom)
+    if (submenu("Focus and bounds"))
     {
-        ImGui::SetKeyboardFocusHere();
-        set_focus_zoom = false;
+        auto [cx, cy] = State::get_camera_position();
+        float cpos[2]{cx, cy};
+        ImGui::InputFloat2("Position##CameraPos", cpos);
+        ImGui::InputFloat2("Focus##CameraFocus", &g_state->camera->focus_x);
+        ImGui::InputFloat2("Adjusted Focus##CameraAdjusted", &g_state->camera->adjusted_focus_x);
+        ImGui::InputFloat2("Calculated Focus##CameraCalculated", &g_state->camera->calculated_focus_x);
+        ImGui::InputFloat2("Focus Offset##CameraOffset", &g_state->camera->focus_offset_x);
+        ImGui::InputFloat("Vertical Pan##CameraOffset", &g_state->camera->vertical_pan);
+        ImGui::InputFloat4("Bounds##CameraBounds", &g_state->camera->bounds_left);
+        endmenu();
     }
     ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
     if (ImGui::DragFloat("Zoom##ZoomLevel", &g_zoom, 0.5f, 0.5, 60.0, "%.2f"))
@@ -4064,15 +4142,6 @@ void render_camera()
             g_state->camera->focused_entity_uid = g_last_id;
         tooltip("Focus the selected entity");
     }
-    ImGui::InputFloat("Camera Focus X##CameraFocusX", &g_state->camera->focus_x, 0.2f, 1.0f);
-    ImGui::InputFloat("Camera Focus Y##CameraFocusY", &g_state->camera->focus_y, 0.2f, 1.0f);
-    ImGui::InputFloat("Camera Real X##CameraRealX", &g_state->camera->adjusted_focus_x, 0.2f, 1.0f);
-    ImGui::InputFloat("Camera Real Y##CameraRealY", &g_state->camera->adjusted_focus_y, 0.2f, 1.0f);
-    ImGui::SeparatorText("Camera bounds");
-    ImGui::InputFloat("Top##CameraBoundTop", &g_state->camera->bounds_top, 0.2f, 1.0f);
-    ImGui::InputFloat("Bottom##CameraBoundBottom", &g_state->camera->bounds_bottom, 0.2f, 1.0f);
-    ImGui::InputFloat("Left##CameraBoundLeft", &g_state->camera->bounds_left, 0.2f, 1.0f);
-    ImGui::InputFloat("Right##CameraBoundRight", &g_state->camera->bounds_right, 0.2f, 1.0f);
     if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
         set_camera_bounds(enable_camera_bounds);
     tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.", "camera_reset");
@@ -4088,15 +4157,43 @@ void render_camera()
         }
     }
     tooltip("Disable to free the camera in camp.\nAutomatically disabled when zooming.");
-    if (ImGui::Checkbox("Follow focused entity absolutely##CameraForcePlayer", &camera_hack))
+    if (ImGui::Checkbox("Follow focused entity absolutely##CameraForcePlayer", &options["camera_hack"]))
     {
-        set_camera_hack(camera_hack);
-        enable_camera_bounds = !camera_hack;
+        set_camera_hack(options["camera_hack"]);
+        enable_camera_bounds = !options["camera_hack"];
         set_camera_bounds(enable_camera_bounds);
-        enable_camp_camera = !camera_hack;
+        enable_camp_camera = !options["camera_hack"];
         UI::set_camp_camera_bounds_enabled(enable_camp_camera);
     }
-    tooltip("Enable to remove camera bounds and always center the entity instantly without rubberbanding.");
+    tooltip("Enable to always center the followed entity instantly\nwithout respecting level borders.");
+    if (ImGui::Checkbox("Update camera position during pause##CameraPaused", &options["pause_update_camera"]))
+        g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+    tooltip("Enable to follow the entity smoothly when paused\nor combine with speed=5 for instant camera that respects level borders.");
+    static bool lock_inertia{false};
+    if (ImGui::Checkbox("Lock current camera speed multiplier##LockInertia", &lock_inertia))
+    {
+        if (lock_inertia)
+            g_camera_inertia = g_state->camera->inertia;
+        else
+            g_camera_inertia = -FLT_MAX;
+    }
+    tooltip("Force selected speed multiplier on the next level too.");
+    ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
+    if (ImGui::DragFloat("Speed multiplier##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f))
+    {
+        if (lock_inertia)
+            g_camera_inertia = g_state->camera->inertia;
+        else
+            g_camera_inertia = -FLT_MAX;
+    }
+    tooltip("Lower values moves slower and smoother,\nhigher values reduce lagging behind.\n5 = instantly move any distance");
+    ImGui::SameLine();
+    if (ImGui::Button("Reset##ResetCameraInertia"))
+    {
+        g_state->camera->inertia = 1.0f;
+        g_camera_inertia = -FLT_MAX;
+    }
+    ImGui::PopItemWidth();
 }
 
 void render_arrow()
@@ -5776,21 +5873,26 @@ void render_options()
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
 
+        if (ImGui::Checkbox("Skip fades##SkipFades", &options["skip_fades"]))
+            g_ui_scripts["skip_fades"]->set_enabled(options["skip_fades"]);
+        tooltip("Skips all fade to black transitions.");
+
         ImGui::Checkbox("Uncap unfocused FPS on start", &options["uncap_unfocused_fps"]);
         tooltip("Sets the unfocused FPS to unlimited automatically.");
 
-        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_multiplier, 0.1f, 10.f, "%.2fx"))
+        g_speedhack_ui_multiplier = UI::get_speedhack();
+        if (ImGui::SliderFloat("Speedhack##SpeedHack", &g_speedhack_ui_multiplier, 0.1f, 10.f, "%.2fx"))
         {
             if (should_speedhack())
                 options["speedhack"] = false;
-            speedhack();
+            UI::speedhack(g_speedhack_ui_multiplier);
         }
         tooltip("Slow down or speed up everything,\nlike in Cheat Engine.", "speedhack_decrease");
         ImGui::SameLine();
         if (ImGui::Button("Reset##ResetSpeedhack"))
         {
-            g_speedhack_multiplier = 1.0f;
-            speedhack();
+            g_speedhack_ui_multiplier = 1.0f;
+            UI::speedhack(g_speedhack_ui_multiplier);
         }
         if (ImGui::SliderScalar("Engine FPS##EngineFPS", ImGuiDataType_Double, &g_engine_fps, &fps_min, &fps_max, "%f"))
             update_frametimes();
@@ -5878,6 +5980,12 @@ void render_options()
 
         ImGui::Checkbox("Show tooltips", &options["show_tooltips"]);
         tooltip("Am I annoying you already :(");
+        if (ImGui::Checkbox("Automatically check for updates", &options["update_check"]))
+        {
+            if (options["update_check"])
+                version_check(true);
+        }
+        tooltip("Check if you're running the latest build of Overlunky WHIP on start.");
         endmenu();
     }
 
@@ -5917,11 +6025,26 @@ void render_options()
         endmenu();
     }
 
-    if (submenu("Frame advance / Engine pause type"))
+    if (submenu("Frame advance / Pause options"))
     {
         ImGui::PushID("PauseType");
         render_flags(pause_types, &g_pause_type, false);
         ImGui::PopID();
+        ImGui::Separator();
+        if (ImGui::Checkbox("Freeze during loading screens", &options["pause_loading"]))
+            g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]));
+        bool pause_level = UI::get_start_level_paused();
+        if (ImGui::Checkbox("Auto (fade) pause on level start", &pause_level))
+            UI::set_start_level_paused(pause_level);
+        if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &options["pause_update_camera"]))
+            g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+        tooltip("Calls the vanilla camera update when it\nwould be skipped by blocking the state update.");
+        ImGui::Separator();
+        ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let you unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
+        ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce any selected normal pause flags");
+        ImGui::TextWrapped("- Using the freeze options without a) a camera hack or b) a normal pause flag (use fade) will induce weird camera flickering");
+        if (keys["toggle_pause"] & VK_SPACE || keys["frame_advance"] & VK_SPACE || keys["frame_advance_alt"] & VK_SPACE)
+            ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: frame_advance/toggle_pause is bound to Space,\nnormal menu input using Space will be disabled (use Z)");
         endmenu();
     }
 
@@ -5940,6 +6063,10 @@ void render_options()
     {
         if (ImGui::BeginMenu("Help"))
         {
+            if (ImGui::MenuItem("Check for updates"))
+                version_check(true);
+            if (ImGui::MenuItem("Get latest version here"))
+                ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky/releases/tag/whip", NULL, NULL, SW_SHOWNORMAL);
             if (ImGui::MenuItem("README"))
                 ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
             if (ImGui::MenuItem("API Documentation"))
@@ -8049,6 +8176,76 @@ void render_game_props()
     if (g_state == 0)
         return;
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
+    if (submenu("Seed"))
+    {
+        static std::random_device rd;
+        if (ImGui::MenuItem("Restart this run with same seed##RestartWithSeed"))
+        {
+            if (g_state->screen == 12 || g_state->screen == 13 || g_state->screen == 14 || g_state->screen == 16 || g_state->screen == 17 || g_state->screen == 18)
+            {
+                if ((g_state->quest_flags & 0x40) == 0)
+                {
+                    UI::set_adventure_seed(g_bucket->adventure_seed.first, g_bucket->adventure_seed.second);
+                    g_state->world_next = g_state->world_start;
+                    g_state->level_next = g_state->level_start;
+                    g_state->theme_next = g_state->theme_start;
+                    g_state->screen_next = 12;
+                }
+                g_state->quest_flags |= 1;
+                g_state->loading = 1;
+            }
+        }
+        if (ImGui::MenuItem("New random adventure run", key_string(keys["quick_restart"]).c_str()))
+        {
+            UI::init_adventure();
+            static std::uniform_int_distribution<uint64_t> dist(1, UINT64_MAX);
+            UI::set_adventure_seed(dist(rd), dist(rd));
+            quick_start(12, 1, 1, 1);
+        }
+        if (ImGui::MenuItem("New random seeded run"))
+        {
+            static std::uniform_int_distribution<uint32_t> dist(1, UINT32_MAX);
+            quick_start(12, 1, 1, 1, dist(rd));
+        }
+        auto seed_str = fmt::format("{:08X}", g_state->seed);
+        ImGui::InputText("Seeded seed", &seed_str, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            uint32_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << seed_str;
+            ss >> new_seed;
+            if (new_seed != g_state->seed)
+                quick_start(12, 1, 1, 1, new_seed);
+        }
+
+        static bool first_run{true};
+        if (g_bucket->adventure_seed.first == 0 && first_run)
+            UI::get_adventure_seed(true);
+        first_run = false;
+
+        std::string adventure_seed_first = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.first);
+        std::string adventure_seed_second = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.second);
+        ImGui::InputText("Adventure seed##AdventureSeedFirst", &adventure_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            int64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << adventure_seed_first;
+            ss >> new_seed;
+            g_bucket->adventure_seed.first = new_seed;
+        }
+        ImGui::InputText("##AdventureSeedSecond", &adventure_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            int64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << adventure_seed_second;
+            ss >> new_seed;
+            g_bucket->adventure_seed.second = new_seed;
+        }
+        endmenu();
+    }
     if (submenu("State"))
     {
         render_screen("Current screen", g_state->screen);
@@ -8877,6 +9074,7 @@ void render_prohud()
         last_frame = this_frame;
         last_time = this_time;
     }
+    g_speedhack_ui_multiplier = UI::get_speedhack();
 
     auto io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
@@ -8884,11 +9082,11 @@ void render_prohud()
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("TIMER:{}/{} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
+    std::string buf = fmt::format("TIMER:{}/{} GLOBAL:{:#06} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), get_global_frame_count(), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{:.2f} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_multiplier != 1.0 ? fmt::format("SPEEDHACK:{:.2f}x ", g_speedhack_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
+    buf = fmt::format("{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}", (options["god_mode"] ? "GODMODE " : ""), (options["god_mode_companions"] ? "HHGODMODE " : ""), (options["noclip"] ? "NOCLIP " : ""), (options["fly_mode"] ? "FLY " : ""), (options["lights"] ? "LIGHTS " : ""), (test_flag(g_dark_mode, 1) ? "DARK " : ""), (test_flag(g_dark_mode, 2) ? "NODARK " : ""), (options["disable_ghost_timer"] ? "NOGHOST " : ""), (options["disable_achievements"] ? "NOSTEAM " : ""), (options["disable_savegame"] ? "NOSAVE " : ""), (options["disable_pause"] ? "NOPAUSE " : ""), (g_zoom != 13.5 ? fmt::format("ZOOM:{:.2f} ", g_zoom) : ""), (options["speedhack"] ? "TURBO " : ""), (g_speedhack_ui_multiplier != 1.0 ? fmt::format("SPEEDHACK:{:.2f}x ", g_speedhack_ui_multiplier) : ""), (!options["mouse_control"] ? "NOMOUSE " : ""), (!options["keyboard_control"] ? "NOKEYBOARD " : ""));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -8896,6 +9094,15 @@ void render_prohud()
     buf = fmt::format("{}", (type == "" ? "" : fmt::format("SPAWN:{}{}", type, options["snap_to_grid"] ? " SNAP" : "")));
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
+
+    if (paused)
+    {
+        buf = "||";
+        ImGui::PushFont(bigfont);
+        textsize = ImGui::CalcTextSize(buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, ImColor(1.0f, 1.0f, 1.0f, .7f), buf.c_str());
+        ImGui::PopFont();
+    }
 
     static std::array<int, 4> inputs{0};
     static uint32_t last_input_frame = 0;
@@ -9001,6 +9208,7 @@ void imgui_init(ImGuiContext*)
     refresh_script_files();
     autorun_scripts();
     set_colors();
+    version_check();
     windows["tool_entity"] = new Window({"Spawner", is_tab_detached("tool_entity"), is_tab_open("tool_entity")});
     windows["tool_door"] = new Window({"Warp", is_tab_detached("tool_door"), is_tab_open("tool_door")});
     windows["tool_camera"] = new Window({"Camera", is_tab_detached("tool_camera"), is_tab_open("tool_camera")});
@@ -9021,23 +9229,90 @@ meta = {
     name = "pause",
     author = "overlunky",
 }
+
 exports = {
     type = 0,
     paused = false,
     skip = false,
+    loading = true,
+    camera = false,
 }
-set_callback(function()
-    if test_mask(exports.type, 0x40) then
+
+kb = get_raw_input().keyboard
+gp = game_manager.game_props
+ol = get_bucket().overlunky
+
+function apply_pause()
+    return state.screen == SCREEN.INTRO
+        or state.screen == SCREEN.CAMP
+        or state.screen == SCREEN.LEVEL
+        or state.screen == SCREEN.DEATH
+        or state.screen == SCREEN.TRANSITION
+end
+
+function not_loading()
+    local ret = state.loading > 0
+        or state.fadevalue > 0
+        or (state.screen == SCREEN.MENU and game_manager.screen_menu.menu_text_opacity < 1)
+        or (state.screen == SCREEN.CHARACTER_SELECT and (state.screen_character_select.topleft_woodpanel_esc_slidein_timer == 0 or state.screen_character_select.start_pressed))
+    if state.loading == 3 and state.fadevalue < 0.03 then
+        ret = false
+    end
+    return not ret
+end
+
+function block_update(pause_type)
+    if test_mask(exports.type, pause_type) then
         if exports.paused and exports.skip then
-            exports.skip = false
             state.pause = clr_mask(state.pause, exports.type)
             return false
-        elseif exports.paused then
-            state.pause = set_mask(state.pause, clr_mask(exports.type, 0x40))
+        elseif exports.paused and apply_pause() then
+            state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
         end
-        return exports.paused
+        local block = exports.paused and (exports.loading or not_loading())
+        return block
     end
-end, ON.PRE_UPDATE))");
+    return false
+end
+
+function move_camera(blocked)
+    if not exports.camera or not exports.paused then return end
+    if ((exports.type & 0xC0) > 0 and blocked) or (exports.type & 0xC0) == 0 then
+        update_camera_position()
+    end
+end
+
+set_callback(function()
+    local block = block_update(0x40)
+    move_camera(block)
+    return block
+end, ON.PRE_UPDATE)
+
+set_callback(function()
+    if not exports.paused and state.pause == 2 and test_mask(state.pause, exports.type) and get_start_level_paused() and state.time_level == 1 and apply_pause() then
+        exports.paused = true
+    end
+    local block = block_update(0x80)
+    move_camera(block)
+    return block
+end, ON.PRE_GAME_LOOP)
+
+set_callback(function()
+    exports.skip = false
+end, ON.POST_GAME_LOOP)
+
+set_callback(function()
+    if exports.paused and not exports.skip then
+        return true
+    end
+end, ON.PRE_PROCESS_INPUT)
+
+set_callback(function()
+    if (test_mask(ol.keys["toggle_pause"], KEY.SPACE) or test_mask(ol.keys["frame_advance"], KEY.SPACE) or test_mask(ol.keys["frame_advance_alt"], KEY.SPACE)) and kb[40].down and not kb[33].down then
+        gp.input_menu = clr_mask(gp.input_menu, MENU_INPUT.SELECT)
+    end
+end, ON.POST_PROCESS_INPUT)
+)");
     add_ui_script("camera_hack", false, R"(
 lastpos = Vec2:new()
 set_callback(function()
@@ -9123,6 +9398,11 @@ set_callback(init_hooks, ON.SCRIPT_ENABLE)
 set_callback(clear_hooks, ON.SCRIPT_DISABLE)
 )");
     add_ui_script("level_size", false, "");
+    add_ui_script("skip_fades", options["skip_fades"], R"(
+set_callback(function()
+    state.fadeout = 0
+    state.fadevalue = 0
+end, ON.PRE_UPDATE))");
 }
 
 void imgui_draw()
@@ -9267,6 +9547,10 @@ void imgui_draw()
                 }
                 if (ImGui::BeginMenu("Help"))
                 {
+                    if (ImGui::MenuItem("Check for updates"))
+                        version_check(true);
+                    if (ImGui::MenuItem("Get latest version here"))
+                        ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky/releases/tag/whip", NULL, NULL, SW_SHOWNORMAL);
                     if (ImGui::MenuItem("README"))
                         ShellExecuteA(NULL, "open", "https://github.com/spelunky-fyi/overlunky#overlunky", NULL, NULL, SW_SHOWNORMAL);
                     if (ImGui::MenuItem("API Documentation"))
@@ -9398,32 +9682,6 @@ void check_focus()
     }
 }
 
-std::unordered_set<std::string> legal_options{
-    "disable_ghost_timer",
-    "disable_pause",
-    "draw_entity_info",
-    "draw_entity_tooltip",
-    "draw_grid",
-    "draw_hitboxes",
-    "draw_hitboxes_interpolated",
-    "draw_hotbar",
-    "draw_hud",
-    "draw_path",
-    "draw_script_messages",
-    "fade_script_messages",
-    "fly_mode",
-    "god_mode",
-    "god_mode_companions",
-    "hd_cursor",
-    "keyboard_control",
-    "lights",
-    "mouse_control",
-    "noclip",
-    "smooth_camera",
-    "pause_type",
-    "camera_hack",
-};
-
 void update_bucket()
 {
     if (g_bucket->overlunky->set_selected_uid.has_value())
@@ -9486,8 +9744,8 @@ void update_bucket()
         {
             if (auto* val = std::get_if<int64_t>(&v))
             {
-                camera_hack = (uint32_t)*val;
-                set_camera_hack(camera_hack);
+                options["camera_hack"] = (uint32_t)*val;
+                set_camera_hack(options["camera_hack"]);
             }
         }
     }
@@ -9572,7 +9830,7 @@ void init_ui()
     render_api.set_advanced_hud();
 
     const std::string version_string = fmt::format("Overlunky {}", get_version());
-    const float scale{0.00035f};
+    const float scale{0.0004f};
 
     static TextRenderingInfo tri{};
     tri.set_text(version_string, 0, 0, scale, scale, 1, 0);
@@ -9586,6 +9844,7 @@ void init_ui()
             auto& render_api_l = RenderAPI::get();
             static const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
             render_vanilla_stuff();
+            render_version_warning();
             render_api_l.draw_text(&tri, color);
         });
 }

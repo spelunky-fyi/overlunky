@@ -703,7 +703,8 @@ std::array pause_types{
     "8: ?",
     "16: ?",
     "32: Ankh (smooth camera, janky audio)",
-    "Freeze on PRE_UPDATE", // this is not a real state.pause flag, it's only used by ui.cpp for magic
+    "Freeze on PRE_UPDATE (state)",           // this is not a real state.pause flag, it's only used by ui.cpp for magic
+    "Freeze on PRE_GAME_LOOP (state + menu)", // this is not a real state.pause flag, it's only used by ui.cpp for magic
 };
 
 std::array levelgen_flags{
@@ -782,4 +783,30 @@ std::array player_inputs{
     "Controller 2",
     "Controller 3",
     "Controller 4",
+};
+
+std::unordered_set<std::string> legal_options{
+    "disable_ghost_timer",
+    "disable_pause",
+    "draw_entity_info",
+    "draw_entity_tooltip",
+    "draw_grid",
+    "draw_hitboxes",
+    "draw_hitboxes_interpolated",
+    "draw_hotbar",
+    "draw_hud",
+    "draw_path",
+    "draw_script_messages",
+    "fade_script_messages",
+    "fly_mode",
+    "god_mode",
+    "god_mode_companions",
+    "hd_cursor",
+    "keyboard_control",
+    "lights",
+    "mouse_control",
+    "noclip",
+    "smooth_camera",
+    "pause_type",
+    "camera_hack",
 };

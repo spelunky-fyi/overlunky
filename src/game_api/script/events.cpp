@@ -6,6 +6,7 @@
 #include <type_traits>  // for move
 #include <utility>      // for max, pair, min
 
+#include "bucket.hpp"
 #include "constants.hpp"          // for no_return_str
 #include "level_api_types.hpp"    // for LevelGenRoomData
 #include "rpc.hpp"                // for game_log, get_adventure_seed
@@ -27,17 +28,6 @@ void pre_load_level_files()
             return true;
         });
 }
-bool pre_level_generation()
-{
-    bool block{false};
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            block = backend->pre_level_generation();
-            return !block;
-        });
-    return block;
-}
 bool pre_load_screen()
 {
     static int64_t prev_seed = 0;
@@ -53,10 +43,12 @@ bool pre_load_screen()
         }
         else
         {
-            auto seed = get_adventure_seed();
+            auto seed = get_adventure_seed(false);
             if (seed.second != prev_seed)
                 game_log(fmt::format("{} Seed: {:X} {:X}", ((state->quest_flags & (1U << 7)) > 0 && state->screen == 28) ? "Daily" : "Adventure", (uint64_t)seed.first, (uint64_t)seed.second));
             prev_seed = seed.second;
+            auto bucket = Bucket::get();
+            bucket->adventure_seed = std::make_pair(seed.first, seed.second);
         }
     }
 
@@ -152,30 +144,12 @@ void post_init_layer(LAYER layer)
             return true;
         });
 }
-void post_init_level()
-{
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            backend->post_init_level();
-            return true;
-        });
-}
 void post_load_screen()
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
             backend->post_load_screen();
-            return true;
-        });
-}
-void post_unload_level()
-{
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            backend->post_unload_level();
             return true;
         });
 }
@@ -408,22 +382,6 @@ void update_backends()
         });
 }
 
-bool pre_state_update()
-{
-    bool return_val = false;
-    LuaBackend::for_each_backend(
-        [=, &return_val](LuaBackend::LockedBackend backend)
-        {
-            if (backend->on_pre_state_update())
-            {
-                return_val = true;
-                return false;
-            }
-            return true;
-        });
-    return return_val;
-}
-
 bool pre_load_journal_chapter(uint8_t chapter)
 {
     bool return_value = false;
@@ -487,13 +445,13 @@ bool pre_set_feat(FEAT feat)
     return block;
 }
 
-bool pre_process_input()
+bool pre_event(ON event)
 {
     bool return_val = false;
     LuaBackend::for_each_backend(
         [=, &return_val](LuaBackend::LockedBackend backend)
         {
-            if (backend->on_pre_process_input())
+            if (backend->on_pre(event))
             {
                 return_val = true;
                 return false;
@@ -503,12 +461,12 @@ bool pre_process_input()
     return return_val;
 }
 
-void post_process_input()
+void post_event(ON event)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->on_post_process_input();
+            backend->on_post(event);
             return true;
         });
 }
