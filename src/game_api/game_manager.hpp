@@ -89,14 +89,15 @@ struct ControllerButton
 
 struct ControllerInput
 {
+    /// Zero-based indexing, i.e. use PlayerSlot.input_mapping_controller directly to index this.
     std::array<ControllerButton, 16> buttons;
 };
 
 struct RawInput
 {
-    /// State of all keyboard buttons in a random game order as usual, most key indexes can be found in RAW_KEY.
+    /// State of all keyboard buttons in a random game order as usual, most key indexes can be found in RAW_KEY. Zero-based indexing, i.e. use PlayerSlot.input_mapping_keyboard directly to index this.
     std::array<KeyboardKey, 112> keyboard;
-    /// State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
+    /// State of controller buttons per controller. Zero-based indexing, i.e. use GameProps.input_index directly to index this.
     std::array<ControllerInput, 12> controller;
 };
 

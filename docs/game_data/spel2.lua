@@ -2297,15 +2297,15 @@ do
     ---@field input_index integer[] @size: 5 @Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ---@class RawInput
-    ---@field keyboard KeyboardKey[] @size: 112 @State of all keyboard buttons in a random game order as usual, most key indexes can be found in RAW_KEY.
-    ---@field controller ControllerInput[] @size: 12 @State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
+    ---@field keyboard KeyboardKey[] @size: 112 @State of all keyboard buttons in a random game order as usual, most key indexes can be found in RAW_KEY. Zero-based indexing, i.e. use PlayerSlot.input_mapping_keyboard directly to index this.
+    ---@field controller ControllerInput[] @size: 12 @State of controller buttons per controller. Zero-based indexing, i.e. use GameProps.input_index directly to index this.
 
 ---@class KeyboardKey
     ---@field down boolean @Key is being held
     ---@field pressed boolean @Key was just pressed down this frame
 
 ---@class ControllerInput
-    ---@field buttons ControllerButton[] @size: 16
+    ---@field buttons ControllerButton[] @size: 16 @Zero-based indexing, i.e. use PlayerSlot.input_mapping_controller directly to index this.
 
 ---@class ControllerButton
     ---@field down boolean @Button is being held
@@ -8470,6 +8470,7 @@ KEY = {
   ["6"] = 54,
   ["7"] = 55,
   ["8"] = 56,
+  ["9"] = 57,
   A = 65,
   ADD = 107,
   ALT = 18,
@@ -8588,7 +8589,8 @@ KEY = {
   V = 86,
   W = 87,
   X = 88,
-  Y = 89
+  Y = 89,
+  Z = 90
 }
 ---@alias KEY integer
 LAYER = {
@@ -8622,6 +8624,13 @@ LEVEL_CONFIG = {
   MOUNT_CHANCE = 4
 }
 ---@alias LEVEL_CONFIG integer
+LIGHT_TYPE = {
+  FOLLOW_CAMERA = 1,
+  FOLLOW_ENTITY = 2,
+  NONE = 0,
+  ROOM_LIGHT = 4
+}
+---@alias LIGHT_TYPE integer
 LIQUID_POOL = {
   COARSE_LAVA = 4,
   COARSE_WATER = 2,
@@ -8681,6 +8690,19 @@ MASK = {
   WATER = 8192
 }
 ---@alias MASK integer
+MENU_INPUT = {
+  BACK = 2,
+  DELETE = 4,
+  DOWN = 256,
+  JOURNAL = 16,
+  LEFT = 32,
+  NONE = 0,
+  RANDOM = 8,
+  RIGHT = 64,
+  SELECT = 1,
+  UP = 128
+}
+---@alias MENU_INPUT integer
 ON = {
   ARENA_INTRO = 25,
   ARENA_ITEMS = 23,
@@ -8709,6 +8731,7 @@ ON = {
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
   PLAYER_PROFILE = 6,
+  POST_GAME_LOOP = 156,
   POST_LAYER_CREATION = 148,
   POST_LAYER_DESTRUCTION = 152,
   POST_LEVEL_CREATION = 146,
@@ -8716,8 +8739,10 @@ ON = {
   POST_LEVEL_GENERATION = 112,
   POST_LOAD_JOURNAL_CHAPTER = 139,
   POST_LOAD_SCREEN = 136,
+  POST_PROCESS_INPUT = 154,
   POST_ROOM_GENERATION = 111,
   POST_UPDATE = 143,
+  PRE_GAME_LOOP = 155,
   PRE_GET_FEAT = 140,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
@@ -8729,6 +8754,7 @@ ON = {
   PRE_LOAD_JOURNAL_CHAPTER = 138,
   PRE_LOAD_LEVEL_FILES = 109,
   PRE_LOAD_SCREEN = 135,
+  PRE_PROCESS_INPUT = 153,
   PRE_SET_FEAT = 141,
   PRE_UPDATE = 142,
   PROLOGUE = 2,
@@ -9150,6 +9176,101 @@ QUEST_FLAG = {
   WADDLER_AGGROED = 10
 }
 ---@alias QUEST_FLAG integer
+RAW_KEY = {
+  ["0"] = 65,
+  ["1"] = 66,
+  ["2"] = 67,
+  ["3"] = 68,
+  ["4"] = 69,
+  ["5"] = 70,
+  ["6"] = 71,
+  ["7"] = 72,
+  ["8"] = 73,
+  ["9"] = 74,
+  A = 9,
+  ADD = 86,
+  ALT = 37,
+  B = 10,
+  BACKSPACE = 40,
+  C = 11,
+  COMMA = 93,
+  CTRL = 33,
+  D = 12,
+  DECIMAL = 90,
+  DELETE = 104,
+  DIVIDE = 88,
+  DOWN = 1,
+  E = 13,
+  END = 106,
+  ESCAPE = 4,
+  F = 14,
+  F1 = 41,
+  F2 = 42,
+  F3 = 43,
+  F4 = 44,
+  F5 = 45,
+  F6 = 46,
+  F7 = 47,
+  F8 = 48,
+  F9 = 49,
+  F10 = 50,
+  F11 = 51,
+  F12 = 52,
+  G = 15,
+  H = 16,
+  HOME = 108,
+  I = 17,
+  INSERT = 103,
+  J = 18,
+  K = 19,
+  L = 20,
+  LALT = 37,
+  LCONTROL = 33,
+  LEFT = 2,
+  LSHIFT = 35,
+  M = 21,
+  MINUS = 92,
+  MULTIPLY = 87,
+  N = 22,
+  NUMPAD0 = 75,
+  NUMPAD1 = 76,
+  NUMPAD2 = 77,
+  NUMPAD3 = 78,
+  NUMPAD4 = 79,
+  NUMPAD5 = 80,
+  NUMPAD6 = 81,
+  NUMPAD7 = 82,
+  NUMPAD8 = 83,
+  NUMPAD9 = 84,
+  NUMPADENTER = 110,
+  O = 23,
+  P = 24,
+  PERIOD = 94,
+  PGDN = 105,
+  PGUP = 107,
+  PLUS = 98,
+  Q = 25,
+  R = 26,
+  RALT = 38,
+  RCONTROL = 34,
+  RETURN = 5,
+  RIGHT = 3,
+  RSHIFT = 36,
+  S = 27,
+  SHIFT = 35,
+  SPACE = 39,
+  SUBTRACT = 85,
+  T = 28,
+  TAB = 6,
+  U = 29,
+  UP = 0,
+  V = 30,
+  W = 31,
+  X = 32,
+  Y = 33,
+  Z = 34
+}
+---@alias RAW_KEY integer
 RECURSIVE_MODE = {
   EXCLUSIVE = 0,
   INCLUSIVE = 1,
