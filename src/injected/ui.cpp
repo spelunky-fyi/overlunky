@@ -6043,6 +6043,8 @@ void render_options()
         ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let you unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
         ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce any selected normal pause flags");
         ImGui::TextWrapped("- Using the freeze options without a) a camera hack or b) a normal pause flag (use fade) will induce weird camera flickering");
+        if (keys["toggle_pause"] & VK_SPACE || keys["frame_advance"] & VK_SPACE || keys["frame_advance_alt"] & VK_SPACE)
+            ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: frame_advance/toggle_pause is bound to Space,\nnormal menu input using Space will be disabled (use Z)");
         endmenu();
     }
 
@@ -9306,7 +9308,7 @@ set_callback(function()
 end, ON.PRE_PROCESS_INPUT)
 
 set_callback(function()
-    if kb[40].down and not kb[33].down then
+    if (test_mask(ol.keys["toggle_pause"], KEY.SPACE) or test_mask(ol.keys["frame_advance"], KEY.SPACE) or test_mask(ol.keys["frame_advance_alt"], KEY.SPACE)) and kb[40].down and not kb[33].down then
         gp.input_menu = clr_mask(gp.input_menu, MENU_INPUT.SELECT)
     end
 end, ON.POST_PROCESS_INPUT)
