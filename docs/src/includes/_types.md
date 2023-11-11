@@ -1030,9 +1030,10 @@ Type | Name | Description
 float | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
 bool | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
 bool | [keysdown[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
- | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown(int keycode)<br/>bool keydown(char key)<br/> 
- | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
- | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/> 
+bool | [keys[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | ZeroIndexArray<bool>, use [KEY](#KEY) to index<br/> 
+ | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown([KEY](#KEY) keycode)<br/>bool keydown(char key)<br/> 
+ | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed([KEY](#KEY) keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
+ | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased([KEY](#KEY) keycode)<br/>bool keyreleased(char key)<br/> 
 bool | [keyctrl](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) | 
 bool | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) | 
 bool | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 

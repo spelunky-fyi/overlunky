@@ -1681,7 +1681,7 @@ function mouse_position() end
 ---Returns: [ImGuiIO](https://spelunky-fyi.github.io/overlunky/#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 ---
 ---- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
----- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+---- Note: You can use KEY or standard VK keycodes to index `keys` or the other functions.
 ---- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 ---- Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
@@ -5071,6 +5071,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field framerate number
     ---@field wantkeyboard boolean
     ---@field keysdown boolean[] @size: ImGuiKey_COUNT
+    ---@field keys boolean[] @size: ImGuiKey_COUNT
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean

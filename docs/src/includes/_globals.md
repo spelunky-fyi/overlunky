@@ -2087,7 +2087,7 @@ Converts (x, y, BUTTON) to [INPUTS](#INPUTS)
 Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 
 - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
-- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+- Note: You can use [KEY](#KEY) or standard VK keycodes to index `keys` or the other functions.
 - Note: [Overlunky](#Overlunky)/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 - Note: [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 
