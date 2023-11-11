@@ -208,7 +208,7 @@ set_callback(function(draw_ctx)
             inputcheck = draw_ctx:win_check('Check this out', inputcheck)
             inputcolorrgb = draw_ctx:win_color_editor('Color (RGB)', inputcolorrgb, false)
             inputcolorrgba = draw_ctx:win_color_editor('Color (RGBA)', inputcolorrgba, true)
-            if inputdisable then draw_ctx:win_disabled(false) end
+            draw_ctx:win_disabled(false)
             inputdisable = draw_ctx:win_check('Disable widgets above', inputdisable)
 
             draw_ctx:win_separator_text('Section Two')
@@ -355,7 +355,7 @@ set_callback(function(draw_ctx)
                 draw_ctx:draw_circle(sx, sy, 0.75 * radius, 6, inputcolorrgba:get_ucolor())
             end
             --this disable would be very bad because it's never enabled again, but the api should pop it at the end of the window callback
-            draw_ctx:win_disabled(true)
+            --draw_ctx:win_disabled(true)
         end)
         if not widgetopen then
             message('Window was closed from the X')
@@ -529,6 +529,6 @@ set_callback(function(draw_ctx)
         end)
     end
 
-    -- this disable would disable the whole UI, but the api should pop after the GUIFRAME callback
-    draw_ctx:win_disabled(true)
+    -- this disable would disable the whole UI, but the api should pop it after the GUIFRAME callback
+    --draw_ctx:win_disabled(true)
 end, ON.GUIFRAME)

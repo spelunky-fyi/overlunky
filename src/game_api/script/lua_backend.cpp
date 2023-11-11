@@ -577,7 +577,7 @@ void LuaBackend::draw(ImDrawList* dl)
         /// Use `set_callback(function, ON.GUIFRAME)` instead
         sol::optional<sol::function> on_guiframe = lua["on_guiframe"];
 
-        GuiDrawContext draw_ctx(this);
+        auto draw_ctx = new GuiDrawContext(this);
 
         if (on_guiframe)
         {
@@ -593,11 +593,13 @@ void LuaBackend::draw(ImDrawList* dl)
             if (callback.screen == ON::GUIFRAME)
             {
                 set_current_callback(-1, id, CallbackType::Normal);
-                handle_function<void>(this, callback.func, &draw_ctx);
+                handle_function<void>(this, callback.func, draw_ctx);
                 clear_current_callback();
                 callback.lastRan = now;
             }
         }
+
+        delete draw_ctx;
     }
     catch (const sol::error& e)
     {

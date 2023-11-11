@@ -86,18 +86,57 @@ GuiDrawContext::~GuiDrawContext()
 {
     ImGuiStackSizes pop;
     pop.SetToCurrentState();
-    while (pop.SizeOfIDStack-- > stack_sizes.SizeOfIDStack)
-        ImGui::PopID();
-    while (pop.SizeOfDisabledStack-- > stack_sizes.SizeOfDisabledStack)
-        ImGui::EndDisabled();
 
-    /* TODO:
-    SizeOfColorStack;
-    SizeOfStyleVarStack;
+    auto IDStack = pop.SizeOfIDStack - stack_sizes.SizeOfIDStack;
+    if (IDStack > 0)
+    {
+        DEBUG("IDStack is leaking {}, you should call win_popid() more!", IDStack);
+        while (IDStack-- > 0)
+            ImGui::PopID();
+    }
+
+    pop.SetToCurrentState();
+
+    auto DisabledStack = pop.SizeOfDisabledStack - stack_sizes.SizeOfDisabledStack;
+    if (DisabledStack > 0)
+    {
+        DEBUG("DisabledStack is leaking {}, you should call win_disabled(false) more!", DisabledStack);
+        while (DisabledStack-- > 0)
+            ImGui::EndDisabled();
+    }
+
+    pop.SetToCurrentState();
+
+    auto ItemFlagsStack = pop.SizeOfItemFlagsStack - stack_sizes.SizeOfItemFlagsStack;
+    if (ItemFlagsStack > 0)
+    {
+        DEBUG("ItemFlagsStack is leaking {}, you should call TODO more!", ItemFlagsStack);
+        while (ItemFlagsStack-- > 0)
+            ImGui::PopItemFlag();
+    }
+
+    pop.SetToCurrentState();
+
+    auto StyleVarStack = pop.SizeOfStyleVarStack - stack_sizes.SizeOfStyleVarStack;
+    if (StyleVarStack > 0)
+    {
+        DEBUG("StyleVarStack is leaking {}, you should call TODO more!", StyleVarStack);
+        ImGui::PopStyleVar(StyleVarStack);
+    }
+
+    pop.SetToCurrentState();
+
+    auto ColorStack = pop.SizeOfColorStack - stack_sizes.SizeOfColorStack;
+    if (ColorStack > 0)
+    {
+        DEBUG("ColorStack is leaking {}, you should call TODO more!", ColorStack);
+        ImGui::PopStyleColor(ColorStack);
+    }
+
+    /* TODO?:
     SizeOfFontStack;
     SizeOfFocusScopeStack;
     SizeOfGroupStack;
-    SizeOfItemFlagsStack;
     SizeOfBeginPopupStack;
     */
 }
@@ -376,6 +415,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
 }
 bool GuiDrawContext::window(std::string title, float x, float y, float w, float h, bool collapsed, GUI_CONDITION pos_cond, GUI_CONDITION size_cond, GUI_CONDITION collapsed_cond, int flags, sol::function callback)
 {
+    auto win_ctx = new GuiDrawContext(backend);
     bool win_open = true;
     ImGui::PushID("backendwindow");
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4, 4});
@@ -400,7 +440,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     size.x += 1.0f;
     size.y -= 1.0f;
     size.y *= -1.0f;
-    handle_function<void>(backend, callback, *this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size), ImGui::IsWindowCollapsed());
+    handle_function<void>(backend, callback, win_ctx, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size), ImGui::IsWindowCollapsed());
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -423,6 +463,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
         hide_cursor();
     }
 
+    delete win_ctx;
     return win_open;
 }
 void GuiDrawContext::win_child(std::string id, float w, float h, bool border, int flags, sol::function callback)
@@ -723,7 +764,7 @@ void GuiDrawContext::win_disabled(bool disabled, std::optional<sol::function> ca
     {
         if (disabled)
             ImGui::BeginDisabled(true);
-        else
+        else if (g.DisabledStackSize > 0)
             ImGui::EndDisabled();
     }
 }
