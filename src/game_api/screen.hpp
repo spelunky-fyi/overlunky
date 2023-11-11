@@ -383,7 +383,7 @@ class ScreenCodeInput : public Screen // ID: 8
     TextureRenderingInfo main_woodpanel_center;
     TextureRenderingInfo main_woodpanel_right_border;
     TextureRenderingInfo top_scroll;
-    TextureRenderingInfo seed_letter_cutouts;
+    TextureRenderingInfo letter_cutouts;
     TextureRenderingInfo hand_pointer;
     TextureRenderingInfo key_background;
     TextureRenderingInfo topleft_woodpanel_esc;

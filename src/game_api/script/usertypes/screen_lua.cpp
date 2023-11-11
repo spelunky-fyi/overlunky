@@ -268,7 +268,7 @@ void register_usertypes(sol::state& lua)
     screenseedinput_type["main_woodpanel_center"] = &ScreenCodeInput::main_woodpanel_center;
     screenseedinput_type["main_woodpanel_right_border"] = &ScreenCodeInput::main_woodpanel_right_border;
     screenseedinput_type["top_scroll"] = &ScreenCodeInput::top_scroll;
-    screenseedinput_type["seed_letter_cutouts"] = &ScreenCodeInput::seed_letter_cutouts;
+    screenseedinput_type["letter_cutouts"] = &ScreenCodeInput::letter_cutouts;
     screenseedinput_type["hand_pointer"] = &ScreenCodeInput::hand_pointer;
     screenseedinput_type["key_background"] = &ScreenCodeInput::key_background;
     screenseedinput_type["topleft_woodpanel_esc"] = &ScreenCodeInput::topleft_woodpanel_esc;

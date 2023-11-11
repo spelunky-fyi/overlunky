@@ -2258,7 +2258,7 @@ do
     ---@field screen_options ScreenOptions
     ---@field screen_player_profile Screen @It just opens journal
     ---@field screen_leaderboards Screen @All handled by the Online
-    ---@field screen_seed_input ScreenSeedInput
+    ---@field screen_seed_input ScreenCodeInput
     ---@field screen_camp ScreenCamp
     ---@field screen_level ScreenLevel
     ---@field screen_online_loading ScreenOnlineLoading
@@ -5662,7 +5662,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field resolution_scale integer @100 = 1.0
     ---@field display_mode integer @0 = Fullscreen, 1 = Borderless Windowed, 2 = Windowed
 
----@class ScreenSeedInput : Screen
+---@class ScreenCodeInput : Screen
     ---@field bottom_woodpanel_slideup_speed number
     ---@field bottom_woodpanel_slideup_timer number
     ---@field bottom_woodpanel_y_offset number
@@ -5682,7 +5682,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field main_woodpanel_center TextureRenderingInfo
     ---@field main_woodpanel_right_border TextureRenderingInfo
     ---@field top_scroll TextureRenderingInfo
-    ---@field seed_letter_cutouts TextureRenderingInfo
+    ---@field letter_cutouts TextureRenderingInfo
     ---@field hand_pointer TextureRenderingInfo
     ---@field key_background TextureRenderingInfo
     ---@field topleft_woodpanel_esc TextureRenderingInfo
@@ -5690,7 +5690,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field start_sidepanel_slidein_timer number
     ---@field seed_length integer @Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
     ---@field get_seed integer?
-    ---@field set_seed any @[](ScreenSeedInput&s
+    ---@field set_seed any @[](ScreenCodeInput&s
 
 ---@class ScreenCharacterSelect : Screen
     ---@field main_background_zoom_target number
@@ -5883,27 +5883,32 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field ouroboros_angle number
 
 ---@class OnlineLobbyScreenPlayer
+    ---@field platform_icon integer @16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = Switch, 48 = PS, 49 = PS again?
     ---@field character integer @0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     ---@field ready boolean
+    ---@field searching boolean
 
 ---@class ScreenOnlineLobby : Screen
-    ---@field woodpanels_slidein_timer number
-    ---@field scroll_unfurl_timer number
+    ---@field bottom_woodpanel_slideup_speed number
+    ---@field bottom_woodpanel_slideup number
+    ---@field scroll_unfurl number
+    ---@field bottom_woodpanel_y_offset number
     ---@field woodpanel_bottom TextureRenderingInfo
     ---@field woodpanel_top TextureRenderingInfo
+    ---@field scroll TextureRenderingInfo
     ---@field left_scroll_handle TextureRenderingInfo
     ---@field right_scroll_handle TextureRenderingInfo
-    ---@field scroll_text_id STRINGID
-    ---@field btn_left_text_id STRINGID
-    ---@field btn_right_text_id STRINGID
-    ---@field btn_center_text_id STRINGID
-    ---@field woodpanel_top_visible boolean
-    ---@field woodpanel_bottom_visible boolean
-    ---@field toggle_panels_slidein boolean
+    ---@field scroll_text STRINGID
+    ---@field bottom_left_text STRINGID
+    ---@field bottom_right_text STRINGID
+    ---@field bottom_middle_text STRINGID
+    ---@field show_top_woodpanel boolean
+    ---@field show_bottom_woodpanel boolean
+    ---@field slide_in_bottom_woodpanel boolean
     ---@field players OnlineLobbyScreenPlayer[] @size: 4
     ---@field background_image TextureRenderingInfo
     ---@field topleft_woodpanel_esc TextureRenderingInfo
-    ---@field topleft_woodpanel_esc_slidein_timer number
+    ---@field topleft_woodpanel_esc_slidein number
     ---@field character_walk_offset number
     ---@field character_facing_left boolean
     ---@field move_direction integer
@@ -5917,30 +5922,12 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_count integer
     ---@field searching_for_players boolean
     ---@field show_code_panel boolean
-    ---@field enter_code_woodpanel_bottom_slidein_pos number
-    ---@field enter_code_woodpanel_bottom TextureRenderingInfo
-    ---@field enter_code_btn_right_text_id STRINGID
-    ---@field enter_code_woodpanel_top_visible boolean
-    ---@field enter_code_woodpanel_bottom_visible boolean
-    ---@field enter_code_toggle_panels_slidein boolean
-    ---@field selected_character integer
-    ---@field characters_entered_count integer
-    ---@field enter_code_topleft_woodpanel_esc_slidein_timer number
-    ---@field enter_code_banner_text_id STRINGID
-    ---@field enter_code_OK_text_id STRINGID
-    ---@field enter_code_main_woodpanel_left TextureRenderingInfo
-    ---@field enter_code_main_woodpanel_center TextureRenderingInfo
-    ---@field enter_code_main_woodpanel_right TextureRenderingInfo
-    ---@field enter_code_banner TextureRenderingInfo
-    ---@field enter_code_char_cutouts TextureRenderingInfo
-    ---@field enter_code_pointing_hand TextureRenderingInfo
-    ---@field enter_code_buttons TextureRenderingInfo
-    ---@field enter_code_OK_panel TextureRenderingInfo
-    ---@field enter_code_OK_panel_slidein_timer number
+    ---@field screen_code_input any @sol::property([](ScreenOnlineLobby*screen)->ScreenEnterOnlineCode*{returnreinterpret_cast<ScreenEnterOnlineCode*>(&screen->screen_code_input)
+
+---@class ScreenEnterOnlineCode : ScreenCodeInput
     ---@field enter_code_your_code_scroll TextureRenderingInfo
     ---@field enter_code_your_code_scroll_left_handle TextureRenderingInfo
     ---@field enter_code_your_code_scroll_right_handle TextureRenderingInfo
-    ---@field set_code fun(self, code: string): nil
 
 ---@class PauseUI
     ---@field menu_slidein_progress number
