@@ -3751,6 +3751,15 @@
                     <a href="#QUEST_FLAG" class="toc-h2 toc-link" data-title="QUEST_FLAG">QUEST_FLAG</a>
                   </li>
                   <li>
+                    <a href="#RAW_BUTTON" class="toc-h2 toc-link" data-title="RAW_BUTTON">RAW_BUTTON</a>
+                  </li>
+                  <li>
+                    <a href="#RAW_DUALSHOCK" class="toc-h2 toc-link" data-title="RAW_DUALSHOCK">RAW_DUALSHOCK</a>
+                  </li>
+                  <li>
+                    <a href="#RAW_KEY" class="toc-h2 toc-link" data-title="RAW_KEY">RAW_KEY</a>
+                  </li>
+                  <li>
                     <a href="#RECURSIVE_MODE" class="toc-h2 toc-link" data-title="RECURSIVE_MODE">RECURSIVE_MODE</a>
                   </li>
                   <li>
@@ -3989,10 +3998,6 @@
 </tr>
 <tr>
 <td>FEAT</td>
-<td>int;</td>
-</tr>
-<tr>
-<td>KEY</td>
 <td>int;</td>
 </tr>
 </tbody></table>
@@ -5508,7 +5513,7 @@ Look at the example on how to mimic game layer switching behavior</p>
 
 <ul>
 <li>Note: The clicked/pressed actions only make sense in <code>ON.GUIFRAME</code>.</li>
-<li>Note: Lua starts indexing at 1, you need <code>keysdown[string.byte(&#39;A&#39;) + 1]</code> to find the A key.</li>
+<li>Note: You can use <a href="#KEY">KEY</a> or standard VK keycodes to index <code>keys</code> or the other functions.</li>
 <li>Note: <a href="#Overlunky">Overlunky</a>/etc will eat all keys it is currently configured to use, your script will only get leftovers.</li>
 <li>Note: <a href="#Gamepad">Gamepad</a> is basically <a href="https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad">XINPUT_GAMEPAD</a> but variables are renamed and values are normalized to -1.0..1.0 range.</li>
 </ul>
@@ -9525,6 +9530,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=down">down</a></td>
 <td>Key is being held</td>
 </tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pressed">pressed</a></td>
+<td>Key was just pressed down this frame</td>
+</tr>
 </tbody></table>
 <h3 id='Letter'>Letter</h3>
 <table><thead>
@@ -10301,7 +10311,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td>array&lt;<a href="#ControllerButton">ControllerButton</a>, 16&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
-<td></td>
+<td>Zero-based indexing. Use <a href="#PlayerSlot">PlayerSlot</a>.input_mapping_controller or <a href="#RAW_BUTTON">RAW_BUTTON</a> (or RAW_DUALSHOCK) to index this.</td>
 </tr>
 </tbody></table>
 <h3 id='Gamepad'>Gamepad</h3>
@@ -10386,19 +10396,24 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keys">keys[ImGuiKey_COUNT]</a></td>
+<td>ZeroIndexArray<bool>, use <a href="#KEY">KEY</a> to index<br/></td>
+</tr>
+<tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keydown">keydown</a></td>
-<td>bool keydown(int keycode)<br/>bool keydown(char key)<br/></td>
+<td>bool keydown(<a href="#KEY">KEY</a> keycode)<br/>bool keydown(char key)<br/></td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keypressed">keypressed</a></td>
-<td>bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/></td>
+<td>bool keypressed(<a href="#KEY">KEY</a> keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/></td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyreleased">keyreleased</a></td>
-<td>bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/></td>
+<td>bool keyreleased(<a href="#KEY">KEY</a> keycode)<br/>bool keyreleased(char key)<br/></td>
 </tr>
 <tr>
 <td>bool</td>
@@ -10555,6 +10570,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=down">down</a></td>
 <td></td>
 </tr>
+<tr>
+<td>array&lt;<a href="#RAW_KEY">RAW_KEY</a>, 12&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mapping">mapping</a></td>
+<td>Can be indexed with <a href="#INPUT_FLAG">INPUT_FLAG</a>. Keyboard uses <a href="#RAW_KEY">RAW_KEY</a> values, controller uses <a href="#RAW_BUTTON">RAW_BUTTON</a> values.</td>
+</tr>
 </tbody></table>
 <h3 id='PlayerInputs'>PlayerInputs</h3>
 <p>Used in <a href="#StateMemory">StateMemory</a></p>
@@ -10628,12 +10648,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td>array&lt;<a href="#KeyboardKey">KeyboardKey</a>, 112&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyboard">keyboard</a></td>
-<td>State of all keyboard buttons in a random game order as usual</td>
+<td>State of all keyboard buttons in a random game order as usual, most key indexes can be found in <a href="#RAW_KEY">RAW_KEY</a>. Zero-based indexing, i.e. use <a href="#PlayerSlot">PlayerSlot</a>.input_mapping_keyboard directly to index this.</td>
 </tr>
 <tr>
 <td>array&lt;<a href="#ControllerInput">ControllerInput</a>, 12&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=controller">controller</a></td>
-<td>State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.</td>
+<td>State of controller buttons per controller. Zero-based indexing, i.e. use <a href="#GameProps">GameProps</a>.input_index directly to index this.</td>
 </tr>
 </tbody></table>
 <h2 id='Journal-types'>Journal types</h2><h3 id='JournalPage'>JournalPage</h3>
@@ -32548,6 +32568,215 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED">SUN_CHALLENGE_SPAWNED</a></td>
 <td>27</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='RAW_BUTTON'>RAW_BUTTON</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON">RAW_BUTTON</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.UP">UP</a></td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.DOWN">DOWN</a></td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.LEFT">LEFT</a></td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.RIGHT">RIGHT</a></td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.A">A</a></td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.B">B</a></td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.X">X</a></td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.Y">Y</a></td>
+<td>7</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.LEFT_SHOULDER">LEFT_SHOULDER</a></td>
+<td>8</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.RIGHT_SHOULDER">RIGHT_SHOULDER</a></td>
+<td>9</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.LEFT_TRIGGER">LEFT_TRIGGER</a></td>
+<td>10</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.RIGHT_TRIGGER">RIGHT_TRIGGER</a></td>
+<td>11</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.LEFT_THUMB">LEFT_THUMB</a></td>
+<td>12</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.RIGHT_THUMB">RIGHT_THUMB</a></td>
+<td>13</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.BACK">BACK</a></td>
+<td>14</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_BUTTON.START">START</a></td>
+<td>15</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='RAW_DUALSHOCK'>RAW_DUALSHOCK</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK">RAW_DUALSHOCK</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.UP">UP</a></td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.DOWN">DOWN</a></td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.LEFT">LEFT</a></td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.RIGHT">RIGHT</a></td>
+<td>3</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.CROSS">CROSS</a></td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.CIRCLE">CIRCLE</a></td>
+<td>5</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.SQUARE">SQUARE</a></td>
+<td>6</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.TRIANGLE">TRIANGLE</a></td>
+<td>7</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.L1">L1</a></td>
+<td>8</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.R1">R1</a></td>
+<td>9</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.L2">L2</a></td>
+<td>10</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.R2">R2</a></td>
+<td>11</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.L3">L3</a></td>
+<td>12</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.R3">R3</a></td>
+<td>13</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.SHARE">SHARE</a></td>
+<td>14</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_DUALSHOCK.OPTIONS">OPTIONS</a></td>
+<td>15</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='RAW_KEY'>RAW_KEY</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_KEY">RAW_KEY</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RAW_KEY.UP">UP</a></td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td>...check <a href="game_data/lua_enums.txt">lua_enums.txt</a>...</td>
+<td></td>
 <td></td>
 </tr>
 </tbody></table>
