@@ -194,18 +194,21 @@ set_callback(function(draw_ctx)
 
                 -- all the input widgets return the current value always, and expect you to keep feeding it back, or it will just revert to default when you blur the input
                 local stupidexample = draw_ctx:win_input_text('Not like this', '') -- this will just always be empty
-
-                -- you need to circulate your value through the widget like this
-                inputtext = draw_ctx:win_input_text('Write text##texthereplease', inputtext)
-                inputnumber = draw_ctx:win_input_int('Write number', inputnumber)
-                inputslider = draw_ctx:win_slider_int('Select number##slider', inputslider, 1, 10)
-                inputdragfloat = draw_ctx:win_drag_float('Select another number##dragfloat', inputdragfloat, 1, 10)
-                inputdragfloatsmall = draw_ctx:win_drag_float('Select a small number##dragfloatsmall', inputdragfloatsmall, 0, 0.1, 0.0001, "%.4f Units", GUI_SLIDER_FLAG.ALWAYS_CLAMP)
-                inputcombo = draw_ctx:win_combo('Combo thing', inputcombo, table.concat(comboopts, '\0')..'\0\0')
-                inputcheck = draw_ctx:win_check('Check this out', inputcheck)
-                inputcolorrgb = draw_ctx:win_color_editor('Color (RGB)', inputcolorrgb, false)
-                inputcolorrgba = draw_ctx:win_color_editor('Color (RGBA)', inputcolorrgba, true)
             end)
+
+            -- these are disabled without using a callback
+            draw_ctx:win_disabled(inputdisable)
+            -- you need to circulate your value through the widget like this
+            inputtext = draw_ctx:win_input_text('Write text##texthereplease', inputtext)
+            inputnumber = draw_ctx:win_input_int('Write number', inputnumber)
+            inputslider = draw_ctx:win_slider_int('Select number##slider', inputslider, 1, 10)
+            inputdragfloat = draw_ctx:win_drag_float('Select another number##dragfloat', inputdragfloat, 1, 10)
+            inputdragfloatsmall = draw_ctx:win_drag_float('Select a small number##dragfloatsmall', inputdragfloatsmall, 0, 0.1, 0.0001, "%.4f Units", GUI_SLIDER_FLAG.ALWAYS_CLAMP)
+            inputcombo = draw_ctx:win_combo('Combo thing', inputcombo, table.concat(comboopts, '\0')..'\0\0')
+            inputcheck = draw_ctx:win_check('Check this out', inputcheck)
+            inputcolorrgb = draw_ctx:win_color_editor('Color (RGB)', inputcolorrgb, false)
+            inputcolorrgba = draw_ctx:win_color_editor('Color (RGBA)', inputcolorrgba, true)
+            if inputdisable then draw_ctx:win_disabled(false) end
             inputdisable = draw_ctx:win_check('Disable widgets above', inputdisable)
 
             draw_ctx:win_separator_text('Section Two')
@@ -351,7 +354,8 @@ set_callback(function(draw_ctx)
                 -- draw an inner circle using one of the colors from the window color editors
                 draw_ctx:draw_circle(sx, sy, 0.75 * radius, 6, inputcolorrgba:get_ucolor())
             end
-
+            --this disable would be very bad because it's never enabled again, but the api should pop it at the end of the window callback
+            draw_ctx:win_disabled(true)
         end)
         if not widgetopen then
             message('Window was closed from the X')
@@ -524,4 +528,7 @@ set_callback(function(draw_ctx)
             end
         end)
     end
+
+    -- this disable would disable the whole UI, but the api should pop after the GUIFRAME callback
+    draw_ctx:win_disabled(true)
 end, ON.GUIFRAME)

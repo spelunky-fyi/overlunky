@@ -593,7 +593,7 @@ void LuaBackend::draw(ImDrawList* dl)
             if (callback.screen == ON::GUIFRAME)
             {
                 set_current_callback(-1, id, CallbackType::Normal);
-                handle_function<void>(this, callback.func, draw_ctx);
+                handle_function<void>(this, callback.func, &draw_ctx);
                 clear_current_callback();
                 callback.lastRan = now;
             }

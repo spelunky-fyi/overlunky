@@ -79,6 +79,27 @@ Gamepad get_gamepad(unsigned int index = 1)
 GuiDrawContext::GuiDrawContext(LuaBackend* _backend)
     : backend(_backend), g(*GImGui)
 {
+    stack_sizes.SetToCurrentState();
+}
+
+GuiDrawContext::~GuiDrawContext()
+{
+    ImGuiStackSizes pop;
+    pop.SetToCurrentState();
+    while (pop.SizeOfIDStack-- > stack_sizes.SizeOfIDStack)
+        ImGui::PopID();
+    while (pop.SizeOfDisabledStack-- > stack_sizes.SizeOfDisabledStack)
+        ImGui::EndDisabled();
+
+    /* TODO:
+    SizeOfColorStack;
+    SizeOfStyleVarStack;
+    SizeOfFontStack;
+    SizeOfFocusScopeStack;
+    SizeOfGroupStack;
+    SizeOfItemFlagsStack;
+    SizeOfBeginPopupStack;
+    */
 }
 
 void GuiDrawContext::draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)
@@ -379,7 +400,7 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     size.x += 1.0f;
     size.y -= 1.0f;
     size.y *= -1.0f;
-    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size), ImGui::IsWindowCollapsed());
+    handle_function<void>(backend, callback, *this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size), ImGui::IsWindowCollapsed());
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
@@ -411,7 +432,7 @@ void GuiDrawContext::win_child(std::string id, float w, float h, bool border, in
     if (std::abs(h) > 0.0f && std::abs(h) < 1.0f)
         h *= ImGui::GetContentRegionMax().x;
     if (ImGui::BeginChild(id.c_str(), ImVec2(w, h), border, flags))
-        handle_function<void>(backend, callback);
+        handle_function<void>(backend, callback, this);
     ImGui::EndChild();
 }
 void GuiDrawContext::win_text(std::string text)
@@ -587,7 +608,7 @@ void GuiDrawContext::win_tooltip(std::string text)
 void GuiDrawContext::win_section(std::string title, sol::function callback)
 {
     if (ImGui::CollapsingHeader(title.c_str()))
-        handle_function<void>(backend, callback);
+        handle_function<void>(backend, callback, this);
 };
 void GuiDrawContext::win_tab_bar(std::string id, sol::function callback)
 {
@@ -597,7 +618,7 @@ void GuiDrawContext::win_tab_bar(std::string id, int flags, sol::function callba
 {
     if (ImGui::BeginTabBar(id.c_str(), flags))
     {
-        handle_function<void>(backend, callback);
+        handle_function<void>(backend, callback, this);
         ImGui::EndTabBar();
     }
 }
@@ -610,7 +631,7 @@ bool GuiDrawContext::win_tab_item(std::string label, bool closeable, int flags, 
     bool open = true;
     if (ImGui::BeginTabItem(label.c_str(), closeable ? &open : NULL, flags))
     {
-        handle_function<void>(backend, callback);
+        handle_function<void>(backend, callback, this);
         ImGui::EndTabItem();
     }
     return open;
@@ -627,7 +648,7 @@ void GuiDrawContext::win_menu_bar(sol::function callback)
 {
     if (ImGui::BeginMenuBar())
     {
-        handle_function<void>(backend, callback);
+        handle_function<void>(backend, callback, this);
         ImGui::EndMenuBar();
     }
 }
@@ -639,7 +660,7 @@ void GuiDrawContext::win_menu(std::string label, bool enabled, sol::function cal
 {
     if (ImGui::BeginMenu(label.c_str(), enabled))
     {
-        handle_function<void>(backend, callback);
+        handle_function<void>(backend, callback, this);
         ImGui::EndMenu();
     }
 }
@@ -654,7 +675,7 @@ bool GuiDrawContext::win_menu_item(std::string label, std::optional<std::string>
 void GuiDrawContext::win_group(sol::function callback)
 {
     ImGui::BeginGroup();
-    handle_function<void>(backend, callback);
+    handle_function<void>(backend, callback, this);
     ImGui::EndGroup();
 }
 void GuiDrawContext::win_dummy(float width, float height)
@@ -688,13 +709,23 @@ void GuiDrawContext::win_disabled(sol::function callback)
 {
     win_disabled(true, callback);
 }
-void GuiDrawContext::win_disabled(bool disabled, sol::function callback)
+void GuiDrawContext::win_disabled(bool disabled, std::optional<sol::function> callback)
 {
-    if (disabled)
-        ImGui::BeginDisabled(true);
-    handle_function<void>(backend, callback);
-    if (disabled)
-        ImGui::EndDisabled();
+    if (callback.has_value())
+    {
+        if (disabled)
+            ImGui::BeginDisabled(true);
+        handle_function<void>(backend, callback.value(), this);
+        if (disabled)
+            ImGui::EndDisabled();
+    }
+    else
+    {
+        if (disabled)
+            ImGui::BeginDisabled(true);
+        else
+            ImGui::EndDisabled();
+    }
 }
 Vec2 GuiDrawContext::win_get_cursor_pos()
 {
@@ -806,7 +837,7 @@ void register_usertypes(sol::state& lua)
         static_cast<bool (GuiDrawContext::*)(std::string, std::optional<std::string>, bool, bool)>(&GuiDrawContext::win_menu_item));
     auto win_disabled = sol::overload(
         static_cast<void (GuiDrawContext::*)(sol::function)>(&GuiDrawContext::win_disabled),
-        static_cast<void (GuiDrawContext::*)(bool, sol::function)>(&GuiDrawContext::win_disabled));
+        static_cast<void (GuiDrawContext::*)(bool, std::optional<sol::function>)>(&GuiDrawContext::win_disabled));
     auto win_set_cursor_pos = sol::overload(
         static_cast<void (GuiDrawContext::*)(float, float)>(&GuiDrawContext::win_set_cursor_pos),
         static_cast<void (GuiDrawContext::*)(Vec2)>(&GuiDrawContext::win_set_cursor_pos));

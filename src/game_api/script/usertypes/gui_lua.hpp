@@ -6,7 +6,8 @@
 
 #include "aliases.hpp" // for uColor, IMAGE
 #include "color.hpp"   // for Color
-#include "math.hpp"    // for Vec2, AABB (ptr only)
+#include "imgui_internal.h"
+#include "math.hpp" // for Vec2, AABB (ptr only)
 
 using GUI_CONDITION = int;
 
@@ -28,6 +29,7 @@ class GuiDrawContext
 {
   public:
     GuiDrawContext(class LuaBackend* script);
+    ~GuiDrawContext();
 
     /// Draws a line on screen
     void draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color);
@@ -186,7 +188,7 @@ class GuiDrawContext
     /// Disable user interactions and dim widgets inside callback.
     void win_disabled(sol::function callback);
     /// Disable user interactions and dim widgets inside callback. Widgets are not disabled if `disabled` is false.
-    void win_disabled(bool disabled, sol::function callback);
+    void win_disabled(bool disabled, std::optional<sol::function> callback);
     // TODO: "Cursor" may be a confusing name.
     // TODO: What should I do about the different coordinate systems for these calls?
     Vec2 win_get_cursor_pos();
@@ -209,6 +211,7 @@ class GuiDrawContext
     class LuaBackend* backend;
     DRAW_LAYER drawlist;
     ImGuiContext& g;
+    ImGuiStackSizes stack_sizes;
 };
 
 namespace NGui
