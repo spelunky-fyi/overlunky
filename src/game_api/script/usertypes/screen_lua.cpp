@@ -44,7 +44,7 @@ void register_usertypes(sol::state& lua)
     lua["Screen"]["as_screen_title"] = &Screen::as<ScreenTitle>;
     lua["Screen"]["as_screen_menu"] = &Screen::as<ScreenMenu>;
     lua["Screen"]["as_screen_options"] = &Screen::as<ScreenOptions>;
-    lua["Screen"]["as_screen_seed_input"] = &Screen::as<ScreenSeedInput>;
+    lua["Screen"]["as_screen_seed_input"] = &Screen::as<ScreenCodeInput>;
     lua["Screen"]["as_screen_character_select"] = &Screen::as<ScreenCharacterSelect>;
     lua["Screen"]["as_screen_team_select"] = &Screen::as<ScreenTeamSelect>;
     lua["Screen"]["as_screen_camp"] = &Screen::as<ScreenCamp>;
@@ -248,47 +248,47 @@ void register_usertypes(sol::state& lua)
         "display_mode",
         &GraphicandAudioSettings::display_mode);
 
-    auto screenseedinput_type = lua.new_usertype<ScreenSeedInput>("ScreenSeedInput", sol::base_classes, sol::bases<Screen>());
-    screenseedinput_type["bottom_woodpanel_slideup_speed"] = &ScreenSeedInput::bottom_woodpanel_slideup_speed;
-    screenseedinput_type["bottom_woodpanel_slideup_timer"] = &ScreenSeedInput::bottom_woodpanel_slideup;
-    screenseedinput_type["bottom_woodpanel_y_offset"] = &ScreenSeedInput::bottom_woodpanel_y_offset;
-    screenseedinput_type["bottom_woodpanel"] = &ScreenSeedInput::bottom_woodpanel;
-    screenseedinput_type["bottom_left_text"] = &ScreenSeedInput::bottom_left_text;
-    screenseedinput_type["bottom_right_text"] = &ScreenSeedInput::bottom_right_text;
-    screenseedinput_type["bottom_middle_text"] = &ScreenSeedInput::bottom_middle_text;
-    screenseedinput_type["show_bottom_woodpanel"] = &ScreenSeedInput::show_bottom_woodpanel;
-    screenseedinput_type["slide_in_bottom_woodpanel"] = &ScreenSeedInput::slide_in_bottom_woodpanel;
-    screenseedinput_type["allow_random"] = &ScreenSeedInput::allow_random;
-    screenseedinput_type["selected_button_index"] = &ScreenSeedInput::selected_button_index;
-    screenseedinput_type["pressed_select"] = &ScreenSeedInput::pressed_select;
-    screenseedinput_type["topleft_woodpanel_esc_slidein_timer"] = &ScreenSeedInput::topleft_woodpanel_esc_slidein;
-    screenseedinput_type["scroll_text_id"] = &ScreenSeedInput::scroll_text_id;
-    screenseedinput_type["start_text_id"] = &ScreenSeedInput::start_text_id;
-    screenseedinput_type["main_woodpanel_left_border"] = &ScreenSeedInput::main_woodpanel_left_border;
-    screenseedinput_type["main_woodpanel_center"] = &ScreenSeedInput::main_woodpanel_center;
-    screenseedinput_type["main_woodpanel_right_border"] = &ScreenSeedInput::main_woodpanel_right_border;
-    screenseedinput_type["top_scroll"] = &ScreenSeedInput::top_scroll;
-    screenseedinput_type["seed_letter_cutouts"] = &ScreenSeedInput::seed_letter_cutouts;
-    screenseedinput_type["hand_pointer"] = &ScreenSeedInput::hand_pointer;
-    screenseedinput_type["key_background"] = &ScreenSeedInput::key_background;
-    screenseedinput_type["topleft_woodpanel_esc"] = &ScreenSeedInput::topleft_woodpanel_esc;
-    screenseedinput_type["start_sidepanel"] = &ScreenSeedInput::start_sidepanel;
-    screenseedinput_type["start_sidepanel_slidein_timer"] = &ScreenSeedInput::start_sidepanel_slidein;
-    screenseedinput_type["seed_length"] = &ScreenSeedInput::seed_length;
-    screenseedinput_type["get_seed"] = [](ScreenSeedInput& s) -> std::optional<uint32_t>
+    auto screenseedinput_type = lua.new_usertype<ScreenCodeInput>("ScreenCodeInput", sol::base_classes, sol::bases<Screen>());
+    screenseedinput_type["bottom_woodpanel_slideup_speed"] = &ScreenCodeInput::bottom_woodpanel_slideup_speed;
+    screenseedinput_type["bottom_woodpanel_slideup_timer"] = &ScreenCodeInput::bottom_woodpanel_slideup;
+    screenseedinput_type["bottom_woodpanel_y_offset"] = &ScreenCodeInput::bottom_woodpanel_y_offset;
+    screenseedinput_type["bottom_woodpanel"] = &ScreenCodeInput::woodpanel_bottom;
+    screenseedinput_type["bottom_left_text"] = &ScreenCodeInput::bottom_left_text;
+    screenseedinput_type["bottom_right_text"] = &ScreenCodeInput::bottom_right_text;
+    screenseedinput_type["bottom_middle_text"] = &ScreenCodeInput::bottom_middle_text;
+    screenseedinput_type["show_bottom_woodpanel"] = &ScreenCodeInput::show_bottom_woodpanel;
+    screenseedinput_type["slide_in_bottom_woodpanel"] = &ScreenCodeInput::slide_in_bottom_woodpanel;
+    screenseedinput_type["allow_random"] = &ScreenCodeInput::allow_random;
+    screenseedinput_type["selected_button_index"] = &ScreenCodeInput::selected_button_index;
+    screenseedinput_type["pressed_select"] = &ScreenCodeInput::pressed_select;
+    screenseedinput_type["topleft_woodpanel_esc_slidein_timer"] = &ScreenCodeInput::topleft_woodpanel_esc_slidein;
+    screenseedinput_type["scroll_text_id"] = &ScreenCodeInput::scroll_text_id;
+    screenseedinput_type["start_text_id"] = &ScreenCodeInput::start_text_id;
+    screenseedinput_type["main_woodpanel_left_border"] = &ScreenCodeInput::main_woodpanel_left_border;
+    screenseedinput_type["main_woodpanel_center"] = &ScreenCodeInput::main_woodpanel_center;
+    screenseedinput_type["main_woodpanel_right_border"] = &ScreenCodeInput::main_woodpanel_right_border;
+    screenseedinput_type["top_scroll"] = &ScreenCodeInput::top_scroll;
+    screenseedinput_type["seed_letter_cutouts"] = &ScreenCodeInput::seed_letter_cutouts;
+    screenseedinput_type["hand_pointer"] = &ScreenCodeInput::hand_pointer;
+    screenseedinput_type["key_background"] = &ScreenCodeInput::key_background;
+    screenseedinput_type["topleft_woodpanel_esc"] = &ScreenCodeInput::topleft_woodpanel_esc;
+    screenseedinput_type["start_sidepanel"] = &ScreenCodeInput::start_sidepanel;
+    screenseedinput_type["start_sidepanel_slidein_timer"] = &ScreenCodeInput::start_sidepanel_slidein;
+    screenseedinput_type["seed_length"] = &ScreenCodeInput::code_length;
+    screenseedinput_type["get_seed"] = [](ScreenCodeInput& s) -> std::optional<uint32_t>
     {
-        if (s.seed_length == 0)
+        if (s.code_length == 0)
             return std::nullopt;
         std::wstringstream ss;
         std::wstring seed_str;
-        for (uint8_t i = 0; i < s.seed_length; ++i)
-            seed_str.push_back((wchar_t)(s.seed_chars[i]));
+        for (uint8_t i = 0; i < s.code_length; ++i)
+            seed_str.push_back((wchar_t)(s.code_chars[i]));
         ss << std::hex << seed_str;
         uint32_t seed{0};
         ss >> seed;
         return seed;
     };
-    screenseedinput_type["set_seed"] = [](ScreenSeedInput& s, std::optional<uint32_t> seed, std::optional<uint8_t> length)
+    screenseedinput_type["set_seed"] = [](ScreenCodeInput& s, std::optional<uint32_t> seed, std::optional<uint8_t> length)
     {
         uint8_t len = length.value_or(8);
         if (len > 8)
@@ -297,16 +297,16 @@ void register_usertypes(sol::state& lua)
         {
             std::wstringstream ss;
             ss << std::uppercase << std::hex << std::setw(len) << std::setfill(L'0') << seed.value();
-            memcpy(s.seed_chars, ss.str().c_str(), len * 2);
-            s.seed_length = len;
+            memcpy(s.code_chars, ss.str().c_str(), len * 2);
+            s.code_length = len;
         }
         else
         {
-            s.seed_length = 0;
+            s.code_length = 0;
         }
     };
 
-    /* ScreenSeedInput
+    /* ScreenCodeInput
     // get_seed
     // Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.
     // set_seed
@@ -588,29 +588,36 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<OnlineLobbyScreenPlayer>(
         "OnlineLobbyScreenPlayer",
+        "platform_icon",
+        &OnlineLobbyScreenPlayer::platform_icon,
         "character",
         &OnlineLobbyScreenPlayer::character,
         "ready",
-        &OnlineLobbyScreenPlayer::ready);
+        &OnlineLobbyScreenPlayer::ready,
+        "searching",
+        &OnlineLobbyScreenPlayer::searching);
 
     auto screenonlinelobby_type = lua.new_usertype<ScreenOnlineLobby>("ScreenOnlineLobby", sol::base_classes, sol::bases<Screen>());
-    screenonlinelobby_type["woodpanels_slidein_timer"] = &ScreenOnlineLobby::woodpanels_slidein_timer;
-    screenonlinelobby_type["scroll_unfurl_timer"] = &ScreenOnlineLobby::scroll_unfurl_timer;
+    screenonlinelobby_type["bottom_woodpanel_slideup_speed"] = &ScreenOnlineLobby::bottom_woodpanel_slideup_speed;
+    screenonlinelobby_type["bottom_woodpanel_slideup"] = &ScreenOnlineLobby::bottom_woodpanel_slideup;
+    screenonlinelobby_type["scroll_unfurl"] = &ScreenOnlineLobby::scroll_unfurl;
+    screenonlinelobby_type["bottom_woodpanel_y_offset"] = &ScreenOnlineLobby::bottom_woodpanel_y_offset;
     screenonlinelobby_type["woodpanel_bottom"] = &ScreenOnlineLobby::woodpanel_bottom;
     screenonlinelobby_type["woodpanel_top"] = &ScreenOnlineLobby::woodpanel_top;
+    screenonlinelobby_type["scroll"] = &ScreenOnlineLobby::scroll;
     screenonlinelobby_type["left_scroll_handle"] = &ScreenOnlineLobby::left_scroll_handle;
     screenonlinelobby_type["right_scroll_handle"] = &ScreenOnlineLobby::right_scroll_handle;
-    screenonlinelobby_type["scroll_text_id"] = &ScreenOnlineLobby::scroll_text_id;
-    screenonlinelobby_type["btn_left_text_id"] = &ScreenOnlineLobby::btn_left_text_id;
-    screenonlinelobby_type["btn_right_text_id"] = &ScreenOnlineLobby::btn_right_text_id;
-    screenonlinelobby_type["btn_center_text_id"] = &ScreenOnlineLobby::btn_center_text_id;
-    screenonlinelobby_type["woodpanel_top_visible"] = &ScreenOnlineLobby::woodpanel_top_visible;
-    screenonlinelobby_type["woodpanel_bottom_visible"] = &ScreenOnlineLobby::woodpanel_bottom_visible;
-    screenonlinelobby_type["toggle_panels_slidein"] = &ScreenOnlineLobby::toggle_panels_slidein;
+    screenonlinelobby_type["scroll_text"] = &ScreenOnlineLobby::scroll_text;
+    screenonlinelobby_type["bottom_left_text"] = &ScreenOnlineLobby::bottom_left_text;
+    screenonlinelobby_type["bottom_right_text"] = &ScreenOnlineLobby::bottom_right_text;
+    screenonlinelobby_type["bottom_middle_text"] = &ScreenOnlineLobby::bottom_middle_text;
+    screenonlinelobby_type["show_top_woodpanel"] = &ScreenOnlineLobby::show_top_woodpanel;
+    screenonlinelobby_type["show_bottom_woodpanel"] = &ScreenOnlineLobby::show_bottom_woodpanel;
+    screenonlinelobby_type["slide_in_bottom_woodpanel"] = &ScreenOnlineLobby::slide_in_bottom_woodpanel;
     screenonlinelobby_type["players"] = &ScreenOnlineLobby::players;
     screenonlinelobby_type["background_image"] = &ScreenOnlineLobby::background_image;
     screenonlinelobby_type["topleft_woodpanel_esc"] = &ScreenOnlineLobby::topleft_woodpanel_esc;
-    screenonlinelobby_type["topleft_woodpanel_esc_slidein_timer"] = &ScreenOnlineLobby::topleft_woodpanel_esc_slidein_timer;
+    screenonlinelobby_type["topleft_woodpanel_esc_slidein"] = &ScreenOnlineLobby::topleft_woodpanel_esc_slidein;
     screenonlinelobby_type["character_walk_offset"] = &ScreenOnlineLobby::character_walk_offset;
     screenonlinelobby_type["character_facing_left"] = &ScreenOnlineLobby::character_facing_left;
     screenonlinelobby_type["move_direction"] = &ScreenOnlineLobby::move_direction;
@@ -624,30 +631,23 @@ void register_usertypes(sol::state& lua)
     screenonlinelobby_type["player_count"] = &ScreenOnlineLobby::player_count;
     screenonlinelobby_type["searching_for_players"] = &ScreenOnlineLobby::searching_for_players;
     screenonlinelobby_type["show_code_panel"] = &ScreenOnlineLobby::show_code_panel;
-    screenonlinelobby_type["enter_code_woodpanel_bottom_slidein_pos"] = &ScreenOnlineLobby::enter_code_woodpanel_bottom_slidein_pos;
-    screenonlinelobby_type["enter_code_woodpanel_bottom"] = &ScreenOnlineLobby::enter_code_woodpanel_bottom;
-    screenonlinelobby_type["enter_code_btn_right_text_id"] = &ScreenOnlineLobby::enter_code_btn_right_text_id;
-    screenonlinelobby_type["enter_code_woodpanel_top_visible"] = &ScreenOnlineLobby::enter_code_woodpanel_top_visible;
-    screenonlinelobby_type["enter_code_woodpanel_bottom_visible"] = &ScreenOnlineLobby::enter_code_woodpanel_bottom_visible;
-    screenonlinelobby_type["enter_code_toggle_panels_slidein"] = &ScreenOnlineLobby::enter_code_toggle_panels_slidein;
-    screenonlinelobby_type["selected_character"] = &ScreenOnlineLobby::selected_character;
-    screenonlinelobby_type["characters_entered_count"] = &ScreenOnlineLobby::characters_entered_count;
-    screenonlinelobby_type["enter_code_topleft_woodpanel_esc_slidein_timer"] = &ScreenOnlineLobby::enter_code_topleft_woodpanel_esc_slidein_timer;
-    screenonlinelobby_type["enter_code_banner_text_id"] = &ScreenOnlineLobby::enter_code_banner_text_id;
-    screenonlinelobby_type["enter_code_OK_text_id"] = &ScreenOnlineLobby::enter_code_OK_text_id;
-    screenonlinelobby_type["enter_code_main_woodpanel_left"] = &ScreenOnlineLobby::enter_code_main_woodpanel_left;
-    screenonlinelobby_type["enter_code_main_woodpanel_center"] = &ScreenOnlineLobby::enter_code_main_woodpanel_center;
-    screenonlinelobby_type["enter_code_main_woodpanel_right"] = &ScreenOnlineLobby::enter_code_main_woodpanel_right;
-    screenonlinelobby_type["enter_code_banner"] = &ScreenOnlineLobby::enter_code_banner;
-    screenonlinelobby_type["enter_code_char_cutouts"] = &ScreenOnlineLobby::enter_code_char_cutouts;
-    screenonlinelobby_type["enter_code_pointing_hand"] = &ScreenOnlineLobby::enter_code_pointing_hand;
-    screenonlinelobby_type["enter_code_buttons"] = &ScreenOnlineLobby::enter_code_buttons;
-    screenonlinelobby_type["enter_code_OK_panel"] = &ScreenOnlineLobby::enter_code_OK_panel;
-    screenonlinelobby_type["enter_code_OK_panel_slidein_timer"] = &ScreenOnlineLobby::enter_code_OK_panel_slidein_timer;
-    screenonlinelobby_type["enter_code_your_code_scroll"] = &ScreenOnlineLobby::enter_code_your_code_scroll;
-    screenonlinelobby_type["enter_code_your_code_scroll_left_handle"] = &ScreenOnlineLobby::enter_code_your_code_scroll_left_handle;
-    screenonlinelobby_type["enter_code_your_code_scroll_right_handle"] = &ScreenOnlineLobby::enter_code_your_code_scroll_right_handle;
-    screenonlinelobby_type["set_code"] = &ScreenOnlineLobby::set_code;
+    screenonlinelobby_type["screen_code_input"] = sol::property(
+        [](ScreenOnlineLobby* screen) -> ScreenEnterOnlineCode*
+        {
+            return reinterpret_cast<ScreenEnterOnlineCode*>(&screen->screen_code_input);
+        });
+
+    /// Available in ScreenOnlineLobby
+    lua.new_usertype<ScreenEnterOnlineCode>(
+        "ScreenEnterOnlineCode",
+        "enter_code_your_code_scroll",
+        &ScreenEnterOnlineCode::enter_code_your_code_scroll,
+        "enter_code_your_code_scroll_left_handle",
+        &ScreenEnterOnlineCode::enter_code_your_code_scroll_left_handle,
+        "enter_code_your_code_scroll_right_handle",
+        &ScreenEnterOnlineCode::enter_code_your_code_scroll_right_handle,
+        sol::base_classes,
+        sol::bases<Screen, ScreenCodeInput>());
 
     lua.new_usertype<PauseUI>(
         "PauseUI",

@@ -340,38 +340,40 @@ class ScreenOptions : public Screen // ID: 5
     size_t unknown57;
 };
 
-class ScreenSeedInput : public Screen // ID: 8
+class ScreenCodeInput : public Screen // ID: 8
 {
   public:
+    // This beginning is the same for ScreenOnlineLobby and similar code can be found in ScreenOptions
+
     float bottom_woodpanel_slideup_speed;
     float bottom_woodpanel_slideup;
-    float unknown_timer;
-    float unknown6;
+    float scroll_unfurl;
+    float unknown1;
     float bottom_woodpanel_y_offset;
-    TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo unknown8; // top_woodpanel?
-    TextureRenderingInfo unknown9;
-    TextureRenderingInfo unknown10;
-    TextureRenderingInfo unknown11;
-    STRINGID unknown12; // this should be scroll_text and above the scroll TextureRenderingInfo, but for some reason they decided to redo it later in the struct
+    TextureRenderingInfo woodpanel_bottom;
+    TextureRenderingInfo woodpanel_top;
+    TextureRenderingInfo scroll;
+    TextureRenderingInfo left_scroll_handle;
+    TextureRenderingInfo right_scroll_handle;
+    STRINGID scroll_text;
     STRINGID bottom_left_text;
     /// The only one actually used
     STRINGID bottom_right_text;
     STRINGID bottom_middle_text;
-    bool unknown16;
+    bool show_top_woodpanel;
     bool show_bottom_woodpanel;
     bool slide_in_bottom_woodpanel;
-    uint8_t unknown19;
+    uint8_t unknown2;
     /// needs to be set before opening the screen to show the correct text at the bottom
     bool allow_random;
     // uint8_t probably_padding1[3];
     uint32_t selected_button_index;
     bool pressed_select;
     // uint8_t probably_padding2;
-    uint16_t seed_chars[9]; // utf16 chars
+    char16_t code_chars[9]; // utf16 chars
 
     /// Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
-    uint8_t seed_length;
+    uint8_t code_length;
     // uint8_t probably_padding3[3];
 
     float topleft_woodpanel_esc_slidein;
@@ -387,6 +389,8 @@ class ScreenSeedInput : public Screen // ID: 8
     TextureRenderingInfo topleft_woodpanel_esc;
     TextureRenderingInfo start_sidepanel;
     float start_sidepanel_slidein;
+
+    virtual void unknown() = 0; // set seed? sets the game variables in state, for ScreenEnterOnlineCode it just sets the unknown10
 };
 
 struct FlyingThing
@@ -773,53 +777,59 @@ class ScreenOnlineLoading : public Screen // ID: 28
 
 struct OnlineLobbyScreenPlayer
 {
-    uint8_t unknown1;
+    /// 16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = Switch, 48 = PS, 49 = PS again?
+    uint8_t platform_icon; // werid numbers, anything else results in the startd PC icon, maybe it's some actual id
     /// 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     uint8_t character;
     bool ready;
-    uint8_t unknown2;
+    bool searching;
+};
+
+class ScreenEnterOnlineCode : public ScreenCodeInput // no ID, very special screen
+{
+  public:
+    int32_t unknown10; // -1
+    TextureRenderingInfo enter_code_your_code_scroll;
+    TextureRenderingInfo enter_code_your_code_scroll_left_handle;
+    TextureRenderingInfo enter_code_your_code_scroll_right_handle;
+    uint32_t unknown11;
+    TextureRenderingInfo unknown12;
+    uint32_t unknown13;
+    TextureRenderingInfo unknown14;
+    TextureRenderingInfo unknown15;
 };
 
 class ScreenOnlineLobby : public Screen // ID: 29
 {
   public:
-    uint8_t unknown2;
-    uint8_t unknown3;
-    uint8_t unknown4;
-    uint8_t unknown5;
-    float woodpanels_slidein_timer;
-    float scroll_unfurl_timer;
-    uint32_t unknown8;
-    uint32_t unknown9;
+    // This beginning is the same for ScreenCodeInput and similar code can be found in ScreenOptions
+
+    float bottom_woodpanel_slideup_speed;
+    float bottom_woodpanel_slideup;
+    float scroll_unfurl;
+    float unknown6;
+    float bottom_woodpanel_y_offset;
     TextureRenderingInfo woodpanel_bottom;
     TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo unknown13;
+    TextureRenderingInfo scroll;
     TextureRenderingInfo left_scroll_handle;
     TextureRenderingInfo right_scroll_handle;
-    STRINGID scroll_text_id;
-    STRINGID btn_left_text_id;
-    STRINGID btn_right_text_id;
-    STRINGID btn_center_text_id;
-    bool woodpanel_top_visible;
-    bool woodpanel_bottom_visible;
-    bool toggle_panels_slidein;
-    bool unknown21;
+    STRINGID scroll_text;
+    STRINGID bottom_left_text;
+    STRINGID bottom_right_text;
+    STRINGID bottom_middle_text;
+    bool show_top_woodpanel;
+    bool show_bottom_woodpanel;
+    bool slide_in_bottom_woodpanel;
+    uint8_t unknown21;
     std::array<OnlineLobbyScreenPlayer, 4> players;
     TextureRenderingInfo background_image;
-    size_t unknown22;
-    size_t unknown23;
-    size_t unknown24;
-    size_t unknown25;
-    size_t unknown26;
-    size_t unknown27;
-    size_t unknown28;
-    size_t unknown29;
-    size_t unknown30;
+    TextureRenderingInfo unknown35;
     TextureRenderingInfo unknown36;
     TextureRenderingInfo unknown37;
     float unknown38;
     TextureRenderingInfo topleft_woodpanel_esc;
-    float topleft_woodpanel_esc_slidein_timer;
+    float topleft_woodpanel_esc_slidein;
     float character_walk_offset;
     bool character_facing_left;
     int8_t move_direction;
@@ -845,55 +855,10 @@ class ScreenOnlineLobby : public Screen // ID: 29
     uint8_t unknown51;
     uint32_t unknown53;
 
-    // The following is actually class ScreenEnterOnlineCode but it has no direct pointer in GameManager
-    // or State. In assembly this pointer is accessed by &ScreenOnlineLobby + sizeof(ScreenOnlineLobby)
-    size_t enter_code_screen_vftable;
-    float enter_code_render_timer;
-    uint32_t unknown54;
-    float unknown56;
-    float enter_code_woodpanel_bottom_slidein_pos;
-    float unknown58;
-    float unknown59;
-    float unknown60;
-    TextureRenderingInfo enter_code_woodpanel_bottom;
-    TextureRenderingInfo unknown61;
-    TextureRenderingInfo unknown62;
-    TextureRenderingInfo unknown63;
-    TextureRenderingInfo unknown64;
-    STRINGID text_id_1;
-    STRINGID text_id_2;
-    STRINGID enter_code_btn_right_text_id;
-    STRINGID text_id_4;
-    bool enter_code_woodpanel_top_visible;
-    bool enter_code_woodpanel_bottom_visible;
-    bool enter_code_toggle_panels_slidein;
-    bool unknown68;
-    uint32_t unknown69;
-    uint32_t selected_character;
-    bool unknown71a;
-    uint8_t unknown71b;
-    uint16_t code_chars[8];
-    uint16_t code_char_terminator;
-    uint32_t characters_entered_count;
-    float enter_code_topleft_woodpanel_esc_slidein_timer;
-    STRINGID enter_code_banner_text_id;
-    STRINGID enter_code_OK_text_id;
-    TextureRenderingInfo enter_code_main_woodpanel_left;
-    TextureRenderingInfo enter_code_main_woodpanel_center;
-    TextureRenderingInfo enter_code_main_woodpanel_right;
-    TextureRenderingInfo enter_code_banner;
-    TextureRenderingInfo enter_code_char_cutouts;
-    TextureRenderingInfo enter_code_pointing_hand;
-    TextureRenderingInfo enter_code_buttons;
-    TextureRenderingInfo unknown85;
-    TextureRenderingInfo enter_code_OK_panel;
-    float enter_code_OK_panel_slidein_timer;
-    int32_t unknown87;
-    TextureRenderingInfo enter_code_your_code_scroll;
-    TextureRenderingInfo enter_code_your_code_scroll_left_handle;
-    TextureRenderingInfo enter_code_your_code_scroll_right_handle;
+    // can't put ScreenEnterOnlineCode here as it's abstract class
+    // no idea how the game code apperently allows this, unless this is some compiler opimaization bullshit
 
-    void set_code(const std::string& code);
+    size_t screen_code_input;
 };
 
 struct PauseUI

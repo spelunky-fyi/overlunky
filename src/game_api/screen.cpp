@@ -109,31 +109,6 @@ void Screen::unhook(std::uint32_t id)
     }
 }
 
-void ScreenOnlineLobby::set_code(const std::string& code)
-{
-    if (code.length() != 8)
-    {
-        characters_entered_count = 0;
-        return;
-    }
-    std::string code_upper = code;
-    std::transform(code_upper.begin(), code_upper.end(), code_upper.begin(), [](unsigned char c)
-                   { return (unsigned char)std::toupper(c); });
-
-    for (size_t x = 0; x < 8; ++x)
-    {
-        const unsigned char c = code.at(x);
-        auto valid = (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F');
-        if (!valid)
-        {
-            characters_entered_count = 0;
-            return;
-        }
-        code_chars[x] = c;
-    }
-    characters_entered_count = 8;
-}
-
 Screen* get_screen_ptr(uint32_t screen_id)
 {
     auto game_manager = get_game_manager();

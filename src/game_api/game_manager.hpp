@@ -19,7 +19,7 @@ class ScreenOnlineLoading;
 class ScreenOnlineLobby;
 class ScreenOptions;
 class ScreenPrologue;
-class ScreenSeedInput;
+class ScreenCodeInput;
 class ScreenTitle;
 struct JournalUI;
 struct PauseUI;
@@ -184,7 +184,7 @@ struct GameManager
     Screen* screen_player_profile;
     /// All handled by the Online
     Screen* screen_leaderboards;
-    ScreenSeedInput* screen_seed_input;
+    ScreenCodeInput* screen_seed_input;
     size_t unknown_screen_character_select; // available in State
     size_t unknown_screen_team_select;      // available in State
     ScreenCamp* screen_camp;
@@ -202,7 +202,7 @@ struct GameManager
     size_t unknown_screen_arena_items;   // available in State
     size_t unknown_screen_arena_select;  // available in State
     size_t unknown_screen_arena_intro;   // available in State
-    size_t* screen_arena_level;          // also available in State, but it's a different object! this one only has a render_timer, no UI parts
+    Screen* screen_arena_level;          // also available in State, but it's a different object! Seams to only call pause function at the start, probably for the intro stuff
     size_t* unknown_screen_arena_score;  // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;
