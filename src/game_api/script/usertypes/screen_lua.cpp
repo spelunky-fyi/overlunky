@@ -249,20 +249,31 @@ void register_usertypes(sol::state& lua)
         &GraphicandAudioSettings::display_mode);
 
     auto screenseedinput_type = lua.new_usertype<ScreenSeedInput>("ScreenSeedInput", sol::base_classes, sol::bases<Screen>());
-    screenseedinput_type["bottom_woodpanel_slideup_timer"] = &ScreenSeedInput::bottom_woodpanel_slideup_timer;
-    screenseedinput_type["bottom_woodpanel_y"] = &ScreenSeedInput::bottom_woodpanel_y;
+    screenseedinput_type["bottom_woodpanel_slideup_speed"] = &ScreenSeedInput::bottom_woodpanel_slideup_speed;
+    screenseedinput_type["bottom_woodpanel_slideup_timer"] = &ScreenSeedInput::bottom_woodpanel_slideup;
+    screenseedinput_type["bottom_woodpanel_y_offset"] = &ScreenSeedInput::bottom_woodpanel_y_offset;
     screenseedinput_type["bottom_woodpanel"] = &ScreenSeedInput::bottom_woodpanel;
-    screenseedinput_type["buttons_text_id"] = &ScreenSeedInput::buttons_text_id;
-    screenseedinput_type["topleft_woodpanel_esc_slidein_timer"] = &ScreenSeedInput::topleft_woodpanel_esc_slidein_timer;
+    screenseedinput_type["bottom_left_text"] = &ScreenSeedInput::bottom_left_text;
+    screenseedinput_type["bottom_right_text"] = &ScreenSeedInput::bottom_right_text;
+    screenseedinput_type["bottom_middle_text"] = &ScreenSeedInput::bottom_middle_text;
+    screenseedinput_type["show_bottom_woodpanel"] = &ScreenSeedInput::show_bottom_woodpanel;
+    screenseedinput_type["slide_in_bottom_woodpanel"] = &ScreenSeedInput::slide_in_bottom_woodpanel;
+    screenseedinput_type["allow_random"] = &ScreenSeedInput::allow_random;
+    screenseedinput_type["selected_button_index"] = &ScreenSeedInput::selected_button_index;
+    screenseedinput_type["pressed_select"] = &ScreenSeedInput::pressed_select;
+    screenseedinput_type["topleft_woodpanel_esc_slidein_timer"] = &ScreenSeedInput::topleft_woodpanel_esc_slidein;
     screenseedinput_type["scroll_text_id"] = &ScreenSeedInput::scroll_text_id;
     screenseedinput_type["start_text_id"] = &ScreenSeedInput::start_text_id;
     screenseedinput_type["main_woodpanel_left_border"] = &ScreenSeedInput::main_woodpanel_left_border;
     screenseedinput_type["main_woodpanel_center"] = &ScreenSeedInput::main_woodpanel_center;
     screenseedinput_type["main_woodpanel_right_border"] = &ScreenSeedInput::main_woodpanel_right_border;
+    screenseedinput_type["top_scroll"] = &ScreenSeedInput::top_scroll;
     screenseedinput_type["seed_letter_cutouts"] = &ScreenSeedInput::seed_letter_cutouts;
+    screenseedinput_type["hand_pointer"] = &ScreenSeedInput::hand_pointer;
+    screenseedinput_type["key_background"] = &ScreenSeedInput::key_background;
     screenseedinput_type["topleft_woodpanel_esc"] = &ScreenSeedInput::topleft_woodpanel_esc;
     screenseedinput_type["start_sidepanel"] = &ScreenSeedInput::start_sidepanel;
-    screenseedinput_type["start_sidepanel_slidein_timer"] = &ScreenSeedInput::start_sidepanel_slidein_timer;
+    screenseedinput_type["start_sidepanel_slidein_timer"] = &ScreenSeedInput::start_sidepanel_slidein;
     screenseedinput_type["seed_length"] = &ScreenSeedInput::seed_length;
     screenseedinput_type["get_seed"] = [](ScreenSeedInput& s) -> std::optional<uint32_t>
     {
@@ -270,16 +281,16 @@ void register_usertypes(sol::state& lua)
             return std::nullopt;
         std::wstringstream ss;
         std::wstring seed_str;
-        for (uint16_t i = 0; i < s.seed_length; ++i)
+        for (uint8_t i = 0; i < s.seed_length; ++i)
             seed_str.push_back((wchar_t)(s.seed_chars[i]));
         ss << std::hex << seed_str;
         uint32_t seed{0};
         ss >> seed;
         return seed;
     };
-    screenseedinput_type["set_seed"] = [](ScreenSeedInput& s, std::optional<uint32_t> seed, std::optional<uint16_t> length)
+    screenseedinput_type["set_seed"] = [](ScreenSeedInput& s, std::optional<uint32_t> seed, std::optional<uint8_t> length)
     {
-        uint16_t len = length.value_or(8);
+        uint8_t len = length.value_or(8);
         if (len > 8)
             len = 8;
         if (seed.has_value())

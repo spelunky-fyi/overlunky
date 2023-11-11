@@ -343,39 +343,38 @@ class ScreenOptions : public Screen // ID: 5
 class ScreenSeedInput : public Screen // ID: 8
 {
   public:
-    uint16_t unknown4;
-    uint16_t unknown5;
-    float bottom_woodpanel_slideup_timer;
+    float bottom_woodpanel_slideup_speed;
+    float bottom_woodpanel_slideup;
     float unknown_timer;
     float unknown6;
-    float bottom_woodpanel_y;
+    float bottom_woodpanel_y_offset;
     TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo unknown8;
+    TextureRenderingInfo unknown8; // top_woodpanel?
     TextureRenderingInfo unknown9;
     TextureRenderingInfo unknown10;
     TextureRenderingInfo unknown11;
-    STRINGID unknown12;
-    STRINGID unknown13;
-    STRINGID buttons_text_id;
-    STRINGID unknown15;
-    uint8_t unknown16;
-    uint8_t unknown17;
-    uint8_t unknown18;
+    STRINGID unknown12; // this should be scroll_text and above the scroll TextureRenderingInfo, but for some reason they decided to redo it later in the struct
+    STRINGID bottom_left_text;
+    /// The only one actually used
+    STRINGID bottom_right_text;
+    STRINGID bottom_middle_text;
+    bool unknown16;
+    bool show_bottom_woodpanel;
+    bool slide_in_bottom_woodpanel;
     uint8_t unknown19;
-    uint8_t unknown20;
-    uint8_t unknown21;
-    uint8_t unknown22;
-    uint8_t unknown23;
-    uint32_t unknown24;
-    uint16_t unknown25;
-
+    /// needs to be set before opening the screen to show the correct text at the bottom
+    bool allow_random;
+    // uint8_t probably_padding1[3];
+    uint32_t selected_button_index;
+    bool pressed_select;
+    // uint8_t probably_padding2;
     uint16_t seed_chars[9]; // utf16 chars
 
     /// Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
-    uint16_t seed_length;
-    uint16_t unknown39;
+    uint8_t seed_length;
+    // uint8_t probably_padding3[3];
 
-    float topleft_woodpanel_esc_slidein_timer;
+    float topleft_woodpanel_esc_slidein;
     STRINGID scroll_text_id;
     STRINGID start_text_id;
     TextureRenderingInfo main_woodpanel_left_border;
@@ -383,11 +382,11 @@ class ScreenSeedInput : public Screen // ID: 8
     TextureRenderingInfo main_woodpanel_right_border;
     TextureRenderingInfo top_scroll;
     TextureRenderingInfo seed_letter_cutouts;
-    TextureRenderingInfo unknown40;
-    TextureRenderingInfo unknown41;
+    TextureRenderingInfo hand_pointer;
+    TextureRenderingInfo key_background;
     TextureRenderingInfo topleft_woodpanel_esc;
     TextureRenderingInfo start_sidepanel;
-    float start_sidepanel_slidein_timer;
+    float start_sidepanel_slidein;
 };
 
 struct FlyingThing
