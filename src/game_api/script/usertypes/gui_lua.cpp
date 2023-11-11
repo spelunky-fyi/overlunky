@@ -26,6 +26,7 @@
 #include "script/handle_lua_function.hpp" // for handle_function
 #include "script/lua_backend.hpp"         // for LuaBackend
 #include "script/script_util.hpp"         // for screenify_fix, screenify, normalize
+#include "script/sol_helper.hpp"          //
 #include "window_api.hpp"                 // for hide_cursor, show_cursor
 
 typedef DWORD(WINAPI* PFN_XInputGetCapabilities)(DWORD, DWORD, XINPUT_CAPABILITIES*);
@@ -818,9 +819,13 @@ void register_usertypes(sol::state& lua)
         &ImGuiIO::Framerate,
         "wantkeyboard",
         &ImGuiIO::WantCaptureKeyboard,
+        /// NoDoc
         "keysdown",
         sol::property([](ImGuiIO& io)
                       { return std::ref(io.KeysDown) /**/; }),
+        "keys",
+        sol::property([](ImGuiIO& io)
+                      { return ZeroIndexArray<bool>(io.KeysDown) /**/; }),
         "keydown",
         keydown,
         "keypressed",
@@ -866,14 +871,16 @@ void register_usertypes(sol::state& lua)
         &ImGuiIO::MouseDrawCursor);
 
     /* ImGuiIO
+    // keys
+    // ZeroIndexArray<bool>, use KEY to index
     // keydown
-    // bool keydown(int keycode)
+    // bool keydown(KEY keycode)
     // bool keydown(char key)
     // keypressed
-    // bool keypressed(int keycode, bool repeat = false)
+    // bool keypressed(KEY keycode, bool repeat = false)
     // bool keypressed(char key, bool repeat = false)
     // keyreleased
-    // bool keyreleased(int keycode)
+    // bool keyreleased(KEY keycode)
     // bool keyreleased(char key)
     // gamepads
     // Gamepad gamepads(int index)
@@ -889,7 +896,7 @@ void register_usertypes(sol::state& lua)
     /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
     ///
     /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
-    /// - Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+    /// - Note: You can use KEY or standard VK keycodes to index `keys` or the other functions.
     /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
     /// - Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
     // lua["get_io"] = []() -> ImGuiIO

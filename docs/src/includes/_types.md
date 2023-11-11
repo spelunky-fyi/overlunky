@@ -758,6 +758,7 @@ int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner
 Type | Name | Description
 ---- | ---- | -----------
 bool | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | Key is being held
+bool | [pressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pressed) | Key was just pressed down this frame
 
 ### Letter
 
@@ -1002,7 +1003,7 @@ tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/
 
 Type | Name | Description
 ---- | ---- | -----------
-array&lt;[ControllerButton](#ControllerButton), 16&gt; | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
+array&lt;[ControllerButton](#ControllerButton), 16&gt; | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | Zero-based indexing. Use [PlayerSlot](#PlayerSlot).input_mapping_controller or [RAW_BUTTON](#RAW_BUTTON) (or RAW_DUALSHOCK) to index this.
 
 ### Gamepad
 
@@ -1029,9 +1030,10 @@ Type | Name | Description
 float | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
 bool | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
 bool | [keysdown[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
- | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown(int keycode)<br/>bool keydown(char key)<br/> 
- | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed(int keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
- | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased(int keycode)<br/>bool keyreleased(char key)<br/> 
+bool | [keys[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | ZeroIndexArray<bool>, use [KEY](#KEY) to index<br/> 
+ | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown([KEY](#KEY) keycode)<br/>bool keydown(char key)<br/> 
+ | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed([KEY](#KEY) keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
+ | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased([KEY](#KEY) keycode)<br/>bool keyreleased(char key)<br/> 
 bool | [keyctrl](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) | 
 bool | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) | 
 bool | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 
@@ -1072,6 +1074,7 @@ int | [left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) |
 int | [right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) | 
 int | [up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) | 
 int | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | 
+array&lt;[RAW_KEY](#RAW_KEY), 12&gt; | [mapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mapping) | Can be indexed with [INPUT_FLAG](#INPUT_FLAG). Keyboard uses [RAW_KEY](#RAW_KEY) values, controller uses [RAW_BUTTON](#RAW_BUTTON) values.
 
 ### PlayerInputs
 
@@ -1095,8 +1098,8 @@ array&lt;[PlayerSlotSettings](#PlayerSlotSettings), MAX_PLAYERS&gt; | [player_se
 
 Type | Name | Description
 ---- | ---- | -----------
-array&lt;[KeyboardKey](#KeyboardKey), 112&gt; | [keyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyboard) | State of all keyboard buttons in a random game order as usual
-array&lt;[ControllerInput](#ControllerInput), 12&gt; | [controller](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller) | State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
+array&lt;[KeyboardKey](#KeyboardKey), 112&gt; | [keyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyboard) | State of all keyboard buttons in a random game order as usual, most key indexes can be found in [RAW_KEY](#RAW_KEY). Zero-based indexing, i.e. use [PlayerSlot](#PlayerSlot).input_mapping_keyboard directly to index this.
+array&lt;[ControllerInput](#ControllerInput), 12&gt; | [controller](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controller) | State of controller buttons per controller. Zero-based indexing, i.e. use [GameProps](#GameProps).input_index directly to index this.
 
 ## Journal types
 

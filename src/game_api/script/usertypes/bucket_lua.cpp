@@ -130,9 +130,9 @@ void register_usertypes(sol::state& lua)
     lua["KEY"]["OEM_7"] = 0xDE;
     lua["KEY"]["OEM_8"] = 0xDF;
     lua["KEY"]["OEM_102"] = 0xE2;
-    for (char c = '0'; c < '9'; c++)
+    for (char c = '0'; c <= '9'; c++)
         lua["KEY"][std::string{c}] = (int)c;
-    for (char c = 'A'; c < 'Z'; c++)
+    for (char c = 'A'; c <= 'Z'; c++)
         lua["KEY"][std::string{c}] = (int)c;
 }
 }; // namespace NBucket

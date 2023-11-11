@@ -66,7 +66,9 @@ void register_usertypes(sol::state& lua)
         "up",
         sol::readonly(&InputMapping::up),
         "down",
-        sol::readonly(&InputMapping::down));
+        sol::readonly(&InputMapping::down),
+        "mapping",
+        sol::readonly(&InputMapping::mapping));
     /// Used in StateMemory
     lua.new_usertype<PlayerInputs>(
         "PlayerInputs",

@@ -1019,6 +1019,69 @@ Name | Data | Description
 [STAR_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.STAR_CHALLENGE_SPAWNED) | 26 | 
 [SUN_CHALLENGE_SPAWNED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=QUEST_FLAG.SUN_CHALLENGE_SPAWNED) | 27 | 
 
+## RAW_BUTTON
+
+
+> Search script examples for [RAW_BUTTON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.UP) | 0 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.DOWN) | 1 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.LEFT) | 2 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.RIGHT) | 3 | 
+[A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.A) | 4 | 
+[B](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.B) | 5 | 
+[X](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.X) | 6 | 
+[Y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.Y) | 7 | 
+[LEFT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.LEFT_SHOULDER) | 8 | 
+[RIGHT_SHOULDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.RIGHT_SHOULDER) | 9 | 
+[LEFT_TRIGGER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.LEFT_TRIGGER) | 10 | 
+[RIGHT_TRIGGER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.RIGHT_TRIGGER) | 11 | 
+[LEFT_THUMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.LEFT_THUMB) | 12 | 
+[RIGHT_THUMB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.RIGHT_THUMB) | 13 | 
+[BACK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.BACK) | 14 | 
+[START](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_BUTTON.START) | 15 | 
+
+## RAW_DUALSHOCK
+
+
+> Search script examples for [RAW_DUALSHOCK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.UP) | 0 | 
+[DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.DOWN) | 1 | 
+[LEFT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.LEFT) | 2 | 
+[RIGHT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.RIGHT) | 3 | 
+[CROSS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.CROSS) | 4 | 
+[CIRCLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.CIRCLE) | 5 | 
+[SQUARE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.SQUARE) | 6 | 
+[TRIANGLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.TRIANGLE) | 7 | 
+[L1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.L1) | 8 | 
+[R1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.R1) | 9 | 
+[L2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.L2) | 10 | 
+[R2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.R2) | 11 | 
+[L3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.L3) | 12 | 
+[R3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.R3) | 13 | 
+[SHARE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.SHARE) | 14 | 
+[OPTIONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_DUALSHOCK.OPTIONS) | 15 | 
+
+## RAW_KEY
+
+
+> Search script examples for [RAW_KEY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_KEY)
+
+
+Name | Data | Description
+---- | ---- | -----------
+[UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_KEY.UP) | 1 | 
+...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
+
 ## RECURSIVE_MODE
 
 

@@ -1681,7 +1681,7 @@ function mouse_position() end
 ---Returns: [ImGuiIO](https://spelunky-fyi.github.io/overlunky/#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 ---
 ---- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
----- Note: Lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.
+---- Note: You can use KEY or standard VK keycodes to index `keys` or the other functions.
 ---- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
 ---- Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
@@ -2297,14 +2297,15 @@ do
     ---@field input_index integer[] @size: 5 @Input index for players 1-4 and maybe for the menu controls. -1: disabled, 0..3: keyboards, 4..7: Xinput, 8..11: other controllers
 
 ---@class RawInput
-    ---@field keyboard KeyboardKey[] @size: 112 @State of all keyboard buttons in a random game order as usual
-    ---@field controller ControllerInput[] @size: 12 @State of controller buttons per controller. Zero-based indexing, i.e. use game_props.input_index directly to index this.
+    ---@field keyboard KeyboardKey[] @size: 112 @State of all keyboard buttons in a random game order as usual, most key indexes can be found in RAW_KEY. Zero-based indexing, i.e. use PlayerSlot.input_mapping_keyboard directly to index this.
+    ---@field controller ControllerInput[] @size: 12 @State of controller buttons per controller. Zero-based indexing, i.e. use GameProps.input_index directly to index this.
 
 ---@class KeyboardKey
     ---@field down boolean @Key is being held
+    ---@field pressed boolean @Key was just pressed down this frame
 
 ---@class ControllerInput
-    ---@field buttons ControllerButton[] @size: 16
+    ---@field buttons ControllerButton[] @size: 16 @Zero-based indexing. Use PlayerSlot.input_mapping_controller or RAW_BUTTON (or RAW_DUALSHOCK) to index this.
 
 ---@class ControllerButton
     ---@field down boolean @Button is being held
@@ -4919,6 +4920,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field right integer
     ---@field up integer
     ---@field down integer
+    ---@field mapping RAW_KEY[] @size: 12 @Can be indexed with INPUT_FLAG. Keyboard uses RAW_KEY values, controller uses RAW_BUTTON values.
 
 ---@class PlayerInputs
     ---@field player_slots PlayerSlot[] @size: MAX_PLAYERS
@@ -5069,6 +5071,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field framerate number
     ---@field wantkeyboard boolean
     ---@field keysdown boolean[] @size: ImGuiKey_COUNT
+    ---@field keys boolean[] @size: ImGuiKey_COUNT
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean
@@ -8469,6 +8472,7 @@ KEY = {
   ["6"] = 54,
   ["7"] = 55,
   ["8"] = 56,
+  ["9"] = 57,
   A = 65,
   ADD = 107,
   ALT = 18,
@@ -8587,7 +8591,8 @@ KEY = {
   V = 86,
   W = 87,
   X = 88,
-  Y = 89
+  Y = 89,
+  Z = 90
 }
 ---@alias KEY integer
 LAYER = {
@@ -8621,6 +8626,13 @@ LEVEL_CONFIG = {
   MOUNT_CHANCE = 4
 }
 ---@alias LEVEL_CONFIG integer
+LIGHT_TYPE = {
+  FOLLOW_CAMERA = 1,
+  FOLLOW_ENTITY = 2,
+  NONE = 0,
+  ROOM_LIGHT = 4
+}
+---@alias LIGHT_TYPE integer
 LIQUID_POOL = {
   COARSE_LAVA = 4,
   COARSE_WATER = 2,
@@ -8680,6 +8692,19 @@ MASK = {
   WATER = 8192
 }
 ---@alias MASK integer
+MENU_INPUT = {
+  BACK = 2,
+  DELETE = 4,
+  DOWN = 256,
+  JOURNAL = 16,
+  LEFT = 32,
+  NONE = 0,
+  RANDOM = 8,
+  RIGHT = 64,
+  SELECT = 1,
+  UP = 128
+}
+---@alias MENU_INPUT integer
 ON = {
   ARENA_INTRO = 25,
   ARENA_ITEMS = 23,
@@ -8708,6 +8733,7 @@ ON = {
   ONLINE_LOBBY = 29,
   OPTIONS = 5,
   PLAYER_PROFILE = 6,
+  POST_GAME_LOOP = 156,
   POST_LAYER_CREATION = 148,
   POST_LAYER_DESTRUCTION = 152,
   POST_LEVEL_CREATION = 146,
@@ -8715,8 +8741,10 @@ ON = {
   POST_LEVEL_GENERATION = 112,
   POST_LOAD_JOURNAL_CHAPTER = 139,
   POST_LOAD_SCREEN = 136,
+  POST_PROCESS_INPUT = 154,
   POST_ROOM_GENERATION = 111,
   POST_UPDATE = 143,
+  PRE_GAME_LOOP = 155,
   PRE_GET_FEAT = 140,
   PRE_GET_RANDOM_ROOM = 113,
   PRE_HANDLE_ROOM_TILES = 114,
@@ -8728,6 +8756,7 @@ ON = {
   PRE_LOAD_JOURNAL_CHAPTER = 138,
   PRE_LOAD_LEVEL_FILES = 109,
   PRE_LOAD_SCREEN = 135,
+  PRE_PROCESS_INPUT = 153,
   PRE_SET_FEAT = 141,
   PRE_UPDATE = 142,
   PROLOGUE = 2,
@@ -9149,6 +9178,139 @@ QUEST_FLAG = {
   WADDLER_AGGROED = 10
 }
 ---@alias QUEST_FLAG integer
+RAW_BUTTON = {
+  A = 4,
+  B = 5,
+  BACK = 14,
+  DOWN = 1,
+  LEFT = 2,
+  LEFT_SHOULDER = 8,
+  LEFT_THUMB = 12,
+  LEFT_TRIGGER = 10,
+  RIGHT = 3,
+  RIGHT_SHOULDER = 9,
+  RIGHT_THUMB = 13,
+  RIGHT_TRIGGER = 11,
+  START = 15,
+  UP = 0,
+  X = 6,
+  Y = 7
+}
+---@alias RAW_BUTTON integer
+RAW_DUALSHOCK = {
+  CIRCLE = 5,
+  CROSS = 4,
+  DOWN = 1,
+  L1 = 8,
+  L2 = 10,
+  L3 = 12,
+  LEFT = 2,
+  OPTIONS = 15,
+  R1 = 9,
+  R2 = 11,
+  R3 = 13,
+  RIGHT = 3,
+  SHARE = 14,
+  SQUARE = 6,
+  TRIANGLE = 7,
+  UP = 0
+}
+---@alias RAW_DUALSHOCK integer
+RAW_KEY = {
+  ["0"] = 65,
+  ["1"] = 66,
+  ["2"] = 67,
+  ["3"] = 68,
+  ["4"] = 69,
+  ["5"] = 70,
+  ["6"] = 71,
+  ["7"] = 72,
+  ["8"] = 73,
+  ["9"] = 74,
+  A = 9,
+  ADD = 86,
+  ALT = 37,
+  B = 10,
+  BACKSPACE = 40,
+  C = 11,
+  COMMA = 93,
+  CTRL = 33,
+  D = 12,
+  DECIMAL = 90,
+  DELETE = 104,
+  DIVIDE = 88,
+  DOWN = 1,
+  E = 13,
+  END = 106,
+  ESCAPE = 4,
+  F = 14,
+  F1 = 41,
+  F2 = 42,
+  F3 = 43,
+  F4 = 44,
+  F5 = 45,
+  F6 = 46,
+  F7 = 47,
+  F8 = 48,
+  F9 = 49,
+  F10 = 50,
+  F11 = 51,
+  F12 = 52,
+  G = 15,
+  H = 16,
+  HOME = 108,
+  I = 17,
+  INSERT = 103,
+  J = 18,
+  K = 19,
+  L = 20,
+  LALT = 37,
+  LCONTROL = 33,
+  LEFT = 2,
+  LSHIFT = 35,
+  M = 21,
+  MINUS = 92,
+  MULTIPLY = 87,
+  N = 22,
+  NUMPAD0 = 75,
+  NUMPAD1 = 76,
+  NUMPAD2 = 77,
+  NUMPAD3 = 78,
+  NUMPAD4 = 79,
+  NUMPAD5 = 80,
+  NUMPAD6 = 81,
+  NUMPAD7 = 82,
+  NUMPAD8 = 83,
+  NUMPAD9 = 84,
+  NUMPADENTER = 110,
+  O = 23,
+  P = 24,
+  PERIOD = 94,
+  PGDN = 105,
+  PGUP = 107,
+  PLUS = 98,
+  Q = 25,
+  R = 26,
+  RALT = 38,
+  RCONTROL = 34,
+  RETURN = 5,
+  RIGHT = 3,
+  RSHIFT = 36,
+  S = 27,
+  SHIFT = 35,
+  SPACE = 39,
+  SUBTRACT = 85,
+  T = 28,
+  TAB = 6,
+  U = 29,
+  UP = 0,
+  V = 30,
+  W = 31,
+  X = 32,
+  Y = 33,
+  Z = 34
+}
+---@alias RAW_KEY integer
 RECURSIVE_MODE = {
   EXCLUSIVE = 0,
   INCLUSIVE = 1,
@@ -11118,4 +11280,3 @@ local MAX_PLAYERS = 4
 ---@alias SHORT_TILE_CODE integer;
 ---@alias STRINGID integer;
 ---@alias FEAT integer;
----@alias KEY integer;
