@@ -146,6 +146,7 @@ void register_usertypes(sol::state& lua)
         &SpearDanglerAnimFrames::row);
 
     auto screenmenu_type = lua.new_usertype<ScreenMenu>("ScreenMenu", sol::base_classes, sol::bases<Screen>());
+    screenmenu_type["state"] = &ScreenMenu::state;
     screenmenu_type["tunnel_background"] = &ScreenMenu::tunnel_background;
     screenmenu_type["cthulhu_disc"] = &ScreenMenu::cthulhu_disc;
     screenmenu_type["tunnel_ring_darkbrown"] = &ScreenMenu::tunnel_ring_darkbrown;
@@ -161,38 +162,61 @@ void register_usertypes(sol::state& lua)
     screenmenu_type["play_scroll"] = &ScreenMenu::play_scroll;
     screenmenu_type["info_toast"] = &ScreenMenu::info_toast;
     screenmenu_type["cthulhu_sound"] = &ScreenMenu::cthulhu_sound;
+    screenmenu_type["particle_smoke"] = &ScreenMenu::particle_smoke;
+    screenmenu_type["particle_rubble"] = &ScreenMenu::particle_rubble;
     screenmenu_type["cthulhu_disc_ring_angle"] = &ScreenMenu::cthulhu_disc_ring_angle;
     screenmenu_type["cthulhu_disc_split_progress"] = &ScreenMenu::cthulhu_disc_split_progress;
     screenmenu_type["cthulhu_disc_y"] = &ScreenMenu::cthulhu_disc_y;
     screenmenu_type["cthulhu_timer"] = &ScreenMenu::cthulhu_timer;
+    screenmenu_type["controls"] = &ScreenMenu::controls;
     screenmenu_type["selected_menu_index"] = &ScreenMenu::selected_menu_index;
-    screenmenu_type["menu_text_opacity"] = &ScreenMenu::menu_text_opacity;
+    screenmenu_type["sides_hold_down_timer"] = &ScreenMenu::sides_hold_down_timer;
+    screenmenu_type["sides_fast_scroll_timer"] = &ScreenMenu::sides_fast_scroll_timer;
+    screenmenu_type["loop"] = &ScreenMenu::loop;
+    screenmenu_type["menu_id"] = &ScreenMenu::menu_id;
+    screenmenu_type["transfer_to_menu_id"] = &ScreenMenu::transfer_to_menu_id;
     screenmenu_type["menu_text_opacity"] = &ScreenMenu::menu_text_opacity;
     screenmenu_type["spear_position"] = &ScreenMenu::spear_position;
     screenmenu_type["spear_dangler"] = &ScreenMenu::spear_dangler;
+    screenmenu_type["spear_dangle_momentum"] = &ScreenMenu::spear_dangle_momentum;
+    screenmenu_type["spear_dangle_angle"] = &ScreenMenu::spear_dangle_angle;
     screenmenu_type["play_scroll_descend_timer"] = &ScreenMenu::play_scroll_descend;
     screenmenu_type["scroll_text"] = &ScreenMenu::scroll_text;
+    screenmenu_type["shake_offset_x"] = &ScreenMenu::shake_offset_x;
+    screenmenu_type["shake_offset_y"] = &ScreenMenu::shake_offset_y;
 
     auto screenoptions_type = lua.new_usertype<ScreenOptions>("ScreenOptions", sol::base_classes, sol::bases<Screen>());
+    screenoptions_type["DOWN"] = &ScreenOptions::DOWN;
+    screenoptions_type["UP"] = &ScreenOptions::UP;
+    screenoptions_type["direction_input"] = &ScreenOptions::direction_input;
+    screenoptions_type["UP"] = &ScreenOptions::UP;
+    screenoptions_type["hold_down_timer"] = &ScreenOptions::hold_down_timer;
+    screenoptions_type["fast_scroll_timer"] = &ScreenOptions::fast_scroll_timer;
     screenoptions_type["selected_menu_index"] = &ScreenOptions::selected_menu_index;
-    screenoptions_type["brick_border"] = &ScreenOptions::brick_border;
+    screenoptions_type["sides_hold_down_timer"] = &ScreenOptions::sides_hold_down_timer;
+    screenoptions_type["sides_fast_scroll_timer"] = &ScreenOptions::sides_fast_scroll_timer;
+    screenoptions_type["loop"] = &ScreenOptions::loop;
     screenoptions_type["top_bottom_woodpanels_velocity"] = &ScreenOptions::top_bottom_woodpanels_velocity;
     screenoptions_type["top_bottom_woodpanels_progress"] = &ScreenOptions::top_bottom_woodpanels_progress;
     screenoptions_type["scroll_unfurl_progress"] = &ScreenOptions::scroll_unfurl_progress;
-    screenoptions_type["bottom_woodpanel_y"] = &ScreenOptions::bottom_woodpanel_y;
-    screenoptions_type["top_bottom_woodpanels_slide_in_related"] = &ScreenOptions::top_bottom_woodpanels_slide_in_related;
+    screenoptions_type["bottom_woodpanel_speed_multiplayer"] = &ScreenOptions::bottom_woodpanel_speed_multiplayer;
+    screenoptions_type["bottom_woodpanel_y_offset"] = &ScreenOptions::bottom_woodpanel_y_offset;
     screenoptions_type["bottom_woodpanel"] = &ScreenOptions::bottom_woodpanel;
     screenoptions_type["top_woodpanel"] = &ScreenOptions::top_woodpanel;
+    screenoptions_type["scroll"] = &ScreenOptions::scroll;
     screenoptions_type["top_woodpanel_left_scrollhandle"] = &ScreenOptions::top_woodpanel_left_scrollhandle;
     screenoptions_type["top_woodpanel_right_scrollhandle"] = &ScreenOptions::top_woodpanel_right_scrollhandle;
-    screenoptions_type["button_right_caption"] = &ScreenOptions::button_right_caption;
-    screenoptions_type["button_middle_caption"] = &ScreenOptions::button_middle_caption;
+    screenoptions_type["scroll_text"] = &ScreenOptions::scroll_text;
+    screenoptions_type["bottom_left_text"] = &ScreenOptions::bottom_left_text;
+    screenoptions_type["bottom_right_text"] = &ScreenOptions::bottom_right_text;
+    screenoptions_type["bottom_middle_text"] = &ScreenOptions::bottom_middle_text;
     screenoptions_type["top_woodpanel_visible"] = &ScreenOptions::top_woodpanel_visible;
     screenoptions_type["bottom_woodpanel_visible"] = &ScreenOptions::bottom_woodpanel_visible;
     screenoptions_type["toggle_woodpanel_slidein_animation"] = &ScreenOptions::toggle_woodpanel_slidein_animation;
     screenoptions_type["capitalize_top_woodpanel"] = &ScreenOptions::capitalize_top_woodpanel;
-    screenoptions_type["current_menu_1"] = &ScreenOptions::current_menu_1;
-    screenoptions_type["current_menu_2"] = &ScreenOptions::current_menu_2;
+    screenoptions_type["menu_id"] = &ScreenOptions::menu_id;
+    screenoptions_type["transfer_to_menu_id"] = &ScreenOptions::transfer_to_menu_id;
+    screenoptions_type["graphic_and_audio"] = &ScreenOptions::graphic_and_audio;
     screenoptions_type["topleft_woodpanel_esc"] = &ScreenOptions::topleft_woodpanel_esc;
     screenoptions_type["brick_background"] = &ScreenOptions::brick_background;
     screenoptions_type["brick_middlelayer"] = &ScreenOptions::brick_middlelayer;
@@ -203,12 +227,26 @@ void register_usertypes(sol::state& lua)
     screenoptions_type["item_option_arrow_right"] = &ScreenOptions::item_option_arrow_right;
     screenoptions_type["tooltip_background"] = &ScreenOptions::tooltip_background;
     screenoptions_type["progressbar_background"] = &ScreenOptions::progressbar_background;
+    screenoptions_type["volume_progressbar_foreground"] = &ScreenOptions::volume_progressbar_foreground;
     screenoptions_type["progressbar_foreground"] = &ScreenOptions::progressbar_foreground;
-    screenoptions_type["progressbar_position_indicator"] = &ScreenOptions::progressbar_position_indicator;
+    screenoptions_type["volume_progressbar_position_indicator"] = &ScreenOptions::volume_progressbar_position_indicator;
     screenoptions_type["sectionheader_background"] = &ScreenOptions::sectionheader_background;
-    screenoptions_type["topleft_woodpanel_esc_slidein_timer"] = &ScreenOptions::topleft_woodpanel_esc_slidein_timer;
-    screenoptions_type["text_fadein_timer"] = &ScreenOptions::text_fadein_timer;
-    screenoptions_type["vertical_scroll_effect_timer"] = &ScreenOptions::vertical_scroll_effect_timer;
+    screenoptions_type["text_fadein"] = &ScreenOptions::text_fadein;
+    screenoptions_type["vertical_scroll_effect"] = &ScreenOptions::vertical_scroll_effect;
+    screenoptions_type["item_visiable"] = &ScreenOptions::item_visiable;
+    screenoptions_type["item_highlight"] = &ScreenOptions::item_highlight;
+    screenoptions_type["tooltip_text"] = &ScreenOptions::tooltip_text;
+
+    lua.new_usertype<GraphicandAudioSettings>(
+        "GraphicandAudioSettings",
+        "fullscreen_resolution_id",
+        &GraphicandAudioSettings::fullscreen_resolution_id,
+        "windowed_resolution_id",
+        &GraphicandAudioSettings::windowed_resolution_id,
+        "resolution_scale",
+        &GraphicandAudioSettings::resolution_scale,
+        "display_mode",
+        &GraphicandAudioSettings::display_mode);
 
     lua.new_usertype<ScreenPlayerProfile>(
         "ScreenPlayerProfile",

@@ -72,7 +72,7 @@ class ScreenArenaMenu : public Screen // ID: 21
     float center_panels_hor_slide_position;
     float esc_next_panels_slide_timer;
     float main_panel_vertical_scroll_position;
-    uint32_t selected_option_index;
+    uint32_t selected_option_index; // more like highlighted
     ScreenControls contols;
     uint8_t unknown57[3]; // some states, like screen depth
 };
@@ -135,7 +135,7 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     uint8_t padding_probably[3];
     float panels_slide_from_both_sides;
     float visibility_all_stages;
-    uint32_t selected_stage_index;
+    uint32_t selected_stage_index; // more like highlighted
     ScreenControls contols;
     uint8_t unknown57[3]; // some states, like screen depth
 };
@@ -183,7 +183,7 @@ class ScreenArenaItems : public Screen // ID: 23
     float unknown33;
     float center_panels_horizontal_slide_position;
     float esc_panel_slide_timer;
-    uint32_t selected_item_index;
+    uint32_t selected_item_index; // more like highlighted
     ScreenControls controls;
     uint8_t unknown57[3]; // some states, like screen depth
 };
@@ -281,7 +281,7 @@ struct ScreenArenaScoreLavaBubble
     float x;
     float y;
     int16_t timer1;
-    uint8_t timer2; // counts down the the timer1 = -1
+    uint8_t timer2; // counts down when the timer1 = -1
     bool unknown;
 };
 

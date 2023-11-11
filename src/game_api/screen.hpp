@@ -144,19 +144,17 @@ class ScreenMenu : public Screen // ID: 4
     float unknown10;
     float zoom_in_progress;
     float zoom_limit;
-    /*
-    0: "cthulhu_pre_movement",
-    1: "cthulhu_rotating",
-    2: "cthulhu_separating",
-    3: "cthulhu_lowering",
-    4: "cthulhu_transition_to_menu",
-    5: "return_from_backlayer",
-    6: "highlight_selection",
-    7: "idle",
-    8: "to_submenu",
-    9: "to_backlayer",
-    10: "backlayer_idle"
-    */
+    /// 0: "cthulhu_pre_movement",
+    /// 1: "cthulhu_rotating",
+    /// 2: "cthulhu_separating",
+    /// 3: "cthulhu_lowering",
+    /// 4: "cthulhu_transition_to_menu",
+    /// 5: "return_from_backlayer",
+    /// 6: "highlight_selection",
+    /// 7: "idle",
+    /// 8: "to_submenu",
+    /// 9: "to_backlayer",
+    /// 10: "backlayer_idle"
     uint32_t state;
     TextureRenderingInfo tunnel_background;
     TextureRenderingInfo cthulhu_disc;
@@ -175,7 +173,7 @@ class ScreenMenu : public Screen // ID: 4
     TextureRenderingInfo unknown15; // probably xbox username scroll
 
     uint32_t unknown16a;
-    uint32_t unknown16b; // padding probably
+    uint32_t padding_probably1;
     SoundMeta* cthulhu_sound;
     ParticleEmitterInfo* particle_smoke;
     ParticleEmitterInfo* particle_rubble;
@@ -185,12 +183,10 @@ class ScreenMenu : public Screen // ID: 4
     float cthulhu_timer;
     ScreenTransition* screen_transition; // called when you leave the menu, just sets the state.screen_next and stuff
 
-    // game many times have pointer to this point, hoping this is some common struct for the menu :)
-
-    std::vector<std::vector<MenuOption>> menu_tree; // always have the vector of the main menu, and then any deeper level menu, like Play or Online
-    std::vector<uint32_t> menu_index_order;         // to go back to
+    custom_vector<custom_vector<MenuOption>> menu_tree; // always have the vector of the main menu, and then any deeper level menu, like Play or Online
+    custom_vector<uint32_t> menu_index_order;           // to go back to, probably needs a better name
     ScreenControls controls;
-    uint32_t selected_menu_index;
+    uint32_t selected_menu_index; // more like highlighted
     uint8_t sides_hold_down_timer;
     uint8_t sides_fast_scroll_timer;
 
@@ -217,58 +213,93 @@ class ScreenMenu : public Screen // ID: 4
     // maybe two more 32bit values? hard to tell
 };
 
+struct GraphicandAudioSettings
+{
+    uint32_t fullscreen_resolution_id; // depends on the GetMonitorInfo etc.
+    uint32_t windowed_resolution_id;   // depends on the GetMonitorInfo etc.
+    /// 100 = 1.0
+    uint32_t resolution_scale;
+    /// 0 = Fullscreen, 1 = Borderless Windowed, 2 = Windowed
+    uint8_t display_mode;
+    uint8_t unknown33;
+    bool unknown34; // if true, first input just sets it to false and does nothing else
+    uint8_t unknown35;
+    bool unknown36; // if it's not false, it's set to false and nothing else touches it ???
+    // uint8_t padding_probably6[3];
+    uint32_t unknown37;
+    uint32_t unknown38;
+};
+
 class ScreenOptions : public Screen // ID: 5
 {
   public:
-    std::vector<void*> unknown4;    // menu options?
-    std::vector<uint32_t> unknown7; // dunno
+    custom_vector<custom_vector<MenuOption>> menu_tree;
+    custom_vector<uint32_t> menu_index_order; // to go back to, probably needs a better name
 
-    uint32_t selected_menu_index;
-    uint16_t key_press_timer; // might be two separate values
+    // yes, this is just ScreenControls but up/down are reversed and not left/right for some reason
+    // also ScreenControls could include the selected_index, but in arena screen it's above and here it's below :|
+    bool DOWN;
+    bool UP;
+    // bool unused[2]
+    /// -1 = none, 0 = down, 1 = up
+    int32_t direction_input;
+    uint32_t hold_down_timer;
+    uint32_t fast_scroll_timer;
 
-    uint16_t unknown12;
+    uint32_t selected_menu_index; // more like highlighted
+    uint8_t sides_hold_down_timer;
+    uint8_t sides_fast_scroll_timer;
+    // uint16_t probably_padding1;
+    uint32_t unknown0; // pressed direction? 1 = left, 0 = right, no neutral, stays at the last state
+    bool loop;
 
-    bool moved_left;
+    // uint8_t probably_padding2[3];
 
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    uint8_t unknown14;
-    uint8_t unknown15;
-    uint8_t unknown16;
-    uint8_t unknown17;
+    // this is probably similar stuff that is at the beginning of ScreenMenu
+    float unknown1;
+    float unknown2;
+    float unknown3;
+    float unknown4;
+    float unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7; // speed related?
+    float unknown8;
+    float unknown9;
+    float unknown10;
+    float unknown11;
+    float unknown12;
+    float unknown13;
+    float unknown14;
+    uint32_t unknown15;
+    int32_t unknown16;
+    float unknown17;
+    float unknown18;
 
-    TextureRenderingInfo brick_border;
     float top_bottom_woodpanels_velocity;
     float top_bottom_woodpanels_progress; // set to 0 to start sliding in
     float scroll_unfurl_progress;         // set to 0 to start unfurl
-    float unknown21;
-    float bottom_woodpanel_y;
-    float unknown23;
-    float top_bottom_woodpanels_slide_in_related;
+    float bottom_woodpanel_speed_multiplayer;
+    float bottom_woodpanel_y_offset; // maybe a resolution thing?
     TextureRenderingInfo bottom_woodpanel;
     TextureRenderingInfo top_woodpanel;
-    TextureRenderingInfo unknown27;
+    TextureRenderingInfo scroll;
     TextureRenderingInfo top_woodpanel_left_scrollhandle;
     TextureRenderingInfo top_woodpanel_right_scrollhandle;
 
-    STRINGID button_right_caption;
-    STRINGID button_middle_caption;
+    STRINGID scroll_text;
+    STRINGID bottom_left_text;
+    STRINGID bottom_right_text;
+    STRINGID bottom_middle_text;
     bool top_woodpanel_visible;
     bool bottom_woodpanel_visible;
     bool toggle_woodpanel_slidein_animation;
     bool capitalize_top_woodpanel;
-    uint32_t unknown28;
-    uint32_t current_menu_1;
-    uint32_t current_menu_2;
-    uint32_t unknown31;
-    uint32_t unknown32;
-    uint32_t unknown33;
-    uint32_t unknown34;
-    uint32_t unknown35;
-    uint32_t unknown36;
-    uint32_t unknown37;
-    uint32_t unknown38;
+    uint32_t unknown_state; // 0 = none, 2 = moving between inner menus, 3 = exiting menu options
+    uint32_t menu_id;
+    uint32_t transfer_to_menu_id;
+    bool show_apply_button;
+    // uint8_t padding_probably4[3];
+    GraphicandAudioSettings graphic_and_audio;
 
     TextureRenderingInfo topleft_woodpanel_esc;
     TextureRenderingInfo brick_background;
@@ -280,19 +311,32 @@ class ScreenOptions : public Screen // ID: 5
     TextureRenderingInfo item_option_arrow_right;
     TextureRenderingInfo tooltip_background;
     TextureRenderingInfo progressbar_background; // brightness 'progressbar' background texture
-    TextureRenderingInfo unknown40;
-    TextureRenderingInfo progressbar_foreground;
-    TextureRenderingInfo progressbar_position_indicator;
-    TextureRenderingInfo sectionheader_background; // behind 'GRAPHICS' and 'AUDIO'
+    TextureRenderingInfo volume_progressbar_foreground;
+    TextureRenderingInfo progressbar_foreground; // the border
+    TextureRenderingInfo volume_progressbar_position_indicator;
+    TextureRenderingInfo sectionheader_background; // behind 'GRAPHICS' and 'AUDIO' the black bars
 
-    TextureRenderingInfo unknown44;
+    TextureRenderingInfo unknown44; // could be something else, or just not used in PC version or something
     TextureRenderingInfo unknown45;
-    float topleft_woodpanel_esc_slidein_timer;
-    float text_fadein_timer;
-    float vertical_scroll_effect_timer;
+    TextureRenderingInfo unknown46;
+    TextureRenderingInfo unknown47;
+    TextureRenderingInfo unknown48;
+    float unknown48a; // was supposto be topleft_woodpanel_esc_slidein?
+    float text_fadein;
+    float vertical_scroll_effect;
     uint8_t unknown49;
-    uint8_t unknown50;
-    uint8_t unknown51;
+    bool item_visiable;
+    bool item_highlight;
+    // uint8_t padding_probably8[5];
+    custom_vector<size_t> unknown50; // holds one 8 byte value, related to choosen opion menu
+    uint8_t unknown51;               // probably bool
+    // padding_probably10[7];
+    custom_vector<STRINGID> tooltip_text;
+    size_t unknown53;
+    uint32_t unknown54; // some timer
+    uint32_t unknown55; // probably padding
+    size_t* credits_related;
+    size_t unknown57;
 };
 
 class ScreenPlayerProfile : public Screen // ID: 6
