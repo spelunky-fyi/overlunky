@@ -1003,7 +1003,7 @@ tuple&lt;float, float&gt; | [split()](https://github.com/spelunky-fyi/overlunky/
 
 Type | Name | Description
 ---- | ---- | -----------
-array&lt;[ControllerButton](#ControllerButton), 16&gt; | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | Zero-based indexing, i.e. use [PlayerSlot](#PlayerSlot).input_mapping_controller directly to index this.
+array&lt;[ControllerButton](#ControllerButton), 16&gt; | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | Zero-based indexing. Use [PlayerSlot](#PlayerSlot).input_mapping_controller or [RAW_BUTTON](#RAW_BUTTON) (or RAW_DUALSHOCK) to index this.
 
 ### Gamepad
 
@@ -1074,7 +1074,7 @@ int | [left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left) |
 int | [right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right) | 
 int | [up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) | 
 int | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | 
-array&lt;[RAW_KEY](#RAW_KEY), 12&gt; | [mapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mapping) | Can be indexed with [INPUT_FLAG](#INPUT_FLAG), keyboard uses [RAW_KEY](#RAW_KEY) values, controller just uses button numbers.
+array&lt;[RAW_KEY](#RAW_KEY), 12&gt; | [mapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mapping) | Can be indexed with [INPUT_FLAG](#INPUT_FLAG). Keyboard uses [RAW_KEY](#RAW_KEY) values, controller uses [RAW_BUTTON](#RAW_BUTTON) values.
 
 ### PlayerInputs
 

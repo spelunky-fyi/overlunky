@@ -89,7 +89,7 @@ struct ControllerButton
 
 struct ControllerInput
 {
-    /// Zero-based indexing, i.e. use PlayerSlot.input_mapping_controller directly to index this.
+    /// Zero-based indexing. Use PlayerSlot.input_mapping_controller or RAW_BUTTON (or RAW_DUALSHOCK) to index this.
     std::array<ControllerButton, 16> buttons;
 };
 

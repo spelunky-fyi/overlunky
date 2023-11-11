@@ -225,5 +225,9 @@ void register_usertypes(sol::state& lua)
         lua["RAW_KEY"][std::string{c}] = (int)c + 17;
     for (char c = 'A'; c <= 'Z'; c++)
         lua["RAW_KEY"][std::string{c}] = (int)c - 56;
+
+    lua.create_named_table("RAW_BUTTON", "UP", 0, "DOWN", 1, "LEFT", 2, "RIGHT", 3, "A", 4, "B", 5, "X", 6, "Y", 7, "LEFT_SHOULDER", 8, "RIGHT_SHOULDER", 9, "LEFT_TRIGGER", 10, "RIGHT_TRIGGER", 11, "LEFT_THUMB", 12, "RIGHT_THUMB", 13, "BACK", 14, "START", 15);
+
+    lua.create_named_table("RAW_DUALSHOCK", "UP", 0, "DOWN", 1, "LEFT", 2, "RIGHT", 3, "CROSS", 4, "CIRCLE", 5, "SQUARE", 6, "TRIANGLE", 7, "L1", 8, "R1", 9, "L2", 10, "R2", 11, "L3", 12, "R3", 13, "SHARE", 14, "OPTIONS", 15);
 }
 }; // namespace NGM

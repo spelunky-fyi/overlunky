@@ -38,7 +38,7 @@ struct InputMapping
             int8_t up;
             int8_t down;
         };
-        /// Can be indexed with INPUT_FLAG, keyboard uses RAW_KEY values, controller just uses button numbers.
+        /// Can be indexed with INPUT_FLAG. Keyboard uses RAW_KEY values, controller uses RAW_BUTTON values.
         std::array<RAW_KEY, 12> mapping;
     };
 };

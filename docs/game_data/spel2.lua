@@ -2305,7 +2305,7 @@ do
     ---@field pressed boolean @Key was just pressed down this frame
 
 ---@class ControllerInput
-    ---@field buttons ControllerButton[] @size: 16 @Zero-based indexing, i.e. use PlayerSlot.input_mapping_controller directly to index this.
+    ---@field buttons ControllerButton[] @size: 16 @Zero-based indexing. Use PlayerSlot.input_mapping_controller or RAW_BUTTON (or RAW_DUALSHOCK) to index this.
 
 ---@class ControllerButton
     ---@field down boolean @Button is being held
@@ -4920,7 +4920,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field right integer
     ---@field up integer
     ---@field down integer
-    ---@field mapping RAW_KEY[] @size: 12 @Can be indexed with INPUT_FLAG, keyboard uses RAW_KEY values, controller just uses button numbers.
+    ---@field mapping RAW_KEY[] @size: 12 @Can be indexed with INPUT_FLAG. Keyboard uses RAW_KEY values, controller uses RAW_BUTTON values.
 
 ---@class PlayerInputs
     ---@field player_slots PlayerSlot[] @size: MAX_PLAYERS
@@ -9178,6 +9178,44 @@ QUEST_FLAG = {
   WADDLER_AGGROED = 10
 }
 ---@alias QUEST_FLAG integer
+RAW_BUTTON = {
+  A = 4,
+  B = 5,
+  BACK = 14,
+  DOWN = 1,
+  LEFT = 2,
+  LEFT_SHOULDER = 8,
+  LEFT_THUMB = 12,
+  LEFT_TRIGGER = 10,
+  RIGHT = 3,
+  RIGHT_SHOULDER = 9,
+  RIGHT_THUMB = 13,
+  RIGHT_TRIGGER = 11,
+  START = 15,
+  UP = 0,
+  X = 6,
+  Y = 7
+}
+---@alias RAW_BUTTON integer
+RAW_DUALSHOCK = {
+  CIRCLE = 5,
+  CROSS = 4,
+  DOWN = 1,
+  L1 = 8,
+  L2 = 10,
+  L3 = 12,
+  LEFT = 2,
+  OPTIONS = 15,
+  R1 = 9,
+  R2 = 11,
+  R3 = 13,
+  RIGHT = 3,
+  SHARE = 14,
+  SQUARE = 6,
+  TRIANGLE = 7,
+  UP = 0
+}
+---@alias RAW_DUALSHOCK integer
 RAW_KEY = {
   ["0"] = 65,
   ["1"] = 66,
