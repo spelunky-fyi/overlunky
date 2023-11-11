@@ -90,10 +90,13 @@ class GuiDrawContext
     /// `pos_cond`: GUI_CONDITION for applying the position.
     /// `size_cond`: GUI_CONDITION for applying the size.
     /// `collapsed_cond`: GUI_CONDITION for applying the collapsed state.
+    /// `flags`: Mask of GUI_WINDOW_FLAG.
     /// `callback`: Add all `win_*` widgets in here. Signature is `nil function(GuiDrawContext ctx, Vec2 pos, Vec2 size, bool collapsed)`.
     /// Set `x`, `y`, `w`, and `h` to `0, 0, 0, 0` to autosize in center of screen.
     /// Returns false when the window is closed by the user.
     bool window(std::string title, float x, float y, float w, float h, bool collapsed, GUI_CONDITION pos_cond, GUI_CONDITION size_cond, GUI_CONDITION collapsed_cond, int flags, sol::function callback);
+    /// Add a child window with its own scrolling and clipping. `flags` are a mask of GUI_WINDOW_FLAG.
+    void win_child(std::string id, float w, float h, bool border, int flags, sol::function callback);
     /// Add some text to window, automatically wrapped
     void win_text(std::string text);
     /// Add a separator line to window

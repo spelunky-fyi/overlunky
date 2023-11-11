@@ -403,7 +403,17 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     }
 
     return win_open;
-};
+}
+void GuiDrawContext::win_child(std::string id, float w, float h, bool border, int flags, sol::function callback)
+{
+    if (std::abs(w) > 0.0f && std::abs(w) < 1.0f)
+        w *= ImGui::GetContentRegionMax().x;
+    if (std::abs(h) > 0.0f && std::abs(h) < 1.0f)
+        h *= ImGui::GetContentRegionMax().x;
+    if (ImGui::BeginChild(id.c_str(), ImVec2(w, h), border, flags))
+        handle_function<void>(backend, callback);
+    ImGui::EndChild();
+}
 void GuiDrawContext::win_text(std::string text)
 {
     ImGui::TextWrapped("%s", text.c_str());
@@ -822,6 +832,7 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["draw_image_rotated"] = draw_image_rotated;
     guidrawcontext_type["draw_layer"] = &GuiDrawContext::draw_layer;
     guidrawcontext_type["window"] = window;
+    guidrawcontext_type["win_child"] = &GuiDrawContext::win_child;
     guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
     guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
     guidrawcontext_type["win_separator_text"] = &GuiDrawContext::win_separatortext;
@@ -874,7 +885,7 @@ void register_usertypes(sol::state& lua)
     // APPEARING
     // Set the variable if the widget is appearing after being hidden/inactive (or the first time).
     */
-    /// Window flags for `window` in GuiDrawContext.
+    /// Window flags for `window` and `win_child` in GuiDrawContext.
     lua.create_named_table("GUI_WINDOW_FLAG", "NONE", ImGuiWindowFlags_None, "NO_TITLE_BAR", ImGuiWindowFlags_NoTitleBar, "NO_RESIZE", ImGuiWindowFlags_NoResize, "NO_MOVE", ImGuiWindowFlags_NoMove, "NO_SCROLLBAR", ImGuiWindowFlags_NoScrollbar, "NO_SCROLL_WITH_MOUSE", ImGuiWindowFlags_NoScrollWithMouse, "NO_COLLAPSE", ImGuiWindowFlags_NoCollapse, "ALWAYS_AUTO_RESIZE", ImGuiWindowFlags_AlwaysAutoResize, "NO_BACKGROUND", ImGuiWindowFlags_NoBackground, "NO_SAVED_SETTINGS", ImGuiWindowFlags_NoSavedSettings, "NO_MOUSE_INPUTS", ImGuiWindowFlags_NoMouseInputs, "MENU_BAR", ImGuiWindowFlags_MenuBar, "HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_HorizontalScrollbar, "NO_FOCUS_ON_APPEARING", ImGuiWindowFlags_NoFocusOnAppearing, "NO_BRING_TO_FRONT_ON_FOCUS", ImGuiWindowFlags_NoBringToFrontOnFocus, "ALWAYS_VERTICAL_SCROLLBAR", ImGuiWindowFlags_AlwaysVerticalScrollbar, "ALWAYS_HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_AlwaysHorizontalScrollbar, "NO_NAV_INPUTS", ImGuiWindowFlags_NoNavInputs, "NO_NAV_FOCUS", ImGuiWindowFlags_NoNavFocus, "UNSAVED_DOCUMENT", ImGuiWindowFlags_UnsavedDocument);
     /// Tab bar flags for `win_tab_bar` in GuiDrawContext.
     lua.create_named_table("GUI_TAB_BAR_FLAG", "NONE", ImGuiTabBarFlags_None, "REORDERABLE", ImGuiTabBarFlags_Reorderable, "AUTO_SELECT_NEW_TABS", ImGuiTabBarFlags_AutoSelectNewTabs, "TAB_LIST_POPUP_BUTTON", ImGuiTabBarFlags_TabListPopupButton, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton, "NO_TAB_LIST_SCROLLING_BUTTONS", ImGuiTabBarFlags_NoTabListScrollingButtons, "NO_TOOLTIP", ImGuiTabBarFlags_NoTooltip, "FITTING_POLICY_RESIZE_DOWN", ImGuiTabBarFlags_FittingPolicyResizeDown, "FITTING_POLICY_SCROLL", ImGuiTabBarFlags_FittingPolicyScroll);

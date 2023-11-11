@@ -269,6 +269,25 @@ set_callback(function(draw_ctx)
             end)
             draw_ctx:win_popid()
 
+            draw_ctx:win_separator_text('Child Windows')
+
+            -- draw a child window with its own scrolling and clipping
+            draw_ctx:win_child('child_example', 0.5, 0.4, true, GUI_WINDOW_FLAG.MENU_BAR | GUI_WINDOW_FLAG.HORIZONTAL_SCROLLBAR, function()
+                -- child windows can have menu bars
+                draw_ctx:win_menu_bar(function()
+                    draw_ctx:win_menu('Menu', function()
+                        if draw_ctx:win_menu_item('Child window menu item') then
+                            message('Child window menu item pressed')
+                        end
+                    end)
+                end)
+                draw_ctx:win_text('I don\'t like sand. It\'s coarse and rough and irritating and it gets everywhere.')
+                -- this button probably doesn't fit in the child window, but it won't overflow into the parent window
+                draw_ctx:win_button('Really big button', 500, 200)
+            end)
+
+            draw_ctx:win_separator_text('Images')
+
             -- draw the image we loaded before
             if loadingimage > -1 then
                 draw_ctx:win_image(loadingimage, 0, 0)
