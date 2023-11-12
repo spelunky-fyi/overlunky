@@ -1987,11 +1987,12 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
 
 void restart_adventure()
 {
+    auto seed = UI::get_adventure_seed(true);
     if (g_state->screen < 11)
         quick_start(12, 1, 1, 1);
     if ((g_state->quest_flags & 0x40) == 0)
     {
-        UI::set_adventure_seed(g_bucket->adventure_seed.first, g_bucket->adventure_seed.second);
+        UI::set_adventure_seed(seed.first, seed.second);
         g_state->world_next = g_state->world_start;
         g_state->level_next = g_state->level_start;
         g_state->theme_next = g_state->theme_start;
