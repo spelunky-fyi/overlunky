@@ -1934,10 +1934,18 @@ void force_cheats()
 
 void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, std::optional<uint32_t> seed = std::nullopt)
 {
-    if (seed.has_value())
-        UI::init_seeded(seed.value());
-    else if (g_state->screen < 11)
-        UI::init_adventure();
+    if (g_state->screen < 11)
+    {
+        if (seed.has_value())
+            UI::init_seeded(seed.value());
+        else
+            UI::init_adventure();
+    }
+    else
+    {
+        if (seed.has_value())
+            g_state->seed = seed.value();
+    }
     g_state->screen_character_select->available_mine_entrances = 4;
 
     static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
@@ -1988,9 +1996,13 @@ void restart_adventure()
         g_state->level_next = g_state->level_start;
         g_state->theme_next = g_state->theme_start;
         g_state->screen_next = 12;
+        g_state->quest_flags |= 1;
+        g_state->loading = 1;
     }
-    g_state->quest_flags |= 1;
-    g_state->loading = 1;
+    else
+    {
+        quick_start(12, 1, 1, 1);
+    }
 }
 
 std::string get_clipboard()
@@ -3359,7 +3371,16 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         if (g_state->screen > 11)
         {
-            quick_start(12, g_state->world_start, g_state->level_start, g_state->theme_start);
+            if (g_state->quest_flags & 0x40)
+            {
+                std::random_device rd;
+                static std::uniform_int_distribution<uint32_t> dist(1, UINT32_MAX);
+                quick_start(12, 1, 1, 1, dist(rd));
+            }
+            else
+            {
+                quick_start(12, g_state->world_start, g_state->level_start, g_state->theme_start);
+            }
         }
         else
         {
@@ -8206,12 +8227,13 @@ void render_game_props()
         }
         if (ImGui::MenuItem("New random adventure run", key_string(keys["quick_restart"]).c_str()))
         {
+            g_state->quest_flags = 1;
             UI::init_adventure();
             static std::uniform_int_distribution<uint64_t> dist(1, UINT64_MAX);
             UI::set_adventure_seed(dist(rd), dist(rd));
             quick_start(12, 1, 1, 1);
         }
-        if (ImGui::MenuItem("New random seeded run"))
+        if (ImGui::MenuItem("New random seeded run", key_string(keys["quick_restart"]).c_str()))
         {
             static std::uniform_int_distribution<uint32_t> dist(1, UINT32_MAX);
             quick_start(12, 1, 1, 1, dist(rd));
