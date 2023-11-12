@@ -2828,10 +2828,10 @@ sol::state& get_lua_vm(SoundManager* sound_manager)
     return global_vm;
 }
 
-sol::protected_function_result execute_lua(sol::environment& env, std::string_view code)
+sol::protected_function_result execute_lua(sol::environment& env, std::string_view code, bool pass)
 {
     static sol::state& global_vm = get_lua_vm();
-    return global_vm.safe_script(code, env);
+    return global_vm.safe_script(code, env, pass ? &sol::script_pass_on_error : &sol::script_default_on_error);
 }
 
 bool check_safe_io_path(const std::string& filepath, const std::string& basepath)

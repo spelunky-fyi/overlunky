@@ -868,8 +868,8 @@ void autorun_scripts()
 
 void update_frametimes()
 {
-    g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps));
-    g_Console.get()->execute(fmt::format("set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_unfocused_fps));
+    g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps), true);
+    g_Console.get()->execute(fmt::format("set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_unfocused_fps), true);
 }
 
 void save_config(std::string file)
@@ -2183,7 +2183,7 @@ bool toggle_pause()
 {
     g_pause_at = -1;
     g_state->pause ^= ((uint8_t)g_pause_type & ~0xC0);
-    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false exports.loading = {}", g_pause_type, paused, options["pause_loading"]));
+    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false exports.loading = {}", g_pause_type, paused, options["pause_loading"]), true);
     return paused;
 }
 
@@ -2200,9 +2200,9 @@ void frame_advance()
     }
     else
     {
-        paused = g_ui_scripts["pause"]->execute("return exports.paused") == "true";
+        paused = g_ui_scripts["pause"]->execute("return exports.paused", true) == "true";
     }
-    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {} exports.camera = {}", options["pause_loading"], options["pause_update_camera"]));
+    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {} exports.camera = {}", options["pause_loading"], options["pause_update_camera"]), true);
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -3065,7 +3065,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         {
             if (paused)
             {
-                g_ui_scripts["pause"]->execute("exports.skip = true");
+                g_ui_scripts["pause"]->execute("exports.skip = true", true);
             }
         }
         else
@@ -4167,7 +4167,7 @@ void render_camera()
     }
     tooltip("Enable to always center the followed entity instantly\nwithout respecting level borders.");
     if (ImGui::Checkbox("Update camera position during pause##CameraPaused", &options["pause_update_camera"]))
-        g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+        g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]), true);
     tooltip("Enable to follow the entity smoothly when paused\nor combine with speed=5 for instant camera that respects level borders.");
     static bool lock_inertia{false};
     if (ImGui::Checkbox("Lock current camera speed multiplier##LockInertia", &lock_inertia))
@@ -6032,12 +6032,12 @@ void render_options()
         ImGui::PopID();
         ImGui::Separator();
         if (ImGui::Checkbox("Freeze during loading screens", &options["pause_loading"]))
-            g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]));
+            g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]), true);
         bool pause_level = UI::get_start_level_paused();
         if (ImGui::Checkbox("Auto (fade) pause on level start", &pause_level))
             UI::set_start_level_paused(pause_level);
         if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &options["pause_update_camera"]))
-            g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+            g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]), true);
         tooltip("Calls the vanilla camera update when it\nwould be skipped by blocking the state update.");
         ImGui::Separator();
         ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let you unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
@@ -7664,8 +7664,8 @@ void render_entity_props(int uid, bool detached = false)
     if (submenu("Color, Size, Texture"))
     {
         auto textureid = entity->get_texture();
-        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid));
-        // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid));
+        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid), true);
+        // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid), true);
         texture = "TEXTURE." + texture.substr(1, texture.length() - 2);
         // texturepath = texturepath.substr(1, texturepath.length() - 2);
         ImGui::ColorEdit4("Color", (float*)&entity->color);
@@ -7985,7 +7985,7 @@ void render_texture_viewer()
         return;
     }
     auto def = get_texture_definition(texture_viewer.id);
-    std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id));
+    std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id), true);
     name = "TEXTURE." + name.substr(1, name.length() - 2);
     ImGui::InputText("ID", &name, ImGuiInputTextFlags_ReadOnly);
     ImGui::LabelText("Path", "%s", def.texture_path.c_str());

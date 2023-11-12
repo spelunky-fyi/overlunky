@@ -23,6 +23,12 @@ struct ConsoleHistoryItem
     std::vector<ScriptMessage> messages;
 };
 
+struct ConsoleResult
+{
+    std::string str;
+    bool error;
+};
+
 class LuaConsole : public LockableLuaBackend<LuaConsole>
 {
   public:
@@ -79,8 +85,8 @@ class LuaConsole : public LockableLuaBackend<LuaConsole>
     void register_command(LuaBackend* provider, std::string command_name, sol::function cmd);
     void unregister_command(LuaBackend* provider, std::string command_name);
 
-    std::string execute(std::string code);
-    std::string execute_raw(std::string code);
+    ConsoleResult execute(std::string str, bool raw = false);
+    sol::protected_function_result execute_raw(std::string str);
 
     void toggle();
 

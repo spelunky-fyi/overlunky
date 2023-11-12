@@ -922,21 +922,21 @@ bool LuaConsole::pre_draw()
                 {
                     std::size_t messages_before = messages.size();
 
-                    std::string results = execute(console_input);
+                    auto results = execute(console_input);
 
                     std::vector<ScriptMessage> result_message;
                     std::move(messages.begin() + messages_before, messages.end(), std::back_inserter(result_message));
                     messages.erase(messages.begin() + messages_before, messages.end());
 
-                    if (!results.empty())
+                    if (!results.str.empty())
                     {
                         ImVec4 color{1.0f, 1.0f, 1.0f, 1.0f};
-                        if (results.starts_with("sol:"))
+                        if (results.error)
                         {
                             color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
-                            set_error(results);
+                            set_error(results.str);
                         }
-                        result_message.push_back({std::move(results), {}, color});
+                        result_message.push_back({std::move(results.str), {}, color});
                     }
 
                     history_pos = std::nullopt;
@@ -1023,40 +1023,37 @@ void LuaConsole::unregister_command(LuaBackend* provider, std::string command_na
     }
 }
 
-std::string LuaConsole::execute(std::string code)
+ConsoleResult LuaConsole::execute(std::string str, bool raw)
 {
-    if (!code.starts_with("return"))
+    sol::protected_function_result res;
+
+    if (!str.starts_with("return") && !raw)
     {
-        std::string ret = execute_raw("return " + code);
-        if (!ret.starts_with("sol: "))
-        {
-            return ret;
-        }
+        res = execute_raw("return " + str);
+        if (!res.valid())
+            res = execute_raw(std::move(str));
     }
-    return execute_raw(std::move(code));
+    else
+    {
+        res = execute_raw(std::move(str));
+    }
+
+    if (!res.valid())
+    {
+        sol::error err = res;
+        return ConsoleResult{err.what(), true};
+    }
+
+    if (res.get_type() == sol::type::nil || res.get_type() == sol::type::none)
+        return ConsoleResult{"", false};
+
+    sol::function dump_string = lua["dump_string"];
+    return ConsoleResult{dump_string(res, 2), false};
 }
-std::string LuaConsole::execute_raw(std::string code)
+
+sol::protected_function_result LuaConsole::execute_raw(std::string str)
 {
-    try
-    {
-        auto ret = execute_lua(lua, code);
-        if (ret.get_type() == sol::type::nil || ret.get_type() == sol::type::none)
-        {
-            return "";
-        }
-        else
-        {
-            // sol::function serpent = lua["serpent"]["block"];
-            // return serpent(ret);
-            sol::function dump_string = lua["dump_string"];
-            return dump_string(ret, 2);
-        }
-    }
-    catch (const sol::error& e)
-    {
-        return e.what();
-    }
-    return "";
+    return execute_lua(lua, str, true);
 }
 
 void LuaConsole::toggle()

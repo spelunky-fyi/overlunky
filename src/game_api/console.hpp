@@ -29,7 +29,7 @@ class SpelunkyConsole
 
     void toggle();
 
-    std::string execute(std::string code);
+    std::string execute(std::string code, bool raw = false);
 
     bool has_new_history() const;
     void set_max_history_size(size_t max_history);

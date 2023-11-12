@@ -98,7 +98,7 @@ class SpelunkyScript
     void draw(ImDrawList* dl);
     void render_options();
 
-    std::string execute(std::string code);
+    std::string execute(std::string code, bool raw = false);
 
   private:
     std::unique_ptr<ScriptImpl> m_Impl;
