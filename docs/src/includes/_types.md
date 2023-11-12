@@ -1056,14 +1056,6 @@ float | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mo
  | [gamepads](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepads) | [Gamepad](#Gamepad) gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/> 
 bool | [showcursor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=showcursor) | 
 
-### InputDevice
-
-
-Type | Name | Description
----- | ---- | -----------
-int | [input_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_index) | 
-int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
-
 ### InputMapping
 
 Used in [PlayerSlot](#PlayerSlot)

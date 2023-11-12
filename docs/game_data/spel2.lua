@@ -2283,10 +2283,6 @@ do
     ---@field timer integer
     ---@field slide_position number
 
----@class InputDevice
-    ---@field input_index integer
-    ---@field buttons integer
-
 ---@class GameProps
     ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input_previous integer[] @size: MAX_PLAYERS

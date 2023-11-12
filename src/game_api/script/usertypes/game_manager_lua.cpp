@@ -97,12 +97,6 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::timer,
         "slide_position",
         &JournalPopupUI::slide_position);
-    lua.new_usertype<InputDevice>(
-        "InputDevice",
-        "input_index",
-        &InputDevice::input_index,
-        "buttons",
-        &InputDevice::buttons);
     lua.new_usertype<GameProps>(
         "GameProps",
         /// NoDoc
