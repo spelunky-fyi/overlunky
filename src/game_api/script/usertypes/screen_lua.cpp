@@ -186,10 +186,9 @@ void register_usertypes(sol::state& lua)
     screenmenu_type["shake_offset_y"] = &ScreenMenu::shake_offset_y;
 
     auto screenoptions_type = lua.new_usertype<ScreenOptions>("ScreenOptions", sol::base_classes, sol::bases<Screen>());
-    screenoptions_type["DOWN"] = &ScreenOptions::DOWN;
-    screenoptions_type["UP"] = &ScreenOptions::UP;
+    screenoptions_type["down"] = &ScreenOptions::down;
+    screenoptions_type["up"] = &ScreenOptions::up;
     screenoptions_type["direction_input"] = &ScreenOptions::direction_input;
-    screenoptions_type["UP"] = &ScreenOptions::UP;
     screenoptions_type["hold_down_timer"] = &ScreenOptions::hold_down_timer;
     screenoptions_type["fast_scroll_timer"] = &ScreenOptions::fast_scroll_timer;
     screenoptions_type["selected_menu_index"] = &ScreenOptions::selected_menu_index;
@@ -631,11 +630,8 @@ void register_usertypes(sol::state& lua)
     screenonlinelobby_type["player_count"] = &ScreenOnlineLobby::player_count;
     screenonlinelobby_type["searching_for_players"] = &ScreenOnlineLobby::searching_for_players;
     screenonlinelobby_type["show_code_panel"] = &ScreenOnlineLobby::show_code_panel;
-    screenonlinelobby_type["screen_code_input"] = sol::property(
-        [](ScreenOnlineLobby* screen) -> ScreenEnterOnlineCode*
-        {
-            return reinterpret_cast<ScreenEnterOnlineCode*>(&screen->screen_code_input);
-        });
+    screenonlinelobby_type["screen_code_input"] = sol::property([](ScreenOnlineLobby* screen) -> ScreenEnterOnlineCode*
+                                                                { return reinterpret_cast<ScreenEnterOnlineCode*>(&screen->screen_code_input); });
 
     /// Available in ScreenOnlineLobby
     lua.new_usertype<ScreenEnterOnlineCode>(

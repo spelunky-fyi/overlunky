@@ -5605,10 +5605,9 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field shake_offset_y number
 
 ---@class ScreenOptions : Screen
-    ---@field DOWN boolean
-    ---@field UP boolean
+    ---@field down boolean
+    ---@field up boolean
     ---@field direction_input integer @-1 = none, 0 = down, 1 = up
-    ---@field UP boolean
     ---@field hold_down_timer integer
     ---@field fast_scroll_timer integer
     ---@field selected_menu_index integer
@@ -5922,7 +5921,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_count integer
     ---@field searching_for_players boolean
     ---@field show_code_panel boolean
-    ---@field screen_code_input any @sol::property([](ScreenOnlineLobby*screen)->ScreenEnterOnlineCode*{returnreinterpret_cast<ScreenEnterOnlineCode*>(&screen->screen_code_input)
+    ---@field screen_code_input ScreenEnterOnlineCode
 
 ---@class ScreenEnterOnlineCode : ScreenCodeInput
     ---@field enter_code_your_code_scroll TextureRenderingInfo

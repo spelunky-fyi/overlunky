@@ -685,7 +685,11 @@ def run_parse():
 
                 var_name = var[0]
                 cpp = var[1]
-
+                # if "screenonlinelobby_type" in container:
+                #     print_console(var_name)
+                #     print_console(cpp)
+                #     print_console(underlying_cpp_type['name'])
+                    
                 if var[1].startswith("sol::property"):
                     param_match = re.match(
                         rf"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
@@ -772,7 +776,7 @@ def run_parse():
                         )
                     else:
                         m_return_type = re.search(
-                            r"->([:<>\w]+){", var[1]
+                            r"->([:<>\w*]+){", var[1]
                         )  # Use var[1] instead of cpp because it could be replaced on the sol::property stuff
                         if m_return_type:
                             type = replace_fun(m_return_type[1])

@@ -239,8 +239,8 @@ class ScreenOptions : public Screen // ID: 5
 
     // yes, this is just ScreenControls but up/down are reversed and not left/right for some reason
     // also ScreenControls could include the selected_index, but in arena screen it's above and here it's below :|
-    bool DOWN;
-    bool UP;
+    bool down;
+    bool up;
     // bool unused[2]
     /// -1 = none, 0 = down, 1 = up
     int32_t direction_input;

@@ -2301,7 +2301,7 @@ float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/ov
 [TextureRenderingInfo](#TextureRenderingInfo) | [main_woodpanel_center](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_center) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [main_woodpanel_right_border](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_woodpanel_right_border) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [top_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_scroll) | 
-[TextureRenderingInfo](#TextureRenderingInfo) | [seed_letter_cutouts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_letter_cutouts) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [letter_cutouts](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=letter_cutouts) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [hand_pointer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hand_pointer) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [key_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_background) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [topleft_woodpanel_esc](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc) | 
@@ -2519,7 +2519,7 @@ float | [arrow_right_hor_offset](https://github.com/spelunky-fyi/overlunky/searc
 int | [player_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_count) | 
 bool | [searching_for_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=searching_for_players) | 
 bool | [show_code_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_code_panel) | 
- | [screen_code_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_code_input) | 
+[ScreenEnterOnlineCode](#ScreenEnterOnlineCode) | [screen_code_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_code_input) | 
 
 ### ScreenOptions
 
@@ -2528,10 +2528,9 @@ Derived from [Screen](#Screen)
 
 Type | Name | Description
 ---- | ---- | -----------
-bool | [DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DOWN) | 
-bool | [UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UP) | 
+bool | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | 
+bool | [up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=up) | 
 int | [direction_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=direction_input) | -1 = none, 0 = down, 1 = up
-bool | [UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UP) | 
 int | [hold_down_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hold_down_timer) | 
 int | [fast_scroll_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fast_scroll_timer) | 
 int | [selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) | 
