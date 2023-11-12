@@ -959,7 +959,7 @@ class JournalPageProgress : public JournalPage
 class JournalPageJournalMenu : public JournalPage
 {
   public:
-    MenuInsert menu; 
+    MenuInsert menu;
     TextRenderingInfo* journal_text_info;
     TextureRenderingInfo completion_badge;
 };
@@ -1112,7 +1112,7 @@ struct JournalUI
     uint32_t state;
     JOURNALUI_PAGE_SHOWN chapter_shown;
 
-    //uint8_t padding_probably1[3];
+    // uint8_t padding_probably1[3];
 
     /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
     /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
