@@ -1056,6 +1056,7 @@ std::string LuaConsole::execute_raw(std::string code)
     {
         return e.what();
     }
+    return "";
 }
 
 void LuaConsole::toggle()

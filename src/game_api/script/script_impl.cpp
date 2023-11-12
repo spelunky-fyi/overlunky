@@ -210,7 +210,7 @@ const std::filesystem::path& ScriptImpl::get_root_path() const
 
 std::string ScriptImpl::execute(std::string str)
 {
-    if (!code.starts_with("return"))
+    if (!str.starts_with("return"))
     {
         std::string ret = execute_raw("return " + str);
         if (!ret.starts_with("sol: "))

@@ -130,5 +130,5 @@ void SpelunkyScript::render_options()
 }
 std::string SpelunkyScript::execute(std::string code)
 {
-    return m_Impl->Lock()->execute(code);
+    return m_Impl->Lock()->execute_raw(code);
 }
