@@ -8229,20 +8229,20 @@ void render_game_props()
         ImGui::InputText("Adventure seed##AdventureSeedFirst", &adventure_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            int64_t new_seed;
+            uint64_t new_seed;
             std::stringstream ss;
             ss << std::hex << adventure_seed_first;
             ss >> new_seed;
-            g_bucket->adventure_seed.first = new_seed;
+            g_bucket->adventure_seed.first = (int64_t)new_seed;
         }
         ImGui::InputText("##AdventureSeedSecond", &adventure_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            int64_t new_seed;
+            uint64_t new_seed;
             std::stringstream ss;
             ss << std::hex << adventure_seed_second;
             ss >> new_seed;
-            g_bucket->adventure_seed.second = new_seed;
+            g_bucket->adventure_seed.second = (int64_t)new_seed;
         }
         endmenu();
     }
