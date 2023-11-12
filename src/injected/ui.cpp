@@ -203,6 +203,7 @@ std::map<std::string, int64_t> default_keys{
     {"change_layer", OL_KEY_SHIFT | VK_TAB},
     {"quick_start", 'Q'},
     {"quick_restart", OL_KEY_CTRL | 'Q'},
+    {"quick_restart_seed", OL_KEY_ALT | 'Q'},
     {"quick_camp", OL_KEY_CTRL | 'C'},
     {"peek_layer", 0x8}, // backspace
     {"speedhack_increase", OL_KEY_CTRL | OL_KEY_SHIFT | VK_PRIOR},
@@ -868,8 +869,8 @@ void autorun_scripts()
 
 void update_frametimes()
 {
-    g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps));
-    g_Console.get()->execute(fmt::format("set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_unfocused_fps));
+    g_Console.get()->execute(fmt::format("set_frametime({})", g_engine_fps == 0 ? 0 : 1.0 / g_engine_fps), true);
+    g_Console.get()->execute(fmt::format("set_frametime_unfocused({})", g_unfocused_fps == 0 ? 0 : 1.0 / g_unfocused_fps), true);
 }
 
 void save_config(std::string file)
@@ -1976,6 +1977,22 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
         g_game_manager->game_props->input_index[4] = 0;
 }
 
+void restart_adventure()
+{
+    if (g_state->screen < 11)
+        quick_start(12, 1, 1, 1);
+    if ((g_state->quest_flags & 0x40) == 0)
+    {
+        UI::set_adventure_seed(g_bucket->adventure_seed.first, g_bucket->adventure_seed.second);
+        g_state->world_next = g_state->world_start;
+        g_state->level_next = g_state->level_start;
+        g_state->theme_next = g_state->theme_start;
+        g_state->screen_next = 12;
+    }
+    g_state->quest_flags |= 1;
+    g_state->loading = 1;
+}
+
 std::string get_clipboard()
 {
     if (!OpenClipboard(nullptr))
@@ -2183,7 +2200,7 @@ bool toggle_pause()
 {
     g_pause_at = -1;
     g_state->pause ^= ((uint8_t)g_pause_type & ~0xC0);
-    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false exports.loading = {}", g_pause_type, paused, options["pause_loading"]));
+    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false exports.loading = {}", g_pause_type, paused, options["pause_loading"]), true);
     return paused;
 }
 
@@ -2200,9 +2217,9 @@ void frame_advance()
     }
     else
     {
-        paused = g_ui_scripts["pause"]->execute("return exports.paused") == "true";
+        paused = g_ui_scripts["pause"]->execute("return exports.paused", true) == "true";
     }
-    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {} exports.camera = {}", options["pause_loading"], options["pause_update_camera"]));
+    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {} exports.camera = {}", options["pause_loading"], options["pause_update_camera"]), true);
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -3065,7 +3082,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         {
             if (paused)
             {
-                g_ui_scripts["pause"]->execute("exports.skip = true");
+                g_ui_scripts["pause"]->execute("exports.skip = true", true);
             }
         }
         else
@@ -3348,6 +3365,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         {
             quick_start(12, 1, 1, 1);
         }
+    }
+    else if (pressed("quick_restart_seed", wParam))
+    {
+        restart_adventure();
     }
     else if (pressed("quick_camp", wParam))
     {
@@ -4167,7 +4188,7 @@ void render_camera()
     }
     tooltip("Enable to always center the followed entity instantly\nwithout respecting level borders.");
     if (ImGui::Checkbox("Update camera position during pause##CameraPaused", &options["pause_update_camera"]))
-        g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+        g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]), true);
     tooltip("Enable to follow the entity smoothly when paused\nor combine with speed=5 for instant camera that respects level borders.");
     static bool lock_inertia{false};
     if (ImGui::Checkbox("Lock current camera speed multiplier##LockInertia", &lock_inertia))
@@ -6032,12 +6053,12 @@ void render_options()
         ImGui::PopID();
         ImGui::Separator();
         if (ImGui::Checkbox("Freeze during loading screens", &options["pause_loading"]))
-            g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]));
+            g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]), true);
         bool pause_level = UI::get_start_level_paused();
         if (ImGui::Checkbox("Auto (fade) pause on level start", &pause_level))
             UI::set_start_level_paused(pause_level);
         if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &options["pause_update_camera"]))
-            g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]));
+            g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]), true);
         tooltip("Calls the vanilla camera update when it\nwould be skipped by blocking the state update.");
         ImGui::Separator();
         ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let you unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
@@ -7664,8 +7685,8 @@ void render_entity_props(int uid, bool detached = false)
     if (submenu("Color, Size, Texture"))
     {
         auto textureid = entity->get_texture();
-        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid));
-        // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid));
+        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid), true);
+        // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid), true);
         texture = "TEXTURE." + texture.substr(1, texture.length() - 2);
         // texturepath = texturepath.substr(1, texturepath.length() - 2);
         ImGui::ColorEdit4("Color", (float*)&entity->color);
@@ -7985,7 +8006,7 @@ void render_texture_viewer()
         return;
     }
     auto def = get_texture_definition(texture_viewer.id);
-    std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id));
+    std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id), true);
     name = "TEXTURE." + name.substr(1, name.length() - 2);
     ImGui::InputText("ID", &name, ImGuiInputTextFlags_ReadOnly);
     ImGui::LabelText("Path", "%s", def.texture_path.c_str());
@@ -8179,21 +8200,9 @@ void render_game_props()
     if (submenu("Seed"))
     {
         static std::random_device rd;
-        if (ImGui::MenuItem("Restart this run with same seed##RestartWithSeed"))
+        if (ImGui::MenuItem("Restart this run with same seed##RestartWithSeed", key_string(keys["quick_restart_seed"]).c_str()))
         {
-            if (g_state->screen == 12 || g_state->screen == 13 || g_state->screen == 14 || g_state->screen == 16 || g_state->screen == 17 || g_state->screen == 18)
-            {
-                if ((g_state->quest_flags & 0x40) == 0)
-                {
-                    UI::set_adventure_seed(g_bucket->adventure_seed.first, g_bucket->adventure_seed.second);
-                    g_state->world_next = g_state->world_start;
-                    g_state->level_next = g_state->level_start;
-                    g_state->theme_next = g_state->theme_start;
-                    g_state->screen_next = 12;
-                }
-                g_state->quest_flags |= 1;
-                g_state->loading = 1;
-            }
+            restart_adventure();
         }
         if (ImGui::MenuItem("New random adventure run", key_string(keys["quick_restart"]).c_str()))
         {
@@ -8218,7 +8227,7 @@ void render_game_props()
             if (new_seed != g_state->seed)
                 quick_start(12, 1, 1, 1, new_seed);
         }
-
+        ImGui::Separator();
         static bool first_run{true};
         if (g_bucket->adventure_seed.first == 0 && first_run)
             UI::get_adventure_seed(true);
@@ -8229,20 +8238,42 @@ void render_game_props()
         ImGui::InputText("Adventure seed##AdventureSeedFirst", &adventure_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            int64_t new_seed;
+            uint64_t new_seed;
             std::stringstream ss;
             ss << std::hex << adventure_seed_first;
             ss >> new_seed;
-            g_bucket->adventure_seed.first = new_seed;
+            g_bucket->adventure_seed.first = (int64_t)new_seed;
         }
-        ImGui::InputText("##AdventureSeedSecond", &adventure_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        ImGui::InputText("(whole run)##AdventureSeedSecond", &adventure_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
-            int64_t new_seed;
+            uint64_t new_seed;
             std::stringstream ss;
             ss << std::hex << adventure_seed_second;
             ss >> new_seed;
-            g_bucket->adventure_seed.second = new_seed;
+            g_bucket->adventure_seed.second = (int64_t)new_seed;
+        }
+        ImGui::Separator();
+        auto current_seed = UI::get_adventure_seed(false);
+        std::string current_seed_first = fmt::format("{:016X}", (uint64_t)current_seed.first);
+        std::string current_seed_second = fmt::format("{:016X}", (uint64_t)current_seed.second);
+        ImGui::InputText("Adventure seed##CurrentSeedFirst", &current_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            uint64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << current_seed_first;
+            ss >> new_seed;
+            UI::set_adventure_seed((int64_t)new_seed, current_seed.second);
+        }
+        ImGui::InputText("(current level)##CurrentSeedSecond", &current_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            uint64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << current_seed_second;
+            ss >> new_seed;
+            UI::set_adventure_seed(current_seed.first, (int64_t)new_seed);
         }
         endmenu();
     }

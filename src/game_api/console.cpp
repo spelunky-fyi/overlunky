@@ -54,9 +54,9 @@ void SpelunkyConsole::render_options()
     m_Impl->Lock()->render_options();
 }
 
-std::string SpelunkyConsole::execute(std::string code)
+std::string SpelunkyConsole::execute(std::string code, bool raw)
 {
-    return m_Impl->Lock()->execute(std::move(code));
+    return m_Impl->Lock()->execute(std::move(code), raw).str;
 }
 
 bool SpelunkyConsole::has_new_history() const
