@@ -256,7 +256,7 @@ class ScreenOptions : public Screen // ID: 5
 
     // uint8_t probably_padding2[3];
 
-    // this is probably similar stuff that is at the beginning of ScreenMenu
+    // this is probably similar stuff that is at the beginning of ScreenMenu, transitions from and to menus
     float unknown1;
     float unknown2;
     float unknown3;
@@ -296,7 +296,7 @@ class ScreenOptions : public Screen // ID: 5
     bool toggle_woodpanel_slidein_animation;
     bool capitalize_top_woodpanel;
     uint32_t unknown_state; // 0 = none, 2 = moving between inner menus, 3 = exiting menu options
-    uint32_t menu_id;
+    uint32_t current_menu_id;
     uint32_t transfer_to_menu_id;
     bool show_apply_button;
     // uint8_t padding_probably4[3];
@@ -318,26 +318,32 @@ class ScreenOptions : public Screen // ID: 5
     TextureRenderingInfo sectionheader_background; // behind 'GRAPHICS' and 'AUDIO' the black bars
 
     TextureRenderingInfo unknown44; // could be something else, or just not used in PC version or something
-    TextureRenderingInfo unknown45;
-    TextureRenderingInfo unknown46;
-    TextureRenderingInfo unknown47;
-    TextureRenderingInfo unknown48;
-    float unknown48a; // was supposto be topleft_woodpanel_esc_slidein?
+    /// In "Gameplay" menu
+    TextureRenderingInfo pet_icons;
+    /// For the code in the sync menu
+    TextureRenderingInfo bottom_scroll;
+    TextureRenderingInfo bottom_left_scrollhandle;
+    TextureRenderingInfo bottom_right_scrollhandle;
+    float topleft_woodpanel_esc_slidein;
     float text_fadein;
     float vertical_scroll_effect;
-    uint8_t unknown49;
-    bool item_visiable;
-    bool item_highlight;
+    uint8_t unknown49; // small random timer
+    bool items_visiable;
+    /// Shows the red background behind the option, the scarab on the left and left/right arrows
+    bool show_highlight;
     // uint8_t padding_probably8[5];
     custom_vector<size_t> unknown50; // holds one 8 byte value, related to choosen opion menu
     uint8_t unknown51;               // probably bool
     // padding_probably10[7];
     custom_vector<STRINGID> tooltip_text;
-    size_t unknown53;
+    /// Used for sync progress
+    bool disable_controls;
+    // uint8_t padding_probably9[3];
+    /// 0 - none, 1 - waiting for the code, 2 - code acquired, 3 - sync in progress, 4 - sync completed
+    uint32_t sync_progress_state;
     uint32_t unknown54; // some timer
-    uint32_t unknown55; // probably padding
-    size_t* credits_related;
-    size_t unknown57;
+    // uint32_t padding_probably10;
+    float* credits_progression;
 };
 
 class ScreenCodeInput : public Screen // ID: 8
@@ -866,9 +872,31 @@ class ScreenOnlineLobby : public Screen // ID: 29
     size_t screen_code_input;
 };
 
+struct MenuInsert
+{
+    float x;
+    float y;
+    float unknown1; // text_disappearance_speed?
+    float text_spacing;
+    float unknown5;
+    uint32_t unknown6;
+    float unknown7;
+    float unknown8;
+    uint32_t unknown9;
+    float unknown10;
+    std::vector<size_t*> unknown11; // menu options, probably just a bunch of floats, suprisingly it's not TextRenderingInfo
+    size_t* unknown12;
+    size_t* unknown13; // function
+    uint32_t selected_menu_index;
+    bool loop;
+    bool unknown16;
+    bool disable_controls;
+};
+
 struct PauseUI
 {
     float menu_slidein_progress;
+    /// Actually darkened background when you get a prompt asking are you sure about selecting that option
     TextureRenderingInfo blurred_background;
     TextureRenderingInfo woodpanel_left;
     TextureRenderingInfo woodpanel_middle;
@@ -876,22 +904,22 @@ struct PauseUI
     TextureRenderingInfo woodpanel_top;
     TextureRenderingInfo scroll;
 
-    uint32_t unknown2;
-    size_t unknown3;
-
+    // uint32_t probably_padding1;
+    MenuInsert* menu;
+    /// Prompt background
     TextureRenderingInfo confirmation_panel;
-
-    uint32_t unknown5;
-    uint32_t unknown6;
-    size_t unknown7;
-    uint32_t unknown8;
-
+    MultiLineTextRendering* prompt_question;
+    MenuInsert* prompt_menu;
+    bool unknown8;
+    // uint8_t probably_padding2[3];
+    /// This is more like selected_option, it's set when you select an option and the game displays the prompt
     uint32_t previously_selected_menu_index;
-    uint32_t buttons_actions;
-    uint32_t buttons_movement;
-    uint8_t unknown11a;
-    int8_t unknown11b;
-    uint16_t unknown12;
+    bool prompt_visible;
+    std::array<uint8_t, MAX_PLAYERS> buttons_actions;  // per player, so no default menu input
+    std::array<uint8_t, MAX_PLAYERS> buttons_movement; // per player, so no default menu input
+    int8_t unknown11;
+    // uint16_t probably_padding3;
+    /// 0 - Invisible, 1 - Sliding down, 2 - Visible, 3 - Sliding up
     uint32_t visibility;
 };
 
@@ -902,7 +930,7 @@ class JournalPage
   public:
     TextureRenderingInfo background;
     uint32_t page_number;
-    uint32_t unknown2;
+    uint32_t unknown2; // probably padding
 
     template <typename T>
     T* as()
@@ -926,34 +954,14 @@ class JournalPageProgress : public JournalPage
 {
   public:
     TextureRenderingInfo coffeestain_top;
-
-    virtual ~JournalPageProgress() = 0;
 };
 
 class JournalPageJournalMenu : public JournalPage
 {
   public:
-    float unknown3;
-    float unknown4;
-    float unknown5;
-    float unknown6;
-    float unknown7;
-    float unknown8;
-    float unknown9;
-    float unknown10;
-    uint32_t unknown11;
-    float unknown12;
-    size_t unknown13;
-    size_t unknown15;
-    size_t unknown17;
-    size_t unknown19;
-    size_t unknown21;
-    uint32_t selected_menu_index;
-    uint32_t unknown23;
+    MenuInsert menu; 
     TextRenderingInfo* journal_text_info;
     TextureRenderingInfo completion_badge;
-
-    virtual ~JournalPageJournalMenu() = 0;
 };
 
 class JournalPageDiscoverable : public JournalPage
@@ -974,16 +982,12 @@ class JournalPageDiscoverable : public JournalPage
     MultiLineTextRendering* text_lines;
     TextRenderingInfo* entry_text_info;
     TextRenderingInfo* chapter_title_text_info;
-
-    virtual ~JournalPageDiscoverable() = 0;
 };
 
 class JournalPagePlaces : public JournalPageDiscoverable
 {
   public:
     TextureRenderingInfo main_image;
-
-    virtual ~JournalPagePlaces() = 0;
 };
 
 class JournalPagePeople : public JournalPageDiscoverable
@@ -992,8 +996,6 @@ class JournalPagePeople : public JournalPageDiscoverable
     TextureRenderingInfo character_background;
     TextureRenderingInfo character_icon;
     TextureRenderingInfo character_drawing;
-
-    virtual ~JournalPagePeople() = 0;
 };
 
 class JournalPageBestiary : public JournalPageDiscoverable
@@ -1006,8 +1008,6 @@ class JournalPageBestiary : public JournalPageDiscoverable
     TextRenderingInfo* defeated_value_text_info;
     TextRenderingInfo* killedby_text_info;
     TextRenderingInfo* killedby_value_text_info;
-
-    virtual ~JournalPageBestiary() = 0;
 };
 
 class JournalPageItems : public JournalPageDiscoverable
@@ -1015,8 +1015,6 @@ class JournalPageItems : public JournalPageDiscoverable
   public:
     TextureRenderingInfo item_icon;
     TextureRenderingInfo item_background;
-
-    virtual ~JournalPageItems() = 0;
 };
 
 class JournalPageTraps : public JournalPageDiscoverable
@@ -1024,15 +1022,11 @@ class JournalPageTraps : public JournalPageDiscoverable
   public:
     TextureRenderingInfo trap_icon;
     TextureRenderingInfo trap_background;
-
-    virtual ~JournalPageTraps() = 0;
 };
 
 class JournalPageStory : public JournalPage
 {
   public:
-    virtual ~JournalPageStory() = 0;
-
     static JournalPageStory* construct(bool right_side, uint32_t page_number);
 };
 
@@ -1041,38 +1035,18 @@ class JournalPageFeats : public JournalPage
   public:
     TextRenderingInfo* chapter_title_text_info;
     TextureRenderingInfo feat_icons;
-
-    virtual ~JournalPageFeats() = 0;
 };
 
 class JournalPageDeathCause : public JournalPage
 {
   public:
     TextRenderingInfo* death_cause_text_info;
-
-    virtual ~JournalPageDeathCause() = 0;
 };
 
 class JournalPageDeathMenu : public JournalPage
 {
   public:
-    float unknown3;
-    float unknown4;
-    float unknown5;
-    float unknown6;
-    float unknown7;
-    float unknown8;
-    float unknown9;
-    float unknown10;
-    uint32_t unknown11;
-    float unknown12;
-    size_t unknown13;
-    size_t unknown14;
-    size_t unknown15;
-    size_t unknown16;
-    size_t unknown17;
-    uint32_t selected_menu_index;
-    uint32_t unknown18;
+    MenuInsert menu;
     TextRenderingInfo* game_over_text_info;
     TextRenderingInfo* level_text_info;
     TextRenderingInfo* level_value_text_info;
@@ -1080,14 +1054,11 @@ class JournalPageDeathMenu : public JournalPage
     TextRenderingInfo* money_value_text_info;
     TextRenderingInfo* time_text_info;
     TextRenderingInfo* time_value_text_info;
-
-    virtual ~JournalPageDeathMenu() = 0;
 };
 
 class JournalPageRecap : public JournalPage
 {
   public:
-    virtual ~JournalPageRecap() = 0;
 };
 
 class JournalPagePlayerProfile : public JournalPage
@@ -1117,8 +1088,6 @@ class JournalPagePlayerProfile : public JournalPage
     TextRenderingInfo* average_time_value_text_info;
     TextRenderingInfo* best_time_text_info;
     TextRenderingInfo* best_time_value_text_info;
-
-    virtual ~JournalPagePlayerProfile() = 0;
 };
 
 class JournalPageLastGamePlayed : public JournalPage
@@ -1134,8 +1103,6 @@ class JournalPageLastGamePlayed : public JournalPage
     TextRenderingInfo* time_value_text_info;
     uint32_t sticker_count;
     std::array<TextureRenderingInfo, 20> stickers;
-
-    virtual ~JournalPageLastGamePlayed() = 0;
 };
 
 using JOURNALUI_PAGE_SHOWN = uint8_t; // NoAlias
@@ -1145,8 +1112,8 @@ struct JournalUI
     uint32_t state;
     JOURNALUI_PAGE_SHOWN chapter_shown;
 
-    uint8_t unknown1;
-    uint16_t unknown2;
+    //uint8_t padding_probably1[3];
+
     /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
     /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
     custom_vector<JournalPage*> pages;
@@ -1180,8 +1147,6 @@ struct JournalUI
 
     uint32_t unknown28;
     size_t unknown29;
-    float unknown31;
-    uint32_t unknown30;
 };
 
 Screen* get_screen_ptr(uint32_t screen_id);

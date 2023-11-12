@@ -213,7 +213,7 @@ void register_usertypes(sol::state& lua)
     screenoptions_type["bottom_woodpanel_visible"] = &ScreenOptions::bottom_woodpanel_visible;
     screenoptions_type["toggle_woodpanel_slidein_animation"] = &ScreenOptions::toggle_woodpanel_slidein_animation;
     screenoptions_type["capitalize_top_woodpanel"] = &ScreenOptions::capitalize_top_woodpanel;
-    screenoptions_type["menu_id"] = &ScreenOptions::menu_id;
+    screenoptions_type["menu_id"] = &ScreenOptions::current_menu_id;
     screenoptions_type["transfer_to_menu_id"] = &ScreenOptions::transfer_to_menu_id;
     screenoptions_type["graphic_and_audio"] = &ScreenOptions::graphic_and_audio;
     screenoptions_type["topleft_woodpanel_esc"] = &ScreenOptions::topleft_woodpanel_esc;
@@ -232,8 +232,8 @@ void register_usertypes(sol::state& lua)
     screenoptions_type["sectionheader_background"] = &ScreenOptions::sectionheader_background;
     screenoptions_type["text_fadein"] = &ScreenOptions::text_fadein;
     screenoptions_type["vertical_scroll_effect"] = &ScreenOptions::vertical_scroll_effect;
-    screenoptions_type["item_visiable"] = &ScreenOptions::item_visiable;
-    screenoptions_type["item_highlight"] = &ScreenOptions::item_highlight;
+    screenoptions_type["items_visiable"] = &ScreenOptions::items_visiable;
+    screenoptions_type["show_highlight"] = &ScreenOptions::show_highlight;
     screenoptions_type["tooltip_text"] = &ScreenOptions::tooltip_text;
 
     lua.new_usertype<GraphicandAudioSettings>(
@@ -710,8 +710,6 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<JournalPageJournalMenu>(
         "JournalPageJournalMenu",
-        "selected_menu_index",
-        &JournalPageJournalMenu::selected_menu_index,
         "journal_text_info",
         &JournalPageJournalMenu::journal_text_info,
         "completion_badge",
@@ -810,8 +808,6 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<JournalPageDeathMenu>(
         "JournalPageDeathMenu",
-        "selected_menu_index",
-        &JournalPageDeathMenu::selected_menu_index,
         "game_over_text_info",
         &JournalPageDeathMenu::game_over_text_info,
         "level_text_info",

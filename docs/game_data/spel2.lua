@@ -5647,8 +5647,8 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field sectionheader_background TextureRenderingInfo
     ---@field text_fadein number
     ---@field vertical_scroll_effect number
-    ---@field item_visiable boolean
-    ---@field item_highlight boolean
+    ---@field items_visiable boolean
+    ---@field show_highlight boolean @Shows the red background behind the option, the scarab on the left and left/right arrows
     ---@field tooltip_text STRINGID[]
 
 ---@class GraphicandAudioSettings
@@ -5926,15 +5926,15 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class PauseUI
     ---@field menu_slidein_progress number
-    ---@field blurred_background TextureRenderingInfo
+    ---@field blurred_background TextureRenderingInfo @Actually darkened background when you get a prompt asking are you sure about selecting that option
     ---@field woodpanel_left TextureRenderingInfo
     ---@field woodpanel_middle TextureRenderingInfo
     ---@field woodpanel_right TextureRenderingInfo
     ---@field woodpanel_top TextureRenderingInfo
     ---@field scroll TextureRenderingInfo
-    ---@field confirmation_panel TextureRenderingInfo
-    ---@field previously_selected_menu_index integer
-    ---@field visibility integer
+    ---@field confirmation_panel TextureRenderingInfo @Prompt background
+    ---@field previously_selected_menu_index integer @This is more like selected_option, it's set when you select an option and the game displays the prompt
+    ---@field visibility integer @0 - Invisible, 1 - Sliding down, 2 - Visible, 3 - Sliding up
 
 ---@class JournalUI
     ---@field state integer
@@ -5962,7 +5962,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field coffeestain_top TextureRenderingInfo
 
 ---@class JournalPageJournalMenu : JournalPage
-    ---@field selected_menu_index integer
     ---@field journal_text_info TextRenderingInfo
     ---@field completion_badge TextureRenderingInfo
 
@@ -6007,7 +6006,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field death_cause_text_info TextRenderingInfo
 
 ---@class JournalPageDeathMenu : JournalPage
-    ---@field selected_menu_index integer
     ---@field game_over_text_info TextRenderingInfo
     ---@field level_text_info TextRenderingInfo
     ---@field level_value_text_info TextRenderingInfo

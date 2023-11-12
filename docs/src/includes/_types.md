@@ -1145,7 +1145,6 @@ Derived from [JournalPage](#JournalPage)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) | 
 [TextRenderingInfo](#TextRenderingInfo) | [game_over_text_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_over_text_info) | 
 [TextRenderingInfo](#TextRenderingInfo) | [level_text_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_text_info) | 
 [TextRenderingInfo](#TextRenderingInfo) | [level_value_text_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_value_text_info) | 
@@ -1193,7 +1192,6 @@ Derived from [JournalPage](#JournalPage)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_menu_index) | 
 [TextRenderingInfo](#TextRenderingInfo) | [journal_text_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_text_info) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [completion_badge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=completion_badge) | 
 
@@ -1943,15 +1941,15 @@ bool | [searching](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sear
 Type | Name | Description
 ---- | ---- | -----------
 float | [menu_slidein_progress](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_slidein_progress) | 
-[TextureRenderingInfo](#TextureRenderingInfo) | [blurred_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blurred_background) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [blurred_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blurred_background) | Actually darkened background when you get a prompt asking are you sure about selecting that option
 [TextureRenderingInfo](#TextureRenderingInfo) | [woodpanel_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_left) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [woodpanel_middle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_middle) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [woodpanel_right](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_right) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [woodpanel_top](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=woodpanel_top) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll) | 
-[TextureRenderingInfo](#TextureRenderingInfo) | [confirmation_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=confirmation_panel) | 
-int | [previously_selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=previously_selected_menu_index) | 
-int | [visibility](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [confirmation_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=confirmation_panel) | Prompt background
+int | [previously_selected_menu_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=previously_selected_menu_index) | This is more like selected_option, it's set when you select an option and the game displays the prompt
+int | [visibility](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility) | 0 - Invisible, 1 - Sliding down, 2 - Visible, 3 - Sliding up
 
 ### SaveRelated
 
@@ -2566,8 +2564,8 @@ int | [transfer_to_menu_id](https://github.com/spelunky-fyi/overlunky/search?l=L
 [TextureRenderingInfo](#TextureRenderingInfo) | [sectionheader_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sectionheader_background) | 
 float | [text_fadein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_fadein) | 
 float | [vertical_scroll_effect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=vertical_scroll_effect) | 
-bool | [item_visiable](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_visiable) | 
-bool | [item_highlight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_highlight) | 
+bool | [items_visiable](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items_visiable) | 
+bool | [show_highlight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=show_highlight) | Shows the red background behind the option, the scarab on the left and left/right arrows
 vector&lt;[STRINGID](#Aliases)&gt; | [tooltip_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tooltip_text) | 
 
 ### ScreenPrologue

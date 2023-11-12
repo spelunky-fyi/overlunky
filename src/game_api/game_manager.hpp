@@ -209,6 +209,16 @@ struct GameManager
     PauseUI* pause_ui;
     JournalUI* journal_ui;
     BackgroundSound* main_menu_music;
+    float layer_transition; // menus, going inwards/backwards
+    float layer;
+    int8_t transition_timer;
+    bool unknown31;
+    // uint8_t padding_probably1[2];
+    uint32_t unknown33;
+    bool unknown34;
+    bool unknown35;
+    // uint8_t padding_probably2[2];
+    // 3 * 4 bytes more maybe?
 };
 
 GameManager* get_game_manager();
