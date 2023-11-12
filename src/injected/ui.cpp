@@ -203,6 +203,7 @@ std::map<std::string, int64_t> default_keys{
     {"change_layer", OL_KEY_SHIFT | VK_TAB},
     {"quick_start", 'Q'},
     {"quick_restart", OL_KEY_CTRL | 'Q'},
+    {"quick_restart_seed", OL_KEY_ALT | 'Q'},
     {"quick_camp", OL_KEY_CTRL | 'C'},
     {"peek_layer", 0x8}, // backspace
     {"speedhack_increase", OL_KEY_CTRL | OL_KEY_SHIFT | VK_PRIOR},
@@ -1976,6 +1977,22 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
         g_game_manager->game_props->input_index[4] = 0;
 }
 
+void restart_adventure()
+{
+    if (g_state->screen < 11)
+        quick_start(12, 1, 1, 1);
+    if ((g_state->quest_flags & 0x40) == 0)
+    {
+        UI::set_adventure_seed(g_bucket->adventure_seed.first, g_bucket->adventure_seed.second);
+        g_state->world_next = g_state->world_start;
+        g_state->level_next = g_state->level_start;
+        g_state->theme_next = g_state->theme_start;
+        g_state->screen_next = 12;
+    }
+    g_state->quest_flags |= 1;
+    g_state->loading = 1;
+}
+
 std::string get_clipboard()
 {
     if (!OpenClipboard(nullptr))
@@ -3348,6 +3365,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         {
             quick_start(12, 1, 1, 1);
         }
+    }
+    else if (pressed("quick_restart_seed", wParam))
+    {
+        restart_adventure();
     }
     else if (pressed("quick_camp", wParam))
     {
@@ -8179,21 +8200,9 @@ void render_game_props()
     if (submenu("Seed"))
     {
         static std::random_device rd;
-        if (ImGui::MenuItem("Restart this run with same seed##RestartWithSeed"))
+        if (ImGui::MenuItem("Restart this run with same seed##RestartWithSeed", key_string(keys["quick_restart_seed"]).c_str()))
         {
-            if (g_state->screen == 12 || g_state->screen == 13 || g_state->screen == 14 || g_state->screen == 16 || g_state->screen == 17 || g_state->screen == 18)
-            {
-                if ((g_state->quest_flags & 0x40) == 0)
-                {
-                    UI::set_adventure_seed(g_bucket->adventure_seed.first, g_bucket->adventure_seed.second);
-                    g_state->world_next = g_state->world_start;
-                    g_state->level_next = g_state->level_start;
-                    g_state->theme_next = g_state->theme_start;
-                    g_state->screen_next = 12;
-                }
-                g_state->quest_flags |= 1;
-                g_state->loading = 1;
-            }
+            restart_adventure();
         }
         if (ImGui::MenuItem("New random adventure run", key_string(keys["quick_restart"]).c_str()))
         {
@@ -8218,7 +8227,7 @@ void render_game_props()
             if (new_seed != g_state->seed)
                 quick_start(12, 1, 1, 1, new_seed);
         }
-
+        ImGui::Separator();
         static bool first_run{true};
         if (g_bucket->adventure_seed.first == 0 && first_run)
             UI::get_adventure_seed(true);
@@ -8235,7 +8244,7 @@ void render_game_props()
             ss >> new_seed;
             g_bucket->adventure_seed.first = (int64_t)new_seed;
         }
-        ImGui::InputText("##AdventureSeedSecond", &adventure_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        ImGui::InputText("(whole run)##AdventureSeedSecond", &adventure_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
             uint64_t new_seed;
@@ -8243,6 +8252,28 @@ void render_game_props()
             ss << std::hex << adventure_seed_second;
             ss >> new_seed;
             g_bucket->adventure_seed.second = (int64_t)new_seed;
+        }
+        ImGui::Separator();
+        auto current_seed = UI::get_adventure_seed(false);
+        std::string current_seed_first = fmt::format("{:016X}", (uint64_t)current_seed.first);
+        std::string current_seed_second = fmt::format("{:016X}", (uint64_t)current_seed.second);
+        ImGui::InputText("Adventure seed##CurrentSeedFirst", &current_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            uint64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << current_seed_first;
+            ss >> new_seed;
+            UI::set_adventure_seed((int64_t)new_seed, current_seed.second);
+        }
+        ImGui::InputText("(current level)##CurrentSeedSecond", &current_seed_second, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
+        if (ImGui::IsItemDeactivatedAfterEdit())
+        {
+            uint64_t new_seed;
+            std::stringstream ss;
+            ss << std::hex << current_seed_second;
+            ss >> new_seed;
+            UI::set_adventure_seed(current_seed.first, (int64_t)new_seed);
         }
         endmenu();
     }
