@@ -2308,8 +2308,8 @@ float | [topleft_woodpanel_esc_slidein_timer](https://github.com/spelunky-fyi/ov
 [TextureRenderingInfo](#TextureRenderingInfo) | [start_sidepanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel) | 
 float | [start_sidepanel_slidein_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_sidepanel_slidein_timer) | 
 int | [seed_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_length) | Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
-optional&lt;int&gt; | [get_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_seed) | Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.<br/> 
- | [set_seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_seed) | Params: optional<int> seed, optional<int> length<br/>Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.<br/> 
+optional&lt;int&gt; | [get_seed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_seed) | Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.
+nil | [set_seed(optional<int> seed, optional<int> length)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_seed) | Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.
 
 ### ScreenConstellation
 

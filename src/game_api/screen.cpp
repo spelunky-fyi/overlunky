@@ -369,3 +369,35 @@ void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page)
         gm->journal_ui->flipping_to_page = page;
     }
 }
+
+std::optional<uint32_t> ScreenCodeInput::get_seed()
+{
+    if (code_length == 0)
+        return std::nullopt;
+    std::wstringstream ss;
+    std::wstring seed_str;
+    for (uint8_t i = 0; i < code_length; ++i)
+        seed_str.push_back((wchar_t)(code_chars[i]));
+    ss << std::hex << seed_str;
+    uint32_t seed{0};
+    ss >> seed;
+    return seed;
+}
+
+void ScreenCodeInput::set_seed(std::optional<uint32_t> seed, std::optional<uint8_t> length)
+{
+    uint8_t len = length.value_or(8);
+    if (len > 8)
+        len = 8;
+    if (seed.has_value())
+    {
+        std::wstringstream ss;
+        ss << std::uppercase << std::hex << std::setw(len) << std::setfill(L'0') << seed.value();
+        memcpy(code_chars, ss.str().c_str(), len * 2);
+        code_length = len;
+    }
+    else
+    {
+        code_length = 0;
+    }
+}

@@ -5688,8 +5688,8 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field start_sidepanel TextureRenderingInfo
     ---@field start_sidepanel_slidein_timer number
     ---@field seed_length integer @Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
-    ---@field get_seed integer?
-    ---@field set_seed any @[](ScreenCodeInput&s
+    ---@field get_seed fun(self): integer? @Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.
+    ---@field set_seed fun(self, seed: integer?, length: integer?): nil @Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.
 
 ---@class ScreenCharacterSelect : Screen
     ---@field main_background_zoom_target number

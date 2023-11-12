@@ -274,44 +274,8 @@ void register_usertypes(sol::state& lua)
     screenseedinput_type["start_sidepanel"] = &ScreenCodeInput::start_sidepanel;
     screenseedinput_type["start_sidepanel_slidein_timer"] = &ScreenCodeInput::start_sidepanel_slidein;
     screenseedinput_type["seed_length"] = &ScreenCodeInput::code_length;
-    screenseedinput_type["get_seed"] = [](ScreenCodeInput& s) -> std::optional<uint32_t>
-    {
-        if (s.code_length == 0)
-            return std::nullopt;
-        std::wstringstream ss;
-        std::wstring seed_str;
-        for (uint8_t i = 0; i < s.code_length; ++i)
-            seed_str.push_back((wchar_t)(s.code_chars[i]));
-        ss << std::hex << seed_str;
-        uint32_t seed{0};
-        ss >> seed;
-        return seed;
-    };
-    screenseedinput_type["set_seed"] = [](ScreenCodeInput& s, std::optional<uint32_t> seed, std::optional<uint8_t> length)
-    {
-        uint8_t len = length.value_or(8);
-        if (len > 8)
-            len = 8;
-        if (seed.has_value())
-        {
-            std::wstringstream ss;
-            ss << std::uppercase << std::hex << std::setw(len) << std::setfill(L'0') << seed.value();
-            memcpy(s.code_chars, ss.str().c_str(), len * 2);
-            s.code_length = len;
-        }
-        else
-        {
-            s.code_length = 0;
-        }
-    };
-
-    /* ScreenCodeInput
-    // get_seed
-    // Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.
-    // set_seed
-    // Params: optional<int> seed, optional<int> length
-    // Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.
-    */
+    screenseedinput_type["get_seed"] = &ScreenCodeInput::get_seed;
+    screenseedinput_type["set_seed"] = &ScreenCodeInput::set_seed;
 
     auto screencharacterselect_type = lua.new_usertype<ScreenCharacterSelect>("ScreenCharacterSelect", sol::base_classes, sol::bases<Screen>());
     screencharacterselect_type["main_background_zoom_target"] = &ScreenCharacterSelect::main_background_zoom_target;

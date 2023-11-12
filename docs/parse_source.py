@@ -685,10 +685,6 @@ def run_parse():
 
                 var_name = var[0]
                 cpp = var[1]
-                # if "screenonlinelobby_type" in container:
-                #     print_console(var_name)
-                #     print_console(cpp)
-                #     print_console(underlying_cpp_type['name'])
                     
                 if var[1].startswith("sol::property"):
                     param_match = re.match(
