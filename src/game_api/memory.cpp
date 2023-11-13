@@ -106,14 +106,15 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
 
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
 {
-    auto map_it = Bucket::get()->original_memory.find(name);
-    if (map_it == Bucket::get()->original_memory.end())
+    static const auto bucket = Bucket::get();
+    auto map_it = bucket->original_memory.find(name);
+    if (map_it == bucket->original_memory.end())
     {
         char* old_data = (char*)VirtualAlloc(0, payload.size(), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (old_data)
         {
             memcpy(old_data, (char*)addr, payload.size());
-            Bucket::get()->original_memory.emplace(name, EditedMemory{{{addr, old_data, payload.size(), prot}}, true});
+            bucket->original_memory.emplace(name, EditedMemory{{{addr, old_data, payload.size(), prot}}, true});
         }
     }
     else
@@ -137,22 +138,23 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
             }
         }
     }
-    Bucket::get()->original_memory[name].dirty = true;
+    bucket->original_memory[name].dirty = true;
     write_mem_prot(addr, payload, prot);
 }
 
 void recover_mem(std::string name, size_t addr)
 {
-    if (Bucket::get()->original_memory.contains(name))
+    static const auto bucket = Bucket::get();
+    if (bucket->original_memory.contains(name))
     {
         size_t fixed = 0;
-        for (auto& it : Bucket::get()->original_memory[name].mem)
+        for (auto& it : bucket->original_memory[name].mem)
         {
             if (!addr || addr == it.address)
             {
                 write_mem_prot(it.address, std::string_view{it.old_data, it.size}, it.prot_used);
-                if (++fixed == Bucket::get()->original_memory[name].mem.size())
-                    Bucket::get()->original_memory[name].dirty = false;
+                if (++fixed == bucket->original_memory[name].mem.size())
+                    bucket->original_memory[name].dirty = false;
             }
         }
     }
@@ -160,7 +162,8 @@ void recover_mem(std::string name, size_t addr)
 
 bool mem_written(std::string name)
 {
-    return Bucket::get()->original_memory.contains(name) && Bucket::get()->original_memory[name].dirty;
+    static const auto bucket = Bucket::get();
+    return bucket->original_memory.contains(name) && bucket->original_memory[name].dirty;
 }
 
 size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_view payload, bool just_nop, size_t return_to_addr, bool game_code_first)
