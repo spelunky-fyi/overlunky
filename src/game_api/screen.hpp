@@ -76,6 +76,29 @@ class ScreenPrologue : public Screen // ID: 2
     float line3_alpha;
 };
 
+struct MenuScreenPanels
+{
+    float top_bottom_woodpanels_velocity;
+    float top_bottom_woodpanels_progress; // set to 0 to start sliding in
+    float scroll_unfurl_progress;         // set to 0 to start unfurl
+    float bottom_woodpanel_speed_multiplayer;
+    float bottom_woodpanel_y_offset; // maybe a resolution thing?
+    TextureRenderingInfo bottom_woodpanel;
+    TextureRenderingInfo top_woodpanel;
+    TextureRenderingInfo scroll;
+    TextureRenderingInfo top_woodpanel_left_scrollhandle;
+    TextureRenderingInfo top_woodpanel_right_scrollhandle;
+
+    STRINGID scroll_text;
+    STRINGID bottom_left_text;
+    STRINGID bottom_right_text;
+    STRINGID bottom_middle_text;
+    bool top_woodpanel_visible;
+    bool bottom_woodpanel_visible;
+    bool toggle_woodpanel_slidein_animation;
+    bool capitalize_top_woodpanel;
+};
+
 class ScreenTitle : public Screen // ID: 3
 {
   public:
@@ -276,25 +299,8 @@ class ScreenOptions : public Screen // ID: 5
     float unknown17;
     float unknown18;
 
-    float top_bottom_woodpanels_velocity;
-    float top_bottom_woodpanels_progress; // set to 0 to start sliding in
-    float scroll_unfurl_progress;         // set to 0 to start unfurl
-    float bottom_woodpanel_speed_multiplayer;
-    float bottom_woodpanel_y_offset; // maybe a resolution thing?
-    TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo top_woodpanel;
-    TextureRenderingInfo scroll;
-    TextureRenderingInfo top_woodpanel_left_scrollhandle;
-    TextureRenderingInfo top_woodpanel_right_scrollhandle;
+    MenuScreenPanels screen_panels;
 
-    STRINGID scroll_text;
-    STRINGID bottom_left_text;
-    STRINGID bottom_right_text;
-    STRINGID bottom_middle_text;
-    bool top_woodpanel_visible;
-    bool bottom_woodpanel_visible;
-    bool toggle_woodpanel_slidein_animation;
-    bool capitalize_top_woodpanel;
     uint32_t unknown_state; // 0 = none, 2 = moving between inner menus, 3 = exiting menu options
     uint32_t current_menu_id;
     uint32_t transfer_to_menu_id;
@@ -349,27 +355,7 @@ class ScreenOptions : public Screen // ID: 5
 class ScreenCodeInput : public Screen // ID: 8
 {
   public:
-    // This beginning is the same for ScreenOnlineLobby and similar code can be found in ScreenOptions
-
-    float bottom_woodpanel_slideup_speed;
-    float bottom_woodpanel_slideup;
-    float scroll_unfurl;
-    float unknown1;
-    float bottom_woodpanel_y_offset;
-    TextureRenderingInfo woodpanel_bottom;
-    TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo scroll;
-    TextureRenderingInfo left_scroll_handle;
-    TextureRenderingInfo right_scroll_handle;
-    STRINGID scroll_text;
-    STRINGID bottom_left_text;
-    /// The only one actually used
-    STRINGID bottom_right_text;
-    STRINGID bottom_middle_text;
-    bool show_top_woodpanel;
-    bool show_bottom_woodpanel;
-    bool slide_in_bottom_woodpanel;
-    uint8_t unknown2;
+    MenuScreenPanels screen_panels;
     /// needs to be set before opening the screen to show the correct text at the bottom
     bool allow_random;
     // uint8_t probably_padding1[3];
@@ -436,6 +422,12 @@ struct FlyingThing
     uint32_t unknown22;
 };
 
+struct InputsDevice
+{
+    uint16_t buttons;
+    uint16_t buttons_previous;
+};
+
 class ScreenCharacterSelect : public Screen // ID: 9
 {
   public:
@@ -460,24 +452,8 @@ class ScreenCharacterSelect : public Screen // ID: 9
     uint8_t unknown22;
     float blurred_border_zoom_timer;
     float blurred_border_zoom_target;
-    float unknown25;
-    float top_bottom_woodpanel_slidein_timer;
-    float top_scroll_unfurl_timer;
-    float unknown28;
-    uint32_t unknown29;
-    uint32_t unknown30;
-    TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo top_woodpanel;
-    TextureRenderingInfo unknown32;
-    TextureRenderingInfo left_scroll_handle;
-    TextureRenderingInfo right_scroll_handle;
-    STRINGID left_button_text_id;
-    STRINGID right_button_text_id;
-    STRINGID middle_button_text_id;
-    bool top_woodpanel_visible;
-    bool bottom_woodpanel_visible;
-    bool toggle_woodpanel_slidein_animation;
-    uint8_t padding1;
+
+    MenuScreenPanels screen_panels;
     TextureRenderingInfo mine_entrance_background;
     TextureRenderingInfo character;
     TextureRenderingInfo character_shadow;
@@ -514,33 +490,33 @@ class ScreenCharacterSelect : public Screen // ID: 9
     std::array<float, MAX_PLAYERS> player_quickselect_wiggle_angle;
 
     float another_timer;
-    float topleft_woodpanel_esc_slidein_timer;
-    float start_panel_slidein_timer;
+    float topleft_woodpanel_esc_slidein;
+    float start_panel_slidein;
     float action_buttons_keycap_size;
     bool unknown64a;
     bool unknown64b;
     bool unknown64c;
     bool unknown64d;
-    uint32_t unknown65;
+    uint32_t next_screen_to_load;
     bool not_ready_to_start_yet;
     uint8_t available_mine_entrances; // The rest are boarded off
     uint8_t amount_of_mine_entrances_activated;
-    uint8_t unknown66;
-    size_t reset_func; /* unsure*/
-    uint32_t buttons;
-    TextureRenderingInfo unknown69; // TODO: this is wrong, there's just a bunch of other stuff here, like some run type flags probably (seeded/adventure/daily) and the next screen (camp/level)
-
-    float opacity;
+    // uint8_t probably_padding1;
+    size_t* reset_func; /* unsure*/
+    uint32_t unknown69; // it's some states, or flags
+    TextureRenderingInfo screen_blackout;
+    float blackout_transparency;
     bool start_pressed;
     bool transition_to_game_started;
-    uint8_t unknown71c;
-    uint8_t unknown71d;
+    bool disable_buttons; /* unsure */ // hides the buttons on the enrances and disables control (without setting the bool below)
+    bool disable_controls;
     uint32_t unknown72;
 
     std::array<FlyingThing, 6> flying_things;
     uint16_t flying_thing_countdown; // when 0, flying things appear
-    int16_t unknown79;
-    uint32_t unknown80;
+    int16_t unknown79;               // negative, counts up to 0
+
+    // uint32_t probably_padding2;
 
     ParticleEmitterInfo* particle_ceilingdust_smoke;
     ParticleEmitterInfo* particle_ceilingdust_rubble;
@@ -553,7 +529,9 @@ class ScreenCharacterSelect : public Screen // ID: 9
     ParticleEmitterInfo* particle_torchflame_flames3;
     ParticleEmitterInfo* particle_torchflame_smoke4;
     ParticleEmitterInfo* particle_torchflame_flames4;
-    SoundMeta* sound;
+    std::array<SoundMeta*, 4> torch_sound;
+    std::array<InputsDevice, 12> inputs;
+    std::array<uint8_t, MAX_PLAYERS> buttons;
 };
 
 class ScreenTeamSelect : public Screen // ID: 10
@@ -813,26 +791,7 @@ class ScreenEnterOnlineCode : public ScreenCodeInput // no ID, very special scre
 class ScreenOnlineLobby : public Screen // ID: 29
 {
   public:
-    // This beginning is the same for ScreenCodeInput and similar code can be found in ScreenOptions
-
-    float bottom_woodpanel_slideup_speed;
-    float bottom_woodpanel_slideup;
-    float scroll_unfurl;
-    float unknown6;
-    float bottom_woodpanel_y_offset;
-    TextureRenderingInfo woodpanel_bottom;
-    TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo scroll;
-    TextureRenderingInfo left_scroll_handle;
-    TextureRenderingInfo right_scroll_handle;
-    STRINGID scroll_text;
-    STRINGID bottom_left_text;
-    STRINGID bottom_right_text;
-    STRINGID bottom_middle_text;
-    bool show_top_woodpanel;
-    bool show_bottom_woodpanel;
-    bool slide_in_bottom_woodpanel;
-    uint8_t unknown21;
+    MenuScreenPanels screen_panels;
     std::array<OnlineLobbyScreenPlayer, 4> players;
     TextureRenderingInfo background_image;
     TextureRenderingInfo unknown35;

@@ -22,24 +22,7 @@ class ScreenArenaMenu : public Screen // ID: 21
   public:
     ScreenZoomAnimation brick_background_animation;
     ScreenZoomAnimation blurry_border_animation;
-    float unknown6;
-    float top_woodpanel_slidein_timer;
-    float top_scroll_unfurl_timer;
-    float unknown11;
-    float unknown12;
-    TextureRenderingInfo unknown13;
-    TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo unknown15;
-    TextureRenderingInfo left_scroll_handle;
-    TextureRenderingInfo right_scroll_handle;
-    STRINGID scroll_text_id;    // StringsTableID
-    STRINGID unknown17_text_id; // StringsTableID
-    STRINGID unknown18_text_id; // StringsTableID
-    STRINGID unknown19_text_id; // StringsTableID
-    bool top_woodpanel_visible;
-    bool bottom_woodpanel_visible;
-    bool woodpanels_toggle;
-    bool unknown20d;
+    MenuScreenPanels screen_panels;
     TextureRenderingInfo brick_background;
     TextureRenderingInfo blurry_border;
     TextureRenderingInfo blurry_border2;
@@ -80,25 +63,7 @@ class ScreenArenaMenu : public Screen // ID: 21
 class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
 {
   public:
-    uint16_t unknown3a;
-    uint16_t unknown3b;
-    float woodenpanel_top_slidein_timer;
-    float woodenpanel_top_scroll_unfurl_timer;
-    uint32_t unknown6;
-    uint32_t unknown7;
-    TextureRenderingInfo unknown8;
-    TextureRenderingInfo woodenpanel_top;
-    TextureRenderingInfo unknown10;
-    TextureRenderingInfo woodenpanel_top_left_scroll;
-    TextureRenderingInfo woodenpanel_top_right_scroll;
-    STRINGID text_id_1; // Strings table ID
-    STRINGID text_id_2; // Strings table ID
-    STRINGID text_id_3; // Strings table ID
-    STRINGID text_id_4; // Strings table ID
-    bool woodenpanel_top_visible;
-    bool woodenpanel_bottom_visible;
-    bool woodenpanels_toggle;
-    bool unknown11d;
+    MenuScreenPanels screen_panels;
     uint16_t buttons;
     uint16_t padding1;
     TextureRenderingInfo brick_background;
@@ -143,25 +108,7 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
 class ScreenArenaItems : public Screen // ID: 23
 {
   public:
-    float unknown4;
-    float woodpanel_top_slidein_timer;
-    float woodpanel_top_scroll_unfurl_timer;
-    float unknown7;
-    float unknown8;
-    TextureRenderingInfo unknown9;
-    TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo unknown11;
-    TextureRenderingInfo top_scroll_left_handle;
-    TextureRenderingInfo top_scroll_right_handle;
-    STRINGID scroll_text_id; // Strings table ID
-    STRINGID text_id_2;      // Strings table ID
-    STRINGID text_id_3;      // Strings table ID
-    STRINGID text_id_4;      // Strings table ID
-    bool woodpanel_top_visible;
-    bool woodpanel_bottom_visible;
-    bool woodpanels_toggle;
-    bool unknown15;
-
+    MenuScreenPanels screen_panels;
     TextureRenderingInfo brick_background;
     TextureRenderingInfo black_background_bottom_right;
     TextureRenderingInfo woodpanel_bottom;

@@ -195,24 +195,6 @@ void register_usertypes(sol::state& lua)
     screenoptions_type["sides_hold_down_timer"] = &ScreenOptions::sides_hold_down_timer;
     screenoptions_type["sides_fast_scroll_timer"] = &ScreenOptions::sides_fast_scroll_timer;
     screenoptions_type["loop"] = &ScreenOptions::loop;
-    screenoptions_type["top_bottom_woodpanels_velocity"] = &ScreenOptions::top_bottom_woodpanels_velocity;
-    screenoptions_type["top_bottom_woodpanels_progress"] = &ScreenOptions::top_bottom_woodpanels_progress;
-    screenoptions_type["scroll_unfurl_progress"] = &ScreenOptions::scroll_unfurl_progress;
-    screenoptions_type["bottom_woodpanel_speed_multiplayer"] = &ScreenOptions::bottom_woodpanel_speed_multiplayer;
-    screenoptions_type["bottom_woodpanel_y_offset"] = &ScreenOptions::bottom_woodpanel_y_offset;
-    screenoptions_type["bottom_woodpanel"] = &ScreenOptions::bottom_woodpanel;
-    screenoptions_type["top_woodpanel"] = &ScreenOptions::top_woodpanel;
-    screenoptions_type["scroll"] = &ScreenOptions::scroll;
-    screenoptions_type["top_woodpanel_left_scrollhandle"] = &ScreenOptions::top_woodpanel_left_scrollhandle;
-    screenoptions_type["top_woodpanel_right_scrollhandle"] = &ScreenOptions::top_woodpanel_right_scrollhandle;
-    screenoptions_type["scroll_text"] = &ScreenOptions::scroll_text;
-    screenoptions_type["bottom_left_text"] = &ScreenOptions::bottom_left_text;
-    screenoptions_type["bottom_right_text"] = &ScreenOptions::bottom_right_text;
-    screenoptions_type["bottom_middle_text"] = &ScreenOptions::bottom_middle_text;
-    screenoptions_type["top_woodpanel_visible"] = &ScreenOptions::top_woodpanel_visible;
-    screenoptions_type["bottom_woodpanel_visible"] = &ScreenOptions::bottom_woodpanel_visible;
-    screenoptions_type["toggle_woodpanel_slidein_animation"] = &ScreenOptions::toggle_woodpanel_slidein_animation;
-    screenoptions_type["capitalize_top_woodpanel"] = &ScreenOptions::capitalize_top_woodpanel;
     screenoptions_type["menu_id"] = &ScreenOptions::current_menu_id;
     screenoptions_type["transfer_to_menu_id"] = &ScreenOptions::transfer_to_menu_id;
     screenoptions_type["graphic_and_audio"] = &ScreenOptions::graphic_and_audio;
@@ -248,15 +230,6 @@ void register_usertypes(sol::state& lua)
         &GraphicandAudioSettings::display_mode);
 
     auto screenseedinput_type = lua.new_usertype<ScreenCodeInput>("ScreenCodeInput", sol::base_classes, sol::bases<Screen>());
-    screenseedinput_type["bottom_woodpanel_slideup_speed"] = &ScreenCodeInput::bottom_woodpanel_slideup_speed;
-    screenseedinput_type["bottom_woodpanel_slideup_timer"] = &ScreenCodeInput::bottom_woodpanel_slideup;
-    screenseedinput_type["bottom_woodpanel_y_offset"] = &ScreenCodeInput::bottom_woodpanel_y_offset;
-    screenseedinput_type["bottom_woodpanel"] = &ScreenCodeInput::woodpanel_bottom;
-    screenseedinput_type["bottom_left_text"] = &ScreenCodeInput::bottom_left_text;
-    screenseedinput_type["bottom_right_text"] = &ScreenCodeInput::bottom_right_text;
-    screenseedinput_type["bottom_middle_text"] = &ScreenCodeInput::bottom_middle_text;
-    screenseedinput_type["show_bottom_woodpanel"] = &ScreenCodeInput::show_bottom_woodpanel;
-    screenseedinput_type["slide_in_bottom_woodpanel"] = &ScreenCodeInput::slide_in_bottom_woodpanel;
     screenseedinput_type["allow_random"] = &ScreenCodeInput::allow_random;
     screenseedinput_type["selected_button_index"] = &ScreenCodeInput::selected_button_index;
     screenseedinput_type["pressed_select"] = &ScreenCodeInput::pressed_select;
@@ -280,18 +253,6 @@ void register_usertypes(sol::state& lua)
     auto screencharacterselect_type = lua.new_usertype<ScreenCharacterSelect>("ScreenCharacterSelect", sol::base_classes, sol::bases<Screen>());
     screencharacterselect_type["main_background_zoom_target"] = &ScreenCharacterSelect::main_background_zoom_target;
     screencharacterselect_type["blurred_border_zoom_target"] = &ScreenCharacterSelect::blurred_border_zoom_target;
-    screencharacterselect_type["top_bottom_woodpanel_slidein_timer"] = &ScreenCharacterSelect::top_bottom_woodpanel_slidein_timer;
-    screencharacterselect_type["top_scroll_unfurl_timer"] = &ScreenCharacterSelect::top_scroll_unfurl_timer;
-    screencharacterselect_type["bottom_woodpanel"] = &ScreenCharacterSelect::bottom_woodpanel;
-    screencharacterselect_type["top_woodpanel"] = &ScreenCharacterSelect::top_woodpanel;
-    screencharacterselect_type["left_scroll_handle"] = &ScreenCharacterSelect::left_scroll_handle;
-    screencharacterselect_type["right_scroll_handle"] = &ScreenCharacterSelect::right_scroll_handle;
-    screencharacterselect_type["left_button_text_id"] = &ScreenCharacterSelect::left_button_text_id;
-    screencharacterselect_type["right_button_text_id"] = &ScreenCharacterSelect::right_button_text_id;
-    screencharacterselect_type["middle_button_text_id"] = &ScreenCharacterSelect::middle_button_text_id;
-    screencharacterselect_type["top_woodpanel_visible"] = &ScreenCharacterSelect::top_woodpanel_visible;
-    screencharacterselect_type["bottom_woodpanel_visible"] = &ScreenCharacterSelect::bottom_woodpanel_visible;
-    screencharacterselect_type["toggle_woodpanel_slidein_animation"] = &ScreenCharacterSelect::toggle_woodpanel_slidein_animation;
     screencharacterselect_type["mine_entrance_background"] = &ScreenCharacterSelect::mine_entrance_background;
     screencharacterselect_type["character"] = &ScreenCharacterSelect::character;
     screencharacterselect_type["character_shadow"] = &ScreenCharacterSelect::character_shadow;
@@ -317,14 +278,13 @@ void register_usertypes(sol::state& lua)
     screencharacterselect_type["player_quickselect_fadein_timer"] = &ScreenCharacterSelect::player_quickselect_fadein_timer;
     screencharacterselect_type["player_quickselect_coords"] = &ScreenCharacterSelect::player_quickselect_coords;
     screencharacterselect_type["player_quickselect_wiggle_angle"] = &ScreenCharacterSelect::player_quickselect_wiggle_angle;
-    screencharacterselect_type["topleft_woodpanel_esc_slidein_timer"] = &ScreenCharacterSelect::topleft_woodpanel_esc_slidein_timer;
-    screencharacterselect_type["start_panel_slidein_timer"] = &ScreenCharacterSelect::start_panel_slidein_timer;
+    screencharacterselect_type["topleft_woodpanel_esc_slidein"] = &ScreenCharacterSelect::topleft_woodpanel_esc_slidein;
+    screencharacterselect_type["start_panel_slidein"] = &ScreenCharacterSelect::start_panel_slidein;
     screencharacterselect_type["action_buttons_keycap_size"] = &ScreenCharacterSelect::action_buttons_keycap_size;
     screencharacterselect_type["not_ready_to_start_yet"] = &ScreenCharacterSelect::not_ready_to_start_yet;
     screencharacterselect_type["available_mine_entrances"] = &ScreenCharacterSelect::available_mine_entrances;
     screencharacterselect_type["amount_of_mine_entrances_activated"] = &ScreenCharacterSelect::amount_of_mine_entrances_activated;
     screencharacterselect_type["buttons"] = &ScreenCharacterSelect::buttons;
-    screencharacterselect_type["opacity"] = &ScreenCharacterSelect::opacity;
     screencharacterselect_type["start_pressed"] = &ScreenCharacterSelect::start_pressed;
     screencharacterselect_type["transition_to_game_started"] = &ScreenCharacterSelect::transition_to_game_started;
     screencharacterselect_type["flying_things"] = &ScreenCharacterSelect::flying_things;
@@ -340,7 +300,6 @@ void register_usertypes(sol::state& lua)
     screencharacterselect_type["particle_torchflame_flames3"] = &ScreenCharacterSelect::particle_torchflame_flames3;
     screencharacterselect_type["particle_torchflame_smoke4"] = &ScreenCharacterSelect::particle_torchflame_smoke4;
     screencharacterselect_type["particle_torchflame_flames4"] = &ScreenCharacterSelect::particle_torchflame_flames4;
-    screencharacterselect_type["sound"] = &ScreenCharacterSelect::sound;
 
     lua.new_usertype<FlyingThing>(
         "FlyingThing",
@@ -561,22 +520,6 @@ void register_usertypes(sol::state& lua)
         &OnlineLobbyScreenPlayer::searching);
 
     auto screenonlinelobby_type = lua.new_usertype<ScreenOnlineLobby>("ScreenOnlineLobby", sol::base_classes, sol::bases<Screen>());
-    screenonlinelobby_type["bottom_woodpanel_slideup_speed"] = &ScreenOnlineLobby::bottom_woodpanel_slideup_speed;
-    screenonlinelobby_type["bottom_woodpanel_slideup"] = &ScreenOnlineLobby::bottom_woodpanel_slideup;
-    screenonlinelobby_type["scroll_unfurl"] = &ScreenOnlineLobby::scroll_unfurl;
-    screenonlinelobby_type["bottom_woodpanel_y_offset"] = &ScreenOnlineLobby::bottom_woodpanel_y_offset;
-    screenonlinelobby_type["woodpanel_bottom"] = &ScreenOnlineLobby::woodpanel_bottom;
-    screenonlinelobby_type["woodpanel_top"] = &ScreenOnlineLobby::woodpanel_top;
-    screenonlinelobby_type["scroll"] = &ScreenOnlineLobby::scroll;
-    screenonlinelobby_type["left_scroll_handle"] = &ScreenOnlineLobby::left_scroll_handle;
-    screenonlinelobby_type["right_scroll_handle"] = &ScreenOnlineLobby::right_scroll_handle;
-    screenonlinelobby_type["scroll_text"] = &ScreenOnlineLobby::scroll_text;
-    screenonlinelobby_type["bottom_left_text"] = &ScreenOnlineLobby::bottom_left_text;
-    screenonlinelobby_type["bottom_right_text"] = &ScreenOnlineLobby::bottom_right_text;
-    screenonlinelobby_type["bottom_middle_text"] = &ScreenOnlineLobby::bottom_middle_text;
-    screenonlinelobby_type["show_top_woodpanel"] = &ScreenOnlineLobby::show_top_woodpanel;
-    screenonlinelobby_type["show_bottom_woodpanel"] = &ScreenOnlineLobby::show_bottom_woodpanel;
-    screenonlinelobby_type["slide_in_bottom_woodpanel"] = &ScreenOnlineLobby::slide_in_bottom_woodpanel;
     screenonlinelobby_type["players"] = &ScreenOnlineLobby::players;
     screenonlinelobby_type["background_image"] = &ScreenOnlineLobby::background_image;
     screenonlinelobby_type["topleft_woodpanel_esc"] = &ScreenOnlineLobby::topleft_woodpanel_esc;
