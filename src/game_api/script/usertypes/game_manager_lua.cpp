@@ -107,10 +107,8 @@ void register_usertypes(sol::state& lua)
         "GameProps",
         /// NoDoc
         "buttons",
-        [](GameProps& gp) -> uint32_t
-        {
-            return gp.buttons[0];
-        },
+        sol::property([](GameProps& gp) -> uint32_t
+                      { return gp.buttons[0]; }),
         "input",
         &GameProps::buttons,
         "input_previous",
