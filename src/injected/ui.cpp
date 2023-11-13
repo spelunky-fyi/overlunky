@@ -9285,6 +9285,8 @@ meta = {
 }
 
 exports = {
+    -- this was a cool experiment to control the pause state from scripts,
+    -- but you should probably do it through Bucket.set_options instead
     type = 0,
     paused = false,
     skip = false,
@@ -9362,7 +9364,7 @@ set_callback(function()
 end, ON.PRE_PROCESS_INPUT)
 
 set_callback(function()
-    if (test_mask(ol.keys["toggle_pause"], KEY.SPACE) or test_mask(ol.keys["frame_advance"], KEY.SPACE) or test_mask(ol.keys["frame_advance_alt"], KEY.SPACE)) and kb[40].down and not kb[33].down then
+    if (test_mask(ol.keys["toggle_pause"], KEY.SPACE) or test_mask(ol.keys["frame_advance"], KEY.SPACE) or test_mask(ol.keys["frame_advance_alt"], KEY.SPACE)) and kb[RAW_KEY.SPACE].down and not kb[RAW_KEY.Z].down then
         gp.input_menu = clr_mask(gp.input_menu, MENU_INPUT.SELECT)
     end
 end, ON.POST_PROCESS_INPUT)
@@ -9757,6 +9759,7 @@ void update_bucket()
         g_bucket->overlunky->options[k] = options[k];
     }
     g_bucket->overlunky->options["pause_type"] = g_pause_type;
+    g_bucket->overlunky->options["paused"] = paused;
 
     for (auto [k, v] : g_bucket->overlunky->set_options)
     {
@@ -9777,7 +9780,7 @@ void update_bucket()
         {
             UI::godmode(options["god_mode"]);
         }
-        else if (k == "god_mode")
+        else if (k == "god_mode_companions")
         {
             UI::godmode_companions(options["god_mode_companions"]);
         }
@@ -9789,10 +9792,44 @@ void update_bucket()
         {
             toggle_lights();
         }
+        else if (k == "skip_fades")
+        {
+            if (auto* val = std::get_if<bool>(&v))
+            {
+                options["skip_fades"] = *val;
+                g_ui_scripts["skip_fades"]->set_enabled(options["skip_fades"]);
+            }
+        }
         else if (k == "pause_type")
         {
             if (auto* val = std::get_if<int64_t>(&v))
                 g_pause_type = (uint32_t)*val;
+        }
+        else if (k == "paused")
+        {
+            bool was_paused = paused;
+            if (auto* val = std::get_if<bool>(&v))
+                paused = *val;
+            if (paused != was_paused)
+                toggle_pause();
+        }
+        else if (k == "skip")
+        {
+            if (g_pause_type & 0xC0)
+            {
+                if (paused)
+                {
+                    g_ui_scripts["pause"]->execute("exports.skip = true", true);
+                }
+            }
+            else
+            {
+                if (g_state->pause == (uint8_t)g_pause_type)
+                {
+                    g_pause_at = UI::get_frame_count() + 1;
+                    g_state->pause = 0;
+                }
+            }
         }
         else if (k == "camera_hack")
         {

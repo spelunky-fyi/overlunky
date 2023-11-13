@@ -808,5 +808,9 @@ std::unordered_set<std::string> legal_options{
     "noclip",
     "smooth_camera",
     "pause_type",
+    "pause_update_camera",
+    "pause_loading",
+    "paused",
+    "skip",
     "camera_hack",
 };

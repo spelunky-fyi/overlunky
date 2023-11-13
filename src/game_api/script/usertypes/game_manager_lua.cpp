@@ -224,7 +224,7 @@ void register_usertypes(sol::state& lua)
     for (char c = '0'; c <= '9'; c++)
         lua["RAW_KEY"][std::string{c}] = (int)c + 17;
     for (char c = 'A'; c <= 'Z'; c++)
-        lua["RAW_KEY"][std::string{c}] = (int)c - 56;
+        lua["RAW_KEY"][std::string{c}] = (int)c - 58;
 
     lua.create_named_table("RAW_BUTTON", "UP", 0, "DOWN", 1, "LEFT", 2, "RIGHT", 3, "A", 4, "B", 5, "X", 6, "Y", 7, "LEFT_SHOULDER", 8, "RIGHT_SHOULDER", 9, "LEFT_TRIGGER", 10, "RIGHT_TRIGGER", 11, "LEFT_THUMB", 12, "RIGHT_THUMB", 13, "BACK", 14, "START", 15);
 
