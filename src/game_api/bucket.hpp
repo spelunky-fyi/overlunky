@@ -9,6 +9,20 @@
 using BucketItem = std::variant<bool, int64_t, float, std::string>;
 using KEY = int64_t;
 
+struct RecoverableMemory
+{
+    size_t address;
+    char* old_data;
+    size_t size;
+    bool prot_used;
+};
+
+struct EditedMemory
+{
+    std::vector<RecoverableMemory> mem;
+    bool dirty;
+};
+
 struct Overlunky
 {
     /// Current Overlunky options. Read only.
@@ -48,4 +62,6 @@ class Bucket
     bool patches_applied{false};
     // Used by Overlunky to restart adventure runs with same seed, updated by PRE_LOAD_SCREEN
     std::pair<int64_t, int64_t> adventure_seed{0, 0};
+    // Used by memory for recoverable memory interoperability
+    std::unordered_map<std::string, EditedMemory> original_memory;
 };
