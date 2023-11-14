@@ -142,11 +142,11 @@ class ScreenArenaIntro : public Screen // ID: 25
     TextureRenderingInfo background_colors;
     TextureRenderingInfo vertical_lines;
     TextureRenderingInfo vertical_line_electricity_effect;
-    TextureRenderingInfo unknown_all_forced;
+    TextureRenderingInfo unknown_all_forced; // probably scroll
     TextureRenderingInfo left_scroll;
     TextureRenderingInfo right_scroll;
     TextureRenderingInfo unknown1;
-    float scroll_unfurl_timer;
+    float scroll_unfurl;
     bool waiting; // when false, the cutscene ends and gameplay starts
     uint8_t unknown10b;
     uint8_t unknown10c;
@@ -252,18 +252,19 @@ struct ScreenArenaScoreUnknown
 class ScreenArenaScore : public Screen // ID: 27
 {
   public:
-    uint16_t unknown3a;
+    uint16_t unknown3a; // probably float
     uint16_t unknown3b;
-    float woodpanel_slide_timer;
-    float scroll_unfurl_timer;
+    float woodpanel_slide;
+    float scroll_unfurl;
     uint32_t unknown6;
     uint32_t unknown7;
     uint32_t unknown8;
     float unknown9;
 
+    // similar to the MenuScreenPanels ?
     TextureRenderingInfo unknown10;
     TextureRenderingInfo woodpanel;
-    TextureRenderingInfo unknown_all_forced;
+    TextureRenderingInfo unknown_all_forced; // probably scroll
     TextureRenderingInfo woodpanel_left_scroll;
     TextureRenderingInfo woodpanel_right_scroll;
 

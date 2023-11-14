@@ -17,6 +17,56 @@ struct SoundMeta;
 struct MultiLineTextRendering;
 class Entity;
 
+struct MenuScreenPanels
+{
+    float woodpanels_velocity;
+    float woodpanels_progress;
+    float scroll_unfurl_progress;
+    float bottom_woodpanel_speed_multiplayer;
+    float bottom_woodpanel_y_offset; // maybe a resolution thing?
+    TextureRenderingInfo bottom_woodpanel;
+    TextureRenderingInfo top_woodpanel;
+    TextureRenderingInfo scroll;
+    TextureRenderingInfo top_woodpanel_left_scrollhandle;
+    TextureRenderingInfo top_woodpanel_right_scrollhandle;
+
+    STRINGID scroll_text;
+    STRINGID bottom_left_text;
+    STRINGID bottom_right_text;
+    STRINGID bottom_middle_text;
+    bool top_woodpanel_visible;
+    bool bottom_woodpanel_visible;
+    bool toggle_woodpanel_slidein_animation;
+    bool capitalize_scroll_text;
+};
+
+struct ScreenControls
+{
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    uint32_t direction_input;
+    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    uint32_t hold_down_timer;
+    uint32_t fast_scroll_timer;
+};
+
+// probably common thing, right now only used in the arena screen
+struct ScreenZoomAnimation
+{
+    float unknown1;
+    float unknown2;
+    float unknown3;
+    float unknown4;
+    float unknown5;
+    uint32_t image; /* unsure*/ // probably wrong
+    uint32_t unknown6;
+    float zoom_timer;
+    float zoom_target;
+};
+
 class Screen
 {
   public:
@@ -57,8 +107,8 @@ class ScreenLogo : public Screen // ID: 0
 class ScreenIntro : public Screen // ID: 1
 {
   public:
-    TextureRenderingInfo unknown4;
-    float darkness;
+    TextureRenderingInfo blackout_background;
+    float blackout_alpha;
     /// ends the intro immediately if set to false
     bool active;
     /// skips prologue and goes straight to the title screen after the intro
@@ -74,29 +124,6 @@ class ScreenPrologue : public Screen // ID: 2
     float line1_alpha;
     float line2_alpha;
     float line3_alpha;
-};
-
-struct MenuScreenPanels
-{
-    float woodpanels_velocity;
-    float woodpanels_progress;
-    float scroll_unfurl_progress;
-    float bottom_woodpanel_speed_multiplayer;
-    float bottom_woodpanel_y_offset; // maybe a resolution thing?
-    TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo top_woodpanel;
-    TextureRenderingInfo scroll;
-    TextureRenderingInfo top_woodpanel_left_scrollhandle;
-    TextureRenderingInfo top_woodpanel_right_scrollhandle;
-
-    STRINGID scroll_text;
-    STRINGID bottom_left_text;
-    STRINGID bottom_right_text;
-    STRINGID bottom_middle_text;
-    bool top_woodpanel_visible;
-    bool bottom_woodpanel_visible;
-    bool toggle_woodpanel_slidein_animation;
-    bool capitalize_scroll_text;
 };
 
 class ScreenTitle : public Screen // ID: 3
@@ -122,19 +149,6 @@ struct SpearDanglerAnimFrames
 {
     uint32_t column;
     uint32_t row;
-};
-
-struct ScreenControls
-{
-    bool up;
-    bool down;
-    bool left;
-    bool right;
-    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
-    uint32_t direction_input;
-    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
-    uint32_t hold_down_timer;
-    uint32_t fast_scroll_timer;
 };
 
 struct MenuOption
@@ -217,11 +231,13 @@ class ScreenMenu : public Screen // ID: 4
     // uint8_t padding_probably[2];
 
     uint32_t unknown27; // pressed direction? 1 = left, 0 = right, no neutral, stays at the last state
-    bool loop;          // allow going up from first to last option
+    /// Allow going up from first to last option
+    bool loop;
 
     // uint8_t padding_probably[3];
 
-    uint32_t menu_id; // 0 = main menu, 1 = play, 2 = online
+    /// 0 = main menu, 1 = play, 2 = online
+    uint32_t menu_id;
     uint32_t transfer_to_menu_id;
     float menu_text_opacity;
     std::array<float, 6> spear_position;
@@ -275,6 +291,7 @@ class ScreenOptions : public Screen // ID: 5
     uint8_t sides_fast_scroll_timer;
     // uint16_t probably_padding1;
     uint32_t unknown0; // pressed direction? 1 = left, 0 = right, no neutral, stays at the last state
+    /// Allow going up from first to last option
     bool loop;
 
     // uint8_t probably_padding2[3];
@@ -334,7 +351,7 @@ class ScreenOptions : public Screen // ID: 5
     float text_fadein;
     float vertical_scroll_effect;
     uint8_t unknown49; // small random timer
-    bool items_visiable;
+    bool options_visiable;
     /// Shows the red background behind the option, the scarab on the left and left/right arrows
     bool show_highlight;
     // uint8_t padding_probably8[5];
@@ -438,7 +455,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     float main_background_zoom_related1;
     uint32_t main_background_zoom_related2;
     uint32_t unknown10;
-    float main_background_zoom_timer;
+    float main_background_zoom_progress;
     float main_background_zoom_target;
     float blurred_border_zoom;
     float unknown14;
@@ -450,7 +467,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     uint8_t unknown20;
     uint8_t unknown21;
     uint8_t unknown22;
-    float blurred_border_zoom_timer;
+    float blurred_border_zoom_progress;
     float blurred_border_zoom_target;
 
     MenuScreenPanels screen_panels;
@@ -625,7 +642,7 @@ class ScreenTransition : public Screen // ID: 13
     float mama_tunnel_fade_actualvalue;
     float mama_tunnel_fade_targetvalue;
     STRINGID mama_tunnel_text_id;
-    uint16_t mama_tunnel_text_buffer[256]; // UTF16 string
+    char16_t mama_tunnel_text_buffer[256]; // UTF16 string
     bool mama_tunnel_choice_visible;
     bool mama_tunnel_agree_with_gift;
     bool mama_tunnel_face_invisible;
@@ -639,8 +656,8 @@ class ScreenTransition : public Screen // ID: 13
     TextureRenderingInfo big_dollar_sign;
     TextureRenderingInfo unknown26;
 
-    uint16_t string_buffer[130]; // UTF16 string
-    uint32_t stats_scroll_unfurl_sequence_timer;
+    char16_t string_buffer[130]; // UTF16 string
+    uint32_t stats_scroll_unfurl_sequence;
     uint32_t unknown30;
     uint32_t unknown31;
 
@@ -658,12 +675,12 @@ class ScreenTransition : public Screen // ID: 13
     TextureRenderingInfo hourglasses;
     TextureRenderingInfo small_dollar_signs;
 
-    uint16_t string_buffer_this_level_time[10];        // UTF16 string
-    uint16_t string_buffer_total_time[10];             // UTF16 string
-    uint16_t string_buffer_this_level_milliseconds[5]; // UTF16 string
-    uint16_t string_buffer_total_milliseconds[5];      // UTF16 string
-    uint16_t string_buffer_this_level_money[10];       // UTF16 string
-    uint16_t string_buffer_total_money[10];            // UTF16 string
+    char16_t string_buffer_this_level_time[10];        // UTF16 string
+    char16_t string_buffer_total_time[10];             // UTF16 string
+    char16_t string_buffer_this_level_milliseconds[5]; // UTF16 string
+    char16_t string_buffer_total_milliseconds[5];      // UTF16 string
+    char16_t string_buffer_this_level_money[10];       // UTF16 string
+    char16_t string_buffer_total_money[10];            // UTF16 string
 
     Color this_level_money_color;
 
@@ -734,22 +751,6 @@ class ScreenRecap : public Screen // ID: 20
     uint32_t unknown1;
     uint32_t unknown2;
 };
-
-struct ScreenZoomAnimation
-{
-    float unknown1;
-    float unknown2;
-    float unknown3;
-    float unknown4;
-    float unknown5;
-    uint32_t image; /* unsure*/
-    uint32_t unknown6;
-    float zoom_timer;
-    float zoom_target;
-};
-
-// For the ARENA screens, see screen_arena.hpp
-// Putting them here makes the compiler run out of heap space
 
 class ScreenOnlineLoading : public Screen // ID: 28
 {
@@ -849,8 +850,7 @@ struct MenuInsert
 struct PauseUI
 {
     float menu_slidein_progress;
-    /// Actually darkened background when you get a prompt asking are you sure about selecting that option
-    TextureRenderingInfo blurred_background;
+    TextureRenderingInfo blackout_background;
     TextureRenderingInfo woodpanel_left;
     TextureRenderingInfo woodpanel_middle;
     TextureRenderingInfo woodpanel_right;
@@ -865,8 +865,8 @@ struct PauseUI
     MenuInsert* prompt_menu;
     bool unknown8;
     // uint8_t probably_padding2[3];
-    /// This is more like selected_option, it's set when you select an option and the game displays the prompt
-    uint32_t previously_selected_menu_index;
+    /// It's set wh game displays the prompt
+    uint32_t selected_option;
     bool prompt_visible;
     std::array<uint8_t, MAX_PLAYERS> buttons_actions;  // per player, so no default menu input
     std::array<uint8_t, MAX_PLAYERS> buttons_movement; // per player, so no default menu input

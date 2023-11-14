@@ -8,6 +8,7 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
+#include "particles.hpp"    //
 #include "screen.hpp"       // for ScreenZoomAnimation, Screen (ptr only)
 #include "screen_arena.hpp" // for ScreenArenaMenu, ScreenArenaStagesSelect
 
@@ -15,26 +16,10 @@ namespace NScreenArena
 {
 void register_usertypes(sol::state& lua)
 {
-    lua.new_usertype<ScreenControls>(
-        "ScreenControls",
-        "up",
-        &ScreenControls::up,
-        "down",
-        &ScreenControls::down,
-        "left",
-        &ScreenControls::left,
-        "right",
-        &ScreenControls::right,
-        "direction_input",
-        &ScreenControls::direction_input,
-        "hold_down_timer",
-        &ScreenControls::hold_down_timer,
-        "fast_scroll_timer",
-        &ScreenControls::fast_scroll_timer);
-
     auto screenarenamenu_type = lua.new_usertype<ScreenArenaMenu>("ScreenArenaMenu", sol::base_classes, sol::bases<Screen>());
     screenarenamenu_type["brick_background_animation"] = &ScreenArenaMenu::brick_background_animation;
     screenarenamenu_type["blurry_border_animation"] = &ScreenArenaMenu::blurry_border_animation;
+    screenarenamenu_type["screen_panels"] = &ScreenArenaMenu::screen_panels;
     screenarenamenu_type["brick_background"] = &ScreenArenaMenu::brick_background;
     screenarenamenu_type["blurry_border"] = &ScreenArenaMenu::blurry_border;
     screenarenamenu_type["blurry_border2"] = &ScreenArenaMenu::blurry_border2;
@@ -60,18 +45,15 @@ void register_usertypes(sol::state& lua)
     screenarenamenu_type["bottom_left_bricks"] = &ScreenArenaMenu::bottom_left_bricks;
     screenarenamenu_type["top_left_esc_panel"] = &ScreenArenaMenu::top_left_esc_panel;
     screenarenamenu_type["next_panel"] = &ScreenArenaMenu::next_panel;
+    screenarenamenu_type["option_captions"] = &ScreenArenaMenu::option_captions;
     screenarenamenu_type["center_panels_hor_slide_position"] = &ScreenArenaMenu::center_panels_hor_slide_position;
     screenarenamenu_type["esc_next_panels_slide_timer"] = &ScreenArenaMenu::esc_next_panels_slide_timer;
     screenarenamenu_type["main_panel_vertical_scroll_position"] = &ScreenArenaMenu::main_panel_vertical_scroll_position;
     screenarenamenu_type["selected_option_index"] = &ScreenArenaMenu::selected_option_index;
     screenarenamenu_type["contols"] = &ScreenArenaMenu::contols;
 
-    lua.new_usertype<ScreenZoomAnimation>(
-        "ScreenZoomAnimation",
-        "zoom_target",
-        &ScreenZoomAnimation::zoom_target);
-
     auto screenarenastagesselect_type = lua.new_usertype<ScreenArenaStagesSelect>("ScreenArenaStagesSelect", sol::base_classes, sol::bases<Screen>());
+    screenarenastagesselect_type["screen_panels"] = &ScreenArenaStagesSelect::screen_panels;
     screenarenastagesselect_type["buttons"] = &ScreenArenaStagesSelect::buttons;
     screenarenastagesselect_type["brick_background"] = &ScreenArenaStagesSelect::brick_background;
     screenarenastagesselect_type["info_black_background"] = &ScreenArenaStagesSelect::info_black_background;
@@ -98,10 +80,14 @@ void register_usertypes(sol::state& lua)
     screenarenastagesselect_type["players_turn_scroll"] = &ScreenArenaStagesSelect::players_turn_scroll;
     screenarenastagesselect_type["players_turn_scroll_handle"] = &ScreenArenaStagesSelect::players_turn_scroll_handle;
     screenarenastagesselect_type["grid_player_icon"] = &ScreenArenaStagesSelect::grid_player_icon;
+    screenarenastagesselect_type["stages_to_gay_out"] = &ScreenArenaStagesSelect::stages_to_gay_out;
+    screenarenastagesselect_type["panels_slide_from_both_sides"] = &ScreenArenaStagesSelect::panels_slide_from_both_sides;
+    screenarenastagesselect_type["visibility_all_stages"] = &ScreenArenaStagesSelect::visibility_all_stages;
     screenarenastagesselect_type["selected_stage_index"] = &ScreenArenaStagesSelect::selected_stage_index;
     screenarenastagesselect_type["contols"] = &ScreenArenaStagesSelect::contols;
 
     auto screenarenaitems_type = lua.new_usertype<ScreenArenaItems>("ScreenArenaItems", sol::base_classes, sol::bases<Screen>());
+    screenarenaitems_type["screen_panels"] = &ScreenArenaItems::screen_panels;
     screenarenaitems_type["brick_background"] = &ScreenArenaItems::brick_background;
     screenarenaitems_type["black_background_bottom_right"] = &ScreenArenaItems::black_background_bottom_right;
     screenarenaitems_type["woodpanel_bottom"] = &ScreenArenaItems::woodpanel_bottom;
@@ -117,6 +103,7 @@ void register_usertypes(sol::state& lua)
     screenarenaitems_type["item_equipped_badge"] = &ScreenArenaItems::item_equipped_badge;
     screenarenaitems_type["item_off_gray_overlay"] = &ScreenArenaItems::item_off_gray_overlay;
     screenarenaitems_type["esc_woodpanel"] = &ScreenArenaItems::esc_woodpanel;
+    screenarenaitems_type["items_to_gay_out"] = &ScreenArenaItems::items_to_gay_out;
     screenarenaitems_type["center_panels_horizontal_slide_position"] = &ScreenArenaItems::center_panels_horizontal_slide_position;
     screenarenaitems_type["esc_panel_slide_timer"] = &ScreenArenaItems::esc_panel_slide_timer;
     screenarenaitems_type["selected_item_index"] = &ScreenArenaItems::selected_item_index;
@@ -127,15 +114,15 @@ void register_usertypes(sol::state& lua)
     screenarenaintro_type["background_colors"] = &ScreenArenaIntro::background_colors;
     screenarenaintro_type["vertical_lines"] = &ScreenArenaIntro::vertical_lines;
     screenarenaintro_type["vertical_line_electricity_effect"] = &ScreenArenaIntro::vertical_line_electricity_effect;
-    screenarenaintro_type["unknown_all_forced"] = &ScreenArenaIntro::unknown_all_forced;
     screenarenaintro_type["left_scroll"] = &ScreenArenaIntro::left_scroll;
     screenarenaintro_type["right_scroll"] = &ScreenArenaIntro::right_scroll;
-    screenarenaintro_type["scroll_unfurl_timer"] = &ScreenArenaIntro::scroll_unfurl_timer;
+    screenarenaintro_type["scroll_unfurl"] = &ScreenArenaIntro::scroll_unfurl;
     screenarenaintro_type["waiting"] = &ScreenArenaIntro::waiting;
     screenarenaintro_type["names_opacity"] = &ScreenArenaIntro::names_opacity;
     screenarenaintro_type["line_electricity_effect_timer"] = &ScreenArenaIntro::line_electricity_effect_timer;
     screenarenaintro_type["state"] = &ScreenArenaIntro::state;
     screenarenaintro_type["countdown"] = &ScreenArenaIntro::countdown;
+    screenarenaintro_type["particles"] = &ScreenArenaIntro::particles;
 
     lua.new_usertype<ScreenArenaLevel>(
         "ScreenArenaLevel",
@@ -145,15 +132,28 @@ void register_usertypes(sol::state& lua)
         &ScreenArenaLevel::get_ready_gray_background,
         "get_ready_outline",
         &ScreenArenaLevel::get_ready_outline,
+        "particles",
+        &ScreenArenaLevel::particles,
         sol::base_classes,
         sol::bases<Screen>());
 
+    lua.new_usertype<ScreenArenaScoreLavaBubble>(
+        "ScreenArenaScoreLavaBubble",
+        "x",
+        &ScreenArenaScoreLavaBubble::x,
+        "y",
+        &ScreenArenaScoreLavaBubble::y,
+        "timer1",
+        &ScreenArenaScoreLavaBubble::timer1,
+        "timer2",
+        &ScreenArenaScoreLavaBubble::timer2,
+        "visible",
+        &ScreenArenaScoreLavaBubble::visible);
+
     auto screenarenascore_type = lua.new_usertype<ScreenArenaScore>("ScreenArenaScore", sol::base_classes, sol::bases<Screen>());
-    screenarenascore_type["woodpanel_slide_timer"] = &ScreenArenaScore::woodpanel_slide_timer;
-    screenarenascore_type["scroll_unfurl_timer"] = &ScreenArenaScore::scroll_unfurl_timer;
-    screenarenascore_type["unknown10"] = &ScreenArenaScore::unknown10;
+    screenarenascore_type["woodpanel_slide"] = &ScreenArenaScore::woodpanel_slide;
+    screenarenascore_type["scroll_unfurl"] = &ScreenArenaScore::scroll_unfurl;
     screenarenascore_type["woodpanel"] = &ScreenArenaScore::woodpanel;
-    screenarenascore_type["unknown_all_forced"] = &ScreenArenaScore::unknown_all_forced;
     screenarenascore_type["woodpanel_left_scroll"] = &ScreenArenaScore::woodpanel_left_scroll;
     screenarenascore_type["woodpanel_right_scroll"] = &ScreenArenaScore::woodpanel_right_scroll;
     screenarenascore_type["text_id_1"] = &ScreenArenaScore::text_id_1;
@@ -169,15 +169,11 @@ void register_usertypes(sol::state& lua)
     screenarenascore_type["bottom_lava"] = &ScreenArenaScore::bottom_lava;
     screenarenascore_type["players"] = &ScreenArenaScore::players;
     screenarenascore_type["player_shadows"] = &ScreenArenaScore::player_shadows;
-    screenarenascore_type["unknown24"] = &ScreenArenaScore::unknown24;
-    screenarenascore_type["unknown25"] = &ScreenArenaScore::unknown25;
     screenarenascore_type["score_counter"] = &ScreenArenaScore::score_counter;
-    screenarenascore_type["unknown27"] = &ScreenArenaScore::unknown27;
     screenarenascore_type["lava_bubbles"] = &ScreenArenaScore::lava_bubbles;
     screenarenascore_type["player_won"] = &ScreenArenaScore::player_won;
     screenarenascore_type["victory_jump_y_pos"] = &ScreenArenaScore::victory_jump_y_pos;
     screenarenascore_type["victory_jump_velocity"] = &ScreenArenaScore::victory_jump_velocity;
-    screenarenascore_type["animation_frame"] = &ScreenArenaScore::animation_frame;
     screenarenascore_type["squash_and_celebrate"] = &ScreenArenaScore::squash_and_celebrate;
     screenarenascore_type["player_ready"] = &ScreenArenaScore::player_ready;
     screenarenascore_type["next_transition_timer"] = &ScreenArenaScore::next_transition_timer;
@@ -185,5 +181,7 @@ void register_usertypes(sol::state& lua)
     screenarenascore_type["player_crushing_pillar_height"] = &ScreenArenaScore::player_crushing_pillar_height;
     screenarenascore_type["player_create_giblets"] = &ScreenArenaScore::player_create_giblets;
     screenarenascore_type["next_sidepanel_slidein_timer"] = &ScreenArenaScore::next_sidepanel_slidein_timer;
+    screenarenascore_type["particles"] = &ScreenArenaScore::particles;
+    screenarenascore_type["lava_bubbles_positions"] = &ScreenArenaScore::lava_bubbles_positions;
 }
 } // namespace NScreenArena
