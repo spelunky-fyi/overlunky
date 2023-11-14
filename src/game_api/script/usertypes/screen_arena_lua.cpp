@@ -17,8 +17,6 @@ namespace NScreenArena
 void register_usertypes(sol::state& lua)
 {
     auto screenarenamenu_type = lua.new_usertype<ScreenArenaMenu>("ScreenArenaMenu", sol::base_classes, sol::bases<Screen>());
-    screenarenamenu_type["brick_background_animation"] = &ScreenArenaMenu::brick_background_animation;
-    screenarenamenu_type["blurry_border_animation"] = &ScreenArenaMenu::blurry_border_animation;
     screenarenamenu_type["screen_panels"] = &ScreenArenaMenu::screen_panels;
     screenarenamenu_type["brick_background"] = &ScreenArenaMenu::brick_background;
     screenarenamenu_type["blurry_border"] = &ScreenArenaMenu::blurry_border;
@@ -45,7 +43,6 @@ void register_usertypes(sol::state& lua)
     screenarenamenu_type["bottom_left_bricks"] = &ScreenArenaMenu::bottom_left_bricks;
     screenarenamenu_type["top_left_esc_panel"] = &ScreenArenaMenu::top_left_esc_panel;
     screenarenamenu_type["next_panel"] = &ScreenArenaMenu::next_panel;
-    screenarenamenu_type["option_captions"] = &ScreenArenaMenu::option_captions;
     screenarenamenu_type["center_panels_hor_slide_position"] = &ScreenArenaMenu::center_panels_hor_slide_position;
     screenarenamenu_type["esc_next_panels_slide_timer"] = &ScreenArenaMenu::esc_next_panels_slide_timer;
     screenarenamenu_type["main_panel_vertical_scroll_position"] = &ScreenArenaMenu::main_panel_vertical_scroll_position;

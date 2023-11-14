@@ -5,10 +5,10 @@
 
 struct ArenaRulesString
 {
-    STRINGID text_1_id; // StringsTableID
-    STRINGID text_2_id; // StringsTableID
-    STRINGID text_3_id; // StringsTableID
-    STRINGID text_4_id; // StringsTableID
+    STRINGID text_1; // StringsTableID
+    STRINGID text_2; // StringsTableID
+    STRINGID text_3; // StringsTableID
+    STRINGID text_4; // StringsTableID
     uint8_t unknown1;
     uint8_t unknown2;
     uint8_t unknown3;

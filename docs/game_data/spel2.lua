@@ -5889,7 +5889,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field ouroboros_angle number
 
 ---@class OnlineLobbyScreenPlayer
-    ---@field platform_icon integer @16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = Switch, 48 = PS, 49 = PS again?
+    ---@field platform_icon integer @16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = switch, 48 = PS, 49 = PS again?
     ---@field character integer @0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     ---@field ready boolean
     ---@field searching boolean
@@ -6048,8 +6048,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field stickers TextureRenderingInfo[] @size: 20
 
 ---@class ScreenArenaMenu : Screen
-    ---@field brick_background_animation ScreenZoomAnimation
-    ---@field blurry_border_animation ScreenZoomAnimation
     ---@field screen_panels MenuScreenPanels
     ---@field brick_background TextureRenderingInfo
     ---@field blurry_border TextureRenderingInfo
@@ -6076,7 +6074,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field bottom_left_bricks TextureRenderingInfo
     ---@field top_left_esc_panel TextureRenderingInfo
     ---@field next_panel TextureRenderingInfo
-    ---@field option_captions ArenaRulesString[]
     ---@field center_panels_hor_slide_position number
     ---@field esc_next_panels_slide_timer number
     ---@field main_panel_vertical_scroll_position number

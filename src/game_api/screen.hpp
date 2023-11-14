@@ -761,7 +761,7 @@ class ScreenOnlineLoading : public Screen // ID: 28
 
 struct OnlineLobbyScreenPlayer
 {
-    /// 16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = Switch, 48 = PS, 49 = PS again?
+    /// 16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = switch, 48 = PS, 49 = PS again?
     uint8_t platform_icon; // werid numbers, anything else results in the startd PC icon, maybe it's some actual id
     /// 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     uint8_t character;

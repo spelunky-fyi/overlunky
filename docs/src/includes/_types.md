@@ -1927,7 +1927,7 @@ bool | [capitalize_scroll_text](https://github.com/spelunky-fyi/overlunky/search
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [platform_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_icon) | 16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = [Switch](#Switch), 48 = PS, 49 = PS again?
+int | [platform_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform_icon) | 16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = switch, 48 = PS, 49 = PS again?
 int | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in [ENT_TYPE](#ENT_TYPE)
 bool | [ready](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready) | 
 bool | [searching](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=searching) | 
@@ -2035,8 +2035,6 @@ Derived from [Screen](#Screen)
 
 Type | Name | Description
 ---- | ---- | -----------
-ScreenZoomAnimation | [brick_background_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_background_animation) | 
-ScreenZoomAnimation | [blurry_border_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blurry_border_animation) | 
 [MenuScreenPanels](#MenuScreenPanels) | [screen_panels](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_panels) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [brick_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=brick_background) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [blurry_border](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blurry_border) | 
@@ -2063,7 +2061,6 @@ ScreenZoomAnimation | [blurry_border_animation](https://github.com/spelunky-fyi/
 [TextureRenderingInfo](#TextureRenderingInfo) | [bottom_left_bricks](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bottom_left_bricks) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [top_left_esc_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=top_left_esc_panel) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [next_panel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_panel) | 
-vector&lt;ArenaRulesString&gt; | [option_captions](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=option_captions) | 
 float | [center_panels_hor_slide_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center_panels_hor_slide_position) | 
 float | [esc_next_panels_slide_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=esc_next_panels_slide_timer) | 
 float | [main_panel_vertical_scroll_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_panel_vertical_scroll_position) | 
