@@ -229,7 +229,7 @@ struct ScreenArenaScoreLavaBubble
     float y;
     int16_t timer1;
     uint8_t timer2; // counts down when the timer1 = -1
-    bool unknown;
+    bool visible;
 };
 
 struct ScreenArenaScoreUnknown
@@ -287,7 +287,7 @@ class ScreenArenaScore : public Screen // ID: 27
     TextureRenderingInfo unknown25;
     TextureRenderingInfo score_counter;
     TextureRenderingInfo unknown27;
-    TextureRenderingInfo unknown28;
+    TextureRenderingInfo lava_bubbles;
 
     std::array<bool, MAX_PLAYERS> player_won;
     float victory_jump_y_pos;
@@ -306,6 +306,6 @@ class ScreenArenaScore : public Screen // ID: 27
     float next_sidepanel_slidein_timer;
     // uint32_t padding_probably;
     std::array<ParticleEmitterInfo*, 13> particles;
-    std::array<ScreenArenaScoreLavaBubble, 15> lava_bubbles;
+    std::array<ScreenArenaScoreLavaBubble, 15> lava_bubbles_positions;
     std::array<ScreenArenaScoreUnknown, 160> unknown45; // only used if one of the players win, probably the flying down confetti/featers
 };

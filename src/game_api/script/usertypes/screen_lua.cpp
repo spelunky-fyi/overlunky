@@ -323,17 +323,14 @@ void register_usertypes(sol::state& lua)
         &FlyingThing::sinewave_angle);
 
     auto screenteamselect_type = lua.new_usertype<ScreenTeamSelect>("ScreenTeamSelect", sol::base_classes, sol::bases<Screen>());
-    screenteamselect_type["ana_carrying_torch"] = &ScreenTeamSelect::ana_carrying_torch;
     screenteamselect_type["scroll_bottom_left"] = &ScreenTeamSelect::scroll_bottom_left;
     screenteamselect_type["scrollend_bottom_left"] = &ScreenTeamSelect::scrollend_bottom_left;
     screenteamselect_type["four_ropes"] = &ScreenTeamSelect::four_ropes;
-    screenteamselect_type["unknown4"] = &ScreenTeamSelect::unknown4;
     screenteamselect_type["four_characters"] = &ScreenTeamSelect::four_characters;
     screenteamselect_type["left_arrow"] = &ScreenTeamSelect::left_arrow;
     screenteamselect_type["right_arrow"] = &ScreenTeamSelect::right_arrow;
     screenteamselect_type["start_panel"] = &ScreenTeamSelect::start_panel;
     screenteamselect_type["go_back_wooden_panel"] = &ScreenTeamSelect::go_back_wooden_panel;
-    screenteamselect_type["start_panel_slide_timer"] = &ScreenTeamSelect::start_panel_slide_timer;
     screenteamselect_type["pulsating_arrows_timer"] = &ScreenTeamSelect::pulsating_arrows_timer;
     screenteamselect_type["selected_player"] = &ScreenTeamSelect::selected_player;
     screenteamselect_type["buttons"] = &ScreenTeamSelect::buttons;
@@ -385,7 +382,7 @@ void register_usertypes(sol::state& lua)
     screentransition_type["woodpanel_bottomcutout1"] = &ScreenTransition::woodpanel_bottomcutout1;
     screentransition_type["woodpanel_bottomcutout2"] = &ScreenTransition::woodpanel_bottomcutout2;
     screentransition_type["woodpanel_bottomcutout3"] = &ScreenTransition::woodpanel_bottomcutout3;
-    screentransition_type["unknown_all_forced"] = &ScreenTransition::unknown_all_forced;
+    screentransition_type["scroll"] = &ScreenTransition::scroll;
     screentransition_type["stats_scroll_top_bottom"] = &ScreenTransition::stats_scroll_top_bottom;
     screentransition_type["killcount_rounded_rect"] = &ScreenTransition::killcount_rounded_rect;
     screentransition_type["level_completed_panel"] = &ScreenTransition::level_completed_panel;

@@ -78,9 +78,9 @@ class ScreenPrologue : public Screen // ID: 2
 
 struct MenuScreenPanels
 {
-    float top_bottom_woodpanels_velocity;
-    float top_bottom_woodpanels_progress; // set to 0 to start sliding in
-    float scroll_unfurl_progress;         // set to 0 to start unfurl
+    float woodpanels_velocity;
+    float woodpanels_progress;
+    float scroll_unfurl_progress;
     float bottom_woodpanel_speed_multiplayer;
     float bottom_woodpanel_y_offset; // maybe a resolution thing?
     TextureRenderingInfo bottom_woodpanel;
@@ -96,7 +96,7 @@ struct MenuScreenPanels
     bool top_woodpanel_visible;
     bool bottom_woodpanel_visible;
     bool toggle_woodpanel_slidein_animation;
-    bool capitalize_top_woodpanel;
+    bool capitalize_scroll_text;
 };
 
 class ScreenTitle : public Screen // ID: 3
@@ -537,18 +537,18 @@ class ScreenCharacterSelect : public Screen // ID: 9
 class ScreenTeamSelect : public Screen // ID: 10
 {
   public:
-    TextureRenderingInfo ana_carrying_torch;
+    TextureRenderingInfo player_portrait;
     TextureRenderingInfo scroll_bottom_left;
     TextureRenderingInfo scrollend_bottom_left;
     TextureRenderingInfo four_ropes;
-    TextureRenderingInfo unknown4;
+    TextureRenderingInfo gems_above_the_ropes;
     TextureRenderingInfo four_characters;
     TextureRenderingInfo left_arrow;
     TextureRenderingInfo right_arrow;
     TextureRenderingInfo start_panel;
     TextureRenderingInfo go_back_wooden_panel;
-    float unknown2;
-    float start_panel_slide_timer;
+    float start_panel_slide;
+    float go_back_wooden_panel_slide;
     float pulsating_arrows_timer;
     uint8_t selected_player;
     uint8_t buttons;
@@ -603,7 +603,7 @@ class ScreenTransition : public Screen // ID: 13
     TextureRenderingInfo woodpanel_bottomcutout1;
     TextureRenderingInfo woodpanel_bottomcutout2;
     TextureRenderingInfo woodpanel_bottomcutout3;
-    TextureRenderingInfo unknown_all_forced;
+    TextureRenderingInfo scroll;
     TextureRenderingInfo stats_scroll_top_bottom;
     TextureRenderingInfo killcount_rounded_rect;
     TextureRenderingInfo level_completed_panel;
@@ -667,13 +667,7 @@ class ScreenTransition : public Screen // ID: 13
 
     Color this_level_money_color;
 
-    uint8_t unknown41;
-    uint8_t unknown42;
-    uint8_t unknown43;
-    uint8_t unknown44;
-    uint32_t unknown45;
-    uint32_t unknown46;
-    uint32_t unknown47;
+    std::array<uint8_t, MAX_PLAYERS> buttons;
 };
 
 /// The POST render call will only be visible in the polaroid area on the left of the book. The book is apparently drawn on top of that.
