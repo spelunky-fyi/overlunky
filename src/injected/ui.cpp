@@ -4100,15 +4100,62 @@ void render_camera()
 {
     if (submenu("Focus and bounds"))
     {
+        if (render_uid(g_state->camera->focused_entity_uid, "FocusedEntity"))
+        {
+            ImGui::SameLine(0, 4.0f);
+            if (ImGui::Button("Unfocus"))
+                g_state->camera->focused_entity_uid = -1;
+            tooltip("Remove camera focus. Drag to move the camera around.", "mouse_camera_drag");
+        }
+        if (!g_players.empty())
+        {
+            if (g_state->camera->focused_entity_uid != g_players.at(0)->uid)
+            {
+                ImGui::SameLine(0, 4.0f);
+                if (ImGui::Button("Focus player"))
+                    g_state->camera->focused_entity_uid = g_players.at(0)->uid;
+                tooltip("Focus the player.", "camera_reset");
+            }
+        }
+        if (g_last_id != -1 && g_state->camera->focused_entity_uid != g_last_id)
+        {
+            ImGui::SameLine(0, 4.0f);
+            if (ImGui::Button("Focus selected"))
+                g_state->camera->focused_entity_uid = g_last_id;
+            tooltip("Focus the selected entity");
+        }
+
         auto [cx, cy] = State::get_camera_position();
-        float cpos[2]{cx, cy};
-        ImGui::InputFloat2("Position##CameraPos", cpos);
-        ImGui::InputFloat2("Focus##CameraFocus", &g_state->camera->focus_x);
-        ImGui::InputFloat2("Adjusted Focus##CameraAdjusted", &g_state->camera->adjusted_focus_x);
-        ImGui::InputFloat2("Calculated Focus##CameraCalculated", &g_state->camera->calculated_focus_x);
-        ImGui::InputFloat2("Focus Offset##CameraOffset", &g_state->camera->focus_offset_x);
-        ImGui::InputFloat("Vertical Pan##CameraOffset", &g_state->camera->vertical_pan);
+        ImGui::PushItemWidth(120.0f);
+        ImGui::InputFloat("##CameraPosX", &cx, 0.1f, 1.0f);
+        if (ImGui::IsItemEdited())
+            State::get().set_camera_position(cx, cy);
+        ImGui::SameLine(0, 4.0f);
+        ImGui::InputFloat("Position##CameraPosY", &cy, 0.1f, 1.0f);
+        if (ImGui::IsItemEdited())
+            State::get().set_camera_position(cx, cy);
+
+        ImGui::InputFloat("##CameraFocusX", &g_state->camera->focus_x, 0.1f, 1.0f);
+        ImGui::SameLine(0, 4.0f);
+        ImGui::InputFloat("Focus##CameraFocusY", &g_state->camera->focus_y, 0.1f, 1.0f);
+
+        ImGui::InputFloat("##CameraAdjustedFocusX", &g_state->camera->adjusted_focus_x, 0.1f, 1.0f);
+        ImGui::SameLine(0, 4.0f);
+        ImGui::InputFloat("Adjusted Focus##CameraAdjustedFocusY", &g_state->camera->adjusted_focus_y, 0.1f, 1.0f);
+
+        ImGui::InputFloat("##CameraCalculatedFocusX", &g_state->camera->calculated_focus_x, 0.1f, 1.0f);
+        ImGui::SameLine(0, 4.0f);
+        ImGui::InputFloat("Calculated Focus##CameraCalculatedFocusY", &g_state->camera->calculated_focus_y, 0.1f, 1.0f);
+
+        ImGui::InputFloat("##CameraOffsetX", &g_state->camera->focus_offset_x, 0.1f, 1.0f);
+        ImGui::SameLine(0, 4.0f);
+        ImGui::InputFloat("Focus Offset##CameraOffsetY", &g_state->camera->focus_offset_y, 0.1f, 1.0f);
+        ImGui::PopItemWidth();
+
+        ImGui::PushItemWidth(244.0f);
+        ImGui::InputFloat("Vertical Pan##CameraOffset", &g_state->camera->vertical_pan, 0.1f, 1.0f);
         ImGui::InputFloat4("Bounds##CameraBounds", &g_state->camera->bounds_left);
+        ImGui::PopItemWidth();
         endmenu();
     }
     ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
@@ -4159,32 +4206,6 @@ void render_camera()
         set_zoom();
     }
     tooltip("Automatically fit level width to screen.", "zoom_auto");
-    ImGui::Text("Focus:");
-    ImGui::SameLine();
-    if (render_uid(g_state->camera->focused_entity_uid, "FocusedEntity"))
-    {
-        ImGui::SameLine();
-        if (ImGui::Button("Unfocus"))
-            g_state->camera->focused_entity_uid = -1;
-        tooltip("Remove camera focus. Drag to move the camera around.", "mouse_camera_drag");
-    }
-    if (!g_players.empty())
-    {
-        if (g_state->camera->focused_entity_uid != g_players.at(0)->uid)
-        {
-            ImGui::SameLine();
-            if (ImGui::Button("Player"))
-                g_state->camera->focused_entity_uid = g_players.at(0)->uid;
-            tooltip("Focus the player.", "camera_reset");
-        }
-    }
-    if (g_last_id != -1 && g_state->camera->focused_entity_uid != g_last_id)
-    {
-        ImGui::SameLine();
-        if (ImGui::Button("Selected"))
-            g_state->camera->focused_entity_uid = g_last_id;
-        tooltip("Focus the selected entity");
-    }
     if (ImGui::Checkbox("Enable default camera bounds##CameraBoundsLevel", &enable_camera_bounds))
         set_camera_bounds(enable_camera_bounds);
     tooltip("Disable to free the camera bounds in a level.\nAutomatically disabled when dragging.", "camera_reset");
@@ -4213,16 +4234,20 @@ void render_camera()
         g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]), true);
     tooltip("Enable to follow the entity smoothly when paused\nor combine with speed=5 for instant camera that respects level borders.");
     static bool lock_inertia{false};
-    if (ImGui::Checkbox("Lock current camera speed multiplier##LockInertia", &lock_inertia))
+    if (ImGui::Checkbox("Lock current game camera speed##LockInertia", &lock_inertia))
     {
         if (lock_inertia)
             g_camera_inertia = g_state->camera->inertia;
         else
             g_camera_inertia = -FLT_MAX;
     }
-    tooltip("Force selected speed multiplier on the next level too.");
-    ImGui::PushItemWidth(-ImGui::GetContentRegionMax().x * 0.5f);
-    if (ImGui::DragFloat("Speed multiplier##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f))
+    tooltip("Force selected game camera speed on the next level too.");
+
+    ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
+    tooltip("Smooth camera movement when dragging, unless paused.");
+
+    ImGui::PushItemWidth(0.25f * ImGui::GetContentRegionMax().x);
+    if (ImGui::DragFloat("Game camera speed##CameraInertia", &g_state->camera->inertia, 0.1f, 0.1f, 5.0f))
     {
         if (lock_inertia)
             g_camera_inertia = g_state->camera->inertia;
@@ -4231,11 +4256,19 @@ void render_camera()
     }
     tooltip("Lower values moves slower and smoother,\nhigher values reduce lagging behind.\n5 = instantly move any distance");
     ImGui::SameLine();
+    ImGui::Text("(%03d%%)", (int)(20.0f * g_state->camera->inertia));
+    ImGui::SameLine();
     if (ImGui::Button("Reset##ResetCameraInertia"))
     {
         g_state->camera->inertia = 1.0f;
         g_camera_inertia = -FLT_MAX;
     }
+
+    ImGui::DragFloat("UI camera speed##DragSpeed", &g_camera_speed, 0.1f, 0.1f, 10.0f);
+    tooltip("Camera speed when dragging or moving with keyboard.");
+    ImGui::SameLine();
+    if (ImGui::Button("Reset##ResetUICameraSpeed"))
+        g_camera_speed = 1.0f;
     ImGui::PopItemWidth();
 }
 
@@ -5980,10 +6013,6 @@ void render_options()
         tooltip("Draw entity names, uids and some random stuff for hovered entitites.", "toggle_entity_tooltip");
         ImGui::Checkbox("Draw all entity info##DrawEntityInfo", &options["draw_entity_info"]);
         tooltip("Draw entity names, uids and some random stuff next to all entities.", "toggle_entity_info");
-        ImGui::Checkbox("Smooth camera dragging", &options["smooth_camera"]);
-        tooltip("Smooth camera movement when dragging, unless paused.");
-        ImGui::SliderFloat("Camera speed##DragSpeed", &g_camera_speed, 1.0f, 5.0f);
-        tooltip("Faster camera movement when dragging.");
         ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
         tooltip("Show outlines of tiles and rooms, with roomtypes.", "toggle_grid");
         ImGui::Checkbox("Draw path##DrawTileGrid", &options["draw_path"]);
@@ -6070,10 +6099,14 @@ void render_options()
 
     if (submenu("Frame advance / Pause options"))
     {
+        if (ImGui::Checkbox("Paused##PauseSim", &paused))
+            toggle_pause();
+        tooltip("Pause time while still being able to teleport, spawn and move entities", "toggle_pause");
+        ImGui::SeparatorText("Pause type");
         ImGui::PushID("PauseType");
         render_flags(pause_types, &g_pause_type, false);
         ImGui::PopID();
-        ImGui::Separator();
+        ImGui::SeparatorText("Pause options");
         if (ImGui::Checkbox("Freeze during loading screens", &options["pause_loading"]))
             g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]), true);
         bool pause_level = UI::get_start_level_paused();
@@ -8315,9 +8348,6 @@ void render_game_props()
         if (g_state->pause)
             gamestate += "Pause ";
         ImGui::LabelText("Game state", "%s", gamestate.c_str());
-        if (ImGui::Checkbox("Pause game engine##PauseSim", &paused))
-            toggle_pause();
-        tooltip("Pause time while still being able to teleport, spawn and move entities", "toggle_pause");
         endmenu();
     }
     if (submenu("Timer"))

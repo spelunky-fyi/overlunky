@@ -698,13 +698,13 @@ std::array screen_names{
 
 std::array pause_types{
     "1: Menu",
-    "2: Fade (janky camera, default)",
+    "2: Fade",
     "4: Cutscene",
     "8: ?",
     "16: ?",
-    "32: Ankh (smooth camera, janky audio)",
-    "Freeze on PRE_UPDATE (state)",           // this is not a real state.pause flag, it's only used by ui.cpp for magic
-    "Freeze on PRE_GAME_LOOP (state + menu)", // this is not a real state.pause flag, it's only used by ui.cpp for magic
+    "32: Ankh",
+    "Freeze updates (state)",          // this is not a real state.pause flag, it's only used by ui.cpp for magic
+    "Freeze game loop (state + menu)", // this is not a real state.pause flag, it's only used by ui.cpp for magic
 };
 
 std::array levelgen_flags{
