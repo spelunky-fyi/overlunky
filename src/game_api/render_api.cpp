@@ -432,7 +432,7 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
 
         typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
-        rf(&tri, shader, texture->name, &color);
+        rf(&tri, shader, texture == nullptr ? nullptr : texture->name, &color);
     }
 }
 
@@ -443,7 +443,7 @@ void RenderAPI::draw_screen_texture(Texture* texture, TextureRenderingInfo tri, 
     {
         typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
         static render_func* rf = (render_func*)(offset);
-        rf(&tri, shader, texture->name, &color);
+        rf(&tri, shader, texture == nullptr ? nullptr : texture->name, &color);
     }
 }
 

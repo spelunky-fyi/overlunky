@@ -66,6 +66,9 @@ void register_usertypes(sol::state& lua)
     gamemanager_type["screen_seed_input"] = &GameManager::screen_seed_input;
     gamemanager_type["screen_camp"] = &GameManager::screen_camp;
     gamemanager_type["screen_level"] = &GameManager::screen_level;
+    gamemanager_type["screen_transition"] = &GameManager::screen_transition;
+    gamemanager_type["screen_arena_level"] = &GameManager::screen_arena_level;
+    gamemanager_type["screen_arena_score"] = &GameManager::screen_arena_score;
     gamemanager_type["screen_online_loading"] = &GameManager::screen_online_loading;
     gamemanager_type["screen_online_lobby"] = &GameManager::screen_online_lobby;
     gamemanager_type["pause_ui"] = &GameManager::pause_ui;
@@ -97,12 +100,6 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::timer,
         "slide_position",
         &JournalPopupUI::slide_position);
-    lua.new_usertype<InputDevice>(
-        "InputDevice",
-        "input_index",
-        &InputDevice::input_index,
-        "buttons",
-        &InputDevice::buttons);
     lua.new_usertype<GameProps>(
         "GameProps",
         /// NoDoc

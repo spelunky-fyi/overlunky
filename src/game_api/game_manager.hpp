@@ -11,16 +11,15 @@
 struct SaveData;
 class ScreenCamp;
 class ScreenIntro;
-class ScreenLeaderboards;
+class Screen;
 class ScreenLevel;
 class ScreenLogo;
 class ScreenMenu;
 class ScreenOnlineLoading;
 class ScreenOnlineLobby;
 class ScreenOptions;
-class ScreenPlayerProfile;
 class ScreenPrologue;
-class ScreenSeedInput;
+class ScreenCodeInput;
 class ScreenTitle;
 struct JournalUI;
 struct PauseUI;
@@ -35,12 +34,18 @@ struct JournalPopupUI
     uint32_t entry_to_show; // use the odd entry of the left hand page
     uint32_t timer;
     float slide_position;
+    uint8_t unknown;
 };
 
 struct SaveRelated
 {
     OnHeapPointer<SaveData> savedata;
     JournalPopupUI journal_popup_ui;
+};
+
+struct BGMUnknown
+{
+    std::array<float, 40> unknown; // probably wrong size
 };
 
 struct BackgroundMusic
@@ -64,10 +69,10 @@ struct BackgroundMusic
     uint8_t unknown17;
     uint8_t unknown18;
     uint8_t unknown19;
-    uint8_t unknown20;
-    int8_t skip[2400]; // 600 floats, mostly seem to be 1.0
-    float idle_counter;
-    uint32_t unknown22;
+    uint8_t padding_probably;
+    std::array<BGMUnknown, 15> unknown21; // They continously go from 1 to 0 and back as a one big table, from first one to the last one, each change is one tick counted by the unknown22
+    float idle_counter;                   // counts down at the start of a level, then reacts to the player movement controls
+    uint32_t unknown22;                   // some timer (counts continuously)
 };
 
 struct KeyboardKey
@@ -104,14 +109,14 @@ struct RawInput
 struct InputDevice
 {
     // No idea what these actually do, better not to expose this anyway
-    bool unknown1;
-    bool unknown2;
-    bool menu_input;
+    bool unknown1;   // is_keyboard ?
+    bool unknown2;   // is_controller ?
+    bool menu_input; // keyboard doesn't seam to care about this
     bool lost_connection;
     int8_t input_index;
     uint8_t padding2[3];
     uint32_t buttons;
-    // a lot more stuff
+    uint8_t controller_index; // for XInput used in XInputSetState
 };
 
 struct GameProps
@@ -135,18 +140,30 @@ struct GameProps
 
     // uint8_t padding_probably1[3];
 
-    int32_t unknown12; // -1
-    int8_t unknown13;  // -1
+    int32_t next_player_entrence; // unsure?
+    int8_t unknown13a;            // -1
+    int8_t unknown13b;            // bool?
 
-    // uint8_t padding_probably2[3];
+    // uint8_t padding_probably2[2];
 
-    size_t unknown14; // probably not one thig
+    uint32_t unknown14a;
+    int8_t unknown14b[3]; // -1
+
+    // uint8_t padding_probably3;
+
     uint32_t unknown15;
 
-    // uint32_t padding_probably3;
+    // uint32_t padding_probably4;
     size_t* unknown16;
     size_t unknwon17;
-    double unknown18; // counts time or something? only active when the game window is active
+    std::array<double, MAX_PLAYERS> unknown18; // counts time or something? only active when the game window is active when there is a player choosen?
+    int32_t unknown19;
+    int32_t unknown20; // -1
+    size_t unknown21;
+    size_t unknown22;
+    bool unknown23;
+
+    // seam like only garbage below
 };
 
 struct GameManager
@@ -167,14 +184,16 @@ struct GameManager
     ScreenTitle* screen_title;
     ScreenMenu* screen_menu;
     ScreenOptions* screen_options;
-    ScreenPlayerProfile* screen_player_profile;
-    ScreenLeaderboards* screen_leaderboards;
-    ScreenSeedInput* screen_seed_input;
+    /// It just opens journal
+    Screen* screen_player_profile;
+    /// All handled by the Online
+    Screen* screen_leaderboards;
+    ScreenCodeInput* screen_seed_input;
     size_t unknown_screen_character_select; // available in State
     size_t unknown_screen_team_select;      // available in State
     ScreenCamp* screen_camp;
     ScreenLevel* screen_level;
-    size_t* screen_transition;           // available in State, but it's a different object! this one only has a render_timer
+    Screen* screen_transition;           // available in State, but it's a different object! this one only has a render_timer
     size_t unknown_screen_death;         // available in State
     size_t unknown_screen_spaceship;     // (also not) available in State
     size_t unknown_screen_win;           // available in State
@@ -187,13 +206,23 @@ struct GameManager
     size_t unknown_screen_arena_items;   // available in State
     size_t unknown_screen_arena_select;  // available in State
     size_t unknown_screen_arena_intro;   // available in State
-    size_t* screen_arena_level;          // also available in State, but it's a different object! this one only has a render_timer, no UI parts
-    size_t* unknown_screen_arena_score;  // available in State
+    Screen* screen_arena_level;          // also available in State, but it's a different object! Seams to only call pause function at the start, probably for the intro stuff
+    Screen* screen_arena_score;          // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;
     PauseUI* pause_ui;
     JournalUI* journal_ui;
     BackgroundSound* main_menu_music;
+    float layer_transition; // menus, going inwards/backwards
+    float layer;
+    int8_t transition_timer;
+    bool unknown31;
+    // uint8_t padding_probably1[2];
+    uint32_t unknown33;
+    bool unknown34;
+    bool unknown35;
+    // uint8_t padding_probably2[2];
+    // 3 * 4 bytes more maybe?
 };
 
 GameManager* get_game_manager();

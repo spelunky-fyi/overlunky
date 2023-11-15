@@ -2105,16 +2105,16 @@ do
     ---@field layer_transition_timer integer
     ---@field transition_to_layer integer
     ---@field screen_character_select ScreenCharacterSelect
-    ---@field screen_team_select ScreenTeamSelect
+    ---@field screen_team_select ScreenTeamSelect @For the arena
     ---@field screen_camp ScreenStateCamp
     ---@field screen_level ScreenStateLevel
     ---@field screen_transition ScreenTransition
     ---@field screen_death ScreenDeath
     ---@field screen_win ScreenWin
-    ---@field screen_credits ScreenCredits
-    ---@field screen_scores ScreenScores
+    ---@field screen_credits ScreenCredits @The spaceship minigame
+    ---@field screen_scores ScreenScores @Landing on the moon after win
     ---@field screen_constellation ScreenConstellation
-    ---@field screen_recap ScreenRecap
+    ---@field screen_recap ScreenRecap @Journal after CO win
     ---@field screen_arena_stages_select ScreenArenaStagesSelect
     ---@field screen_arena_intro ScreenArenaIntro
     ---@field screen_arena_level ScreenArenaLevel
@@ -2256,11 +2256,14 @@ do
     ---@field screen_title ScreenTitle
     ---@field screen_menu ScreenMenu
     ---@field screen_options ScreenOptions
-    ---@field screen_player_profile ScreenPlayerProfile
-    ---@field screen_leaderboards ScreenLeaderboards
-    ---@field screen_seed_input ScreenSeedInput
+    ---@field screen_player_profile Screen @It just opens journal
+    ---@field screen_leaderboards Screen @All handled by the Online
+    ---@field screen_seed_input ScreenCodeInput
     ---@field screen_camp ScreenCamp
     ---@field screen_level ScreenLevel
+    ---@field screen_transition Screen
+    ---@field screen_arena_level Screen
+    ---@field screen_arena_score Screen
     ---@field screen_online_loading ScreenOnlineLoading
     ---@field screen_online_lobby ScreenOnlineLobby
     ---@field pause_ui PauseUI
@@ -2282,10 +2285,6 @@ do
     ---@field entry_to_show integer
     ---@field timer integer
     ---@field slide_position number
-
----@class InputDevice
-    ---@field input_index integer
-    ---@field buttons integer
 
 ---@class GameProps
     ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
@@ -5526,6 +5525,35 @@ function Quad:is_point_inside(p, epsilon) end
 ---@return boolean
 function Quad:is_point_inside(x, y, epsilon) end
 
+---@class MenuScreenPanels
+    ---@field woodpanels_velocity number
+    ---@field woodpanels_progress number
+    ---@field scroll_unfurl_progress number
+    ---@field bottom_woodpanel_speed_multiplayer number
+    ---@field bottom_woodpanel_y_offset number
+    ---@field bottom_woodpanel TextureRenderingInfo
+    ---@field top_woodpanel TextureRenderingInfo
+    ---@field scroll TextureRenderingInfo
+    ---@field top_woodpanel_left_scrollhandle TextureRenderingInfo
+    ---@field top_woodpanel_right_scrollhandle TextureRenderingInfo
+    ---@field scroll_text STRINGID
+    ---@field bottom_left_text STRINGID
+    ---@field bottom_right_text STRINGID
+    ---@field bottom_middle_text STRINGID
+    ---@field top_woodpanel_visible boolean
+    ---@field bottom_woodpanel_visible boolean
+    ---@field toggle_woodpanel_slidein_animation boolean
+    ---@field capitalize_scroll_text boolean
+
+---@class ScreenControls
+    ---@field up boolean
+    ---@field down boolean
+    ---@field left boolean
+    ---@field right boolean
+    ---@field direction_input integer @-1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    ---@field hold_down_timer integer @Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    ---@field fast_scroll_timer integer
+
 ---@class Screen
     ---@field render_timer number
     ---@field init fun(self): nil @Initializes the screen.
@@ -5534,10 +5562,12 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field logo_mossmouth TextureRenderingInfo
     ---@field logo_blitworks TextureRenderingInfo
     ---@field logo_fmod TextureRenderingInfo
+    ---@field state integer @0 - mossmouth, 1 - blitworks, 2 - fmod, 3 - end (next screen)
+    ---@field timer integer
 
 ---@class ScreenIntro : Screen
-    ---@field unknown4 TextureRenderingInfo
-    ---@field darkness number
+    ---@field blackout_background TextureRenderingInfo
+    ---@field blackout_alpha number
     ---@field active boolean @ends the intro immediately if set to false
     ---@field skip_prologue boolean @skips prologue and goes straight to the title screen after the intro
 
@@ -5560,6 +5590,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field particle_torchflame_backflames_animated ParticleEmitterInfo
     ---@field particle_torchflame_flames_animated ParticleEmitterInfo
     ---@field particle_torchflame_ash ParticleEmitterInfo
+    ---@field brightness number
     ---@field music SoundMeta
     ---@field torch_sound SoundMeta
 
@@ -5568,6 +5599,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field row integer
 
 ---@class ScreenMenu : Screen
+    ---@field state integer @0: "cthulhu_pre_movement",<br/>1: "cthulhu_rotating",<br/>2: "cthulhu_separating",<br/>3: "cthulhu_lowering",<br/>4: "cthulhu_transition_to_menu",<br/>5: "return_from_backlayer",<br/>6: "highlight_selection",<br/>7: "idle",<br/>8: "to_submenu",<br/>9: "to_backlayer",<br/>10: "backlayer_idle"
     ---@field tunnel_background TextureRenderingInfo
     ---@field cthulhu_disc TextureRenderingInfo
     ---@field tunnel_ring_darkbrown TextureRenderingInfo
@@ -5583,37 +5615,43 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field play_scroll TextureRenderingInfo
     ---@field info_toast TextureRenderingInfo
     ---@field cthulhu_sound SoundMeta
+    ---@field particle_smoke ParticleEmitterInfo
+    ---@field particle_rubble ParticleEmitterInfo
     ---@field cthulhu_disc_ring_angle number
     ---@field cthulhu_disc_split_progress number
     ---@field cthulhu_disc_y number
     ---@field cthulhu_timer number
+    ---@field controls ScreenControls
     ---@field selected_menu_index integer
----@field menu_text_opacity number
+    ---@field sides_hold_down_timer integer
+    ---@field sides_fast_scroll_timer integer
+    ---@field loop boolean @Allow going up from first to last option
+    ---@field menu_id integer @0 = main menu, 1 = play, 2 = online
+    ---@field transfer_to_menu_id integer
+    ---@field menu_text_opacity number
     ---@field spear_position number[] @size: 6
     ---@field spear_dangler SpearDanglerAnimFrames[] @size: 6
+    ---@field spear_dangle_momentum integer[] @size: 6
+    ---@field spear_dangle_angle integer[] @size: 6
     ---@field play_scroll_descend_timer number
     ---@field scroll_text STRINGID
+    ---@field shake_offset_x number
+    ---@field shake_offset_y number
 
 ---@class ScreenOptions : Screen
+    ---@field down boolean
+    ---@field up boolean
+    ---@field direction_input integer @-1 = none, 0 = down, 1 = up
+    ---@field hold_down_timer integer
+    ---@field fast_scroll_timer integer
     ---@field selected_menu_index integer
-    ---@field brick_border TextureRenderingInfo
-    ---@field top_bottom_woodpanels_velocity number
-    ---@field top_bottom_woodpanels_progress number
-    ---@field scroll_unfurl_progress number
-    ---@field bottom_woodpanel_y number
-    ---@field top_bottom_woodpanels_slide_in_related number
-    ---@field bottom_woodpanel TextureRenderingInfo
-    ---@field top_woodpanel TextureRenderingInfo
-    ---@field top_woodpanel_left_scrollhandle TextureRenderingInfo
-    ---@field top_woodpanel_right_scrollhandle TextureRenderingInfo
-    ---@field button_right_caption STRINGID
-    ---@field button_middle_caption STRINGID
-    ---@field top_woodpanel_visible boolean
-    ---@field bottom_woodpanel_visible boolean
-    ---@field toggle_woodpanel_slidein_animation boolean
-    ---@field capitalize_top_woodpanel boolean
-    ---@field current_menu_1 integer
-    ---@field current_menu_2 integer
+    ---@field sides_hold_down_timer integer
+    ---@field sides_fast_scroll_timer integer
+    ---@field loop boolean @Allow going up from first to last option
+    ---@field screen_panels MenuScreenPanels
+    ---@field menu_id integer
+    ---@field transfer_to_menu_id integer
+    ---@field show_apply_button boolean
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field brick_background TextureRenderingInfo
     ---@field brick_middlelayer TextureRenderingInfo
@@ -5624,51 +5662,63 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field item_option_arrow_right TextureRenderingInfo
     ---@field tooltip_background TextureRenderingInfo
     ---@field progressbar_background TextureRenderingInfo
+    ---@field volume_progressbar_foreground TextureRenderingInfo
     ---@field progressbar_foreground TextureRenderingInfo
-    ---@field progressbar_position_indicator TextureRenderingInfo
+    ---@field volume_progressbar_position_indicator TextureRenderingInfo
     ---@field sectionheader_background TextureRenderingInfo
-    ---@field topleft_woodpanel_esc_slidein_timer number
-    ---@field text_fadein_timer number
-    ---@field vertical_scroll_effect_timer number
+    ---@field pet_icons TextureRenderingInfo @In "Gameplay" menu
+    ---@field bottom_scroll TextureRenderingInfo @For the code in the sync menu
+    ---@field bottom_left_scrollhandle TextureRenderingInfo
+    ---@field bottom_right_scrollhandle TextureRenderingInfo
+    ---@field topleft_woodpanel_esc_slidein number
+    ---@field text_fadein number
+    ---@field vertical_scroll_effect number
+    ---@field options_visiable boolean
+    ---@field show_highlight boolean @Shows the red background behind the option, the scarab on the left and left/right arrows
+    ---@field tooltip_text STRINGID[]
+    ---@field disable_controls boolean @Used for sync progress
+    ---@field sync_progress_state integer @0 - none, 1 - waiting for the code, 2 - code acquired, 3 - sync in progress, 4 - sync completed
+    ---@field credits_progression number
 
----@class ScreenPlayerProfile : Screen
-
----@class ScreenLeaderboards : Screen
-
----@class ScreenSeedInput : Screen
-    ---@field bottom_woodpanel_slideup_timer number
-    ---@field bottom_woodpanel_y number
-    ---@field bottom_woodpanel TextureRenderingInfo
-    ---@field buttons_text_id STRINGID
-    ---@field topleft_woodpanel_esc_slidein_timer number
+---@class ScreenCodeInput : Screen
+    ---@field screen_panels MenuScreenPanels
+    ---@field allow_random boolean @needs to be set before opening the screen to show the correct text at the bottom
+    ---@field selected_button_index integer
+    ---@field pressed_select boolean
+    ---@field topleft_woodpanel_esc_slidein number
     ---@field scroll_text_id STRINGID
     ---@field start_text_id STRINGID
     ---@field main_woodpanel_left_border TextureRenderingInfo
     ---@field main_woodpanel_center TextureRenderingInfo
     ---@field main_woodpanel_right_border TextureRenderingInfo
-    ---@field seed_letter_cutouts TextureRenderingInfo
+    ---@field top_scroll TextureRenderingInfo
+    ---@field letter_cutouts TextureRenderingInfo
+    ---@field hand_pointer TextureRenderingInfo
+    ---@field key_background TextureRenderingInfo
     ---@field topleft_woodpanel_esc TextureRenderingInfo
     ---@field start_sidepanel TextureRenderingInfo
-    ---@field start_sidepanel_slidein_timer number
+    ---@field start_sidepanel_slidein number
     ---@field seed_length integer @Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
-    ---@field get_seed integer?
-    ---@field set_seed any @[](ScreenSeedInput&s
+    ---@field get_seed fun(self): integer? @Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.
+    ---@field set_seed fun(self, seed: integer?, length: integer?): nil @Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.
+
+---@class FlyingThing
+    ---@field texture_info TextureRenderingInfo
+    ---@field entity_type ENT_TYPE
+    ---@field spritesheet_column number
+    ---@field spritesheet_row number
+    ---@field spritesheet_animation_length number
+    ---@field velocity_x number
+    ---@field amplitude number
+    ---@field frequency number
+    ---@field sinewave_angle number
 
 ---@class ScreenCharacterSelect : Screen
+    ---@field main_background_zoom_progress number
     ---@field main_background_zoom_target number
+    ---@field blurred_border_zoom_progress number
     ---@field blurred_border_zoom_target number
-    ---@field top_bottom_woodpanel_slidein_timer number
-    ---@field top_scroll_unfurl_timer number
-    ---@field bottom_woodpanel TextureRenderingInfo
-    ---@field top_woodpanel TextureRenderingInfo
-    ---@field left_scroll_handle TextureRenderingInfo
-    ---@field right_scroll_handle TextureRenderingInfo
-    ---@field left_button_text_id STRINGID
-    ---@field right_button_text_id STRINGID
-    ---@field middle_button_text_id STRINGID
-    ---@field top_woodpanel_visible boolean
-    ---@field bottom_woodpanel_visible boolean
-    ---@field toggle_woodpanel_slidein_animation boolean
+    ---@field screen_panels MenuScreenPanels
     ---@field mine_entrance_background TextureRenderingInfo
     ---@field character TextureRenderingInfo
     ---@field character_shadow TextureRenderingInfo
@@ -5694,16 +5744,18 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_quickselect_fadein_timer number[] @size: MAX_PLAYERS
     ---@field player_quickselect_coords number[][] @size: MAX_PLAYERS
     ---@field player_quickselect_wiggle_angle number[] @size: MAX_PLAYERS
-    ---@field topleft_woodpanel_esc_slidein_timer number
-    ---@field start_panel_slidein_timer number
+    ---@field topleft_woodpanel_esc_slidein number
+    ---@field start_panel_slidein number
     ---@field action_buttons_keycap_size number
+    ---@field next_screen_to_load integer
     ---@field not_ready_to_start_yet boolean
     ---@field available_mine_entrances integer
     ---@field amount_of_mine_entrances_activated integer
-    ---@field buttons integer
-    ---@field opacity number
+    ---@field screen_blackout TextureRenderingInfo
+    ---@field blackout_transparency number
     ---@field start_pressed boolean
     ---@field transition_to_game_started boolean
+    ---@field disable_controls boolean
     ---@field flying_things FlyingThing[] @size: 6
     ---@field flying_thing_countdown integer
     ---@field particle_ceilingdust_smoke ParticleEmitterInfo
@@ -5717,30 +5769,22 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field particle_torchflame_flames3 ParticleEmitterInfo
     ---@field particle_torchflame_smoke4 ParticleEmitterInfo
     ---@field particle_torchflame_flames4 ParticleEmitterInfo
-    ---@field sound SoundMeta
-
----@class FlyingThing
-    ---@field texture_info TextureRenderingInfo
-    ---@field entity_type ENT_TYPE
-    ---@field spritesheet_column number
-    ---@field spritesheet_row number
-    ---@field spritesheet_animation_length number
-    ---@field velocity_x number
-    ---@field amplitude number
-    ---@field frequency number
-    ---@field sinewave_angle number
+    ---@field torch_sound SoundMeta[] @size: 4
+    ---@field buttons integer[] @size: MAX_PLAYERS
 
 ---@class ScreenTeamSelect : Screen
-    ---@field ana_carrying_torch TextureRenderingInfo
+    ---@field player_portrait TextureRenderingInfo
     ---@field scroll_bottom_left TextureRenderingInfo
     ---@field scrollend_bottom_left TextureRenderingInfo
     ---@field four_ropes TextureRenderingInfo
-    ---@field unknown4 TextureRenderingInfo
+    ---@field gems_above_the_ropes TextureRenderingInfo
     ---@field four_characters TextureRenderingInfo
     ---@field left_arrow TextureRenderingInfo
     ---@field right_arrow TextureRenderingInfo
     ---@field start_panel TextureRenderingInfo
-    ---@field start_panel_slide_timer number
+    ---@field go_back_wooden_panel TextureRenderingInfo
+    ---@field start_panel_slide number
+    ---@field go_back_wooden_panel_slide number
     ---@field pulsating_arrows_timer number
     ---@field selected_player integer
     ---@field buttons integer
@@ -5764,6 +5808,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field stats_scroll_horizontal_posaa number
     ---@field stats_scroll_vertical_pos number
     ---@field level_completed_pos number
+    ---@field stats_scroll_unfurl_actualvalue number
     ---@field stats_scroll_unfurl_targetvalue number
     ---@field woodpanel1 TextureRenderingInfo
     ---@field woodpanel2 TextureRenderingInfo
@@ -5775,7 +5820,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field woodpanel_bottomcutout1 TextureRenderingInfo
     ---@field woodpanel_bottomcutout2 TextureRenderingInfo
     ---@field woodpanel_bottomcutout3 TextureRenderingInfo
-    ---@field unknown_all_forced TextureRenderingInfo
+    ---@field scroll TextureRenderingInfo
     ---@field stats_scroll_top_bottom TextureRenderingInfo
     ---@field killcount_rounded_rect TextureRenderingInfo
     ---@field level_completed_panel TextureRenderingInfo
@@ -5785,6 +5830,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field mama_tunnel TextureRenderingInfo
     ---@field speechbubble TextureRenderingInfo
     ---@field speechbubble_arrow TextureRenderingInfo
+    ---@field mama_tunnel_fade_targetvalue number
     ---@field mama_tunnel_fade_targetvalue number
     ---@field mama_tunnel_text_id STRINGID
     ---@field mama_tunnel_choice_visible boolean
@@ -5797,7 +5843,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field woodpanel_cutout_big_money2 TextureRenderingInfo
     ---@field woodpanel_cutout_big_money3 TextureRenderingInfo
     ---@field big_dollar_sign TextureRenderingInfo
-    ---@field unknown26 TextureRenderingInfo
+    ---@field stats_scroll_unfurl_sequence integer
     ---@field player_stats_scroll_numeric_value integer[] @size: MAX_PLAYERS
     ---@field player_secondary_icon TextureRenderingInfo[] @size: MAX_PLAYERS
     ---@field player_icon TextureRenderingInfo[] @size: MAX_PLAYERS
@@ -5806,6 +5852,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field hourglasses TextureRenderingInfo
     ---@field small_dollar_signs TextureRenderingInfo
     ---@field this_level_money_color Color
+    ---@field buttons integer[] @size: MAX_PLAYERS
 
 ---@class ScreenDeath : Screen
 
@@ -5816,6 +5863,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field rescuing_ship_entity Entity
 
 ---@class ScreenCredits : Screen
+    ---@field credits_progression number
     ---@field bg_music_info SoundMeta
 
 ---@class ScreenScores : Screen
@@ -5844,27 +5892,17 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field ouroboros_angle number
 
 ---@class OnlineLobbyScreenPlayer
+    ---@field platform_icon integer @16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = switch, 48 = PS, 49 = PS again?
     ---@field character integer @0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     ---@field ready boolean
+    ---@field searching boolean
 
 ---@class ScreenOnlineLobby : Screen
-    ---@field woodpanels_slidein_timer number
-    ---@field scroll_unfurl_timer number
-    ---@field woodpanel_bottom TextureRenderingInfo
-    ---@field woodpanel_top TextureRenderingInfo
-    ---@field left_scroll_handle TextureRenderingInfo
-    ---@field right_scroll_handle TextureRenderingInfo
-    ---@field scroll_text_id STRINGID
-    ---@field btn_left_text_id STRINGID
-    ---@field btn_right_text_id STRINGID
-    ---@field btn_center_text_id STRINGID
-    ---@field woodpanel_top_visible boolean
-    ---@field woodpanel_bottom_visible boolean
-    ---@field toggle_panels_slidein boolean
+    ---@field screen_panels MenuScreenPanels
     ---@field players OnlineLobbyScreenPlayer[] @size: 4
     ---@field background_image TextureRenderingInfo
     ---@field topleft_woodpanel_esc TextureRenderingInfo
-    ---@field topleft_woodpanel_esc_slidein_timer number
+    ---@field topleft_woodpanel_esc_slidein number
     ---@field character_walk_offset number
     ---@field character_facing_left boolean
     ---@field move_direction integer
@@ -5878,30 +5916,12 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_count integer
     ---@field searching_for_players boolean
     ---@field show_code_panel boolean
-    ---@field enter_code_woodpanel_bottom_slidein_pos number
-    ---@field enter_code_woodpanel_bottom TextureRenderingInfo
-    ---@field enter_code_btn_right_text_id STRINGID
-    ---@field enter_code_woodpanel_top_visible boolean
-    ---@field enter_code_woodpanel_bottom_visible boolean
-    ---@field enter_code_toggle_panels_slidein boolean
-    ---@field selected_character integer
-    ---@field characters_entered_count integer
-    ---@field enter_code_topleft_woodpanel_esc_slidein_timer number
-    ---@field enter_code_banner_text_id STRINGID
-    ---@field enter_code_OK_text_id STRINGID
-    ---@field enter_code_main_woodpanel_left TextureRenderingInfo
-    ---@field enter_code_main_woodpanel_center TextureRenderingInfo
-    ---@field enter_code_main_woodpanel_right TextureRenderingInfo
-    ---@field enter_code_banner TextureRenderingInfo
-    ---@field enter_code_char_cutouts TextureRenderingInfo
-    ---@field enter_code_pointing_hand TextureRenderingInfo
-    ---@field enter_code_buttons TextureRenderingInfo
-    ---@field enter_code_OK_panel TextureRenderingInfo
-    ---@field enter_code_OK_panel_slidein_timer number
+    ---@field screen_code_input ScreenEnterOnlineCode
+
+---@class ScreenEnterOnlineCode : ScreenCodeInput
     ---@field enter_code_your_code_scroll TextureRenderingInfo
     ---@field enter_code_your_code_scroll_left_handle TextureRenderingInfo
     ---@field enter_code_your_code_scroll_right_handle TextureRenderingInfo
-    ---@field set_code fun(self, code: string): nil
 
 ---@class PauseUI
     ---@field menu_slidein_progress number
@@ -5911,9 +5931,12 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field woodpanel_right TextureRenderingInfo
     ---@field woodpanel_top TextureRenderingInfo
     ---@field scroll TextureRenderingInfo
-    ---@field confirmation_panel TextureRenderingInfo
-    ---@field previously_selected_menu_index integer
-    ---@field visibility integer
+    ---@field confirmation_panel TextureRenderingInfo @Prompt background
+    ---@field selected_option integer @It's set wh game displays the prompt
+    ---@field prompt_visible boolean
+    ---@field buttons_actions integer[] @size: MAX_PLAYERS
+    ---@field buttons_movement integer[] @size: MAX_PLAYERS
+    ---@field visibility integer @0 - Invisible, 1 - Sliding down, 2 - Visible, 3 - Sliding up
 
 ---@class JournalUI
     ---@field state integer
@@ -5924,10 +5947,9 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field book_background TextureRenderingInfo
     ---@field arrow_left TextureRenderingInfo
     ---@field arrow_right TextureRenderingInfo
-    ---@field unknown23 TextureRenderingInfo
     ---@field entire_book TextureRenderingInfo
-    ---@field page_timer integer
     ---@field fade_timer integer
+    ---@field page_timer integer
     ---@field opacity integer
     ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
@@ -5941,7 +5963,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field coffeestain_top TextureRenderingInfo
 
 ---@class JournalPageJournalMenu : JournalPage
-    ---@field selected_menu_index integer
     ---@field journal_text_info TextRenderingInfo
     ---@field completion_badge TextureRenderingInfo
 
@@ -5976,8 +5997,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field trap_icon TextureRenderingInfo
     ---@field trap_background TextureRenderingInfo
 
----@class JournalPageStory : JournalPage
-
 ---@class JournalPageFeats : JournalPage
     ---@field chapter_title_text_info TextRenderingInfo
     ---@field feat_icons TextureRenderingInfo
@@ -5986,7 +6005,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field death_cause_text_info TextRenderingInfo
 
 ---@class JournalPageDeathMenu : JournalPage
-    ---@field selected_menu_index integer
     ---@field game_over_text_info TextRenderingInfo
     ---@field level_text_info TextRenderingInfo
     ---@field level_value_text_info TextRenderingInfo
@@ -5994,8 +6012,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field money_value_text_info TextRenderingInfo
     ---@field time_text_info TextRenderingInfo
     ---@field time_value_text_info TextRenderingInfo
-
----@class JournalPageRecap : JournalPage
 
 ---@class JournalPagePlayerProfile : JournalPage
     ---@field player_icon TextureRenderingInfo
@@ -6035,22 +6051,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field stickers TextureRenderingInfo[] @size: 20
 
 ---@class ScreenArenaMenu : Screen
-    ---@field brick_background_animation ScreenZoomAnimation
-    ---@field blurry_border_animation ScreenZoomAnimation
-    ---@field top_woodpanel_slidein_timer number
-    ---@field top_scroll_unfurl_timer number
-    ---@field unknown13 TextureRenderingInfo
-    ---@field woodpanel_top TextureRenderingInfo
-    ---@field unknown15 TextureRenderingInfo
-    ---@field left_scroll_handle TextureRenderingInfo
-    ---@field right_scroll_handle TextureRenderingInfo
-    ---@field scroll_text_id STRINGID
-    ---@field unknown17_text_id STRINGID
-    ---@field unknown18_text_id STRINGID
-    ---@field unknown19_text_id STRINGID
-    ---@field top_woodpanel_visible boolean
-    ---@field bottom_woodpanel_visible boolean
-    ---@field woodpanels_toggle boolean
+    ---@field screen_panels MenuScreenPanels
     ---@field brick_background TextureRenderingInfo
     ---@field blurry_border TextureRenderingInfo
     ---@field blurry_border2 TextureRenderingInfo
@@ -6080,23 +6081,10 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field esc_next_panels_slide_timer number
     ---@field main_panel_vertical_scroll_position number
     ---@field selected_option_index integer
-
----@class ScreenZoomAnimation
-    ---@field zoom_target number
+    ---@field controls ScreenControls
 
 ---@class ScreenArenaStagesSelect : Screen
-    ---@field woodenpanel_top_slidein_timer number
-    ---@field woodenpanel_top_scroll_unfurl_timer number
-    ---@field woodenpanel_top TextureRenderingInfo
-    ---@field woodenpanel_top_left_scroll TextureRenderingInfo
-    ---@field woodenpanel_top_right_scroll TextureRenderingInfo
-    ---@field text_id_1 STRINGID
-    ---@field text_id_2 STRINGID
-    ---@field text_id_3 STRINGID
-    ---@field text_id_4 STRINGID
-    ---@field woodenpanel_top_visible boolean
-    ---@field woodenpanel_bottom_visible boolean
-    ---@field woodenpanels_toggle boolean
+    ---@field screen_panels MenuScreenPanels
     ---@field buttons integer
     ---@field brick_background TextureRenderingInfo
     ---@field info_black_background TextureRenderingInfo
@@ -6123,23 +6111,14 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field players_turn_scroll TextureRenderingInfo
     ---@field players_turn_scroll_handle TextureRenderingInfo
     ---@field grid_player_icon TextureRenderingInfo
+    ---@field stages_to_gray_out table<integer, number>
+    ---@field panels_slide_from_both_sides number
+    ---@field visibility_all_stages number
     ---@field selected_stage_index integer
+    ---@field controls ScreenControls
 
 ---@class ScreenArenaItems : Screen
-    ---@field woodpanel_top_slidein_timer number
-    ---@field woodpanel_top_scroll_unfurl_timer number
-    ---@field unknown9 TextureRenderingInfo
-    ---@field woodpanel_top TextureRenderingInfo
-    ---@field unknown11 TextureRenderingInfo
-    ---@field top_scroll_left_handle TextureRenderingInfo
-    ---@field top_scroll_right_handle TextureRenderingInfo
-    ---@field scroll_text_id STRINGID
-    ---@field text_id_2 STRINGID
-    ---@field text_id_3 STRINGID
-    ---@field text_id_4 STRINGID
-    ---@field woodpanel_top_visible boolean
-    ---@field woodpanel_bottom_visible boolean
-    ---@field woodpanels_toggle boolean
+    ---@field screen_panels MenuScreenPanels
     ---@field brick_background TextureRenderingInfo
     ---@field black_background_bottom_right TextureRenderingInfo
     ---@field woodpanel_bottom TextureRenderingInfo
@@ -6155,36 +6134,44 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field item_equipped_badge TextureRenderingInfo
     ---@field item_off_gray_overlay TextureRenderingInfo
     ---@field esc_woodpanel TextureRenderingInfo
+    ---@field items_to_gray_out table<integer, number>
     ---@field center_panels_horizontal_slide_position number
     ---@field esc_panel_slide_timer number
     ---@field selected_item_index integer
+    ---@field controls ScreenControls
 
 ---@class ScreenArenaIntro : Screen
     ---@field players TextureRenderingInfo
     ---@field background_colors TextureRenderingInfo
     ---@field vertical_lines TextureRenderingInfo
     ---@field vertical_line_electricity_effect TextureRenderingInfo
-    ---@field unknown_all_forced TextureRenderingInfo
     ---@field left_scroll TextureRenderingInfo
     ---@field right_scroll TextureRenderingInfo
-    ---@field scroll_unfurl_timer number
+    ---@field scroll_unfurl number
     ---@field waiting boolean
     ---@field names_opacity number
     ---@field line_electricity_effect_timer number
     ---@field state integer
     ---@field countdown integer
+    ---@field particles ParticleEmitterInfo[] @size: 9
 
 ---@class ScreenArenaLevel : Screen
     ---@field get_ready TextureRenderingInfo
     ---@field get_ready_gray_background TextureRenderingInfo
     ---@field get_ready_outline TextureRenderingInfo
+    ---@field particles ParticleEmitterInfo[] @size: 11
+
+---@class ScreenArenaScoreLavaBubble
+    ---@field x number
+    ---@field y number
+    ---@field timer1 integer
+    ---@field timer2 integer
+    ---@field visible boolean
 
 ---@class ScreenArenaScore : Screen
-    ---@field woodpanel_slide_timer number
-    ---@field scroll_unfurl_timer number
-    ---@field unknown10 TextureRenderingInfo
+    ---@field woodpanel_slide number
+    ---@field scroll_unfurl number
     ---@field woodpanel TextureRenderingInfo
-    ---@field unknown_all_forced TextureRenderingInfo
     ---@field woodpanel_left_scroll TextureRenderingInfo
     ---@field woodpanel_right_scroll TextureRenderingInfo
     ---@field text_id_1 STRINGID
@@ -6200,15 +6187,11 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field bottom_lava TextureRenderingInfo
     ---@field players TextureRenderingInfo
     ---@field player_shadows TextureRenderingInfo
-    ---@field unknown24 TextureRenderingInfo
-    ---@field unknown25 TextureRenderingInfo
     ---@field score_counter TextureRenderingInfo
-    ---@field unknown27 TextureRenderingInfo
     ---@field lava_bubbles TextureRenderingInfo
     ---@field player_won boolean[] @size: MAX_PLAYERS
     ---@field victory_jump_y_pos number
     ---@field victory_jump_velocity number
-    ---@field animation_frame integer
     ---@field squash_and_celebrate boolean
     ---@field player_ready boolean[] @size: MAX_PLAYERS
     ---@field next_transition_timer integer
@@ -6216,6 +6199,8 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field player_crushing_pillar_height number[] @size: MAX_PLAYERS
     ---@field player_create_giblets boolean[] @size: MAX_PLAYERS
     ---@field next_sidepanel_slidein_timer number
+    ---@field particles ParticleEmitterInfo[] @size: 13
+    ---@field lava_bubbles_positions ScreenArenaScoreLavaBubble[] @size: 15
 
 ---@class UdpServer
 

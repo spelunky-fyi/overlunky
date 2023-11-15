@@ -215,6 +215,7 @@ struct StateMemory
     // screen pointers below are most likely in an array and indexed through the screen ID (-10), hence the nullptrs for
     // screens that are available in GameManager
     ScreenCharacterSelect* screen_character_select;
+    /// For the arena
     ScreenTeamSelect* screen_team_select;
     ScreenStateCamp* screen_camp;
     ScreenStateLevel* screen_level;
@@ -222,9 +223,12 @@ struct StateMemory
     ScreenDeath* screen_death;
     size_t unknown_screen_spaceship; // potentially ScreenSpaceship, but is nullptr (there is no UI rendering on spaceship anyway)
     ScreenWin* screen_win;
+    /// The spaceship minigame
     ScreenCredits* screen_credits;
+    /// Landing on the moon after win
     ScreenScores* screen_scores;
     ScreenConstellation* screen_constellation;
+    /// Journal after CO win
     ScreenRecap* screen_recap;
     ScreenArenaMenu* screen_arena_menu;
     ScreenArenaStagesSelect* screen_arena_stages_select1;

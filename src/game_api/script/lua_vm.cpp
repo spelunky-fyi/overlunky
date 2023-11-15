@@ -2573,11 +2573,9 @@ end
     // `page:as_journal_page_bestiary()`
     // `page:as_journal_page_items()`
     // `page:as_journal_page_traps()`
-    // `page:as_journal_page_story()`
     // `page:as_journal_page_feats()`
     // `page:as_journal_page_deathcause()`
     // `page:as_journal_page_deathmenu()`
-    // `page:as_journal_page_recap()`
     // `page:as_journal_page_playerprofile()`
     // `page:as_journal_page_lastgameplayed()`
     // SPEECH_BUBBLE

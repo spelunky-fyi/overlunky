@@ -137,11 +137,11 @@ class Movable : public Entity
 
     /// Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
     virtual bool can_jump() = 0;                                             // 37
-    virtual void get_collision_info(CollisionInfo*) = 0;                     // 38
+    virtual void get_collision_info(CollisionInfo* dest) = 0;                // 38
     virtual float sprint_factor() = 0;                                       // 39
     virtual void calculate_jump_height() = 0;                                // 40, when disabled, jump height is very high
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0; // 41
-    virtual void apply_velocity(Vec2* velocities) = 0;                       // 42, param is pointer to an array of two floats: velocity x and y
+    virtual void apply_velocity(Vec2* velocities, bool) = 0;                 // 42, param is pointer to an array of two floats: velocity x and y, could be returninig something
     /// Returns stomp damage based on shoes and fall time
     virtual int8_t stomp_damage() = 0;            // 43, calculates the amount of stomp damage applied (checks spike shoes, movable.state and stand_counter resulting in different damage values)
     virtual int8_t stomp_damage_trampoline() = 0; // 44, simply jumps to the 43rd virtual function, aka stomp_damage...

@@ -1,13 +1,14 @@
 #pragma once
 
+#include "containers/custom_unordered_map.hpp"
 #include "screen.hpp"
 
 struct ArenaRulesString
 {
-    STRINGID text_1_id; // StringsTableID
-    STRINGID text_2_id; // StringsTableID
-    STRINGID text_3_id; // StringsTableID
-    STRINGID text_4_id; // StringsTableID
+    STRINGID text_1; // StringsTableID
+    STRINGID text_2; // StringsTableID
+    STRINGID text_3; // StringsTableID
+    STRINGID text_4; // StringsTableID
     uint8_t unknown1;
     uint8_t unknown2;
     uint8_t unknown3;
@@ -21,24 +22,7 @@ class ScreenArenaMenu : public Screen // ID: 21
   public:
     ScreenZoomAnimation brick_background_animation;
     ScreenZoomAnimation blurry_border_animation;
-    float unknown6;
-    float top_woodpanel_slidein_timer;
-    float top_scroll_unfurl_timer;
-    float unknown11;
-    float unknown12;
-    TextureRenderingInfo unknown13;
-    TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo unknown15;
-    TextureRenderingInfo left_scroll_handle;
-    TextureRenderingInfo right_scroll_handle;
-    STRINGID scroll_text_id;    // StringsTableID
-    STRINGID unknown17_text_id; // StringsTableID
-    STRINGID unknown18_text_id; // StringsTableID
-    STRINGID unknown19_text_id; // StringsTableID
-    bool top_woodpanel_visible;
-    bool bottom_woodpanel_visible;
-    bool woodpanels_toggle;
-    bool unknown20d;
+    MenuScreenPanels screen_panels;
     TextureRenderingInfo brick_background;
     TextureRenderingInfo blurry_border;
     TextureRenderingInfo blurry_border2;
@@ -64,42 +48,22 @@ class ScreenArenaMenu : public Screen // ID: 21
     TextureRenderingInfo bottom_left_bricks;
     TextureRenderingInfo top_left_esc_panel;
     TextureRenderingInfo next_panel;
-    ArenaRulesString* option_captions; // 17 in total
-    size_t unknown46;
-    size_t unknown47;
-    bool unknown48;
-    uint8_t unknown49;
-    uint8_t unknown50;
-    uint8_t unknown51;
+    custom_vector<ArenaRulesString> option_captions; // I assume it's custom, it's filled with the screen construction
+
+    uint32_t unknown48; // load state?
     uint32_t unknown52;
     float center_panels_hor_slide_position;
     float esc_next_panels_slide_timer;
     float main_panel_vertical_scroll_position;
-    uint32_t selected_option_index;
+    uint32_t selected_option_index; // more like highlighted
+    ScreenControls controls;
+    uint8_t unknown57[3]; // some states, like screen depth
 };
 
 class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
 {
   public:
-    uint16_t unknown3a;
-    uint16_t unknown3b;
-    float woodenpanel_top_slidein_timer;
-    float woodenpanel_top_scroll_unfurl_timer;
-    uint32_t unknown6;
-    uint32_t unknown7;
-    TextureRenderingInfo unknown8;
-    TextureRenderingInfo woodenpanel_top;
-    TextureRenderingInfo unknown10;
-    TextureRenderingInfo woodenpanel_top_left_scroll;
-    TextureRenderingInfo woodenpanel_top_right_scroll;
-    STRINGID text_id_1; // Strings table ID
-    STRINGID text_id_2; // Strings table ID
-    STRINGID text_id_3; // Strings table ID
-    STRINGID text_id_4; // Strings table ID
-    bool woodenpanel_top_visible;
-    bool woodenpanel_bottom_visible;
-    bool woodenpanels_toggle;
-    bool unknown11d;
+    MenuScreenPanels screen_panels;
     uint16_t buttons;
     uint16_t padding1;
     TextureRenderingInfo brick_background;
@@ -127,53 +91,24 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     TextureRenderingInfo players_turn_scroll;
     TextureRenderingInfo players_turn_scroll_handle;
     TextureRenderingInfo grid_player_icon;
-    float unknown30;
-    float unknown31;
-    float unknown32;
-    uint32_t unknown33;
-    uint32_t unknown34;
-    uint32_t unknown35;
-    uint32_t unknown36;
-    uint32_t unknown37;
-    uint32_t unknown38;
-    uint32_t unknown39;
-    uint32_t unknown40;
-    uint32_t unknown41;
-    uint32_t unknown42;
-    uint32_t unknown43;
-    uint32_t unknown44;
-    uint32_t unknown45;
-    uint32_t unknown46;
-    uint32_t unknown47;
+    float unknown30;                                          // padding probably
+    custom_unordered_map<uint32_t, float> stages_to_gray_out; // key is the stage, float is how gray out it is
+
+    uint32_t unknown47; // load state?
     uint32_t unknown48;
-    uint32_t unknown49;
-    uint32_t unknown50;
-    uint32_t unknown51;
-    uint32_t selected_stage_index;
+    uint8_t unknown49;
+    uint8_t padding_probably[3];
+    float panels_slide_from_both_sides;
+    float visibility_all_stages;
+    uint32_t selected_stage_index; // more like highlighted
+    ScreenControls controls;
+    uint8_t unknown57[3]; // some states, like screen depth
 };
 
 class ScreenArenaItems : public Screen // ID: 23
 {
   public:
-    float unknown4;
-    float woodpanel_top_slidein_timer;
-    float woodpanel_top_scroll_unfurl_timer;
-    float unknown7;
-    float unknown8;
-    TextureRenderingInfo unknown9;
-    TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo unknown11;
-    TextureRenderingInfo top_scroll_left_handle;
-    TextureRenderingInfo top_scroll_right_handle;
-    STRINGID scroll_text_id; // Strings table ID
-    STRINGID text_id_2;      // Strings table ID
-    STRINGID text_id_3;      // Strings table ID
-    STRINGID text_id_4;      // Strings table ID
-    bool woodpanel_top_visible;
-    bool woodpanel_bottom_visible;
-    bool woodpanels_toggle;
-    bool unknown15;
-
+    MenuScreenPanels screen_panels;
     TextureRenderingInfo brick_background;
     TextureRenderingInfo black_background_bottom_right;
     TextureRenderingInfo woodpanel_bottom;
@@ -190,24 +125,14 @@ class ScreenArenaItems : public Screen // ID: 23
     TextureRenderingInfo item_off_gray_overlay;
     TextureRenderingInfo esc_woodpanel;
 
-    float unknown22;
-    float unknown23;
-    size_t powerup_deactivation_related;
-    uint8_t powerup_deactivation_counter; /* unsure */
-    uint8_t padding1;
-    uint16_t padding2;
-    uint32_t unknown25;
-    size_t unknown26;
-    size_t unknown27;
-    size_t unknown28;
-    uint32_t unknown29;
-    uint32_t unknown30;
-    uint32_t unknown31;
-    uint32_t unknown32;
-    uint32_t unknown33;
+    custom_unordered_map<uint32_t, float> items_to_gray_out;
+
+    float unknown33;
     float center_panels_horizontal_slide_position;
     float esc_panel_slide_timer;
-    uint32_t selected_item_index;
+    uint32_t selected_item_index; // more like highlighted
+    ScreenControls controls;
+    uint8_t unknown57[3]; // some states, like screen depth
 };
 
 class ScreenArenaIntro : public Screen // ID: 25
@@ -217,10 +142,11 @@ class ScreenArenaIntro : public Screen // ID: 25
     TextureRenderingInfo background_colors;
     TextureRenderingInfo vertical_lines;
     TextureRenderingInfo vertical_line_electricity_effect;
-    TextureRenderingInfo unknown_all_forced;
+    TextureRenderingInfo unknown_all_forced; // probably scroll
     TextureRenderingInfo left_scroll;
     TextureRenderingInfo right_scroll;
-    float scroll_unfurl_timer;
+    TextureRenderingInfo unknown1;
+    float scroll_unfurl;
     bool waiting; // when false, the cutscene ends and gameplay starts
     uint8_t unknown10b;
     uint8_t unknown10c;
@@ -234,6 +160,9 @@ class ScreenArenaIntro : public Screen // ID: 25
     uint8_t unknown14c;
     uint8_t unknown14d;
     uint32_t countdown; // when 0, continues to gameplay
+    // uint32_t padding_probably
+
+    std::array<ParticleEmitterInfo*, 9> particles;
 };
 
 class ScreenArenaLevel : public Screen // ID: 26
@@ -291,23 +220,51 @@ class ScreenArenaLevel : public Screen // ID: 26
     TextureRenderingInfo unknown51;
     TextureRenderingInfo unknown52;
     TextureRenderingInfo unknown53;
+    std::array<ParticleEmitterInfo*, 11> particles;
+};
+
+struct ScreenArenaScoreLavaBubble
+{
+    float x;
+    float y;
+    int16_t timer1;
+    uint8_t timer2; // counts down when the timer1 = -1
+    bool visible;
+};
+
+struct ScreenArenaScoreUnknown
+{
+    // this is mostly a guess
+    TextureRenderingInfo texture;
+    float some_x; // when not in use set to 9999.0
+    float some_y; // when not in use set to 9999.0
+    float unknown4;
+    float unknown5;
+    float unknown6;
+    float unknown7;
+    float unknown8; // when not in use set to float max
+    float unknown9; // when not in use set to float max
+    float unknown10;
+    float unknown11;
+    float unknown12;
 };
 
 class ScreenArenaScore : public Screen // ID: 27
 {
   public:
-    uint16_t unknown3a;
+    uint16_t unknown3a; // probably float
     uint16_t unknown3b;
-    float woodpanel_slide_timer;
-    float scroll_unfurl_timer;
+    float woodpanel_slide;
+    float scroll_unfurl;
     uint32_t unknown6;
     uint32_t unknown7;
     uint32_t unknown8;
     float unknown9;
 
+    // similar to the MenuScreenPanels ?
     TextureRenderingInfo unknown10;
     TextureRenderingInfo woodpanel;
-    TextureRenderingInfo unknown_all_forced;
+    TextureRenderingInfo unknown_all_forced; // probably scroll
     TextureRenderingInfo woodpanel_left_scroll;
     TextureRenderingInfo woodpanel_right_scroll;
 
@@ -331,7 +288,7 @@ class ScreenArenaScore : public Screen // ID: 27
     TextureRenderingInfo unknown25;
     TextureRenderingInfo score_counter;
     TextureRenderingInfo unknown27;
-    TextureRenderingInfo lava_bubbles; /* unsure */
+    TextureRenderingInfo lava_bubbles;
 
     std::array<bool, MAX_PLAYERS> player_won;
     float victory_jump_y_pos;
@@ -348,4 +305,8 @@ class ScreenArenaScore : public Screen // ID: 27
     std::array<float, MAX_PLAYERS> player_crushing_pillar_height;
     std::array<bool, MAX_PLAYERS> player_create_giblets;
     float next_sidepanel_slidein_timer;
+    // uint32_t padding_probably;
+    std::array<ParticleEmitterInfo*, 13> particles;
+    std::array<ScreenArenaScoreLavaBubble, 15> lava_bubbles_positions;
+    std::array<ScreenArenaScoreUnknown, 160> unknown45; // only used if one of the players win, probably the flying down confetti/featers
 };

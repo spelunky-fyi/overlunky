@@ -17,6 +17,56 @@ struct SoundMeta;
 struct MultiLineTextRendering;
 class Entity;
 
+struct MenuScreenPanels
+{
+    float woodpanels_velocity;
+    float woodpanels_progress;
+    float scroll_unfurl_progress;
+    float bottom_woodpanel_speed_multiplayer;
+    float bottom_woodpanel_y_offset; // maybe a resolution thing?
+    TextureRenderingInfo bottom_woodpanel;
+    TextureRenderingInfo top_woodpanel;
+    TextureRenderingInfo scroll;
+    TextureRenderingInfo top_woodpanel_left_scrollhandle;
+    TextureRenderingInfo top_woodpanel_right_scrollhandle;
+
+    STRINGID scroll_text;
+    STRINGID bottom_left_text;
+    STRINGID bottom_right_text;
+    STRINGID bottom_middle_text;
+    bool top_woodpanel_visible;
+    bool bottom_woodpanel_visible;
+    bool toggle_woodpanel_slidein_animation;
+    bool capitalize_scroll_text;
+};
+
+struct ScreenControls
+{
+    bool up;
+    bool down;
+    bool left;
+    bool right;
+    /// -1 - none, 0 - UP, 1 - DOWN, 2 - LEFT, 3 - RIGHT
+    uint32_t direction_input;
+    /// Delay after which fast scroll activates (can stop at different value, only matters when you hold down the direction button)
+    uint32_t hold_down_timer;
+    uint32_t fast_scroll_timer;
+};
+
+// probably common thing, right now only used in the arena screen
+struct ScreenZoomAnimation
+{
+    float unknown1;
+    float unknown2;
+    float unknown3;
+    float unknown4;
+    float unknown5;
+    uint32_t image; /* unsure*/ // probably wrong
+    uint32_t unknown6;
+    float zoom_timer;
+    float zoom_target;
+};
+
 class Screen
 {
   public:
@@ -49,13 +99,16 @@ class ScreenLogo : public Screen // ID: 0
     TextureRenderingInfo logo_mossmouth;
     TextureRenderingInfo logo_blitworks;
     TextureRenderingInfo logo_fmod;
+    /// 0 - mossmouth, 1 - blitworks, 2 - fmod, 3 - end (next screen)
+    uint32_t state;
+    uint32_t timer;
 };
 
 class ScreenIntro : public Screen // ID: 1
 {
   public:
-    TextureRenderingInfo unknown4;
-    float darkness;
+    TextureRenderingInfo blackout_background;
+    float blackout_alpha;
     /// ends the intro immediately if set to false
     bool active;
     /// skips prologue and goes straight to the title screen after the intro
@@ -86,8 +139,8 @@ class ScreenTitle : public Screen // ID: 3
     ParticleEmitterInfo* particle_torchflame_backflames_animated;
     ParticleEmitterInfo* particle_torchflame_flames_animated;
     ParticleEmitterInfo* particle_torchflame_ash;
-    uint32_t unknown7;
-    float unknown8;
+    uint8_t unknown7a; // random very short timer that doesn't seam to do anything
+    float brightness;
     SoundMeta* music;
     SoundMeta* torch_sound;
 };
@@ -98,19 +151,49 @@ struct SpearDanglerAnimFrames
     uint32_t row;
 };
 
+struct MenuOption
+{
+    // return and first param are the same, pointer on stack, it really seam to be just two 32bit fields
+    // int is normally set to 0x2B and float to 0, if the third parameter is not 2, then the function sets first to 0, and the float to float max,
+    using OptionSelect = std::pair<uint32_t, float>&(std::pair<uint32_t, float>&, Screen* src, uint8_t);
+
+    STRINGID option_name;
+    float y_position;
+    float brigthness; // 1.0 for selected item, 0 for non selected
+    bool enabled;     // only visual thing, locks brigthness at 0
+    // uint8_t padding_probably[3]
+
+    OptionSelect* select; // called as soon as you hit enter on the selected option
+    // function is expected to play the select sound
+    // for main menu it also stops the cthulhu_sound (call kill(true) and set the pointer to null) when leaving the menu to different screen
+};
+
 class ScreenMenu : public Screen // ID: 4
 {
   public:
-    float unknown4;
-    float unknown5;
+    using ScreenTransition = void();
+
+    float backlayer_transition_speed;
+    float frontlayer_transition_speed;
     float unknown6;
     float unknown7;
-    float unknown8;
-    float unknown9;
+    float unknown8;              // middle layer related?
+    uint32_t some_unknown_state; // 5 in main menu, 1 when going to different screen
     float unknown10;
-    float unknown11;
-    float unknown12;
-    uint32_t unknown13;
+    float zoom_in_progress;
+    float zoom_limit;
+    /// 0: "cthulhu_pre_movement",
+    /// 1: "cthulhu_rotating",
+    /// 2: "cthulhu_separating",
+    /// 3: "cthulhu_lowering",
+    /// 4: "cthulhu_transition_to_menu",
+    /// 5: "return_from_backlayer",
+    /// 6: "highlight_selection",
+    /// 7: "idle",
+    /// 8: "to_submenu",
+    /// 9: "to_backlayer",
+    /// 10: "backlayer_idle"
+    uint32_t state;
     TextureRenderingInfo tunnel_background;
     TextureRenderingInfo cthulhu_disc;
     TextureRenderingInfo tunnel_ring_darkbrown;
@@ -125,96 +208,122 @@ class ScreenMenu : public Screen // ID: 4
     TextureRenderingInfo spear_dangler_related;
     TextureRenderingInfo play_scroll;
     TextureRenderingInfo info_toast;
-    TextureRenderingInfo unknown15;
+    TextureRenderingInfo unknown15; // probably xbox username scroll
 
     uint32_t unknown16a;
-    uint32_t unknown16b;
+    uint32_t padding_probably1;
     SoundMeta* cthulhu_sound;
-    size_t unknown16e; // std::list ?
-    size_t unknown16f; //
-    float unknown16g;
-    float unknown16h;
-    float unknown16i;
-    float unknown16j;
-    size_t unknown16k;
-    std::vector<size_t> unknown17;   // pointers, vector of vectors? menu options?
-    std::vector<uint32_t> unknown20; // unsure what's inside
-    size_t buttons;
-    uint32_t unknown23;
-    uint32_t unknown24;
-    uint32_t selected_menu_index;
-    uint32_t unknown26;
-    uint32_t unknown27;
-    uint32_t unknown28;
-    uint32_t unknown29a;
-    uint32_t unknown29b;
+    ParticleEmitterInfo* particle_smoke;
+    ParticleEmitterInfo* particle_rubble;
+    float cthulhu_disc_ring_angle;
+    float cthulhu_disc_split_progress;
+    float cthulhu_disc_y;
+    float cthulhu_timer;
+    ScreenTransition* screen_transition; // called when you leave the menu, just sets the state.screen_next and stuff
+
+    custom_vector<custom_vector<MenuOption>> menu_tree; // always have the vector of the main menu, and then any deeper level menu, like Play or Online
+    custom_vector<uint32_t> menu_index_order;           // to go back to, probably needs a better name
+    ScreenControls controls;
+    uint32_t selected_menu_index; // more like highlighted
+    uint8_t sides_hold_down_timer;
+    uint8_t sides_fast_scroll_timer;
+
+    // uint8_t padding_probably[2];
+
+    uint32_t unknown27; // pressed direction? 1 = left, 0 = right, no neutral, stays at the last state
+    /// Allow going up from first to last option
+    bool loop;
+
+    // uint8_t padding_probably[3];
+
+    /// 0 = main menu, 1 = play, 2 = online
+    uint32_t menu_id;
+    uint32_t transfer_to_menu_id;
     float menu_text_opacity;
     std::array<float, 6> spear_position;
     std::array<SpearDanglerAnimFrames, 6> spear_dangler;
     std::array<uint32_t, 6> spear_dangle_momentum;
     std::array<uint32_t, 6> spear_dangle_angle;
 
-    float play_scroll_descend_timer;
+    float play_scroll_descend;
     STRINGID scroll_text;
+    float shake_offset_x;
+    float shake_offset_y;
+    bool unknown30;
+    // maybe two more 32bit values? hard to tell
+};
 
-    float cthulhu_disc_ring_angle;
-    float cthulhu_disc_split_progress;
-    float cthulhu_disc_y;
-    float cthulhu_timer;
+struct GraphicandAudioSettings
+{
+    uint32_t fullscreen_resolution_id; // depends on the GetMonitorInfo etc.
+    uint32_t windowed_resolution_id;   // depends on the GetMonitorInfo etc.
+    /// 100 = 1.0
+    uint32_t resolution_scale;
+    /// 0 = Fullscreen, 1 = Borderless Windowed, 2 = Windowed
+    uint8_t display_mode;
+    uint8_t unknown33;
+    bool unknown34; // if true, first input just sets it to false and does nothing else
+    uint8_t unknown35;
+    bool unknown36; // if it's not false, it's set to false and nothing else touches it ???
+    // uint8_t padding_probably6[3];
+    uint32_t unknown37;
+    uint32_t unknown38;
 };
 
 class ScreenOptions : public Screen // ID: 5
 {
   public:
-    std::vector<void*> unknown4;    // menu options?
-    std::vector<uint32_t> unknown7; // dunno
+    custom_vector<custom_vector<MenuOption>> menu_tree;
+    custom_vector<uint32_t> menu_index_order; // to go back to, probably needs a better name
 
-    uint32_t selected_menu_index;
-    uint16_t key_press_timer; // might be two separate values
+    // yes, this is just ScreenControls but up/down are reversed and not left/right for some reason
+    // also ScreenControls could include the selected_index, but in arena screen it's above and here it's below :|
+    bool down;
+    bool up;
+    // bool unused[2]
+    /// -1 = none, 0 = down, 1 = up
+    int32_t direction_input;
+    uint32_t hold_down_timer;
+    uint32_t fast_scroll_timer;
 
-    uint16_t unknown12;
+    uint32_t selected_menu_index; // more like highlighted
+    uint8_t sides_hold_down_timer;
+    uint8_t sides_fast_scroll_timer;
+    // uint16_t probably_padding1;
+    uint32_t unknown0; // pressed direction? 1 = left, 0 = right, no neutral, stays at the last state
+    /// Allow going up from first to last option
+    bool loop;
 
-    bool moved_left;
+    // uint8_t probably_padding2[3];
 
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    uint8_t unknown14;
-    uint8_t unknown15;
-    uint8_t unknown16;
-    uint8_t unknown17;
+    // this is probably similar stuff that is at the beginning of ScreenMenu, transitions from and to menus
+    float unknown1;
+    float unknown2;
+    float unknown3;
+    float unknown4;
+    float unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7; // speed related?
+    float unknown8;
+    float unknown9;
+    float unknown10;
+    float unknown11;
+    float unknown12;
+    float unknown13;
+    float unknown14;
+    uint32_t unknown15;
+    int32_t unknown16;
+    float unknown17;
+    float unknown18;
 
-    TextureRenderingInfo brick_border;
-    float top_bottom_woodpanels_velocity;
-    float top_bottom_woodpanels_progress; // set to 0 to start sliding in
-    float scroll_unfurl_progress;         // set to 0 to start unfurl
-    float unknown21;
-    float bottom_woodpanel_y;
-    float unknown23;
-    float top_bottom_woodpanels_slide_in_related;
-    TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo top_woodpanel;
-    TextureRenderingInfo unknown27;
-    TextureRenderingInfo top_woodpanel_left_scrollhandle;
-    TextureRenderingInfo top_woodpanel_right_scrollhandle;
+    MenuScreenPanels screen_panels;
 
-    STRINGID button_right_caption;
-    STRINGID button_middle_caption;
-    bool top_woodpanel_visible;
-    bool bottom_woodpanel_visible;
-    bool toggle_woodpanel_slidein_animation;
-    bool capitalize_top_woodpanel;
-    uint32_t unknown28;
-    uint32_t current_menu_1;
-    uint32_t current_menu_2;
-    uint32_t unknown31;
-    uint32_t unknown32;
-    uint32_t unknown33;
-    uint32_t unknown34;
-    uint32_t unknown35;
-    uint32_t unknown36;
-    uint32_t unknown37;
-    uint32_t unknown38;
+    uint32_t unknown_state; // 0 = none, 2 = moving between inner menus, 3 = exiting menu options
+    uint32_t current_menu_id;
+    uint32_t transfer_to_menu_id;
+    bool show_apply_button;
+    // uint8_t padding_probably4[3];
+    GraphicandAudioSettings graphic_and_audio;
 
     TextureRenderingInfo topleft_woodpanel_esc;
     TextureRenderingInfo brick_background;
@@ -226,79 +335,76 @@ class ScreenOptions : public Screen // ID: 5
     TextureRenderingInfo item_option_arrow_right;
     TextureRenderingInfo tooltip_background;
     TextureRenderingInfo progressbar_background; // brightness 'progressbar' background texture
-    TextureRenderingInfo unknown40;
-    TextureRenderingInfo progressbar_foreground;
-    TextureRenderingInfo progressbar_position_indicator;
-    TextureRenderingInfo sectionheader_background; // behind 'GRAPHICS' and 'AUDIO'
+    TextureRenderingInfo volume_progressbar_foreground;
+    TextureRenderingInfo progressbar_foreground; // the border
+    TextureRenderingInfo volume_progressbar_position_indicator;
+    TextureRenderingInfo sectionheader_background; // behind 'GRAPHICS' and 'AUDIO' the black bars
 
-    TextureRenderingInfo unknown44;
-    TextureRenderingInfo unknown45;
-    float topleft_woodpanel_esc_slidein_timer;
-    float text_fadein_timer;
-    float vertical_scroll_effect_timer;
-    uint8_t unknown49;
-    uint8_t unknown50;
-    uint8_t unknown51;
+    TextureRenderingInfo unknown44; // could be something else, or just not used in PC version or something
+    /// In "Gameplay" menu
+    TextureRenderingInfo pet_icons;
+    /// For the code in the sync menu
+    TextureRenderingInfo bottom_scroll;
+    TextureRenderingInfo bottom_left_scrollhandle;
+    TextureRenderingInfo bottom_right_scrollhandle;
+    float topleft_woodpanel_esc_slidein;
+    float text_fadein;
+    float vertical_scroll_effect;
+    uint8_t unknown49; // small random timer
+    bool options_visiable;
+    /// Shows the red background behind the option, the scarab on the left and left/right arrows
+    bool show_highlight;
+    // uint8_t padding_probably8[5];
+    custom_vector<size_t> unknown50; // holds one 8 byte value, related to choosen opion menu
+    uint8_t unknown51;               // probably bool
+    // padding_probably10[7];
+    custom_vector<STRINGID> tooltip_text;
+    /// Used for sync progress
+    bool disable_controls;
+    // uint8_t padding_probably9[3];
+    /// 0 - none, 1 - waiting for the code, 2 - code acquired, 3 - sync in progress, 4 - sync completed
+    uint32_t sync_progress_state;
+    uint32_t unknown54; // some timer
+    // uint32_t padding_probably10;
+    float* credits_progression;
 };
 
-class ScreenPlayerProfile : public Screen // ID: 6
-{
-  public: // not reverse engineered
-};
-
-class ScreenLeaderboards : public Screen // ID: 7
-{
-  public: // not reverse engineered
-};
-
-class ScreenSeedInput : public Screen // ID: 8
+class ScreenCodeInput : public Screen // ID: 8
 {
   public:
-    uint16_t unknown4;
-    uint16_t unknown5;
-    float bottom_woodpanel_slideup_timer;
-    float unknown_timer;
-    float unknown6;
-    float bottom_woodpanel_y;
-    TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo unknown8;
-    TextureRenderingInfo unknown9;
-    TextureRenderingInfo unknown10;
-    TextureRenderingInfo unknown11;
-    STRINGID unknown12;
-    STRINGID unknown13;
-    STRINGID buttons_text_id;
-    STRINGID unknown15;
-    uint8_t unknown16;
-    uint8_t unknown17;
-    uint8_t unknown18;
-    uint8_t unknown19;
-    uint8_t unknown20;
-    uint8_t unknown21;
-    uint8_t unknown22;
-    uint8_t unknown23;
-    uint32_t unknown24;
-    uint16_t unknown25;
-
-    uint16_t seed_chars[9]; // utf16 chars
+    MenuScreenPanels screen_panels;
+    /// needs to be set before opening the screen to show the correct text at the bottom
+    bool allow_random;
+    // uint8_t probably_padding1[3];
+    uint32_t selected_button_index;
+    bool pressed_select;
+    // uint8_t probably_padding2;
+    char16_t code_chars[9]; // utf16 chars
 
     /// Current input length (0-8). You probably shouldn't write to this, except to set it to 0.
-    uint16_t seed_length;
-    uint16_t unknown39;
+    uint8_t code_length;
+    // uint8_t probably_padding3[3];
 
-    float topleft_woodpanel_esc_slidein_timer;
+    float topleft_woodpanel_esc_slidein;
     STRINGID scroll_text_id;
     STRINGID start_text_id;
     TextureRenderingInfo main_woodpanel_left_border;
     TextureRenderingInfo main_woodpanel_center;
     TextureRenderingInfo main_woodpanel_right_border;
     TextureRenderingInfo top_scroll;
-    TextureRenderingInfo seed_letter_cutouts;
-    TextureRenderingInfo unknown40;
-    TextureRenderingInfo unknown41;
+    TextureRenderingInfo letter_cutouts;
+    TextureRenderingInfo hand_pointer;
+    TextureRenderingInfo key_background;
     TextureRenderingInfo topleft_woodpanel_esc;
     TextureRenderingInfo start_sidepanel;
-    float start_sidepanel_slidein_timer;
+    float start_sidepanel_slidein;
+
+    /// Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.
+    void set_seed(std::optional<uint32_t> seed, std::optional<uint8_t> length);
+    /// Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.
+    std::optional<uint32_t> get_seed();
+
+    virtual void unknown() = 0; // set seed? sets the game variables in state, for ScreenEnterOnlineCode it just sets the unknown10
 };
 
 struct FlyingThing
@@ -333,6 +439,12 @@ struct FlyingThing
     uint32_t unknown22;
 };
 
+struct InputsDevice
+{
+    uint16_t buttons;
+    uint16_t buttons_previous;
+};
+
 class ScreenCharacterSelect : public Screen // ID: 9
 {
   public:
@@ -343,7 +455,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     float main_background_zoom_related1;
     uint32_t main_background_zoom_related2;
     uint32_t unknown10;
-    float main_background_zoom_timer;
+    float main_background_zoom_progress;
     float main_background_zoom_target;
     float blurred_border_zoom;
     float unknown14;
@@ -355,26 +467,10 @@ class ScreenCharacterSelect : public Screen // ID: 9
     uint8_t unknown20;
     uint8_t unknown21;
     uint8_t unknown22;
-    float blurred_border_zoom_timer;
+    float blurred_border_zoom_progress;
     float blurred_border_zoom_target;
-    float unknown25;
-    float top_bottom_woodpanel_slidein_timer;
-    float top_scroll_unfurl_timer;
-    float unknown28;
-    uint32_t unknown29;
-    uint32_t unknown30;
-    TextureRenderingInfo bottom_woodpanel;
-    TextureRenderingInfo top_woodpanel;
-    TextureRenderingInfo unknown32;
-    TextureRenderingInfo left_scroll_handle;
-    TextureRenderingInfo right_scroll_handle;
-    STRINGID left_button_text_id;
-    STRINGID right_button_text_id;
-    STRINGID middle_button_text_id;
-    bool top_woodpanel_visible;
-    bool bottom_woodpanel_visible;
-    bool toggle_woodpanel_slidein_animation;
-    uint8_t padding1;
+
+    MenuScreenPanels screen_panels;
     TextureRenderingInfo mine_entrance_background;
     TextureRenderingInfo character;
     TextureRenderingInfo character_shadow;
@@ -411,33 +507,33 @@ class ScreenCharacterSelect : public Screen // ID: 9
     std::array<float, MAX_PLAYERS> player_quickselect_wiggle_angle;
 
     float another_timer;
-    float topleft_woodpanel_esc_slidein_timer;
-    float start_panel_slidein_timer;
+    float topleft_woodpanel_esc_slidein;
+    float start_panel_slidein;
     float action_buttons_keycap_size;
     bool unknown64a;
     bool unknown64b;
     bool unknown64c;
     bool unknown64d;
-    uint32_t unknown65;
+    uint32_t next_screen_to_load;
     bool not_ready_to_start_yet;
     uint8_t available_mine_entrances; // The rest are boarded off
     uint8_t amount_of_mine_entrances_activated;
-    uint8_t unknown66;
-    size_t reset_func; /* unsure*/
-    uint32_t buttons;
-    TextureRenderingInfo unknown69; // TODO: this is wrong, there's just a bunch of other stuff here, like some run type flags probably (seeded/adventure/daily) and the next screen (camp/level)
-
-    float opacity;
+    // uint8_t probably_padding1;
+    size_t* reset_func; /* unsure*/
+    uint32_t unknown69; // it's some states, or flags
+    TextureRenderingInfo screen_blackout;
+    float blackout_transparency;
     bool start_pressed;
     bool transition_to_game_started;
-    uint8_t unknown71c;
-    uint8_t unknown71d;
+    bool disable_buttons; /* unsure */ // hides the buttons on the enrances and disables control (without setting the bool below)
+    bool disable_controls;
     uint32_t unknown72;
 
     std::array<FlyingThing, 6> flying_things;
     uint16_t flying_thing_countdown; // when 0, flying things appear
-    int16_t unknown79;
-    uint32_t unknown80;
+    int16_t unknown79;               // negative, counts up to 0
+
+    // uint32_t probably_padding2;
 
     ParticleEmitterInfo* particle_ceilingdust_smoke;
     ParticleEmitterInfo* particle_ceilingdust_rubble;
@@ -450,33 +546,33 @@ class ScreenCharacterSelect : public Screen // ID: 9
     ParticleEmitterInfo* particle_torchflame_flames3;
     ParticleEmitterInfo* particle_torchflame_smoke4;
     ParticleEmitterInfo* particle_torchflame_flames4;
-    SoundMeta* sound;
+    std::array<SoundMeta*, 4> torch_sound;
+    std::array<InputsDevice, 12> inputs;
+    std::array<uint8_t, MAX_PLAYERS> buttons;
 };
 
 class ScreenTeamSelect : public Screen // ID: 10
 {
   public:
-    TextureRenderingInfo ana_carrying_torch;
+    TextureRenderingInfo player_portrait;
     TextureRenderingInfo scroll_bottom_left;
     TextureRenderingInfo scrollend_bottom_left;
     TextureRenderingInfo four_ropes;
-    TextureRenderingInfo unknown4;
+    TextureRenderingInfo gems_above_the_ropes;
     TextureRenderingInfo four_characters;
     TextureRenderingInfo left_arrow;
     TextureRenderingInfo right_arrow;
     TextureRenderingInfo start_panel;
-    float start_panel_slide_timer;
+    TextureRenderingInfo go_back_wooden_panel;
+    float start_panel_slide;
+    float go_back_wooden_panel_slide;
     float pulsating_arrows_timer;
     uint8_t selected_player;
     uint8_t buttons;
     bool ready;
-    uint8_t unknown4d;
-    uint32_t unknown5;
-    uint32_t unknown6;
-    uint32_t unknown7;
 };
 
-class ScreenCamp : public Screen // ID: 11 GameManager
+class ScreenCamp : public Screen // ID: 11 GameManager, same as ScreenLevel
 {
   public:
     uint8_t buttons;
@@ -524,7 +620,7 @@ class ScreenTransition : public Screen // ID: 13
     TextureRenderingInfo woodpanel_bottomcutout1;
     TextureRenderingInfo woodpanel_bottomcutout2;
     TextureRenderingInfo woodpanel_bottomcutout3;
-    TextureRenderingInfo unknown_all_forced;
+    TextureRenderingInfo scroll;
     TextureRenderingInfo stats_scroll_top_bottom;
     TextureRenderingInfo killcount_rounded_rect;
     TextureRenderingInfo level_completed_panel;
@@ -546,7 +642,7 @@ class ScreenTransition : public Screen // ID: 13
     float mama_tunnel_fade_actualvalue;
     float mama_tunnel_fade_targetvalue;
     STRINGID mama_tunnel_text_id;
-    uint16_t mama_tunnel_text_buffer[256]; // UTF16 string
+    char16_t mama_tunnel_text_buffer[256]; // UTF16 string
     bool mama_tunnel_choice_visible;
     bool mama_tunnel_agree_with_gift;
     bool mama_tunnel_face_invisible;
@@ -560,8 +656,8 @@ class ScreenTransition : public Screen // ID: 13
     TextureRenderingInfo big_dollar_sign;
     TextureRenderingInfo unknown26;
 
-    uint16_t string_buffer[130]; // UTF16 string
-    uint32_t stats_scroll_unfurl_sequence_timer;
+    char16_t string_buffer[130]; // UTF16 string
+    uint32_t stats_scroll_unfurl_sequence;
     uint32_t unknown30;
     uint32_t unknown31;
 
@@ -579,29 +675,23 @@ class ScreenTransition : public Screen // ID: 13
     TextureRenderingInfo hourglasses;
     TextureRenderingInfo small_dollar_signs;
 
-    uint16_t string_buffer_this_level_time[10];        // UTF16 string
-    uint16_t string_buffer_total_time[10];             // UTF16 string
-    uint16_t string_buffer_this_level_milliseconds[5]; // UTF16 string
-    uint16_t string_buffer_total_milliseconds[5];      // UTF16 string
-    uint16_t string_buffer_this_level_money[10];       // UTF16 string
-    uint16_t string_buffer_total_money[10];            // UTF16 string
+    char16_t string_buffer_this_level_time[10];        // UTF16 string
+    char16_t string_buffer_total_time[10];             // UTF16 string
+    char16_t string_buffer_this_level_milliseconds[5]; // UTF16 string
+    char16_t string_buffer_total_milliseconds[5];      // UTF16 string
+    char16_t string_buffer_this_level_money[10];       // UTF16 string
+    char16_t string_buffer_total_money[10];            // UTF16 string
 
     Color this_level_money_color;
 
-    uint8_t unknown41;
-    uint8_t unknown42;
-    uint8_t unknown43;
-    uint8_t unknown44;
-    uint32_t unknown45;
-    uint32_t unknown46;
-    uint32_t unknown47;
-    uint32_t unknown48;
-    uint32_t unknown49;
+    std::array<uint8_t, MAX_PLAYERS> buttons;
 };
 
 /// The POST render call will only be visible in the polaroid area on the left of the book. The book is apparently drawn on top of that.
 class ScreenDeath : public Screen // ID: 14
 {
+  public:
+    size_t unknown;
 };
 
 class ScreenWin : public Screen // ID: 16
@@ -618,8 +708,6 @@ class ScreenWin : public Screen // ID: 16
     Entity* rescuing_ship_entity;
 
     size_t unknown8;
-    uint32_t unknown9;
-    uint32_t unknown10;
 };
 
 class ScreenCredits : public Screen // ID: 17
@@ -653,28 +741,16 @@ class ScreenConstellation : public Screen // ID: 19
     float* credits_progression;
     SoundMeta* explosion_and_loop;
     SoundMeta* music;
+    size_t unknown; // not sure if it's something actually there, or it's some allocator aliment to memory page or something, seam to happen a lot with the screens
 };
 
 /// The recap book is drawn on top of the POST render event
 class ScreenRecap : public Screen // ID: 20
 {
+  public:
+    uint32_t unknown1;
+    uint32_t unknown2;
 };
-
-struct ScreenZoomAnimation
-{
-    float unknown1;
-    float unknown2;
-    float unknown3;
-    float unknown4;
-    float unknown5;
-    uint32_t image; /* unsure*/
-    uint32_t unknown6;
-    float zoom_timer;
-    float zoom_target;
-};
-
-// For the ARENA screens, see screen_arena.hpp
-// Putting them here makes the compiler run out of heap space
 
 class ScreenOnlineLoading : public Screen // ID: 28
 {
@@ -685,53 +761,40 @@ class ScreenOnlineLoading : public Screen // ID: 28
 
 struct OnlineLobbyScreenPlayer
 {
-    uint8_t unknown1;
+    /// 16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = switch, 48 = PS, 49 = PS again?
+    uint8_t platform_icon; // werid numbers, anything else results in the startd PC icon, maybe it's some actual id
     /// 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     uint8_t character;
     bool ready;
-    uint8_t unknown2;
+    bool searching;
+};
+
+class ScreenEnterOnlineCode : public ScreenCodeInput // no ID, very special screen
+{
+  public:
+    int32_t unknown10; // -1
+    TextureRenderingInfo enter_code_your_code_scroll;
+    TextureRenderingInfo enter_code_your_code_scroll_left_handle;
+    TextureRenderingInfo enter_code_your_code_scroll_right_handle;
+    uint32_t unknown11;
+    TextureRenderingInfo unknown12;
+    uint32_t unknown13;
+    TextureRenderingInfo unknown14;
+    TextureRenderingInfo unknown15;
 };
 
 class ScreenOnlineLobby : public Screen // ID: 29
 {
   public:
-    uint8_t unknown2;
-    uint8_t unknown3;
-    uint8_t unknown4;
-    uint8_t unknown5;
-    float woodpanels_slidein_timer;
-    float scroll_unfurl_timer;
-    uint32_t unknown8;
-    uint32_t unknown9;
-    TextureRenderingInfo woodpanel_bottom;
-    TextureRenderingInfo woodpanel_top;
-    TextureRenderingInfo unknown13;
-    TextureRenderingInfo left_scroll_handle;
-    TextureRenderingInfo right_scroll_handle;
-    STRINGID scroll_text_id;
-    STRINGID btn_left_text_id;
-    STRINGID btn_right_text_id;
-    STRINGID btn_center_text_id;
-    bool woodpanel_top_visible;
-    bool woodpanel_bottom_visible;
-    bool toggle_panels_slidein;
-    bool unknown21;
+    MenuScreenPanels screen_panels;
     std::array<OnlineLobbyScreenPlayer, 4> players;
     TextureRenderingInfo background_image;
-    size_t unknown22;
-    size_t unknown23;
-    size_t unknown24;
-    size_t unknown25;
-    size_t unknown26;
-    size_t unknown27;
-    size_t unknown28;
-    size_t unknown29;
-    size_t unknown30;
+    TextureRenderingInfo unknown35;
     TextureRenderingInfo unknown36;
     TextureRenderingInfo unknown37;
     float unknown38;
     TextureRenderingInfo topleft_woodpanel_esc;
-    float topleft_woodpanel_esc_slidein_timer;
+    float topleft_woodpanel_esc_slidein;
     float character_walk_offset;
     bool character_facing_left;
     int8_t move_direction;
@@ -757,83 +820,59 @@ class ScreenOnlineLobby : public Screen // ID: 29
     uint8_t unknown51;
     uint32_t unknown53;
 
-    // The following is actually class ScreenEnterOnlineCode but it has no direct pointer in GameManager
-    // or State. In assembly this pointer is accessed by &ScreenOnlineLobby + sizeof(ScreenOnlineLobby)
-    size_t enter_code_screen_vftable;
-    float enter_code_render_timer;
-    uint32_t unknown54;
-    float unknown56;
-    float enter_code_woodpanel_bottom_slidein_pos;
-    float unknown58;
-    float unknown59;
-    float unknown60;
-    TextureRenderingInfo enter_code_woodpanel_bottom;
-    TextureRenderingInfo unknown61;
-    TextureRenderingInfo unknown62;
-    TextureRenderingInfo unknown63;
-    TextureRenderingInfo unknown64;
-    STRINGID text_id_1;
-    STRINGID text_id_2;
-    STRINGID enter_code_btn_right_text_id;
-    STRINGID text_id_4;
-    bool enter_code_woodpanel_top_visible;
-    bool enter_code_woodpanel_bottom_visible;
-    bool enter_code_toggle_panels_slidein;
-    bool unknown68;
-    uint32_t unknown69;
-    uint32_t selected_character;
-    bool unknown71a;
-    uint8_t unknown71b;
-    uint16_t code_chars[8];
-    uint16_t code_char_terminator;
-    uint32_t characters_entered_count;
-    float enter_code_topleft_woodpanel_esc_slidein_timer;
-    STRINGID enter_code_banner_text_id;
-    STRINGID enter_code_OK_text_id;
-    TextureRenderingInfo enter_code_main_woodpanel_left;
-    TextureRenderingInfo enter_code_main_woodpanel_center;
-    TextureRenderingInfo enter_code_main_woodpanel_right;
-    TextureRenderingInfo enter_code_banner;
-    TextureRenderingInfo enter_code_char_cutouts;
-    TextureRenderingInfo enter_code_pointing_hand;
-    TextureRenderingInfo enter_code_buttons;
-    TextureRenderingInfo unknown85;
-    TextureRenderingInfo enter_code_OK_panel;
-    float enter_code_OK_panel_slidein_timer;
-    int32_t unknown87;
-    TextureRenderingInfo enter_code_your_code_scroll;
-    TextureRenderingInfo enter_code_your_code_scroll_left_handle;
-    TextureRenderingInfo enter_code_your_code_scroll_right_handle;
+    // can't put ScreenEnterOnlineCode here as it's abstract class
+    // no idea how the game code apperently allows this, unless this is some compiler opimaization bullshit
 
-    void set_code(const std::string& code);
+    size_t screen_code_input;
+};
+
+struct MenuInsert
+{
+    float x;
+    float y;
+    float unknown1; // text_disappearance_speed?
+    float text_spacing;
+    float unknown5;
+    uint32_t unknown6;
+    float unknown7;
+    float unknown8;
+    uint32_t unknown9;
+    float unknown10;
+    std::vector<size_t*> unknown11; // menu options, probably just a bunch of floats, suprisingly it's not TextRenderingInfo
+    size_t* unknown12;
+    size_t* unknown13; // function
+    uint32_t selected_menu_index;
+    bool loop;
+    bool unknown16;
+    bool disable_controls;
 };
 
 struct PauseUI
 {
     float menu_slidein_progress;
-    TextureRenderingInfo blurred_background;
+    TextureRenderingInfo blackout_background;
     TextureRenderingInfo woodpanel_left;
     TextureRenderingInfo woodpanel_middle;
     TextureRenderingInfo woodpanel_right;
     TextureRenderingInfo woodpanel_top;
     TextureRenderingInfo scroll;
 
-    uint32_t unknown2;
-    size_t unknown3;
-
+    // uint32_t probably_padding1;
+    MenuInsert* menu;
+    /// Prompt background
     TextureRenderingInfo confirmation_panel;
-
-    uint32_t unknown5;
-    uint32_t unknown6;
-    size_t unknown7;
-    uint32_t unknown8;
-
-    uint32_t previously_selected_menu_index;
-    uint32_t buttons_actions;
-    uint32_t buttons_movement;
-    uint8_t unknown11a;
-    int8_t unknown11b;
-    uint16_t unknown12;
+    MultiLineTextRendering* prompt_question;
+    MenuInsert* prompt_menu;
+    bool unknown8;
+    // uint8_t probably_padding2[3];
+    /// It's set wh game displays the prompt
+    uint32_t selected_option;
+    bool prompt_visible;
+    std::array<uint8_t, MAX_PLAYERS> buttons_actions;  // per player, so no default menu input
+    std::array<uint8_t, MAX_PLAYERS> buttons_movement; // per player, so no default menu input
+    int8_t unknown11;
+    // uint16_t probably_padding3;
+    /// 0 - Invisible, 1 - Sliding down, 2 - Visible, 3 - Sliding up
     uint32_t visibility;
 };
 
@@ -844,7 +883,7 @@ class JournalPage
   public:
     TextureRenderingInfo background;
     uint32_t page_number;
-    uint32_t unknown2;
+    uint32_t unknown2; // probably padding
 
     template <typename T>
     T* as()
@@ -868,34 +907,14 @@ class JournalPageProgress : public JournalPage
 {
   public:
     TextureRenderingInfo coffeestain_top;
-
-    virtual ~JournalPageProgress() = 0;
 };
 
 class JournalPageJournalMenu : public JournalPage
 {
   public:
-    float unknown3;
-    float unknown4;
-    float unknown5;
-    float unknown6;
-    float unknown7;
-    float unknown8;
-    float unknown9;
-    float unknown10;
-    uint32_t unknown11;
-    float unknown12;
-    size_t unknown13;
-    size_t unknown15;
-    size_t unknown17;
-    size_t unknown19;
-    size_t unknown21;
-    uint32_t selected_menu_index;
-    uint32_t unknown23;
+    MenuInsert menu;
     TextRenderingInfo* journal_text_info;
     TextureRenderingInfo completion_badge;
-
-    virtual ~JournalPageJournalMenu() = 0;
 };
 
 class JournalPageDiscoverable : public JournalPage
@@ -916,16 +935,12 @@ class JournalPageDiscoverable : public JournalPage
     MultiLineTextRendering* text_lines;
     TextRenderingInfo* entry_text_info;
     TextRenderingInfo* chapter_title_text_info;
-
-    virtual ~JournalPageDiscoverable() = 0;
 };
 
 class JournalPagePlaces : public JournalPageDiscoverable
 {
   public:
     TextureRenderingInfo main_image;
-
-    virtual ~JournalPagePlaces() = 0;
 };
 
 class JournalPagePeople : public JournalPageDiscoverable
@@ -934,8 +949,6 @@ class JournalPagePeople : public JournalPageDiscoverable
     TextureRenderingInfo character_background;
     TextureRenderingInfo character_icon;
     TextureRenderingInfo character_drawing;
-
-    virtual ~JournalPagePeople() = 0;
 };
 
 class JournalPageBestiary : public JournalPageDiscoverable
@@ -948,8 +961,6 @@ class JournalPageBestiary : public JournalPageDiscoverable
     TextRenderingInfo* defeated_value_text_info;
     TextRenderingInfo* killedby_text_info;
     TextRenderingInfo* killedby_value_text_info;
-
-    virtual ~JournalPageBestiary() = 0;
 };
 
 class JournalPageItems : public JournalPageDiscoverable
@@ -957,8 +968,6 @@ class JournalPageItems : public JournalPageDiscoverable
   public:
     TextureRenderingInfo item_icon;
     TextureRenderingInfo item_background;
-
-    virtual ~JournalPageItems() = 0;
 };
 
 class JournalPageTraps : public JournalPageDiscoverable
@@ -966,15 +975,11 @@ class JournalPageTraps : public JournalPageDiscoverable
   public:
     TextureRenderingInfo trap_icon;
     TextureRenderingInfo trap_background;
-
-    virtual ~JournalPageTraps() = 0;
 };
 
 class JournalPageStory : public JournalPage
 {
   public:
-    virtual ~JournalPageStory() = 0;
-
     static JournalPageStory* construct(bool right_side, uint32_t page_number);
 };
 
@@ -983,38 +988,18 @@ class JournalPageFeats : public JournalPage
   public:
     TextRenderingInfo* chapter_title_text_info;
     TextureRenderingInfo feat_icons;
-
-    virtual ~JournalPageFeats() = 0;
 };
 
 class JournalPageDeathCause : public JournalPage
 {
   public:
     TextRenderingInfo* death_cause_text_info;
-
-    virtual ~JournalPageDeathCause() = 0;
 };
 
 class JournalPageDeathMenu : public JournalPage
 {
   public:
-    float unknown3;
-    float unknown4;
-    float unknown5;
-    float unknown6;
-    float unknown7;
-    float unknown8;
-    float unknown9;
-    float unknown10;
-    uint32_t unknown11;
-    float unknown12;
-    size_t unknown13;
-    size_t unknown14;
-    size_t unknown15;
-    size_t unknown16;
-    size_t unknown17;
-    uint32_t selected_menu_index;
-    uint32_t unknown18;
+    MenuInsert menu;
     TextRenderingInfo* game_over_text_info;
     TextRenderingInfo* level_text_info;
     TextRenderingInfo* level_value_text_info;
@@ -1022,14 +1007,11 @@ class JournalPageDeathMenu : public JournalPage
     TextRenderingInfo* money_value_text_info;
     TextRenderingInfo* time_text_info;
     TextRenderingInfo* time_value_text_info;
-
-    virtual ~JournalPageDeathMenu() = 0;
 };
 
 class JournalPageRecap : public JournalPage
 {
   public:
-    virtual ~JournalPageRecap() = 0;
 };
 
 class JournalPagePlayerProfile : public JournalPage
@@ -1059,8 +1041,6 @@ class JournalPagePlayerProfile : public JournalPage
     TextRenderingInfo* average_time_value_text_info;
     TextRenderingInfo* best_time_text_info;
     TextRenderingInfo* best_time_value_text_info;
-
-    virtual ~JournalPagePlayerProfile() = 0;
 };
 
 class JournalPageLastGamePlayed : public JournalPage
@@ -1076,8 +1056,6 @@ class JournalPageLastGamePlayed : public JournalPage
     TextRenderingInfo* time_value_text_info;
     uint32_t sticker_count;
     std::array<TextureRenderingInfo, 20> stickers;
-
-    virtual ~JournalPageLastGamePlayed() = 0;
 };
 
 using JOURNALUI_PAGE_SHOWN = uint8_t; // NoAlias
@@ -1087,8 +1065,8 @@ struct JournalUI
     uint32_t state;
     JOURNALUI_PAGE_SHOWN chapter_shown;
 
-    uint8_t unknown1;
-    uint16_t unknown2;
+    // uint8_t padding_probably1[3];
+
     /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
     /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
     custom_vector<JournalPage*> pages;
@@ -1122,8 +1100,6 @@ struct JournalUI
 
     uint32_t unknown28;
     size_t unknown29;
-    float unknown31;
-    uint32_t unknown30;
 };
 
 Screen* get_screen_ptr(uint32_t screen_id);
