@@ -2010,7 +2010,7 @@ Type | Name | Description
 [TextureRenderingInfo](#TextureRenderingInfo) | [item_equipped_badge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_equipped_badge) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [item_off_gray_overlay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_off_gray_overlay) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [esc_woodpanel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=esc_woodpanel) | 
-map&lt;int, float&gt; | [items_to_gay_out](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items_to_gay_out) | 
+map&lt;int, float&gt; | [items_to_gray_out](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=items_to_gray_out) | 
 float | [center_panels_horizontal_slide_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=center_panels_horizontal_slide_position) | 
 float | [esc_panel_slide_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=esc_panel_slide_timer) | 
 int | [selected_item_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_item_index) | 
@@ -2065,7 +2065,7 @@ float | [center_panels_hor_slide_position](https://github.com/spelunky-fyi/overl
 float | [esc_next_panels_slide_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=esc_next_panels_slide_timer) | 
 float | [main_panel_vertical_scroll_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=main_panel_vertical_scroll_position) | 
 int | [selected_option_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_option_index) | 
-[ScreenControls](#ScreenControls) | [contols](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=contols) | 
+[ScreenControls](#ScreenControls) | [controls](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controls) | 
 
 ### ScreenArenaScore
 
@@ -2152,11 +2152,11 @@ int | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons
 [TextureRenderingInfo](#TextureRenderingInfo) | [players_turn_scroll](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_turn_scroll) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [players_turn_scroll_handle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players_turn_scroll_handle) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [grid_player_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grid_player_icon) | 
-map&lt;int, float&gt; | [stages_to_gay_out](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stages_to_gay_out) | 
+map&lt;int, float&gt; | [stages_to_gray_out](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stages_to_gray_out) | 
 float | [panels_slide_from_both_sides](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=panels_slide_from_both_sides) | 
 float | [visibility_all_stages](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visibility_all_stages) | 
 int | [selected_stage_index](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=selected_stage_index) | 
-[ScreenControls](#ScreenControls) | [contols](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=contols) | 
+[ScreenControls](#ScreenControls) | [controls](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=controls) | 
 
 ### ScreenCamp
 

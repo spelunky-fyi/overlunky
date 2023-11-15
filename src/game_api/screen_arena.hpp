@@ -56,7 +56,7 @@ class ScreenArenaMenu : public Screen // ID: 21
     float esc_next_panels_slide_timer;
     float main_panel_vertical_scroll_position;
     uint32_t selected_option_index; // more like highlighted
-    ScreenControls contols;
+    ScreenControls controls;
     uint8_t unknown57[3]; // some states, like screen depth
 };
 
@@ -91,8 +91,8 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     TextureRenderingInfo players_turn_scroll;
     TextureRenderingInfo players_turn_scroll_handle;
     TextureRenderingInfo grid_player_icon;
-    float unknown30;                                         // padding probably
-    custom_unordered_map<uint32_t, float> stages_to_gay_out; // key is the stage, float is how gray out it is
+    float unknown30;                                          // padding probably
+    custom_unordered_map<uint32_t, float> stages_to_gray_out; // key is the stage, float is how gray out it is
 
     uint32_t unknown47; // load state?
     uint32_t unknown48;
@@ -101,7 +101,7 @@ class ScreenArenaStagesSelect : public Screen // ID: 22 and 24
     float panels_slide_from_both_sides;
     float visibility_all_stages;
     uint32_t selected_stage_index; // more like highlighted
-    ScreenControls contols;
+    ScreenControls controls;
     uint8_t unknown57[3]; // some states, like screen depth
 };
 
@@ -125,7 +125,7 @@ class ScreenArenaItems : public Screen // ID: 23
     TextureRenderingInfo item_off_gray_overlay;
     TextureRenderingInfo esc_woodpanel;
 
-    custom_unordered_map<uint32_t, float> items_to_gay_out;
+    custom_unordered_map<uint32_t, float> items_to_gray_out;
 
     float unknown33;
     float center_panels_horizontal_slide_position;

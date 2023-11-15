@@ -47,7 +47,7 @@ void register_usertypes(sol::state& lua)
     screenarenamenu_type["esc_next_panels_slide_timer"] = &ScreenArenaMenu::esc_next_panels_slide_timer;
     screenarenamenu_type["main_panel_vertical_scroll_position"] = &ScreenArenaMenu::main_panel_vertical_scroll_position;
     screenarenamenu_type["selected_option_index"] = &ScreenArenaMenu::selected_option_index;
-    screenarenamenu_type["contols"] = &ScreenArenaMenu::contols;
+    screenarenamenu_type["controls"] = &ScreenArenaMenu::controls;
 
     auto screenarenastagesselect_type = lua.new_usertype<ScreenArenaStagesSelect>("ScreenArenaStagesSelect", sol::base_classes, sol::bases<Screen>());
     screenarenastagesselect_type["screen_panels"] = &ScreenArenaStagesSelect::screen_panels;
@@ -77,11 +77,11 @@ void register_usertypes(sol::state& lua)
     screenarenastagesselect_type["players_turn_scroll"] = &ScreenArenaStagesSelect::players_turn_scroll;
     screenarenastagesselect_type["players_turn_scroll_handle"] = &ScreenArenaStagesSelect::players_turn_scroll_handle;
     screenarenastagesselect_type["grid_player_icon"] = &ScreenArenaStagesSelect::grid_player_icon;
-    screenarenastagesselect_type["stages_to_gay_out"] = &ScreenArenaStagesSelect::stages_to_gay_out;
+    screenarenastagesselect_type["stages_to_gray_out"] = &ScreenArenaStagesSelect::stages_to_gray_out;
     screenarenastagesselect_type["panels_slide_from_both_sides"] = &ScreenArenaStagesSelect::panels_slide_from_both_sides;
     screenarenastagesselect_type["visibility_all_stages"] = &ScreenArenaStagesSelect::visibility_all_stages;
     screenarenastagesselect_type["selected_stage_index"] = &ScreenArenaStagesSelect::selected_stage_index;
-    screenarenastagesselect_type["contols"] = &ScreenArenaStagesSelect::contols;
+    screenarenastagesselect_type["controls"] = &ScreenArenaStagesSelect::controls;
 
     auto screenarenaitems_type = lua.new_usertype<ScreenArenaItems>("ScreenArenaItems", sol::base_classes, sol::bases<Screen>());
     screenarenaitems_type["screen_panels"] = &ScreenArenaItems::screen_panels;
@@ -100,7 +100,7 @@ void register_usertypes(sol::state& lua)
     screenarenaitems_type["item_equipped_badge"] = &ScreenArenaItems::item_equipped_badge;
     screenarenaitems_type["item_off_gray_overlay"] = &ScreenArenaItems::item_off_gray_overlay;
     screenarenaitems_type["esc_woodpanel"] = &ScreenArenaItems::esc_woodpanel;
-    screenarenaitems_type["items_to_gay_out"] = &ScreenArenaItems::items_to_gay_out;
+    screenarenaitems_type["items_to_gray_out"] = &ScreenArenaItems::items_to_gray_out;
     screenarenaitems_type["center_panels_horizontal_slide_position"] = &ScreenArenaItems::center_panels_horizontal_slide_position;
     screenarenaitems_type["esc_panel_slide_timer"] = &ScreenArenaItems::esc_panel_slide_timer;
     screenarenaitems_type["selected_item_index"] = &ScreenArenaItems::selected_item_index;

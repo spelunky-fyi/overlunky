@@ -6078,7 +6078,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field esc_next_panels_slide_timer number
     ---@field main_panel_vertical_scroll_position number
     ---@field selected_option_index integer
-    ---@field contols ScreenControls
+    ---@field controls ScreenControls
 
 ---@class ScreenArenaStagesSelect : Screen
     ---@field screen_panels MenuScreenPanels
@@ -6108,11 +6108,11 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field players_turn_scroll TextureRenderingInfo
     ---@field players_turn_scroll_handle TextureRenderingInfo
     ---@field grid_player_icon TextureRenderingInfo
-    ---@field stages_to_gay_out table<integer, number>
+    ---@field stages_to_gray_out table<integer, number>
     ---@field panels_slide_from_both_sides number
     ---@field visibility_all_stages number
     ---@field selected_stage_index integer
-    ---@field contols ScreenControls
+    ---@field controls ScreenControls
 
 ---@class ScreenArenaItems : Screen
     ---@field screen_panels MenuScreenPanels
@@ -6131,7 +6131,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field item_equipped_badge TextureRenderingInfo
     ---@field item_off_gray_overlay TextureRenderingInfo
     ---@field esc_woodpanel TextureRenderingInfo
-    ---@field items_to_gay_out table<integer, number>
+    ---@field items_to_gray_out table<integer, number>
     ---@field center_panels_horizontal_slide_position number
     ---@field esc_panel_slide_timer number
     ---@field selected_item_index integer
