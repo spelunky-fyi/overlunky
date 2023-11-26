@@ -63,15 +63,15 @@ set_callback(function()
         zoom(control.zoom)
     end
     if control.fade then
-        state.fadevalue = 0
-        state.fadeout = 0
-        state.fadein = 0
+        state.fade_value = 0
+        state.fade_timer = 0
+        state.fade_length = 0
         state.loading_black_screen_timer = 0
     end
-    if control.level and state.loading == 3 and ((not control.fade and state.fadeout == 1) or control.fade) then
+    if control.level and state.loading == 3 and ((not control.fade and state.fade_timer == 1) or control.fade) then
         control.paused = true
         control.skip = false
-        state.fadevalue = 0
+        state.fade_value = 0
         state.loading = 0
     end
     if control.paused and control.skip then

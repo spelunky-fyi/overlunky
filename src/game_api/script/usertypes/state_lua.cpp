@@ -324,8 +324,11 @@ void register_usertypes(sol::state& lua)
     statememory_type["loading"] = &StateMemory::loading;
     statememory_type["quest_flags"] = &StateMemory::quest_flags;
     statememory_type["presence_flags"] = &StateMemory::presence_flags;
+    statememory_type["fade_value"] = &StateMemory::fade_value;
     statememory_type["fadevalue"] = &StateMemory::fadevalue;
+    statememory_type["fade_timer"] = &StateMemory::fade_timer;
     statememory_type["fadeout"] = &StateMemory::fadeout;
+    statememory_type["fade_length"] = &StateMemory::fade_length;
     statememory_type["fadein"] = &StateMemory::fadein;
     statememory_type["loading_black_screen_timer"] = &StateMemory::loading_black_screen_timer;
     statememory_type["saved_dogs"] = &StateMemory::saved_dogs;

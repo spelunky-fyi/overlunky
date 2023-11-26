@@ -17,8 +17,8 @@ function transition_to_duat()
     state.level_next = 4
     state.theme_next = THEME.DUAT
     state.ingame = 1
-    state.fadeout = 18
-    state.fadein = 18
+    state.fade_timer = 18
+    state.fade_length = 18
     state.loading_black_screen_timer = 0
     state:force_current_theme(THEME.CITY_OF_GOLD) -- this makes it so we "come from" COG, which renders the correct limbo transition
     state.loading = 1

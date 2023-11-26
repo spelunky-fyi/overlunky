@@ -142,7 +142,7 @@ end, 1)
 
 set_callback(function()
     if options.turbo then
-        state.fadeout = 0
-        state.fadein = 0
+        state.fade_timer = 0
+        state.fade_length = 0
     end
 end, ON.LOADING)

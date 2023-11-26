@@ -9338,10 +9338,10 @@ end
 
 function not_loading()
     local ret = state.loading > 0
-        or state.fadevalue > 0
+        or state.fade_value > 0
         or (state.screen == SCREEN.MENU and game_manager.screen_menu.menu_text_opacity < 1)
         or (state.screen == SCREEN.CHARACTER_SELECT and (state.screen_character_select.topleft_woodpanel_esc_slidein_timer == 0 or state.screen_character_select.start_pressed))
-    if state.loading == 3 and state.fadevalue < 0.03 then
+    if state.loading == 3 and state.fade_value < 0.03 then
         ret = false
     end
     return not ret
@@ -9486,8 +9486,8 @@ set_callback(clear_hooks, ON.SCRIPT_DISABLE)
     add_ui_script("level_size", false, "");
     add_ui_script("skip_fades", options["skip_fades"], R"(
 set_callback(function()
-    state.fadeout = 0
-    state.fadevalue = 0
+    state.fade_timer = 0
+    state.fade_value = 0
 end, ON.PRE_UPDATE))");
 }
 
