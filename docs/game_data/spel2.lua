@@ -2742,6 +2742,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field ai Ai
     ---@field input PlayerSlot
     ---@field basecamp_button_entity Entity @Used in base camp to talk with the NPC's
+    ---@field special_sound SoundMeta @For Lise System walking and looking up sounds
     ---@field jump_lock_timer integer @Increases when holding jump button in the air, set to max while jumping. If this isn't 0, a jump will only be<br/>registered if the jump button was not held on the previous frame.
     ---@field coyote_timer integer @can jump while airborne if greater than 0
     ---@field swim_timer integer @Timer between strokes when holding jump button in water.

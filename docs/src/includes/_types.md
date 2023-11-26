@@ -5312,6 +5312,7 @@ int | [linked_companion_child](https://github.com/spelunky-fyi/overlunky/search?
 [Ai](#Ai) | [ai](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai) | 
 [PlayerSlot](#PlayerSlot) | [input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input) | 
 [Entity](#Entity) | [basecamp_button_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp_button_entity) | Used in base camp to talk with the [NPC](#NPC)'s
+[SoundMeta](#SoundMeta) | [special_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_sound) | For Lise System walking and looking up sounds
 int | [jump_lock_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_lock_timer) | Increases when holding jump button in the air, set to max while jumping. If this isn't 0, a jump will only be<br/>registered if the jump button was not held on the previous frame.
 int | [coyote_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coyote_timer) | can jump while airborne if greater than 0
 int | [swim_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swim_timer) | Timer between strokes when holding jump button in water.

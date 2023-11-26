@@ -102,8 +102,8 @@ class Player : public PowerupCapable
     PlayerSlot* input_ptr;
     /// Used in base camp to talk with the NPC's
     Entity* basecamp_button_entity;
-    int32_t i168;
-    int32_t i16c;
+    /// For Lise System walking and looking up sounds
+    SoundMeta* special_sound;
     float y_pos; // not sure why, seams to be the same as abs_y
     /// Increases when holding jump button in the air, set to max while jumping. If this isn't 0, a jump will only be
     /// registered if the jump button was not held on the previous frame.
