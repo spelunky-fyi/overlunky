@@ -9783,12 +9783,6 @@ void update_bucket()
     g_bucket->overlunky->selected_uid = g_last_id;
     g_bucket->overlunky->selected_uids = g_selected_ids;
     g_bucket->overlunky->keys = keys;
-    for (auto [k, v] : options)
-    {
-        g_bucket->overlunky->options[k] = options[k];
-    }
-    g_bucket->overlunky->options["pause_type"] = g_pause_type;
-    g_bucket->overlunky->options["paused"] = paused;
 
     for (auto [k, v] : g_bucket->overlunky->set_options)
     {
@@ -9870,6 +9864,13 @@ void update_bucket()
         }
     }
     g_bucket->overlunky->set_options.clear();
+
+    for (auto [k, v] : options)
+    {
+        g_bucket->overlunky->options[k] = options[k];
+    }
+    g_bucket->overlunky->options["pause_type"] = g_pause_type;
+    g_bucket->overlunky->options["paused"] = paused;
 }
 
 void post_draw()
