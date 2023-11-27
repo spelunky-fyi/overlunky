@@ -9338,6 +9338,7 @@ end
 
 function not_loading()
     local ret = state.loading > 0
+        or state.fade_value > 0
         or (state.screen == SCREEN.MENU and game_manager.screen_menu.menu_text_opacity < 1)
         or (state.screen == SCREEN.CHARACTER_SELECT and (state.screen_character_select.topleft_woodpanel_esc_slidein_timer == 0 or state.screen_character_select.start_pressed))
     if (state.loading == 3 and state.fade_timer == 1) or (state.loading == 1 and state.fade_timer == state.fade_length) then
