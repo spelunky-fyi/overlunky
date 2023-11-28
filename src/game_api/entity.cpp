@@ -371,21 +371,11 @@ std::span<uint32_t> Entity::get_items()
     return {};
 }
 
-Entity* get_entity_ptr_main(uint32_t uid)
-{
-    auto& state = State::get();
-    auto p = state.find(uid);
-    if (IsBadWritePtr(p, 0x178))
-        return nullptr;
-    return p;
-}
-
 Entity* get_entity_ptr(uint32_t uid)
 {
-    auto& state = State::get();
-    auto p = state.find_local(uid);
-    if (IsBadWritePtr(p, 0x178))
-        return nullptr;
+    auto p = State::find(State::get().ptr(), uid);
+    // if (IsBadWritePtr(p, 0x178))
+    //     return nullptr;
     return p;
 }
 

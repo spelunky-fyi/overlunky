@@ -1419,7 +1419,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             auto old_block_id = UI::get_grid_entity_at(cpos.first, cpos.second, LAYER::PLAYER);
             if (old_block_id != -1)
             {
-                auto old_block = get_entity_ptr_main(old_block_id);
+                auto old_block = get_entity_ptr(old_block_id);
 
                 if (old_block)
                     smart_delete(old_block);
@@ -1434,12 +1434,12 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
         if (to_spawn.name.find("ENT_TYPE_MOUNT") != std::string::npos)
         {
-            auto mount = get_entity_ptr_main(spawned)->as<Mount>();
+            auto mount = get_entity_ptr(spawned)->as<Mount>();
             mount->tame(true);
         }
         if (to_spawn.name.find("ENT_TYPE_FLOOR") != std::string::npos && options["spawn_floor_decorated"])
         {
-            if (Floor* floor = get_entity_ptr_main(spawned)->as<Floor>())
+            if (Floor* floor = get_entity_ptr(spawned)->as<Floor>())
             {
                 if (flip && (to_spawn.name.find("ARROW_TRAP") != std::string::npos || to_spawn.name.find("LASER_TRAP") != std::string::npos || to_spawn.name.find("HORIZONTAL") != std::string::npos))
                 {
@@ -1463,13 +1463,13 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
         }
         if (flip)
         {
-            auto ent = get_entity_ptr_main(spawned);
+            auto ent = get_entity_ptr(spawned);
             if (ent)
                 ent->flags |= (1U << 16);
         }
         if (to_spawn.id == also_snap[0])
         {
-            auto ent = get_entity_ptr_main(spawned)->as<LogicalDoor>();
+            auto ent = get_entity_ptr(spawned)->as<LogicalDoor>();
             ent->door_type = to_id("ENT_TYPE_FLOOR_DOOR_LAYER");
             ent->platform_type = to_id("ENT_TYPE_FLOOR_DOOR_PLATFORM");
         }
@@ -1529,7 +1529,7 @@ void spawn_kit(Kit* kit)
         if (spawned == -1)
             continue;
 
-        auto spawned_ent = get_entity_ptr_main(spawned)->as<Movable>();
+        auto spawned_ent = get_entity_ptr(spawned)->as<Movable>();
 
         if (std::find(std::begin(wearable), std::end(wearable), id) != std::end(wearable) && g_players.at(0)->worn_backitem() == -1)
         {
@@ -1537,7 +1537,7 @@ void spawn_kit(Kit* kit)
         }
         else if (item.name.find("MOUNT_") != std::string::npos)
         {
-            auto spawned_mount = get_entity_ptr_main(spawned)->as<Mount>();
+            auto spawned_mount = get_entity_ptr(spawned)->as<Mount>();
             spawned_mount->tame(true);
             if (!g_players.at(0)->overlay)
             {
@@ -1601,9 +1601,9 @@ void spawn_entity_over()
             return;
         }
 
-        if (g_over_id == -1 || !get_entity_ptr_main(g_over_id))
+        if (g_over_id == -1 || !get_entity_ptr(g_over_id))
             return;
-        auto overlay = get_entity_ptr_main(g_over_id);
+        auto overlay = get_entity_ptr(g_over_id);
 
         if (item.name.find("ENT_TYPE_ITEM_POWERUP") != std::string::npos)
         {
@@ -1613,7 +1613,7 @@ void spawn_entity_over()
         else if (item.name.find("ENT_TYPE_ITEM") != std::string::npos && overlay->type->search_flags & 0x100)
         {
             int spawned = UI::spawn_entity_over(item.id, g_over_id, g_dx, g_dy);
-            auto ent = get_entity_ptr_main(spawned);
+            auto ent = get_entity_ptr(spawned);
             if (g_dx == 0 && g_dy == 0)
             {
                 ent->set_draw_depth(9);
@@ -1639,7 +1639,7 @@ void spawn_entity_over()
         {
             auto mount = overlay->as<Mount>();
             int spawned = UI::spawn_entity(item.id, g_x, g_y, true, g_vx, g_vy, false);
-            auto rider = get_entity_ptr_main(spawned)->as<Movable>();
+            auto rider = get_entity_ptr(spawned)->as<Movable>();
             mount->carry(rider);
             rider->move_state = 0;
             if (!lock_entity)
@@ -1689,7 +1689,7 @@ bool update_entity()
         return false;
     if (g_last_id > -1)
     {
-        g_entity = get_entity_ptr_main(g_last_id);
+        g_entity = get_entity_ptr(g_last_id);
         if (!g_entity)
             return false;
 
@@ -2065,7 +2065,7 @@ void clear_void()
 {
     for (auto uid : UI::get_entities_by({}, 1422, LAYER::FRONT))
     {
-        auto ent = get_entity_ptr_main(uid);
+        auto ent = get_entity_ptr(uid);
         auto [x, y] = ent->position();
         if (x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
             UI::safe_destroy(ent);
@@ -2095,7 +2095,7 @@ void load_void(std::string data)
         if (e.id <= 915)
         {
             auto uid = UI::spawn_grid(e.id, (float)e.x, (float)e.y, 0);
-            auto ent = get_entity_ptr_main(uid);
+            auto ent = get_entity_ptr(uid);
             if (ent->type->search_flags & 0x100)
             {
                 fix_decorations_at((float)e.x, (float)e.y, LAYER::FRONT);
@@ -2160,7 +2160,7 @@ std::string serialize_void()
         uids = UI::get_entities_by({}, export_mask, LAYER::FRONT);
     for (auto uid : uids)
     {
-        auto ent = get_entity_ptr_main(uid);
+        auto ent = get_entity_ptr(uid);
         if (!ent || !(ent->type->search_flags & export_mask))
             continue;
         auto [x, y] = ent->position();
@@ -2341,7 +2341,7 @@ void warp_next_level(size_t num)
 
     for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
     {
-        ExitDoor* doorent = get_entity_ptr_main(doorid)->as<ExitDoor>();
+        ExitDoor* doorent = get_entity_ptr(doorid)->as<ExitDoor>();
         if (!doorent->special_door)
             continue;
         targets.emplace_back(doorent->world, doorent->level, doorent->theme);
@@ -3490,7 +3490,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("destroy_grabbed", wParam))
     {
-        auto selected = get_entity_ptr_main(g_last_id);
+        auto selected = get_entity_ptr(g_last_id);
         if (selected)
             smart_delete(selected, true);
         if (!lock_entity)
@@ -3500,7 +3500,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         for (auto selected_uid : g_selected_ids)
         {
-            auto ent = get_entity_ptr_main(selected_uid);
+            auto ent = get_entity_ptr(selected_uid);
             if (ent)
                 smart_delete(ent, false);
         }
@@ -3867,7 +3867,7 @@ void render_narnia()
 
         for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
         {
-            ExitDoor* target = get_entity_ptr_main(doorid)->as<ExitDoor>();
+            ExitDoor* target = get_entity_ptr(doorid)->as<ExitDoor>();
             if (!target->special_door)
                 continue;
             std::string buf = fmt::format("{}-{} {}", target->world, target->level, theme_name(target->theme));
@@ -4347,7 +4347,7 @@ void erase_entities()
     auto box = AABB{ax, ay, ax, ay};
     for (auto erase_uid : UI::get_entities_overlapping(mask, box.extrude(0.1f), (LAYER)g_state->camera_layer))
     {
-        auto erase = get_entity_ptr_main(erase_uid);
+        auto erase = get_entity_ptr(erase_uid);
         if (erase)
             smart_delete(erase);
     }
@@ -4638,7 +4638,7 @@ std::string entity_tooltip(Entity* hovered)
     if (hovered->type->search_flags & 15 && hovered->as<Movable>()->last_owner_uid > -1)
     {
         auto ent = hovered->as<Movable>();
-        auto owner = get_entity_ptr_main(ent->last_owner_uid);
+        auto owner = get_entity_ptr(ent->last_owner_uid);
         if (owner)
             coords += fmt::format("\nOWNER: {}, {} ({:.2f}, {:.2f})", owner->uid, entity_names[owner->type->id], owner->abs_x == -FLT_MAX ? owner->x : owner->abs_x, owner->abs_y == -FLT_MAX ? owner->y : owner->abs_y);
     }
@@ -4995,7 +4995,7 @@ void render_clickhandler()
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
         for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer)))
         {
-            auto ent = get_entity_ptr_main(entity);
+            auto ent = get_entity_ptr(entity);
             if (!ent)
                 continue;
 
@@ -5049,17 +5049,17 @@ void render_clickhandler()
             };
             for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // FLOOR | ACTIVEFLOOR
             {
-                auto ent = get_entity_ptr_main(entity);
+                auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
             }
             for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // LOGICAL
             {
-                auto ent = get_entity_ptr_main(entity);
+                auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             }
             for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // DOOR
             {
-                auto ent = get_entity_ptr_main(entity);
+                auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 180, 45, 150), false, true);
             }
 
@@ -5120,7 +5120,7 @@ void render_clickhandler()
     }
     for (auto entity : g_selected_ids)
     {
-        auto ent = get_entity_ptr_main(entity);
+        auto ent = get_entity_ptr(entity);
         if (ent)
         {
             if (ent->layer == (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))
@@ -5414,7 +5414,7 @@ void render_clickhandler()
                 throw_held = true;
             }
             set_pos(startpos);
-            auto held = get_entity_ptr_main(g_held_id);
+            auto held = get_entity_ptr(g_held_id);
             if (held && held->is_movable())
             {
                 UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, false);
@@ -6177,7 +6177,7 @@ void render_options()
 void render_debug()
 {
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() * 0.5f);
-    const auto selected_entity = get_entity_ptr_main(g_last_id);
+    const auto selected_entity = get_entity_ptr(g_last_id);
     size_t entity_addr = reinterpret_cast<size_t>(selected_entity);
     size_t state_addr = reinterpret_cast<size_t>(g_state);
     size_t save_addr = reinterpret_cast<size_t>(g_save);
@@ -7120,7 +7120,7 @@ void render_entity_finder()
             {
                 g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                     {
-                                                        auto ent = get_entity_ptr_main(filter_uid);
+                                                        auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
                                                         return ent->type->id != search_entity_type; }),
@@ -7130,7 +7130,7 @@ void render_entity_finder()
             {
                 g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                     {
-                                                        auto ent = get_entity_ptr_main(filter_uid);
+                                                        auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
                                                         return (ent->type->search_flags & search_entity_mask) == 0; }),
@@ -7139,7 +7139,7 @@ void render_entity_finder()
             {
                 g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                     {
-                                                        auto ent = get_entity_ptr_main(filter_uid);
+                                                        auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
                                                         return ent->layer != enum_to_layer((LAYER)search_entity_layer); }),
@@ -7151,7 +7151,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return (ent->flags & search_entity_flags) != search_entity_flags; }),
@@ -7161,7 +7161,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return (ent->flags & search_entity_not_flags) != 0; }),
@@ -7171,7 +7171,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return (ent->more_flags & search_entity_more_flags) != search_entity_more_flags; }),
@@ -7181,7 +7181,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return (ent->more_flags & search_entity_not_more_flags) != 0; }),
@@ -7191,7 +7191,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return (ent->type->properties_flags & search_entity_properties_flags) != search_entity_properties_flags; }),
@@ -7201,7 +7201,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return (ent->type->properties_flags & search_entity_not_properties_flags) != 0; }),
@@ -7211,7 +7211,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return !StrStrIA(entity_names[ent->type->id].c_str(), search_entity_name.c_str()); }),
@@ -7221,7 +7221,7 @@ void render_entity_finder()
         {
             g_selected_ids.erase(std::remove_if(g_selected_ids.begin(), g_selected_ids.end(), [&](uint32_t filter_uid)
                                                 {
-                                                    auto ent = get_entity_ptr_main(filter_uid);
+                                                    auto ent = get_entity_ptr(filter_uid);
                                                     if (!ent)
                                                         return true;
                                                     return ent->draw_depth < search_entity_depth[0] || ent->draw_depth > search_entity_depth[1]; }),
@@ -7255,7 +7255,7 @@ void render_entity_finder()
         {
             for (auto selected_uid : g_selected_ids)
             {
-                auto ent = get_entity_ptr_main(selected_uid);
+                auto ent = get_entity_ptr(selected_uid);
                 if (ent)
                     smart_delete(ent, false);
             }
@@ -7266,7 +7266,7 @@ void render_entity_finder()
         {
             for (auto selected_uid : g_selected_ids)
             {
-                auto ent = get_entity_ptr_main(selected_uid);
+                auto ent = get_entity_ptr(selected_uid);
                 if (ent)
                     ent->kill(true, nullptr);
             }
@@ -7277,7 +7277,7 @@ void render_entity_finder()
         {
             for (auto selected_uid : g_selected_ids)
             {
-                auto ent = get_entity_ptr_main(selected_uid);
+                auto ent = get_entity_ptr(selected_uid);
                 if (ent)
                     ent->destroy();
             }
@@ -7293,7 +7293,7 @@ void render_entity_finder()
 
 void render_entity_props(int uid, bool detached = false)
 {
-    auto entity = get_entity_ptr_main(uid);
+    auto entity = get_entity_ptr(uid);
     ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.5f);
     if (!detached)
     {
@@ -7468,7 +7468,7 @@ void render_entity_props(int uid, bool detached = false)
                 ImGui::SameLine();
                 if (ImGui::Button("Drop##DropHolding"))
                 {
-                    auto holding = get_entity_ptr_main(movable->holding_uid);
+                    auto holding = get_entity_ptr(movable->holding_uid);
                     if (holding)
                         movable->drop(holding);
                     else
@@ -8044,12 +8044,12 @@ void render_texture_viewer()
     }
     if (texture_viewer.uid != g_last_id)
     {
-        Entity* ent = get_entity_ptr_main(g_last_id);
+        Entity* ent = get_entity_ptr(g_last_id);
         if (ent)
             texture_viewer.id = ent->get_texture();
         texture_viewer.uid = g_last_id;
     }
-    Entity* ent = get_entity_ptr_main(texture_viewer.uid);
+    Entity* ent = get_entity_ptr(texture_viewer.uid);
 
     auto pos = ImGui::GetWindowPos();
     auto size = ImGui::GetWindowSize();
@@ -8584,7 +8584,7 @@ void render_game_props()
                 }
                 for (auto uid : UI::get_entities_by({to_id("ENT_TYPE_ITEM_PLAYERGHOST")}, 0x8, LAYER::BOTH))
                 {
-                    auto ghost = get_entity_ptr_main(uid)->as<PlayerGhost>();
+                    auto ghost = get_entity_ptr(uid)->as<PlayerGhost>();
                     if (ghost->player_inputs && ghost->player_inputs->player_slot == i && g_state->items->player_count < i + 1)
                         ghost->destroy();
                 }
@@ -8602,7 +8602,7 @@ void render_game_props()
                     g_state->items->player_inventories[i].health = 4;
                     auto uid = g_state->next_entity_uid;
                     UI::spawn_player(i);
-                    auto player = get_entity_ptr_main(uid)->as<Player>();
+                    auto player = get_entity_ptr(uid)->as<Player>();
                     player->set_position(spawn_x, spawn_y);
                 }
             }
@@ -8742,7 +8742,7 @@ void render_game_props()
             {
                 continue;
             }
-            auto ai_entity = get_entity_ptr_main(ai_target.ai_uid);
+            auto ai_entity = get_entity_ptr(ai_target.ai_uid);
             auto target = ai_target.target_uid;
             if (ai_entity == nullptr || (ai_entity->type->search_flags & 1) != 1)
             {
@@ -8758,7 +8758,7 @@ void render_game_props()
             }
             else
             {
-                auto target_entity = get_entity_ptr_main(target);
+                auto target_entity = get_entity_ptr(target);
                 if (target_entity != nullptr)
                 {
                     ImGui::Text("%s", entity_names[target_entity->type->id].c_str());
@@ -9773,7 +9773,7 @@ void update_bucket()
     if (g_bucket->overlunky->set_selected_uid.has_value())
     {
         g_last_id = g_bucket->overlunky->set_selected_uid.value();
-        g_entity = get_entity_ptr_main(g_last_id);
+        g_entity = get_entity_ptr(g_last_id);
         g_bucket->overlunky->set_selected_uid = std::nullopt;
     }
     if (g_bucket->overlunky->set_selected_uids.has_value())

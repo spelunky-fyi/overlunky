@@ -547,7 +547,7 @@ uint32_t lowbias32_r(uint32_t x)
     x ^= x >> 16;
     return x;
 }
-Entity* find(StateMemory* state, uint32_t uid)
+Entity* State::find(StateMemory* state, uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
 
@@ -580,14 +580,6 @@ Entity* find(StateMemory* state, uint32_t uid)
 
         cur_index = (cur_index + (uint32_t)1) & mask;
     }
-}
-Entity* State::find(uint32_t uid)
-{
-    return ::find(ptr(), uid);
-}
-Entity* State::find_local(uint32_t uid)
-{
-    return ::find(ptr_local(), uid);
 }
 
 LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
