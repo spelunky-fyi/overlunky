@@ -313,5 +313,5 @@ std::tuple<float, float> get_velocity(uint32_t uid);
 AABB get_hitbox(uint32_t uid, bool use_render_pos);
 
 struct EntityFactory* entity_factory();
+Entity* get_entity_ptr_main(uint32_t uid);
 Entity* get_entity_ptr(uint32_t uid);
-Entity* get_entity_ptr_local(uint32_t uid);

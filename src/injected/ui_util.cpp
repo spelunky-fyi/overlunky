@@ -12,7 +12,7 @@
 #include "entities_floors.hpp"       // for Floor, Floor::(anonymous), FLOO...
 #include "entities_items.hpp"        // for Torch
 #include "entities_mounts.hpp"       // for Mount
-#include "entity.hpp"                // for to_id, Entity, get_entity_ptr
+#include "entity.hpp"                // for to_id, Entity, get_entity_ptr_main
 #include "entity_lookup.hpp"         //
 #include "game_api.hpp"              //
 #include "game_manager.hpp"          // for get_game_manager, GameManager
@@ -176,7 +176,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 }
 void UI::move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto ent = get_entity_ptr(uid);
+    auto ent = get_entity_ptr_main(uid);
     if (ent)
         ent->teleport(x, y, s, vx, vy, snap);
 }
@@ -255,7 +255,7 @@ float UI::get_spark_distance(SparkTrap* ent)
     const static auto offset = get_address("sparktrap_angle_increment") + 4;
     if (memory_read<uint8_t>(offset - 1) == 0x89) // check if sparktraps_hack is active
     {
-        auto spark = get_entity_ptr(ent->spark_uid)->as<Spark>();
+        auto spark = get_entity_ptr_main(ent->spark_uid)->as<Spark>();
         return spark->distance;
     }
     auto parameters = get_sparktraps_parameters_ptr();
@@ -307,7 +307,7 @@ std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, ui
 int32_t UI::spawn_companion(ENT_TYPE compatnion_type, float x, float y, LAYER l, float vx, float vy)
 {
     auto uid = ::spawn_companion(compatnion_type, x, y, (LAYER)enum_to_layer(l));
-    auto ent = get_entity_ptr(uid)->as<Movable>();
+    auto ent = get_entity_ptr_main(uid)->as<Movable>();
     ent->velocityx = vx;
     ent->velocityy = vy;
     return uid;
@@ -354,7 +354,7 @@ int32_t UI::destroy_entity_items(Entity* ent)
     int32_t last_uid = *it;
     while (it != items.rend())
     {
-        auto item = get_entity_ptr(*it);
+        auto item = get_entity_ptr_main(*it);
         UI::destroy_entity_items(item);
         UI::safe_destroy(item, false, false);
         it++;
@@ -370,7 +370,7 @@ bool UI::destroy_entity_item_type(Entity* ent, ENT_TYPE type)
     std::vector<uint32_t>::reverse_iterator it = items.rbegin();
     while (it != items.rend())
     {
-        auto item = get_entity_ptr(*it);
+        auto item = get_entity_ptr_main(*it);
         if (item && item->type->id == type)
         {
             UI::destroy_entity_items(item);
@@ -409,7 +409,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
     auto uid = get_grid_entity_at(x, y, l);
     if (uid == -1)
         return;
-    auto ent = get_entity_ptr(uid);
+    auto ent = get_entity_ptr_main(uid);
     if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
@@ -418,7 +418,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
     {
         for (auto item : entity_get_items_by(floor->uid, 0, 0x8))
         {
-            auto embed = get_entity_ptr(item);
+            auto embed = get_entity_ptr_main(item);
             clr_flag(embed->flags, 1);
         }
     }
@@ -433,7 +433,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
     {
         for (int i = 0; i < 4; ++i)
         {
-            auto deco_ent = get_entity_ptr(floor->decos[i]);
+            auto deco_ent = get_entity_ptr_main(floor->decos[i]);
             if (deco_ent)
                 deco_ent->destroy();
             floor->decos[i] = -1;
@@ -441,13 +441,13 @@ void UI::update_floor_at(float x, float y, LAYER l)
     }
     for (auto deco : entity_get_items_by(floor->uid, destroy_deco, 0x200))
     {
-        auto deco_ent = get_entity_ptr(deco);
+        auto deco_ent = get_entity_ptr_main(deco);
         if (deco_ent)
             deco_ent->destroy();
     }
     for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 0.5f))
     {
-        auto deco_ent = get_entity_ptr(deco);
+        auto deco_ent = get_entity_ptr_main(deco);
         if (deco_ent)
             deco_ent->destroy();
     }
@@ -504,7 +504,7 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
 
     for (auto bg : get_entities_at(cleanup_ents, 0, x, y, l, 0.1f))
     {
-        auto bg_ent = get_entity_ptr(bg);
+        auto bg_ent = get_entity_ptr_main(bg);
         if (bg_ent)
             bg_ent->destroy();
     }
@@ -519,7 +519,7 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
                 return;
             for (auto bg : bgs)
             {
-                auto ent = get_entity_ptr(bg);
+                auto ent = get_entity_ptr_main(bg);
                 ent->destroy();
             }
         }
@@ -532,12 +532,12 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
         auto door_parts = get_entities_at(door_crap, 0, x, y, l, 0.5f);
         for (auto part : door_parts)
         {
-            auto ent = get_entity_ptr(part);
+            auto ent = get_entity_ptr_main(part);
             ent->destroy();
         }
         for (auto uid : get_entities_at(door_platform, 0x100, x, y - 1.0f, l, 0.5f))
         {
-            auto ent = get_entity_ptr(uid);
+            auto ent = get_entity_ptr_main(uid);
             ent->destroy();
         }
     }
@@ -636,7 +636,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
                 // stupid tail is not attached to jelly, but it should always be here
                 for (int tail_uid = last_item + 8; tail_uid > last_item; --tail_uid)
                 {
-                    auto tail = get_entity_ptr(tail_uid);
+                    auto tail = get_entity_ptr_main(tail_uid);
                     if (tail)
                         tail->destroy();
                 }
@@ -650,7 +650,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
                 while (true)
                 {
                     uid--;
-                    find_jelly = get_entity_ptr(uid);
+                    find_jelly = get_entity_ptr_main(uid);
                     if (find_jelly && in_array(find_jelly->type->id, jellys))
                     {
                         safe_destroy(find_jelly);
@@ -754,7 +754,7 @@ void UI::save_progress()
 int32_t UI::spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer, float vx, float vy)
 {
     auto uid = ::spawn_playerghost(char_type, x, y, (LAYER)enum_to_layer(layer));
-    auto ent = get_entity_ptr(uid)->as<Movable>();
+    auto ent = get_entity_ptr_main(uid)->as<Movable>();
     ent->velocityx = vx;
     ent->velocityy = vy;
     return uid;

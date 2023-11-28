@@ -14,7 +14,6 @@
 #include "constants.hpp"                    // for no_return_str
 #include "entities_chars.hpp"               // for Player
 #include "entity.hpp"                       // for Entity, get_entity_ptr
-#include "entity_lookup.hpp"                //
 #include "handle_lua_function.hpp"          // for handle_function
 #include "items.hpp"                        // for Inventory
 #include "level_api.hpp"                    // for LevelGenData, LevelGenSy...
@@ -832,55 +831,62 @@ bool LuaBackend::pre_load_screen()
 
     if ((ON)state_ptr->screen == ON::LEVEL && (ON)state_ptr->screen_next != ON::DEATH && (state_ptr->quest_flags & 1) == 0)
     {
-        for (auto uid : get_entities_by_mask(1))
+        for (auto layer : State::get().ptr()->layers)
         {
-            auto ent = get_entity_ptr(uid)->as<Player>();
-            int slot = ent->inventory_ptr->player_slot;
-            if (slot == -1 && ent->linked_companion_parent == -1)
+            auto it = layer->entities_by_mask.find(1);
+            if (it == layer->entities_by_mask.end())
                 continue;
-            if (slot == -1 && ent->linked_companion_parent != -1)
+
+            for (auto entity : it->second.entities())
             {
-                Player* parent = ent;
-                while (true)
+                auto ent = entity->as<Player>();
+                int slot = ent->inventory_ptr->player_slot;
+                if (slot == -1 && ent->linked_companion_parent == -1)
+                    continue;
+                if (slot == -1 && ent->linked_companion_parent != -1)
                 {
-                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
-                    slot++;
-                    if (parent->linked_companion_parent == -1)
+                    Player* parent = ent;
+                    while (true)
                     {
-                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
-                        break;
+                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                        slot++;
+                        if (parent->linked_companion_parent == -1)
+                        {
+                            slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                            break;
+                        }
                     }
                 }
-            }
-            if (slot < 0)
-                continue;
-            bool should_save = false;
-            SavedUserData saved;
-            if (user_datas.contains(ent->uid))
-            {
-                saved.self = get_user_data(ent->uid);
-                should_save = true;
-            }
-            if (ent->holding_uid != -1 and user_datas.contains(ent->holding_uid))
-            {
-                saved.held = get_user_data(ent->holding_uid);
-                should_save = true;
-            }
-            if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && user_datas.contains(ent->overlay->uid))
-            {
-                saved.mount = get_user_data(ent->overlay->uid);
-                should_save = true;
-            }
-            for (auto& [type, powerup] : ent->powerups)
-            {
-                if (user_datas.contains(powerup->uid))
+                if (slot < 0)
+                    continue;
+                bool should_save = false;
+                SavedUserData saved;
+                if (user_datas.contains(ent->uid))
                 {
-                    saved.powerups[type] = get_user_data(powerup->uid);
+                    saved.self = get_user_data(ent->uid);
                     should_save = true;
                 }
+                if (ent->holding_uid != -1 and user_datas.contains(ent->holding_uid))
+                {
+                    saved.held = get_user_data(ent->holding_uid);
+                    should_save = true;
+                }
+                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && user_datas.contains(ent->overlay->uid))
+                {
+                    saved.mount = get_user_data(ent->overlay->uid);
+                    should_save = true;
+                }
+                for (auto& [type, powerup] : ent->powerups)
+                {
+                    if (user_datas.contains(powerup->uid))
+                    {
+                        saved.powerups[type] = get_user_data(powerup->uid);
+                        should_save = true;
+                    }
+                }
+                if (should_save)
+                    saved_user_datas[slot] = saved;
             }
-            if (should_save)
-                saved_user_datas[slot] = saved;
         }
     }
 
@@ -969,40 +975,47 @@ void LuaBackend::post_room_generation()
 
 void LuaBackend::load_user_data()
 {
-    for (auto uid : get_entities_by_mask(1))
+    for (auto layer : State::get().ptr()->layers)
     {
-        auto ent = get_entity_ptr(uid)->as<Player>();
-        int slot = ent->inventory_ptr->player_slot;
-        if (slot == -1 && ent->linked_companion_parent == -1)
+        auto it = layer->entities_by_mask.find(1);
+        if (it == layer->entities_by_mask.end())
             continue;
-        if (slot == -1 && ent->linked_companion_parent != -1)
+
+        for (auto entity : it->second.entities())
         {
-            Player* parent = ent;
-            while (true)
+            auto ent = entity->as<Player>();
+            int slot = ent->inventory_ptr->player_slot;
+            if (slot == -1 && ent->linked_companion_parent == -1)
+                continue;
+            if (slot == -1 && ent->linked_companion_parent != -1)
             {
-                parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
-                slot++;
-                if (parent->linked_companion_parent == -1)
+                Player* parent = ent;
+                while (true)
                 {
-                    slot += (parent->inventory_ptr->player_slot + 1) * 100;
-                    break;
+                parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                    slot++;
+                    if (parent->linked_companion_parent == -1)
+                    {
+                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        break;
+                    }
                 }
             }
-        }
-        if (slot < 0)
-            continue;
-        if (saved_user_datas.contains(slot))
-        {
-            if (saved_user_datas[slot].self.has_value())
-                set_user_data(*ent, saved_user_datas[slot].self.value());
-            if (ent->holding_uid != -1 && saved_user_datas[slot].held.has_value())
-                set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
-            if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
-                set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
-            for (auto& [type, powerup] : ent->powerups)
+            if (slot < 0)
+                continue;
+            if (saved_user_datas.contains(slot))
             {
-                if (saved_user_datas[slot].powerups.contains(type))
-                    set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+                if (saved_user_datas[slot].self.has_value())
+                    set_user_data(*ent, saved_user_datas[slot].self.value());
+                if (ent->holding_uid != -1 && saved_user_datas[slot].held.has_value())
+                    set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
+                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
+                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
+                for (auto& [type, powerup] : ent->powerups)
+                {
+                    if (saved_user_datas[slot].powerups.contains(type))
+                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+                }
             }
         }
     }
@@ -1204,7 +1217,7 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
                 if (auto spawn_replacement = handle_function<std::uint32_t>(this, callback.func, entity_type, x, y, layer, overlay, spawn_type_flags))
                 {
                     clear_current_callback();
-                    return get_entity_ptr(spawn_replacement.value());
+                    return get_entity_ptr(spawn_replacement.value()); // TODO: this assumes that the entity is valid, which will crash if it's not
                 }
                 clear_current_callback();
             }
