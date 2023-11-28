@@ -176,7 +176,7 @@ std::pair<float, float> Entity::position_self() const
 
 void Entity::remove_item(uint32_t item_uid)
 {
-    auto entity = get_entity_ptr_local(item_uid);
+    auto entity = get_entity_ptr(item_uid);
     if (entity)
         remove_item_ptr(entity);
 }
@@ -213,7 +213,7 @@ bool Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t 
         return;
     }*/
 
-    auto dealer = get_entity_ptr_local(damage_dealer_uid);
+    auto dealer = get_entity_ptr(damage_dealer_uid);
     /* but it can be nil?
     if (dealer == nullptr)
     {
@@ -241,7 +241,7 @@ bool Movable::is_button_released(BUTTON button)
 
 std::tuple<float, float, uint8_t> get_position(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr_local(uid);
+    Entity* ent = get_entity_ptr(uid);
     if (ent)
         return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
 
@@ -250,7 +250,7 @@ std::tuple<float, float, uint8_t> get_position(uint32_t uid)
 
 std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
 {
-    Entity* ent = get_entity_ptr_local(uid);
+    Entity* ent = get_entity_ptr(uid);
     if (ent)
     {
         if (ent->rendering_info != nullptr && !ent->rendering_info->render_inactive)
@@ -263,7 +263,7 @@ std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
 
 std::tuple<float, float> get_velocity(uint32_t uid)
 {
-    if (Entity* ent = get_entity_ptr_local(uid))
+    if (Entity* ent = get_entity_ptr(uid))
     {
         float vx{0.0f};
         float vy{0.0f};
@@ -292,7 +292,7 @@ std::tuple<float, float> get_velocity(uint32_t uid)
 
 AABB get_hitbox(uint32_t uid, bool use_render_pos)
 {
-    if (Entity* ent = get_entity_ptr_local(uid))
+    if (Entity* ent = get_entity_ptr(uid))
     {
         auto [x, y, l] = (use_render_pos ? get_render_position : get_position)(uid);
         return AABB{
@@ -380,7 +380,7 @@ Entity* get_entity_ptr_main(uint32_t uid)
     return p;
 }
 
-Entity* get_entity_ptr_local(uint32_t uid)
+Entity* get_entity_ptr(uint32_t uid)
 {
     auto& state = State::get();
     auto p = state.find_local(uid);
@@ -518,7 +518,7 @@ bool recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> 
             auto currend_uid = true_type->tail_bg_uid;
             for (int idx = 0; idx < 8; ++idx)
             {
-                auto tail_ent = get_entity_ptr_local(currend_uid + idx);
+                auto tail_ent = get_entity_ptr(currend_uid + idx);
                 if (tail_ent != nullptr && (tail_ent->type->id == jellys_tails[0] || tail_ent->type->id == jellys_tails[1])) // only kill the tail
                 {
                     recursive(tail_ent, mask, ent_types, rec_mode, func);
