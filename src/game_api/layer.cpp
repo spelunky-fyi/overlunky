@@ -31,7 +31,7 @@ Entity* Layer::spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx
     }
     else if (screen)
     {
-        auto state = State::get();
+        auto& state = State::get();
         std::tie(x, y) = state.click_position(x, y);
         min_speed_check = 0.04f;
         if (snap && abs(vx) + abs(vy) <= min_speed_check)

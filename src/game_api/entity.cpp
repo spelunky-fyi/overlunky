@@ -54,7 +54,7 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
     {
         // screen coordinates -1..1
         // log::debug!("Teleporting to screen {}, {}", x, y);
-        auto state = State::get();
+        auto& state = State::get();
         auto [x_pos, y_pos] = state.click_position(dx, dy);
         if (snap && abs(vx) + abs(vy) <= 0.04f)
         {
@@ -96,7 +96,7 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == dest_layer)
         return;
 
-    auto state = State::get();
+    auto& state = State::get();
     if (this != this->topmost_mount())
         this->topmost_mount()->set_layer(layer_to);
 
@@ -125,7 +125,7 @@ void Entity::remove()
 {
     if (layer != 2)
     {
-        auto state = State::get();
+        auto& state = State::get();
         auto ptr_from = state.ptr()->layers[layer];
         if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
         {
@@ -373,7 +373,7 @@ std::span<uint32_t> Entity::get_items()
 
 Entity* get_entity_ptr(uint32_t uid)
 {
-    auto state = State::get();
+    auto& state = State::get();
     auto p = state.find(uid);
     if (IsBadWritePtr(p, 0x178))
         return nullptr;
@@ -382,7 +382,7 @@ Entity* get_entity_ptr(uint32_t uid)
 
 Entity* get_entity_ptr_local(uint32_t uid)
 {
-    auto state = State::get();
+    auto& state = State::get();
     auto p = state.find_local(uid);
     if (IsBadWritePtr(p, 0x178))
         return nullptr;

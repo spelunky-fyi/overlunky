@@ -977,7 +977,7 @@ end
     /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
     lua["pause"] = [](bool p)
     {
-        auto state = State::get();
+        auto& state = State::get();
         if (p)
             state.set_pause(0x20);
         else

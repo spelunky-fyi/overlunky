@@ -1887,8 +1887,7 @@ std::pair<float, float> LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
 }
 std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, uint8_t l)
 {
-    auto state = State::get();
-    auto* state_ptr = state.ptr_local();
+    auto* state_ptr = State::get().ptr_local();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return std::nullopt;
@@ -1904,8 +1903,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
 }
 bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
 {
-    auto state = State::get();
-    auto* state_ptr = state.ptr_local();
+    auto* state_ptr = State::get().ptr_local();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;

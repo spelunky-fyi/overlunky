@@ -275,15 +275,16 @@ void State::post_init()
 
 State& State::get()
 {
-    static State STATE;
+    static State STATE{0x4A0};
     if (!get_is_init())
     {
         if (get_write_load_opt())
         {
             do_write_load_opt();
         }
-        auto addr_location = get_address("state_location");
-        STATE = State{addr_location};
+        if (auto addr_location = get_address("state_location"); addr_location != 0)
+            STATE.location = addr_location;
+
         get_is_init() = true;
 
         if (get_do_hooks())
@@ -420,7 +421,7 @@ void State::zoom_reset()
     game_api->set_zoom(std::nullopt, 13.5f);
 }
 
-void StateMemory::force_current_theme(uint32_t t)
+void StateMemory::force_current_theme(THEME t)
 {
     if (t > 0 && t < 19)
     {
@@ -697,7 +698,7 @@ using OnGameLoop = void(void* a, float b, void* c);
 OnGameLoop* g_game_loop_trampoline{nullptr};
 void GameLoop(void* a, float b, void* c)
 {
-    auto state = State::get();
+    auto& state = State::get();
     if (global_frame_count < state.get_frame_count_main())
         global_frame_count = state.get_frame_count_main();
     else

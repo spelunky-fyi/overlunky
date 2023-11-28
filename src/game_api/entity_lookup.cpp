@@ -43,7 +43,7 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 
 int32_t get_grid_entity_at(float x, float y, LAYER layer)
 {
-    auto state = State::get();
+    auto& state = State::get();
     uint8_t actual_layer = enum_to_layer(layer);
 
     if (Entity* ent = state.layer(actual_layer)->get_grid_entity_at(x, y))
@@ -169,8 +169,8 @@ std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER
 
 std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
-    // TODO: use entitie regions?
-    auto state = State::get();
+    // TODO: use entity regions?
+    auto& state = State::get();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     auto push_entities_at = [&x, &y, &radius, &proper_types, &found](const EntityList& entities)
@@ -204,8 +204,8 @@ std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float
 
 std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
 {
-    // TODO: use entitie regions?
-    auto state = State::get();
+    // TODO: use entity regions?
+    auto& state = State::get();
     std::vector<uint32_t> result;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     if (layer == LAYER::BOTH)

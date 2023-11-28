@@ -88,7 +88,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
     Floor* neighbours[4]{};
     bool neighbours_same[4]{};
 
-    auto state = State::get();
+    auto& state = State::get();
     auto layer_ptr = state.layer(layer);
 
     for (size_t i = 0; i < 4; i++)
@@ -188,7 +188,7 @@ void Floor::add_decoration(FLOOR_SIDE side)
         return;
     }
 
-    auto state = State::get();
+    auto& state = State::get();
     auto layer_ptr = state.layer(layer);
     add_decoration_opt(side, decoration_entity_type, layer_ptr);
 }
@@ -735,7 +735,7 @@ void Door::unlock(bool unlock)
     static const ENT_TYPE eggchild_room_door = to_id("ENT_TYPE_FLOOR_DOOR_MOAI_STATUE");
     static const ENT_TYPE EW_door = to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
     const auto ent_type = this->type->id;
-    auto state = State::get();
+    auto& state = State::get();
 
     if (ent_type == locked_door || ent_type == locked_door + 1) // plus one for DOOR_LOCKED_PEN
     {
