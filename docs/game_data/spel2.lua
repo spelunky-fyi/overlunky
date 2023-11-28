@@ -2063,7 +2063,7 @@ do
     ---@field theme_next THEME @Next THEME number, used when loading a new level or transition
     ---@field theme_start THEME @THEME to start new runs in
     ---@field current_theme ThemeInfo @Points to the current ThemeInfo
-    ---@field force_current_theme fun(self, t: integer): nil @This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
+    ---@field force_current_theme fun(self, t: THEME): nil @This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     ---@field shoppie_aggro integer @Current shoppie aggro
     ---@field shoppie_aggro_next integer @Shoppie aggro to use in the next level
     ---@field outposts_spawned integer

@@ -2926,7 +2926,7 @@ int | [level_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lev
 [THEME](#THEME) | [theme_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_next) | Next [THEME](#THEME) number, used when loading a new level or transition
 [THEME](#THEME) | [theme_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) | [THEME](#THEME) to start new runs in
 [ThemeInfo](#ThemeInfo) | [current_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_theme) | Points to the current [ThemeInfo](#ThemeInfo)
-nil | [force_current_theme(int t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) | This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
+nil | [force_current_theme(THEME t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) | This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
 int | [shoppie_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro) | Current shoppie aggro
 int | [shoppie_aggro_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro_next) | Shoppie aggro to use in the next level
 int | [outposts_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=outposts_spawned) | 

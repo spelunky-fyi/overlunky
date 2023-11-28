@@ -330,7 +330,7 @@ struct State
     StateMemory* ptr_local() const;
 
     // TODO: rest of the functions should probably be just static or moved out of here as they don't need State
-    // they have to assume to use public/local ptr in which case they probably should be moved to StateMemory
+    // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
     // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
 
     // use only if you only want the layer, otherwise use `ptr()->layers`
