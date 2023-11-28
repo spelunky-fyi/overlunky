@@ -848,7 +848,7 @@ bool LuaBackend::pre_load_screen()
                     Player* parent = ent;
                     while (true)
                     {
-                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                        parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
                         slot++;
                         if (parent->linked_companion_parent == -1)
                         {
@@ -992,7 +992,7 @@ void LuaBackend::load_user_data()
                 Player* parent = ent;
                 while (true)
                 {
-                parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
+                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
                     slot++;
                     if (parent->linked_companion_parent == -1)
                     {
