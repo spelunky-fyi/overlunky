@@ -9388,7 +9388,7 @@ set_callback(function()
 end, ON.POST_GAME_LOOP)
 
 set_callback(function()
-    if exports.paused and not exports.skip then
+    if test_mask(exports.type, 0xc0) and exports.paused and not exports.skip then
         return true
     end
 end, ON.PRE_PROCESS_INPUT)
