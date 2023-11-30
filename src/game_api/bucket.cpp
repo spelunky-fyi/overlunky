@@ -12,6 +12,7 @@ Bucket* Bucket::get()
         return bucket;
     auto new_bucket = new Bucket();
     write_mem_prot(bucket_offset, new_bucket, true);
+    new_bucket->pause_api = new PauseAPI();
     return new_bucket;
 }
 
@@ -25,4 +26,34 @@ void PauseAPI::set_pause(PAUSE_TYPE flags)
     auto state = State::get().ptr();
     pause = flags;
     state->pause = (uint8_t)(((uint32_t)flags) & 0x3f);
+}
+
+bool PauseAPI::paused()
+{
+    return get_pause() != PAUSE_TYPE::NONE && (get_pause() & pause_type) != PAUSE_TYPE::NONE;
+}
+
+bool PauseAPI::set_paused(bool enable)
+{
+    if (enable)
+        set_pause(get_pause() | pause_type);
+    else
+        set_pause(get_pause() & (~pause_type));
+    return paused();
+}
+
+bool PauseAPI::toggle()
+{
+    set_pause(get_pause() ^ pause_type);
+    return paused();
+}
+
+void PauseAPI::frame_advance()
+{
+    skip = true;
+}
+
+void PauseAPI::apply()
+{
+    set_pause(pause);
 }

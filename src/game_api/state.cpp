@@ -25,6 +25,7 @@
 #include "movable_behavior.hpp"                  // for init_behavior_hooks
 #include "render_api.hpp"                        // for init_render_api_hooks
 #include "savedata.hpp"                          // for SaveData
+#include "screen.hpp"                            // for Screen
 #include "script/events.hpp"                     // for pre_entity_instagib
 #include "script/lua_vm.hpp"                     // for get_lua_vm
 #include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
@@ -643,32 +644,68 @@ std::vector<int64_t> State::read_prng() const
     return prng;
 }
 
+bool pause_loading()
+{
+    auto state = State::get().ptr();
+    auto gm = get_game_manager();
+    bool loading = state->loading > 0 || state->fade_value > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed));
+    if ((state->loading == 3 && state->fade_timer == 1) || (state->loading == 1 and state->fade_timer == state->fade_length))
+        loading = false;
+    return loading;
+}
+
 bool pause_event(PAUSE_TYPE event)
 {
-    bool ret = false;
+    bool block = false;
     static const auto bucket = Bucket::get();
     auto state = State::get().ptr();
 
-    if (bucket->pause_api.frame_advance)
-        return ret;
+    if (bucket->pause_api->skip)
+    {
+        state->pause &= ~((uint8_t)bucket->pause_api->pause_type & 0x3f);
+        return block;
+    }
 
     // TODO: Handle pausing
 
     // TODO: Handle unpausing
 
-    if ((bucket->pause_api.pause & event) != PAUSE_TYPE::NONE)
-        ret = true;
+    if ((bucket->pause_api->pause & event) != PAUSE_TYPE::NONE)
+        block = true;
 
-    if ((bucket->pause_api.ignore_screen & (PAUSE_SCREEN)(1 >> state->screen)) != PAUSE_SCREEN::NONE)
-        ret = false;
+    if ((bucket->pause_api->ignore_screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE)
+        block = false;
 
-    if ((bucket->pause_api.ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && state->loading > 0) // TODO: more conditions
-        ret = false;
+    if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && pause_loading())
+        block = false;
 
-    if (ret && (bucket->pause_api.pause & PAUSE_TYPE::UPDATE_CAMERA) != PAUSE_TYPE::NONE)
+    if (bucket->pause_api->update_camera && ((block && (event == PAUSE_TYPE::PRE_UPDATE || event == PAUSE_TYPE::PRE_GAME_LOOP)) || ((event == PAUSE_TYPE::PRE_UPDATE && (uint8_t)bucket->pause_api->pause_type & 0x3f) && state->pause > 0)) && ((state->pause & 1) == 0 || (uint8_t)bucket->pause_api->pause_type & 1))
         update_camera_position();
 
-    return ret;
+    return block;
+}
+
+void post_pause()
+{
+    static const auto bucket = Bucket::get();
+    auto state = State::get().ptr();
+    if (bucket->pause_api->skip)
+        state->pause |= (uint8_t)bucket->pause_api->pause_type & 0x3f;
+    bucket->pause_api->skip = false;
+}
+
+void post_pause_input()
+{
+    static const auto bucket = Bucket::get();
+
+    if (!bucket->overlunky)
+        return;
+
+    auto gm = get_game_manager();
+    auto kb = get_raw_input()->keyboard;
+
+    if (((bucket->overlunky->keys["toggle_pause"] & 32) || (bucket->overlunky->keys["frame_advance"] & 32) || (bucket->overlunky->keys["frame_advance_alt"] & 32)) && kb[39].down && !kb[32].down)
+        gm->game_props->buttons_menu &= ~1;
 }
 
 using OnStateUpdate = void(StateMemory*);
@@ -711,6 +748,7 @@ void ProcessInput(void* s)
         g_process_input_trampoline(s);
         post_event(ON::POST_PROCESS_INPUT);
     }
+    post_pause_input();
 }
 
 void init_process_input_hook()
@@ -731,7 +769,6 @@ using OnGameLoop = void(void* a, float b, void* c);
 OnGameLoop* g_game_loop_trampoline{nullptr};
 void GameLoop(void* a, float b, void* c)
 {
-    static const auto bucket = Bucket::get();
     auto state = State::get();
     if (global_frame_count < state.get_frame_count_main())
         global_frame_count = state.get_frame_count_main();
@@ -746,7 +783,7 @@ void GameLoop(void* a, float b, void* c)
         g_game_loop_trampoline(a, b, c);
         post_event(ON::POST_GAME_LOOP);
     }
-    bucket->pause_api.frame_advance = false;
+    post_pause();
 }
 
 void init_game_loop_hook()

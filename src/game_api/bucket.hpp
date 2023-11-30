@@ -54,22 +54,29 @@ struct Overlunky
 struct PauseAPI
 {
     PAUSE_TYPE pause;
-    bool frame_advance;
+    PAUSE_TYPE pause_type;
 
-    PAUSE_TYPE pause_flags;
     PAUSE_CONDITION pause_condition;
     PAUSE_SCREEN pause_screen;
     int64_t pause_time;
 
-    PAUSE_TYPE unpause_flags;
     PAUSE_CONDITION unpause_condition;
     PAUSE_SCREEN unpause_screen;
     int64_t unpause_time;
 
     PAUSE_SCREEN ignore_screen;
+    PAUSE_SCREEN ignore_screen_conditions;
+
+    bool skip;
+    bool update_camera;
 
     PAUSE_TYPE get_pause();
     void set_pause(PAUSE_TYPE flags);
+    bool set_paused(bool enable = true);
+    bool paused();
+    bool toggle();
+    void frame_advance();
+    void apply();
 };
 
 class Bucket
@@ -88,5 +95,5 @@ class Bucket
     // Used by memory for recoverable memory interoperability
     std::unordered_map<std::string, EditedMemory> original_memory;
     /// WIP Pause API
-    PauseAPI pause_api;
+    PauseAPI* pause_api;
 };

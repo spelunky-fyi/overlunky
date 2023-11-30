@@ -703,8 +703,43 @@ std::array pause_types{
     "8: ?",
     "16: ?",
     "32: Ankh",
-    "Freeze updates (state)",          // this is not a real state.pause flag, it's only used by ui.cpp for magic
-    "Freeze game loop (state + menu)", // this is not a real state.pause flag, it's only used by ui.cpp for magic
+    "Freeze updates (game state)",                    // this is not a real state.pause flag, only used by PauseAPI
+    "Freeze game loop (game state + menus)",          // this is not a real state.pause flag, only used by PauseAPI
+    "Freeze input (required for menu frame advance)", // this is not a real state.pause flag, only used by PauseAPI
+};
+
+std::array pause_screens{
+    "Logo",
+    "Intro",
+    "Prologue",
+    "Title",
+    "Menu",
+    "Options",
+    "Player Profile",
+    "Leaderboard",
+    "Seed Input",
+    "Character Select",
+    "Team Select",
+    "Camp",
+    "Level",
+    "Transition",
+    "Death",
+    "Spaceship",
+    "Win",
+    "Credits",
+    "Scores",
+    "Constellation",
+    "Recap",
+    "Arena Menu",
+    "Arena Stages",
+    "Arena Items",
+    "Arena Select",
+    "Arena Intro",
+    "Arena Level",
+    "Arena Score",
+    "Online Loading",
+    "Online Lobby",
+    "Any Loading / Fade",
 };
 
 std::array levelgen_flags{

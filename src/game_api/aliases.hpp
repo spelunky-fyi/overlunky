@@ -122,7 +122,6 @@ enum class PAUSE_TYPE : int64_t
     PRE_UPDATE = 1 << 6,
     PRE_GAME_LOOP = 1 << 7,
     PRE_PROCESS_INPUT = 1 << 8,
-    UPDATE_CAMERA = 1 << 9,
 };
 ENUM_CLASS_FLAGS(PAUSE_TYPE);
 
