@@ -9338,10 +9338,10 @@ end
 
 function not_loading()
     local ret = state.loading > 0
-        or state.fadevalue > 0
+        or state.fade_value > 0
         or (state.screen == SCREEN.MENU and game_manager.screen_menu.menu_text_opacity < 1)
         or (state.screen == SCREEN.CHARACTER_SELECT and (state.screen_character_select.topleft_woodpanel_esc_slidein_timer == 0 or state.screen_character_select.start_pressed))
-    if state.loading == 3 and state.fadevalue < 0.03 then
+    if (state.loading == 3 and state.fade_timer == 1) or (state.loading == 1 and state.fade_timer == state.fade_length) then
         ret = false
     end
     return not ret
@@ -9486,8 +9486,8 @@ set_callback(clear_hooks, ON.SCRIPT_DISABLE)
     add_ui_script("level_size", false, "");
     add_ui_script("skip_fades", options["skip_fades"], R"(
 set_callback(function()
-    state.fadeout = 0
-    state.fadevalue = 0
+    state.fade_timer = 0
+    state.fade_value = 0
 end, ON.PRE_UPDATE))");
 }
 
@@ -9784,12 +9784,6 @@ void update_bucket()
     g_bucket->overlunky->selected_uid = g_last_id;
     g_bucket->overlunky->selected_uids = g_selected_ids;
     g_bucket->overlunky->keys = keys;
-    for (auto [k, v] : options)
-    {
-        g_bucket->overlunky->options[k] = options[k];
-    }
-    g_bucket->overlunky->options["pause_type"] = g_pause_type;
-    g_bucket->overlunky->options["paused"] = paused;
 
     for (auto [k, v] : g_bucket->overlunky->set_options)
     {
@@ -9871,6 +9865,13 @@ void update_bucket()
         }
     }
     g_bucket->overlunky->set_options.clear();
+
+    for (auto [k, v] : options)
+    {
+        g_bucket->overlunky->options[k] = options[k];
+    }
+    g_bucket->overlunky->options["pause_type"] = g_pause_type;
+    g_bucket->overlunky->options["paused"] = paused;
 }
 
 void post_draw()

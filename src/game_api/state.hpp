@@ -65,11 +65,11 @@ struct StateMemory
     /// The global level illumination, very big and bright.
     Illumination* illumination;
     /// Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
-    float fadevalue;
-    /// Amount of frames the fadeout should last when loading
-    uint32_t fadeout;
-    /// Amount of frames the fadein should last when loading
-    uint32_t fadein;
+    float fade_value;
+    /// Remaining frames for fade-in/fade-out when loading. Counts down to 0.
+    uint32_t fade_timer;
+    /// Total frames for fade-in/fade-out when loading.
+    uint32_t fade_length;
     /// if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
     uint32_t loading_black_screen_timer;
     /// Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options

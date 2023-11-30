@@ -244,9 +244,9 @@ function stats()
 end
 
 set_callback(function()
-    state.fadeout = 0
-    state.fadein = 0
-    state.fadevalue = 0
+    state.fade_timer = 0
+    state.fade_length = 0
+    state.fade_value = 0
     state.loading_black_screen_timer = 0
 
     if not exports.find then return end
@@ -307,16 +307,16 @@ set_callback(function()
     if test_flag(state.quest_flags, 1) and state.screen_next == SCREEN.LEVEL then
         exports.a, exports.b = get_adventure_seed()
     end
-    state.fadeout = 0
-    state.fadein = 0
-    state.fadevalue = 0
+    state.fade_timer = 0
+    state.fade_length = 0
+    state.fade_value = 0
     state.loading_black_screen_timer = 0
 end, ON.PRE_LOAD_SCREEN)
 
 set_callback(function(ctx)
-    state.fadeout = 0
-    state.fadein = 0
-    state.fadevalue = 0
+    state.fade_timer = 0
+    state.fade_length = 0
+    state.fade_value = 0
     state.loading_black_screen_timer = 0
     if not exports.find and not exports.found and not exports.gaveup then
         exports.msg = F"Goal: \"{exports.goal}\"\n\n\n\n"

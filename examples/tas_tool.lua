@@ -515,9 +515,9 @@ end, 1)]]
 
 set_callback(function()
     if turbo then
-        state.fadeout = 0
-        state.fadein = 0
-        state.fadevalue = 0
+        state.fade_timer = 0
+        state.fade_length = 0
+        state.fade_value = 0
     end
 end, ON.LOADING)
 

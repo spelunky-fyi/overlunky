@@ -2941,9 +2941,9 @@ int | [level_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lev
 int | [loading](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) | Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
 [QUEST_FLAG](#QUEST_FLAG) | [quest_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) | 32bit flags, can be written to trigger a run reset on next level load etc.
 [PRESENCE_FLAG](#PRESENCE_FLAG) | [presence_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=presence_flags) | 
-float | [fadevalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadevalue) | Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
-int | [fadeout](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadeout) | Amount of frames the fadeout should last when loading
-int | [fadein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fadein) | Amount of frames the fadein should last when loading
+float | [fade_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_value) | Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
+int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | Remaining frames for fade-in/fade-out when loading. Counts down to 0.
+int | [fade_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_length) | Total frames for fade-in/fade-out when loading.
 int | [loading_black_screen_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading_black_screen_timer) | if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
 int | [saved_dogs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_dogs) | Run totals
 int | [saved_cats](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_cats) | 

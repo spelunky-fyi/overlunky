@@ -2078,9 +2078,9 @@ do
     ---@field loading integer @Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
     ---@field quest_flags QUEST_FLAG @32bit flags, can be written to trigger a run reset on next level load etc.
     ---@field presence_flags PRESENCE_FLAG
-    ---@field fadevalue number @Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
-    ---@field fadeout integer @Amount of frames the fadeout should last when loading
-    ---@field fadein integer @Amount of frames the fadein should last when loading
+    ---@field fade_value number @Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
+    ---@field fade_timer integer @Remaining frames for fade-in/fade-out when loading. Counts down to 0.
+    ---@field fade_length integer @Total frames for fade-in/fade-out when loading.
     ---@field loading_black_screen_timer integer @if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
     ---@field saved_dogs integer @Run totals
     ---@field saved_cats integer
