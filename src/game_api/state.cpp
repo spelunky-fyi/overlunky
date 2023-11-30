@@ -643,11 +643,42 @@ std::vector<int64_t> State::read_prng() const
     return prng;
 }
 
+bool pause_event(PAUSE_TYPE event)
+{
+    bool ret = false;
+    static const auto bucket = Bucket::get();
+    auto state = State::get().ptr();
+
+    if (bucket->pause_api.frame_advance)
+        return ret;
+
+    // TODO: Handle pausing
+
+    // TODO: Handle unpausing
+
+    if ((bucket->pause_api.pause & event) != PAUSE_TYPE::NONE)
+        ret = true;
+
+    if ((bucket->pause_api.ignore_screen & (PAUSE_SCREEN)(1 >> state->screen)) != PAUSE_SCREEN::NONE)
+        ret = false;
+
+    if ((bucket->pause_api.ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && state->loading > 0) // TODO: more conditions
+        ret = false;
+
+    if (ret && (bucket->pause_api.pause & PAUSE_TYPE::UPDATE_CAMERA) != PAUSE_TYPE::NONE)
+        update_camera_position();
+
+    return ret;
+}
+
 using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    if (!pre_event(ON::PRE_UPDATE))
+    auto block = pre_event(ON::PRE_UPDATE);
+    if (pause_event(PAUSE_TYPE::PRE_UPDATE))
+        block = true;
+    if (!block)
     {
         g_state_update_trampoline(s);
     }
@@ -672,11 +703,14 @@ using OnProcessInput = void(void*);
 OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
-    if (!pre_event(ON::PRE_PROCESS_INPUT))
+    auto block = pre_event(ON::PRE_PROCESS_INPUT);
+    if (pause_event(PAUSE_TYPE::PRE_PROCESS_INPUT))
+        block = true;
+    if (!block)
     {
         g_process_input_trampoline(s);
+        post_event(ON::POST_PROCESS_INPUT);
     }
-    post_event(ON::POST_PROCESS_INPUT);
 }
 
 void init_process_input_hook()
@@ -697,17 +731,22 @@ using OnGameLoop = void(void* a, float b, void* c);
 OnGameLoop* g_game_loop_trampoline{nullptr};
 void GameLoop(void* a, float b, void* c)
 {
+    static const auto bucket = Bucket::get();
     auto state = State::get();
     if (global_frame_count < state.get_frame_count_main())
         global_frame_count = state.get_frame_count_main();
     else
         global_frame_count++;
 
-    if (!pre_event(ON::PRE_GAME_LOOP))
+    auto block = pre_event(ON::PRE_GAME_LOOP);
+    if (pause_event(PAUSE_TYPE::PRE_GAME_LOOP))
+        block = true;
+    if (!block)
     {
         g_game_loop_trampoline(a, b, c);
+        post_event(ON::POST_GAME_LOOP);
     }
-    post_event(ON::POST_GAME_LOOP);
+    bucket->pause_api.frame_advance = false;
 }
 
 void init_game_loop_hook()
@@ -1015,4 +1054,15 @@ void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
             magmaman_positions.erase(it);
         }
     }
+}
+
+void update_camera_position()
+{
+    auto camera = State::get().ptr()->camera;
+    static const size_t offset = get_address("update_camera_position");
+    typedef void update_camera_func(Camera*);
+    static update_camera_func* ucf = (update_camera_func*)(offset);
+    ucf(camera);
+    camera->calculated_focus_x = camera->adjusted_focus_x;
+    camera->calculated_focus_y = camera->adjusted_focus_y;
 }

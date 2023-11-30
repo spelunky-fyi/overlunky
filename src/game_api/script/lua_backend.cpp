@@ -1640,12 +1640,12 @@ void LuaBackend::set_error(std::string err)
 /**
  * static functions begin
  */
-void LuaBackend::for_each_backend(std::function<bool(LockedBackend)> fun)
+void LuaBackend::for_each_backend(std::function<bool(LockedBackend)> fun, bool stop_propagation)
 {
     std::lock_guard lock{g_all_backends_mutex};
     for (std::unique_ptr<ProtectedBackend>& backend : g_all_backends)
     {
-        if (!fun(backend->Lock()))
+        if (!fun(backend->Lock()) && stop_propagation)
         {
             break;
         }

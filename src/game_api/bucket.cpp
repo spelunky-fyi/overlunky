@@ -2,6 +2,7 @@
 
 #include "containers/game_allocator.hpp"
 #include "memory.hpp"
+#include "state.hpp"
 
 Bucket* Bucket::get()
 {
@@ -12,4 +13,16 @@ Bucket* Bucket::get()
     auto new_bucket = new Bucket();
     write_mem_prot(bucket_offset, new_bucket, true);
     return new_bucket;
+}
+
+PAUSE_TYPE PauseAPI::get_pause()
+{
+    return (PAUSE_TYPE)(State::get().ptr()->pause | ((uint32_t)pause & ~0x3f));
+}
+
+void PauseAPI::set_pause(PAUSE_TYPE flags)
+{
+    auto state = State::get().ptr();
+    pause = flags;
+    state->pause = (uint8_t)(((uint32_t)flags) & 0x3f);
 }

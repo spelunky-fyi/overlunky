@@ -137,4 +137,3 @@ void set_speedhack(std::optional<float> multiplier);
 float get_speedhack();
 void init_adventure();
 void init_seeded(uint32_t seed);
-void update_camera_position();
