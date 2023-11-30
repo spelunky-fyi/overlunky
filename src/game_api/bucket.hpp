@@ -6,6 +6,8 @@
 #include <unordered_set>
 #include <variant>
 
+#include "aliases.hpp"
+
 using BucketItem = std::variant<bool, int64_t, float, std::string>;
 using KEY = int64_t;
 
@@ -49,6 +51,20 @@ struct Overlunky
     std::optional<std::vector<uint32_t>> set_selected_uids;
 };
 
+struct PauseAPI
+{
+    PAUSE_TYPE flags;
+    bool skip;
+
+    PAUSE_TYPE pause_flags;
+    PAUSE_CONDITION pause_condition;
+    PAUSE_SCREEN pause_screen;
+
+    PAUSE_TYPE unpause_flags;
+    PAUSE_CONDITION unpause_condition;
+    PAUSE_SCREEN unpause_screen;
+};
+
 class Bucket
 {
   public:
@@ -64,4 +80,6 @@ class Bucket
     std::pair<int64_t, int64_t> adventure_seed{0, 0};
     // Used by memory for recoverable memory interoperability
     std::unordered_map<std::string, EditedMemory> original_memory;
+    /// WIP Pause API
+    PauseAPI pause;
 };

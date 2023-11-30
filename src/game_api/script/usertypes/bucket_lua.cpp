@@ -1,6 +1,7 @@
 #include "bucket_lua.hpp"
 
 #include "bucket.hpp"
+#include "state.hpp"
 
 namespace NBucket
 {
@@ -20,10 +21,34 @@ void register_usertypes(sol::state& lua)
     ol_type["set_selected_uid"] = &Overlunky::set_selected_uid;
     ol_type["set_selected_uids"] = &Overlunky::set_selected_uids;
 
+    /// Control the pause API
+    auto pauseapi_type = lua.new_usertype<PauseAPI>("PauseAPI", sol::no_constructor);
+    // pauseapi_type["flags"] = &PauseAPI::flags;
+    pauseapi_type["flags"] = sol::property([](PauseAPI& pa)
+                                           {
+                                               auto state = State::get().ptr();
+                                               auto flags = (uint32_t)pa.flags & ~0x3f;
+                                               flags |= state->pause;
+                                               return flags; },
+                                           [](PauseAPI& pa, PAUSE_TYPE flags)
+                                           {
+                                               auto state = State::get().ptr();
+                                               pa.flags = flags;
+                                               state->pause = (uint8_t)(((uint32_t)flags) & 0x3f);
+                                           });
+    pauseapi_type["skip"] = &PauseAPI::skip;
+    pauseapi_type["pause_flags"] = &PauseAPI::pause_flags;
+    pauseapi_type["pause_condition"] = &PauseAPI::pause_condition;
+    pauseapi_type["pause_screen"] = &PauseAPI::pause_screen;
+    pauseapi_type["unpause_flags"] = &PauseAPI::unpause_flags;
+    pauseapi_type["unpause_condition"] = &PauseAPI::unpause_condition;
+    pauseapi_type["unpause_screen"] = &PauseAPI::unpause_screen;
+
     /// Shared memory structure used for Playlunky-Overlunky interoperability
     auto bucket_type = lua.new_usertype<Bucket>("Bucket", sol::no_constructor);
     bucket_type["data"] = &Bucket::data;
     bucket_type["overlunky"] = sol::readonly(&Bucket::overlunky);
+    bucket_type["pause"] = &Bucket::pause;
 
     /// Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
     // lua["get_bucket"] = []() -> Bucket*
