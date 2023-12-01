@@ -918,6 +918,86 @@ Name | Data | Description
 [VISIBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.VISIBLE) | 2 | 
 [SLIDING_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSEUI_VISIBILITY.SLIDING_UP) | 3 | 
 
+## PAUSE_SCREEN
+
+
+> Search script examples for [PAUSE_SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN)
+
+Used in [PauseAPI](#PauseAPI)
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.NONE) | PAUSE_SCREEN::NONE | 
+[LOGO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.LOGO) | PAUSE_SCREEN::LOGO | 
+[INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.INTRO) | PAUSE_SCREEN::INTRO | 
+[PROLOGUE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.PROLOGUE) | PAUSE_SCREEN::PROLOGUE | 
+[TITLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.TITLE) | PAUSE_SCREEN::TITLE | 
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.MENU) | PAUSE_SCREEN::MENU | 
+[OPTIONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.OPTIONS) | PAUSE_SCREEN::OPTIONS | 
+[PLAYER_PROFILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.PLAYER_PROFILE) | PAUSE_SCREEN::PLAYER_PROFILE | 
+[LEADERBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.LEADERBOARD) | PAUSE_SCREEN::LEADERBOARD | 
+[SEED_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.SEED_INPUT) | PAUSE_SCREEN::SEED_INPUT | 
+[CHARACTER_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.CHARACTER_SELECT) | PAUSE_SCREEN::CHARACTER_SELECT | 
+[TEAM_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.TEAM_SELECT) | PAUSE_SCREEN::TEAM_SELECT | 
+[CAMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.CAMP) | PAUSE_SCREEN::CAMP | 
+[LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.LEVEL) | PAUSE_SCREEN::LEVEL | 
+[TRANSITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.TRANSITION) | PAUSE_SCREEN::TRANSITION | 
+[DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.DEATH) | PAUSE_SCREEN::DEATH | 
+[SPACESHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.SPACESHIP) | PAUSE_SCREEN::SPACESHIP | 
+[WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.WIN) | PAUSE_SCREEN::WIN | 
+[CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.CREDITS) | PAUSE_SCREEN::CREDITS | 
+[SCORES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.SCORES) | PAUSE_SCREEN::SCORES | 
+[CONSTELLATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.CONSTELLATION) | PAUSE_SCREEN::CONSTELLATION | 
+[RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.RECAP) | PAUSE_SCREEN::RECAP | 
+[ARENA_MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ARENA_MENU) | PAUSE_SCREEN::ARENA_MENU | 
+[ARENA_STAGES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ARENA_STAGES) | PAUSE_SCREEN::ARENA_STAGES | 
+[ARENA_ITEMS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ARENA_ITEMS) | PAUSE_SCREEN::ARENA_ITEMS | 
+[ARENA_SELECT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ARENA_SELECT) | PAUSE_SCREEN::ARENA_SELECT | 
+[ARENA_INTRO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ARENA_INTRO) | PAUSE_SCREEN::ARENA_INTRO | 
+[ARENA_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ARENA_LEVEL) | PAUSE_SCREEN::ARENA_LEVEL | 
+[ARENA_SCORE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ARENA_SCORE) | PAUSE_SCREEN::ARENA_SCORE | 
+[ONLINE_LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ONLINE_LOADING) | PAUSE_SCREEN::ONLINE_LOADING | 
+[ONLINE_LOBBY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.ONLINE_LOBBY) | PAUSE_SCREEN::ONLINE_LOBBY | 
+[LOADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.LOADING) | PAUSE_SCREEN::LOADING | 
+[EXIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_SCREEN.EXIT) | PAUSE_SCREEN::EXIT | 
+
+## PAUSE_TRIGGER
+
+
+> Search script examples for [PAUSE_TRIGGER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TRIGGER)
+
+Used in [PauseAPI](#PauseAPI)
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TRIGGER.NONE) | PAUSE_TRIGGER::NONE | 
+[FADE_START](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TRIGGER.FADE_START) | PAUSE_TRIGGER::FADE_START | 
+[FADE_END](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TRIGGER.FADE_END) | PAUSE_TRIGGER::FADE_END | 
+[SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TRIGGER.SCREEN) | PAUSE_TRIGGER::SCREEN | 
+[ONCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TRIGGER.ONCE) | PAUSE_TRIGGER::ONCE | 
+[EXIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TRIGGER.EXIT) | PAUSE_TRIGGER::EXIT | 
+
+## PAUSE_TYPE
+
+
+> Search script examples for [PAUSE_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE)
+
+Used in [PauseAPI](#PauseAPI)
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.NONE) | PAUSE_TYPE::NONE | 
+[MENU](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.MENU) | PAUSE_TYPE::MENU | 
+[FADE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.FADE) | PAUSE_TYPE::FADE | 
+[CUTSCENE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.CUTSCENE) | PAUSE_TYPE::CUTSCENE | 
+[FLAG4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.FLAG4) | PAUSE_TYPE::FLAG4 | 
+[FLAG5](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.FLAG5) | PAUSE_TYPE::FLAG5 | 
+[ANKH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.ANKH) | PAUSE_TYPE::ANKH | 
+[PRE_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.PRE_UPDATE) | PAUSE_TYPE::PRE_UPDATE | 
+[PRE_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.PRE_GAME_LOOP) | PAUSE_TYPE::PRE_GAME_LOOP | 
+[PRE_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.PRE_PROCESS_INPUT) | PAUSE_TYPE::PRE_PROCESS_INPUT | 
+[FORCE_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.FORCE_STATE) | PAUSE_TYPE::FORCE_STATE | 
+
 ## POS_TYPE
 
 

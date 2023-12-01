@@ -604,6 +604,7 @@ Type | Name | Description
 ---- | ---- | -----------
 map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data) | You can store arbitrary simple values here in Playlunky to be read in on [Overlunky](#Overlunky) script for example.
 [Overlunky](#Overlunky) | [overlunky](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlunky) | Access [Overlunky](#Overlunky) options here, nil if [Overlunky](#Overlunky) is not loaded.
+[PauseAPI](#PauseAPI) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | WIP Pause API
 
 ### Color
 
@@ -828,6 +829,32 @@ optional&lt;int&gt; | [random(int i)](https://github.com/spelunky-fyi/overlunky/
 optional&lt;int&gt; | [random(int min, int max)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(min, max)`
 tuple&lt;int, int&gt; | [get_pair(PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) | 
 nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) | 
+
+### PauseAPI
+
+Control the pause API
+
+Type | Name | Description
+---- | ---- | -----------
+[PAUSE_TYPE](#PAUSE_TYPE) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 
+ | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 
+[PAUSE_TYPE](#PAUSE_TYPE) | [pause_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_type) | 
+[PAUSE_TRIGGER](#PAUSE_TRIGGER) | [pause_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_trigger) | 
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [pause_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_screen) | 
+[PAUSE_TRIGGER](#PAUSE_TRIGGER) | [unpause_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unpause_trigger) | 
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [unpause_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unpause_screen) | 
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [ignore_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_screen) | 
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [ignore_screen_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_screen_trigger) | 
+bool | [update_camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_camera) | 
+bool | [skip](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip) | 
+int | [last_trigger_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_trigger_frame) | 
+int | [last_fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_fade_timer) | 
+nil | [frame_advance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frame_advance) | 
+[PAUSE_TYPE](#PAUSE_TYPE) | [get_pause()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pause) | 
+nil | [set_pause(PAUSE_TYPE flags)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pause) | 
+bool | [set_paused(bool enable = true)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_paused) | 
+bool | [paused()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=paused) | 
+bool | [toggle()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle) | 
 
 ### Quad
 

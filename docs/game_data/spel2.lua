@@ -6370,9 +6370,31 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
     ---@field set_selected_uids integer[] @size: ? @Set currently selected uids in the entity finder.
 
+---@class PauseAPI
+    ---@field pause PAUSE_TYPE
+    ---@field pause any @sol::property(&PauseAPI::get_pause
+    ---@field pause_type PAUSE_TYPE
+    ---@field pause_trigger PAUSE_TRIGGER
+    ---@field pause_screen PAUSE_SCREEN
+    ---@field unpause_trigger PAUSE_TRIGGER
+    ---@field unpause_screen PAUSE_SCREEN
+    ---@field ignore_screen PAUSE_SCREEN
+    ---@field ignore_screen_trigger PAUSE_SCREEN
+    ---@field update_camera boolean
+    ---@field skip boolean
+    ---@field last_trigger_frame integer
+    ---@field last_fade_timer integer
+    ---@field frame_advance fun(self): nil
+    ---@field get_pause fun(self): PAUSE_TYPE
+    ---@field set_pause fun(self, flags: PAUSE_TYPE): nil
+    ---@field set_paused fun(self, true: boolean enable =): boolean
+    ---@field paused fun(self): boolean
+    ---@field toggle fun(self): boolean
+
 ---@class Bucket
     ---@field data table<string, any> @You can store arbitrary simple values here in Playlunky to be read in on Overlunky script for example.
     ---@field overlunky Overlunky @Access Overlunky options here, nil if Overlunky is not loaded.
+    ---@field pause PauseAPI @WIP Pause API
 
 end
 --## Static class functions
