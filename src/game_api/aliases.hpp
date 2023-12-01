@@ -132,7 +132,8 @@ enum class PAUSE_TRIGGER : int64_t
     FADE_START = 1 << 0,
     FADE_END = 1 << 1,
     SCREEN = 1 << 2,
-    ONCE = 1 << 3,
+    EXIT = 1 << 3,
+    ONCE = 1 << 4,
 };
 ENUM_CLASS_FLAGS(PAUSE_TRIGGER);
 
@@ -170,5 +171,6 @@ enum class PAUSE_SCREEN : int64_t
     ONLINE_LOADING = 1 << 28,
     ONLINE_LOBBY = 1 << 29,
     LOADING = 1 << 30,
+    EXIT = 1 << 31,
 };
 ENUM_CLASS_FLAGS(PAUSE_SCREEN);

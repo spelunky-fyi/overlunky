@@ -741,13 +741,15 @@ std::array pause_screens{
     "Online Loading",
     "Online Lobby",
     "Loading, fades, etc.",
+    "Exiting level",
 };
 
 std::array pause_triggers{
     "Fade start",
     "Fade end",
     "Screen loaded",
-    "Trigger once and clear trigger",
+    "Exit level",
+    "Trigger only once",
 };
 
 std::array levelgen_flags{

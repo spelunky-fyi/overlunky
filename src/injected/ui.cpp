@@ -6124,7 +6124,7 @@ void render_options()
         if (submenu("Ignore triggers in screens"))
         {
             ImGui::PushID("IgnorePauseScreenTrigger");
-            render_flags(pause_screens, &g_bucket->pause_api->ignore_screen_trigger);
+            render_flags(screen_names, &g_bucket->pause_api->ignore_screen_trigger);
             ImGui::PopID();
             endmenu();
         }

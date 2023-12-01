@@ -669,6 +669,9 @@ bool pause_check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
     if ((trigger & PAUSE_TRIGGER::FADE_END) != PAUSE_TRIGGER::NONE && state->fade_timer == 1 && state->fade_timer != bucket->pause_api->last_fade_timer)
         match = true;
 
+    if ((trigger & PAUSE_TRIGGER::EXIT) != PAUSE_TRIGGER::NONE && (state->screen == 12 || state->screen == 11) && (state->level_flags & (1 << 20)) && !(bucket->pause_api->last_level_flags & (1 << 20)))
+        match = true;
+
     if (match && (trigger & PAUSE_TRIGGER::ONCE) != PAUSE_TRIGGER::NONE)
         trigger = PAUSE_TRIGGER::NONE;
 
@@ -706,6 +709,7 @@ bool pause_event(PAUSE_TYPE event)
             bucket->pause_api->last_trigger_frame = State::get().get_frame_count();
         }
         bucket->pause_api->last_fade_timer = state->fade_timer;
+        bucket->pause_api->last_level_flags = state->level_flags;
     }
 
     auto loading = pause_loading();
@@ -717,6 +721,9 @@ bool pause_event(PAUSE_TYPE event)
         block = false;
 
     if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && loading)
+        block = false;
+
+    if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::EXIT) != PAUSE_SCREEN::NONE && (state->screen == 12 || state->screen == 11) && (state->level_flags & (1 << 20)))
         block = false;
 
     if (force.has_value())

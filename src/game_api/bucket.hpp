@@ -64,6 +64,7 @@ struct PauseAPI
 
     int64_t last_trigger_frame;
     int64_t last_fade_timer;
+    uint32_t last_level_flags;
 
     PAUSE_SCREEN ignore_screen;
     PAUSE_SCREEN ignore_screen_trigger;
