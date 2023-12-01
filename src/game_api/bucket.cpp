@@ -61,9 +61,3 @@ void PauseAPI::apply()
 {
     set_pause(pause);
 }
-
-void PauseAPI::load_screen()
-{
-    if ((pause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE || (unpause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
-        screen_loaded = true;
-}

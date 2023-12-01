@@ -9451,7 +9451,12 @@ set_callback(clear_hooks, ON.SCRIPT_DISABLE)
 set_callback(function()
     state.fade_timer = 0
     state.fade_value = 0
-end, ON.PRE_UPDATE))");
+end, ON.PRE_UPDATE)
+set_callback(function()
+    state.fade_timer = 0
+    state.fade_value = 0
+end, ON.PRE_GAME_LOOP)
+)");
 }
 
 void imgui_draw()

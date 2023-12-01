@@ -648,8 +648,8 @@ bool pause_loading()
 {
     auto state = State::get().ptr();
     auto gm = get_game_manager();
-    bool loading = state->loading > 0 || state->fade_value > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed)) || state->logic->ouroboros;
-    if ((state->loading == 3 && state->fade_timer == 1) || (state->loading == 1 and state->fade_timer == state->fade_length))
+    bool loading = state->loading > 0 || state->fade_timer > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed)) || state->logic->ouroboros;
+    if ((state->loading == 3 && (state->fade_timer <= 1 || state->fade_length == 0)) || (state->loading == 1 && state->fade_timer == state->fade_length))
         loading = false;
     return loading;
 }
@@ -660,38 +660,20 @@ bool pause_check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
     static const auto bucket = Bucket::get();
     auto state = State::get().ptr();
 
-    if (bucket->pause_api->screen_loaded && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen == PAUSE_SCREEN::NONE || (screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE))
-    {
-        auto loading = pause_loading();
-        if (loading || (!loading && (uint8_t)bucket->pause_api->pause_type & 0x3f))
-        {
-            bucket->pause_api->screen_loaded = false;
-            match = true;
-        }
-    }
+    if (state->loading == 2 && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen == PAUSE_SCREEN::NONE || (screen & (PAUSE_SCREEN)(1 << state->screen_next)) != PAUSE_SCREEN::NONE))
+        match = true;
 
     if ((trigger & PAUSE_TRIGGER::FADE_START) != PAUSE_TRIGGER::NONE && state->fade_timer > 0 && state->fade_timer == state->fade_length && state->fade_timer != bucket->pause_api->last_fade_timer)
-    {
         match = true;
-    }
 
     if ((trigger & PAUSE_TRIGGER::FADE_END) != PAUSE_TRIGGER::NONE && state->fade_timer == 1 && state->fade_timer != bucket->pause_api->last_fade_timer)
-    {
         match = true;
-    }
 
     if (match && (trigger & PAUSE_TRIGGER::ONCE) != PAUSE_TRIGGER::NONE)
-    {
         trigger = PAUSE_TRIGGER::NONE;
-    }
 
     if (match && bucket->pause_api->last_trigger_frame == State::get().get_frame_count())
         match = false;
-
-    if (match)
-        bucket->pause_api->last_trigger_frame = State::get().get_frame_count();
-
-    bucket->pause_api->last_fade_timer = state->fade_timer;
 
     return match;
 }
@@ -715,13 +697,18 @@ bool pause_event(PAUSE_TYPE event)
         {
             bucket->pause_api->set_paused(true);
             force = true;
+            bucket->pause_api->last_trigger_frame = State::get().get_frame_count();
         }
         if (pause_check_trigger(bucket->pause_api->unpause_trigger, bucket->pause_api->unpause_screen))
         {
             bucket->pause_api->set_paused(false);
             force = false;
+            bucket->pause_api->last_trigger_frame = State::get().get_frame_count();
         }
+        bucket->pause_api->last_fade_timer = state->fade_timer;
     }
+
+    auto loading = pause_loading();
 
     if ((bucket->pause_api->get_pause() & event) != PAUSE_TYPE::NONE)
         block = true;
@@ -729,13 +716,13 @@ bool pause_event(PAUSE_TYPE event)
     if ((bucket->pause_api->ignore_screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE)
         block = false;
 
-    if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && pause_loading())
+    if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && loading)
         block = false;
 
     if (force.has_value())
     {
         block = force.value();
-        if ((bucket->pause_api->pause_type & PAUSE_TYPE::FORCE_STATE) != PAUSE_TYPE::NONE)
+        if ((bucket->pause_api->pause_type & PAUSE_TYPE::FORCE_STATE) != PAUSE_TYPE::NONE && !loading && (uint8_t)bucket->pause_api->pause_type & 0x3f)
             bucket->pause_api->set_paused(block);
     }
 

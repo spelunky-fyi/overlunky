@@ -70,7 +70,6 @@ struct PauseAPI
 
     bool skip;
     bool update_camera;
-    bool screen_loaded;
     bool block;
 
     PAUSE_TYPE get_pause();
@@ -80,7 +79,6 @@ struct PauseAPI
     bool toggle();
     void frame_advance();
     void apply();
-    void load_screen();
 };
 
 class Bucket
