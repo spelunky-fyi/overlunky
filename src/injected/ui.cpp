@@ -911,6 +911,10 @@ void save_config(std::string file)
     writeData << "pause_type = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_type << " # 64bit flags" << std::endl;
     writeData << "pause_ignore_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->ignore_screen << " # 64bit flags" << std::endl;
     writeData << "pause_ignore_screen_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->ignore_screen_trigger << " # 64bit flags" << std::endl;
+    writeData << "pause_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_trigger << " # 64bit flags" << std::endl;
+    writeData << "pause_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_screen << " # 64bit flags" << std::endl;
+    writeData << "unpause_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->unpause_trigger << " # 64bit flags" << std::endl;
+    writeData << "unpause_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->unpause_screen << " # 64bit flags" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < kits.size(); i++)
@@ -1120,10 +1124,14 @@ void load_config(std::string file)
     }
     if (g_bucket)
     {
+        g_bucket->pause_api->update_camera = options["pause_update_camera"];
         g_bucket->pause_api->pause_type = (PAUSE_TYPE)toml::find_or<int64_t>(opts, "pause_type", 0x140);
         g_bucket->pause_api->ignore_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen", 0);
         g_bucket->pause_api->ignore_screen_trigger = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen_trigger", 0);
-        g_bucket->pause_api->update_camera = options["pause_update_camera"];
+        g_bucket->pause_api->pause_trigger = (PAUSE_TRIGGER)toml::find_or<int64_t>(opts, "pause_trigger", 0);
+        g_bucket->pause_api->pause_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_screen", 0);
+        g_bucket->pause_api->unpause_trigger = (PAUSE_TRIGGER)toml::find_or<int64_t>(opts, "unpause_trigger", 0);
+        g_bucket->pause_api->unpause_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "unpause_screen", 0);
     }
     save_config(file);
 }
@@ -6123,12 +6131,12 @@ void render_options()
         if (submenu("Automatic pause triggers"))
         {
             bool pause_level = UI::get_start_level_paused();
-            if (ImGui::Checkbox("Auto (fade) pause on level start (DEPRECATED)", &pause_level))
+            if (ImGui::Checkbox("Disable fade unpause on screen load", &pause_level))
                 UI::set_start_level_paused(pause_level);
             render_flags(pause_triggers, &g_bucket->pause_api->pause_trigger, false);
             if ((g_bucket->pause_api->pause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
             {
-                ImGui::SeparatorText("Pause when loading screens");
+                ImGui::SeparatorText("Pause on screens (or any)");
                 render_flags(screen_names, &g_bucket->pause_api->pause_screen);
             }
             endmenu();
@@ -6138,7 +6146,7 @@ void render_options()
             render_flags(pause_triggers, &g_bucket->pause_api->unpause_trigger, false);
             if ((g_bucket->pause_api->unpause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
             {
-                ImGui::SeparatorText("Screens to unpause on");
+                ImGui::SeparatorText("Unpause on screens (or any)");
                 render_flags(pause_screens, &g_bucket->pause_api->unpause_screen);
             }
             endmenu();
@@ -6146,7 +6154,7 @@ void render_options()
         bool paused = g_bucket->pause_api->paused();
         if (ImGui::Checkbox("Paused##PauseSim", &paused))
             toggle_pause();
-        tooltip("Toggle current pause API state according to the pause type below.", "toggle_pause");
+        tooltip("Toggle current pause API state according to the toggled type.", "toggle_pause");
         if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &g_bucket->pause_api->update_camera))
             options["pause_update_camera"] = g_bucket->pause_api->update_camera;
         tooltip("Calls the vanilla camera update when it\nwould be skipped by freezing the state update.");
@@ -6158,7 +6166,9 @@ void render_options()
         if (keys["toggle_pause"] & VK_SPACE || keys["frame_advance"] & VK_SPACE || keys["frame_advance_alt"] & VK_SPACE)
             ImGui::TextWrapped("- frame_advance/toggle_pause is bound to Space, normal menu input using Space will be disabled (use Z)");
         if ((uint8_t)g_bucket->pause_api->pause_type & 0x3f || UI::get_start_level_paused())
-            ImGui::TextWrapped("- Using vanilla state.pause flags is stupid and obsolete and advanced UI features for it will be removed when TASW supports freeze pausing.");
+            ImGui::TextWrapped("- Using vanilla state.pause flags is obsolete and advanced UI features for it might be removed soon");
+        if ((g_bucket->pause_api->pause_type & PAUSE_TYPE::FADE) == PAUSE_TYPE::NONE && UI::get_start_level_paused())
+            ImGui::TextWrapped("- You should enable toggling fade pauses if you enable the fade pause hack");
         ImGui::PopStyleColor();
         endmenu();
     }
@@ -9220,10 +9230,15 @@ void render_prohud()
 
     if (g_bucket->pause_api->get_pause() != PAUSE_TYPE::NONE)
     {
+        auto col = ImColor(0.3f, 1.0f, 0.3f, 0.7f);
+        if (!g_bucket->pause_api->paused() || g_state->pause > 0)
+            col = ImColor(1.0f, 1.0f, 0.3f, 0.7f);
+        if (g_bucket->pause_api->paused() && (g_bucket->pause_api->block || g_state->pause > 0))
+            col = ImColor(1.0f, 0.3f, 0.3f, 0.7f);
         buf = "||";
         ImGui::PushFont(bigfont);
         textsize = ImGui::CalcTextSize(buf.c_str());
-        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, g_bucket->pause_api->paused() ? ImColor(1.0f, 0.3f, 0.3f, 0.7f) : ImColor(1.0f, 1.0f, 0.3f, 0.7f), buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, col, buf.c_str());
         ImGui::PopFont();
     }
 

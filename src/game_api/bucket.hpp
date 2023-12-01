@@ -71,6 +71,7 @@ struct PauseAPI
     bool skip;
     bool update_camera;
     bool screen_loaded;
+    bool block;
 
     PAUSE_TYPE get_pause();
     void set_pause(PAUSE_TYPE flags);

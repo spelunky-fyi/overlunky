@@ -648,7 +648,7 @@ bool pause_loading()
 {
     auto state = State::get().ptr();
     auto gm = get_game_manager();
-    bool loading = state->loading > 0 || state->fade_value > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed));
+    bool loading = state->loading > 0 || state->fade_value > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed)) || state->logic->ouroboros;
     if ((state->loading == 3 && state->fade_timer == 1) || (state->loading == 1 and state->fade_timer == state->fade_length))
         loading = false;
     return loading;
@@ -659,14 +659,12 @@ bool pause_check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
     bool match = false;
     static const auto bucket = Bucket::get();
     auto state = State::get().ptr();
-    std::string thing = "";
 
-    if (bucket->pause_api->screen_loaded && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE)
+    if (bucket->pause_api->screen_loaded && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen == PAUSE_SCREEN::NONE || (screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE))
     {
         auto loading = pause_loading();
         if (loading || (!loading && (uint8_t)bucket->pause_api->pause_type & 0x3f))
         {
-            thing = "screen load";
             bucket->pause_api->screen_loaded = false;
             match = true;
         }
@@ -674,13 +672,11 @@ bool pause_check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
 
     if ((trigger & PAUSE_TRIGGER::FADE_START) != PAUSE_TRIGGER::NONE && state->fade_timer > 0 && state->fade_timer == state->fade_length && state->fade_timer != bucket->pause_api->last_fade_timer)
     {
-        thing = "fade start";
         match = true;
     }
 
     if ((trigger & PAUSE_TRIGGER::FADE_END) != PAUSE_TRIGGER::NONE && state->fade_timer == 1 && state->fade_timer != bucket->pause_api->last_fade_timer)
     {
-        thing = "fade end";
         match = true;
     }
 
@@ -748,6 +744,9 @@ bool pause_event(PAUSE_TYPE event)
 
     if (bucket->pause_api->update_camera && ((block && (event == PAUSE_TYPE::PRE_UPDATE || event == PAUSE_TYPE::PRE_GAME_LOOP)) || ((event == PAUSE_TYPE::PRE_UPDATE && (uint8_t)bucket->pause_api->pause_type & 0x3f) && state->pause > 0)) && ((state->pause & 1) == 0 || (uint8_t)bucket->pause_api->pause_type & 1))
         update_camera_position();
+
+    if ((bucket->pause_api->pause_type & event) != PAUSE_TYPE::NONE)
+        bucket->pause_api->block = block;
 
     return block;
 }

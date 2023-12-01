@@ -697,16 +697,16 @@ std::array screen_names{
 };
 
 std::array pause_types{
-    "1: Menu",
-    "2: Fade",
-    "4: Cutscene",
-    "8: ?",
-    "16: ?",
-    "32: Ankh",
-    "Freeze updates (game state)",                    // this is not a real state.pause flag, only used by PauseAPI
-    "Freeze game loop (game state + menus)",          // this is not a real state.pause flag, only used by PauseAPI
-    "Freeze input (required for menu frame advance)", // this is not a real state.pause flag, only used by PauseAPI
-    "Enforce state flags",                            // this is not a real state.pause flag, only used by PauseAPI
+    "Menu",
+    "Fade",
+    "Cutscene",
+    "",
+    "",
+    "Ankh",
+    "Freeze updates (game state)",           // this is not a real state.pause flag, only used by PauseAPI
+    "Freeze game loop (game state + menus)", // this is not a real state.pause flag, only used by PauseAPI
+    "Freeze input (for menu frame advance)", // this is not a real state.pause flag, only used by PauseAPI
+    "Enforce state flags",                   // this is not a real state.pause flag, only used by PauseAPI
 };
 
 std::array pause_screens{
@@ -740,7 +740,7 @@ std::array pause_screens{
     "Arena Score",
     "Online Loading",
     "Online Lobby",
-    "Any Loading / Fade",
+    "Loading, fades, etc.",
 };
 
 std::array pause_triggers{
