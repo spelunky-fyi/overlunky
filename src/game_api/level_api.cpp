@@ -18,6 +18,7 @@
 #include <tuple>         // for tie, tuple
 #include <unordered_map> // for unordered_map, _Umap_traits<>::allo...
 
+#include "bucket.hpp"                // for Bucket
 #include "entities_activefloors.hpp" //
 #include "entities_items.hpp"        //
 #include "entities_monsters.hpp"     // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
@@ -854,6 +855,8 @@ void load_screen(StateMemory* state, size_t param_2, size_t param_3)
 {
     if (pre_load_screen())
         return;
+    static const auto bucket = Bucket::get();
+    bucket->pause_api->load_screen();
     g_load_screen_trampoline(state, param_2, param_3);
     post_load_screen();
 }

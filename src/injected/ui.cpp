@@ -910,7 +910,7 @@ void save_config(std::string file)
     writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
     writeData << "pause_type = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_type << " # 64bit flags" << std::endl;
     writeData << "pause_ignore_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->ignore_screen << " # 64bit flags" << std::endl;
-    writeData << "pause_ignore_screen_conditions = 0x" << std::hex << (uint64_t)g_bucket->pause_api->ignore_screen_conditions << " # 64bit flags" << std::endl;
+    writeData << "pause_ignore_screen_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->ignore_screen_trigger << " # 64bit flags" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < kits.size(); i++)
@@ -1122,7 +1122,7 @@ void load_config(std::string file)
     {
         g_bucket->pause_api->pause_type = (PAUSE_TYPE)toml::find_or<int64_t>(opts, "pause_type", 0x140);
         g_bucket->pause_api->ignore_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen", 0);
-        g_bucket->pause_api->ignore_screen_conditions = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen_conditions", 0);
+        g_bucket->pause_api->ignore_screen_trigger = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen_trigger", 0);
         g_bucket->pause_api->update_camera = options["pause_update_camera"];
     }
     save_config(file);
@@ -6091,25 +6091,56 @@ void render_options()
     {
         if (submenu("Current pause flags"))
         {
+            ImGui::PushID("CurrentPauseFlags");
             auto old_flags = g_bucket->pause_api->pause;
             render_flags(pause_types, &g_bucket->pause_api->pause, false);
             if (g_bucket->pause_api->pause != old_flags)
                 g_bucket->pause_api->apply();
+            ImGui::PopID();
             endmenu();
         }
         if (submenu("Toggled pause flags"))
         {
+            ImGui::PushID("TogglePauseFlags");
             render_flags(pause_types, &g_bucket->pause_api->pause_type, false);
+            ImGui::PopID();
             endmenu();
         }
         if (submenu("Ignore freeze in screens"))
         {
+            ImGui::PushID("IgnorePauseScreen");
             render_flags(pause_screens, &g_bucket->pause_api->ignore_screen);
+            ImGui::PopID();
             endmenu();
         }
-        if (submenu("Ignore conditions in screens"))
+        if (submenu("Ignore triggers in screens"))
         {
-            render_flags(pause_screens, &g_bucket->pause_api->ignore_screen_conditions);
+            ImGui::PushID("IgnorePauseScreenTrigger");
+            render_flags(pause_screens, &g_bucket->pause_api->ignore_screen_trigger);
+            ImGui::PopID();
+            endmenu();
+        }
+        if (submenu("Automatic pause triggers"))
+        {
+            bool pause_level = UI::get_start_level_paused();
+            if (ImGui::Checkbox("Auto (fade) pause on level start (DEPRECATED)", &pause_level))
+                UI::set_start_level_paused(pause_level);
+            render_flags(pause_triggers, &g_bucket->pause_api->pause_trigger, false);
+            if ((g_bucket->pause_api->pause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
+            {
+                ImGui::SeparatorText("Pause when loading screens");
+                render_flags(screen_names, &g_bucket->pause_api->pause_screen);
+            }
+            endmenu();
+        }
+        if (submenu("Automatic unpause triggers"))
+        {
+            render_flags(pause_triggers, &g_bucket->pause_api->unpause_trigger, false);
+            if ((g_bucket->pause_api->unpause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
+            {
+                ImGui::SeparatorText("Screens to unpause on");
+                render_flags(pause_screens, &g_bucket->pause_api->unpause_screen);
+            }
             endmenu();
         }
         bool paused = g_bucket->pause_api->paused();
@@ -6121,12 +6152,14 @@ void render_options()
         tooltip("Calls the vanilla camera update when it\nwould be skipped by freezing the state update.");
         ImGui::Separator();
         ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. blocking updates during a normal game pause won't interfere with the vanilla pause", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
-        ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce any selected normal pause flags");
+        ImGui::TextWrapped("- The freeze options will block the game in the specified callback (as well as enforce any selected normal pause flags, for now)");
         ImGui::TextWrapped("- Using the freeze options without a camera hack will induce weird camera flickering");
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
         if (keys["toggle_pause"] & VK_SPACE || keys["frame_advance"] & VK_SPACE || keys["frame_advance_alt"] & VK_SPACE)
-            ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: frame_advance/toggle_pause is bound to Space,\nnormal menu input using Space will be disabled (use Z)");
-        if ((uint8_t)g_bucket->pause_api->pause_type & 0x3f)
-            ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: Using vanilla state.pause flags is stupid\nand obsolete. Prefer the freeze options instead!");
+            ImGui::TextWrapped("- frame_advance/toggle_pause is bound to Space, normal menu input using Space will be disabled (use Z)");
+        if ((uint8_t)g_bucket->pause_api->pause_type & 0x3f || UI::get_start_level_paused())
+            ImGui::TextWrapped("- Using vanilla state.pause flags is stupid and obsolete and advanced UI features for it will be removed when TASW supports freeze pausing.");
+        ImGui::PopStyleColor();
         endmenu();
     }
 
@@ -9185,12 +9218,12 @@ void render_prohud()
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    if (g_bucket->pause_api->paused())
+    if (g_bucket->pause_api->get_pause() != PAUSE_TYPE::NONE)
     {
         buf = "||";
         ImGui::PushFont(bigfont);
         textsize = ImGui::CalcTextSize(buf.c_str());
-        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, ImColor(1.0f, 1.0f, 1.0f, .7f), buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, g_bucket->pause_api->paused() ? ImColor(1.0f, 0.3f, 0.3f, 0.7f) : ImColor(1.0f, 1.0f, 0.3f, 0.7f), buf.c_str());
         ImGui::PopFont();
     }
 

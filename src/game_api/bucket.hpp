@@ -56,19 +56,21 @@ struct PauseAPI
     PAUSE_TYPE pause;
     PAUSE_TYPE pause_type;
 
-    PAUSE_CONDITION pause_condition;
+    PAUSE_TRIGGER pause_trigger;
     PAUSE_SCREEN pause_screen;
-    int64_t pause_time;
 
-    PAUSE_CONDITION unpause_condition;
+    PAUSE_TRIGGER unpause_trigger;
     PAUSE_SCREEN unpause_screen;
-    int64_t unpause_time;
+
+    int64_t last_trigger_frame;
+    int64_t last_fade_timer;
 
     PAUSE_SCREEN ignore_screen;
-    PAUSE_SCREEN ignore_screen_conditions;
+    PAUSE_SCREEN ignore_screen_trigger;
 
     bool skip;
     bool update_camera;
+    bool screen_loaded;
 
     PAUSE_TYPE get_pause();
     void set_pause(PAUSE_TYPE flags);
@@ -77,6 +79,7 @@ struct PauseAPI
     bool toggle();
     void frame_advance();
     void apply();
+    void load_screen();
 };
 
 class Bucket

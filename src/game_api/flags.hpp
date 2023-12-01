@@ -706,6 +706,7 @@ std::array pause_types{
     "Freeze updates (game state)",                    // this is not a real state.pause flag, only used by PauseAPI
     "Freeze game loop (game state + menus)",          // this is not a real state.pause flag, only used by PauseAPI
     "Freeze input (required for menu frame advance)", // this is not a real state.pause flag, only used by PauseAPI
+    "Enforce state flags",                            // this is not a real state.pause flag, only used by PauseAPI
 };
 
 std::array pause_screens{
@@ -740,6 +741,13 @@ std::array pause_screens{
     "Online Loading",
     "Online Lobby",
     "Any Loading / Fade",
+};
+
+std::array pause_triggers{
+    "Fade start",
+    "Fade end",
+    "Screen loaded",
+    "Trigger once and clear trigger",
 };
 
 std::array levelgen_flags{

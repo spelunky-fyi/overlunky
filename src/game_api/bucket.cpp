@@ -18,7 +18,8 @@ Bucket* Bucket::get()
 
 PAUSE_TYPE PauseAPI::get_pause()
 {
-    return (PAUSE_TYPE)(State::get().ptr()->pause | ((uint32_t)pause & ~0x3f));
+    pause = (PAUSE_TYPE)(State::get().ptr()->pause | ((uint32_t)pause & ~0x3f));
+    return pause;
 }
 
 void PauseAPI::set_pause(PAUSE_TYPE flags)
@@ -44,7 +45,10 @@ bool PauseAPI::set_paused(bool enable)
 
 bool PauseAPI::toggle()
 {
-    set_pause(get_pause() ^ pause_type);
+    if (paused())
+        set_paused(false);
+    else
+        set_paused(true);
     return paused();
 }
 
@@ -56,4 +60,10 @@ void PauseAPI::frame_advance()
 void PauseAPI::apply()
 {
     set_pause(pause);
+}
+
+void PauseAPI::load_screen()
+{
+    if ((pause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE || (unpause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
+        screen_loaded = true;
 }

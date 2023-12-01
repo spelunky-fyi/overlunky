@@ -654,9 +654,56 @@ bool pause_loading()
     return loading;
 }
 
+bool pause_check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
+{
+    bool match = false;
+    static const auto bucket = Bucket::get();
+    auto state = State::get().ptr();
+    std::string thing = "";
+
+    if (bucket->pause_api->screen_loaded && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE)
+    {
+        auto loading = pause_loading();
+        if (loading || (!loading && (uint8_t)bucket->pause_api->pause_type & 0x3f))
+        {
+            thing = "screen load";
+            bucket->pause_api->screen_loaded = false;
+            match = true;
+        }
+    }
+
+    if ((trigger & PAUSE_TRIGGER::FADE_START) != PAUSE_TRIGGER::NONE && state->fade_timer > 0 && state->fade_timer == state->fade_length && state->fade_timer != bucket->pause_api->last_fade_timer)
+    {
+        thing = "fade start";
+        match = true;
+    }
+
+    if ((trigger & PAUSE_TRIGGER::FADE_END) != PAUSE_TRIGGER::NONE && state->fade_timer == 1 && state->fade_timer != bucket->pause_api->last_fade_timer)
+    {
+        thing = "fade end";
+        match = true;
+    }
+
+    if (match && (trigger & PAUSE_TRIGGER::ONCE) != PAUSE_TRIGGER::NONE)
+    {
+        trigger = PAUSE_TRIGGER::NONE;
+    }
+
+    if (match && bucket->pause_api->last_trigger_frame == State::get().get_frame_count())
+        match = false;
+
+    if (match)
+        bucket->pause_api->last_trigger_frame = State::get().get_frame_count();
+
+    bucket->pause_api->last_fade_timer = state->fade_timer;
+
+    return match;
+}
+
 bool pause_event(PAUSE_TYPE event)
 {
     bool block = false;
+    std::optional<bool> force;
     static const auto bucket = Bucket::get();
     auto state = State::get().ptr();
 
@@ -666,11 +713,21 @@ bool pause_event(PAUSE_TYPE event)
         return block;
     }
 
-    // TODO: Handle pausing
+    if (((bucket->pause_api->pause_type & event) != PAUSE_TYPE::NONE || ((uint8_t)bucket->pause_api->pause_type & 0x3f && event == PAUSE_TYPE::PRE_UPDATE)) && (bucket->pause_api->ignore_screen_trigger & (PAUSE_SCREEN)(1 << state->screen)) == PAUSE_SCREEN::NONE)
+    {
+        if (pause_check_trigger(bucket->pause_api->pause_trigger, bucket->pause_api->pause_screen))
+        {
+            bucket->pause_api->set_paused(true);
+            force = true;
+        }
+        if (pause_check_trigger(bucket->pause_api->unpause_trigger, bucket->pause_api->unpause_screen))
+        {
+            bucket->pause_api->set_paused(false);
+            force = false;
+        }
+    }
 
-    // TODO: Handle unpausing
-
-    if ((bucket->pause_api->pause & event) != PAUSE_TYPE::NONE)
+    if ((bucket->pause_api->get_pause() & event) != PAUSE_TYPE::NONE)
         block = true;
 
     if ((bucket->pause_api->ignore_screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE)
@@ -678,6 +735,16 @@ bool pause_event(PAUSE_TYPE event)
 
     if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && pause_loading())
         block = false;
+
+    if (force.has_value())
+    {
+        block = force.value();
+        if ((bucket->pause_api->pause_type & PAUSE_TYPE::FORCE_STATE) != PAUSE_TYPE::NONE)
+            bucket->pause_api->set_paused(block);
+    }
+
+    if ((bucket->pause_api->pause & PAUSE_TYPE::FORCE_STATE) != PAUSE_TYPE::NONE)
+        bucket->pause_api->set_paused(true);
 
     if (bucket->pause_api->update_camera && ((block && (event == PAUSE_TYPE::PRE_UPDATE || event == PAUSE_TYPE::PRE_GAME_LOOP)) || ((event == PAUSE_TYPE::PRE_UPDATE && (uint8_t)bucket->pause_api->pause_type & 0x3f) && state->pause > 0)) && ((state->pause & 1) == 0 || (uint8_t)bucket->pause_api->pause_type & 1))
         update_camera_position();

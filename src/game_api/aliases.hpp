@@ -122,22 +122,19 @@ enum class PAUSE_TYPE : int64_t
     PRE_UPDATE = 1 << 6,
     PRE_GAME_LOOP = 1 << 7,
     PRE_PROCESS_INPUT = 1 << 8,
+    FORCE_STATE = 1 << 9,
 };
 ENUM_CLASS_FLAGS(PAUSE_TYPE);
 
-enum class PAUSE_CONDITION : int64_t
+enum class PAUSE_TRIGGER : int64_t
 {
     NONE = 0,
-    MENU = 1 << 0,
-    FADE = 1 << 1,
+    FADE_START = 1 << 0,
+    FADE_END = 1 << 1,
     SCREEN = 1 << 2,
-    TIME_LEVEL = 1 << 3,
-    TIME_TOTAL = 1 << 4,
-    TIME_STARTUP = 1 << 5,
-    TIME_GLOBAL = 1 << 6,
-    ONCE = 1 << 7,
+    ONCE = 1 << 3,
 };
-ENUM_CLASS_FLAGS(PAUSE_CONDITION);
+ENUM_CLASS_FLAGS(PAUSE_TRIGGER);
 
 enum class PAUSE_SCREEN : int64_t
 {

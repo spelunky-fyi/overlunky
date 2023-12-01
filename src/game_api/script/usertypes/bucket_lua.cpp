@@ -22,19 +22,20 @@ void register_usertypes(sol::state& lua)
 
     /// Control the pause API
     auto pauseapi_type = lua.new_usertype<PauseAPI>("PauseAPI", sol::no_constructor);
-    // pauseapi_type["state"] = &PauseAPI::state;
+    // pauseapi_type["pause"] = &PauseAPI::pause;
     pauseapi_type["pause"] = sol::property(&PauseAPI::get_pause, &PauseAPI::set_pause);
     pauseapi_type["pause_type"] = &PauseAPI::pause_type;
-    pauseapi_type["pause_condition"] = &PauseAPI::pause_condition;
+    pauseapi_type["pause_trigger"] = &PauseAPI::pause_trigger;
     pauseapi_type["pause_screen"] = &PauseAPI::pause_screen;
-    pauseapi_type["pause_time"] = &PauseAPI::pause_time;
-    pauseapi_type["unpause_condition"] = &PauseAPI::unpause_condition;
+    pauseapi_type["unpause_trigger"] = &PauseAPI::unpause_trigger;
     pauseapi_type["unpause_screen"] = &PauseAPI::unpause_screen;
-    pauseapi_type["unpause_time"] = &PauseAPI::unpause_time;
     pauseapi_type["ignore_screen"] = &PauseAPI::ignore_screen;
-    pauseapi_type["ignore_screen_conditions"] = &PauseAPI::ignore_screen_conditions;
+    pauseapi_type["ignore_screen_trigger"] = &PauseAPI::ignore_screen_trigger;
     pauseapi_type["update_camera"] = &PauseAPI::update_camera;
     pauseapi_type["skip"] = &PauseAPI::skip;
+    pauseapi_type["screen_loaded"] = &PauseAPI::screen_loaded;
+    pauseapi_type["last_trigger_frame"] = &PauseAPI::last_trigger_frame;
+    pauseapi_type["last_fade_timer"] = &PauseAPI::last_fade_timer;
     pauseapi_type["frame_advance"] = &PauseAPI::frame_advance;
     pauseapi_type["get_pause"] = &PauseAPI::get_pause;
     pauseapi_type["set_pause"] = &PauseAPI::set_pause;
