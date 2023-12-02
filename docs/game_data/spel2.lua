@@ -4904,7 +4904,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field buttons INPUTS
     ---@field input_mapping_keyboard InputMapping
     ---@field input_mapping_controller InputMapping
-    ---@field player_id integer
+    ---@field player_slot integer
     ---@field is_participating boolean
 
 ---@class InputMapping

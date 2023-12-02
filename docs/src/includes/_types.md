@@ -2862,7 +2862,7 @@ Type | Name | Description
 [INPUTS](#INPUTS) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 [InputMapping](#InputMapping) | [input_mapping_keyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_keyboard) | 
 [InputMapping](#InputMapping) | [input_mapping_controller](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_controller) | 
-int | [player_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_id) | 
+int | [player_slot](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) | 
 bool | [is_participating](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_participating) | 
 
 ### PlayerSlotSettings
