@@ -31,8 +31,9 @@ void register_usertypes(sol::state& lua)
     pauseapi_type["unpause_screen"] = &PauseAPI::unpause_screen;
     pauseapi_type["ignore_screen"] = &PauseAPI::ignore_screen;
     pauseapi_type["ignore_screen_trigger"] = &PauseAPI::ignore_screen_trigger;
-    pauseapi_type["update_camera"] = &PauseAPI::update_camera;
     pauseapi_type["skip"] = &PauseAPI::skip;
+    pauseapi_type["update_camera"] = &PauseAPI::update_camera;
+    pauseapi_type["blocked"] = &PauseAPI::blocked;
     pauseapi_type["skip_fade"] = &PauseAPI::skip_fade;
     pauseapi_type["last_trigger_frame"] = &PauseAPI::last_trigger_frame;
     pauseapi_type["last_fade_timer"] = &PauseAPI::last_fade_timer;
@@ -42,6 +43,7 @@ void register_usertypes(sol::state& lua)
     pauseapi_type["set_paused"] = &PauseAPI::set_paused;
     pauseapi_type["paused"] = &PauseAPI::paused;
     pauseapi_type["toggle"] = &PauseAPI::toggle;
+    pauseapi_type["loading"] = &PauseAPI::loading;
 
     /// Shared memory structure used for Playlunky-Overlunky interoperability
     auto bucket_type = lua.new_usertype<Bucket>("Bucket", sol::no_constructor);

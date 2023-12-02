@@ -644,143 +644,13 @@ std::vector<int64_t> State::read_prng() const
     return prng;
 }
 
-bool pause_loading()
-{
-    auto state = State::get().ptr();
-    auto gm = get_game_manager();
-    bool loading = state->loading > 0 || state->fade_timer > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed)) || state->logic->ouroboros;
-    if ((state->loading == 3 && (state->fade_timer <= 1 || state->fade_length == 0)) || (state->loading == 1 && state->fade_timer == state->fade_length))
-        loading = false;
-    return loading;
-}
-
-bool pause_check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
-{
-    bool match = false;
-    static const auto bucket = Bucket::get();
-    auto state = State::get().ptr();
-
-    if (state->loading == 2 && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen == PAUSE_SCREEN::NONE || (screen & (PAUSE_SCREEN)(1 << state->screen_next)) != PAUSE_SCREEN::NONE))
-        match = true;
-
-    if ((trigger & PAUSE_TRIGGER::FADE_START) != PAUSE_TRIGGER::NONE && state->fade_timer > 0 && state->fade_timer == state->fade_length && state->fade_timer != bucket->pause_api->last_fade_timer)
-        match = true;
-
-    if ((trigger & PAUSE_TRIGGER::FADE_END) != PAUSE_TRIGGER::NONE && state->fade_timer == 1 && state->fade_timer != bucket->pause_api->last_fade_timer)
-        match = true;
-
-    if ((trigger & PAUSE_TRIGGER::EXIT) != PAUSE_TRIGGER::NONE && (state->screen == 12 || state->screen == 11) && (state->level_flags & (1 << 20)) && !(bucket->pause_api->last_level_flags & (1 << 20)))
-        match = true;
-
-    if (match && (trigger & PAUSE_TRIGGER::ONCE) != PAUSE_TRIGGER::NONE)
-        trigger = PAUSE_TRIGGER::NONE;
-
-    if (match && bucket->pause_api->last_trigger_frame == State::get().get_frame_count())
-        match = false;
-
-    return match;
-}
-
-bool pause_event(PAUSE_TYPE event)
-{
-    bool block = false;
-    std::optional<bool> force;
-    static const auto bucket = Bucket::get();
-    auto state = State::get().ptr();
-
-    if (bucket->pause_api->skip_fade)
-    {
-        state->fade_enabled = false;
-        state->fade_value = 0;
-        state->fade_timer = 0;
-    }
-
-    if (bucket->pause_api->skip)
-    {
-        state->pause &= ~((uint8_t)bucket->pause_api->pause_type & 0x3f);
-        return block;
-    }
-
-    if (((bucket->pause_api->pause_type & event) != PAUSE_TYPE::NONE || ((uint8_t)bucket->pause_api->pause_type & 0x3f && event == PAUSE_TYPE::PRE_UPDATE)) && (bucket->pause_api->ignore_screen_trigger & (PAUSE_SCREEN)(1 << state->screen)) == PAUSE_SCREEN::NONE)
-    {
-        if (pause_check_trigger(bucket->pause_api->pause_trigger, bucket->pause_api->pause_screen))
-        {
-            bucket->pause_api->set_paused(true);
-            force = true;
-            bucket->pause_api->last_trigger_frame = State::get().get_frame_count();
-        }
-        if (pause_check_trigger(bucket->pause_api->unpause_trigger, bucket->pause_api->unpause_screen))
-        {
-            bucket->pause_api->set_paused(false);
-            force = false;
-            bucket->pause_api->last_trigger_frame = State::get().get_frame_count();
-        }
-        bucket->pause_api->last_fade_timer = state->fade_timer;
-        bucket->pause_api->last_level_flags = state->level_flags;
-    }
-
-    auto loading = pause_loading();
-
-    if ((bucket->pause_api->get_pause() & event) != PAUSE_TYPE::NONE)
-        block = true;
-
-    if ((bucket->pause_api->ignore_screen & (PAUSE_SCREEN)(1 << state->screen)) != PAUSE_SCREEN::NONE)
-        block = false;
-
-    if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::LOADING) != PAUSE_SCREEN::NONE && loading)
-        block = false;
-
-    if ((bucket->pause_api->ignore_screen & PAUSE_SCREEN::EXIT) != PAUSE_SCREEN::NONE && (state->screen == 12 || state->screen == 11) && (state->level_flags & (1 << 20)))
-        block = false;
-
-    if (force.has_value())
-    {
-        block = force.value();
-        if ((bucket->pause_api->pause_type & PAUSE_TYPE::FORCE_STATE) != PAUSE_TYPE::NONE && !loading && (uint8_t)bucket->pause_api->pause_type & 0x3f)
-            bucket->pause_api->set_paused(block);
-    }
-
-    if ((bucket->pause_api->pause & PAUSE_TYPE::FORCE_STATE) != PAUSE_TYPE::NONE)
-        bucket->pause_api->set_paused(true);
-
-    if (bucket->pause_api->update_camera && ((block && (event == PAUSE_TYPE::PRE_UPDATE || event == PAUSE_TYPE::PRE_GAME_LOOP)) || ((event == PAUSE_TYPE::PRE_UPDATE && (uint8_t)bucket->pause_api->pause_type & 0x3f) && state->pause > 0)) && ((state->pause & 1) == 0 || (uint8_t)bucket->pause_api->pause_type & 1))
-        update_camera_position();
-
-    if ((bucket->pause_api->pause_type & event) != PAUSE_TYPE::NONE)
-        bucket->pause_api->block = block;
-
-    return block;
-}
-
-void post_pause()
-{
-    static const auto bucket = Bucket::get();
-    auto state = State::get().ptr();
-    if (bucket->pause_api->skip)
-        state->pause |= (uint8_t)bucket->pause_api->pause_type & 0x3f;
-    bucket->pause_api->skip = false;
-}
-
-void post_pause_input()
-{
-    static const auto bucket = Bucket::get();
-
-    if (!bucket->overlunky)
-        return;
-
-    auto gm = get_game_manager();
-    auto kb = get_raw_input()->keyboard;
-
-    if (((bucket->overlunky->keys["toggle_pause"] & 32) || (bucket->overlunky->keys["frame_advance"] & 32) || (bucket->overlunky->keys["frame_advance_alt"] & 32)) && kb[39].down && !kb[32].down)
-        gm->game_props->buttons_menu &= ~1;
-}
-
 using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
+    static const auto pa = Bucket::get()->pause_api;
     auto block = pre_event(ON::PRE_UPDATE);
-    if (pause_event(PAUSE_TYPE::PRE_UPDATE))
+    if (pa->event(PAUSE_TYPE::PRE_UPDATE))
         block = true;
     if (!block)
     {
@@ -808,15 +678,16 @@ using OnProcessInput = void(void*);
 OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
+    static const auto pa = Bucket::get()->pause_api;
     auto block = pre_event(ON::PRE_PROCESS_INPUT);
-    if (pause_event(PAUSE_TYPE::PRE_PROCESS_INPUT))
+    if (pa->event(PAUSE_TYPE::PRE_PROCESS_INPUT))
         block = true;
     if (!block)
     {
         g_process_input_trampoline(s);
         post_event(ON::POST_PROCESS_INPUT);
     }
-    post_pause_input();
+    pa->input();
 }
 
 void init_process_input_hook()
@@ -837,6 +708,7 @@ using OnGameLoop = void(void* a, float b, void* c);
 OnGameLoop* g_game_loop_trampoline{nullptr};
 void GameLoop(void* a, float b, void* c)
 {
+    static const auto pa = Bucket::get()->pause_api;
     auto state = State::get();
     if (global_frame_count < state.get_frame_count_main())
         global_frame_count = state.get_frame_count_main();
@@ -844,14 +716,14 @@ void GameLoop(void* a, float b, void* c)
         global_frame_count++;
 
     auto block = pre_event(ON::PRE_GAME_LOOP);
-    if (pause_event(PAUSE_TYPE::PRE_GAME_LOOP))
+    if (pa->event(PAUSE_TYPE::PRE_GAME_LOOP))
         block = true;
     if (!block)
     {
         g_game_loop_trampoline(a, b, c);
         post_event(ON::POST_GAME_LOOP);
     }
-    post_pause();
+    pa->post_loop();
 }
 
 void init_game_loop_hook()

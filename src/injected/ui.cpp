@@ -9235,7 +9235,7 @@ void render_prohud()
         auto col = ImColor(0.3f, 1.0f, 0.3f, 0.7f);
         if (!g_bucket->pause_api->paused() || g_state->pause > 0)
             col = ImColor(1.0f, 1.0f, 0.3f, 0.7f);
-        if (g_bucket->pause_api->paused() && (g_bucket->pause_api->block || g_state->pause > 0))
+        if (g_bucket->pause_api->paused() && (g_bucket->pause_api->blocked || g_state->pause > 0))
             col = ImColor(1.0f, 0.3f, 0.3f, 0.7f);
         buf = "||";
         ImGui::PushFont(bigfont);
