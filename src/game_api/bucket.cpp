@@ -67,25 +67,24 @@ void PauseAPI::apply()
 bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
 {
     bool match = false;
-    static const auto bucket = Bucket::get();
     auto state = State::get().ptr();
 
     if (state->loading == 2 && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen == PAUSE_SCREEN::NONE || (screen & (PAUSE_SCREEN)(1 << state->screen_next)) != PAUSE_SCREEN::NONE))
         match = true;
 
-    if ((trigger & PAUSE_TRIGGER::FADE_START) != PAUSE_TRIGGER::NONE && state->fade_timer > 0 && state->fade_timer == state->fade_length && state->fade_timer != bucket->pause_api->last_fade_timer)
+    if ((trigger & PAUSE_TRIGGER::FADE_START) != PAUSE_TRIGGER::NONE && state->fade_timer > 0 && state->fade_timer == state->fade_length && state->fade_timer != last_fade_timer)
         match = true;
 
-    if ((trigger & PAUSE_TRIGGER::FADE_END) != PAUSE_TRIGGER::NONE && state->fade_timer == 1 && state->fade_timer != bucket->pause_api->last_fade_timer)
+    if ((trigger & PAUSE_TRIGGER::FADE_END) != PAUSE_TRIGGER::NONE && state->fade_timer == 1 && state->fade_timer != last_fade_timer)
         match = true;
 
-    if ((trigger & PAUSE_TRIGGER::EXIT) != PAUSE_TRIGGER::NONE && (state->screen == 12 || state->screen == 11) && (state->level_flags & (1 << 20)) && !(bucket->pause_api->last_level_flags & (1 << 20)))
+    if ((trigger & PAUSE_TRIGGER::EXIT) != PAUSE_TRIGGER::NONE && (state->screen == 12 || state->screen == 11) && (state->level_flags & (1 << 20)) && !(last_level_flags & (1 << 20)))
         match = true;
 
     if (match && (trigger & PAUSE_TRIGGER::ONCE) != PAUSE_TRIGGER::NONE)
         trigger = PAUSE_TRIGGER::NONE;
 
-    if (match && bucket->pause_api->last_trigger_frame == State::get().get_frame_count())
+    if (match && last_trigger_frame == State::get().get_frame_count())
         match = false;
 
     return match;
@@ -171,13 +170,17 @@ bool PauseAPI::event(PAUSE_TYPE pause_event)
     return block;
 }
 
+void PauseAPI::pre_loop()
+{
+    blocked = false;
+}
+
 void PauseAPI::post_loop()
 {
-    static const auto bucket = Bucket::get();
     auto state = State::get().ptr();
-    if (bucket->pause_api->skip)
-        state->pause |= (uint8_t)bucket->pause_api->pause_type & 0x3f;
-    bucket->pause_api->skip = false;
+    if (skip)
+        state->pause |= (uint8_t)pause_type & 0x3f;
+    skip = false;
 }
 
 void PauseAPI::input()

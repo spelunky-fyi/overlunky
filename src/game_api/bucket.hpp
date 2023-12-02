@@ -53,37 +53,61 @@ struct Overlunky
 
 struct PauseAPI
 {
+    /// Current pause state bitmask. Use custom PAUSE_TYPE.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching ON update callbacks, so can be set on the same callback you want to block at the latest. Vanilla PAUSE flags will be forwarded to state.pause, but use of vanilla PAUSE flags is discouraged and might not work with other PauseAPI features.
     PAUSE_TYPE pause;
-    PAUSE_TYPE pause_type;
+    /// Pause mask to toggle when using the PauseAPI methods to set or get pause state.
+    PAUSE_TYPE pause_type{PAUSE_TYPE::PRE_UPDATE};
 
+    /// Bitmask for conditions when the current `pause_type` should be automatically enabled in `pause`, can have multiple conditions.
     PAUSE_TRIGGER pause_trigger;
+    /// Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
     PAUSE_SCREEN pause_screen;
 
+    /// Bitmask for conditions when the current `pause_type` should be automatically disabled in `pause`, can have multiple conditions.
     PAUSE_TRIGGER unpause_trigger;
+    /// Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
     PAUSE_SCREEN unpause_screen;
 
+    /// Global frame stamp when one of the triggers was last triggered, used to prevent running them again on the same frame on unpause.
     int64_t last_trigger_frame;
+    /// Fade timer stamp when fade triggers were last checked.
     int64_t last_fade_timer;
+    /// Used to detect changes in state.level_flags for triggers.
     uint32_t last_level_flags;
 
+    /// Bitmask for game SCREEN where the PRE_✱ pause types are ignored, even though enabled in `pause`. Can also use the special cases [FADE, EXIT] to unfreeze temporarily during fades (or other screen transitions where player input is probably impossible) or the level exit walk of shame.
     PAUSE_SCREEN ignore_screen;
+    /// Bitmask for game SCREEN where the triggers are ignored.
     PAUSE_SCREEN ignore_screen_trigger;
 
+    /// Set to true to unfreeze the game for one update cycle. Sets back to false after ON.POST_GAME_LOOP, so it can be used to check if current frame is a frame advance frame.
     bool skip;
+    /// Set to true to enable normal camera movement when the game is paused or frozen on a callback by PauseAPI.
     bool update_camera;
+    /// Is true when PauseAPI is freezing the game.
     bool blocked;
+    /// Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
     bool skip_fade;
 
+    /// Get the current pause flags
     PAUSE_TYPE get_pause();
+    /// Set the current pause flags
     void set_pause(PAUSE_TYPE flags);
+    /// Enable/disable the current pause_type flags in pause state
     bool set_paused(bool enable = true);
+    /// Is the game currently paused and that pause state matches any of the current the pause_type
     bool paused();
+    /// Toggles pause state
     bool toggle();
+    /// Sets skip
     void frame_advance();
+    /// Is the game currently loading and PAUSE_SCREEN.LOADING would be triggered, based on state.loading and some arbitrary checks.
+    bool loading();
+
     void apply();
     bool event(PAUSE_TYPE event);
     bool check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen);
-    bool loading();
+    void pre_loop();
     void post_loop();
     void input();
 };
@@ -103,6 +127,6 @@ class Bucket
     std::pair<int64_t, int64_t> adventure_seed{0, 0};
     // Used by memory for recoverable memory interoperability
     std::unordered_map<std::string, EditedMemory> original_memory;
-    /// WIP Pause API
+    /// PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     PauseAPI* pause_api;
 };

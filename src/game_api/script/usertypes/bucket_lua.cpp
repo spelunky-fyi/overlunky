@@ -21,7 +21,7 @@ void register_usertypes(sol::state& lua)
     ol_type["set_selected_uids"] = &Overlunky::set_selected_uids;
 
     /// Control the pause API
-    auto pauseapi_type = lua.new_usertype<PauseAPI>("PauseAPI", sol::no_constructor);
+    auto pauseapi_type = lua.new_usertype<PauseAPI>("PauseAPI", "new", sol::no_constructor);
     // pauseapi_type["pause"] = &PauseAPI::pause;
     pauseapi_type["pause"] = sol::property(&PauseAPI::get_pause, &PauseAPI::set_pause);
     pauseapi_type["pause_type"] = &PauseAPI::pause_type;
@@ -44,6 +44,11 @@ void register_usertypes(sol::state& lua)
     pauseapi_type["paused"] = &PauseAPI::paused;
     pauseapi_type["toggle"] = &PauseAPI::toggle;
     pauseapi_type["loading"] = &PauseAPI::loading;
+
+    /// Access the PauseAPI, or directly call `pause(true)` to enable current `pause.pause_type`
+    lua["pause"] = Bucket::get()->pause_api;
+    /// NoDoc
+    lua["pause"][sol::metatable_key]["__call"] = &PauseAPI::set_paused;
 
     /// Shared memory structure used for Playlunky-Overlunky interoperability
     auto bucket_type = lua.new_usertype<Bucket>("Bucket", sol::no_constructor);

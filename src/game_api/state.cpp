@@ -715,6 +715,7 @@ void GameLoop(void* a, float b, void* c)
     else
         global_frame_count++;
 
+    pa->pre_loop();
     auto block = pre_event(ON::PRE_GAME_LOOP);
     if (pa->event(PAUSE_TYPE::PRE_GAME_LOOP))
         block = true;
