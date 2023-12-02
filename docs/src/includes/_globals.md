@@ -1677,11 +1677,9 @@ Reverse of some random hash function
 
 > Search script examples for [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause)
 
-#### nil pause(bool p)
+#### nil pause()
 
-Pause/unpause the game.
-This is just short for `state.pause == 32`, but that produces an audio bug
-I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
+Access the [PauseAPI](#PauseAPI), or directly call `pause(true)` to enable current `pause.pause_type`
 
 ### register_console_command
 
@@ -1933,7 +1931,7 @@ Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack,
 
 #### nil set_start_level_paused(bool enable)
 
-Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == [PAUSE](#PAUSE).FADE on the first frame to do what you want.
+Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == [PAUSE](#PAUSE).[FADE](#FADE) on the first frame to do what you want.
 
 ### set_storage_layer
 

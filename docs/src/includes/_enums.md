@@ -346,6 +346,20 @@ Name | Data | Description
 ...check [entities.txt](game_data/entities.txt)... |  | 
 [LIQUID_COARSE_LAVA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENT_TYPE.LIQUID_COARSE_LAVA) | 915 | 
 
+## FADE
+
+
+> Search script examples for [FADE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FADE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FADE.NONE) | 0 | 
+[OUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FADE.OUT) | 1 | 
+[LOAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FADE.LOAD) | 2 | 
+[IN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=FADE.IN) | 3 | 
+
 ## FLOOR_SIDE
 
 
