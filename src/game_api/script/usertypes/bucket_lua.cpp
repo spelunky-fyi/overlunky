@@ -33,6 +33,7 @@ void register_usertypes(sol::state& lua)
     pauseapi_type["ignore_screen_trigger"] = &PauseAPI::ignore_screen_trigger;
     pauseapi_type["update_camera"] = &PauseAPI::update_camera;
     pauseapi_type["skip"] = &PauseAPI::skip;
+    pauseapi_type["skip_fade"] = &PauseAPI::skip_fade;
     pauseapi_type["last_trigger_frame"] = &PauseAPI::last_trigger_frame;
     pauseapi_type["last_fade_timer"] = &PauseAPI::last_fade_timer;
     pauseapi_type["frame_advance"] = &PauseAPI::frame_advance;

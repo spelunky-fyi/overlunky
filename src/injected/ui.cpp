@@ -5949,10 +5949,6 @@ void render_options()
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
 
-        if (ImGui::Checkbox("Skip fades##SkipFades", &options["skip_fades"]))
-            g_ui_scripts["skip_fades"]->set_enabled(options["skip_fades"]);
-        tooltip("Skips all fade to black transitions.");
-
         ImGui::Checkbox("Uncap unfocused FPS on start", &options["uncap_unfocused_fps"]);
         tooltip("Sets the unfocused FPS to unlimited automatically.");
 
@@ -6157,9 +6153,13 @@ void render_options()
         if (ImGui::Checkbox("Paused##PauseSim", &paused))
             toggle_pause();
         tooltip("Toggle current pause API state according to the toggled type.", "toggle_pause");
+        if (ImGui::Checkbox("Skip fades##SkipFades", &g_bucket->pause_api->skip_fade))
+            options["skip_fades"] = g_bucket->pause_api->skip_fade;
+        tooltip("Skips all fade to black / circle wipe transitions.");
         if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &g_bucket->pause_api->update_camera))
             options["pause_update_camera"] = g_bucket->pause_api->update_camera;
         tooltip("Calls the vanilla camera update when it\nwould be skipped by freezing the state update.");
+
         ImGui::Separator();
         ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. blocking updates during a normal game pause won't interfere with the vanilla pause", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
         ImGui::TextWrapped("- The freeze options will block the game in the specified callback (as well as enforce any selected normal pause flags, for now)");
@@ -9449,16 +9449,6 @@ set_callback(init_hooks, ON.SCRIPT_ENABLE)
 set_callback(clear_hooks, ON.SCRIPT_DISABLE)
 )");
     add_ui_script("level_size", false, "");
-    add_ui_script("skip_fades", options["skip_fades"], R"(
-set_callback(function()
-    state.fade_timer = 0
-    state.fade_value = 0
-end, ON.PRE_UPDATE)
-set_callback(function()
-    state.fade_timer = 0
-    state.fade_value = 0
-end, ON.PRE_GAME_LOOP)
-)");
 }
 
 void imgui_draw()
@@ -9786,12 +9776,12 @@ void update_bucket()
         {
             toggle_lights();
         }
-        else if (k == "skip_fades")
+        else if (k == "skip_fades") // Deprecated
         {
             if (auto* val = std::get_if<bool>(&v))
             {
                 options["skip_fades"] = *val;
-                g_ui_scripts["skip_fades"]->set_enabled(options["skip_fades"]);
+                g_bucket->pause_api->skip_fade = *val;
             }
         }
         else if (k == "pause_type") // Deprecated

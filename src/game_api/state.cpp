@@ -688,6 +688,13 @@ bool pause_event(PAUSE_TYPE event)
     static const auto bucket = Bucket::get();
     auto state = State::get().ptr();
 
+    if (bucket->pause_api->skip_fade)
+    {
+        state->fade_enabled = false;
+        state->fade_value = 0;
+        state->fade_timer = 0;
+    }
+
     if (bucket->pause_api->skip)
     {
         state->pause &= ~((uint8_t)bucket->pause_api->pause_type & 0x3f);
