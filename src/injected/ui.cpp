@@ -1987,7 +1987,8 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
     g_state->quest_flags |= 1;
     if (seed.has_value())
         g_state->quest_flags |= 0x40;
-    g_state->loading = 1;
+    g_state->fade_enabled = false;
+    g_state->loading = 2;
 
     if (g_game_manager->main_menu_music)
     {
@@ -2014,7 +2015,8 @@ void restart_adventure()
         g_state->theme_next = g_state->theme_start;
         g_state->screen_next = 12;
         g_state->quest_flags |= 1;
-        g_state->loading = 1;
+        g_state->fade_enabled = false;
+        g_state->loading = 2;
     }
     else
     {

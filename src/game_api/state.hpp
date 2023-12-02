@@ -52,6 +52,7 @@ void fix_liquid_out_of_bounds();
 struct StateMemory
 {
     using SCREEN = uint32_t;
+    using FADE = uint32_t;
 
     size_t p00;
     /// Previous SCREEN, used to check where we're coming from when loading another SCREEN
@@ -60,8 +61,8 @@ struct StateMemory
     SCREEN screen;
     /// Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
     SCREEN screen_next;
-    /// Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
-    uint32_t loading;
+    /// Current loading/fade state. Pauses all updates if > FADE.NONE. Writing FADE.OUT or FADE.LOAD will trigger a screen load to `screen_next`.
+    FADE loading;
     /// The global level illumination, very big and bright.
     Illumination* illumination;
     /// Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
@@ -70,12 +71,20 @@ struct StateMemory
     uint32_t fade_timer;
     /// Total frames for fade-in/fade-out when loading.
     uint32_t fade_length;
-    /// if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
-    uint32_t loading_black_screen_timer;
-    /// Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
-    uint8_t ingame;
-    /// Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
-    uint8_t playing;
+    /// Additional delay after fade_timer reaches 0, before moving to the next fading state. Used after Ouroboros, in credits etc. for longer black screens, but also works after FADE.IN.
+    uint32_t fade_delay;
+    union
+    {
+        uint8_t ingame;
+        /// Enables the fade effect on FADE.IN, setting to false makes loading skip FADE.IN state instantly
+        bool fade_enabled;
+    };
+    union
+    {
+        uint8_t playing;
+        /// Makes loading use circle iris effect instead of fade on FADE.IN
+        bool fade_circle;
+    };
     /// 8bit flags, multiple might be active at the same time
     /// 1: Menu: Pauses the level timer and engine. Can't set, controlled by the menu.
     /// 2: Fade/Loading: Pauses all timers and engine.

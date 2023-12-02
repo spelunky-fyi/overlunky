@@ -288,8 +288,6 @@ void register_usertypes(sol::state& lua)
     statememory_type["screen_last"] = &StateMemory::screen_last;
     statememory_type["screen"] = &StateMemory::screen;
     statememory_type["screen_next"] = &StateMemory::screen_next;
-    statememory_type["ingame"] = &StateMemory::ingame;
-    statememory_type["playing"] = &StateMemory::playing;
     statememory_type["pause"] = &StateMemory::pause;
     statememory_type["width"] = &StateMemory::w;
     statememory_type["height"] = &StateMemory::h;
@@ -321,9 +319,9 @@ void register_usertypes(sol::state& lua)
     statememory_type["time_last_level"] = &StateMemory::time_last_level;
     statememory_type["time_level"] = &StateMemory::time_level;
     statememory_type["level_flags"] = &StateMemory::level_flags;
-    statememory_type["loading"] = &StateMemory::loading;
     statememory_type["quest_flags"] = &StateMemory::quest_flags;
     statememory_type["presence_flags"] = &StateMemory::presence_flags;
+    statememory_type["loading"] = &StateMemory::loading;
     statememory_type["fade_value"] = &StateMemory::fade_value;
     /// NoDoc
     statememory_type["fadevalue"] = &StateMemory::fade_value;
@@ -333,7 +331,15 @@ void register_usertypes(sol::state& lua)
     statememory_type["fade_length"] = &StateMemory::fade_length;
     /// NoDoc
     statememory_type["fadein"] = &StateMemory::fade_length;
-    statememory_type["loading_black_screen_timer"] = &StateMemory::loading_black_screen_timer;
+    /// NoDoc
+    statememory_type["loading_black_screen_timer"] = &StateMemory::fade_delay;
+    statememory_type["fade_delay"] = &StateMemory::fade_delay;
+    /// NoDoc
+    statememory_type["ingame"] = &StateMemory::ingame;
+    statememory_type["fade_enabled"] = &StateMemory::fade_enabled;
+    /// NoDoc
+    statememory_type["playing"] = &StateMemory::playing;
+    statememory_type["fade_circle"] = &StateMemory::fade_circle;
     statememory_type["saved_dogs"] = &StateMemory::saved_dogs;
     statememory_type["saved_cats"] = &StateMemory::saved_cats;
     statememory_type["saved_hamsters"] = &StateMemory::saved_hamsters;
@@ -403,6 +409,8 @@ void register_usertypes(sol::state& lua)
     statememory_type["liquid"] = &StateMemory::liquid_physics;
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
     statememory_type["room_owners"] = &StateMemory::room_owners;
+
+    lua.create_named_table("FADE", "NONE", 0, "OUT", 1, "LOAD", 2, "IN", 3);
 
     lua.create_named_table("QUEST_FLAG", "RESET", 1, "DARK_LEVEL_SPAWNED", 2, "VAULT_SPAWNED", 3, "SPAWN_OUTPOST", 4, "SHOP_SPAWNED", 5, "SHORTCUT_USED", 6, "SEEDED", 7, "DAILY", 8, "CAVEMAN_SHOPPIE_AGGROED", 9, "WADDLER_AGGROED", 10, "SHOP_BOUGHT_OUT", 11, "EGGPLANT_CROWN_PICKED_UP", 12, "UDJAT_EYE_SPAWNED", 17, "BLACK_MARKET_SPAWNED", 18, "DRILL_SPAWNED", 19, "MOON_CHALLENGE_SPAWNED", 25, "STAR_CHALLENGE_SPAWNED", 26, "SUN_CHALLENGE_SPAWNED", 27);
 
