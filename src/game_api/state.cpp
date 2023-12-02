@@ -778,6 +778,7 @@ void StateUpdate(StateMemory* s)
     if (!block)
     {
         g_state_update_trampoline(s);
+        post_event(ON::POST_UPDATE);
     }
     update_backends();
 }

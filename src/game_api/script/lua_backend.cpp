@@ -441,12 +441,6 @@ bool LuaBackend::update()
                     }
                     break;
                 }
-                case ON::POST_UPDATE:
-                {
-                    handle_function<void>(this, callback.func);
-                    callback.lastRan = now;
-                    break;
-                }
                 case ON::SCREEN:
                 {
                     if (g_state->screen != state.screen)
