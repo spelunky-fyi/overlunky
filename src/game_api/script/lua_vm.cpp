@@ -2399,7 +2399,15 @@ end
         "PRE_GAME_LOOP",
         ON::PRE_GAME_LOOP,
         "POST_GAME_LOOP",
-        ON::POST_GAME_LOOP);
+        ON::POST_GAME_LOOP,
+        "BLOCKED_LEVEL_GENERATION",
+        ON::BLOCKED_LEVEL_GENERATION,
+        "BLOCKED_UPDATE",
+        ON::BLOCKED_UPDATE,
+        "BLOCKED_GAME_LOOP",
+        ON::BLOCKED_GAME_LOOP,
+        "BLOCKED_PROCESS_INPUT",
+        ON::BLOCKED_PROCESS_INPUT);
 
     /* ON
     // LOGO

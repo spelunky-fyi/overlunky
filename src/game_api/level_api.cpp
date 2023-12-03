@@ -1829,7 +1829,10 @@ void LevelGenSystem::init()
                                 { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
 
                 if (pre_event(ON::PRE_LEVEL_GENERATION))
+                {
+                    post_event(ON::BLOCKED_LEVEL_GENERATION);
                     return;
+                }
                 original(th);
                 post_event(ON::POST_LEVEL_GENERATION);
             });
