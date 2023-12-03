@@ -889,6 +889,10 @@ Name | Data | Description
 [POST_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_PROCESS_INPUT) | ON::POST_PROCESS_INPUT | Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/>
 [PRE_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GAME_LOOP) | ON::PRE_GAME_LOOP | Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.<br/>
 [POST_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_GAME_LOOP) | ON::POST_GAME_LOOP | Runs right after the main engine loop.<br/>
+[BLOCKED_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_LEVEL_GENERATION) | ON::BLOCKED_LEVEL_GENERATION | 
+[BLOCKED_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_UPDATE) | ON::BLOCKED_UPDATE | 
+[BLOCKED_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_GAME_LOOP) | ON::BLOCKED_GAME_LOOP | 
+[BLOCKED_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_PROCESS_INPUT) | ON::BLOCKED_PROCESS_INPUT | 
 
 ## PARTICLEEMITTER
 
