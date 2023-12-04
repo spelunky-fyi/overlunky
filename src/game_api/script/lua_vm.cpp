@@ -2219,6 +2219,24 @@ end
     /// Get the current speedhack multiplier
     lua["get_speedhack"] = get_speedhack;
 
+    /// Retrieves the current value of the performance counter, which is a high resolution (<1us) time stamp that can be used for time-interval measurements.
+    lua["get_performance_counter"] = []() -> int64_t
+    {
+        LARGE_INTEGER ret;
+        if (QueryPerformanceCounter(&ret))
+            return ret.QuadPart;
+        return 0;
+    };
+
+    /// Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
+    lua["get_performance_frequency"] = []() -> int64_t
+    {
+        LARGE_INTEGER ret;
+        if (QueryPerformanceFrequency(&ret))
+            return ret.QuadPart;
+        return 0;
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
     lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);
