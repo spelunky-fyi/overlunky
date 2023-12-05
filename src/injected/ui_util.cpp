@@ -80,7 +80,8 @@ void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
     state->theme_next = theme;
     state->screen_next = 13;
     state->win_state = 0;
-    state->loading = 1;
+    state->fade_enabled = false;
+    state->loading = 2;
 
     if (state->items->player_inventories[0].health == 0)
         state->items->player_inventories[0].health = 4;
