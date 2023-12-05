@@ -26,20 +26,18 @@ void register_usertypes(sol::state& lua)
         sol::readonly(&PlayerSlotSettings::auto_run_enabled),
         "controller_right_stick",
         sol::readonly(&PlayerSlotSettings::controller_right_stick));
-    lua.new_usertype<PlayerSlot>(
-        "PlayerSlot",
-        "buttons_gameplay",
-        &PlayerSlot::buttons_gameplay,
-        "buttons",
-        &PlayerSlot::buttons,
-        "input_mapping_keyboard",
-        sol::readonly(&PlayerSlot::input_mapping_keyboard),
-        "input_mapping_controller",
-        sol::readonly(&PlayerSlot::input_mapping_controller),
-        "player_id",
-        sol::readonly(&PlayerSlot::player_slot),
-        "is_participating",
-        sol::readonly(&PlayerSlot::is_participating));
+
+    auto playerslot_type = lua.new_usertype<PlayerSlot>("PlayerSlot");
+    playerslot_type["buttons_gameplay"] = &PlayerSlot::buttons_gameplay;
+    playerslot_type["buttons"] = &PlayerSlot::buttons;
+    playerslot_type["input_mapping_keyboard"] = sol::readonly(&PlayerSlot::input_mapping_keyboard);
+    playerslot_type["input_mapping_controller"] = sol::readonly(&PlayerSlot::input_mapping_controller);
+    /// NoDoc
+    playerslot_type["player_id"] = sol::readonly(&PlayerSlot::player_slot);
+    playerslot_type["player_slot"] = sol::property([](PlayerSlot& p)
+                                                   { return p.player_slot < 0 ? p.player_slot : p.player_slot + 1; });
+    playerslot_type["is_participating"] = sol::readonly(&PlayerSlot::is_participating);
+
     /// Used in PlayerSlot
     lua.new_usertype<InputMapping>(
         "InputMapping",

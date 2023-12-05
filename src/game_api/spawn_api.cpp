@@ -214,7 +214,7 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto state = State::get();
+    auto& state = State::get();
     Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
         return -1;
@@ -243,7 +243,7 @@ void spawn_backdoor_abs(float x, float y)
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto state = State::get();
+    auto& state = State::get();
     DEBUG("Spawning backdoor on {}, {}", x, y);
     Layer* front_layer = state.layer(0);
     Layer* back_layer = state.layer(1);

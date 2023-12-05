@@ -13,6 +13,7 @@
 #include "entity.hpp"         // for Entity
 #include "illumination.hpp"   // IWYU pragma: keep
 #include "items.hpp"          // for Inventory, Inventory::acquired_powerups
+#include "sound_manager.hpp"  // IWYU pragma: keep
 #include "state_structs.hpp"  // IWYU pragma: keep
 
 class Movable;
@@ -114,6 +115,7 @@ void register_usertypes(sol::state& lua)
     player_type["ai"] = &Player::ai;
     player_type["input"] = &Player::input_ptr;
     player_type["basecamp_button_entity"] = &Player::basecamp_button_entity;
+    player_type["special_sound"] = &Player::special_sound;
     player_type["jump_lock_timer"] = &Player::jump_lock_timer;
     player_type["coyote_timer"] = &Player::coyote_timer;
     player_type["swim_timer"] = &Player::swim_timer;

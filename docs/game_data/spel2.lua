@@ -2063,7 +2063,7 @@ do
     ---@field theme_next THEME @Next THEME number, used when loading a new level or transition
     ---@field theme_start THEME @THEME to start new runs in
     ---@field current_theme ThemeInfo @Points to the current ThemeInfo
-    ---@field force_current_theme fun(self, t: integer): nil @This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
+    ---@field force_current_theme fun(self, t: THEME): nil @This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     ---@field shoppie_aggro integer @Current shoppie aggro
     ---@field shoppie_aggro_next integer @Shoppie aggro to use in the next level
     ---@field outposts_spawned integer
@@ -2742,6 +2742,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field ai Ai
     ---@field input PlayerSlot
     ---@field basecamp_button_entity Entity @Used in base camp to talk with the NPC's
+    ---@field special_sound SoundMeta @For Lise System walking and looking up sounds
     ---@field jump_lock_timer integer @Increases when holding jump button in the air, set to max while jumping. If this isn't 0, a jump will only be<br/>registered if the jump button was not held on the previous frame.
     ---@field coyote_timer integer @can jump while airborne if greater than 0
     ---@field swim_timer integer @Timer between strokes when holding jump button in water.
@@ -4903,7 +4904,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field buttons INPUTS
     ---@field input_mapping_keyboard InputMapping
     ---@field input_mapping_controller InputMapping
-    ---@field player_id integer
+    ---@field player_slot integer
     ---@field is_participating boolean
 
 ---@class InputMapping

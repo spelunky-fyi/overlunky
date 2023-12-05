@@ -64,4 +64,9 @@ class Bucket
     std::pair<int64_t, int64_t> adventure_seed{0, 0};
     // Used by memory for recoverable memory interoperability
     std::unordered_map<std::string, EditedMemory> original_memory;
+
+  private:
+    Bucket() = default;
+    Bucket(const Bucket&) = delete;
+    Bucket& operator=(const Bucket&) = delete;
 };
