@@ -1926,7 +1926,7 @@ end
     };
 
     /// Get memory address from a lua object
-    lua["get_address"] = [&lua](sol::object o)
+    lua["get_address"] = [&lua]([[maybe_unused]] sol::object o)
     {
         return fmt::format("{:X}", *(size_t*)lua_touserdata(lua, 1));
     };

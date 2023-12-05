@@ -4145,6 +4145,7 @@ nil | [set_enable_turning(bool enabled)](https://github.com/spelunky-fyi/overlun
 nil | [liberate_from_shop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | 
 [Entity](#Entity) | [get_held_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) | 
 nil | [set_layer(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) | Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+nil | [apply_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_layer) | Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
 nil | [remove()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove) | Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
 nil | [respawn(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=respawn) | Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
 nil | [kill(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill) | Kills the entity, you can set responsible to `nil` to ignore it
@@ -4162,6 +4163,7 @@ nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mas
 nil | [kill_recursive(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
 nil | [destroy_recursive(optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
 nil | [destroy_recursive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
+nil | [update()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update) | 
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.

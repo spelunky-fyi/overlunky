@@ -1180,6 +1180,10 @@ function get_rva(address_name) end
 ---@param index integer
 ---@return string
 function get_virtual_rva(offset, index) end
+---Get memory address from a lua object
+---@param o any
+---@return nil
+function get_address(o) end
 ---Log to spelunky.log
 ---@param message string
 ---@return nil
@@ -1361,6 +1365,12 @@ function set_speedhack(multiplier) end
 ---Get the current speedhack multiplier
 ---@return number
 function get_speedhack() end
+---Retrieves the current value of the performance counter, which is a high resolution (<1us) time stamp that can be used for time-interval measurements.
+---@return integer
+function get_performance_counter() end
+---Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
+---@return integer
+function get_performance_frequency() end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2450,6 +2460,7 @@ function PRNG:random(min, max) end
     ---@field liberate_from_shop fun(self): nil
     ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+    ---@field apply_layer fun(self): nil @Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
     ---@field remove fun(self): nil @Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
     ---@field respawn fun(self, layer: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
     ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil @Kills the entity, you can set responsible to `nil` to ignore it
@@ -2463,6 +2474,7 @@ function PRNG:random(min, max) end
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean @Returns true if entity is in water/lava
     ---@field is_cursed fun(self): boolean
+    ---@field update fun(self): nil
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -8216,6 +8228,13 @@ ENT_TYPE = {
   YETIQUEEN = 1333
 }
 ---@alias ENT_TYPE integer
+FADE = {
+  IN = 3,
+  LOAD = 2,
+  NONE = 0,
+  OUT = 1
+}
+---@alias FADE integer
 FEAT = {
   ARENA_CHAMPION = 22,
   AWAKENED = 12,
@@ -8720,6 +8739,10 @@ ON = {
   ARENA_SCORE = 27,
   ARENA_SELECT = 24,
   ARENA_STAGES = 22,
+  BLOCKED_GAME_LOOP = 159,
+  BLOCKED_LEVEL_GENERATION = 157,
+  BLOCKED_PROCESS_INPUT = 160,
+  BLOCKED_UPDATE = 158,
   CAMP = 11,
   CHARACTER_SELECT = 9,
   CONSTELLATION = 19,
@@ -9041,6 +9064,65 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+PAUSE_SCREEN = {
+  ARENA_INTRO = 33554432,
+  ARENA_ITEMS = 8388608,
+  ARENA_LEVEL = 67108864,
+  ARENA_MENU = 2097152,
+  ARENA_SCORE = 134217728,
+  ARENA_SELECT = 16777216,
+  ARENA_STAGES = 4194304,
+  CAMP = 2048,
+  CHARACTER_SELECT = 512,
+  CONSTELLATION = 524288,
+  CREDITS = 131072,
+  DEATH = 16384,
+  EXIT = -2147483648,
+  INTRO = 2,
+  LEADERBOARD = 128,
+  LEVEL = 4096,
+  LOADING = 1073741824,
+  LOGO = 1,
+  MENU = 16,
+  NONE = 0,
+  ONLINE_LOADING = 268435456,
+  ONLINE_LOBBY = 536870912,
+  OPTIONS = 32,
+  PLAYER_PROFILE = 64,
+  PROLOGUE = 4,
+  RECAP = 1048576,
+  SCORES = 262144,
+  SEED_INPUT = 256,
+  SPACESHIP = 32768,
+  TEAM_SELECT = 1024,
+  TITLE = 8,
+  TRANSITION = 8192,
+  WIN = 65536
+}
+---@alias PAUSE_SCREEN integer
+PAUSE_TRIGGER = {
+  EXIT = 8,
+  FADE_END = 2,
+  FADE_START = 1,
+  NONE = 0,
+  ONCE = 16,
+  SCREEN = 4
+}
+---@alias PAUSE_TRIGGER integer
+PAUSE_TYPE = {
+  ANKH = 32,
+  CUTSCENE = 4,
+  FADE = 2,
+  FLAG4 = 8,
+  FLAG5 = 16,
+  FORCE_STATE = 512,
+  MENU = 1,
+  NONE = 0,
+  PRE_GAME_LOOP = 128,
+  PRE_PROCESS_INPUT = 256,
+  PRE_UPDATE = 64
+}
+---@alias PAUSE_TYPE integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,
