@@ -1305,6 +1305,9 @@ void smart_delete(Entity* ent, bool unsafe = false)
 {
     static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
+    ent->flags = set_flag(ent->flags, 1);
+    for (auto item : ent->items.entities())
+        item->flags = set_flag(item->flags, 1);
     UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
@@ -1401,6 +1404,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
         int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+        get_entity_ptr(spawned)->apply_layer();
         if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
@@ -1414,7 +1418,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     {
         static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
         auto spawned = UI::spawn_playerghost(ana_spelunky + (rand() % 19), cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
-
+        get_entity_ptr(spawned)->apply_layer();
         if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
@@ -1448,6 +1452,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             }
         }
         int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+        get_entity_ptr(spawned)->apply_layer();
         if (to_spawn.name.find("ENT_TYPE_MOUNT") != std::string::npos)
         {
             auto mount = get_entity_ptr(spawned)->as<Mount>();
@@ -1463,18 +1468,10 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                     for (auto trig : floor->items.entities())
                         trig->flags |= (1U << 16);
                 }
-
-                if (floor->get_decoration_entity_type() != -1)
-                {
-                    floor->fix_decorations(true, false);
-                }
-                auto fpos = floor->position();
-                auto layer = (LAYER)floor->layer;
-                Callback cb = {g_state->time_total + 2, [fpos, layer]
-                               {
-                                   fix_decorations_at(fpos.first, fpos.second, layer);
-                               }};
-                callbacks.push_back(cb);
+                uint32_t i_x = static_cast<uint32_t>(floor->x + 0.5f);
+                uint32_t i_y = static_cast<uint32_t>(floor->y + 0.5f);
+                State::get().layer(floor->layer)->grid_entities[i_y][i_x] = floor;
+                fix_decorations_at(floor->x, floor->y, (LAYER)floor->layer);
             }
         }
         if (flip)
@@ -5099,7 +5096,7 @@ void render_clickhandler()
         {
             g_bucket->overlunky->hovered_uid = -1;
         }
-        if (options["draw_entity_tooltip"])
+        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered())
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);

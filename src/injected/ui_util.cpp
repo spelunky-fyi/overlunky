@@ -435,7 +435,10 @@ void UI::update_floor_at(float x, float y, LAYER l)
         {
             auto deco_ent = get_entity_ptr(floor->decos[i]);
             if (deco_ent)
+            {
+                deco_ent->color.a = 0;
                 deco_ent->destroy();
+            }
             floor->decos[i] = -1;
         }
     }
@@ -443,13 +446,19 @@ void UI::update_floor_at(float x, float y, LAYER l)
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
+        {
+            deco_ent->color.a = 0;
             deco_ent->destroy();
+        }
     }
     for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 0.5f))
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
+        {
+            deco_ent->color.a = 0;
             deco_ent->destroy();
+        }
     }
     if (test_flag(floor->type->properties_flags, 1) || test_flag(floor->type->properties_flags, 2))
     {

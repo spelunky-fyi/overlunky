@@ -121,6 +121,20 @@ void Entity::set_layer(LAYER layer_to)
     }
 }
 
+void Entity::apply_layer()
+{
+    auto ptr_to = State::get().ptr()->layers[layer];
+
+    using AddToLayer = void(Layer*, Entity*);
+    static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
+    add_to_layer(ptr_to, this);
+
+    for (auto item : items.entities())
+    {
+        item->apply_layer();
+    }
+}
+
 void Entity::remove()
 {
     if (layer != 2)

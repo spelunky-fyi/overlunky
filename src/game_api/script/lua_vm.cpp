@@ -1925,6 +1925,12 @@ end
         return fmt::format("{:X}", get_virtual_function_address(offset, index));
     };
 
+    /// Get memory address from a lua object
+    lua["get_address"] = [&lua](sol::object o)
+    {
+        return fmt::format("{:X}", *(size_t*)lua_touserdata(lua, 1));
+    };
+
     /// Log to spelunky.log
     lua["log_print"] = game_log;
 

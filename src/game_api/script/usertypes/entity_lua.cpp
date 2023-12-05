@@ -270,6 +270,7 @@ void register_usertypes(sol::state& lua)
     entity_type["liberate_from_shop"] = &Entity::liberate_from_shop;
     entity_type["get_held_entity"] = &Entity::get_held_entity;
     entity_type["set_layer"] = &Entity::set_layer;
+    entity_type["apply_layer"] = &Entity::apply_layer;
     entity_type["remove"] = &Entity::remove;
     entity_type["respawn"] = &Entity::respawn;
     entity_type["kill"] = &Entity::kill;
@@ -285,6 +286,7 @@ void register_usertypes(sol::state& lua)
     entity_type["is_cursed"] = &Entity::is_cursed;
     entity_type["kill_recursive"] = kill_recursive;
     entity_type["destroy_recursive"] = destroy_recursive;
+    entity_type["update"] = &Entity::handle_state_machine;
     /* Entity
     // user_data
     // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.
