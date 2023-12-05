@@ -111,7 +111,7 @@ float UI::screen_distance(float x)
 }
 Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
-    auto state = State::get();
+    auto& state = State::get();
 
     static const auto masks_order = {
         0x1,    // Player

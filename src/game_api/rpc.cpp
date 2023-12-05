@@ -236,13 +236,13 @@ int get_entity_ai_state(uint32_t uid)
 
 uint32_t get_level_flags()
 {
-    auto state = State::get();
+    auto& state = State::get();
     return state.flags();
 }
 
 void set_level_flags(uint32_t flags)
 {
-    auto state = State::get();
+    auto& state = State::get();
     state.set_flags(flags);
 }
 
@@ -391,12 +391,12 @@ void unlock_door_at(float x, float y)
 
 uint32_t get_frame_count_main()
 {
-    auto state = State::get();
+    auto& state = State::get();
     return state.get_frame_count_main();
 }
 uint32_t get_frame_count()
 {
-    auto state = State::get();
+    auto& state = State::get();
     return state.get_frame_count();
 }
 
@@ -447,19 +447,19 @@ void flip_entity(uint32_t uid)
 
 void set_camera_position(float cx, float cy)
 {
-    auto state = State::get();
+    auto& state = State::get();
     state.set_camera_position(cx, cy);
 }
 
 void warp(uint8_t world, uint8_t level, uint8_t theme)
 {
-    auto state = State::get();
+    auto& state = State::get();
     state.warp(world, level, theme);
 }
 
 void set_seed(uint32_t seed)
 {
-    auto state = State::get();
+    auto& state = State::get();
     state.set_seed(seed);
 }
 
@@ -562,7 +562,7 @@ void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscap
 
 std::vector<int64_t> read_prng()
 {
-    auto state = State::get();
+    auto& state = State::get();
     return state.read_prng();
 }
 
@@ -1209,7 +1209,7 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto state = State::get();
+        auto& state = State::get();
         std::pair<float, float> offset;
         const auto actual_layer = enum_to_layer(layer, offset);
         state.layer(entity->layer)->move_grid_entity(entity, offset.first + x, offset.first + y, state.layer(actual_layer));
@@ -1222,14 +1222,14 @@ void destroy_grid(int32_t uid)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto state = State::get();
+        auto& state = State::get();
         state.layer(entity->layer)->destroy_grid_entity(entity);
     }
 }
 
 void destroy_grid(float x, float y, LAYER layer)
 {
-    auto state = State::get();
+    auto& state = State::get();
     uint8_t actual_layer = enum_to_layer(layer);
 
     if (Entity* entity = state.layer(actual_layer)->get_grid_entity_at(x, y))

@@ -343,6 +343,7 @@ const std::vector<std::pair<CUSTOM_TYPE, std::string_view>> custom_type_names = 
     {CUSTOM_TYPE::YELLOWCAPE, "YELLOWCAPE"},
     {CUSTOM_TYPE::YETIKING, "YETIKING"},
     {CUSTOM_TYPE::YETIQUEEN, "YETIQUEEN"},
+    {CUSTOM_TYPE::PURCHASABLE, "PURCHASABLE"},
 };
 
 template <CUSTOM_TYPE CustomEntityType, class... StrArgs>
@@ -1564,6 +1565,64 @@ std::span<const ENT_TYPE> get_custom_entity_types(CUSTOM_TYPE type)
         return make_custom_entity_type_list<CUSTOM_TYPE::YETIKING>("ENT_TYPE_MONS_YETIKING");
     case CUSTOM_TYPE::YETIQUEEN:
         return make_custom_entity_type_list<CUSTOM_TYPE::YETIQUEEN>("ENT_TYPE_MONS_YETIQUEEN");
+    case CUSTOM_TYPE::PURCHASABLE:
+        return make_custom_entity_type_list<CUSTOM_TYPE::TORCH>(
+            "ENT_TYPE_ITEM_WOODEN_ARROW",
+            "ENT_TYPE_ITEM_ROCK",
+            "ENT_TYPE_ITEM_METAL_ARROW",
+            "ENT_TYPE_ITEM_LIGHT_ARROW",
+            "ENT_TYPE_ITEM_PRESENT",
+            "ENT_TYPE_ITEM_GHIST_PRESENT",
+            "ENT_TYPE_ITEM_POT",
+            "ENT_TYPE_ITEM_SKULL",
+            "ENT_TYPE_ITEM_PICKUP_TORNJOURNALPAGE",
+            "ENT_TYPE_ITEM_PICKUP_JOURNAL",
+            "ENT_TYPE_ITEM_PICKUP_ROPE",
+            "ENT_TYPE_ITEM_PICKUP_ROPEPILE",
+            "ENT_TYPE_ITEM_PICKUP_BOMBBAG",
+            "ENT_TYPE_ITEM_PICKUP_BOMBBOX",
+            "ENT_TYPE_ITEM_PICKUP_ROYALJELLY",
+            "ENT_TYPE_ITEM_PICKUP_COOKEDTURKEY",
+            "ENT_TYPE_ITEM_PICKUP_GIANTFOOD",
+            "ENT_TYPE_ITEM_PICKUP_ELIXIR",
+            "ENT_TYPE_ITEM_PICKUP_CLOVER",
+            "ENT_TYPE_ITEM_PICKUP_SEEDEDRUNSUNLOCKER",
+            "ENT_TYPE_ITEM_PICKUP_SPECTACLES",
+            "ENT_TYPE_ITEM_PICKUP_CLIMBINGGLOVES",
+            "ENT_TYPE_ITEM_PICKUP_PITCHERSMITT",
+            "ENT_TYPE_ITEM_PICKUP_SPRINGSHOES",
+            "ENT_TYPE_ITEM_PICKUP_SPIKESHOES",
+            "ENT_TYPE_ITEM_PICKUP_PASTE",
+            "ENT_TYPE_ITEM_PICKUP_COMPASS",
+            "ENT_TYPE_ITEM_PICKUP_SPECIALCOMPASS",
+            "ENT_TYPE_ITEM_PICKUP_PARACHUTE",
+            "ENT_TYPE_ITEM_PICKUP_UDJATEYE",
+            "ENT_TYPE_ITEM_PICKUP_KAPALA",
+            "ENT_TYPE_ITEM_PICKUP_HEDJET",
+            "ENT_TYPE_ITEM_PICKUP_CROWN",
+            "ENT_TYPE_ITEM_PICKUP_EGGPLANTCROWN",
+            "ENT_TYPE_ITEM_PICKUP_TRUECROWN",
+            "ENT_TYPE_ITEM_PICKUP_ANKH",
+            "ENT_TYPE_ITEM_PICKUP_TABLETOFDESTINY",
+            "ENT_TYPE_ITEM_PICKUP_SKELETON_KEY",
+            "ENT_TYPE_ITEM_PURCHASABLE_CAPE",
+            "ENT_TYPE_ITEM_PURCHASABLE_JETPACK",
+            "ENT_TYPE_ITEM_PURCHASABLE_TELEPORTER_BACKPACK",
+            "ENT_TYPE_ITEM_PURCHASABLE_HOVERPACK",
+            "ENT_TYPE_ITEM_PURCHASABLE_POWERPACK",
+            "ENT_TYPE_ITEM_WEBGUN",
+            "ENT_TYPE_ITEM_SHOTGUN",
+            "ENT_TYPE_ITEM_FREEZERAY",
+            "ENT_TYPE_ITEM_CAMERA",
+            "ENT_TYPE_ITEM_TELEPORTER",
+            "ENT_TYPE_ITEM_MATTOCK",
+            "ENT_TYPE_ITEM_BOOMERANG",
+            "ENT_TYPE_ITEM_MACHETE",
+            "ENT_TYPE_ITEM_PLASMACANNON",
+            "ENT_TYPE_ITEM_SCEPTER",
+            "ENT_TYPE_ITEM_CLONEGUN",
+            "ENT_TYPE_ITEM_WOODEN_SHIELD",
+            "ENT_TYPE_ITEM_METAL_SHIELD");
     default:
     {
         auto it = user_custom_types.find(type);

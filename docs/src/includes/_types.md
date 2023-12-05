@@ -2892,7 +2892,7 @@ Type | Name | Description
 [INPUTS](#INPUTS) | [buttons](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons) | 
 [InputMapping](#InputMapping) | [input_mapping_keyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_keyboard) | 
 [InputMapping](#InputMapping) | [input_mapping_controller](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input_mapping_controller) | 
-int | [player_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_id) | 
+int | [player_slot](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_slot) | 
 bool | [is_participating](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_participating) | 
 
 ### PlayerSlotSettings
@@ -2954,7 +2954,7 @@ int | [level_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lev
 [THEME](#THEME) | [theme_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_next) | Next [THEME](#THEME) number, used when loading a new level or transition
 [THEME](#THEME) | [theme_start](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme_start) | [THEME](#THEME) to start new runs in
 [ThemeInfo](#ThemeInfo) | [current_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_theme) | Points to the current [ThemeInfo](#ThemeInfo)
-nil | [force_current_theme(int t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) | This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
+nil | [force_current_theme(THEME t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=force_current_theme) | This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
 int | [shoppie_aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro) | Current shoppie aggro
 int | [shoppie_aggro_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shoppie_aggro_next) | Shoppie aggro to use in the next level
 int | [outposts_spawned](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=outposts_spawned) | 
@@ -5344,6 +5344,7 @@ int | [linked_companion_child](https://github.com/spelunky-fyi/overlunky/search?
 [Ai](#Ai) | [ai](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai) | 
 [PlayerSlot](#PlayerSlot) | [input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=input) | 
 [Entity](#Entity) | [basecamp_button_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=basecamp_button_entity) | Used in base camp to talk with the [NPC](#NPC)'s
+[SoundMeta](#SoundMeta) | [special_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_sound) | For Lise System walking and looking up sounds
 int | [jump_lock_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_lock_timer) | Increases when holding jump button in the air, set to max while jumping. If this isn't 0, a jump will only be<br/>registered if the jump button was not held on the previous frame.
 int | [coyote_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coyote_timer) | can jump while airborne if greater than 0
 int | [swim_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swim_timer) | Timer between strokes when holding jump button in water.

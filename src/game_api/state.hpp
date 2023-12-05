@@ -311,7 +311,7 @@ struct StateMemory
     uint32_t unknown44; // probably padding
 
     /// This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
-    void force_current_theme(uint32_t t);
+    void force_current_theme(THEME t);
 
     /// Returns animation_frame of the correct ushabti
     uint16_t get_correct_ushabti();
@@ -323,8 +323,6 @@ StateMemory* get_state_ptr();
 
 struct State
 {
-    size_t location;
-
     static void set_do_hooks(bool do_hooks);
 
     static void set_write_load_opt(bool allow);
@@ -339,6 +337,10 @@ struct State
     // Returns the local-thread version of StateMemory*
     StateMemory* ptr() const;
     StateMemory* ptr_local() const;
+
+    // TODO: rest of the functions should probably be just static or moved out of here as they don't need State
+    // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
+    // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
 
     // use only if you only want the layer, otherwise use `ptr()->layers`
     Layer* layer(uint8_t index) const
@@ -376,8 +378,7 @@ struct State
 
     std::vector<int64_t> read_prng() const;
 
-    Entity* find(uint32_t uid);
-    Entity* find_local(uint32_t uid);
+    static Entity* find(StateMemory* state, uint32_t uid);
 
     static std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);
@@ -385,6 +386,14 @@ struct State
     void set_seed(uint32_t seed);
     SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
+
+  private:
+    State(size_t addr)
+        : location(addr){};
+
+    size_t location;
+    State(const State&) = delete;
+    State& operator=(const State&) = delete;
 };
 void init_state_update_hook();
 void init_process_input_hook();

@@ -276,15 +276,16 @@ void State::post_init()
 
 State& State::get()
 {
-    static State STATE;
+    static State STATE{0x4A0};
     if (!get_is_init())
     {
         if (get_write_load_opt())
         {
             do_write_load_opt();
         }
-        auto addr_location = get_address("state_location");
-        STATE = State{addr_location};
+        if (auto addr_location = get_address("state_location"); addr_location != 0)
+            STATE.location = addr_location;
+
         get_is_init() = true;
 
         if (get_do_hooks())
@@ -421,7 +422,7 @@ void State::zoom_reset()
     game_api->set_zoom(std::nullopt, 13.5f);
 }
 
-void StateMemory::force_current_theme(uint32_t t)
+void StateMemory::force_current_theme(THEME t)
 {
     if (t > 0 && t < 19)
     {
@@ -547,7 +548,7 @@ uint32_t lowbias32_r(uint32_t x)
     x ^= x >> 16;
     return x;
 }
-Entity* find(StateMemory* state, uint32_t uid)
+Entity* State::find(StateMemory* state, uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
 
@@ -580,14 +581,6 @@ Entity* find(StateMemory* state, uint32_t uid)
 
         cur_index = (cur_index + (uint32_t)1) & mask;
     }
-}
-Entity* State::find(uint32_t uid)
-{
-    return ::find(ptr(), uid);
-}
-Entity* State::find_local(uint32_t uid)
-{
-    return ::find(ptr_local(), uid);
 }
 
 LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
@@ -717,7 +710,8 @@ OnGameLoop* g_game_loop_trampoline{nullptr};
 void GameLoop(void* a, float b, void* c)
 {
     static const auto pa = Bucket::get()->pause_api;
-    auto state = State::get();
+    auto& state = State::get();
+
     if (global_frame_count < state.get_frame_count_main())
         global_frame_count = state.get_frame_count_main();
     else

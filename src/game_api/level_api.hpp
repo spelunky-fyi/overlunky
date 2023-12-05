@@ -142,7 +142,7 @@ struct LevelGenData
             uint32_t machine_rewardroom_chance;
             uint32_t max_liquid_particles;
             uint32_t flagged_liquid_rooms;
-            uint32_t unknown_config;
+            uint32_t unknown_config; //
         };
     };
 
@@ -151,7 +151,8 @@ struct LevelGenData
     game_unordered_map<game_string, RoomTemplateDef> room_templates;
 
     game_unordered_map<std::uint16_t, RoomTemplateData> room_template_datas;
-    std::byte padding1[0x6b8];
+    std::array<uint32_t, 429> unknown; // index is tile code id from TileCodeDef
+    // uint32_t padding;
     std::array<RoomTemplateData, 8 * 15> set_room_datas;
 
     game_unordered_map<game_string, ChanceDef> monster_chances;

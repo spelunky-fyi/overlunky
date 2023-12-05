@@ -7,6 +7,7 @@
 
 #include "aliases.hpp" // for ENT_TYPE
 
+// New types need to be added to the enum, plus the custom_type_names vector and then finally in the get_custom_entity_types function
 enum class CUSTOM_TYPE : uint32_t
 {
     ACIDBUBBLE = 1000, // to be sure that's it's bigger than ENT_TYPE_LIQUID_COARSE_LAVA
@@ -343,6 +344,7 @@ enum class CUSTOM_TYPE : uint32_t
     YELLOWCAPE,
     YETIKING,
     YETIQUEEN,
+    PURCHASABLE,
 };
 
 constexpr CUSTOM_TYPE custom_type_max = CUSTOM_TYPE::YETIQUEEN;
