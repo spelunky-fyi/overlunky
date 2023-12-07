@@ -1895,10 +1895,11 @@ void init_adventure()
     iaf();
 }
 
-void init_seeded(uint32_t seed)
+void init_seeded(std::optional<uint32_t> seed)
 {
     static const size_t offset = get_address("init_seeded");
     typedef void init_func(void*, uint32_t);
     static init_func* isf = (init_func*)(offset);
-    isf(State::get().ptr(), seed);
+    auto* state = State::get().ptr();
+    isf(state, seed.value_or(state->seed));
 }

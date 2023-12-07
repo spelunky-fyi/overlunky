@@ -29,6 +29,7 @@ void register_usertypes(sol::state& lua)
 {
     /// Used in ArenaState
     auto arenaconfigarenas_type = lua.new_usertype<ArenaConfigArenas>("ArenaConfigArenas");
+    arenaconfigarenas_type["list"] = &ArenaConfigArenas::list;
     arenaconfigarenas_type["dwelling_1"] = &ArenaConfigArenas::dwelling_1;
     arenaconfigarenas_type["dwelling_2"] = &ArenaConfigArenas::dwelling_2;
     arenaconfigarenas_type["dwelling_3"] = &ArenaConfigArenas::dwelling_3;
