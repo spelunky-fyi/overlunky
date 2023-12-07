@@ -9495,22 +9495,18 @@ void imgui_draw()
                     ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {500.0f, base->Size.y - 50.0f});
                     if (tab == "tool_entity")
                         ImGui::SetNextWindowSizeConstraints({400.0f, 100.0f}, {400.0f, base->Size.y - 50.0f});
-                    bool ismenu = false;
                     if (windows[tab]->popup)
                     {
                         ImGui::OpenPopup(windows[tab]->name.c_str());
                         windows[tab]->popup = false;
                     }
-                    if ((ImGui::BeginMenu(windows[tab]->name.c_str(), true) && (ismenu = true) == true) || ImGui::BeginPopup(windows[tab]->name.c_str()))
+                    if (ImGui::BeginMenu(windows[tab]->name.c_str(), true))
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
-                        if (ismenu)
-                            ImGui::EndMenu();
-                        else
-                            ImGui::EndPopup();
+                        ImGui::EndMenu();
                     }
                     if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
                         detach(tab);
