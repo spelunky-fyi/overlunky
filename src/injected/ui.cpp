@@ -604,9 +604,9 @@ void set_colors()
     colors[ImGuiCol_Button] = ImVec4(col_main.x, col_main.y, col_main.z, 0.44f);
     colors[ImGuiCol_ButtonHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
     colors[ImGuiCol_ButtonActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.76f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
-    colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.50f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.30f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.40f);
     colors[ImGuiCol_Separator] = ImVec4(col_main.x, col_main.y, col_main.z, 0.50f);
     colors[ImGuiCol_SeparatorHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
     colors[ImGuiCol_SeparatorActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
@@ -1426,6 +1426,8 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
     {
         bool snap = options["snap_to_grid"];
+        if (to_spawn.name.find("ENT_TYPE_ACTIVEFLOOR") != std::string::npos)
+            snap = true;
         if (std::find(std::begin(also_snap), std::end(also_snap), to_spawn.id) != std::end(also_snap))
         {
             snap = true;
@@ -3583,7 +3585,7 @@ bool render_uid(int uid, const char* section, bool rembtn = false)
     {
         ImGui::SameLine();
         ImGui::PushID(uid);
-        if (ImGui::Button("X"))
+        if (ImGui::Button("Remove"))
             g_entity->remove_item(uid);
         ImGui::PopID();
     }
@@ -7604,11 +7606,92 @@ void render_entity_props(int uid, bool detached = false)
         }
         endmenu();
     }
-    if (submenu("Items"))
+    if (submenu("Items & Powerups"))
     {
-        for (uint32_t item_uid : entity->items.uids())
+        static bool fx = false;
+        ImGui::Checkbox("Show annoying FX items", &fx);
+        ImGui::SeparatorText("Items");
+        if (entity->type->search_flags & 0x7)
         {
-            render_uid(item_uid, "EntityItems", true);
+            auto entity_pow = entity->as<PowerupCapable>();
+            for (auto ent : entity->items.entities())
+            {
+                if ((fx || (ent->type->search_flags & 0x40) == 0) && !entity_pow->has_powerup(ent->type->id))
+                    render_uid(ent->uid, "EntityItems", true);
+            }
+            ImGui::SeparatorText("Powerups");
+            for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
+            {
+                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
+            }
+            ImGui::PushItemWidth(160);
+            static const char* chosenPowerup = "";
+            static uint8_t chosenPowerupIndex = 0;
+            static const char* powerupOptions[] = {
+                "Alien compass",
+                "Ankh",
+                "Climbing gloves",
+                "Compass",
+                "Crown",
+                "Eggplant crown",
+                "Hedjet",
+                "Kapala",
+                "Parachute",
+                "Paste",
+                "Pitcher's mitt",
+                "Skeleton key",
+                "Spectacles",
+                "Spike shoes",
+                "Spring shoes",
+                "Tablet of Destiny",
+                "True crown",
+                "Udjat eye"};
+            static const uint32_t powerupTypeIDOptions[] = {
+                to_id("ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS"),
+                to_id("ENT_TYPE_ITEM_POWERUP_ANKH"),
+                to_id("ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_COMPASS"),
+                to_id("ENT_TYPE_ITEM_POWERUP_CROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_EGGPLANTCROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_HEDJET"),
+                to_id("ENT_TYPE_ITEM_POWERUP_KAPALA"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PARACHUTE"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PASTE"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PITCHERSMITT"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPECTACLES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPIKE_SHOES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPRING_SHOES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_TABLETOFDESTINY"),
+                to_id("ENT_TYPE_ITEM_POWERUP_TRUECROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_UDJATEYE")};
+            if (ImGui::BeginCombo("##AddPowerupCombo", chosenPowerup))
+            {
+                for (uint8_t i = 0; i < IM_ARRAYSIZE(powerupOptions); ++i)
+                {
+                    bool isSelected = (chosenPowerup == powerupOptions[i]);
+                    if (ImGui::Selectable(powerupOptions[i], isSelected))
+                    {
+                        chosenPowerup = powerupOptions[i];
+                        chosenPowerupIndex = i;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Add Powerup##AddPowerupButton"))
+            {
+                entity_pow->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
+            }
+            ImGui::PopItemWidth();
+        }
+        else
+        {
+            for (auto ent : entity->items.entities())
+            {
+                if ((fx || (ent->type->search_flags & 0x40) == 0))
+                    render_uid(ent->uid, "EntityItems", true);
+            }
         }
         endmenu();
     }
@@ -7623,7 +7706,9 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragFloat("Max speed##GlobalMaxSpeed", &entity->type->max_speed, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Jump power##GlobalJumpPower", &entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputScalar("Mask:##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%08X", ImGuiInputTextFlags_ReadOnly);
+        ImGui::SameLine();
+        ImGui::TextUnformatted(mask_names[std::countr_zero(entity->type->search_flags)]);
         if (submenu("Properties flags"))
         {
             render_flags(entity_type_properties_flags, &entity->type->properties_flags);
@@ -7705,71 +7790,6 @@ void render_entity_props(int uid, bool detached = false)
         }
         else if (entity->type->search_flags & 0x7) // PLYAER, MOUNT, MONSTER
         {
-            auto entity_pow = entity->as<PowerupCapable>();
-            for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
-            {
-                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
-            }
-            ImGui::PushItemWidth(160);
-            static const char* chosenPowerup = "";
-            static uint8_t chosenPowerupIndex = 0;
-            static const char* powerupOptions[] = {
-                "Alien compass",
-                "Ankh",
-                "Climbing gloves",
-                "Compass",
-                "Crown",
-                "Eggplant crown",
-                "Hedjet",
-                "Kapala",
-                "Parachute",
-                "Paste",
-                "Pitcher's mitt",
-                "Skeleton key",
-                "Spectacles",
-                "Spike shoes",
-                "Spring shoes",
-                "Tablet of Destiny",
-                "True crown",
-                "Udjat eye"};
-            static const uint32_t powerupTypeIDOptions[] = {
-                to_id("ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS"),
-                to_id("ENT_TYPE_ITEM_POWERUP_ANKH"),
-                to_id("ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_COMPASS"),
-                to_id("ENT_TYPE_ITEM_POWERUP_CROWN"),
-                to_id("ENT_TYPE_ITEM_POWERUP_EGGPLANTCROWN"),
-                to_id("ENT_TYPE_ITEM_POWERUP_HEDJET"),
-                to_id("ENT_TYPE_ITEM_POWERUP_KAPALA"),
-                to_id("ENT_TYPE_ITEM_POWERUP_PARACHUTE"),
-                to_id("ENT_TYPE_ITEM_POWERUP_PASTE"),
-                to_id("ENT_TYPE_ITEM_POWERUP_PITCHERSMITT"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SPECTACLES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SPIKE_SHOES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SPRING_SHOES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_TABLETOFDESTINY"),
-                to_id("ENT_TYPE_ITEM_POWERUP_TRUECROWN"),
-                to_id("ENT_TYPE_ITEM_POWERUP_UDJATEYE")};
-            if (ImGui::BeginCombo("##AddPowerupCombo", chosenPowerup))
-            {
-                for (uint8_t i = 0; i < IM_ARRAYSIZE(powerupOptions); ++i)
-                {
-                    bool isSelected = (chosenPowerup == powerupOptions[i]);
-                    if (ImGui::Selectable(powerupOptions[i], isSelected))
-                    {
-                        chosenPowerup = powerupOptions[i];
-                        chosenPowerupIndex = i;
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Add Powerup##AddPowerupButton"))
-            {
-                entity_pow->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
-            }
-            ImGui::PopItemWidth();
             auto entity_player = entity->as<Player>();
             if ((entity->type->search_flags & 0x1) && entity_player->ai != 0)
             {
@@ -8320,6 +8340,23 @@ void render_game_props()
             static std::uniform_int_distribution<uint32_t> dist(1, UINT32_MAX);
             quick_start(12, 1, 1, 1, dist(rd));
         }
+
+        static bool first_run{true};
+        if (g_bucket->adventure_seed.first == 0 && first_run)
+            UI::get_adventure_seed(true);
+        first_run = false;
+        std::string adventure_seed_first = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.first);
+        std::string adventure_seed_second = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.second);
+
+        if (ImGui::MenuItem("Copy current seed to clipboard"))
+        {
+            std::string clip_str;
+            if (g_state->quest_flags & 0x40)
+                clip_str = fmt::format("{:08X}", g_state->seed);
+            else
+                clip_str = adventure_seed_first + " " + adventure_seed_second;
+            set_clipboard(clip_str);
+        }
         auto seed_str = fmt::format("{:08X}", g_state->seed);
         ImGui::InputText("Seeded seed", &seed_str, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
@@ -8332,13 +8369,6 @@ void render_game_props()
                 quick_start(12, 1, 1, 1, new_seed);
         }
         ImGui::Separator();
-        static bool first_run{true};
-        if (g_bucket->adventure_seed.first == 0 && first_run)
-            UI::get_adventure_seed(true);
-        first_run = false;
-
-        std::string adventure_seed_first = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.first);
-        std::string adventure_seed_second = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.second);
         ImGui::InputText("Adventure seed##AdventureSeedFirst", &adventure_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
