@@ -915,6 +915,7 @@ void save_config(std::string file)
     writeData << "pause_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_screen << " # 64bit flags" << std::endl;
     writeData << "unpause_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->unpause_trigger << " # 64bit flags" << std::endl;
     writeData << "unpause_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->unpause_screen << " # 64bit flags" << std::endl;
+    writeData << "block_modifiers = 0x" << std::hex << g_bucket->overlunky->block_modifiers << " # 32bit flags" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < kits.size(); i++)
@@ -1132,6 +1133,7 @@ void load_config(std::string file)
         g_bucket->pause_api->pause_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_screen", 0);
         g_bucket->pause_api->unpause_trigger = (PAUSE_TRIGGER)toml::find_or<int64_t>(opts, "unpause_trigger", 0);
         g_bucket->pause_api->unpause_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "unpause_screen", 0);
+        g_bucket->overlunky->block_modifiers = toml::find_or<uint32_t>(opts, "block_modifiers", 0);
     }
     save_config(file);
 }
@@ -2790,6 +2792,14 @@ void toggle_lights()
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     ImGuiContext& g = *GImGui;
+
+    g_bucket->overlunky->held_modifiers = 0;
+    if (ImGui::GetIO().KeyCtrl)
+        g_bucket->overlunky->held_modifiers |= OL_KEY_CTRL;
+    if (ImGui::GetIO().KeyShift)
+        g_bucket->overlunky->held_modifiers |= OL_KEY_SHIFT;
+    if (ImGui::GetIO().KeyAlt)
+        g_bucket->overlunky->held_modifiers |= OL_KEY_ALT;
 
     if (nCode == WM_KEYUP)
     {
@@ -5693,6 +5703,15 @@ void render_keyconfig()
         keys = default_keys;
         save_config(cfgfile);
     }
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Block game input when holding");
+    ImGui::SameLine();
+    ImGui::CheckboxFlags("Ctrl##IgnoreCtrl", &g_bucket->overlunky->block_modifiers, OL_KEY_CTRL);
+    ImGui::SameLine();
+    ImGui::CheckboxFlags("Alt##IgnoreAlt", &g_bucket->overlunky->block_modifiers, OL_KEY_ALT);
+    ImGui::SameLine();
+    ImGui::CheckboxFlags("Shift##IgnoreShift", &g_bucket->overlunky->block_modifiers, OL_KEY_SHIFT);
+
     if (g_bucket->overlunky->ignore_keys.size())
     {
         std::string s;

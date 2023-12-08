@@ -1,7 +1,9 @@
 #include "bucket.hpp"
 
 #include "containers/game_allocator.hpp"
+#include "entities_chars.hpp"
 #include "game_manager.hpp"
+#include "items.hpp"
 #include "memory.hpp"
 #include "screen.hpp"
 #include "state.hpp"
@@ -183,7 +185,44 @@ void PauseAPI::post_loop()
     skip = false;
 }
 
-void PauseAPI::input()
+bool PauseAPI::pre_input()
+{
+    static const auto bucket = Bucket::get();
+
+    if (!bucket->overlunky)
+        return false;
+
+    auto gm = get_game_manager();
+    auto kb = get_raw_input()->keyboard;
+    auto state = State::get().ptr();
+
+    if (bucket->overlunky && (bucket->overlunky->block_modifiers & bucket->overlunky->held_modifiers))
+    {
+        gm->game_props->buttons_menu = 0;
+        gm->game_props->buttons_menu_previous = 0;
+        for (size_t i = 0; i < state->items->player_count; ++i)
+        {
+            if (gm->game_props->input_index[i] > 4)
+                continue;
+            state->player_inputs->player_slots[i].buttons = 0;
+            state->player_inputs->player_slots[i].buttons_gameplay = 0;
+            gm->game_props->buttons[i] = 0;
+            gm->game_props->buttons_previous[i] = 0;
+            if (state->items->players[i])
+            {
+                state->items->players[i]->buttons = 0;
+                state->items->players[i]->buttons_previous = 0;
+                state->items->players[i]->movex = 0;
+                state->items->players[i]->movey = 0;
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
+void PauseAPI::post_input()
 {
     static const auto bucket = Bucket::get();
 

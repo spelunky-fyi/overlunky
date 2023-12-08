@@ -19,6 +19,8 @@ void register_usertypes(sol::state& lua)
     ol_type["hovered_uid"] = &Overlunky::hovered_uid;
     ol_type["set_selected_uid"] = &Overlunky::set_selected_uid;
     ol_type["set_selected_uids"] = &Overlunky::set_selected_uids;
+    ol_type["held_modifiers"] = &Overlunky::held_modifiers;
+    ol_type["block_modifiers"] = &Overlunky::block_modifiers;
 
     /// Control the pause API
     auto pauseapi_type = lua.new_usertype<PauseAPI>("PauseAPI", sol::no_constructor);

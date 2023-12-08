@@ -2243,7 +2243,7 @@ end
         return 0;
     };
 
-    /// Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.player_count` appropriately too.
+    /// Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
     lua["play_adventure"] = init_adventure;
 
     /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.

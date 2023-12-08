@@ -49,6 +49,10 @@ struct Overlunky
     std::vector<uint32_t> selected_uids;
     /// Set currently selected uids in the entity finder.
     std::optional<std::vector<uint32_t>> set_selected_uids;
+    /// Bitmask of modifier KEYs that are currently held
+    uint32_t held_modifiers;
+    /// Bitmask of modifier KEYs that will block all game input
+    uint32_t block_modifiers;
 };
 
 struct PauseAPI
@@ -109,7 +113,8 @@ struct PauseAPI
     bool check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen);
     void pre_loop();
     void post_loop();
-    void input();
+    bool pre_input();
+    void post_input();
 };
 
 class Bucket

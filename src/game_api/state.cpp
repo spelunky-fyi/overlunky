@@ -676,6 +676,8 @@ OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
     static const auto pa = Bucket::get()->pause_api;
+    if (pa->pre_input())
+        return;
     auto block = pre_event(ON::PRE_PROCESS_INPUT);
     if (pa->event(PAUSE_TYPE::PRE_PROCESS_INPUT))
         block = true;
@@ -688,7 +690,7 @@ void ProcessInput(void* s)
     {
         post_event(ON::BLOCKED_PROCESS_INPUT);
     }
-    pa->input();
+    pa->post_input();
 }
 
 void init_process_input_hook()
