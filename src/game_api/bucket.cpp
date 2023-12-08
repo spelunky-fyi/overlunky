@@ -193,7 +193,6 @@ bool PauseAPI::pre_input()
         return false;
 
     auto gm = get_game_manager();
-    auto kb = get_raw_input()->keyboard;
     auto state = State::get().ptr();
 
     if (bucket->overlunky && (bucket->overlunky->block_modifiers & bucket->overlunky->held_modifiers))
