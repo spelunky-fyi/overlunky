@@ -810,8 +810,6 @@ vector&lt;int&gt; | [selected_uids](https://github.com/spelunky-fyi/overlunky/se
 int | [hovered_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hovered_uid) | Currently hovered entity uid or -1 if nothing is hovered.
 optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
 optional&lt;vector&lt;int&gt;&gt; | [set_selected_uids](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uids) | Set currently selected uids in the entity finder.
-int | [held_modifiers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_modifiers) | Bitmask of modifier KEYs that are currently held
-int | [block_modifiers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=block_modifiers) | Bitmask of modifier KEYs that will block all game input
 
 ### PRNG
 
@@ -861,6 +859,9 @@ bool | [set_paused(bool enable = true)](https://github.com/spelunky-fyi/overlunk
 bool | [paused()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=paused) | Is the game currently paused and that pause state matches any of the current the pause_type
 bool | [toggle()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle) | Toggles pause state
 bool | [loading()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) | Is the game currently loading and [PAUSE_SCREEN](#PAUSE_SCREEN).LOADING would be triggered, based on state.loading and some arbitrary checks.
+int | [modifiers_down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifiers_down) | Bitmask of modifier KEYs that are currently held
+int | [modifiers_block](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifiers_block) | Bitmask of modifier KEYs that will block all game input
+bool | [modifiers_clear_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifiers_clear_input) | Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
 
 ### Quad
 

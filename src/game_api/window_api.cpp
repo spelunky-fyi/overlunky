@@ -10,6 +10,7 @@
 #include <atomic>
 #include <chrono>
 
+#include "bucket.hpp"
 #include "logger.h"
 #include "memory.hpp"
 
@@ -109,6 +110,16 @@ bool HID_UnregisterDevice(USHORT usage)
 
 LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static const auto bucket = Bucket::get();
+
+    bucket->pause_api->modifiers_down = 0;
+    if (ImGui::GetIO().KeyCtrl)
+        bucket->pause_api->modifiers_down |= 0x100;
+    if (ImGui::GetIO().KeyShift)
+        bucket->pause_api->modifiers_down |= 0x200;
+    if (ImGui::GetIO().KeyAlt)
+        bucket->pause_api->modifiers_down |= 0x800;
+
     bool consumed_input = g_OnInputCallback ? g_OnInputCallback(message, wParam, lParam) : false;
     if (!consumed_input)
     {

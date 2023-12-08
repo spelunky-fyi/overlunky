@@ -6387,8 +6387,6 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field hovered_uid integer @Currently hovered entity uid or -1 if nothing is hovered.
     ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
     ---@field set_selected_uids integer[] @size: ? @Set currently selected uids in the entity finder.
-    ---@field held_modifiers integer @Bitmask of modifier KEYs that are currently held
-    ---@field block_modifiers integer @Bitmask of modifier KEYs that will block all game input
 
 ---@class PauseAPI
     ---@field pause PAUSE_TYPE @Current pause state bitmask. Use custom PAUSE_TYPE.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching ON update callbacks, so can be set on the same callback you want to block at the latest. Vanilla PAUSE flags will be forwarded to state.pause, but use of vanilla PAUSE flags is discouraged and might not work with other PauseAPI features.
@@ -6413,6 +6411,9 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field paused fun(self): boolean @Is the game currently paused and that pause state matches any of the current the pause_type
     ---@field toggle fun(self): boolean @Toggles pause state
     ---@field loading fun(self): boolean @Is the game currently loading and PAUSE_SCREEN.LOADING would be triggered, based on state.loading and some arbitrary checks.
+    ---@field modifiers_down integer @Bitmask of modifier KEYs that are currently held
+    ---@field modifiers_block integer @Bitmask of modifier KEYs that will block all game input
+    ---@field modifiers_clear_input boolean @Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
 
 ---@class Bucket
     ---@field data table<string, any> @You can store arbitrary simple values here in Playlunky to be read in on Overlunky script for example.

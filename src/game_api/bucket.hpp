@@ -49,10 +49,6 @@ struct Overlunky
     std::vector<uint32_t> selected_uids;
     /// Set currently selected uids in the entity finder.
     std::optional<std::vector<uint32_t>> set_selected_uids;
-    /// Bitmask of modifier KEYs that are currently held
-    uint32_t held_modifiers;
-    /// Bitmask of modifier KEYs that will block all game input
-    uint32_t block_modifiers;
 };
 
 struct PauseAPI
@@ -92,6 +88,13 @@ struct PauseAPI
     bool blocked;
     /// Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
     bool skip_fade;
+
+    /// Bitmask of modifier KEYs that are currently held
+    uint32_t modifiers_down;
+    /// Bitmask of modifier KEYs that will block all game input
+    uint32_t modifiers_block;
+    /// Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
+    bool modifiers_clear_input;
 
     /// Get the current pause flags
     PAUSE_TYPE get_pause();

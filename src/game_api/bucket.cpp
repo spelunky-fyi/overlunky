@@ -195,24 +195,27 @@ bool PauseAPI::pre_input()
     auto gm = get_game_manager();
     auto state = State::get().ptr();
 
-    if (bucket->overlunky && (bucket->overlunky->block_modifiers & bucket->overlunky->held_modifiers))
+    if (bucket->pause_api->modifiers_block & bucket->pause_api->modifiers_down)
     {
-        gm->game_props->buttons_menu = 0;
-        gm->game_props->buttons_menu_previous = 0;
-        for (size_t i = 0; i < state->items->player_count; ++i)
+        if (bucket->pause_api->modifiers_clear_input)
         {
-            if (gm->game_props->input_index[i] > 4)
-                continue;
-            state->player_inputs->player_slots[i].buttons = 0;
-            state->player_inputs->player_slots[i].buttons_gameplay = 0;
-            gm->game_props->buttons[i] = 0;
-            gm->game_props->buttons_previous[i] = 0;
-            if (state->items->players[i])
+            gm->game_props->buttons_menu = 0;
+            gm->game_props->buttons_menu_previous = 0;
+            for (size_t i = 0; i < state->items->player_count; ++i)
             {
-                state->items->players[i]->buttons = 0;
-                state->items->players[i]->buttons_previous = 0;
-                state->items->players[i]->movex = 0;
-                state->items->players[i]->movey = 0;
+                if (gm->game_props->input_index[i] > 4)
+                    continue;
+                state->player_inputs->player_slots[i].buttons = 0;
+                state->player_inputs->player_slots[i].buttons_gameplay = 0;
+                gm->game_props->buttons[i] = 0;
+                gm->game_props->buttons_previous[i] = 0;
+                if (state->items->players[i])
+                {
+                    state->items->players[i]->buttons = 0;
+                    state->items->players[i]->buttons_previous = 0;
+                    state->items->players[i]->movex = 0;
+                    state->items->players[i]->movey = 0;
+                }
             }
         }
         return true;
