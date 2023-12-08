@@ -1371,6 +1371,13 @@ function get_performance_counter() end
 ---Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
 ---@return integer
 function get_performance_frequency() end
+---Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
+---@return nil
+function play_adventure() end
+---Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
+---@param seed integer?
+---@return nil
+function play_seeded(seed) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1865,6 +1872,7 @@ do
     ---@field load fun(self): string
 
 ---@class ArenaConfigArenas
+    ---@field list boolean[] @size: 40
     ---@field dwelling_1 boolean
     ---@field dwelling_2 boolean
     ---@field dwelling_3 boolean
@@ -6379,6 +6387,8 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field hovered_uid integer @Currently hovered entity uid or -1 if nothing is hovered.
     ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
     ---@field set_selected_uids integer[] @size: ? @Set currently selected uids in the entity finder.
+    ---@field held_modifiers integer @Bitmask of modifier KEYs that are currently held
+    ---@field block_modifiers integer @Bitmask of modifier KEYs that will block all game input
 
 ---@class PauseAPI
     ---@field pause PAUSE_TYPE @Current pause state bitmask. Use custom PAUSE_TYPE.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching ON update callbacks, so can be set on the same callback you want to block at the latest. Vanilla PAUSE flags will be forwarded to state.pause, but use of vanilla PAUSE flags is discouraged and might not work with other PauseAPI features.

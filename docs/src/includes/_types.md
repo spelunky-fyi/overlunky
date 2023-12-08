@@ -11,6 +11,7 @@ Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
+array&lt;bool, 40&gt; | [list](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list) | 
 bool | [dwelling_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) | 
 bool | [dwelling_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_2) | 
 bool | [dwelling_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_3) | 
@@ -809,6 +810,8 @@ vector&lt;int&gt; | [selected_uids](https://github.com/spelunky-fyi/overlunky/se
 int | [hovered_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hovered_uid) | Currently hovered entity uid or -1 if nothing is hovered.
 optional&lt;int&gt; | [set_selected_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uid) | Set currently selected uid in the entity picker or -1 to clear selection.
 optional&lt;vector&lt;int&gt;&gt; | [set_selected_uids](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_selected_uids) | Set currently selected uids in the entity finder.
+int | [held_modifiers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=held_modifiers) | Bitmask of modifier KEYs that are currently held
+int | [block_modifiers](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=block_modifiers) | Bitmask of modifier KEYs that will block all game input
 
 ### PRNG
 

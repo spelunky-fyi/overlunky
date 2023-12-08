@@ -1708,6 +1708,24 @@ Reverse of some random hash function
 
 Access the [PauseAPI](#PauseAPI), or directly call `pause(true)` to enable current `pause.pause_type`
 
+### play_adventure
+
+
+> Search script examples for [play_adventure](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_adventure)
+
+#### nil play_adventure()
+
+Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
+
+### play_seeded
+
+
+> Search script examples for [play_seeded](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_seeded)
+
+#### nil play_seeded(optional<int> seed)
+
+Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
+
 ### register_console_command
 
 
