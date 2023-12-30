@@ -432,11 +432,23 @@ struct HookableVTable
     {
         if (!hook_info.is_dtor_hooked())
         {
+            // We would like to just call
+            // hook_vtable_impl<void(SelfT*), dtor_index>::call(*this, obj);
+            // but that won't work for derived classes due to how the hookable
+            // vtables are setup, so this is instead a workaround for not using
+            // the existing code to hook the dtor
             hook_dtor(
                 obj,
                 [this](void* obj_inner)
                 {
-                    remove_hooks((SelfT*)obj_inner);
+                    // If the dtor was additionally hooked we need to delay cleanup
+                    // to after all those other hooks have executed, otherwise they
+                    // will be lost, aka never executed
+                    MyHookInfos& hook_info = get_hooks((SelfT*)obj_inner);
+                    if (!hook_info.is_hooked(dtor_index))
+                    {
+                        remove_hooks((SelfT*)obj_inner);
+                    }
                 },
                 dtor_index);
             hook_info.set_dtor_hooked();
@@ -506,6 +518,12 @@ struct HookableVTable
                     {
                         postfun(inner_obj, args...);
                     }
+
+                    // cleanup hooks, delayed until all other dtor hooks have run
+                    if constexpr (Index == dtor_index)
+                    {
+                        self.remove_hooks(inner_obj);
+                    }
                 });
         }
     };
@@ -537,6 +555,10 @@ struct HookableVTable
                     {
                         postfun(inner_obj, args...);
                     }
+
+                    // dtor should never have a return value, so shouldn't reach here
+                    assert(Index != dtor_index);
+
                     return return_value.value();
                 });
         }
@@ -553,7 +575,7 @@ struct HookableVTable
             };
 
             using namespace std::string_view_literals;
-            for (auto [idx, name] : index_and_name)
+            for (const auto& [idx, name] : index_and_name)
             {
                 if (name == "dtor"sv)
                 {
