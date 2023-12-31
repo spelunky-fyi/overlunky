@@ -444,8 +444,8 @@ struct HookableVTable
                     // If the dtor was additionally hooked we need to delay cleanup
                     // to after all those other hooks have executed, otherwise they
                     // will be lost, aka never executed
-                    MyHookInfos& hook_info = get_hooks((SelfT*)obj_inner);
-                    if (!hook_info.is_hooked(dtor_index))
+                    MyHookInfos& hook_info_inner = get_hooks((SelfT*)obj_inner);
+                    if (!hook_info_inner.is_hooked(dtor_index))
                     {
                         remove_hooks((SelfT*)obj_inner);
                     }
