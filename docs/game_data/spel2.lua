@@ -4946,7 +4946,6 @@ function CustomSound:play(paused, sound_type) end
     ---@field draw_circle_filled fun(self, x: number, y: number, radius: number, color: uColor): nil @Draws a filled circle on screen
     ---@field draw_text fun(self, x: number, y: number, size: number, text: string, color: uColor): nil @Draws text in screen coordinates `x`, `y`, anchored top-left. Text size 0 uses the default 18.
     ---@field draw_layer fun(self, layer: DRAW_LAYER): nil @Draw on top of UI windows, including platform windows that may be outside the game area, or only in current widget window. Defaults to main viewport background.
-    ---@field window fun(self, title: string, x: number, y: number, w: number, h: number, movable: boolean, callback: fun(ctx: GuiDrawContext, pos: Vec2, size: Vec2): nil): boolean @Create a new widget window. Put all win_ widgets inside the callback function. The window functions are just wrappers for the<br/>[ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there. Use screen position and distance, or `0, 0, 0, 0` to<br/>autosize in center. Use just a `##Label` as title to hide titlebar.<br/>**Important: Keep all your labels unique!** If you need inputs with the same label, add `##SomeUniqueLabel` after the text, or use pushid to<br/>give things unique ids. ImGui doesn't know what you clicked if all your buttons have the same text...<br/>Returns false if the window was closed from the X.<br/><br/>The callback signature is nil win(GuiDrawContext ctx, Vec2 pos, Vec2 size)
     ---@field win_text fun(self, text: string): nil @Add some text to window, automatically wrapped
     ---@field win_separator fun(self): nil @Add a separator line to window
     ---@field win_separator_text fun(self, text: string): nil @Add a separator text line to window
@@ -4962,10 +4961,13 @@ function CustomSound:play(paused, sound_type) end
     ---@field win_drag_float fun(self, label: string, value: number, min: number, max: number): number @Add an float dragfield
     ---@field win_check fun(self, label: string, value: boolean): boolean @Add a checkbox
     ---@field win_combo fun(self, label: string, selected: integer, opts: string): integer @Add a combo box
+    ---@field win_color_editor fun(self, label: string, value: Color, can_edit_alpha: boolean): Color @Add a color editor
     ---@field win_popid fun(self): nil @Pop unique identifier from the stack. Put after the input.
     ---@field win_image fun(self, image: IMAGE, width: number, height: number): nil @Draw image to window.
     ---@field win_imagebutton fun(self, label: string, image: IMAGE, width: number, height: number, uvx1: number, uvy1: number, uvx2: number, uvy2: number): boolean @Draw imagebutton to window.
+    ---@field win_tooltip fun(self, text: string): nil @Sets a tooltip to show when hovering the cursor over the previous item.
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
+    ---@field win_menu_bar fun(self, callback: function): nil @Add a menu bar. Only create menus inside the callback.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
     ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
 local GuiDrawContext = nil
@@ -5047,6 +5049,53 @@ function GuiDrawContext:draw_image_rotated(image, left, top, right, bottom, uvx1
 ---@param py number
 ---@return nil
 function GuiDrawContext:draw_image_rotated(image, rect, uv_rect, color, angle, px, py) end
+---Create a new widget window. The window functions are just wrappers for [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there.
+---Important: Keep all your widget ids unique! If you need inputs with the same visible label, add `##SomeUniqueId` after the label,
+---or use `win_pushid` to give things unique ids. ImGui doesn't know what you interacted with if all your widgets have the same id.
+---See [ImGui docs](https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-about-the-id-stack-system) for more information about unique ids.
+---`title`: Title and id of the window. Avoid changing the id of an active window. Every time the id changes, ImGui will discard the old window and create a new one. Use something like `##SomeUniqueId` as the title to hide the title bar.
+---`x`, `y`: Initial position of the window, in screen coordinates.
+---`w`, `h`: Initial size of the window, in screen coordinates.
+---`movable`: Whether the user can move and resize the window.
+---`callback`: Add all `win_` widgets in here. Signature is `nil function(GuiDrawContext ctx, Vec2 pos, Vec2 size, boolean collapsed)`.
+---Set `x`, `y`, `w`, and `h` to `0, 0, 0, 0` to autosize in center of screen.
+---Returns false when the window is closed by the user.
+---@param title string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param movable boolean
+---@param callback function
+---@return boolean
+function GuiDrawContext:window(title, x, y, w, h, movable, callback) end
+---Create a new widget window. The window functions are just wrappers for [ImGui](https://github.com/ocornut/imgui/) widgets, so read more about them there.
+---Important: Keep all your widget ids unique! If you need inputs with the same visible label, add `##SomeUniqueId` after the label,
+---or use `win_pushid` to give things unique ids. ImGui doesn't know what you interacted with if all your widgets have the same id.
+---See [ImGui docs](https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-about-the-id-stack-system) for more information about unique ids.
+---`title`: Title and id of the window. A changing the id of an active window. Every time the id changes, ImGui will discard the old window and create a new one.
+---`x`, `y`: Position of the window, in screen coordinates.
+---`w`, `h`: Size of the window, in screen coordinates.
+---`collapsed`: Collapsed state of the window.
+---`pos_cond`: GUI_CONDITION for applying the position.
+---`size_cond`: GUI_CONDITION for applying the size.
+---`collapsed_cond`: GUI_CONDITION for applying the collapsed state.
+---`callback`: Add all `win_` widgets in here. Signature is `nil function(GuiDrawContext ctx, Vec2 pos, Vec2 size, boolean collapsed)`.
+---Set `x`, `y`, `w`, and `h` to `0, 0, 0, 0` to autosize in center of screen.
+---Returns false when the window is closed by the user.
+---@param title string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param collapsed boolean
+---@param pos_cond GUI_CONDITION
+---@param size_cond GUI_CONDITION
+---@param collapsed_cond GUI_CONDITION
+---@param flags integer
+---@param callback function
+---@return boolean
+function GuiDrawContext:window(title, x, y, w, h, collapsed, pos_cond, size_cond, collapsed_cond, flags, callback) end
 ---Add unique identifier to the stack, to distinguish identical inputs from each other. Put before the input.
 ---@param id integer
 ---@return nil
@@ -5055,6 +5104,61 @@ function GuiDrawContext:win_pushid(id) end
 ---@param id string
 ---@return nil
 function GuiDrawContext:win_pushid(id) end
+---Add a tab bar. Only create tab items inside the callback.
+---@param id string
+---@param callback function
+---@return nil
+function GuiDrawContext:win_tab_bar(id, callback) end
+---Add a tab bar. Only create tab items inside the callback. `flags` are a mask of GUI_TAB_BAR_FLAG.
+---@param id string
+---@param flags integer
+---@param callback function
+---@return nil
+function GuiDrawContext:win_tab_bar(id, flags, callback) end
+---Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. Returns false when the tab is closed.
+---@param label string
+---@param closeable boolean
+---@param callback function
+---@return boolean
+function GuiDrawContext:win_tab_item(label, closeable, callback) end
+---Add a tab item. Only use this inside a tab bar callback. Put contents in the callback function. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns false when the tab is closed.
+---@param label string
+---@param closeable boolean
+---@param flags integer
+---@param callback function
+---@return boolean
+function GuiDrawContext:win_tab_item(label, closeable, flags, callback) end
+---Add a tab item button. Only use this inside a tab bar callback. Returns true when clicked.
+---@param label string
+---@return boolean
+function GuiDrawContext:win_tab_item_button(label) end
+---Add a tab item button. Only use this inside a tab bar callback. `flags` are a mask of GUI_TAB_ITEM_FLAG. Returns true when clicked.
+---@param label string
+---@param flags integer
+---@return boolean
+function GuiDrawContext:win_tab_item_button(label, flags) end
+---Add a menu. Only use this inside a menu bar or menu callback. Can contain most widgets, including nested menus.
+---@param label string
+---@param callback function
+---@return nil
+function GuiDrawContext:win_menu(label, callback) end
+---Add a menu. Only use this inside a menu bar or menu callback. Can contain most widgets, including nested menus.
+---@param label string
+---@param enabled boolean
+---@param callback function
+---@return nil
+function GuiDrawContext:win_menu(label, enabled, callback) end
+---Add a menu item. Only use this inside a menu callback. Returns true when clicked.
+---@param label string
+---@return boolean
+function GuiDrawContext:win_menu_item(label) end
+---Add a menu item. Only use this inside a menu callback. Returns true when clicked. Shortcut text is only visual and does not create a shortcut key.
+---@param label string
+---@param shortcut string?
+---@param checked boolean
+---@param enabled boolean
+---@return boolean
+function GuiDrawContext:win_menu_item(label, shortcut, checked, enabled) end
 
 ---@class Gamepad
     ---@field enabled boolean

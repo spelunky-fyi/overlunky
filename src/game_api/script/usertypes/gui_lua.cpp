@@ -346,18 +346,22 @@ void GuiDrawContext::draw_image_rotated(IMAGE image, AABB rect, AABB uv_rect, uC
 
 bool GuiDrawContext::window(std::string title, float x, float y, float w, float h, bool movable, sol::function callback)
 {
+    ImGuiCond pos_size_cond = movable ? ImGuiCond_Appearing : ImGuiCond_Always;
+    ImGuiWindowFlags flags = movable ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+    if (title == "" || title.find("##") == 0)
+    {
+        flags |= ImGuiWindowFlags_NoTitleBar;
+    }
+    return window(title, x, y, w, h, false, pos_size_cond, pos_size_cond, ImGuiCond_Appearing, flags, callback);
+}
+bool GuiDrawContext::window(std::string title, float x, float y, float w, float h, bool collapsed, GUI_CONDITION pos_cond, GUI_CONDITION size_cond, GUI_CONDITION collapsed_cond, int flags, sol::function callback)
+{
     bool win_open = true;
     ImGui::PushID("backendwindow");
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4, 4});
-    ImGuiCond cond = (movable ? ImGuiCond_Appearing : ImGuiCond_Always);
-    ImGuiCond flag = (movable ? 0 : ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-    if (title == "" || title.find("##") == 0)
-    {
-        flag |= ImGuiWindowFlags_NoTitleBar;
-    }
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
-        ImGui::SetNextWindowSize(ImVec2(400, -1), cond);
+        ImGui::SetNextWindowSize(ImVec2(400, -1), size_cond);
     }
     else
     {
@@ -365,23 +369,24 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
         ImVec2 ssa = screenify_fix(ImVec2(w, h));
         ImVec2 ssb = screenify_fix(ImVec2(0, 0));
         ImVec2 ssize = ImVec2(ssa.x - ssb.x, ssb.y - ssa.y);
-        ImGui::SetNextWindowPos(spos, cond);
-        ImGui::SetNextWindowSize(ssize, cond);
+        ImGui::SetNextWindowPos(spos, pos_cond);
+        ImGui::SetNextWindowSize(ssize, size_cond);
     }
-    flag |= ImGuiWindowFlags_NoDocking;
-    ImGui::Begin(title.c_str(), &win_open, flag);
+    ImGui::SetNextWindowCollapsed(collapsed, collapsed_cond);
+    flags |= ImGuiWindowFlags_NoDocking;
+    ImGui::Begin(title.c_str(), &win_open, flags);
     ImGui::PushItemWidth(-ImGui::GetWindowWidth() / 2);
     auto size = normalize(ImGui::GetWindowSize());
     size.x += 1.0f;
     size.y -= 1.0f;
     size.y *= -1.0f;
-    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size));
+    handle_function<void>(backend, callback, this, Vec2(normalize(ImGui::GetWindowPos() - ImGui::GetMainViewport()->Pos)), Vec2(size), ImGui::IsWindowCollapsed());
     ImGui::PopItemWidth();
     if (x == 0.0f && y == 0.0f && w == 0.0f && h == 0.0f)
     {
         ImGui::SetWindowPos(
             {ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowWidth() / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowHeight() / 2},
-            cond);
+            pos_cond);
     }
     ImGui::End();
     ImGui::PopID();
@@ -399,7 +404,17 @@ bool GuiDrawContext::window(std::string title, float x, float y, float w, float 
     }
 
     return win_open;
-};
+}
+void GuiDrawContext::win_child(std::string id, float w, float h, bool border, int flags, sol::function callback)
+{
+    if (std::abs(w) > 0.0f && std::abs(w) < 1.0f)
+        w *= ImGui::GetContentRegionMax().x;
+    if (std::abs(h) > 0.0f && std::abs(h) < 1.0f)
+        h *= ImGui::GetContentRegionMax().x;
+    if (ImGui::BeginChild(id.c_str(), ImVec2(w, h), border, flags))
+        handle_function<void>(backend, callback);
+    ImGui::EndChild();
+}
 void GuiDrawContext::win_text(std::string text)
 {
     ImGui::TextWrapped("%s", text.c_str());
@@ -422,14 +437,18 @@ void GuiDrawContext::win_sameline(float offset, float spacing)
         offset *= ImGui::GetContentRegionMax().x;
     ImGui::SameLine(offset, spacing);
 };
-bool GuiDrawContext::win_button(std::string text)
+bool GuiDrawContext::win_button(std::string label)
 {
-    if (ImGui::Button(text.c_str()))
-    {
-        return true;
-    }
-    return false;
-};
+    return ImGui::Button(label.c_str());
+}
+bool GuiDrawContext::win_button(std::string label, float width, float height)
+{
+    if (std::abs(width) > 0.0f && std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
+    if (std::abs(height) > 0.0f && std::abs(height) < 1.0f)
+        height *= ImGui::GetContentRegionMax().x;
+    return ImGui::Button(label.c_str(), ImVec2(width, height));
+}
 std::string GuiDrawContext::win_input_text(std::string label, std::string value)
 {
     InputString(label.c_str(), &value, 0, nullptr, nullptr);
@@ -449,22 +468,42 @@ int GuiDrawContext::win_slider_int(std::string label, int value, int min, int ma
 {
     ImGui::SliderInt(label.c_str(), &value, min, max);
     return value;
-};
+}
+int GuiDrawContext::win_slider_int(std::string label, int value, int min, int max, std::string format, int flags)
+{
+    ImGui::SliderInt(label.c_str(), &value, min, max, format.c_str(), flags);
+    return value;
+}
 int GuiDrawContext::win_drag_int(std::string label, int value, int min, int max)
 {
     ImGui::DragInt(label.c_str(), &value, 0.1f, min, max);
     return value;
-};
+}
+int GuiDrawContext::win_drag_int(std::string label, int value, int min, int max, float speed, std::string format, int flags)
+{
+    ImGui::DragInt(label.c_str(), &value, speed, min, max, format.c_str(), flags);
+    return value;
+}
 float GuiDrawContext::win_slider_float(std::string label, float value, float min, float max)
 {
     ImGui::SliderFloat(label.c_str(), &value, min, max);
     return value;
-};
+}
+float GuiDrawContext::win_slider_float(std::string label, float value, float min, float max, std::string format, int flags)
+{
+    ImGui::SliderFloat(label.c_str(), &value, min, max, format.c_str(), flags);
+    return value;
+}
 float GuiDrawContext::win_drag_float(std::string label, float value, float min, float max)
 {
     ImGui::DragFloat(label.c_str(), &value, 0.1f, min, max);
     return value;
-};
+}
+float GuiDrawContext::win_drag_float(std::string label, float value, float min, float max, float speed, std::string format, int flags)
+{
+    ImGui::DragFloat(label.c_str(), &value, speed, min, max, format.c_str(), flags);
+    return value;
+}
 bool GuiDrawContext::win_check(std::string label, bool value)
 {
     ImGui::Checkbox(label.c_str(), &value);
@@ -475,6 +514,14 @@ int GuiDrawContext::win_combo(std::string label, int selected, std::string opts)
     int reals = selected - 1;
     ImGui::Combo(label.c_str(), &reals, opts.c_str());
     return reals + 1;
+};
+Color GuiDrawContext::win_color_editor(std::string label, Color value, bool can_edit_alpha)
+{
+    if (can_edit_alpha)
+        ImGui::ColorEdit4(label.c_str(), (float*)&value);
+    else
+        ImGui::ColorEdit3(label.c_str(), (float*)&value);
+    return value;
 };
 void GuiDrawContext::win_pushid(int id)
 {
@@ -532,11 +579,93 @@ bool GuiDrawContext::win_imagebutton(std::string label, IMAGE image, float width
 
     return ImGui::ImageButton(label.c_str(), image_ptr->texture, im_size, ImVec2(uvx1, uvy1), ImVec2(uvx2, uvy2));
 };
+void GuiDrawContext::win_tooltip(std::string text)
+{
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+        // TODO: HD cursor overlaps tooltip
+        ImGui::SetTooltip("%s", text.c_str());
+}
 void GuiDrawContext::win_section(std::string title, sol::function callback)
 {
     if (ImGui::CollapsingHeader(title.c_str()))
         handle_function<void>(backend, callback);
 };
+void GuiDrawContext::win_tab_bar(std::string id, sol::function callback)
+{
+    win_tab_bar(id, ImGuiTabBarFlags_None, callback);
+}
+void GuiDrawContext::win_tab_bar(std::string id, int flags, sol::function callback)
+{
+    if (ImGui::BeginTabBar(id.c_str(), flags))
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndTabBar();
+    }
+}
+bool GuiDrawContext::win_tab_item(std::string label, bool closeable, sol::function callback)
+{
+    return win_tab_item(label, closeable, ImGuiTabItemFlags_None, callback);
+}
+bool GuiDrawContext::win_tab_item(std::string label, bool closeable, int flags, sol::function callback)
+{
+    bool open = true;
+    if (ImGui::BeginTabItem(label.c_str(), closeable ? &open : NULL, flags))
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndTabItem();
+    }
+    return open;
+}
+bool GuiDrawContext::win_tab_item_button(std::string label)
+{
+    return win_tab_item_button(label, ImGuiTabItemFlags_None);
+}
+bool GuiDrawContext::win_tab_item_button(std::string label, int flags)
+{
+    return ImGui::TabItemButton(label.c_str(), flags);
+}
+void GuiDrawContext::win_menu_bar(sol::function callback)
+{
+    if (ImGui::BeginMenuBar())
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndMenuBar();
+    }
+}
+void GuiDrawContext::win_menu(std::string label, sol::function callback)
+{
+    win_menu(label, true, callback);
+}
+void GuiDrawContext::win_menu(std::string label, bool enabled, sol::function callback)
+{
+    if (ImGui::BeginMenu(label.c_str(), enabled))
+    {
+        handle_function<void>(backend, callback);
+        ImGui::EndMenu();
+    }
+}
+bool GuiDrawContext::win_menu_item(std::string label)
+{
+    return ImGui::MenuItem(label.c_str());
+}
+bool GuiDrawContext::win_menu_item(std::string label, std::optional<std::string> shortcut, bool checked, bool enabled)
+{
+    return ImGui::MenuItem(label.c_str(), shortcut ? shortcut.value().c_str() : NULL, checked, enabled);
+}
+void GuiDrawContext::win_group(sol::function callback)
+{
+    ImGui::BeginGroup();
+    handle_function<void>(backend, callback);
+    ImGui::EndGroup();
+}
+void GuiDrawContext::win_dummy(float width, float height)
+{
+    if (std::abs(width) > 0.0f && std::abs(width) < 1.0f)
+        width *= ImGui::GetContentRegionMax().x;
+    if (std::abs(height) > 0.0f && std::abs(height) < 1.0f)
+        height *= ImGui::GetContentRegionMax().x;
+    ImGui::Dummy(ImVec2(width, height));
+}
 void GuiDrawContext::win_indent(float width)
 {
     if (std::abs(width) < 1.0f)
@@ -555,6 +684,52 @@ void GuiDrawContext::win_width(float width)
     else if (width < -ImGui::GetStyle().ItemInnerSpacing.x)
         width += ImGui::GetStyle().ItemInnerSpacing.x;
     ImGui::SetNextItemWidth(width);
+}
+void GuiDrawContext::win_disabled(sol::function callback)
+{
+    win_disabled(true, callback);
+}
+void GuiDrawContext::win_disabled(bool disabled, sol::function callback)
+{
+    if (disabled)
+        ImGui::BeginDisabled(true);
+    handle_function<void>(backend, callback);
+    if (disabled)
+        ImGui::EndDisabled();
+}
+Vec2 GuiDrawContext::win_get_cursor_pos()
+{
+    return Vec2(ImGui::GetCursorPos());
+}
+void GuiDrawContext::win_set_cursor_pos(float x, float y)
+{
+    ImGui::SetCursorPos(ImVec2(x, y));
+}
+void GuiDrawContext::win_set_cursor_pos(Vec2 p)
+{
+    win_set_cursor_pos(p.x, p.y);
+}
+Vec2 GuiDrawContext::win_get_cursor_screen_pos()
+{
+    return Vec2(ImGui::GetCursorScreenPos());
+}
+void GuiDrawContext::win_set_cursor_screen_pos(float x, float y)
+{
+    ImGui::SetCursorScreenPos(ImVec2(x, y));
+}
+void GuiDrawContext::win_set_cursor_screen_pos(Vec2 p)
+{
+    win_set_cursor_screen_pos(p.x, p.y);
+}
+Vec2 GuiDrawContext::win_get_content_region_max()
+{
+    return Vec2(ImGui::GetContentRegionMax());
+}
+AABB GuiDrawContext::win_get_item_rect()
+{
+    auto rect_min = ImGui::GetItemRectMin();
+    auto rect_max = ImGui::GetItemRectMax();
+    return AABB(rect_min.x, rect_max.y, rect_max.x, rect_min.y);
 }
 void GuiDrawContext::draw_layer(DRAW_LAYER layer)
 {
@@ -594,9 +769,51 @@ void register_usertypes(sol::state& lua)
     auto draw_image_rotated = sol::overload(
         static_cast<void (GuiDrawContext::*)(IMAGE, float, float, float, float, float, float, float, float, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated),
         static_cast<void (GuiDrawContext::*)(IMAGE, AABB, AABB, uColor, float, float, float)>(&GuiDrawContext::draw_image_rotated));
+    auto window = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, sol::function)>(&GuiDrawContext::window),
+        static_cast<bool (GuiDrawContext::*)(std::string, float, float, float, float, bool, GUI_CONDITION, GUI_CONDITION, GUI_CONDITION, int, sol::function)>(&GuiDrawContext::window));
+    auto win_button = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_button),
+        static_cast<bool (GuiDrawContext::*)(std::string, float, float)>(&GuiDrawContext::win_button));
+    auto win_slider_int = sol::overload(
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int)>(&GuiDrawContext::win_slider_int),
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int, std::string, int)>(&GuiDrawContext::win_slider_int));
+    auto win_drag_int = sol::overload(
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int)>(&GuiDrawContext::win_drag_int),
+        static_cast<int (GuiDrawContext::*)(std::string, int, int, int, float, std::string, int)>(&GuiDrawContext::win_drag_int));
+    auto win_slider_float = sol::overload(
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float)>(&GuiDrawContext::win_slider_float),
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float, std::string, int)>(&GuiDrawContext::win_slider_float));
+    auto win_drag_float = sol::overload(
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float)>(&GuiDrawContext::win_drag_float),
+        static_cast<float (GuiDrawContext::*)(std::string, float, float, float, float, std::string, int)>(&GuiDrawContext::win_drag_float));
     auto win_pushid = sol::overload(
         static_cast<void (GuiDrawContext::*)(int)>(&GuiDrawContext::win_pushid),
         static_cast<void (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_pushid));
+    auto win_tab_bar = sol::overload(
+        static_cast<void (GuiDrawContext::*)(std::string, sol::function)>(&GuiDrawContext::win_tab_bar),
+        static_cast<void (GuiDrawContext::*)(std::string, int, sol::function)>(&GuiDrawContext::win_tab_bar));
+    auto win_tab_item = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string, bool, sol::function)>(&GuiDrawContext::win_tab_item),
+        static_cast<bool (GuiDrawContext::*)(std::string, bool, int, sol::function)>(&GuiDrawContext::win_tab_item));
+    auto win_tab_item_button = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_tab_item_button),
+        static_cast<bool (GuiDrawContext::*)(std::string, int)>(&GuiDrawContext::win_tab_item_button));
+    auto win_menu = sol::overload(
+        static_cast<void (GuiDrawContext::*)(std::string, sol::function)>(&GuiDrawContext::win_menu),
+        static_cast<void (GuiDrawContext::*)(std::string, bool, sol::function)>(&GuiDrawContext::win_menu));
+    auto win_menu_item = sol::overload(
+        static_cast<bool (GuiDrawContext::*)(std::string)>(&GuiDrawContext::win_menu_item),
+        static_cast<bool (GuiDrawContext::*)(std::string, std::optional<std::string>, bool, bool)>(&GuiDrawContext::win_menu_item));
+    auto win_disabled = sol::overload(
+        static_cast<void (GuiDrawContext::*)(sol::function)>(&GuiDrawContext::win_disabled),
+        static_cast<void (GuiDrawContext::*)(bool, sol::function)>(&GuiDrawContext::win_disabled));
+    auto win_set_cursor_pos = sol::overload(
+        static_cast<void (GuiDrawContext::*)(float, float)>(&GuiDrawContext::win_set_cursor_pos),
+        static_cast<void (GuiDrawContext::*)(Vec2)>(&GuiDrawContext::win_set_cursor_pos));
+    auto win_set_cursor_screen_pos = sol::overload(
+        static_cast<void (GuiDrawContext::*)(float, float)>(&GuiDrawContext::win_set_cursor_screen_pos),
+        static_cast<void (GuiDrawContext::*)(Vec2)>(&GuiDrawContext::win_set_cursor_screen_pos));
 
     /// Used in [register_option_callback](#register_option_callback) and [set_callback](#set_callback) with ON.GUIFRAME
     auto guidrawcontext_type = lua.new_usertype<GuiDrawContext>("GuiDrawContext");
@@ -615,29 +832,68 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["draw_image"] = draw_image;
     guidrawcontext_type["draw_image_rotated"] = draw_image_rotated;
     guidrawcontext_type["draw_layer"] = &GuiDrawContext::draw_layer;
-    guidrawcontext_type["window"] = &GuiDrawContext::window;
+    guidrawcontext_type["window"] = window;
+    guidrawcontext_type["win_child"] = &GuiDrawContext::win_child;
     guidrawcontext_type["win_text"] = &GuiDrawContext::win_text;
     guidrawcontext_type["win_separator"] = &GuiDrawContext::win_separator;
     guidrawcontext_type["win_separator_text"] = &GuiDrawContext::win_separatortext;
     guidrawcontext_type["win_inline"] = &GuiDrawContext::win_inline;
     guidrawcontext_type["win_sameline"] = &GuiDrawContext::win_sameline;
-    guidrawcontext_type["win_button"] = &GuiDrawContext::win_button;
+    guidrawcontext_type["win_button"] = win_button;
     guidrawcontext_type["win_input_text"] = &GuiDrawContext::win_input_text;
     guidrawcontext_type["win_input_int"] = &GuiDrawContext::win_input_int;
     guidrawcontext_type["win_input_float"] = &GuiDrawContext::win_input_float;
-    guidrawcontext_type["win_slider_int"] = &GuiDrawContext::win_slider_int;
-    guidrawcontext_type["win_drag_int"] = &GuiDrawContext::win_drag_int;
-    guidrawcontext_type["win_slider_float"] = &GuiDrawContext::win_slider_float;
-    guidrawcontext_type["win_drag_float"] = &GuiDrawContext::win_drag_float;
+    guidrawcontext_type["win_slider_int"] = win_slider_int;
+    guidrawcontext_type["win_drag_int"] = win_drag_int;
+    guidrawcontext_type["win_slider_float"] = win_slider_float;
+    guidrawcontext_type["win_drag_float"] = win_drag_float;
     guidrawcontext_type["win_check"] = &GuiDrawContext::win_check;
     guidrawcontext_type["win_combo"] = &GuiDrawContext::win_combo;
+    guidrawcontext_type["win_color_editor"] = &GuiDrawContext::win_color_editor;
     guidrawcontext_type["win_pushid"] = win_pushid;
     guidrawcontext_type["win_popid"] = &GuiDrawContext::win_popid;
     guidrawcontext_type["win_image"] = &GuiDrawContext::win_image;
     guidrawcontext_type["win_imagebutton"] = &GuiDrawContext::win_imagebutton;
+    guidrawcontext_type["win_tooltip"] = &GuiDrawContext::win_tooltip;
     guidrawcontext_type["win_section"] = &GuiDrawContext::win_section;
+    guidrawcontext_type["win_tab_bar"] = win_tab_bar;
+    guidrawcontext_type["win_tab_item"] = win_tab_item;
+    guidrawcontext_type["win_tab_item_button"] = win_tab_item_button;
+    guidrawcontext_type["win_menu_bar"] = &GuiDrawContext::win_menu_bar;
+    guidrawcontext_type["win_menu"] = win_menu;
+    guidrawcontext_type["win_menu_item"] = win_menu_item;
+    guidrawcontext_type["win_group"] = &GuiDrawContext::win_group;
+    guidrawcontext_type["win_dummy"] = &GuiDrawContext::win_dummy;
     guidrawcontext_type["win_indent"] = &GuiDrawContext::win_indent;
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
+    guidrawcontext_type["win_disabled"] = win_disabled;
+    guidrawcontext_type["win_get_cursor_pos"] = &GuiDrawContext::win_get_cursor_pos;
+    guidrawcontext_type["win_set_cursor_pos"] = win_set_cursor_pos;
+    guidrawcontext_type["win_get_cursor_screen_pos"] = &GuiDrawContext::win_get_cursor_screen_pos;
+    guidrawcontext_type["win_set_cursor_screen_pos"] = win_set_cursor_screen_pos;
+    guidrawcontext_type["win_get_content_region_max"] = &GuiDrawContext::win_get_content_region_max;
+    guidrawcontext_type["win_get_item_rect"] = &GuiDrawContext::win_get_item_rect;
+
+    /// Condition for setting a variable on a GUI widget. The variable is not changed if the condition is not met.
+    lua.create_named_table("GUI_CONDITION", "ALWAYS", ImGuiCond_Always, "ONCE", ImGuiCond_Once, "FIRST_USE_EVER", ImGuiCond_FirstUseEver, "APPEARING", ImGuiCond_Appearing);
+    /* GUI_CONDITION
+    // ALWAYS
+    // Always set the variable.
+    // ONCE
+    // Set the variable only the first time per runtime session.
+    // FIRST_USE_EVER
+    // Set the variable if the widget has no persistently saved data (no entry in .ini file).
+    // APPEARING
+    // Set the variable if the widget is appearing after being hidden/inactive (or the first time).
+    */
+    /// Window flags for `window` and `win_child` in GuiDrawContext.
+    lua.create_named_table("GUI_WINDOW_FLAG", "NONE", ImGuiWindowFlags_None, "NO_TITLE_BAR", ImGuiWindowFlags_NoTitleBar, "NO_RESIZE", ImGuiWindowFlags_NoResize, "NO_MOVE", ImGuiWindowFlags_NoMove, "NO_SCROLLBAR", ImGuiWindowFlags_NoScrollbar, "NO_SCROLL_WITH_MOUSE", ImGuiWindowFlags_NoScrollWithMouse, "NO_COLLAPSE", ImGuiWindowFlags_NoCollapse, "ALWAYS_AUTO_RESIZE", ImGuiWindowFlags_AlwaysAutoResize, "NO_BACKGROUND", ImGuiWindowFlags_NoBackground, "NO_SAVED_SETTINGS", ImGuiWindowFlags_NoSavedSettings, "NO_MOUSE_INPUTS", ImGuiWindowFlags_NoMouseInputs, "MENU_BAR", ImGuiWindowFlags_MenuBar, "HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_HorizontalScrollbar, "NO_FOCUS_ON_APPEARING", ImGuiWindowFlags_NoFocusOnAppearing, "NO_BRING_TO_FRONT_ON_FOCUS", ImGuiWindowFlags_NoBringToFrontOnFocus, "ALWAYS_VERTICAL_SCROLLBAR", ImGuiWindowFlags_AlwaysVerticalScrollbar, "ALWAYS_HORIZONTAL_SCROLLBAR", ImGuiWindowFlags_AlwaysHorizontalScrollbar, "NO_NAV_INPUTS", ImGuiWindowFlags_NoNavInputs, "NO_NAV_FOCUS", ImGuiWindowFlags_NoNavFocus, "UNSAVED_DOCUMENT", ImGuiWindowFlags_UnsavedDocument);
+    /// Tab bar flags for `win_tab_bar` in GuiDrawContext.
+    lua.create_named_table("GUI_TAB_BAR_FLAG", "NONE", ImGuiTabBarFlags_None, "REORDERABLE", ImGuiTabBarFlags_Reorderable, "AUTO_SELECT_NEW_TABS", ImGuiTabBarFlags_AutoSelectNewTabs, "TAB_LIST_POPUP_BUTTON", ImGuiTabBarFlags_TabListPopupButton, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabBarFlags_NoCloseWithMiddleMouseButton, "NO_TAB_LIST_SCROLLING_BUTTONS", ImGuiTabBarFlags_NoTabListScrollingButtons, "NO_TOOLTIP", ImGuiTabBarFlags_NoTooltip, "FITTING_POLICY_RESIZE_DOWN", ImGuiTabBarFlags_FittingPolicyResizeDown, "FITTING_POLICY_SCROLL", ImGuiTabBarFlags_FittingPolicyScroll);
+    /// Tab item flags for `win_tab_item` and `win_tab_item_button` in GuiDrawContext.
+    lua.create_named_table("GUI_TAB_ITEM_FLAG", "NONE", ImGuiTabItemFlags_None, "UNSAVED_DOCUMENT", ImGuiTabItemFlags_UnsavedDocument, "SET_SELECTED", ImGuiTabItemFlags_SetSelected, "NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON", ImGuiTabItemFlags_NoCloseWithMiddleMouseButton, "NO_PUSH_ID", ImGuiTabItemFlags_NoPushId, "NO_TOOLTIP", ImGuiTabItemFlags_NoTooltip, "NO_REORDER", ImGuiTabItemFlags_NoReorder, "LEADING", ImGuiTabItemFlags_Leading, "TRAILING", ImGuiTabItemFlags_Trailing);
+    /// Flags for slider and drag inputs in GuiDrawContext.
+    lua.create_named_table("GUI_SLIDER_FLAG", "NONE", ImGuiSliderFlags_None, "ALWAYS_CLAMP", ImGuiSliderFlags_AlwaysClamp, "LOGARITHMIC", ImGuiSliderFlags_Logarithmic, "NO_ROUND_TO_FORMAT", ImGuiSliderFlags_NoRoundToFormat, "NO_INPUT", ImGuiSliderFlags_NoInput);
 
     /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
     lua["rgba"] = [](int r, int g, int b, int a) -> uColor

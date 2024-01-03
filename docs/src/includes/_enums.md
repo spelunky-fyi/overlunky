@@ -441,6 +441,88 @@ Name | Data | Description
 [SMALL_SAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_SAD) | GHOST_BEHAVIOR::SMALL_SAD | 
 [SMALL_HAPPY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_HAPPY) | GHOST_BEHAVIOR::SMALL_HAPPY | 
 
+## GUI_CONDITION
+
+
+> Search script examples for [GUI_CONDITION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_CONDITION)
+
+Condition for setting a variable on a GUI widget. The variable is not changed if the condition is not met.
+
+Name | Data | Description
+---- | ---- | -----------
+[ALWAYS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_CONDITION.ALWAYS) | ImGuiCond_Always | Always set the variable.<br/>
+[ONCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_CONDITION.ONCE) | ImGuiCond_Once | Set the variable only the first time per runtime session.<br/>
+[FIRST_USE_EVER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_CONDITION.FIRST_USE_EVER) | ImGuiCond_FirstUseEver | Set the variable if the widget has no persistently saved data (no entry in .ini file).<br/>
+[APPEARING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_CONDITION.APPEARING) | ImGuiCond_Appearing | Set the variable if the widget is appearing after being hidden/inactive (or the first time).<br/>
+
+## GUI_TAB_BAR_FLAG
+
+
+> Search script examples for [GUI_TAB_BAR_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG)
+
+Tab bar flags for `win_tab_bar` in GuiDrawContext.
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NONE) | ImGuiTabBarFlags_None | 
+[REORDERABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.REORDERABLE) | ImGuiTabBarFlags_Reorderable | 
+[AUTO_SELECT_NEW_TABS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.AUTO_SELECT_NEW_TABS) | ImGuiTabBarFlags_AutoSelectNewTabs | 
+[TAB_LIST_POPUP_BUTTON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.TAB_LIST_POPUP_BUTTON) | ImGuiTabBarFlags_TabListPopupButton | 
+[NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON) | ImGuiTabBarFlags_NoCloseWithMiddleMouseButton | 
+[NO_TAB_LIST_SCROLLING_BUTTONS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NO_TAB_LIST_SCROLLING_BUTTONS) | ImGuiTabBarFlags_NoTabListScrollingButtons | 
+[NO_TOOLTIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.NO_TOOLTIP) | ImGuiTabBarFlags_NoTooltip | 
+[FITTING_POLICY_RESIZE_DOWN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.FITTING_POLICY_RESIZE_DOWN) | ImGuiTabBarFlags_FittingPolicyResizeDown | 
+[FITTING_POLICY_SCROLL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_BAR_FLAG.FITTING_POLICY_SCROLL) | ImGuiTabBarFlags_FittingPolicyScroll | 
+
+## GUI_TAB_ITEM_FLAG
+
+
+> Search script examples for [GUI_TAB_ITEM_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG)
+
+Tab item flags for `win_tab_item` and `win_tab_item_button` in GuiDrawContext.
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NONE) | ImGuiTabItemFlags_None | 
+[UNSAVED_DOCUMENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.UNSAVED_DOCUMENT) | ImGuiTabItemFlags_UnsavedDocument | 
+[SET_SELECTED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.SET_SELECTED) | ImGuiTabItemFlags_SetSelected | 
+[NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_CLOSE_WITH_MIDDLE_MOUSE_BUTTON) | ImGuiTabItemFlags_NoCloseWithMiddleMouseButton | 
+[NO_PUSH_ID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_PUSH_ID) | ImGuiTabItemFlags_NoPushId | 
+[NO_TOOLTIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_TOOLTIP) | ImGuiTabItemFlags_NoTooltip | 
+[NO_REORDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.NO_REORDER) | ImGuiTabItemFlags_NoReorder | 
+[LEADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.LEADING) | ImGuiTabItemFlags_Leading | 
+[TRAILING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_TAB_ITEM_FLAG.TRAILING) | ImGuiTabItemFlags_Trailing | 
+
+## GUI_WINDOW_FLAG
+
+
+> Search script examples for [GUI_WINDOW_FLAG](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG)
+
+Window flags for `window` in GuiDrawContext.
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NONE) | ImGuiWindowFlags_None | 
+[NO_TITLE_BAR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_TITLE_BAR) | ImGuiWindowFlags_NoTitleBar | 
+[NO_RESIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_RESIZE) | ImGuiWindowFlags_NoResize | 
+[NO_MOVE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_MOVE) | ImGuiWindowFlags_NoMove | 
+[NO_SCROLLBAR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_SCROLLBAR) | ImGuiWindowFlags_NoScrollbar | 
+[NO_SCROLL_WITH_MOUSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_SCROLL_WITH_MOUSE) | ImGuiWindowFlags_NoScrollWithMouse | 
+[NO_COLLAPSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_COLLAPSE) | ImGuiWindowFlags_NoCollapse | 
+[ALWAYS_AUTO_RESIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.ALWAYS_AUTO_RESIZE) | ImGuiWindowFlags_AlwaysAutoResize | 
+[NO_BACKGROUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_BACKGROUND) | ImGuiWindowFlags_NoBackground | 
+[NO_SAVED_SETTINGS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_SAVED_SETTINGS) | ImGuiWindowFlags_NoSavedSettings | 
+[NO_MOUSE_INPUTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_MOUSE_INPUTS) | ImGuiWindowFlags_NoMouseInputs | 
+[MENU_BAR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.MENU_BAR) | ImGuiWindowFlags_MenuBar | 
+[HORIZONTAL_SCROLLBAR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.HORIZONTAL_SCROLLBAR) | ImGuiWindowFlags_HorizontalScrollbar | 
+[NO_FOCUS_ON_APPEARING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_FOCUS_ON_APPEARING) | ImGuiWindowFlags_NoFocusOnAppearing | 
+[NO_BRING_TO_FRONT_ON_FOCUS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_BRING_TO_FRONT_ON_FOCUS) | ImGuiWindowFlags_NoBringToFrontOnFocus | 
+[ALWAYS_VERTICAL_SCROLLBAR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.ALWAYS_VERTICAL_SCROLLBAR) | ImGuiWindowFlags_AlwaysVerticalScrollbar | 
+[ALWAYS_HORIZONTAL_SCROLLBAR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.ALWAYS_HORIZONTAL_SCROLLBAR) | ImGuiWindowFlags_AlwaysHorizontalScrollbar | 
+[NO_NAV_INPUTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_NAV_INPUTS) | ImGuiWindowFlags_NoNavInputs | 
+[NO_NAV_FOCUS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.NO_NAV_FOCUS) | ImGuiWindowFlags_NoNavFocus | 
+[UNSAVED_DOCUMENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GUI_WINDOW_FLAG.UNSAVED_DOCUMENT) | ImGuiWindowFlags_UnsavedDocument | 
+
 ## HUNDUNFLAGS
 
 
