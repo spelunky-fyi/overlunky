@@ -88,6 +88,8 @@ struct PauseAPI
     bool blocked{false};
     /// Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
     bool skip_fade{false};
+    /// Set to true to run pause logic and triggers only in the last API instance in the chain (Playlunky) when multiple instances of the API (Overlunky and Playlunky) are injected.
+    bool last_instance{false};
 
     /// Bitmask of modifier KEYs that are currently held
     uint32_t modifiers_down{0};

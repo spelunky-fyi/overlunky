@@ -654,12 +654,13 @@ void StateUpdate(StateMemory* s)
     static const auto bucket = Bucket::get();
     if (bucket->blocked_event)
     {
+        pre_event(ON::PRE_UPDATE);
         post_event(ON::BLOCKED_UPDATE);
         return;
     }
     static const auto pa = bucket->pause_api;
     auto block = pre_event(ON::PRE_UPDATE);
-    if (pa->event(PAUSE_TYPE::PRE_UPDATE))
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_UPDATE))
         block = true;
     if (!block)
     {
@@ -700,14 +701,15 @@ void ProcessInput(void* s)
     static const auto bucket = Bucket::get();
     if (bucket->blocked_event)
     {
+        pre_event(ON::PRE_PROCESS_INPUT);
         post_event(ON::BLOCKED_PROCESS_INPUT);
         return;
     }
     static const auto pa = bucket->pause_api;
-    if (pa->pre_input())
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->pre_input())
         return;
     auto block = pre_event(ON::PRE_PROCESS_INPUT);
-    if (pa->event(PAUSE_TYPE::PRE_PROCESS_INPUT))
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_PROCESS_INPUT))
         block = true;
     if (!block)
     {
@@ -724,7 +726,8 @@ void ProcessInput(void* s)
             bucket->blocked_event = false;
         }
     }
-    pa->post_input();
+    if (!g_forward_blocked_events || !pa->last_instance)
+        pa->post_input();
 }
 
 void init_process_input_hook()
@@ -756,13 +759,15 @@ void GameLoop(void* a, float b, void* c)
 
     if (bucket->blocked_event)
     {
+        pre_event(ON::PRE_GAME_LOOP);
         post_event(ON::BLOCKED_GAME_LOOP);
         return;
     }
 
-    pa->pre_loop();
+    if (!g_forward_blocked_events || !pa->last_instance)
+        pa->pre_loop();
     auto block = pre_event(ON::PRE_GAME_LOOP);
-    if (pa->event(PAUSE_TYPE::PRE_GAME_LOOP))
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_GAME_LOOP))
         block = true;
     if (!block)
     {
@@ -779,7 +784,8 @@ void GameLoop(void* a, float b, void* c)
             bucket->blocked_event = false;
         }
     }
-    pa->post_loop();
+    if (!g_forward_blocked_events || !pa->last_instance)
+        pa->post_loop();
 }
 
 void init_game_loop_hook()

@@ -370,6 +370,7 @@ std::map<std::string, bool> options = {
     {"uncap_unfocused_fps", true},
     {"pause_loading", false},
     {"pause_update_camera", false},
+    {"pause_last_instance", false},
     {"update_check", true},
     {"modifiers_clear_input", true},
 };
@@ -1127,6 +1128,7 @@ void load_config(std::string file)
     if (g_bucket)
     {
         g_bucket->pause_api->update_camera = options["pause_update_camera"];
+        g_bucket->pause_api->last_instance = options["pause_last_instance"];
         g_bucket->pause_api->pause_type = (PAUSE_TYPE)toml::find_or<int64_t>(opts, "pause_type", 0x140);
         g_bucket->pause_api->ignore_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen", 0);
         g_bucket->pause_api->ignore_screen_trigger = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen_trigger", 0);
@@ -6173,6 +6175,9 @@ void render_options()
         if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &g_bucket->pause_api->update_camera))
             options["pause_update_camera"] = g_bucket->pause_api->update_camera;
         tooltip("Calls the vanilla camera update when it\nwould be skipped by freezing the state update.");
+        if (ImGui::Checkbox("Run in last API instance##PauseLast", &g_bucket->pause_api->last_instance))
+            options["pause_last_instance"] = g_bucket->pause_api->last_instance;
+        tooltip("Runs freeze logic and triggers only in Playlunky\nwhen both modding tools are injected.");
 
         ImGui::Separator();
         ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. blocking updates during a normal game pause won't interfere with the vanilla pause", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());

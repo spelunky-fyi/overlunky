@@ -854,6 +854,7 @@ std::unordered_set<std::string> legal_options{
     "smooth_camera",
     "pause_type",
     "pause_update_camera",
+    "pause_last_instance",
     "pause_loading",
     "paused",
     "skip",

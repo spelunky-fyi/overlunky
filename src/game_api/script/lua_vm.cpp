@@ -2676,6 +2676,12 @@ end
     // Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.
     // POST_GAME_LOOP
     // Runs right after the main engine loop.
+    // BLOCKED_UPDATE
+    // Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when Overlunky blocks a PRE_UPDATE.
+    // BLOCKED_GAME_LOOP
+    // Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when Overlunky blocks a PRE_GAME_LOOP.
+    // BLOCKED_PROCESS_INPUT
+    // Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when Overlunky blocks a PRE_PROCESS_INPUT.
     */
 
     lua.create_named_table(
