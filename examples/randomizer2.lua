@@ -1,12 +1,6 @@
 meta.name = "Randomizer Two"
-meta.description = [[THIS REQUIRES 'PLAYLUNKY VERSION > NIGHTLY' IN MODLUNKY! YOU WILL CRASH IF NOT USING LATEST NIGHTLY!
-
-(OR OVERLUNKY WHIP)
-
-I recommend resetting options to defaults after updating to 2.9 for a more balanced experience. Speaking of balance...
-
-Fair, balanced, beginner friendly... These are not words I would use to describe The Randomizer. Fun though? Abso-hecking-lutely.]]
-meta.version = "2.9e"
+meta.description = [[Unless some horrible game breaking glitches emerge, this is the final version of Randomizer. I have tried to make it more chaotic, more balanced, easier, harder, shorter, longer, but the main problem seems to be any changes to anything. Just disable the settings you don't like or unsubscribe.]]
+meta.version = "2.9z"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -48,13 +42,14 @@ local real_default_options = {
     projectile = true,
     storage = true,
     status = true,
-    hard = true,
-    hard_abzu = true,
-    hard_duat = true,
-    hard_hundun = true,
-    hard_olmec = true,
-    hard_olmec_phase = true,
-    hard_tiamat = true,
+    bosses = true,
+    bosses2 = true,
+    bosses_abzu = true,
+    bosses_duat = true,
+    bosses_hundun = true,
+    bosses_olmec = true,
+    bosses_olmec_phase = true,
+    bosses_tiamat = true,
     shop = true,
     liquid_chance = 33,
     trap_spikes = 25,
@@ -75,7 +70,6 @@ local real_default_options = {
     crust_chance = 0.75,
     water_chance = 4,
     themes = true,
-    bosses = true,
     leak_chance = 5,
 }
 local default_options = table.unpack({real_default_options})
@@ -113,17 +107,18 @@ local function register_options()
     register_option_bool("door", "Random level/boss order", default_options.door)
     register_option_int("door_min_levels", "Min levels between midbosses", default_options.door_min_levels, 1, 100)
     register_option_int("door_max_levels", "Max levels between midbosses", default_options.door_max_levels, 1, 100)
-    register_option_int("door_bosses", "Amount of midbosses", default_options.door_bosses, 0, 5)
-    register_option_bool("door_transitions", "Neat transitions (maybe crashy)", default_options.door_transitions)
+    register_option_int("door_bosses", "Amount of midbosses", default_options.door_bosses, 0, 99)
     register_option_bool("projectile", "Random projectiles", default_options.projectile)
     --register_option_bool("storage", "Random Waddler caches", default_options.storage) --TODO
     register_option_bool("status", "Show level progress", default_options.status)
-    register_option_bool("hard_abzu", "Hard bosses: Abzu", default_options.hard_abzu)
-    register_option_bool("hard_duat", "Hard bosses: Duat", default_options.hard_duat)
-    register_option_bool("hard_hundun", "Hard bosses: Hundun", default_options.hard_hundun)
-    register_option_bool("hard_olmec", "Hard bosses: Olmec projectiles", default_options.hard_olmec)
-    register_option_bool("hard_olmec_phase", "Hard bosses: Olmec phases", default_options.hard_olmec_phase)
-    register_option_bool("hard_tiamat", "Hard bosses: Tiamat", default_options.hard_tiamat)
+    register_option_bool("bosses_abzu", "Hard bosses: Abzu", default_options.bosses_abzu)
+    register_option_bool("bosses_duat", "Hard bosses: Duat", default_options.bosses_duat)
+    register_option_bool("bosses_hundun", "Hard bosses: Hundun", default_options.bosses_hundun)
+    register_option_bool("bosses_olmec", "Hard bosses: Olmec projectiles", default_options.bosses_olmec)
+    register_option_bool("bosses_olmec_phase", "Hard bosses: Olmec phases", default_options.bosses_olmec_phase)
+    register_option_bool("bosses_tiamat", "Hard bosses: Tiamat", default_options.bosses_tiamat)
+    register_option_bool("bosses", "Random bosses in boss levels", default_options.bosses)
+    register_option_bool("bosses2", "Hard bosses in every boss arena", default_options.bosses2)
     register_option_float("liquid_chance", "Swap liquid chance", default_options.liquid_chance, 0, 100)
     register_option_float("trap_spikes", "Replace spikes chance", default_options.trap_spikes, 0, 100)
     register_option_float("trap_fields", "Replace forcefields chance", default_options.trap_fields, 0, 100)
@@ -137,7 +132,6 @@ local function register_options()
     register_option_int("bias_09", "Theme bias: Sunken City", default_options.bias_09, 0, 15)
     register_option_int("bias_10", "Theme bias: Cosmic Ocean", default_options.bias_10, 0, 15)
     register_option_int("bias_11", "Theme bias: City of Gold", default_options.bias_11, 0, 15)
-    register_option_bool("bosses", "Random bosses in boss levels", default_options.bosses)
     register_option_int("drill", "Drill chance (x2 in echoes)", default_options.drill, 0, 100)
     register_option_bool("kali", "Random kali items", default_options.kali)
     register_option_float("jellyless_chance", "Easy CO chance (no jelly)", default_options.jellyless_chance, 0, 100)
@@ -298,7 +292,7 @@ bosses = {
     ENT_TYPE.MONS_OSIRIS_HEAD,
     ENT_TYPE.MONS_TIAMAT,
     ENT_TYPE.MONS_HUNDUN,
-    ENT_TYPE.MONS_YAMA
+    --ENT_TYPE.MONS_YAMA
 }
 insert_boss_levels = {}
 insert_bosses = {}
@@ -495,22 +489,28 @@ local function spawn_boss(boss)
         end
         if state.theme ~= THEME.ABZU then
             local e = get_entity(uid)
-            e.initial_shell_health = 0
-            e.health = prng:random_int(20, 100, PRNG_CLASS.PROCEDURAL_SPAWNS)
+            e.initial_shell_health = prng:random_int(0, 2, PRNG_CLASS.PROCEDURAL_SPAWNS)
+            e.health = prng:random_int(50, 100, PRNG_CLASS.PROCEDURAL_SPAWNS)
         end
     elseif boss == ENT_TYPE.MONS_OSIRIS_HEAD then
         if state.theme == THEME.OLMEC then
             spawn_critical(boss, 24.5, 114.5, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.MONS_ANUBIS2, 22.5, 118, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.ABZU then
             spawn_critical(boss, 22.5, 107, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.MONS_ANUBIS, 22.5, 99.5, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.MONS_ANUBIS2, 22.5, 118, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.DUAT then
             spawn_critical(boss, 17.5, 110.5, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.TIAMAT then
             spawn_critical(boss, 17.5, 56.5, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.MONS_ANUBIS2, 17.5, 66, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.HUNDUN then
             spawn_critical(boss, 17.5, 107, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.MONS_ANUBIS2, 17.5, 120.5, LAYER.FRONT, 0, 0)
         elseif state.theme == THEME.EGGPLANT_WORLD then
             spawn_critical(boss, 22.5, 116.5, LAYER.FRONT, 0, 0)
+            spawn_critical(ENT_TYPE.MONS_ANUBIS2, 22.5, 120, LAYER.FRONT, 0, 0)
         end
     elseif boss == ENT_TYPE.MONS_TIAMAT then
         if state.theme == THEME.OLMEC then
@@ -580,9 +580,16 @@ local function spawn_boss(boss)
     return true
 end
 
+local boss_killed = false
 set_callback(function()
+    state.journal_flags = clr_flag(state.journal_flags, 16)
+    state.journal_flags = clr_flag(state.journal_flags, 17)
+    boss_killed = false
     if state.screen ~= SCREEN.LEVEL then return end
     if has(all_boss_levels, state.theme) and options.bosses then
+        if #insert_bosses == 0 then
+            insert_bosses = {table.unpack(bosses)}
+        end
         next_boss = pick(insert_bosses)
     end
 end, ON.PRE_LEVEL_GENERATION)
@@ -805,6 +812,20 @@ local function random_bosses(enable)
                 return true
             end
         end, "lava")
+
+        -- coffins
+        boss_cbs[#boss_cbs + 1] = set_pre_entity_spawn(function(type, x, y, l, overlay)
+            if state.theme == THEME.TIAMAT then
+                y = 75
+            end
+            if state.theme == THEME.ABZU then
+                y = 116
+            end
+            if state.theme == THEME.OLMEC then
+                y = 118
+            end
+            return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
+        end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.ITEM_ANUBIS_COFFIN)
 
     else
         for _,v in pairs(boss_cbs) do
@@ -1115,6 +1136,43 @@ end, SPAWN_TYPE.ANY, MASK.ITEM, ENT_TYPE.ITEM_CHEST)
 
 local swapping_liquid = false
 
+local duat_spawn_x = -1
+local duat_spawn_y = -1
+
+set_callback(function()
+    if state.theme ~= THEME.DUAT then return end
+    if next_boss == ENT_TYPE.ACTIVEFLOOR_OLMEC or next_boss == ENT_TYPE.MONS_HUNDUN then return end
+    duat_spawn_x = state.level_gen.spawn_x
+    duat_spawn_y = state.level_gen.spawn_y
+    state.level_gen.spawn_x = 17
+    state.level_gen.spawn_y = 106
+    if state.level_gen.spawn_y < 47 or not options.bosses_duat then return end
+    local box = AABB:new()
+    box.top = duat_spawn_y - 2
+    box.bottom = duat_spawn_y - 3
+    box.left = duat_spawn_x - 5
+    box.right = duat_spawn_x + 5
+    local floor = get_entities_overlapping_hitbox(0, MASK.FLOOR | MASK.ACTIVEFLOOR, box, LAYER.FRONT)
+    for i,v in ipairs(floor) do
+        kill_entity(v)
+    end
+    set_interval(function()
+        if state.theme ~= THEME.DUAT then return false end
+        if #get_entities_by(0, MASK.LIQUID, LAYER.BOTH) <= 1180 and #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
+            local liquid_type = ENT_TYPE.LIQUID_LAVA
+            if swapping_liquid then
+                liquid_type = ENT_TYPE.LIQUID_WATER
+            end
+            spawn_liquid(liquid_type, duat_spawn_x, duat_spawn_y - 2)
+        elseif #get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR) == 0 then
+            spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 17.5, 36, LAYER.FRONT, 0, 0)
+            spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 2.5, 36, LAYER.FRONT, 0, 0)
+            spawn(ENT_TYPE.ACTIVEFLOOR_CRUSHING_ELEVATOR, 32.5, 36, LAYER.FRONT, 0, 0)
+            return false
+        end
+    end, 10)
+end, ON.LEVEL)
+
 set_callback(function()
     if state.theme ~= THEME.DUAT then return end
     local bones = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_BONEBLOCK)
@@ -1154,7 +1212,7 @@ local enemies_ceiling = {ENT_TYPE.MONS_BAT, ENT_TYPE.MONS_SPIDER, ENT_TYPE.MONS_
 local enemies_air = {ENT_TYPE.MONS_MOSQUITO, ENT_TYPE.MONS_BEE, ENT_TYPE.MONS_GRUB, ENT_TYPE.MONS_IMP, ENT_TYPE.MONS_UFO, ENT_TYPE.MONS_SCARAB}
 local enemies_kingu = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
-    ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_TIKIMAN,
+    ENT_TYPE.MONS_TIKIMAN,
     ENT_TYPE.MONS_MONKEY, ENT_TYPE.MONS_MAGMAMAN,
     ENT_TYPE.MONS_FIREBUG_UNCHAINED, ENT_TYPE.MONS_IMP, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS,
     ENT_TYPE.MONS_CATMUMMY, ENT_TYPE.MONS_NECROMANCER,
@@ -1169,7 +1227,7 @@ local crab_items = {ENT_TYPE.MONS_HERMITCRAB, ENT_TYPE.ACTIVEFLOOR_PUSHBLOCK, EN
 local friends = {ENT_TYPE.CHAR_ANA_SPELUNKY, ENT_TYPE.CHAR_MARGARET_TUNNEL, ENT_TYPE.CHAR_COLIN_NORTHWARD, ENT_TYPE.CHAR_ROFFY_D_SLOTH, ENT_TYPE.CHAR_BANDA, ENT_TYPE.CHAR_GREEN_GIRL, ENT_TYPE.CHAR_AMAZON, ENT_TYPE.CHAR_LISE_SYSTEM, ENT_TYPE.CHAR_COCO_VON_DIAMONDS, ENT_TYPE.CHAR_MANFRED_TUNNEL, ENT_TYPE.CHAR_OTAKU, ENT_TYPE.CHAR_TINA_FLAN, ENT_TYPE.CHAR_VALERIE_CRUMP, ENT_TYPE.CHAR_AU, ENT_TYPE.CHAR_DEMI_VON_DIAMONDS, ENT_TYPE.CHAR_PILOT, ENT_TYPE.CHAR_PRINCESS_AIRYN, ENT_TYPE.CHAR_DIRK_YAMAOKA, ENT_TYPE.CHAR_GUY_SPELUNKY, ENT_TYPE.CHAR_CLASSIC_GUY, ENT_TYPE.CHAR_HIREDHAND, ENT_TYPE.CHAR_EGGPLANT_CHILD}
 local enemies_challenge = {ENT_TYPE.MONS_SNAKE, ENT_TYPE.MONS_SPIDER,
     ENT_TYPE.MONS_CAVEMAN, ENT_TYPE.MONS_SKELETON, ENT_TYPE.MONS_SCORPION, ENT_TYPE.MONS_HORNEDLIZARD,
-    ENT_TYPE.MONS_MOLE, ENT_TYPE.MONS_MANTRAP, ENT_TYPE.MONS_TIKIMAN, ENT_TYPE.MONS_WITCHDOCTOR, ENT_TYPE.MONS_MAGMAMAN, ENT_TYPE.MONS_FIREBUG_UNCHAINED,
+    ENT_TYPE.MONS_MANTRAP, ENT_TYPE.MONS_TIKIMAN, ENT_TYPE.MONS_WITCHDOCTOR, ENT_TYPE.MONS_MAGMAMAN, ENT_TYPE.MONS_FIREBUG_UNCHAINED,
     ENT_TYPE.MONS_CROCMAN, ENT_TYPE.MONS_COBRA, ENT_TYPE.MONS_SORCERESS, ENT_TYPE.MONS_NECROMANCER, ENT_TYPE.MONS_JIANGSHI, ENT_TYPE.MONS_FEMALE_JIANGSHI,
     ENT_TYPE.MONS_FISH, ENT_TYPE.MONS_OCTOPUS, ENT_TYPE.MONS_ALIEN,
     ENT_TYPE.MONS_YETI, ENT_TYPE.MONS_PROTOSHOPKEEPER,
@@ -1453,7 +1511,7 @@ set_post_entity_spawn(function(ent)
 end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_HERMITCRAB)
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.ABZU or not options.hard_abzu then return end
+    if (state.theme ~= THEME.ABZU or not options.bosses_abzu) and not options.bosses2 then return end
     local x, y, l = get_position(ent.uid)
     if y > 105 then
         if prng:random() < 0.6 then ent:destroy() end
@@ -1472,7 +1530,7 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.MONS_KINGU)
 ]]
 
 set_pre_entity_spawn(function(type, x, y, l, overlay)
-    if state.theme ~= THEME.OLMEC or not options.hard_olmec then
+    if (state.theme ~= THEME.OLMEC or not options.bosses_olmec) and not options.bosses2 then
         return spawn_entity_nonreplaceable(type, x, y, l, 0, 0)
     end
     return spawn_entity_nonreplaceable(pick(enemies_small), x, y, l, 0, 0)
@@ -1500,7 +1558,7 @@ set_pre_entity_spawn(function(type, x, y, l, overlay)
 end, SPAWN_TYPE.LEVEL_GEN, 0, {ENT_TYPE.MONS_CAVEMAN_BOSS})
 
 set_post_entity_spawn(function(ent)
-    if state.theme ~= THEME.OLMEC or not options.hard_olmec or next_boss ~= ENT_TYPE.ACTIVEFLOOR_OLMEC then return end
+    if (state.theme ~= THEME.OLMEC or not options.bosses_olmec or next_boss ~= ENT_TYPE.ACTIVEFLOOR_OLMEC) and not options.bosses2 then return end
     local x, y, l = get_position(ent.uid)
     local players = get_entities_at(0, MASK.PLAYER, x, y, l, 0.5)
     if #players > 0 then return end
@@ -1539,6 +1597,12 @@ local function tiamat_attack()
         local vx = prng:random()*0.8-0.4
         local vy = prng:random()*0.8-0.4
         local ammo = pick(tiamat_ammo)
+        if state.theme == THEME.HUNDUN then
+            ammo = ENT_TYPE.ITEM_HUNDUN_FIREBALL
+        end
+        if state.theme == THEME.DUAT then
+            ammo = ENT_TYPE.ITEM_SCEPTER_ANUBISSHOT
+        end
         local dx = 0
         local dy = 0
         if math.abs(vx) > math.abs(vy) then
@@ -1562,15 +1626,19 @@ local function tiamat_attack()
 end
 
 set_callback(function()
-    if state.theme ~= THEME.TIAMAT or not options.hard_tiamat then return end
+    if (state.theme ~= THEME.TIAMAT or not options.bosses_tiamat) and not options.bosses2 then return end
     set_timeout(tiamat_scream, 60)
-    set_interval(tiamat_attack, 4)
+    local inter = 4
+    if state.theme ~= THEME.TIAMAT then
+        inter = prng:random_int(8, 16, PRNG_CLASS.PROCEDURAL_SPAWNS)
+    end
+    set_interval(tiamat_attack, inter)
 end, ON.LEVEL)
 
 local hundun_fireball_timer = -1
 local hundun_
 set_callback(function()
-    if state.theme ~= THEME.HUNDUN or not options.hard_hundun then return end
+    if state.theme ~= THEME.HUNDUN or not options.bosses_hundun then return end
     for i,v in ipairs(get_entities_by_type(ENT_TYPE.MONS_HUNDUN)) do
         local x, y, l = get_position(v)
         move_entity(v, x, 140, 0, 0)
@@ -2116,7 +2184,8 @@ local function get_chain_item()
 end
 
 local function kill_boss(boss, uid)
-    if not has(bosses_killed, boss) and (options.door or options.bosses) then
+    if not boss_killed and (options.door or options.bosses) then
+        boss_killed = true
         bosses_killed[#bosses_killed+1] = boss
         toast("Boss defeated!\nBosses remaining: " .. tostring(bosses_left()))
         if state.theme == THEME.DUAT and boss ~= ENT_TYPE.MONS_OSIRIS_HEAD then
@@ -2370,6 +2439,7 @@ set_post_entity_spawn(function(ent)
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
     local room = get_room_template(rx, ry, l)
+    if not ROOM_TEMPLATE.CHALLENGE_SPECIAL or not room then return end --wtf
     if l == LAYER.BACK and state.world == 2 and room == ROOM_TEMPLATE.CHALLENGE_SPECIAL then
         kill_entity(ent.uid)
         spawn_entity_nonreplaceable(get_chain_item(), x, y, l, 0, 0)
@@ -2381,6 +2451,7 @@ set_post_entity_spawn(function(ent)
     local x, y, l = get_position(ent.uid)
     local rx, ry = get_room_index(x, y)
     local room = get_room_template(rx, ry, l)
+    if not ROOM_TEMPLATE.CHALLENGE_BOTTOM or not room then return end --wtf
     if room > ROOM_TEMPLATE.CHALLENGE_BOTTOM then
         kill_entity(ent.uid)
     end
@@ -2489,6 +2560,9 @@ local function init_run()
     local done = false
     set_theme_biases()
     while not done do
+        if #insert_boss_levels == 0 then
+            insert_boss_levels = { table.unpack(boss_levels) }
+        end
         if bosses_added < options.door_bosses and #insert_boss_levels > 0 and normal_levels >= options.door_min_levels and prng:random_int(1, options.door_max_levels, 0) <= normal_levels then
             normal_levels = 0
             local t = pick(insert_boss_levels)
@@ -3125,7 +3199,7 @@ set_pre_tile_code_callback(function(x, y, l)
 end, "lava")
 
 set_pre_tile_code_callback(function(x, y, l)
-    if state.theme == THEME.HUNDUN and options.hard_hundun then return false end
+    if state.theme == THEME.HUNDUN and options.bosses_hundun then return false end
     return swap_liquid(ENT_TYPE.LIQUID_LAVA, x, y)
 end, "water")
 
@@ -3278,8 +3352,8 @@ set_callback(function()
     olmec_callback = -1
     olmec_floaters = {}
     last_olmec_change = -9999
-    if state.theme == THEME.OLMEC then
-        if options.hard_olmec_phase then
+    if state.theme == THEME.OLMEC or options.bosses2 then
+        if options.bosses_olmec_phase then
             set_olmec_phase_y_level(1, 66)
             set_olmec_phase_y_level(2, 66)
             local olmecs = get_entities_by_type(ENT_TYPE.ACTIVEFLOOR_OLMEC)
@@ -3306,12 +3380,12 @@ set_callback(function()
                     olmec_floaters[#olmec_floaters+1] = v
                 end
                 olmec_callback = set_callback(function(ctx, depth) --TODO: stupid hack
-                    if state.theme ~= THEME.OLMEC or state.screen ~= SCREEN.LEVEL then
+                    if state.screen ~= SCREEN.LEVEL then
                         clear_callback(olmec_callback)
                         olmec_callback = -1
                         return
                     end
-                    if depth == 34 and state.theme == THEME.OLMEC then
+                    if depth == 34 then
                         for i,v in ipairs(olmec_floaters) do
                             local e = get_entity(v)
                             if e ~= nil then
