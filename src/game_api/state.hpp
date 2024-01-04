@@ -406,4 +406,5 @@ uint32_t lowbias32(uint32_t x);
 uint32_t lowbias32_r(uint32_t x);
 
 int64_t get_global_frame_count();
+int64_t get_global_update_count();
 void update_camera_position();

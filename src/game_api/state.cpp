@@ -39,6 +39,7 @@
 #include "vtable_hook.hpp"                       // for hook_vtable
 
 static int64_t global_frame_count{0};
+static int64_t global_update_count{0};
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -626,6 +627,10 @@ int64_t get_global_frame_count()
 {
     return global_frame_count;
 };
+int64_t get_global_update_count()
+{
+    return global_update_count;
+};
 
 std::vector<int64_t> State::read_prng() const
 {
@@ -655,6 +660,7 @@ void StateUpdate(StateMemory* s)
         post_event(ON::BLOCKED_UPDATE);
     }
     update_backends();
+    global_update_count++;
 }
 
 void init_state_update_hook()

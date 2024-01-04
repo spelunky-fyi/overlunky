@@ -54,47 +54,47 @@ struct Overlunky
 struct PauseAPI
 {
     /// Current pause state bitmask. Use custom PAUSE_TYPE.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching ON update callbacks, so can be set on the same callback you want to block at the latest. Vanilla PAUSE flags will be forwarded to state.pause, but use of vanilla PAUSE flags is discouraged and might not work with other PauseAPI features.
-    PAUSE_TYPE pause;
+    PAUSE_TYPE pause{PAUSE_TYPE::NONE};
     /// Pause mask to toggle when using the PauseAPI methods to set or get pause state.
     PAUSE_TYPE pause_type{PAUSE_TYPE::PRE_UPDATE};
 
     /// Bitmask for conditions when the current `pause_type` should be automatically enabled in `pause`, can have multiple conditions.
-    PAUSE_TRIGGER pause_trigger;
+    PAUSE_TRIGGER pause_trigger{PAUSE_TRIGGER::NONE};
     /// Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
-    PAUSE_SCREEN pause_screen;
+    PAUSE_SCREEN pause_screen{PAUSE_SCREEN::NONE};
 
     /// Bitmask for conditions when the current `pause_type` should be automatically disabled in `pause`, can have multiple conditions.
-    PAUSE_TRIGGER unpause_trigger;
+    PAUSE_TRIGGER unpause_trigger{PAUSE_TRIGGER::NONE};
     /// Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
-    PAUSE_SCREEN unpause_screen;
+    PAUSE_SCREEN unpause_screen{PAUSE_SCREEN::NONE};
 
     /// Global frame stamp when one of the triggers was last triggered, used to prevent running them again on the same frame on unpause.
-    int64_t last_trigger_frame;
+    int64_t last_trigger_frame{0};
     /// Fade timer stamp when fade triggers were last checked.
-    int64_t last_fade_timer;
+    int64_t last_fade_timer{0};
     /// Used to detect changes in state.level_flags for triggers.
-    uint32_t last_level_flags;
+    uint32_t last_level_flags{0};
 
     /// Bitmask for game SCREEN where the PRE_✱ pause types are ignored, even though enabled in `pause`. Can also use the special cases [FADE, EXIT] to unfreeze temporarily during fades (or other screen transitions where player input is probably impossible) or the level exit walk of shame.
-    PAUSE_SCREEN ignore_screen;
+    PAUSE_SCREEN ignore_screen{PAUSE_SCREEN::NONE};
     /// Bitmask for game SCREEN where the triggers are ignored.
-    PAUSE_SCREEN ignore_screen_trigger;
+    PAUSE_SCREEN ignore_screen_trigger{PAUSE_SCREEN::NONE};
 
     /// Set to true to unfreeze the game for one update cycle. Sets back to false after ON.POST_GAME_LOOP, so it can be used to check if current frame is a frame advance frame.
-    bool skip;
+    bool skip{false};
     /// Set to true to enable normal camera movement when the game is paused or frozen on a callback by PauseAPI.
-    bool update_camera;
+    bool update_camera{false};
     /// Is true when PauseAPI is freezing the game.
-    bool blocked;
+    bool blocked{false};
     /// Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
-    bool skip_fade;
+    bool skip_fade{false};
 
     /// Bitmask of modifier KEYs that are currently held
-    uint32_t modifiers_down;
+    uint32_t modifiers_down{0};
     /// Bitmask of modifier KEYs that will block all game input
-    uint32_t modifiers_block;
+    uint32_t modifiers_block{0};
     /// Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
-    bool modifiers_clear_input;
+    bool modifiers_clear_input{false};
 
     /// Get the current pause flags
     PAUSE_TYPE get_pause();
