@@ -137,6 +137,10 @@ class Bucket
     std::unordered_map<std::string, EditedMemory> original_memory;
     /// PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     PauseAPI* pause_api;
+    // Used by blockable PRE callbacks to forward BLOCKED events from Overlunky to Playlunky
+    bool forward_blocked_events{false};
+    // Set to true when the callback was blocked by Overlunky and should also be blocked in Playlunky
+    bool blocked_event{false};
 
   private:
     Bucket() = default;

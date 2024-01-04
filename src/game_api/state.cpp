@@ -40,6 +40,7 @@
 
 static int64_t global_frame_count{0};
 static int64_t global_update_count{0};
+static bool g_forward_blocked_events{false};
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -313,10 +314,13 @@ State& State::get()
                 patch_ushabti_error();
                 patch_entering_closed_door_crash();
                 bucket->patches_applied = true;
+                bucket->forward_blocked_events = true;
             }
             else
             {
                 DEBUG("Not applying patches, someone has already done it");
+                if (bucket->forward_blocked_events)
+                    g_forward_blocked_events = true;
             }
         }
     }
@@ -646,7 +650,14 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    static const auto pa = Bucket::get()->pause_api;
+    global_update_count++;
+    static const auto bucket = Bucket::get();
+    if (bucket->blocked_event)
+    {
+        post_event(ON::BLOCKED_UPDATE);
+        return;
+    }
+    static const auto pa = bucket->pause_api;
     auto block = pre_event(ON::PRE_UPDATE);
     if (pa->event(PAUSE_TYPE::PRE_UPDATE))
         block = true;
@@ -658,9 +669,14 @@ void StateUpdate(StateMemory* s)
     else
     {
         post_event(ON::BLOCKED_UPDATE);
+        if (g_forward_blocked_events)
+        {
+            bucket->blocked_event = true;
+            g_state_update_trampoline(s);
+            bucket->blocked_event = false;
+        }
     }
     update_backends();
-    global_update_count++;
 }
 
 void init_state_update_hook()
@@ -681,7 +697,13 @@ using OnProcessInput = void(void*);
 OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
-    static const auto pa = Bucket::get()->pause_api;
+    static const auto bucket = Bucket::get();
+    if (bucket->blocked_event)
+    {
+        post_event(ON::BLOCKED_PROCESS_INPUT);
+        return;
+    }
+    static const auto pa = bucket->pause_api;
     if (pa->pre_input())
         return;
     auto block = pre_event(ON::PRE_PROCESS_INPUT);
@@ -695,6 +717,12 @@ void ProcessInput(void* s)
     else
     {
         post_event(ON::BLOCKED_PROCESS_INPUT);
+        if (g_forward_blocked_events)
+        {
+            bucket->blocked_event = true;
+            g_process_input_trampoline(s);
+            bucket->blocked_event = false;
+        }
     }
     pa->post_input();
 }
@@ -717,13 +745,20 @@ using OnGameLoop = void(void* a, float b, void* c);
 OnGameLoop* g_game_loop_trampoline{nullptr};
 void GameLoop(void* a, float b, void* c)
 {
-    static const auto pa = Bucket::get()->pause_api;
+    static const auto bucket = Bucket::get();
+    static const auto pa = bucket->pause_api;
     auto& state = State::get();
 
     if (global_frame_count < state.get_frame_count_main())
         global_frame_count = state.get_frame_count_main();
     else
         global_frame_count++;
+
+    if (bucket->blocked_event)
+    {
+        post_event(ON::BLOCKED_GAME_LOOP);
+        return;
+    }
 
     pa->pre_loop();
     auto block = pre_event(ON::PRE_GAME_LOOP);
@@ -737,6 +772,12 @@ void GameLoop(void* a, float b, void* c)
     else
     {
         post_event(ON::BLOCKED_GAME_LOOP);
+        if (g_forward_blocked_events)
+        {
+            bucket->blocked_event = true;
+            g_game_loop_trampoline(a, b, c);
+            bucket->blocked_event = false;
+        }
     }
     pa->post_loop();
 }
