@@ -2909,7 +2909,7 @@ void add_partial_safe_libraries(sol::environment& env)
             luaL_error(global_vm, "Attempted to open data file outside data directory");
             return sol::nil;
         }
-        if (mode.value_or("r") != "r")
+        if (mode.value_or("r")[0] != 'r')
             std::filesystem::create_directories(dirpath);
         return global_vm["io"]["open"](fullpath, mode.value_or("r"));
     };
@@ -2929,13 +2929,13 @@ void add_partial_safe_libraries(sol::environment& env)
                 luaL_error(global_vm, "Attempted to open mod file outside mod directory");
                 return sol::nil;
             }
-            if (!is_pack && mode.value_or("r") != "r")
+            if (!is_pack && mode.value_or("r")[0] != 'r')
             {
                 luaL_error(global_vm, "Attempted to write mod file outside Packs directory");
                 return sol::nil;
             }
         }
-        if (mode.value_or("r") != "r")
+        if (mode.value_or("r")[0] != 'r')
             std::filesystem::create_directories(dirpath);
         return global_vm["io"]["open"](fullpath, mode);
     };
