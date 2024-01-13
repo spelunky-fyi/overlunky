@@ -698,7 +698,9 @@ using OnProcessInput = void(void*);
 OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
+    static bool had_focus;
     static const auto bucket = Bucket::get();
+    static const auto gm = get_game_manager();
     if (bucket->blocked_event)
     {
         pre_event(ON::PRE_PROCESS_INPUT);
@@ -711,7 +713,7 @@ void ProcessInput(void* s)
     auto block = pre_event(ON::PRE_PROCESS_INPUT);
     if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_PROCESS_INPUT))
         block = true;
-    if (!block)
+    if (!block || (gm->game_props->game_has_focus && !had_focus))
     {
         g_process_input_trampoline(s);
         post_event(ON::POST_PROCESS_INPUT);
@@ -728,6 +730,7 @@ void ProcessInput(void* s)
     }
     if (!g_forward_blocked_events || !pa->last_instance)
         pa->post_input();
+    had_focus = gm->game_props->game_has_focus;
 }
 
 void init_process_input_hook()
