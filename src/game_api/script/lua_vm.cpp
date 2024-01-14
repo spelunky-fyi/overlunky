@@ -2430,8 +2430,6 @@ end
         ON::PRE_GAME_LOOP,
         "POST_GAME_LOOP",
         ON::POST_GAME_LOOP,
-        "BLOCKED_LEVEL_GENERATION",
-        ON::BLOCKED_LEVEL_GENERATION,
         "BLOCKED_UPDATE",
         ON::BLOCKED_UPDATE,
         "BLOCKED_GAME_LOOP",
@@ -2515,12 +2513,12 @@ end
     // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
-    // Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.
+    // Runs before any level generation, no entities exist at this point. Runs in most screens that have entities. Return true to block normal level generation, i.e. stop any entities from being spawned by ThemeInfo functions. Does not block other ThemeInfo functions, like spawn_effects though. POST_LEVEL_GENERATION will still run if this callback is blocked.
     // POST_ROOM_GENERATION
     // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
-    // Runs right after level generation is done, before any entities are updated
+    // Runs right after level generation is done, i.e. after all level gen entities are spawned, before any entities are updated. You can spawn your own entities here, like extra enemies, give items to players etc.
     // LOADING
     // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
     // PRE_LOAD_SCREEN

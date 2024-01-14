@@ -828,9 +828,8 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
     g_CustomShopTypes[0] = {};
     g_CustomShopTypes[1] = {};
 
-    if (pre_event(ON::PRE_LEVEL_GENERATION))
-        return;
-    g_level_gen_trampoline(level_gen_sys, param_2, param_3);
+    if (!pre_event(ON::PRE_LEVEL_GENERATION))
+        g_level_gen_trampoline(level_gen_sys, param_2, param_3);
     post_level_generation();
 
     for (size_t i = 0; i < sizeof(LevelGenRooms) / sizeof(uint16_t); i++)
@@ -1814,32 +1813,9 @@ uint32_t ThemeInfo::get_aux_id()
 void LevelGenSystem::init()
 {
     data->init();
-
-    for (auto theme : themes)
-    {
-        if (theme == theme_arena) // no reason to?
-            continue;
-
-        hook_vtable<void(ThemeInfo*), 0x15>( // spawn_transition
-            theme,
-            [](ThemeInfo* th, void (*original)(ThemeInfo*))
-            {
-                push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
-                OnScopeExit pop{[]
-                                { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
-
-                if (pre_event(ON::PRE_LEVEL_GENERATION))
-                {
-                    post_event(ON::BLOCKED_LEVEL_GENERATION);
-                    return;
-                }
-                original(th);
-                post_event(ON::POST_LEVEL_GENERATION);
-            });
-    }
 }
 
-void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint64_t param_3, uint64_t param_4, PopulateLevelFun* original)
+bool LevelGenSystem::pre_populate_level(ThemeInfo*, uint64_t, uint64_t, uint64_t)
 {
     post_room_generation();
 
@@ -1852,29 +1828,27 @@ void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint
         }
     }
 
-    original(self, param_2, param_3, param_4);
+    return false;
 }
-// void LevelGenSystem::populate_transition_hook([[maybe_unused]] ThemeInfo* self, [[maybe_unused]] PopulateTransitionFun* original)
-//{
-//     push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL);
-//     OnScopeExit pop{[]
-//                     { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
-//     pre_level_generation();
-//     original(self);
-//     post_level_generation();
-// }
-void LevelGenSystem::do_procedural_spawn_hook(ThemeInfo* self, SpawnInfo* spawn_info, DoProceduralSpawnFun* original)
+void LevelGenSystem::post_populate_level(ThemeInfo*, uint64_t, uint64_t, uint64_t)
 {
-    push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL);
-    OnScopeExit pop{[]
-                    { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_PROCEDURAL); }};
+}
 
-    if (handle_chance(spawn_info))
-    {
-        return;
-    }
+bool LevelGenSystem::pre_populate_transition(ThemeInfo*)
+{
+    return pre_event(ON::PRE_LEVEL_GENERATION);
+}
+void LevelGenSystem::post_populate_transition(ThemeInfo*)
+{
+    post_event(ON::POST_LEVEL_GENERATION);
+}
 
-    original(self, spawn_info);
+bool LevelGenSystem::pre_procedural_spawn(ThemeInfo*, SpawnInfo* spawn_info)
+{
+    return handle_chance(spawn_info);
+}
+void LevelGenSystem::post_procedural_spawn(ThemeInfo*, SpawnInfo*)
+{
 }
 
 std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
