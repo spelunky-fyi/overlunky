@@ -4626,7 +4626,7 @@ std::string entity_tooltip(Entity* hovered)
         if (chest->leprechaun)
             coords += " (LEPRECHAUN)";
     }
-    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_BOMB"))
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_BOMB") or hovered->type->id == to_id("ENT_TYPE_ITEM_PASTEBOMB"))
     {
         auto bomb = hovered->as<Bomb>();
         coords += fmt::format(" ({} FUSE)", 150 - bomb->idle_counter);
@@ -4745,7 +4745,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
             draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, enabled ? ImColor(255, 0, 0, 80) : ImColor(0, 200, 128, 60), 0, 2.0f);
         }
     }
-    else if (type == bomb)
+    else if (type == bomb or type == bomb + 1)
     {
         float rad = 1.6f;
         if (((Bomb*)ent)->scale_hor > 1.25f)
