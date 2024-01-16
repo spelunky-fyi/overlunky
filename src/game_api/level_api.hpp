@@ -19,7 +19,6 @@
 #include "containers/game_vector.hpp"        // for game_vector
 #include "level_api_types.hpp"               // for ShortTileCodeDef
 #include "math.hpp"                          // for AABB (ptr only), Vec2
-#include "spawn_api.hpp"                     // for SpawnType
 
 class Entity;
 
@@ -428,26 +427,21 @@ struct LevelGenSystem
     {
         for (ThemeInfo* theme : themes)
         {
-            hook_impl.template hook<PopulateLevelFun, 0xd, SPAWN_TYPE_NONE, struct PopulateLevelTag>(
-                theme, &pre_populate_level, &post_populate_level);
-            hook_impl.template hook<PopulateTransitionFun, 0x15, SPAWN_TYPE_LEVEL_GEN_GENERAL, struct PopulateTransitionTag>(
-                theme, &pre_populate_transition, &post_populate_transition);
-            hook_impl.template hook<DoProceduralSpawnFun, 0x33, SPAWN_TYPE_LEVEL_GEN_PROCEDURAL, struct ProceduralSpawnTag>(
-                theme, &pre_procedural_spawn, &post_procedural_spawn);
+            hook_impl.template hook<PopulateLevelFun, 0xd>(theme, &populate_level_hook);
+            hook_impl.template hook<DoProceduralSpawnFun, 0x33>(theme, &do_procedural_spawn_hook);
+            // this didn't work right
+            // hook_impl.template hook<PopulateTransitionFun, 0x15>(theme, &populate_transition_hook);
         }
     }
 
     using PopulateLevelFun = void(ThemeInfo*, uint64_t, uint64_t, uint64_t);
-    static bool pre_populate_level(ThemeInfo*, uint64_t, uint64_t, uint64_t);
-    static void post_populate_level(ThemeInfo*, uint64_t, uint64_t, uint64_t);
+    static void populate_level_hook(ThemeInfo*, uint64_t, uint64_t, uint64_t, PopulateLevelFun*);
 
-    using PopulateTransitionFun = void(ThemeInfo*);
-    static bool pre_populate_transition(ThemeInfo*);
-    static void post_populate_transition(ThemeInfo*);
+    // using PopulateTransitionFun = void(ThemeInfo*);
+    // static void populate_transition_hook(ThemeInfo*, PopulateTransitionFun*);
 
     using DoProceduralSpawnFun = void(ThemeInfo*, SpawnInfo*);
-    static bool pre_procedural_spawn(ThemeInfo*, SpawnInfo*);
-    static void post_procedural_spawn(ThemeInfo*, SpawnInfo*);
+    static void do_procedural_spawn_hook(ThemeInfo*, SpawnInfo*, DoProceduralSpawnFun*);
 
     LevelGenData* data;
     uint64_t unknown2;
