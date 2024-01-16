@@ -592,11 +592,6 @@ void update_spawn_type_flags()
 }
 void push_spawn_type_flags(SPAWN_TYPE flags)
 {
-    if (flags == SPAWN_TYPE_NONE)
-    {
-        return;
-    }
-
     for (size_t i = 0; i < g_SpawnTypes.size(); i++)
     {
         if (flags & (1 << i))
@@ -608,11 +603,6 @@ void push_spawn_type_flags(SPAWN_TYPE flags)
 }
 void pop_spawn_type_flags(SPAWN_TYPE flags)
 {
-    if (flags == SPAWN_TYPE_NONE)
-    {
-        return;
-    }
-
     for (size_t i = 0; i < g_SpawnTypes.size(); i++)
     {
         if (flags & (1 << i))

@@ -225,58 +225,35 @@ void State::godmode_companions(bool g)
 
 struct ThemeHookImpl
 {
-    template <class FunT, SpawnType SPAWN_TYPE, class TagT, class PreHookFunT, class PostHookFunT>
-    struct hook_wrapper;
-    template <class... ArgsT, SpawnType SPAWN_TYPE, class TagT, class PreHookFunT, class PostHookFunT>
-    struct hook_wrapper<void(ArgsT...), SPAWN_TYPE, TagT, PreHookFunT, PostHookFunT>
+    template <class FunT, class HookFunT>
+    struct lua_wrapper;
+    template <class... ArgsT, class HookFunT>
+    struct lua_wrapper<void(ArgsT...), HookFunT>
     {
-        static bool lua_pre(ArgsT... args)
+        static auto make(HookFunT* fun)
         {
-            push_spawn_type_flags(SPAWN_TYPE);
-            if (pre(args...))
+            return [=](ArgsT... args)
             {
-                pop_spawn_type_flags(SPAWN_TYPE);
-                return true;
-            }
-            return false;
+                thread_local bool tester;
+                tester = true;
+                fun(args..., [](ArgsT...)
+                    { tester = false; });
+                return tester;
+            };
         }
-        static void lua_post(ArgsT... args)
-        {
-            post(args...);
-            pop_spawn_type_flags(SPAWN_TYPE);
-        }
-        static void raw(ArgsT... args, void (*original)(ArgsT...))
-        {
-            push_spawn_type_flags(SPAWN_TYPE);
-            OnScopeExit pop{[]
-                            { pop_spawn_type_flags(SPAWN_TYPE); }};
-
-            if (pre(args...))
-                return;
-            original(args...);
-            post(args...);
-        }
-
-        inline static PreHookFunT* pre{nullptr};
-        inline static PostHookFunT* post{nullptr};
     };
 
-    template <class FunT, size_t Index, SpawnType SPAWN_TYPE, class TagT, class PreHookFunT, class PostHookFunT>
-    void hook(ThemeInfo* theme, PreHookFunT* pre_fun, PostHookFunT* post_fun)
+    template <class FunT, size_t Index, class HookFunT>
+    void hook(ThemeInfo* theme, HookFunT* fun)
     {
-        using WrapperT = hook_wrapper<FunT, SPAWN_TYPE, TagT, PreHookFunT, PostHookFunT>;
-        WrapperT::pre = pre_fun;
-        WrapperT::post = post_fun;
-
         if (get_do_hooks())
         {
             auto& vtable = NThemeVTables::get_theme_info_vtable(get_lua_vm());
-            vtable.set_pre<FunT, Index>(theme, vtable.reserve_callback_id(theme), WrapperT::lua_pre);
-            vtable.set_post<FunT, Index>(theme, vtable.reserve_callback_id(theme), WrapperT::lua_post);
+            vtable.set_pre<FunT, Index>(theme, vtable.reserve_callback_id(theme), lua_wrapper<FunT, HookFunT>::make(fun));
         }
         else
         {
-            hook_vtable<FunT, Index>(theme, WrapperT::raw);
+            hook_vtable<FunT, Index>(theme, fun);
         }
     }
 };
