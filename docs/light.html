@@ -768,6 +768,9 @@
                             <a href="#force_journal" class="toc-h3 toc-link" data-title="force_journal">force_journal</a>
                           </li>
                           <li>
+                            <a href="#get_address" class="toc-h3 toc-link" data-title="get_address">get_address</a>
+                          </li>
+                          <li>
                             <a href="#get_adventure_seed" class="toc-h3 toc-link" data-title="get_adventure_seed">get_adventure_seed</a>
                           </li>
                           <li>
@@ -808,6 +811,12 @@
                           </li>
                           <li>
                             <a href="#get_ms" class="toc-h3 toc-link" data-title="get_ms">get_ms</a>
+                          </li>
+                          <li>
+                            <a href="#get_performance_counter" class="toc-h3 toc-link" data-title="get_performance_counter">get_performance_counter</a>
+                          </li>
+                          <li>
+                            <a href="#get_performance_frequency" class="toc-h3 toc-link" data-title="get_performance_frequency">get_performance_frequency</a>
                           </li>
                           <li>
                             <a href="#get_setting" class="toc-h3 toc-link" data-title="get_setting">get_setting</a>
@@ -868,6 +877,12 @@
                           </li>
                           <li>
                             <a href="#pause" class="toc-h3 toc-link" data-title="pause">pause</a>
+                          </li>
+                          <li>
+                            <a href="#play_adventure" class="toc-h3 toc-link" data-title="play_adventure">play_adventure</a>
+                          </li>
+                          <li>
+                            <a href="#play_seeded" class="toc-h3 toc-link" data-title="play_seeded">play_seeded</a>
                           </li>
                           <li>
                             <a href="#register_console_command" class="toc-h3 toc-link" data-title="register_console_command">register_console_command</a>
@@ -1806,6 +1821,9 @@
                           </li>
                           <li>
                             <a href="#PRNG" class="toc-h3 toc-link" data-title="PRNG">PRNG</a>
+                          </li>
+                          <li>
+                            <a href="#PauseAPI" class="toc-h3 toc-link" data-title="PauseAPI">PauseAPI</a>
                           </li>
                           <li>
                             <a href="#Quad" class="toc-h3 toc-link" data-title="Quad">Quad</a>
@@ -3601,6 +3619,15 @@
                   <li>
                     <a href="#ON-POST_GAME_LOOP" class="toc-h2 toc-link" data-title="ON.POST_GAME_LOOP">ON.POST_GAME_LOOP</a>
                   </li>
+                  <li>
+                    <a href="#ON-BLOCKED_UPDATE" class="toc-h2 toc-link" data-title="ON.BLOCKED_UPDATE">ON.BLOCKED_UPDATE</a>
+                  </li>
+                  <li>
+                    <a href="#ON-BLOCKED_GAME_LOOP" class="toc-h2 toc-link" data-title="ON.BLOCKED_GAME_LOOP">ON.BLOCKED_GAME_LOOP</a>
+                  </li>
+                  <li>
+                    <a href="#ON-BLOCKED_PROCESS_INPUT" class="toc-h2 toc-link" data-title="ON.BLOCKED_PROCESS_INPUT">ON.BLOCKED_PROCESS_INPUT</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -3653,6 +3680,9 @@
                   </li>
                   <li>
                     <a href="#ENT_TYPE" class="toc-h2 toc-link" data-title="ENT_TYPE">ENT_TYPE</a>
+                  </li>
+                  <li>
+                    <a href="#FADE" class="toc-h2 toc-link" data-title="FADE">FADE</a>
                   </li>
                   <li>
                     <a href="#FLOOR_SIDE" class="toc-h2 toc-link" data-title="FLOOR_SIDE">FLOOR_SIDE</a>
@@ -3728,6 +3758,15 @@
                   </li>
                   <li>
                     <a href="#PAUSEUI_VISIBILITY" class="toc-h2 toc-link" data-title="PAUSEUI_VISIBILITY">PAUSEUI_VISIBILITY</a>
+                  </li>
+                  <li>
+                    <a href="#PAUSE_SCREEN" class="toc-h2 toc-link" data-title="PAUSE_SCREEN">PAUSE_SCREEN</a>
+                  </li>
+                  <li>
+                    <a href="#PAUSE_TRIGGER" class="toc-h2 toc-link" data-title="PAUSE_TRIGGER">PAUSE_TRIGGER</a>
+                  </li>
+                  <li>
+                    <a href="#PAUSE_TYPE" class="toc-h2 toc-link" data-title="PAUSE_TYPE">PAUSE_TYPE</a>
                   </li>
                   <li>
                     <a href="#POS_TYPE" class="toc-h2 toc-link" data-title="POS_TYPE">POS_TYPE</a>
@@ -5006,6 +5045,12 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 </blockquote>
 <h4 id='nil-force_journal-int-chapter-int-entry'>nil force_journal(int chapter, int entry)</h4>
 <p>Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to <code>JOURNALUI_PAGE_SHOWN.JOURNAL</code> to reset. (This forces the journal toggle to always read from <code>game_manager.save_related.journal_popup_ui.entry_to_show</code> etc.)</p>
+<h3 id='get_address'>get_address</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_address">get_address</a></p>
+</blockquote>
+<h4 id='nil-get_address-maybe_unused-any-o'>nil get_address([[maybe_unused]] any o)</h4>
+<p>Get memory address from a lua object</p>
 <h3 id='get_adventure_seed'>get_adventure_seed</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_adventure_seed">get_adventure_seed</a></p>
@@ -5089,6 +5134,18 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 </blockquote>
 <h4 id='nil-get_ms'>nil get_ms()</h4>
 <p>Get the current timestamp in milliseconds since the Unix Epoch.</p>
+<h3 id='get_performance_counter'>get_performance_counter</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_performance_counter">get_performance_counter</a></p>
+</blockquote>
+<h4 id='int-get_performance_counter'>int get_performance_counter()</h4>
+<p>Retrieves the current value of the performance counter, which is a high resolution (&lt;1us) time stamp that can be used for time-interval measurements.</p>
+<h3 id='get_performance_frequency'>get_performance_frequency</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_performance_frequency">get_performance_frequency</a></p>
+</blockquote>
+<h4 id='int-get_performance_frequency'>int get_performance_frequency()</h4>
+<p>Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.</p>
 <h3 id='get_setting'>get_setting</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_setting">get_setting</a></p>
@@ -5215,10 +5272,20 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></p>
 </blockquote>
-<h4 id='nil-pause-bool-p'>nil pause(bool p)</h4>
-<p>Pause/unpause the game.
-This is just short for <code>state.pause == 32</code>, but that produces an audio bug
-I suggest <code>state.pause == 2</code>, but that won&#39;t run any callback, <code>state.pause == 16</code> will do the same but <a href="#set_global_interval">set_global_interval</a> will still work</p>
+<h4 id='nil-pause'>nil pause()</h4>
+<p>Access the <a href="#PauseAPI">PauseAPI</a>, or directly call <code>pause(true)</code> to enable current <code>pause.pause_type</code></p>
+<h3 id='play_adventure'>play_adventure</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=play_adventure">play_adventure</a></p>
+</blockquote>
+<h4 id='nil-play_adventure'>nil play_adventure()</h4>
+<p>Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing <code>state.screen_next</code> right after calling this function, maybe with <code>warp()</code>. If player isn&#39;t already selected, make sure to set <code>state.items.player_select</code> and <code>state.items.player_count</code> appropriately too.</p>
+<h3 id='play_seeded'>play_seeded</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=play_seeded">play_seeded</a></p>
+</blockquote>
+<h4 id='nil-play_seeded-optional-seed'>nil play_seeded(optional<int> seed)</h4>
+<p>Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.</p>
 <h3 id='register_console_command'>register_console_command</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=register_console_command">register_console_command</a></p>
@@ -5395,7 +5462,7 @@ Look at the example on how to mimic game layer switching behavior</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_start_level_paused">set_start_level_paused</a></p>
 </blockquote>
 <h4 id='nil-set_start_level_paused-bool-enable'>nil set_start_level_paused(bool enable)</h4>
-<p>Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == <a href="#PAUSE">PAUSE</a>.FADE on the first frame to do what you want.</p>
+<p>Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == <a href="#PAUSE">PAUSE</a>.<a href="#FADE">FADE</a> on the first frame to do what you want.</p>
 <h3 id='set_storage_layer'>set_storage_layer</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- Sets the right layer when using the vanilla tile code if waddler is still happy,</span>
 <span class="c1">-- otherwise spawns the floor to the left of this tile.</span>
 <span class="c1">-- Manually spawning FLOOR_STORAGE pre-tilecode doesn't seem to work as expected,</span>
@@ -7036,6 +7103,11 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead<
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>array&lt;bool, 40&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=list">list</a></td>
+<td></td>
+</tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dwelling_1">dwelling_1</a></td>
@@ -9107,6 +9179,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=overlunky">overlunky</a></td>
 <td>Access <a href="#Overlunky">Overlunky</a> options here, nil if <a href="#Overlunky">Overlunky</a> is not loaded.</td>
 </tr>
+<tr>
+<td><a href="#PauseAPI">PauseAPI</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></td>
+<td><a href="#PauseAPI">PauseAPI</a> is used by <a href="#Overlunky">Overlunky</a> and can be used to control the <a href="#Overlunky">Overlunky</a> pause options from scripts. Can be accessed from the global <code>pause</code> more easily.</td>
+</tr>
 </tbody></table>
 <h3 id='Color'>Color</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- make a semi transparent red color and print it in different formats</span>
 <span class="kd">local</span> <span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="p">:</span><span class="n">red</span><span class="p">()</span>
@@ -9744,6 +9821,147 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pair">set_pair(PRNG_CLASS type, int first, int second)</a></td>
 <td></td>
+</tr>
+</tbody></table>
+<h3 id='PauseAPI'>PauseAPI</h3>
+<p>Control the pause API</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#PAUSE_TYPE">PAUSE_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></td>
+<td>Current pause state bitmask. Use custom <a href="#PAUSE_TYPE">PAUSE_TYPE</a>.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching <a href="#ON">ON</a> update callbacks, so can be set on the same callback you want to block at the latest. Vanilla <a href="#PAUSE">PAUSE</a> flags will be forwarded to state.pause, but use of vanilla <a href="#PAUSE">PAUSE</a> flags is discouraged and might not work with other <a href="#PauseAPI">PauseAPI</a> features.</td>
+</tr>
+<tr>
+<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#PAUSE_TYPE">PAUSE_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause_type">pause_type</a></td>
+<td>Pause mask to toggle when using the <a href="#PauseAPI">PauseAPI</a> methods to set or get pause state.</td>
+</tr>
+<tr>
+<td><a href="#PAUSE_TRIGGER">PAUSE_TRIGGER</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause_trigger">pause_trigger</a></td>
+<td>Bitmask for conditions when the current <code>pause_type</code> should be automatically enabled in <code>pause</code>, can have multiple conditions.</td>
+</tr>
+<tr>
+<td><a href="#PAUSE_SCREEN">PAUSE_SCREEN</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause_screen">pause_screen</a></td>
+<td>Bitmask to only enable <a href="#PAUSE_TRIGGER">PAUSE_TRIGGER</a>.<a href="#SCREEN">SCREEN</a> during specific <a href="#SCREEN">SCREEN</a>, or any screen when NONE.</td>
+</tr>
+<tr>
+<td><a href="#PAUSE_TRIGGER">PAUSE_TRIGGER</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unpause_trigger">unpause_trigger</a></td>
+<td>Bitmask for conditions when the current <code>pause_type</code> should be automatically disabled in <code>pause</code>, can have multiple conditions.</td>
+</tr>
+<tr>
+<td><a href="#PAUSE_SCREEN">PAUSE_SCREEN</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unpause_screen">unpause_screen</a></td>
+<td>Bitmask to only enable <a href="#PAUSE_TRIGGER">PAUSE_TRIGGER</a>.<a href="#SCREEN">SCREEN</a> during specific <a href="#SCREEN">SCREEN</a>, or any screen when NONE.</td>
+</tr>
+<tr>
+<td><a href="#PAUSE_SCREEN">PAUSE_SCREEN</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ignore_screen">ignore_screen</a></td>
+<td>Bitmask for game <a href="#SCREEN">SCREEN</a> where the PRE_✱ pause types are ignored, even though enabled in <code>pause</code>. Can also use the special cases [FADE, EXIT] to unfreeze temporarily during fades (or other screen transitions where player input is probably impossible) or the level exit walk of shame.</td>
+</tr>
+<tr>
+<td><a href="#PAUSE_SCREEN">PAUSE_SCREEN</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ignore_screen_trigger">ignore_screen_trigger</a></td>
+<td>Bitmask for game <a href="#SCREEN">SCREEN</a> where the triggers are ignored.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=skip">skip</a></td>
+<td>Set to true to unfreeze the game for one update cycle. Sets back to false after <a href="#ON">ON</a>.POST_GAME_LOOP, so it can be used to check if current frame is a frame advance frame.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update_camera">update_camera</a></td>
+<td>Set to true to enable normal camera movement when the game is paused or frozen on a callback by <a href="#PauseAPI">PauseAPI</a>.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=blocked">blocked</a></td>
+<td>Is true when <a href="#PauseAPI">PauseAPI</a> is freezing the game.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=skip_fade">skip_fade</a></td>
+<td>Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=last_instance">last_instance</a></td>
+<td>Set to true to run pause logic and triggers only in the last API instance in the chain (Playlunky) when multiple instances of the API (<a href="#Overlunky">Overlunky</a> and Playlunky) are injected.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=last_trigger_frame">last_trigger_frame</a></td>
+<td>Global frame stamp when one of the triggers was last triggered, used to prevent running them again on the same frame on unpause.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=last_fade_timer">last_fade_timer</a></td>
+<td>Fade timer stamp when fade triggers were last checked.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=frame_advance">frame_advance()</a></td>
+<td>Sets skip</td>
+</tr>
+<tr>
+<td><a href="#PAUSE_TYPE">PAUSE_TYPE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_pause">get_pause()</a></td>
+<td>Get the current pause flags</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pause">set_pause(PAUSE_TYPE flags)</a></td>
+<td>Set the current pause flags</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_paused">set_paused(bool enable = true)</a></td>
+<td>Enable/disable the current pause_type flags in pause state</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=paused">paused()</a></td>
+<td>Is the game currently paused and that pause state matches any of the current the pause_type</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=toggle">toggle()</a></td>
+<td>Toggles pause state</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=loading">loading()</a></td>
+<td>Is the game currently loading and <a href="#PAUSE_SCREEN">PAUSE_SCREEN</a>.LOADING would be triggered, based on state.loading and some arbitrary checks.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modifiers_down">modifiers_down</a></td>
+<td>Bitmask of modifier KEYs that are currently held</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modifiers_block">modifiers_block</a></td>
+<td>Bitmask of modifier KEYs that will block all game input</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modifiers_clear_input">modifiers_clear_input</a></td>
+<td>Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key</td>
 </tr>
 </tbody></table>
 <h3 id='Quad'>Quad</h3>
@@ -16575,16 +16793,6 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td>Next <a href="#SCREEN">SCREEN</a>, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see <code>state.loading</code>.</td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ingame">ingame</a></td>
-<td>Is 1 when you in a game, is set to 0 or 1 in main menu, can&#39;t be trusted there, normally in a level is 1 unless you go to the options</td>
-</tr>
-<tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=playing">playing</a></td>
-<td>Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don&#39;t trust it</td>
-</tr>
-<tr>
 <td><a href="#PAUSE">PAUSE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></td>
 <td>8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can&#39;t set, controlled by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.</td>
@@ -16740,11 +16948,6 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=loading">loading</a></td>
-<td>Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to <code>screen_next</code>.</td>
-</tr>
-<tr>
 <td><a href="#QUEST_FLAG">QUEST_FLAG</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=quest_flags">quest_flags</a></td>
 <td>32bit flags, can be written to trigger a run reset on next level load etc.</td>
@@ -16753,6 +16956,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td><a href="#PRESENCE_FLAG">PRESENCE_FLAG</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=presence_flags">presence_flags</a></td>
 <td></td>
+</tr>
+<tr>
+<td><a href="#FADE">FADE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=loading">loading</a></td>
+<td>Current loading/fade state. Pauses all updates if &gt; <a href="#FADE">FADE</a>.NONE. Writing <a href="#FADE">FADE</a>.OUT or <a href="#FADE">FADE</a>.LOAD will trigger a screen load to <code>screen_next</code>.</td>
 </tr>
 <tr>
 <td>float</td>
@@ -16771,8 +16979,18 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 <tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=loading_black_screen_timer">loading_black_screen_timer</a></td>
-<td>if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fade_delay">fade_delay</a></td>
+<td>Additional delay after fade_timer reaches 0, before moving to the next fading state. Used after Ouroboros, in credits etc. for longer black screens, but also works after <a href="#FADE">FADE</a>.IN.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fade_enabled">fade_enabled</a></td>
+<td>Enables the fade effect on <a href="#FADE">FADE</a>.IN, setting to false makes loading skip <a href="#FADE">FADE</a>.IN state instantly</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fade_circle">fade_circle</a></td>
+<td>Makes loading use circle iris effect instead of fade on <a href="#FADE">FADE</a>.IN</td>
 </tr>
 <tr>
 <td>int</td>
@@ -20390,6 +20608,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 <tr>
 <td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=apply_layer">apply_layer()</a></td>
+<td>Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update</td>
+</tr>
+<tr>
+<td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=remove">remove()</a></td>
 <td>Moves the entity to the limbo-layer where it can later be retrieved from again via <code>respawn</code></td>
 </tr>
@@ -20472,6 +20695,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destroy_recursive">destroy_recursive()</a></td>
 <td>Short for using <a href="#RECURSIVE_MODE">RECURSIVE_MODE</a>.NONE</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=update">update()</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -28797,7 +29025,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_GENERATION">ON.PRE_LEVEL_GENERATION</a></p>
 </blockquote>
 
-<p>Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.<br/></p>
+<p>Runs before any level generation, no entities exist at this point. Runs in most screens that have entities. Return true to block normal level generation, i.e. stop any entities from being spawned by <a href="#ThemeInfo">ThemeInfo</a> functions. Does not block other <a href="#ThemeInfo">ThemeInfo</a> functions, like spawn_effects though. POST_LEVEL_GENERATION will still run if this callback is blocked.<br/></p>
 <h2 id='ON-PRE_LOAD_SCREEN'>ON.PRE_LOAD_SCREEN</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">ON.PRE_LOAD_SCREEN</a></p>
@@ -28815,7 +29043,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_GENERATION">ON.POST_LEVEL_GENERATION</a></p>
 </blockquote>
 
-<p>Runs right after level generation is done, before any entities are updated<br/></p>
+<p>Runs right after level generation is done, i.e. after all level gen entities are spawned, before any entities are updated. You can spawn your own entities here, like extra enemies, give items to players etc.<br/></p>
 <h2 id='ON-POST_LOAD_SCREEN'>ON.POST_LOAD_SCREEN</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_SCREEN">ON.POST_LOAD_SCREEN</a></p>
@@ -29090,6 +29318,24 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </blockquote>
 
 <p>Runs right after the main engine loop.<br/></p>
+<h2 id='ON-BLOCKED_UPDATE'>ON.BLOCKED_UPDATE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.BLOCKED_UPDATE">ON.BLOCKED_UPDATE</a></p>
+</blockquote>
+
+<p>Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when <a href="#Overlunky">Overlunky</a> blocks a PRE_UPDATE.<br/></p>
+<h2 id='ON-BLOCKED_GAME_LOOP'>ON.BLOCKED_GAME_LOOP</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.BLOCKED_GAME_LOOP">ON.BLOCKED_GAME_LOOP</a></p>
+</blockquote>
+
+<p>Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when <a href="#Overlunky">Overlunky</a> blocks a PRE_GAME_LOOP.<br/></p>
+<h2 id='ON-BLOCKED_PROCESS_INPUT'>ON.BLOCKED_PROCESS_INPUT</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.BLOCKED_PROCESS_INPUT">ON.BLOCKED_PROCESS_INPUT</a></p>
+</blockquote>
+
+<p>Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when <a href="#Overlunky">Overlunky</a> blocks a PRE_PROCESS_INPUT.<br/></p>
 <h1 id='Enums'>Enums</h1>
 <p>Enums are like numbers but in text that&#39;s easier to remember.</p>
 <div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
@@ -30201,6 +30447,39 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ENT_TYPE.LIQUID_COARSE_LAVA">LIQUID_COARSE_LAVA</a></td>
 <td>915</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='FADE'>FADE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=FADE">FADE</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=FADE.NONE">NONE</a></td>
+<td>0</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=FADE.OUT">OUT</a></td>
+<td>1</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=FADE.LOAD">LOAD</a></td>
+<td>2</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=FADE.IN">IN</a></td>
+<td>3</td>
 <td></td>
 </tr>
 </tbody></table>
@@ -31821,7 +32100,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_GENERATION">PRE_LEVEL_GENERATION</a></td>
 <td>ON::PRE_LEVEL_GENERATION</td>
-<td>Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.<br/></td>
+<td>Runs before any level generation, no entities exist at this point. Runs in most screens that have entities. Return true to block normal level generation, i.e. stop any entities from being spawned by <a href="#ThemeInfo">ThemeInfo</a> functions. Does not block other <a href="#ThemeInfo">ThemeInfo</a> functions, like spawn_effects though. POST_LEVEL_GENERATION will still run if this callback is blocked.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LOAD_SCREEN">PRE_LOAD_SCREEN</a></td>
@@ -31836,7 +32115,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_GENERATION">POST_LEVEL_GENERATION</a></td>
 <td>ON::POST_LEVEL_GENERATION</td>
-<td>Runs right after level generation is done, before any entities are updated<br/></td>
+<td>Runs right after level generation is done, i.e. after all level gen entities are spawned, before any entities are updated. You can spawn your own entities here, like extra enemies, give items to players etc.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_SCREEN">POST_LOAD_SCREEN</a></td>
@@ -32053,6 +32332,21 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>ON::POST_GAME_LOOP</td>
 <td>Runs right after the main engine loop.<br/></td>
 </tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.BLOCKED_UPDATE">BLOCKED_UPDATE</a></td>
+<td>ON::BLOCKED_UPDATE</td>
+<td>Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when <a href="#Overlunky">Overlunky</a> blocks a PRE_UPDATE.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.BLOCKED_GAME_LOOP">BLOCKED_GAME_LOOP</a></td>
+<td>ON::BLOCKED_GAME_LOOP</td>
+<td>Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when <a href="#Overlunky">Overlunky</a> blocks a PRE_GAME_LOOP.<br/></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.BLOCKED_PROCESS_INPUT">BLOCKED_PROCESS_INPUT</a></td>
+<td>ON::BLOCKED_PROCESS_INPUT</td>
+<td>Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when <a href="#Overlunky">Overlunky</a> blocks a PRE_PROCESS_INPUT.<br/></td>
+</tr>
 </tbody></table>
 <h2 id='PARTICLEEMITTER'>PARTICLEEMITTER</h2>
 <blockquote>
@@ -32157,6 +32451,301 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSEUI_VISIBILITY.SLIDING_UP">SLIDING_UP</a></td>
 <td>3</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='PAUSE_SCREEN'>PAUSE_SCREEN</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN">PAUSE_SCREEN</a></p>
+</blockquote>
+
+<p>Used in <a href="#PauseAPI">PauseAPI</a></p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.NONE">NONE</a></td>
+<td>PAUSE_SCREEN::NONE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.LOGO">LOGO</a></td>
+<td>PAUSE_SCREEN::LOGO</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.INTRO">INTRO</a></td>
+<td>PAUSE_SCREEN::INTRO</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.PROLOGUE">PROLOGUE</a></td>
+<td>PAUSE_SCREEN::PROLOGUE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.TITLE">TITLE</a></td>
+<td>PAUSE_SCREEN::TITLE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.MENU">MENU</a></td>
+<td>PAUSE_SCREEN::MENU</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.OPTIONS">OPTIONS</a></td>
+<td>PAUSE_SCREEN::OPTIONS</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.PLAYER_PROFILE">PLAYER_PROFILE</a></td>
+<td>PAUSE_SCREEN::PLAYER_PROFILE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.LEADERBOARD">LEADERBOARD</a></td>
+<td>PAUSE_SCREEN::LEADERBOARD</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.SEED_INPUT">SEED_INPUT</a></td>
+<td>PAUSE_SCREEN::SEED_INPUT</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.CHARACTER_SELECT">CHARACTER_SELECT</a></td>
+<td>PAUSE_SCREEN::CHARACTER_SELECT</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.TEAM_SELECT">TEAM_SELECT</a></td>
+<td>PAUSE_SCREEN::TEAM_SELECT</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.CAMP">CAMP</a></td>
+<td>PAUSE_SCREEN::CAMP</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.LEVEL">LEVEL</a></td>
+<td>PAUSE_SCREEN::LEVEL</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.TRANSITION">TRANSITION</a></td>
+<td>PAUSE_SCREEN::TRANSITION</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.DEATH">DEATH</a></td>
+<td>PAUSE_SCREEN::DEATH</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.SPACESHIP">SPACESHIP</a></td>
+<td>PAUSE_SCREEN::SPACESHIP</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.WIN">WIN</a></td>
+<td>PAUSE_SCREEN::WIN</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.CREDITS">CREDITS</a></td>
+<td>PAUSE_SCREEN::CREDITS</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.SCORES">SCORES</a></td>
+<td>PAUSE_SCREEN::SCORES</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.CONSTELLATION">CONSTELLATION</a></td>
+<td>PAUSE_SCREEN::CONSTELLATION</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.RECAP">RECAP</a></td>
+<td>PAUSE_SCREEN::RECAP</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ARENA_MENU">ARENA_MENU</a></td>
+<td>PAUSE_SCREEN::ARENA_MENU</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ARENA_STAGES">ARENA_STAGES</a></td>
+<td>PAUSE_SCREEN::ARENA_STAGES</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ARENA_ITEMS">ARENA_ITEMS</a></td>
+<td>PAUSE_SCREEN::ARENA_ITEMS</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ARENA_SELECT">ARENA_SELECT</a></td>
+<td>PAUSE_SCREEN::ARENA_SELECT</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ARENA_INTRO">ARENA_INTRO</a></td>
+<td>PAUSE_SCREEN::ARENA_INTRO</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ARENA_LEVEL">ARENA_LEVEL</a></td>
+<td>PAUSE_SCREEN::ARENA_LEVEL</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ARENA_SCORE">ARENA_SCORE</a></td>
+<td>PAUSE_SCREEN::ARENA_SCORE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ONLINE_LOADING">ONLINE_LOADING</a></td>
+<td>PAUSE_SCREEN::ONLINE_LOADING</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.ONLINE_LOBBY">ONLINE_LOBBY</a></td>
+<td>PAUSE_SCREEN::ONLINE_LOBBY</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.LOADING">LOADING</a></td>
+<td>PAUSE_SCREEN::LOADING</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_SCREEN.EXIT">EXIT</a></td>
+<td>PAUSE_SCREEN::EXIT</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='PAUSE_TRIGGER'>PAUSE_TRIGGER</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TRIGGER">PAUSE_TRIGGER</a></p>
+</blockquote>
+
+<p>Used in <a href="#PauseAPI">PauseAPI</a></p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TRIGGER.NONE">NONE</a></td>
+<td>PAUSE_TRIGGER::NONE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TRIGGER.FADE_START">FADE_START</a></td>
+<td>PAUSE_TRIGGER::FADE_START</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TRIGGER.FADE_END">FADE_END</a></td>
+<td>PAUSE_TRIGGER::FADE_END</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TRIGGER.SCREEN">SCREEN</a></td>
+<td>PAUSE_TRIGGER::SCREEN</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TRIGGER.ONCE">ONCE</a></td>
+<td>PAUSE_TRIGGER::ONCE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TRIGGER.EXIT">EXIT</a></td>
+<td>PAUSE_TRIGGER::EXIT</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id='PAUSE_TYPE'>PAUSE_TYPE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE">PAUSE_TYPE</a></p>
+</blockquote>
+
+<p>Used in <a href="#PauseAPI">PauseAPI</a></p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.NONE">NONE</a></td>
+<td>PAUSE_TYPE::NONE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.MENU">MENU</a></td>
+<td>PAUSE_TYPE::MENU</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.FADE">FADE</a></td>
+<td>PAUSE_TYPE::FADE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.CUTSCENE">CUTSCENE</a></td>
+<td>PAUSE_TYPE::CUTSCENE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.FLAG4">FLAG4</a></td>
+<td>PAUSE_TYPE::FLAG4</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.FLAG5">FLAG5</a></td>
+<td>PAUSE_TYPE::FLAG5</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.ANKH">ANKH</a></td>
+<td>PAUSE_TYPE::ANKH</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.PRE_UPDATE">PRE_UPDATE</a></td>
+<td>PAUSE_TYPE::PRE_UPDATE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.PRE_GAME_LOOP">PRE_GAME_LOOP</a></td>
+<td>PAUSE_TYPE::PRE_GAME_LOOP</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.PRE_PROCESS_INPUT">PRE_PROCESS_INPUT</a></td>
+<td>PAUSE_TYPE::PRE_PROCESS_INPUT</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PAUSE_TYPE.FORCE_STATE">FORCE_STATE</a></td>
+<td>PAUSE_TYPE::FORCE_STATE</td>
 <td></td>
 </tr>
 </tbody></table>

@@ -6402,6 +6402,7 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field update_camera boolean @Set to true to enable normal camera movement when the game is paused or frozen on a callback by PauseAPI.
     ---@field blocked boolean @Is true when PauseAPI is freezing the game.
     ---@field skip_fade boolean @Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
+    ---@field last_instance boolean @Set to true to run pause logic and triggers only in the last API instance in the chain (Playlunky) when multiple instances of the API (Overlunky and Playlunky) are injected.
     ---@field last_trigger_frame integer @Global frame stamp when one of the triggers was last triggered, used to prevent running them again on the same frame on unpause.
     ---@field last_fade_timer integer @Fade timer stamp when fade triggers were last checked.
     ---@field frame_advance fun(self): nil @Sets skip

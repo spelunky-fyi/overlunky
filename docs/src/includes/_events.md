@@ -290,7 +290,7 @@ Params: [PreLoadLevelFilesContext](#PreLoadLevelFilesContext) load_level_ctx<br/
 
 > Search script examples for [ON.PRE_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LEVEL_GENERATION)
 
-Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.<br/>
+Runs before any level generation, no entities exist at this point. Runs in most screens that have entities. Return true to block normal level generation, i.e. stop any entities from being spawned by [ThemeInfo](#ThemeInfo) functions. Does not block other [ThemeInfo](#ThemeInfo) functions, like spawn_effects though. POST_LEVEL_GENERATION will still run if this callback is blocked.<br/>
 
 ## ON.PRE_LOAD_SCREEN
 
@@ -311,7 +311,7 @@ Params: [PostRoomGenerationContext](#PostRoomGenerationContext) room_gen_ctx<br/
 
 > Search script examples for [ON.POST_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION)
 
-Runs right after level generation is done, before any entities are updated<br/>
+Runs right after level generation is done, i.e. after all level gen entities are spawned, before any entities are updated. You can spawn your own entities here, like extra enemies, give items to players etc.<br/>
 
 ## ON.POST_LOAD_SCREEN
 
@@ -634,26 +634,23 @@ Runs right before the main engine loop. Return true to block state updates and m
 
 Runs right after the main engine loop.<br/>
 
-## ON.BLOCKED_LEVEL_GENERATION
-
-
-> Search script examples for [ON.BLOCKED_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_LEVEL_GENERATION)
-
-
 ## ON.BLOCKED_UPDATE
 
 
 > Search script examples for [ON.BLOCKED_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_UPDATE)
 
+Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_UPDATE.<br/>
 
 ## ON.BLOCKED_GAME_LOOP
 
 
 > Search script examples for [ON.BLOCKED_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_GAME_LOOP)
 
+Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_GAME_LOOP.<br/>
 
 ## ON.BLOCKED_PROCESS_INPUT
 
 
 > Search script examples for [ON.BLOCKED_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_PROCESS_INPUT)
 
+Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_PROCESS_INPUT.<br/>

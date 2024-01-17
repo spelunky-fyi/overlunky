@@ -850,6 +850,7 @@ bool | [skip](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip) | S
 bool | [update_camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_camera) | Set to true to enable normal camera movement when the game is paused or frozen on a callback by [PauseAPI](#PauseAPI).
 bool | [blocked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blocked) | Is true when [PauseAPI](#PauseAPI) is freezing the game.
 bool | [skip_fade](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip_fade) | Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
+bool | [last_instance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_instance) | Set to true to run pause logic and triggers only in the last API instance in the chain (Playlunky) when multiple instances of the API ([Overlunky](#Overlunky) and Playlunky) are injected.
 int | [last_trigger_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_trigger_frame) | Global frame stamp when one of the triggers was last triggered, used to prevent running them again on the same frame on unpause.
 int | [last_fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_fade_timer) | Fade timer stamp when fade triggers were last checked.
 nil | [frame_advance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frame_advance) | Sets skip
