@@ -18,6 +18,7 @@
 #include <tuple>         // for tie, tuple
 #include <unordered_map> // for unordered_map, _Umap_traits<>::allo...
 
+#include "bucket.hpp"                // for Bucket
 #include "entities_activefloors.hpp" //
 #include "entities_items.hpp"        //
 #include "entities_monsters.hpp"     // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
@@ -827,9 +828,8 @@ void level_gen(LevelGenSystem* level_gen_sys, float param_2, size_t param_3)
     g_CustomShopTypes[0] = {};
     g_CustomShopTypes[1] = {};
 
-    if (pre_event(ON::PRE_LEVEL_GENERATION))
-        return;
-    g_level_gen_trampoline(level_gen_sys, param_2, param_3);
+    if (!pre_event(ON::PRE_LEVEL_GENERATION))
+        g_level_gen_trampoline(level_gen_sys, param_2, param_3);
     post_level_generation();
 
     for (size_t i = 0; i < sizeof(LevelGenRooms) / sizeof(uint16_t); i++)
@@ -1827,9 +1827,8 @@ void LevelGenSystem::init()
                 OnScopeExit pop{[]
                                 { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
 
-                if (pre_event(ON::PRE_LEVEL_GENERATION))
-                    return;
-                original(th);
+                if (!pre_event(ON::PRE_LEVEL_GENERATION))
+                    original(th);
                 post_event(ON::POST_LEVEL_GENERATION);
             });
     }

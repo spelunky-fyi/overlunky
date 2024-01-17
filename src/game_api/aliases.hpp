@@ -1,6 +1,50 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
+
+#define ENUM_CLASS_FLAGS(Enum)                                      \
+    inline constexpr Enum operator|(Enum Lhs, Enum Rhs)             \
+    {                                                               \
+        return static_cast<Enum>(                                   \
+            static_cast<std::underlying_type_t<Enum>>(Lhs) |        \
+            static_cast<std::underlying_type_t<Enum>>(Rhs));        \
+    }                                                               \
+    inline constexpr Enum operator&(Enum Lhs, Enum Rhs)             \
+    {                                                               \
+        return static_cast<Enum>(                                   \
+            static_cast<std::underlying_type_t<Enum>>(Lhs) &        \
+            static_cast<std::underlying_type_t<Enum>>(Rhs));        \
+    }                                                               \
+    inline constexpr Enum operator^(Enum Lhs, Enum Rhs)             \
+    {                                                               \
+        return static_cast<Enum>(                                   \
+            static_cast<std::underlying_type_t<Enum>>(Lhs) ^        \
+            static_cast<std::underlying_type_t<Enum>>(Rhs));        \
+    }                                                               \
+    inline constexpr Enum operator~(Enum E)                         \
+    {                                                               \
+        return static_cast<Enum>(                                   \
+            ~static_cast<std::underlying_type_t<Enum>>(E));         \
+    }                                                               \
+    inline Enum& operator|=(Enum& Lhs, Enum Rhs)                    \
+    {                                                               \
+        return Lhs = static_cast<Enum>(                             \
+                   static_cast<std::underlying_type_t<Enum>>(Lhs) | \
+                   static_cast<std::underlying_type_t<Enum>>(Rhs)); \
+    }                                                               \
+    inline Enum& operator&=(Enum& Lhs, Enum Rhs)                    \
+    {                                                               \
+        return Lhs = static_cast<Enum>(                             \
+                   static_cast<std::underlying_type_t<Enum>>(Lhs) & \
+                   static_cast<std::underlying_type_t<Enum>>(Rhs)); \
+    }                                                               \
+    inline Enum& operator^=(Enum& Lhs, Enum Rhs)                    \
+    {                                                               \
+        return Lhs = static_cast<Enum>(                             \
+                   static_cast<std::underlying_type_t<Enum>>(Lhs) ^ \
+                   static_cast<std::underlying_type_t<Enum>>(Rhs)); \
+    }
 
 using CallbackId = uint32_t;
 using Flags = uint32_t;
@@ -65,3 +109,68 @@ enum class LogLevel
     Fatal = 1,
     Error = 2
 };
+
+enum class PAUSE_TYPE : int64_t
+{
+    NONE = 0,
+    MENU = 1 << 0,
+    FADE = 1 << 1,
+    CUTSCENE = 1 << 2,
+    FLAG4 = 1 << 3,
+    FLAG5 = 1 << 4,
+    ANKH = 1 << 5,
+    PRE_UPDATE = 1 << 6,
+    PRE_GAME_LOOP = 1 << 7,
+    PRE_PROCESS_INPUT = 1 << 8,
+    FORCE_STATE = 1 << 9,
+};
+ENUM_CLASS_FLAGS(PAUSE_TYPE);
+
+enum class PAUSE_TRIGGER : int64_t
+{
+    NONE = 0,
+    FADE_START = 1 << 0,
+    FADE_END = 1 << 1,
+    SCREEN = 1 << 2,
+    EXIT = 1 << 3,
+    ONCE = 1 << 4,
+};
+ENUM_CLASS_FLAGS(PAUSE_TRIGGER);
+
+enum class PAUSE_SCREEN : int64_t
+{
+    NONE = 0,
+    LOGO = 1 << 0,
+    INTRO = 1 << 1,
+    PROLOGUE = 1 << 2,
+    TITLE = 1 << 3,
+    MENU = 1 << 4,
+    OPTIONS = 1 << 5,
+    PLAYER_PROFILE = 1 << 6,
+    LEADERBOARD = 1 << 7,
+    SEED_INPUT = 1 << 8,
+    CHARACTER_SELECT = 1 << 9,
+    TEAM_SELECT = 1 << 10,
+    CAMP = 1 << 11,
+    LEVEL = 1 << 12,
+    TRANSITION = 1 << 13,
+    DEATH = 1 << 14,
+    SPACESHIP = 1 << 15,
+    WIN = 1 << 16,
+    CREDITS = 1 << 17,
+    SCORES = 1 << 18,
+    CONSTELLATION = 1 << 19,
+    RECAP = 1 << 20,
+    ARENA_MENU = 1 << 21,
+    ARENA_STAGES = 1 << 22,
+    ARENA_ITEMS = 1 << 23,
+    ARENA_SELECT = 1 << 24,
+    ARENA_INTRO = 1 << 25,
+    ARENA_LEVEL = 1 << 26,
+    ARENA_SCORE = 1 << 27,
+    ONLINE_LOADING = 1 << 28,
+    ONLINE_LOBBY = 1 << 29,
+    LOADING = 1 << 30,
+    EXIT = 1 << 31,
+};
+ENUM_CLASS_FLAGS(PAUSE_SCREEN);

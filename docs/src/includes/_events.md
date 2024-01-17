@@ -633,3 +633,27 @@ Runs right before the main engine loop. Return true to block state updates and m
 > Search script examples for [ON.POST_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_GAME_LOOP)
 
 Runs right after the main engine loop.<br/>
+
+## ON.BLOCKED_LEVEL_GENERATION
+
+
+> Search script examples for [ON.BLOCKED_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_LEVEL_GENERATION)
+
+
+## ON.BLOCKED_UPDATE
+
+
+> Search script examples for [ON.BLOCKED_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_UPDATE)
+
+
+## ON.BLOCKED_GAME_LOOP
+
+
+> Search script examples for [ON.BLOCKED_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_GAME_LOOP)
+
+
+## ON.BLOCKED_PROCESS_INPUT
+
+
+> Search script examples for [ON.BLOCKED_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_PROCESS_INPUT)
+

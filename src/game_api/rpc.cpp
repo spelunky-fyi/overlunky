@@ -1895,21 +1895,11 @@ void init_adventure()
     iaf();
 }
 
-void init_seeded(uint32_t seed)
+void init_seeded(std::optional<uint32_t> seed)
 {
     static const size_t offset = get_address("init_seeded");
     typedef void init_func(void*, uint32_t);
     static init_func* isf = (init_func*)(offset);
-    isf(State::get().ptr(), seed);
-}
-
-void update_camera_position()
-{
-    auto camera = State::get().ptr()->camera;
-    static const size_t offset = get_address("update_camera_position");
-    typedef void update_camera_func(Camera*);
-    static update_camera_func* ucf = (update_camera_func*)(offset);
-    ucf(camera);
-    camera->calculated_focus_x = camera->adjusted_focus_x;
-    camera->calculated_focus_y = camera->adjusted_focus_y;
+    auto* state = State::get().ptr();
+    isf(state, seed.value_or(state->seed));
 }

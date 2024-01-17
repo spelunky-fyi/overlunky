@@ -20,10 +20,46 @@ void register_usertypes(sol::state& lua)
     ol_type["set_selected_uid"] = &Overlunky::set_selected_uid;
     ol_type["set_selected_uids"] = &Overlunky::set_selected_uids;
 
+    /// Control the pause API
+    auto pauseapi_type = lua.new_usertype<PauseAPI>("PauseAPI", sol::no_constructor);
+    // pauseapi_type["pause"] = &PauseAPI::pause;
+    pauseapi_type["pause"] = sol::property(&PauseAPI::get_pause, &PauseAPI::set_pause);
+    pauseapi_type["pause_type"] = &PauseAPI::pause_type;
+    pauseapi_type["pause_trigger"] = &PauseAPI::pause_trigger;
+    pauseapi_type["pause_screen"] = &PauseAPI::pause_screen;
+    pauseapi_type["unpause_trigger"] = &PauseAPI::unpause_trigger;
+    pauseapi_type["unpause_screen"] = &PauseAPI::unpause_screen;
+    pauseapi_type["ignore_screen"] = &PauseAPI::ignore_screen;
+    pauseapi_type["ignore_screen_trigger"] = &PauseAPI::ignore_screen_trigger;
+    pauseapi_type["skip"] = &PauseAPI::skip;
+    pauseapi_type["update_camera"] = &PauseAPI::update_camera;
+    pauseapi_type["blocked"] = &PauseAPI::blocked;
+    pauseapi_type["skip_fade"] = &PauseAPI::skip_fade;
+    pauseapi_type["last_instance"] = &PauseAPI::last_instance;
+    pauseapi_type["last_trigger_frame"] = &PauseAPI::last_trigger_frame;
+    pauseapi_type["last_fade_timer"] = &PauseAPI::last_fade_timer;
+    pauseapi_type["frame_advance"] = &PauseAPI::frame_advance;
+    pauseapi_type["get_pause"] = &PauseAPI::get_pause;
+    pauseapi_type["set_pause"] = &PauseAPI::set_pause;
+    pauseapi_type["set_paused"] = &PauseAPI::set_paused;
+    pauseapi_type["paused"] = &PauseAPI::paused;
+    pauseapi_type["toggle"] = &PauseAPI::toggle;
+    pauseapi_type["loading"] = &PauseAPI::loading;
+    pauseapi_type["modifiers_down"] = &PauseAPI::modifiers_down;
+    pauseapi_type["modifiers_block"] = &PauseAPI::modifiers_block;
+    pauseapi_type["modifiers_clear_input"] = &PauseAPI::modifiers_clear_input;
+
+    /// Access the PauseAPI, or directly call `pause(true)` to enable current `pause.pause_type`
+    // lua["pause"] = PauseAPI;
+    lua["pause"] = Bucket::get()->pause_api;
+    /// NoDoc
+    lua["pause"][sol::metatable_key]["__call"] = &PauseAPI::set_paused;
+
     /// Shared memory structure used for Playlunky-Overlunky interoperability
     auto bucket_type = lua.new_usertype<Bucket>("Bucket", sol::no_constructor);
     bucket_type["data"] = &Bucket::data;
     bucket_type["overlunky"] = sol::readonly(&Bucket::overlunky);
+    bucket_type["pause"] = &Bucket::pause_api;
 
     /// Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
     // lua["get_bucket"] = []() -> Bucket*
@@ -134,5 +170,14 @@ void register_usertypes(sol::state& lua)
         lua["KEY"][std::string{c}] = (int)c;
     for (char c = 'A'; c <= 'Z'; c++)
         lua["KEY"][std::string{c}] = (int)c;
+
+    /// Used in PauseAPI
+    lua.create_named_table("PAUSE_TYPE", "NONE", PAUSE_TYPE::NONE, "MENU", PAUSE_TYPE::MENU, "FADE", PAUSE_TYPE::FADE, "CUTSCENE", PAUSE_TYPE::CUTSCENE, "FLAG4", PAUSE_TYPE::FLAG4, "FLAG5", PAUSE_TYPE::FLAG5, "ANKH", PAUSE_TYPE::ANKH, "PRE_UPDATE", PAUSE_TYPE::PRE_UPDATE, "PRE_GAME_LOOP", PAUSE_TYPE::PRE_GAME_LOOP, "PRE_PROCESS_INPUT", PAUSE_TYPE::PRE_PROCESS_INPUT, "FORCE_STATE", PAUSE_TYPE::FORCE_STATE);
+
+    /// Used in PauseAPI
+    lua.create_named_table("PAUSE_TRIGGER", "NONE", PAUSE_TRIGGER::NONE, "FADE_START", PAUSE_TRIGGER::FADE_START, "FADE_END", PAUSE_TRIGGER::FADE_END, "SCREEN", PAUSE_TRIGGER::SCREEN, "ONCE", PAUSE_TRIGGER::ONCE, "EXIT", PAUSE_TRIGGER::EXIT);
+
+    /// Used in PauseAPI
+    lua.create_named_table("PAUSE_SCREEN", "NONE", PAUSE_SCREEN::NONE, "LOGO", PAUSE_SCREEN::LOGO, "INTRO", PAUSE_SCREEN::INTRO, "PROLOGUE", PAUSE_SCREEN::PROLOGUE, "TITLE", PAUSE_SCREEN::TITLE, "MENU", PAUSE_SCREEN::MENU, "OPTIONS", PAUSE_SCREEN::OPTIONS, "PLAYER_PROFILE", PAUSE_SCREEN::PLAYER_PROFILE, "LEADERBOARD", PAUSE_SCREEN::LEADERBOARD, "SEED_INPUT", PAUSE_SCREEN::SEED_INPUT, "CHARACTER_SELECT", PAUSE_SCREEN::CHARACTER_SELECT, "TEAM_SELECT", PAUSE_SCREEN::TEAM_SELECT, "CAMP", PAUSE_SCREEN::CAMP, "LEVEL", PAUSE_SCREEN::LEVEL, "TRANSITION", PAUSE_SCREEN::TRANSITION, "DEATH", PAUSE_SCREEN::DEATH, "SPACESHIP", PAUSE_SCREEN::SPACESHIP, "WIN", PAUSE_SCREEN::WIN, "CREDITS", PAUSE_SCREEN::CREDITS, "SCORES", PAUSE_SCREEN::SCORES, "CONSTELLATION", PAUSE_SCREEN::CONSTELLATION, "RECAP", PAUSE_SCREEN::RECAP, "ARENA_MENU", PAUSE_SCREEN::ARENA_MENU, "ARENA_STAGES", PAUSE_SCREEN::ARENA_STAGES, "ARENA_ITEMS", PAUSE_SCREEN::ARENA_ITEMS, "ARENA_SELECT", PAUSE_SCREEN::ARENA_SELECT, "ARENA_INTRO", PAUSE_SCREEN::ARENA_INTRO, "ARENA_LEVEL", PAUSE_SCREEN::ARENA_LEVEL, "ARENA_SCORE", PAUSE_SCREEN::ARENA_SCORE, "ONLINE_LOADING", PAUSE_SCREEN::ONLINE_LOADING, "ONLINE_LOBBY", PAUSE_SCREEN::ONLINE_LOBBY, "LOADING", PAUSE_SCREEN::LOADING, "EXIT", PAUSE_SCREEN::EXIT);
 }
 }; // namespace NBucket

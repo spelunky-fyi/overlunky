@@ -972,17 +972,6 @@ end
     /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
     lua["zoom_reset"] = []()
     { State::get().zoom_reset(); };
-    /// Pause/unpause the game.
-    /// This is just short for `state.pause == 32`, but that produces an audio bug
-    /// I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
-    lua["pause"] = [](bool p)
-    {
-        auto& state = State::get();
-        if (p)
-            state.set_pause(0x20);
-        else
-            state.set_pause(0);
-    };
     auto move_entity_abs = sol::overload(
         static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
         static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
@@ -1936,6 +1925,12 @@ end
         return fmt::format("{:X}", get_virtual_function_address(offset, index));
     };
 
+    /// Get memory address from a lua object
+    lua["get_address"] = [&lua]([[maybe_unused]] sol::object o)
+    {
+        return fmt::format("{:X}", *(size_t*)lua_touserdata(lua, 1));
+    };
+
     /// Log to spelunky.log
     lua["log_print"] = game_log;
 
@@ -2230,6 +2225,30 @@ end
     /// Get the current speedhack multiplier
     lua["get_speedhack"] = get_speedhack;
 
+    /// Retrieves the current value of the performance counter, which is a high resolution (<1us) time stamp that can be used for time-interval measurements.
+    lua["get_performance_counter"] = []() -> int64_t
+    {
+        LARGE_INTEGER ret;
+        if (QueryPerformanceCounter(&ret))
+            return ret.QuadPart;
+        return 0;
+    };
+
+    /// Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
+    lua["get_performance_frequency"] = []() -> int64_t
+    {
+        LARGE_INTEGER ret;
+        if (QueryPerformanceFrequency(&ret))
+            return ret.QuadPart;
+        return 0;
+    };
+
+    /// Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
+    lua["play_adventure"] = init_adventure;
+
+    /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
+    lua["play_seeded"] = init_seeded;
+
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
     lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);
@@ -2410,7 +2429,13 @@ end
         "PRE_GAME_LOOP",
         ON::PRE_GAME_LOOP,
         "POST_GAME_LOOP",
-        ON::POST_GAME_LOOP);
+        ON::POST_GAME_LOOP,
+        "BLOCKED_UPDATE",
+        ON::BLOCKED_UPDATE,
+        "BLOCKED_GAME_LOOP",
+        ON::BLOCKED_GAME_LOOP,
+        "BLOCKED_PROCESS_INPUT",
+        ON::BLOCKED_PROCESS_INPUT);
 
     /* ON
     // LOGO
@@ -2488,12 +2513,12 @@ end
     // Params: PreLoadLevelFilesContext load_level_ctx
     // Runs right before level files would be loaded
     // PRE_LEVEL_GENERATION
-    // Runs before any level generation, no entities should exist at this point. Does not work in all level-like screens. Return true to stop normal level generation.
+    // Runs before any level generation, no entities exist at this point. Runs in most screens that have entities. Return true to block normal level generation, i.e. stop any entities from being spawned by ThemeInfo functions. Does not block other ThemeInfo functions, like spawn_effects though. POST_LEVEL_GENERATION will still run if this callback is blocked.
     // POST_ROOM_GENERATION
     // Params: PostRoomGenerationContext room_gen_ctx
     // Runs right after all rooms are generated before entities are spawned
     // POST_LEVEL_GENERATION
-    // Runs right after level generation is done, before any entities are updated
+    // Runs right after level generation is done, i.e. after all level gen entities are spawned, before any entities are updated. You can spawn your own entities here, like extra enemies, give items to players etc.
     // LOADING
     // Runs whenever state.loading changes and is > 0. Prefer PRE/POST_LOAD_SCREEN instead though.
     // PRE_LOAD_SCREEN
@@ -2649,6 +2674,12 @@ end
     // Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.
     // POST_GAME_LOOP
     // Runs right after the main engine loop.
+    // BLOCKED_UPDATE
+    // Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when Overlunky blocks a PRE_UPDATE.
+    // BLOCKED_GAME_LOOP
+    // Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when Overlunky blocks a PRE_GAME_LOOP.
+    // BLOCKED_PROCESS_INPUT
+    // Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when Overlunky blocks a PRE_PROCESS_INPUT.
     */
 
     lua.create_named_table(
@@ -2876,7 +2907,7 @@ void add_partial_safe_libraries(sol::environment& env)
             luaL_error(global_vm, "Attempted to open data file outside data directory");
             return sol::nil;
         }
-        if (mode.value_or("r") != "r")
+        if (mode.value_or("r")[0] != 'r')
             std::filesystem::create_directories(dirpath);
         return global_vm["io"]["open"](fullpath, mode.value_or("r"));
     };
@@ -2896,13 +2927,13 @@ void add_partial_safe_libraries(sol::environment& env)
                 luaL_error(global_vm, "Attempted to open mod file outside mod directory");
                 return sol::nil;
             }
-            if (!is_pack && mode.value_or("r") != "r")
+            if (!is_pack && mode.value_or("r")[0] != 'r')
             {
                 luaL_error(global_vm, "Attempted to write mod file outside Packs directory");
                 return sol::nil;
             }
         }
-        if (mode.value_or("r") != "r")
+        if (mode.value_or("r")[0] != 'r')
             std::filesystem::create_directories(dirpath);
         return global_vm["io"]["open"](fullpath, mode);
     };

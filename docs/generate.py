@@ -313,6 +313,7 @@ global_types = {
     "savegame": "SaveData",
     "options": "optional<array<mixed>>",
     "prng": "PRNG",
+    "pause": "PauseAPI"
 }
 
 print("# Global variables")

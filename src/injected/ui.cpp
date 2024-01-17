@@ -258,7 +258,7 @@ ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1,
     g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
-unsigned int g_level_width = 0, grid_x = 0, grid_y = 0, g_pause_type = 0x2;
+unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
 std::vector<EntityItem> g_items;
@@ -274,7 +274,7 @@ std::vector<Kit*> kits;
 std::vector<Player*> g_players;
 std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
-     throw_held = false, paused = false, show_app_metrics = false, lock_entity = false, lock_player = false,
+     throw_held = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
      enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
@@ -370,7 +370,9 @@ std::map<std::string, bool> options = {
     {"uncap_unfocused_fps", true},
     {"pause_loading", false},
     {"pause_update_camera", false},
+    {"pause_last_instance", false},
     {"update_check", true},
+    {"modifiers_clear_input", true},
 };
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
@@ -604,9 +606,9 @@ void set_colors()
     colors[ImGuiCol_Button] = ImVec4(col_main.x, col_main.y, col_main.z, 0.44f);
     colors[ImGuiCol_ButtonHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
     colors[ImGuiCol_ButtonActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
-    colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.76f);
-    colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.86f);
-    colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
+    colors[ImGuiCol_Header] = ImVec4(col_main.x, col_main.y, col_main.z, 0.50f);
+    colors[ImGuiCol_HeaderHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.30f);
+    colors[ImGuiCol_HeaderActive] = ImVec4(col_main.x, col_main.y, col_main.z, 0.40f);
     colors[ImGuiCol_Separator] = ImVec4(col_main.x, col_main.y, col_main.z, 0.50f);
     colors[ImGuiCol_SeparatorHovered] = ImVec4(col_main.x, col_main.y, col_main.z, 0.78f);
     colors[ImGuiCol_SeparatorActive] = ImVec4(col_main.x, col_main.y, col_main.z, 1.00f);
@@ -908,7 +910,14 @@ void save_config(std::string file)
     writeData << "alpha = " << std::fixed << std::setprecision(2) << style.Alpha << " # float, 0.0 - 1.0" << std::endl;
     writeData << "scale = " << std::fixed << std::setprecision(2) << ImGui::GetIO().FontGlobalScale << " # float, 0.3 - 2.0" << std::endl;
     writeData << "camera_speed = " << std::fixed << std::setprecision(2) << g_camera_speed << " # float" << std::endl;
-    writeData << "pause_type = 0x" << std::hex << g_pause_type << " # 8bit flags" << std::endl;
+    writeData << "pause_type = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_type << " # 64bit flags" << std::endl;
+    writeData << "pause_ignore_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->ignore_screen << " # 64bit flags" << std::endl;
+    writeData << "pause_ignore_screen_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->ignore_screen_trigger << " # 64bit flags" << std::endl;
+    writeData << "pause_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_trigger << " # 64bit flags" << std::endl;
+    writeData << "pause_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->pause_screen << " # 64bit flags" << std::endl;
+    writeData << "unpause_trigger = 0x" << std::hex << (uint64_t)g_bucket->pause_api->unpause_trigger << " # 64bit flags" << std::endl;
+    writeData << "unpause_screen = 0x" << std::hex << (uint64_t)g_bucket->pause_api->unpause_screen << " # 64bit flags" << std::endl;
+    writeData << "modifiers_block = 0x" << std::hex << g_bucket->pause_api->modifiers_block << " # 32bit flags" << std::endl;
 
     writeData << "kits = [";
     for (unsigned int i = 0; i < kits.size(); i++)
@@ -1062,7 +1071,6 @@ void load_config(std::string file)
     style.Alpha = toml::find_or<float>(opts, "alpha", 0.66f);
     ImGui::GetIO().FontGlobalScale = toml::find_or<float>(opts, "scale", 1.0f);
     g_camera_speed = toml::find_or<float>(opts, "camera_speed", 1.0f);
-    g_pause_type = toml::find_or<unsigned int>(opts, "pause_type", 2);
     kits.clear();
     saved_entities.clear();
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
@@ -1116,6 +1124,20 @@ void load_config(std::string file)
     {
         g_unfocused_fps = 0;
         update_frametimes();
+    }
+    if (g_bucket)
+    {
+        g_bucket->pause_api->update_camera = options["pause_update_camera"];
+        g_bucket->pause_api->last_instance = options["pause_last_instance"];
+        g_bucket->pause_api->pause_type = (PAUSE_TYPE)toml::find_or<int64_t>(opts, "pause_type", 0x140);
+        g_bucket->pause_api->ignore_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen", 0);
+        g_bucket->pause_api->ignore_screen_trigger = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_ignore_screen_trigger", 0);
+        g_bucket->pause_api->pause_trigger = (PAUSE_TRIGGER)toml::find_or<int64_t>(opts, "pause_trigger", 0);
+        g_bucket->pause_api->pause_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "pause_screen", 0);
+        g_bucket->pause_api->unpause_trigger = (PAUSE_TRIGGER)toml::find_or<int64_t>(opts, "unpause_trigger", 0);
+        g_bucket->pause_api->unpause_screen = (PAUSE_SCREEN)toml::find_or<int64_t>(opts, "unpause_screen", 0);
+        g_bucket->pause_api->modifiers_block = toml::find_or<uint32_t>(opts, "modifiers_block", 0);
+        g_bucket->pause_api->modifiers_clear_input = options["modifiers_clear_input"];
     }
     save_config(file);
 }
@@ -1289,6 +1311,9 @@ void smart_delete(Entity* ent, bool unsafe = false)
 {
     static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
+    ent->flags = set_flag(ent->flags, 1);
+    for (auto item : ent->items.entities())
+        item->flags = set_flag(item->flags, 1);
     UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
@@ -1385,6 +1410,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     if (to_spawn.name.find("ENT_TYPE_CHAR") != std::string::npos)
     {
         int spawned = UI::spawn_companion(to_spawn.id, cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
+        get_entity_ptr(spawned)->apply_layer();
         if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
@@ -1398,7 +1424,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     {
         static const auto ana_spelunky = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
         auto spawned = UI::spawn_playerghost(ana_spelunky + (rand() % 19), cpos.first, cpos.second, LAYER::PLAYER, g_vx, g_vy);
-
+        get_entity_ptr(spawned)->apply_layer();
         if (!lock_entity && set_last && options["draw_hitboxes"])
             g_last_id = spawned;
         return spawned;
@@ -1406,6 +1432,8 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
     else if (to_spawn.name.find("ENT_TYPE_LIQUID") == std::string::npos)
     {
         bool snap = options["snap_to_grid"];
+        if (to_spawn.name.find("ENT_TYPE_ACTIVEFLOOR") != std::string::npos)
+            snap = true;
         if (std::find(std::begin(also_snap), std::end(also_snap), to_spawn.id) != std::end(also_snap))
         {
             snap = true;
@@ -1432,6 +1460,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             }
         }
         int spawned = UI::spawn_entity(to_spawn.id, g_x, g_y, s, g_vx, g_vy, snap);
+        get_entity_ptr(spawned)->apply_layer();
         if (to_spawn.name.find("ENT_TYPE_MOUNT") != std::string::npos)
         {
             auto mount = get_entity_ptr(spawned)->as<Mount>();
@@ -1447,18 +1476,10 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                     for (auto trig : floor->items.entities())
                         trig->flags |= (1U << 16);
                 }
-
-                if (floor->get_decoration_entity_type() != -1)
-                {
-                    floor->fix_decorations(true, false);
-                }
-                auto fpos = floor->position();
-                auto layer = (LAYER)floor->layer;
-                Callback cb = {g_state->time_total + 2, [fpos, layer]
-                               {
-                                   fix_decorations_at(fpos.first, fpos.second, layer);
-                               }};
-                callbacks.push_back(cb);
+                uint32_t i_x = static_cast<uint32_t>(floor->x + 0.5f);
+                uint32_t i_y = static_cast<uint32_t>(floor->y + 0.5f);
+                State::get().layer(floor->layer)->grid_entities[i_y][i_x] = floor;
+                fix_decorations_at(floor->x, floor->y, (LAYER)floor->layer);
             }
         }
         if (flip)
@@ -1971,7 +1992,8 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
     g_state->quest_flags |= 1;
     if (seed.has_value())
         g_state->quest_flags |= 0x40;
-    g_state->loading = 1;
+    g_state->fade_enabled = false;
+    g_state->loading = 2;
 
     if (g_game_manager->main_menu_music)
     {
@@ -1998,7 +2020,8 @@ void restart_adventure()
         g_state->theme_next = g_state->theme_start;
         g_state->screen_next = 12;
         g_state->quest_flags |= 1;
-        g_state->loading = 1;
+        g_state->fade_enabled = false;
+        g_state->loading = 2;
     }
     else
     {
@@ -2211,28 +2234,12 @@ void force_kits()
 
 bool toggle_pause()
 {
-    g_pause_at = -1;
-    g_state->pause ^= ((uint8_t)g_pause_type & ~0xC0);
-    g_ui_scripts["pause"]->execute(fmt::format("exports.type = {} exports.paused = {} exports.skip = false exports.loading = {}", g_pause_type, paused, options["pause_loading"]), true);
-    return paused;
+    return g_bucket->pause_api->toggle();
 }
 
 void frame_advance()
 {
-    if (g_state->pause == 0 && g_pause_at != -1 && (unsigned)g_pause_at <= UI::get_frame_count())
-    {
-        g_state->pause = (uint8_t)g_pause_type & ~0xC0;
-        g_pause_at = -1;
-    }
-    if ((g_pause_type & 0xc0) == 0)
-    {
-        paused = g_state->pause & (uint8_t)g_pause_type;
-    }
-    else
-    {
-        paused = g_ui_scripts["pause"]->execute("return exports.paused", true) == "true";
-    }
-    g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {} exports.camera = {}", options["pause_loading"], options["pause_update_camera"]), true);
+    g_bucket->pause_api->frame_advance();
 }
 
 void warp_inc(uint8_t w, uint8_t l, uint8_t t)
@@ -3078,7 +3085,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("toggle_pause", wParam))
     {
-        paused = !paused;
         toggle_pause();
     }
     else if (pressed("toggle_hud", wParam))
@@ -3091,21 +3097,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("frame_advance", wParam) || pressed("frame_advance_alt", wParam))
     {
-        if (g_pause_type & 0xC0)
-        {
-            if (paused)
-            {
-                g_ui_scripts["pause"]->execute("exports.skip = true", true);
-            }
-        }
-        else
-        {
-            if (g_state->pause == (uint8_t)g_pause_type)
-            {
-                g_pause_at = UI::get_frame_count() + 1;
-                g_state->pause = 0;
-            }
-        }
+        frame_advance();
     }
     else if (pressed("toggle_disable_pause", wParam))
     {
@@ -3599,7 +3591,7 @@ bool render_uid(int uid, const char* section, bool rembtn = false)
     {
         ImGui::SameLine();
         ImGui::PushID(uid);
-        if (ImGui::Button("X"))
+        if (ImGui::Button("Remove"))
             g_entity->remove_item(uid);
         ImGui::PopID();
     }
@@ -3636,6 +3628,19 @@ void render_flags(const std::array<const char*, SIZE> names_array, T* flag_field
         {
             *flag_field ^= value;
         }
+    }
+}
+
+template <std::size_t SIZE, typename T>
+void render_flag(int idx, const std::array<const char*, SIZE> names_array, T* flag_field, bool show_number = true)
+{
+    T value = (T)std::pow(2, idx);
+    bool on = (*flag_field & value) == value;
+
+    if (names_array[idx][0] != '\0' &&
+        ImGui::Checkbox(show_number ? fmt::format("{}: {}", idx + 1, names_array[idx]).c_str() : names_array[idx], &on))
+    {
+        *flag_field ^= value;
     }
 }
 
@@ -4230,8 +4235,8 @@ void render_camera()
         UI::set_camp_camera_bounds_enabled(enable_camp_camera);
     }
     tooltip("Enable to always center the followed entity instantly\nwithout respecting level borders.");
-    if (ImGui::Checkbox("Update camera position during pause##CameraPaused", &options["pause_update_camera"]))
-        g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]), true);
+    if (ImGui::Checkbox("Update camera position during pause##CameraPaused", &g_bucket->pause_api->update_camera))
+        options["pause_update_camera"] = g_bucket->pause_api->update_camera;
     tooltip("Enable to follow the entity smoothly when paused\nor combine with speed=5 for instant camera that respects level borders.");
     static bool lock_inertia{false};
     if (ImGui::Checkbox("Lock current game camera speed##LockInertia", &lock_inertia))
@@ -4621,7 +4626,7 @@ std::string entity_tooltip(Entity* hovered)
         if (chest->leprechaun)
             coords += " (LEPRECHAUN)";
     }
-    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_BOMB"))
+    else if (hovered->type->id == to_id("ENT_TYPE_ITEM_BOMB") or hovered->type->id == to_id("ENT_TYPE_ITEM_PASTEBOMB"))
     {
         auto bomb = hovered->as<Bomb>();
         coords += fmt::format(" ({} FUSE)", 150 - bomb->idle_counter);
@@ -4740,7 +4745,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
             draw_list->AddCircle(fix_pos(spos), srad.x - spos.x, enabled ? ImColor(255, 0, 0, 80) : ImColor(0, 200, 128, 60), 0, 2.0f);
         }
     }
-    else if (type == bomb)
+    else if (type == bomb or type == bomb + 1)
     {
         float rad = 1.6f;
         if (((Bomb*)ent)->scale_hor > 1.25f)
@@ -5099,7 +5104,7 @@ void render_clickhandler()
         {
             g_bucket->overlunky->hovered_uid = -1;
         }
-        if (options["draw_entity_tooltip"])
+        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered())
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
@@ -5550,7 +5555,7 @@ void render_clickhandler()
 
                 g_state->camera->focus_x -= (current_pos.first - oryginal_pos.first) * g_camera_speed;
                 g_state->camera->focus_y -= (current_pos.second - oryginal_pos.second) * g_camera_speed;
-                if (g_state->pause != 0 || paused || !options["smooth_camera"])
+                if (g_state->pause != 0 || g_bucket->pause_api->paused() || !options["smooth_camera"])
                     State::get().set_camera_position(g_state->camera->focus_x, g_state->camera->focus_y);
                 startpos = normalize(mouse_pos());
                 enable_camera_bounds = false;
@@ -5694,6 +5699,17 @@ void render_keyconfig()
         keys = default_keys;
         save_config(cfgfile);
     }
+    ImGui::AlignTextToFramePadding();
+    ImGui::Text("Block game input when holding");
+    ImGui::SameLine();
+    ImGui::CheckboxFlags("Ctrl##IgnoreCtrl", &g_bucket->pause_api->modifiers_block, OL_KEY_CTRL);
+    ImGui::SameLine();
+    ImGui::CheckboxFlags("Alt##IgnoreAlt", &g_bucket->pause_api->modifiers_block, OL_KEY_ALT);
+    ImGui::SameLine();
+    ImGui::CheckboxFlags("Shift##IgnoreShift", &g_bucket->pause_api->modifiers_block, OL_KEY_SHIFT);
+    if (ImGui::Checkbox("Clear blocked input, instead of just ignoring events##IgnoreClear", &g_bucket->pause_api->modifiers_clear_input))
+        options["modifiers_clear_input"] = g_bucket->pause_api->modifiers_clear_input;
+
     if (g_bucket->overlunky->ignore_keys.size())
     {
         std::string s;
@@ -5949,10 +5965,6 @@ void render_options()
         ImGui::Checkbox("Fast menus and transitions##SpeedHackMenu", &options["speedhack"]);
         tooltip("Enable 10x speedhack automatically when not controlling a character.", "toggle_speedhack_auto");
 
-        if (ImGui::Checkbox("Skip fades##SkipFades", &options["skip_fades"]))
-            g_ui_scripts["skip_fades"]->set_enabled(options["skip_fades"]);
-        tooltip("Skips all fade to black transitions.");
-
         ImGui::Checkbox("Uncap unfocused FPS on start", &options["uncap_unfocused_fps"]);
         tooltip("Sets the unfocused FPS to unlimited automatically.");
 
@@ -6099,28 +6111,86 @@ void render_options()
 
     if (submenu("Frame advance / Pause options"))
     {
+        if (submenu("Current pause flags"))
+        {
+            ImGui::PushID("CurrentPauseFlags");
+            auto old_flags = g_bucket->pause_api->pause;
+            render_flags(pause_types, &g_bucket->pause_api->pause, false);
+            if (g_bucket->pause_api->pause != old_flags)
+                g_bucket->pause_api->apply();
+            ImGui::PopID();
+            endmenu();
+        }
+        if (submenu("Toggled pause flags"))
+        {
+            ImGui::PushID("TogglePauseFlags");
+            render_flags(pause_types, &g_bucket->pause_api->pause_type, false);
+            ImGui::PopID();
+            endmenu();
+        }
+        if (submenu("Ignore freeze in screens"))
+        {
+            ImGui::PushID("IgnorePauseScreen");
+            render_flags(pause_screens, &g_bucket->pause_api->ignore_screen);
+            ImGui::PopID();
+            endmenu();
+        }
+        if (submenu("Ignore triggers in screens"))
+        {
+            ImGui::PushID("IgnorePauseScreenTrigger");
+            render_flags(screen_names, &g_bucket->pause_api->ignore_screen_trigger);
+            ImGui::PopID();
+            endmenu();
+        }
+        if (submenu("Automatic pause triggers"))
+        {
+            bool pause_level = UI::get_start_level_paused();
+            if (ImGui::Checkbox("Disable fade unpause on screen load", &pause_level))
+                UI::set_start_level_paused(pause_level);
+            render_flags(pause_triggers, &g_bucket->pause_api->pause_trigger, false);
+            if ((g_bucket->pause_api->pause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
+            {
+                ImGui::SeparatorText("Pause on screens (or any)");
+                render_flags(screen_names, &g_bucket->pause_api->pause_screen);
+            }
+            endmenu();
+        }
+        if (submenu("Automatic unpause triggers"))
+        {
+            render_flags(pause_triggers, &g_bucket->pause_api->unpause_trigger, false);
+            if ((g_bucket->pause_api->unpause_trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE)
+            {
+                ImGui::SeparatorText("Unpause on screens (or any)");
+                render_flags(pause_screens, &g_bucket->pause_api->unpause_screen);
+            }
+            endmenu();
+        }
+        bool paused = g_bucket->pause_api->paused();
         if (ImGui::Checkbox("Paused##PauseSim", &paused))
             toggle_pause();
-        tooltip("Pause time while still being able to teleport, spawn and move entities", "toggle_pause");
-        ImGui::SeparatorText("Pause type");
-        ImGui::PushID("PauseType");
-        render_flags(pause_types, &g_pause_type, false);
-        ImGui::PopID();
-        ImGui::SeparatorText("Pause options");
-        if (ImGui::Checkbox("Freeze during loading screens", &options["pause_loading"]))
-            g_ui_scripts["pause"]->execute(fmt::format("exports.loading = {}", options["pause_loading"]), true);
-        bool pause_level = UI::get_start_level_paused();
-        if (ImGui::Checkbox("Auto (fade) pause on level start", &pause_level))
-            UI::set_start_level_paused(pause_level);
-        if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &options["pause_update_camera"]))
-            g_ui_scripts["pause"]->execute(fmt::format("exports.camera = {}", options["pause_update_camera"]), true);
-        tooltip("Calls the vanilla camera update when it\nwould be skipped by blocking the state update.");
+        tooltip("Toggle current pause API state according to the toggled type.", "toggle_pause");
+        if (ImGui::Checkbox("Skip fades##SkipFades", &g_bucket->pause_api->skip_fade))
+            options["skip_fades"] = g_bucket->pause_api->skip_fade;
+        tooltip("Skips all fade to black / circle wipe transitions.");
+        if (ImGui::Checkbox("Update camera position during pause##PauseCamera", &g_bucket->pause_api->update_camera))
+            options["pause_update_camera"] = g_bucket->pause_api->update_camera;
+        tooltip("Calls the vanilla camera update when it\nwould be skipped by freezing the state update.");
+        if (ImGui::Checkbox("Run in last API instance##PauseLast", &g_bucket->pause_api->last_instance))
+            options["pause_last_instance"] = g_bucket->pause_api->last_instance;
+        tooltip("Runs freeze logic and triggers only in Playlunky\nwhen both modding tools are injected.");
+
         ImGui::Separator();
-        ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. setting auto-pause but not including fade in the pause flags won't let you unpause from that state", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
-        ImGui::TextWrapped("- The freeze options will block the game in the specified callback as well as enforce any selected normal pause flags");
-        ImGui::TextWrapped("- Using the freeze options without a) a camera hack or b) a normal pause flag (use fade) will induce weird camera flickering");
+        ImGui::TextWrapped("- The %s and %s keys will only toggle the pause types listed above, i.e. blocking updates during a normal game pause won't interfere with the vanilla pause", key_string(keys["toggle_pause"]).c_str(), key_string(keys["frame_advance"]).c_str());
+        ImGui::TextWrapped("- The freeze options will block the game in the specified callback (as well as enforce any selected normal pause flags, for now)");
+        ImGui::TextWrapped("- Using the freeze options without a camera hack will induce weird camera flickering");
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
         if (keys["toggle_pause"] & VK_SPACE || keys["frame_advance"] & VK_SPACE || keys["frame_advance_alt"] & VK_SPACE)
-            ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Warning: frame_advance/toggle_pause is bound to Space,\nnormal menu input using Space will be disabled (use Z)");
+            ImGui::TextWrapped("- frame_advance/toggle_pause is bound to Space, normal menu input using Space will be disabled (use Z)");
+        if ((uint8_t)g_bucket->pause_api->pause_type & 0x3f || UI::get_start_level_paused())
+            ImGui::TextWrapped("- Using vanilla state.pause flags is obsolete and advanced UI features for it might be removed soon");
+        if ((g_bucket->pause_api->pause_type & PAUSE_TYPE::FADE) == PAUSE_TYPE::NONE && UI::get_start_level_paused())
+            ImGui::TextWrapped("- You should enable toggling fade pauses if you enable the fade pause hack");
+        ImGui::PopStyleColor();
         endmenu();
     }
 
@@ -7556,11 +7626,92 @@ void render_entity_props(int uid, bool detached = false)
         }
         endmenu();
     }
-    if (submenu("Items"))
+    if (submenu("Items & Powerups"))
     {
-        for (uint32_t item_uid : entity->items.uids())
+        static bool fx = false;
+        ImGui::Checkbox("Show annoying FX items", &fx);
+        ImGui::SeparatorText("Items");
+        if (entity->type->search_flags & 0x7)
         {
-            render_uid(item_uid, "EntityItems", true);
+            auto entity_pow = entity->as<PowerupCapable>();
+            for (auto ent : entity->items.entities())
+            {
+                if ((fx || (ent->type->search_flags & 0x40) == 0) && !entity_pow->has_powerup(ent->type->id))
+                    render_uid(ent->uid, "EntityItems", true);
+            }
+            ImGui::SeparatorText("Powerups");
+            for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
+            {
+                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
+            }
+            ImGui::PushItemWidth(160);
+            static const char* chosenPowerup = "";
+            static uint8_t chosenPowerupIndex = 0;
+            static const char* powerupOptions[] = {
+                "Alien compass",
+                "Ankh",
+                "Climbing gloves",
+                "Compass",
+                "Crown",
+                "Eggplant crown",
+                "Hedjet",
+                "Kapala",
+                "Parachute",
+                "Paste",
+                "Pitcher's mitt",
+                "Skeleton key",
+                "Spectacles",
+                "Spike shoes",
+                "Spring shoes",
+                "Tablet of Destiny",
+                "True crown",
+                "Udjat eye"};
+            static const uint32_t powerupTypeIDOptions[] = {
+                to_id("ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS"),
+                to_id("ENT_TYPE_ITEM_POWERUP_ANKH"),
+                to_id("ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_COMPASS"),
+                to_id("ENT_TYPE_ITEM_POWERUP_CROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_EGGPLANTCROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_HEDJET"),
+                to_id("ENT_TYPE_ITEM_POWERUP_KAPALA"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PARACHUTE"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PASTE"),
+                to_id("ENT_TYPE_ITEM_POWERUP_PITCHERSMITT"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPECTACLES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPIKE_SHOES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_SPRING_SHOES"),
+                to_id("ENT_TYPE_ITEM_POWERUP_TABLETOFDESTINY"),
+                to_id("ENT_TYPE_ITEM_POWERUP_TRUECROWN"),
+                to_id("ENT_TYPE_ITEM_POWERUP_UDJATEYE")};
+            if (ImGui::BeginCombo("##AddPowerupCombo", chosenPowerup))
+            {
+                for (uint8_t i = 0; i < IM_ARRAYSIZE(powerupOptions); ++i)
+                {
+                    bool isSelected = (chosenPowerup == powerupOptions[i]);
+                    if (ImGui::Selectable(powerupOptions[i], isSelected))
+                    {
+                        chosenPowerup = powerupOptions[i];
+                        chosenPowerupIndex = i;
+                    }
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Add Powerup##AddPowerupButton"))
+            {
+                entity_pow->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
+            }
+            ImGui::PopItemWidth();
+        }
+        else
+        {
+            for (auto ent : entity->items.entities())
+            {
+                if ((fx || (ent->type->search_flags & 0x40) == 0))
+                    render_uid(ent->uid, "EntityItems", true);
+            }
         }
         endmenu();
     }
@@ -7575,7 +7726,9 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragFloat("Max speed##GlobalMaxSpeed", &entity->type->max_speed, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Sprint factor##GlobalSprintFactor", &entity->type->sprint_factor, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::DragFloat("Jump power##GlobalJumpPower", &entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
-        ImGui::InputScalar("Search flags##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%p", ImGuiInputTextFlags_ReadOnly);
+        ImGui::InputScalar("Mask:##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%08X", ImGuiInputTextFlags_ReadOnly);
+        ImGui::SameLine();
+        ImGui::TextUnformatted(mask_names[std::countr_zero(entity->type->search_flags)]);
         if (submenu("Properties flags"))
         {
             render_flags(entity_type_properties_flags, &entity->type->properties_flags);
@@ -7657,71 +7810,6 @@ void render_entity_props(int uid, bool detached = false)
         }
         else if (entity->type->search_flags & 0x7) // PLYAER, MOUNT, MONSTER
         {
-            auto entity_pow = entity->as<PowerupCapable>();
-            for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
-            {
-                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
-            }
-            ImGui::PushItemWidth(160);
-            static const char* chosenPowerup = "";
-            static uint8_t chosenPowerupIndex = 0;
-            static const char* powerupOptions[] = {
-                "Alien compass",
-                "Ankh",
-                "Climbing gloves",
-                "Compass",
-                "Crown",
-                "Eggplant crown",
-                "Hedjet",
-                "Kapala",
-                "Parachute",
-                "Paste",
-                "Pitcher's mitt",
-                "Skeleton key",
-                "Spectacles",
-                "Spike shoes",
-                "Spring shoes",
-                "Tablet of Destiny",
-                "True crown",
-                "Udjat eye"};
-            static const uint32_t powerupTypeIDOptions[] = {
-                to_id("ENT_TYPE_ITEM_POWERUP_SPECIALCOMPASS"),
-                to_id("ENT_TYPE_ITEM_POWERUP_ANKH"),
-                to_id("ENT_TYPE_ITEM_POWERUP_CLIMBING_GLOVES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_COMPASS"),
-                to_id("ENT_TYPE_ITEM_POWERUP_CROWN"),
-                to_id("ENT_TYPE_ITEM_POWERUP_EGGPLANTCROWN"),
-                to_id("ENT_TYPE_ITEM_POWERUP_HEDJET"),
-                to_id("ENT_TYPE_ITEM_POWERUP_KAPALA"),
-                to_id("ENT_TYPE_ITEM_POWERUP_PARACHUTE"),
-                to_id("ENT_TYPE_ITEM_POWERUP_PASTE"),
-                to_id("ENT_TYPE_ITEM_POWERUP_PITCHERSMITT"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SKELETON_KEY"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SPECTACLES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SPIKE_SHOES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_SPRING_SHOES"),
-                to_id("ENT_TYPE_ITEM_POWERUP_TABLETOFDESTINY"),
-                to_id("ENT_TYPE_ITEM_POWERUP_TRUECROWN"),
-                to_id("ENT_TYPE_ITEM_POWERUP_UDJATEYE")};
-            if (ImGui::BeginCombo("##AddPowerupCombo", chosenPowerup))
-            {
-                for (uint8_t i = 0; i < IM_ARRAYSIZE(powerupOptions); ++i)
-                {
-                    bool isSelected = (chosenPowerup == powerupOptions[i]);
-                    if (ImGui::Selectable(powerupOptions[i], isSelected))
-                    {
-                        chosenPowerup = powerupOptions[i];
-                        chosenPowerupIndex = i;
-                    }
-                }
-                ImGui::EndCombo();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Add Powerup##AddPowerupButton"))
-            {
-                entity_pow->give_powerup(powerupTypeIDOptions[chosenPowerupIndex]);
-            }
-            ImGui::PopItemWidth();
             auto entity_player = entity->as<Player>();
             if ((entity->type->search_flags & 0x1) && entity_player->ai != 0)
             {
@@ -8272,6 +8360,23 @@ void render_game_props()
             static std::uniform_int_distribution<uint32_t> dist(1, UINT32_MAX);
             quick_start(12, 1, 1, 1, dist(rd));
         }
+
+        static bool first_run{true};
+        if (g_bucket->adventure_seed.first == 0 && first_run)
+            UI::get_adventure_seed(true);
+        first_run = false;
+        std::string adventure_seed_first = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.first);
+        std::string adventure_seed_second = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.second);
+
+        if (ImGui::MenuItem("Copy current seed to clipboard"))
+        {
+            std::string clip_str;
+            if (g_state->quest_flags & 0x40)
+                clip_str = fmt::format("{:08X}", g_state->seed);
+            else
+                clip_str = adventure_seed_first + " " + adventure_seed_second;
+            set_clipboard(clip_str);
+        }
         auto seed_str = fmt::format("{:08X}", g_state->seed);
         ImGui::InputText("Seeded seed", &seed_str, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
@@ -8284,13 +8389,6 @@ void render_game_props()
                 quick_start(12, 1, 1, 1, new_seed);
         }
         ImGui::Separator();
-        static bool first_run{true};
-        if (g_bucket->adventure_seed.first == 0 && first_run)
-            UI::get_adventure_seed(true);
-        first_run = false;
-
-        std::string adventure_seed_first = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.first);
-        std::string adventure_seed_second = fmt::format("{:016X}", (uint64_t)g_bucket->adventure_seed.second);
         ImGui::InputText("Adventure seed##AdventureSeedFirst", &adventure_seed_first, ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_AutoSelectAll);
         if (ImGui::IsItemDeactivatedAfterEdit())
         {
@@ -9179,12 +9277,17 @@ void render_prohud()
     textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + textsize.y * 2 + 4 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
-    if (paused)
+    if (g_bucket->pause_api->get_pause() != PAUSE_TYPE::NONE)
     {
+        auto col = ImColor(0.3f, 1.0f, 0.3f, 0.7f);
+        if (!g_bucket->pause_api->paused() || g_state->pause > 0)
+            col = ImColor(1.0f, 1.0f, 0.3f, 0.7f);
+        if (g_bucket->pause_api->paused() && (g_bucket->pause_api->blocked || g_state->pause > 0))
+            col = ImColor(1.0f, 0.3f, 0.3f, 0.7f);
         buf = "||";
         ImGui::PushFont(bigfont);
         textsize = ImGui::CalcTextSize(buf.c_str());
-        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, ImColor(1.0f, 1.0f, 1.0f, .7f), buf.c_str());
+        dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 80}, col, buf.c_str());
         ImGui::PopFont();
     }
 
@@ -9308,97 +9411,6 @@ void imgui_init(ImGuiContext*)
     windows["tool_texture"] = new Window({"Texture viewer", is_tab_detached("tool_texture"), is_tab_open("tool_texture")});
     // windows["tool_sound"] = new Window({"Sound player", is_tab_detached("tool_sound"), is_tab_open("tool_sound")});
 
-    add_ui_script("pause", true, R"(
-meta = {
-    name = "pause",
-    author = "overlunky",
-}
-
-exports = {
-    -- this was a cool experiment to control the pause state from scripts,
-    -- but you should probably do it through Bucket.set_options instead
-    type = 0,
-    paused = false,
-    skip = false,
-    loading = true,
-    camera = false,
-}
-
-kb = get_raw_input().keyboard
-gp = game_manager.game_props
-ol = get_bucket().overlunky
-
-function apply_pause()
-    return state.screen == SCREEN.INTRO
-        or state.screen == SCREEN.CAMP
-        or state.screen == SCREEN.LEVEL
-        or state.screen == SCREEN.DEATH
-        or state.screen == SCREEN.TRANSITION
-end
-
-function not_loading()
-    local ret = state.loading > 0
-        or state.fade_value > 0
-        or (state.screen == SCREEN.MENU and game_manager.screen_menu.menu_text_opacity < 1)
-        or (state.screen == SCREEN.CHARACTER_SELECT and (state.screen_character_select.topleft_woodpanel_esc_slidein_timer == 0 or state.screen_character_select.start_pressed))
-    if (state.loading == 3 and state.fade_timer == 1) or (state.loading == 1 and state.fade_timer == state.fade_length) then
-        ret = false
-    end
-    return not ret
-end
-
-function block_update(pause_type)
-    if test_mask(exports.type, pause_type) then
-        if exports.paused and exports.skip then
-            state.pause = clr_mask(state.pause, exports.type)
-            return false
-        elseif exports.paused and apply_pause() then
-            state.pause = set_mask(state.pause, clr_mask(exports.type, 0xC0))
-        end
-        local block = exports.paused and (exports.loading or not_loading())
-        return block
-    end
-    return false
-end
-
-function move_camera(blocked)
-    if not exports.camera or not exports.paused then return end
-    if ((exports.type & 0xC0) > 0 and blocked) or (exports.type & 0xC0) == 0 then
-        update_camera_position()
-    end
-end
-
-set_callback(function()
-    local block = block_update(0x40)
-    move_camera(block)
-    return block
-end, ON.PRE_UPDATE)
-
-set_callback(function()
-    if not exports.paused and state.pause == 2 and test_mask(state.pause, exports.type) and get_start_level_paused() and state.time_level == 1 and apply_pause() then
-        exports.paused = true
-    end
-    local block = block_update(0x80)
-    move_camera(block)
-    return block
-end, ON.PRE_GAME_LOOP)
-
-set_callback(function()
-    exports.skip = false
-end, ON.POST_GAME_LOOP)
-
-set_callback(function()
-    if test_mask(exports.type, 0xc0) and exports.paused and not exports.skip then
-        return true
-    end
-end, ON.PRE_PROCESS_INPUT)
-
-set_callback(function()
-    if (test_mask(ol.keys["toggle_pause"], KEY.SPACE) or test_mask(ol.keys["frame_advance"], KEY.SPACE) or test_mask(ol.keys["frame_advance_alt"], KEY.SPACE)) and kb[RAW_KEY.SPACE].down and not kb[RAW_KEY.Z].down then
-        gp.input_menu = clr_mask(gp.input_menu, MENU_INPUT.SELECT)
-    end
-end, ON.POST_PROCESS_INPUT)
-)");
     add_ui_script("camera_hack", false, R"(
 lastpos = Vec2:new()
 set_callback(function()
@@ -9484,11 +9496,6 @@ set_callback(init_hooks, ON.SCRIPT_ENABLE)
 set_callback(clear_hooks, ON.SCRIPT_DISABLE)
 )");
     add_ui_script("level_size", false, "");
-    add_ui_script("skip_fades", options["skip_fades"], R"(
-set_callback(function()
-    state.fade_timer = 0
-    state.fade_value = 0
-end, ON.PRE_UPDATE))");
 }
 
 void imgui_draw()
@@ -9538,22 +9545,18 @@ void imgui_draw()
                     ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {500.0f, base->Size.y - 50.0f});
                     if (tab == "tool_entity")
                         ImGui::SetNextWindowSizeConstraints({400.0f, 100.0f}, {400.0f, base->Size.y - 50.0f});
-                    bool ismenu = false;
                     if (windows[tab]->popup)
                     {
                         ImGui::OpenPopup(windows[tab]->name.c_str());
                         windows[tab]->popup = false;
                     }
-                    if ((ImGui::BeginMenu(windows[tab]->name.c_str(), true) && (ismenu = true) == true) || ImGui::BeginPopup(windows[tab]->name.c_str()))
+                    if (ImGui::BeginMenu(windows[tab]->name.c_str(), true))
                     {
                         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {2, 2});
                         ImGui::GetIO().WantCaptureKeyboard = true;
                         render_tool(tab);
                         ImGui::PopStyleVar();
-                        if (ismenu)
-                            ImGui::EndMenu();
-                        else
-                            ImGui::EndPopup();
+                        ImGui::EndMenu();
                     }
                     if (ImGui::GetIO().MouseClicked[1] && mouse_pos().y < ImGui::GetTextLineHeight() && ImGui::IsItemHovered())
                         detach(tab);
@@ -9816,44 +9819,27 @@ void update_bucket()
         {
             toggle_lights();
         }
-        else if (k == "skip_fades")
+        else if (k == "skip_fades") // Deprecated
         {
             if (auto* val = std::get_if<bool>(&v))
             {
                 options["skip_fades"] = *val;
-                g_ui_scripts["skip_fades"]->set_enabled(options["skip_fades"]);
+                g_bucket->pause_api->skip_fade = *val;
             }
         }
-        else if (k == "pause_type")
+        else if (k == "pause_type") // Deprecated
         {
             if (auto* val = std::get_if<int64_t>(&v))
-                g_pause_type = (uint32_t)*val;
+                g_bucket->pause_api->pause_type = (PAUSE_TYPE)*val;
         }
-        else if (k == "paused")
+        else if (k == "paused") // Deprecated
         {
-            bool was_paused = paused;
             if (auto* val = std::get_if<bool>(&v))
-                paused = *val;
-            if (paused != was_paused)
-                toggle_pause();
+                g_bucket->pause_api->set_paused(*val);
         }
-        else if (k == "skip")
+        else if (k == "skip") // Deprecated
         {
-            if (g_pause_type & 0xC0)
-            {
-                if (paused)
-                {
-                    g_ui_scripts["pause"]->execute("exports.skip = true", true);
-                }
-            }
-            else
-            {
-                if (g_state->pause == (uint8_t)g_pause_type)
-                {
-                    g_pause_at = UI::get_frame_count() + 1;
-                    g_state->pause = 0;
-                }
-            }
+            frame_advance();
         }
         else if (k == "camera_hack")
         {
@@ -9870,8 +9856,8 @@ void update_bucket()
     {
         g_bucket->overlunky->options[k] = options[k];
     }
-    g_bucket->overlunky->options["pause_type"] = g_pause_type;
-    g_bucket->overlunky->options["paused"] = paused;
+    g_bucket->overlunky->options["pause_type"] = (int64_t)g_bucket->pause_api->pause_type; // Deprecated
+    g_bucket->overlunky->options["paused"] = g_bucket->pause_api->paused();                // Deprecated
 }
 
 void post_draw()
@@ -9884,7 +9870,6 @@ void post_draw()
     force_time();
     force_cheats();
     force_lights();
-    frame_advance();
     update_bucket();
 }
 

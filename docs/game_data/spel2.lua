@@ -470,12 +470,6 @@ function zoom(level) end
 ---Reset the default zoom levels for all areas and sets current zoom level to 13.5.
 ---@return nil
 function zoom_reset() end
----Pause/unpause the game.
----This is just short for `state.pause == 32`, but that produces an audio bug
----I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](https://spelunky-fyi.github.io/overlunky/#set_global_interval) will still work
----@param p boolean
----@return nil
-function pause(p) end
 ---Teleport entity to coordinates with optional velocity
 ---@param uid integer
 ---@param x number
@@ -1186,6 +1180,10 @@ function get_rva(address_name) end
 ---@param index integer
 ---@return string
 function get_virtual_rva(offset, index) end
+---Get memory address from a lua object
+---@param o any
+---@return nil
+function get_address(o) end
 ---Log to spelunky.log
 ---@param message string
 ---@return nil
@@ -1367,6 +1365,19 @@ function set_speedhack(multiplier) end
 ---Get the current speedhack multiplier
 ---@return number
 function get_speedhack() end
+---Retrieves the current value of the performance counter, which is a high resolution (<1us) time stamp that can be used for time-interval measurements.
+---@return integer
+function get_performance_counter() end
+---Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
+---@return integer
+function get_performance_frequency() end
+---Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
+---@return nil
+function play_adventure() end
+---Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
+---@param seed integer?
+---@return nil
+function play_seeded(seed) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1842,6 +1853,9 @@ function set_feat_hidden(feat, hidden) end
 ---@param description string
 ---@return nil
 function change_feat(feat, hidden, name, description) end
+---Access the PauseAPI, or directly call `pause(true)` to enable current `pause.pause_type`
+---@return nil
+function pause() end
 ---Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
 ---@return Bucket
 function get_bucket() end
@@ -1858,6 +1872,7 @@ do
     ---@field load fun(self): string
 
 ---@class ArenaConfigArenas
+    ---@field list boolean[] @size: 40
     ---@field dwelling_1 boolean
     ---@field dwelling_2 boolean
     ---@field dwelling_3 boolean
@@ -2042,8 +2057,6 @@ do
     ---@field screen_last SCREEN @Previous SCREEN, used to check where we're coming from when loading another SCREEN
     ---@field screen SCREEN @Current SCREEN, generally read-only or weird things will happen
     ---@field screen_next SCREEN @Next SCREEN, used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
-    ---@field ingame integer @Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
-    ---@field playing integer @Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
     ---@field pause PAUSE @8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controlled by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
     ---@field width integer @level width in rooms (number of rooms horizontally)
     ---@field height integer @level height in rooms (number of rooms vertically)
@@ -2075,13 +2088,15 @@ do
     ---@field time_last_level integer @Level time of previous level in frames, used by game logic to decide dark levels etc
     ---@field time_level integer @Level time of current level in frames, show on the hud
     ---@field level_flags integer
-    ---@field loading integer @Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
     ---@field quest_flags QUEST_FLAG @32bit flags, can be written to trigger a run reset on next level load etc.
     ---@field presence_flags PRESENCE_FLAG
+    ---@field loading FADE @Current loading/fade state. Pauses all updates if > FADE.NONE. Writing FADE.OUT or FADE.LOAD will trigger a screen load to `screen_next`.
     ---@field fade_value number @Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
     ---@field fade_timer integer @Remaining frames for fade-in/fade-out when loading. Counts down to 0.
     ---@field fade_length integer @Total frames for fade-in/fade-out when loading.
-    ---@field loading_black_screen_timer integer @if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
+    ---@field fade_delay integer @Additional delay after fade_timer reaches 0, before moving to the next fading state. Used after Ouroboros, in credits etc. for longer black screens, but also works after FADE.IN.
+    ---@field fade_enabled boolean @Enables the fade effect on FADE.IN, setting to false makes loading skip FADE.IN state instantly
+    ---@field fade_circle boolean @Makes loading use circle iris effect instead of fade on FADE.IN
     ---@field saved_dogs integer @Run totals
     ---@field saved_cats integer
     ---@field saved_hamsters integer
@@ -2453,6 +2468,7 @@ function PRNG:random(min, max) end
     ---@field liberate_from_shop fun(self): nil
     ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+    ---@field apply_layer fun(self): nil @Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
     ---@field remove fun(self): nil @Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
     ---@field respawn fun(self, layer: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
     ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil @Kills the entity, you can set responsible to `nil` to ignore it
@@ -2466,6 +2482,7 @@ function PRNG:random(min, max) end
     ---@field get_items fun(self): integer[]
     ---@field is_in_liquid fun(self): boolean @Returns true if entity is in water/lava
     ---@field is_cursed fun(self): boolean
+    ---@field update fun(self): nil
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -6371,9 +6388,37 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field set_selected_uid integer? @Set currently selected uid in the entity picker or -1 to clear selection.
     ---@field set_selected_uids integer[] @size: ? @Set currently selected uids in the entity finder.
 
+---@class PauseAPI
+    ---@field pause PAUSE_TYPE @Current pause state bitmask. Use custom PAUSE_TYPE.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching ON update callbacks, so can be set on the same callback you want to block at the latest. Vanilla PAUSE flags will be forwarded to state.pause, but use of vanilla PAUSE flags is discouraged and might not work with other PauseAPI features.
+    ---@field pause any @sol::property(&PauseAPI::get_pause
+    ---@field pause_type PAUSE_TYPE @Pause mask to toggle when using the PauseAPI methods to set or get pause state.
+    ---@field pause_trigger PAUSE_TRIGGER @Bitmask for conditions when the current `pause_type` should be automatically enabled in `pause`, can have multiple conditions.
+    ---@field pause_screen PAUSE_SCREEN @Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
+    ---@field unpause_trigger PAUSE_TRIGGER @Bitmask for conditions when the current `pause_type` should be automatically disabled in `pause`, can have multiple conditions.
+    ---@field unpause_screen PAUSE_SCREEN @Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
+    ---@field ignore_screen PAUSE_SCREEN @Bitmask for game SCREEN where the PRE_✱ pause types are ignored, even though enabled in `pause`. Can also use the special cases [FADE, EXIT] to unfreeze temporarily during fades (or other screen transitions where player input is probably impossible) or the level exit walk of shame.
+    ---@field ignore_screen_trigger PAUSE_SCREEN @Bitmask for game SCREEN where the triggers are ignored.
+    ---@field skip boolean @Set to true to unfreeze the game for one update cycle. Sets back to false after ON.POST_GAME_LOOP, so it can be used to check if current frame is a frame advance frame.
+    ---@field update_camera boolean @Set to true to enable normal camera movement when the game is paused or frozen on a callback by PauseAPI.
+    ---@field blocked boolean @Is true when PauseAPI is freezing the game.
+    ---@field skip_fade boolean @Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
+    ---@field last_trigger_frame integer @Global frame stamp when one of the triggers was last triggered, used to prevent running them again on the same frame on unpause.
+    ---@field last_fade_timer integer @Fade timer stamp when fade triggers were last checked.
+    ---@field frame_advance fun(self): nil @Sets skip
+    ---@field get_pause fun(self): PAUSE_TYPE @Get the current pause flags
+    ---@field set_pause fun(self, flags: PAUSE_TYPE): nil @Set the current pause flags
+    ---@field set_paused fun(self, true: boolean enable =): boolean @Enable/disable the current pause_type flags in pause state
+    ---@field paused fun(self): boolean @Is the game currently paused and that pause state matches any of the current the pause_type
+    ---@field toggle fun(self): boolean @Toggles pause state
+    ---@field loading fun(self): boolean @Is the game currently loading and PAUSE_SCREEN.LOADING would be triggered, based on state.loading and some arbitrary checks.
+    ---@field modifiers_down integer @Bitmask of modifier KEYs that are currently held
+    ---@field modifiers_block integer @Bitmask of modifier KEYs that will block all game input
+    ---@field modifiers_clear_input boolean @Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
+
 ---@class Bucket
     ---@field data table<string, any> @You can store arbitrary simple values here in Playlunky to be read in on Overlunky script for example.
     ---@field overlunky Overlunky @Access Overlunky options here, nil if Overlunky is not loaded.
+    ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
 
 end
 --## Static class functions
@@ -8195,6 +8240,13 @@ ENT_TYPE = {
   YETIQUEEN = 1333
 }
 ---@alias ENT_TYPE integer
+FADE = {
+  IN = 3,
+  LOAD = 2,
+  NONE = 0,
+  OUT = 1
+}
+---@alias FADE integer
 FEAT = {
   ARENA_CHAMPION = 22,
   AWAKENED = 12,
@@ -8699,6 +8751,10 @@ ON = {
   ARENA_SCORE = 27,
   ARENA_SELECT = 24,
   ARENA_STAGES = 22,
+  BLOCKED_GAME_LOOP = 159,
+  BLOCKED_LEVEL_GENERATION = 157,
+  BLOCKED_PROCESS_INPUT = 160,
+  BLOCKED_UPDATE = 158,
   CAMP = 11,
   CHARACTER_SELECT = 9,
   CONSTELLATION = 19,
@@ -9020,6 +9076,65 @@ PAUSEUI_VISIBILITY = {
   VISIBLE = 2
 }
 ---@alias PAUSEUI_VISIBILITY integer
+PAUSE_SCREEN = {
+  ARENA_INTRO = 33554432,
+  ARENA_ITEMS = 8388608,
+  ARENA_LEVEL = 67108864,
+  ARENA_MENU = 2097152,
+  ARENA_SCORE = 134217728,
+  ARENA_SELECT = 16777216,
+  ARENA_STAGES = 4194304,
+  CAMP = 2048,
+  CHARACTER_SELECT = 512,
+  CONSTELLATION = 524288,
+  CREDITS = 131072,
+  DEATH = 16384,
+  EXIT = -2147483648,
+  INTRO = 2,
+  LEADERBOARD = 128,
+  LEVEL = 4096,
+  LOADING = 1073741824,
+  LOGO = 1,
+  MENU = 16,
+  NONE = 0,
+  ONLINE_LOADING = 268435456,
+  ONLINE_LOBBY = 536870912,
+  OPTIONS = 32,
+  PLAYER_PROFILE = 64,
+  PROLOGUE = 4,
+  RECAP = 1048576,
+  SCORES = 262144,
+  SEED_INPUT = 256,
+  SPACESHIP = 32768,
+  TEAM_SELECT = 1024,
+  TITLE = 8,
+  TRANSITION = 8192,
+  WIN = 65536
+}
+---@alias PAUSE_SCREEN integer
+PAUSE_TRIGGER = {
+  EXIT = 8,
+  FADE_END = 2,
+  FADE_START = 1,
+  NONE = 0,
+  ONCE = 16,
+  SCREEN = 4
+}
+---@alias PAUSE_TRIGGER integer
+PAUSE_TYPE = {
+  ANKH = 32,
+  CUTSCENE = 4,
+  FADE = 2,
+  FLAG4 = 8,
+  FLAG5 = 16,
+  FORCE_STATE = 512,
+  MENU = 1,
+  NONE = 0,
+  PRE_GAME_LOOP = 128,
+  PRE_PROCESS_INPUT = 256,
+  PRE_UPDATE = 64
+}
+---@alias PAUSE_TYPE integer
 POS_TYPE = {
   AIR = 4,
   ALCOVE = 16,

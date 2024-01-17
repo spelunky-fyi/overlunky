@@ -25,6 +25,7 @@
 #include "movable_behavior.hpp"                  // for init_behavior_hooks
 #include "render_api.hpp"                        // for init_render_api_hooks
 #include "savedata.hpp"                          // for SaveData
+#include "screen.hpp"                            // for Screen
 #include "script/events.hpp"                     // for pre_entity_instagib
 #include "script/lua_vm.hpp"                     // for get_lua_vm
 #include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
@@ -38,6 +39,8 @@
 #include "vtable_hook.hpp"                       // for hook_vtable
 
 static int64_t global_frame_count{0};
+static int64_t global_update_count{0};
+static bool g_forward_blocked_events{false};
 
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
@@ -311,10 +314,13 @@ State& State::get()
                 patch_ushabti_error();
                 patch_entering_closed_door_crash();
                 bucket->patches_applied = true;
+                bucket->forward_blocked_events = true;
             }
             else
             {
                 DEBUG("Not applying patches, someone has already done it");
+                if (bucket->forward_blocked_events)
+                    g_forward_blocked_events = true;
             }
         }
     }
@@ -625,6 +631,10 @@ int64_t get_global_frame_count()
 {
     return global_frame_count;
 };
+int64_t get_global_update_count()
+{
+    return global_update_count;
+};
 
 std::vector<int64_t> State::read_prng() const
 {
@@ -640,9 +650,32 @@ using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)
 {
-    if (!pre_event(ON::PRE_UPDATE))
+    global_update_count++;
+    static const auto bucket = Bucket::get();
+    if (bucket->blocked_event)
+    {
+        pre_event(ON::PRE_UPDATE);
+        post_event(ON::BLOCKED_UPDATE);
+        return;
+    }
+    static const auto pa = bucket->pause_api;
+    auto block = pre_event(ON::PRE_UPDATE);
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_UPDATE))
+        block = true;
+    if (!block)
     {
         g_state_update_trampoline(s);
+        post_event(ON::POST_UPDATE);
+    }
+    else
+    {
+        post_event(ON::BLOCKED_UPDATE);
+        if (g_forward_blocked_events)
+        {
+            bucket->blocked_event = true;
+            g_state_update_trampoline(s);
+            bucket->blocked_event = false;
+        }
     }
     update_backends();
 }
@@ -665,11 +698,39 @@ using OnProcessInput = void(void*);
 OnProcessInput* g_process_input_trampoline{nullptr};
 void ProcessInput(void* s)
 {
-    if (!pre_event(ON::PRE_PROCESS_INPUT))
+    static bool had_focus;
+    static const auto bucket = Bucket::get();
+    static const auto gm = get_game_manager();
+    if (bucket->blocked_event)
+    {
+        pre_event(ON::PRE_PROCESS_INPUT);
+        post_event(ON::BLOCKED_PROCESS_INPUT);
+        return;
+    }
+    static const auto pa = bucket->pause_api;
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->pre_input())
+        return;
+    auto block = pre_event(ON::PRE_PROCESS_INPUT);
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_PROCESS_INPUT))
+        block = true;
+    if (!block || (gm->game_props->game_has_focus && !had_focus))
     {
         g_process_input_trampoline(s);
+        post_event(ON::POST_PROCESS_INPUT);
     }
-    post_event(ON::POST_PROCESS_INPUT);
+    else
+    {
+        post_event(ON::BLOCKED_PROCESS_INPUT);
+        if (g_forward_blocked_events)
+        {
+            bucket->blocked_event = true;
+            g_process_input_trampoline(s);
+            bucket->blocked_event = false;
+        }
+    }
+    if (!g_forward_blocked_events || !pa->last_instance)
+        pa->post_input();
+    had_focus = gm->game_props->game_has_focus;
 }
 
 void init_process_input_hook()
@@ -690,17 +751,44 @@ using OnGameLoop = void(void* a, float b, void* c);
 OnGameLoop* g_game_loop_trampoline{nullptr};
 void GameLoop(void* a, float b, void* c)
 {
+    static const auto bucket = Bucket::get();
+    static const auto pa = bucket->pause_api;
     auto& state = State::get();
+
     if (global_frame_count < state.get_frame_count_main())
         global_frame_count = state.get_frame_count_main();
     else
         global_frame_count++;
 
-    if (!pre_event(ON::PRE_GAME_LOOP))
+    if (bucket->blocked_event)
+    {
+        pre_event(ON::PRE_GAME_LOOP);
+        post_event(ON::BLOCKED_GAME_LOOP);
+        return;
+    }
+
+    if (!g_forward_blocked_events || !pa->last_instance)
+        pa->pre_loop();
+    auto block = pre_event(ON::PRE_GAME_LOOP);
+    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_GAME_LOOP))
+        block = true;
+    if (!block)
     {
         g_game_loop_trampoline(a, b, c);
+        post_event(ON::POST_GAME_LOOP);
     }
-    post_event(ON::POST_GAME_LOOP);
+    else
+    {
+        post_event(ON::BLOCKED_GAME_LOOP);
+        if (g_forward_blocked_events)
+        {
+            bucket->blocked_event = true;
+            g_game_loop_trampoline(a, b, c);
+            bucket->blocked_event = false;
+        }
+    }
+    if (!g_forward_blocked_events || !pa->last_instance)
+        pa->post_loop();
 }
 
 void init_game_loop_hook()
@@ -1008,4 +1096,15 @@ void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
             magmaman_positions.erase(it);
         }
     }
+}
+
+void update_camera_position()
+{
+    auto camera = State::get().ptr()->camera;
+    static const size_t offset = get_address("update_camera_position");
+    typedef void update_camera_func(Camera*);
+    static update_camera_func* ucf = (update_camera_func*)(offset);
+    ucf(camera);
+    camera->calculated_focus_x = camera->adjusted_focus_x;
+    camera->calculated_focus_y = camera->adjusted_focus_y;
 }

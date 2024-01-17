@@ -147,7 +147,7 @@ std::vector<DropEntry> drop_entries{
     {"SACRIFICE_EGGPLANT", "\x48\x8B\x42\x08\x81\x78\x14\xE7\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 7},
     {"YAMA_EGGPLANTCROWN", "\xC6\x44\x24\x20\x00\xBA\x19\x02\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
     {"YAMA_GIANTFOOD", "\xC6\x44\x24\x20\x00\xBA\x07\x02\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
-    {"YANG_KEY", "\xBA\x8F\x01\x00\x00"sv, VTABLE_OFFSET::MONS_YANG, 0, 1},
+    {"YANG_KEY", "\xba\x8f\x01\x00\x00\xe8\xd6\xe7\xe2\xff\x48\x89\xc7\x84\xdb"sv, VTABLE_OFFSET::NONE, 0, 1},
     {"MADAME_TUSK_KEY", "\xBA\x8F\x01\x00\x00"sv, VTABLE_OFFSET::MONS_MADAMETUSK, 0, 1},
     {"ANUBIS_COFFIN_VAMPIRE", "\x83\xF9\x02\xBA\xF5\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_SORCERESS", "\x83\xF9\x01\xB8\xFA\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},

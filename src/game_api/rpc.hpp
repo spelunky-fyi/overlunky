@@ -136,5 +136,4 @@ void set_camera_layer_control_enabled(bool enable);
 void set_speedhack(std::optional<float> multiplier);
 float get_speedhack();
 void init_adventure();
-void init_seeded(uint32_t seed);
-void update_camera_position();
+void init_seeded(std::optional<uint32_t> seed);

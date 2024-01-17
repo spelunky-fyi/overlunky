@@ -122,6 +122,8 @@ class Entity
 
     /// Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
     void set_layer(LAYER layer);
+    /// Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
+    void apply_layer();
     /// Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
     void remove();
     /// Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`

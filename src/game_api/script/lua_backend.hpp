@@ -132,6 +132,9 @@ enum class ON
     POST_PROCESS_INPUT,
     PRE_GAME_LOOP,
     POST_GAME_LOOP,
+    BLOCKED_UPDATE,
+    BLOCKED_GAME_LOOP,
+    BLOCKED_PROCESS_INPUT,
 };
 
 struct IntOption
@@ -423,7 +426,7 @@ class LuaBackend
 
     void set_error(std::string err);
 
-    static void for_each_backend(std::function<bool(LockedBackend)> fun);
+    static void for_each_backend(std::function<bool(LockedBackend)> fun, bool stop_propagation = true);
     static LockedBackend get_backend(std::string_view id);
     static std::optional<LockedBackend> get_backend_safe(std::string_view id);
     static LockedBackend get_backend_by_id(std::string_view id, std::string_view ver = "");

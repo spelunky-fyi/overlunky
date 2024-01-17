@@ -457,7 +457,8 @@ bool pre_event(ON event)
                 return false;
             }
             return true;
-        });
+        },
+        false);
     return return_val;
 }
 

@@ -1362,6 +1362,15 @@ Flips the nth bit in a number. This doesn't actually change the variable you pas
 
 Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
 
+### get_address
+
+
+> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
+
+#### nil get_address([[maybe_unused]] any o)
+
+Get memory address from a lua object
+
 ### get_adventure_seed
 
 
@@ -1487,6 +1496,24 @@ Get the thread-local version of state
 #### nil get_ms()
 
 Get the current timestamp in milliseconds since the Unix Epoch.
+
+### get_performance_counter
+
+
+> Search script examples for [get_performance_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_performance_counter)
+
+#### int get_performance_counter()
+
+Retrieves the current value of the performance counter, which is a high resolution (<1us) time stamp that can be used for time-interval measurements.
+
+### get_performance_frequency
+
+
+> Search script examples for [get_performance_frequency](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_performance_frequency)
+
+#### int get_performance_frequency()
+
+Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
 
 ### get_setting
 
@@ -1677,11 +1704,27 @@ Reverse of some random hash function
 
 > Search script examples for [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause)
 
-#### nil pause(bool p)
+#### nil pause()
 
-Pause/unpause the game.
-This is just short for `state.pause == 32`, but that produces an audio bug
-I suggest `state.pause == 2`, but that won't run any callback, `state.pause == 16` will do the same but [set_global_interval](#set_global_interval) will still work
+Access the [PauseAPI](#PauseAPI), or directly call `pause(true)` to enable current `pause.pause_type`
+
+### play_adventure
+
+
+> Search script examples for [play_adventure](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_adventure)
+
+#### nil play_adventure()
+
+Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
+
+### play_seeded
+
+
+> Search script examples for [play_seeded](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_seeded)
+
+#### nil play_seeded(optional<int> seed)
+
+Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
 
 ### register_console_command
 
@@ -1933,7 +1976,7 @@ Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack,
 
 #### nil set_start_level_paused(bool enable)
 
-Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == [PAUSE](#PAUSE).FADE on the first frame to do what you want.
+Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == [PAUSE](#PAUSE).[FADE](#FADE) on the first frame to do what you want.
 
 ### set_storage_layer
 

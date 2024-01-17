@@ -80,7 +80,8 @@ void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
     state->theme_next = theme;
     state->screen_next = 13;
     state->win_state = 0;
-    state->loading = 1;
+    state->fade_enabled = false;
+    state->loading = 2;
 
     if (state->items->player_inventories[0].health == 0)
         state->items->player_inventories[0].health = 4;
@@ -435,7 +436,10 @@ void UI::update_floor_at(float x, float y, LAYER l)
         {
             auto deco_ent = get_entity_ptr(floor->decos[i]);
             if (deco_ent)
+            {
+                deco_ent->color.a = 0;
                 deco_ent->destroy();
+            }
             floor->decos[i] = -1;
         }
     }
@@ -443,13 +447,19 @@ void UI::update_floor_at(float x, float y, LAYER l)
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
+        {
+            deco_ent->color.a = 0;
             deco_ent->destroy();
+        }
     }
     for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 0.5f))
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
+        {
+            deco_ent->color.a = 0;
             deco_ent->destroy();
+        }
     }
     if (test_flag(floor->type->properties_flags, 1) || test_flag(floor->type->properties_flags, 2))
     {

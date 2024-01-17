@@ -11,6 +11,7 @@ Used in [ArenaState](#ArenaState)
 
 Type | Name | Description
 ---- | ---- | -----------
+array&lt;bool, 40&gt; | [list](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=list) | 
 bool | [dwelling_1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_1) | 
 bool | [dwelling_2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_2) | 
 bool | [dwelling_3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dwelling_3) | 
@@ -604,6 +605,7 @@ Type | Name | Description
 ---- | ---- | -----------
 map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data) | You can store arbitrary simple values here in Playlunky to be read in on [Overlunky](#Overlunky) script for example.
 [Overlunky](#Overlunky) | [overlunky](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlunky) | Access [Overlunky](#Overlunky) options here, nil if [Overlunky](#Overlunky) is not loaded.
+[PauseAPI](#PauseAPI) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | [PauseAPI](#PauseAPI) is used by [Overlunky](#Overlunky) and can be used to control the [Overlunky](#Overlunky) pause options from scripts. Can be accessed from the global `pause` more easily.
 
 ### Color
 
@@ -828,6 +830,38 @@ optional&lt;int&gt; | [random(int i)](https://github.com/spelunky-fyi/overlunky/
 optional&lt;int&gt; | [random(int min, int max)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(min, max)`
 tuple&lt;int, int&gt; | [get_pair(PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) | 
 nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) | 
+
+### PauseAPI
+
+Control the pause API
+
+Type | Name | Description
+---- | ---- | -----------
+[PAUSE_TYPE](#PAUSE_TYPE) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | Current pause state bitmask. Use custom [PAUSE_TYPE](#PAUSE_TYPE).PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching [ON](#ON) update callbacks, so can be set on the same callback you want to block at the latest. Vanilla [PAUSE](#PAUSE) flags will be forwarded to state.pause, but use of vanilla [PAUSE](#PAUSE) flags is discouraged and might not work with other [PauseAPI](#PauseAPI) features.
+ | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 
+[PAUSE_TYPE](#PAUSE_TYPE) | [pause_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_type) | Pause mask to toggle when using the [PauseAPI](#PauseAPI) methods to set or get pause state.
+[PAUSE_TRIGGER](#PAUSE_TRIGGER) | [pause_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_trigger) | Bitmask for conditions when the current `pause_type` should be automatically enabled in `pause`, can have multiple conditions.
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [pause_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause_screen) | Bitmask to only enable [PAUSE_TRIGGER](#PAUSE_TRIGGER).[SCREEN](#SCREEN) during specific [SCREEN](#SCREEN), or any screen when NONE.
+[PAUSE_TRIGGER](#PAUSE_TRIGGER) | [unpause_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unpause_trigger) | Bitmask for conditions when the current `pause_type` should be automatically disabled in `pause`, can have multiple conditions.
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [unpause_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unpause_screen) | Bitmask to only enable [PAUSE_TRIGGER](#PAUSE_TRIGGER).[SCREEN](#SCREEN) during specific [SCREEN](#SCREEN), or any screen when NONE.
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [ignore_screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_screen) | Bitmask for game [SCREEN](#SCREEN) where the PRE_✱ pause types are ignored, even though enabled in `pause`. Can also use the special cases [FADE, EXIT] to unfreeze temporarily during fades (or other screen transitions where player input is probably impossible) or the level exit walk of shame.
+[PAUSE_SCREEN](#PAUSE_SCREEN) | [ignore_screen_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ignore_screen_trigger) | Bitmask for game [SCREEN](#SCREEN) where the triggers are ignored.
+bool | [skip](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip) | Set to true to unfreeze the game for one update cycle. Sets back to false after [ON](#ON).POST_GAME_LOOP, so it can be used to check if current frame is a frame advance frame.
+bool | [update_camera](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_camera) | Set to true to enable normal camera movement when the game is paused or frozen on a callback by [PauseAPI](#PauseAPI).
+bool | [blocked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blocked) | Is true when [PauseAPI](#PauseAPI) is freezing the game.
+bool | [skip_fade](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=skip_fade) | Set to true to skip all fade transitions, forcing fade_timer and fade_value to 0 on every update.
+int | [last_trigger_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_trigger_frame) | Global frame stamp when one of the triggers was last triggered, used to prevent running them again on the same frame on unpause.
+int | [last_fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_fade_timer) | Fade timer stamp when fade triggers were last checked.
+nil | [frame_advance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frame_advance) | Sets skip
+[PAUSE_TYPE](#PAUSE_TYPE) | [get_pause()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pause) | Get the current pause flags
+nil | [set_pause(PAUSE_TYPE flags)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pause) | Set the current pause flags
+bool | [set_paused(bool enable = true)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_paused) | Enable/disable the current pause_type flags in pause state
+bool | [paused()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=paused) | Is the game currently paused and that pause state matches any of the current the pause_type
+bool | [toggle()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=toggle) | Toggles pause state
+bool | [loading()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) | Is the game currently loading and [PAUSE_SCREEN](#PAUSE_SCREEN).LOADING would be triggered, based on state.loading and some arbitrary checks.
+int | [modifiers_down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifiers_down) | Bitmask of modifier KEYs that are currently held
+int | [modifiers_block](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifiers_block) | Bitmask of modifier KEYs that will block all game input
+bool | [modifiers_clear_input](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifiers_clear_input) | Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
 
 ### Quad
 
@@ -2905,8 +2939,6 @@ Type | Name | Description
 [SCREEN](#SCREEN) | [screen_last](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_last) | Previous [SCREEN](#SCREEN), used to check where we're coming from when loading another [SCREEN](#SCREEN)
 [SCREEN](#SCREEN) | [screen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen) | Current [SCREEN](#SCREEN), generally read-only or weird things will happen
 [SCREEN](#SCREEN) | [screen_next](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_next) | Next [SCREEN](#SCREEN), used to load the right screen when loading. Can be changed in PRE_LOAD_SCREEN to go somewhere else instead. Also see `state.loading`.
-int | [ingame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ingame) | Is 1 when you in a game, is set to 0 or 1 in main menu, can't be trusted there, normally in a level is 1 unless you go to the options
-int | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | Is 1 when you are in a level, but going to options sets it to 0 and does not set it back to 1 after the way back, don't trust it
 [PAUSE](#PAUSE) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | 8bit flags, multiple might be active at the same time<br/>1: Menu: Pauses the level timer and engine. Can't set, controlled by the menu.<br/>2: Fade/Loading: Pauses all timers and engine.<br/>4: Cutscene: Pauses total/level time but not engine. Used by boss cutscenes.<br/>8: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>16: Unknown: Pauses total/level time and engine. Does not pause the global counter so set_global_interval still runs.<br/>32: Ankh: Pauses all timers, engine, but not camera. Used by the ankh cutscene.
 int | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | level width in rooms (number of rooms horizontally)
 int | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | level height in rooms (number of rooms vertically)
@@ -2938,13 +2970,15 @@ int | [damage_taken](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=da
 int | [time_last_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_last_level) | Level time of previous level in frames, used by game logic to decide dark levels etc
 int | [time_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) | Level time of current level in frames, show on the hud
 int | [level_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_flags) | 
-int | [loading](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) | Shows the current loading state (0=Not loading, 1=Fadeout, 2=Loading, 3=Fadein). Writing 1 or 2 will trigger a screen load to `screen_next`.
 [QUEST_FLAG](#QUEST_FLAG) | [quest_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_flags) | 32bit flags, can be written to trigger a run reset on next level load etc.
 [PRESENCE_FLAG](#PRESENCE_FLAG) | [presence_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=presence_flags) | 
+[FADE](#FADE) | [loading](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading) | Current loading/fade state. Pauses all updates if > [FADE](#FADE).NONE. Writing [FADE](#FADE).OUT or [FADE](#FADE).LOAD will trigger a screen load to `screen_next`.
 float | [fade_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_value) | Current fade-to-black amount (0.0 = all visible; 1.0 = all black). Manipulated by the loading routine when loading > 0.
 int | [fade_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_timer) | Remaining frames for fade-in/fade-out when loading. Counts down to 0.
 int | [fade_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_length) | Total frames for fade-in/fade-out when loading.
-int | [loading_black_screen_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loading_black_screen_timer) | if state.loading is 1, this timer counts down to 0 while the screen is black (used after Ouroboros, in credits etc.)
+int | [fade_delay](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_delay) | Additional delay after fade_timer reaches 0, before moving to the next fading state. Used after Ouroboros, in credits etc. for longer black screens, but also works after [FADE](#FADE).IN.
+bool | [fade_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_enabled) | Enables the fade effect on [FADE](#FADE).IN, setting to false makes loading skip [FADE](#FADE).IN state instantly
+bool | [fade_circle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fade_circle) | Makes loading use circle iris effect instead of fade on [FADE](#FADE).IN
 int | [saved_dogs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_dogs) | Run totals
 int | [saved_cats](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_cats) | 
 int | [saved_hamsters](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=saved_hamsters) | 
@@ -4115,6 +4149,7 @@ nil | [set_enable_turning(bool enabled)](https://github.com/spelunky-fyi/overlun
 nil | [liberate_from_shop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | 
 [Entity](#Entity) | [get_held_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) | 
 nil | [set_layer(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) | Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+nil | [apply_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_layer) | Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
 nil | [remove()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove) | Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
 nil | [respawn(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=respawn) | Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
 nil | [kill(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill) | Kills the entity, you can set responsible to `nil` to ignore it
@@ -4132,6 +4167,7 @@ nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mas
 nil | [kill_recursive(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
 nil | [destroy_recursive(optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
 nil | [destroy_recursive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
+nil | [update()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update) | 
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.

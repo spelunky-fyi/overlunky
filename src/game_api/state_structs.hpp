@@ -176,46 +176,53 @@ struct JournalProgressStainSlot
 
 struct ArenaConfigArenas // size: 40 bytes
 {
-    bool dwelling_1;
-    bool dwelling_2;
-    bool dwelling_3;
-    bool dwelling_4;
-    bool dwelling_5;
-    bool jungle_1;
-    bool jungle_2;
-    bool jungle_3;
-    bool jungle_4;
-    bool jungle_5;
-    bool volcana_1;
-    bool volcana_2;
-    bool volcana_3;
-    bool volcana_4;
-    bool volcana_5;
-    bool tidepool_1;
-    bool tidepool_2;
-    bool tidepool_3;
-    bool tidepool_4;
-    bool tidepool_5;
-    bool temple_1;
-    bool temple_2;
-    bool temple_3;
-    bool temple_4;
-    bool temple_5;
-    bool icecaves_1;
-    bool icecaves_2;
-    bool icecaves_3;
-    bool icecaves_4;
-    bool icecaves_5;
-    bool neobabylon_1;
-    bool neobabylon_2;
-    bool neobabylon_3;
-    bool neobabylon_4;
-    bool neobabylon_5;
-    bool sunkencity_1;
-    bool sunkencity_2;
-    bool sunkencity_3;
-    bool sunkencity_4;
-    bool sunkencity_5;
+    union
+    {
+        std::array<bool, 40> list;
+        struct
+        {
+            bool dwelling_1;
+            bool dwelling_2;
+            bool dwelling_3;
+            bool dwelling_4;
+            bool dwelling_5;
+            bool jungle_1;
+            bool jungle_2;
+            bool jungle_3;
+            bool jungle_4;
+            bool jungle_5;
+            bool volcana_1;
+            bool volcana_2;
+            bool volcana_3;
+            bool volcana_4;
+            bool volcana_5;
+            bool tidepool_1;
+            bool tidepool_2;
+            bool tidepool_3;
+            bool tidepool_4;
+            bool tidepool_5;
+            bool temple_1;
+            bool temple_2;
+            bool temple_3;
+            bool temple_4;
+            bool temple_5;
+            bool icecaves_1;
+            bool icecaves_2;
+            bool icecaves_3;
+            bool icecaves_4;
+            bool icecaves_5;
+            bool neobabylon_1;
+            bool neobabylon_2;
+            bool neobabylon_3;
+            bool neobabylon_4;
+            bool neobabylon_5;
+            bool sunkencity_1;
+            bool sunkencity_2;
+            bool sunkencity_3;
+            bool sunkencity_4;
+            bool sunkencity_5;
+        };
+    };
 };
 
 struct ArenaConfigItems // size: 40 bytes
