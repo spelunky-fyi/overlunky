@@ -1827,9 +1827,8 @@ void LevelGenSystem::init()
                 OnScopeExit pop{[]
                                 { pop_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_GENERAL); }};
 
-                if (pre_event(ON::PRE_LEVEL_GENERATION))
-                    return;
-                original(th);
+                if (!pre_event(ON::PRE_LEVEL_GENERATION))
+                    original(th);
                 post_event(ON::POST_LEVEL_GENERATION);
             });
     }
