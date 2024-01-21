@@ -1345,6 +1345,7 @@ array&lt;[ThemeInfo](#ThemeInfo), 18&gt; | [themes](https://github.com/spelunky-
 int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
 int | [flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags2) | 
 int | [flags3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags3) | 
+array&lt;int&gt; | [level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_config) | 
 
 ## Lighting types
 

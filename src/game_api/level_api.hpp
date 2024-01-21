@@ -122,7 +122,7 @@ struct LevelGenData
 
     union
     {
-        std::array<uint32_t, 18> level_config;
+        std::array<uint32_t, 17> level_config;
         struct
         {
             uint32_t back_room_chance;
@@ -142,7 +142,7 @@ struct LevelGenData
             uint32_t machine_rewardroom_chance;
             uint32_t max_liquid_particles;
             uint32_t flagged_liquid_rooms;
-            uint32_t unknown_config; //
+            uint32_t unknown_config; // padding
         };
     };
 

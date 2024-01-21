@@ -4764,6 +4764,7 @@ function MovableBehavior:get_state_id() end
     ---@field flags integer
     ---@field flags2 integer
     ---@field flags3 integer
+    ---@field level_config integer[]
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
