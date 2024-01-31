@@ -791,7 +791,7 @@ def run_parse():
                         "name": "set_pre_virtual",
                         "signature": f"CallbackId set_pre_virtual({override_table} entry, function fun)",
                         "comment": [
-                            "Hooks before the virtual function at index `entry`."
+                            "Hooks before the virtual function at index `entry`. If a value is returned, the original virtual and all subsequent registered callbacks will be skipped."
                         ],
                         "function": True,
                     }

@@ -509,14 +509,18 @@ struct HookableVTable
                     for (auto& [id, prefun] : hook_info.template get_pre<void(SelfT*, ArgsT...)>()[Index])
                     {
                         skip_orig = prefun(inner_obj, args...);
+                        if (skip_orig)
+                        {
+                            break;
+                        }
                     }
                     if (!skip_orig)
                     {
                         original(inner_obj, args...);
-                    }
-                    for (auto& [id, postfun] : hook_info.template get_post<void(SelfT*, ArgsT...)>()[Index])
-                    {
-                        postfun(inner_obj, args...);
+                        for (auto& [id, postfun] : hook_info.template get_post<void(SelfT*, ArgsT...)>()[Index])
+                        {
+                            postfun(inner_obj, args...);
+                        }
                     }
 
                     // cleanup hooks, delayed until all other dtor hooks have run
@@ -550,10 +554,10 @@ struct HookableVTable
                     if (!return_value.has_value())
                     {
                         return_value = original(inner_obj, args...);
-                    }
-                    for (auto& [id, postfun] : hook_info.template get_post<RetT(SelfT*, ArgsT...)>()[Index])
-                    {
-                        postfun(inner_obj, args...);
+                        for (auto& [id, postfun] : hook_info.template get_post<RetT(SelfT*, ArgsT...)>()[Index])
+                        {
+                            postfun(inner_obj, args...);
+                        }
                     }
 
                     // dtor should never have a return value, so shouldn't reach here
