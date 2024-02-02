@@ -30,6 +30,7 @@ void post_init_layer(LAYER layer);
 void post_unload_layer(LAYER layer);
 void post_room_generation();
 void post_level_generation();
+void heap_clone_event(ON event, StateMemory* from, StateMemory* to);
 
 void on_death_message(STRINGID stringid);
 std::optional<bool> pre_get_feat(FEAT feat);

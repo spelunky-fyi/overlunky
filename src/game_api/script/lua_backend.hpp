@@ -135,6 +135,8 @@ enum class ON
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
+    PRE_CLONE_HEAP,
+    POST_CLONE_HEAP,
 };
 
 struct IntOption
@@ -440,6 +442,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
+    void on_clone_heap(ON event, StateMemory* from, StateMemory* to);
 };
 
 template <class Inheriting>

@@ -387,17 +387,18 @@ struct State
     SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
 
+    size_t location;
   private:
     State(size_t addr)
         : location(addr){};
 
-    size_t location;
     State(const State&) = delete;
     State& operator=(const State&) = delete;
 };
 void init_state_update_hook();
 void init_process_input_hook();
 void init_game_loop_hook();
+void init_state_clone_hook();
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 uint8_t enum_to_layer(const LAYER layer);

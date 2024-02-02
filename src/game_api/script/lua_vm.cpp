@@ -2435,7 +2435,11 @@ end
         "BLOCKED_GAME_LOOP",
         ON::BLOCKED_GAME_LOOP,
         "BLOCKED_PROCESS_INPUT",
-        ON::BLOCKED_PROCESS_INPUT);
+        ON::BLOCKED_PROCESS_INPUT,
+        "PRE_CLONE_HEAP",
+        ON::PRE_CLONE_HEAP,
+        "POST_CLONE_HEAP",
+        ON::POST_CLONE_HEAP);
 
     /* ON
     // LOGO

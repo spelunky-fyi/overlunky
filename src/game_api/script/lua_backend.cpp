@@ -1814,3 +1814,24 @@ void LuaBackend::on_post(ON event)
         }
     }
 }
+
+void LuaBackend::on_clone_heap(ON event, StateMemory* from, StateMemory* to)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, from, to);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}

@@ -471,3 +471,13 @@ void post_event(ON event)
             return true;
         });
 }
+
+void heap_clone_event(ON event, StateMemory* from, StateMemory* to)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->on_clone_heap(event, from, to);
+            return true;
+        });
+}
