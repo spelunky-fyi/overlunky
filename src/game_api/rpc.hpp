@@ -137,3 +137,4 @@ void set_speedhack(std::optional<float> multiplier);
 float get_speedhack();
 void init_adventure();
 void init_seeded(std::optional<uint32_t> seed);
+void copy_state(int from, int to);

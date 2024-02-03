@@ -2249,6 +2249,20 @@ end
     /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
 
+    /// Save current state to slot 1..4
+    lua["save_state"] = [](int slot)
+    {
+        if (slot >= 1 && slot <= 4)
+            copy_state(5, slot);
+    };
+
+    /// Load current state from slot 1..4
+    lua["load_state"] = [](int slot)
+    {
+        if (slot >= 1 && slot <= 4)
+            copy_state(slot, 5);
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
     lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);

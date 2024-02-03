@@ -824,3 +824,8 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
 {
     ::set_adventure_seed(first, second);
 }
+
+void UI::copy_state(int from, int to)
+{
+    ::copy_state(from, to);
+}

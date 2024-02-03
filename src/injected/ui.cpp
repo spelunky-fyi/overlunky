@@ -148,6 +148,14 @@ std::map<std::string, int64_t> default_keys{
     {"hotbar_8", '8'},
     {"hotbar_9", '9'},
     {"hotbar_0", '0'},
+    {"load_state_1", OL_KEY_SHIFT | VK_F1},
+    {"load_state_2", OL_KEY_SHIFT | VK_F2},
+    {"load_state_3", OL_KEY_SHIFT | VK_F3},
+    {"load_state_4", OL_KEY_SHIFT | VK_F4},
+    {"save_state_1", OL_KEY_SHIFT | VK_F5},
+    {"save_state_2", OL_KEY_SHIFT | VK_F6},
+    {"save_state_3", OL_KEY_SHIFT | VK_F7},
+    {"save_state_4", OL_KEY_SHIFT | VK_F8},
     {"toggle_hotbar", OL_KEY_CTRL | OL_KEY_SHIFT | 'B'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
@@ -3501,6 +3509,38 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("peek_layer", wParam))
     {
         peek_layer = true;
+    }
+    else if (pressed("save_state_1", wParam))
+    {
+        UI::copy_state(5, 1);
+    }
+    else if (pressed("save_state_2", wParam))
+    {
+        UI::copy_state(5, 2);
+    }
+    else if (pressed("save_state_3", wParam))
+    {
+        UI::copy_state(5, 3);
+    }
+    else if (pressed("save_state_4", wParam))
+    {
+        UI::copy_state(5, 4);
+    }
+    else if (pressed("load_state_1", wParam))
+    {
+        UI::copy_state(1, 5);
+    }
+    else if (pressed("load_state_2", wParam))
+    {
+        UI::copy_state(2, 5);
+    }
+    else if (pressed("load_state_3", wParam))
+    {
+        UI::copy_state(3, 5);
+    }
+    else if (pressed("load_state_4", wParam))
+    {
+        UI::copy_state(4, 5);
     }
     else
     {
@@ -8433,6 +8473,22 @@ void render_game_props()
     }
     if (submenu("State"))
     {
+        ImGui::Text("Save state");
+        for (int i = 1; i <= 4; ++i)
+        {
+            ImGui::SameLine();
+            if (ImGui::Button(fmt::format(" {} ##SaveState{}", i, i).c_str()))
+                UI::copy_state(5, i);
+        }
+
+        ImGui::Text("Load state");
+        for (int i = 1; i <= 4; ++i)
+        {
+            ImGui::SameLine();
+            if (ImGui::Button(fmt::format(" {} ##LoadState{}", i, i).c_str()))
+                UI::copy_state(i, 5);
+        }
+
         render_screen("Current screen", g_state->screen);
         render_screen("Last screen", g_state->screen_last);
         render_screen("Next screen", g_state->screen_next);
