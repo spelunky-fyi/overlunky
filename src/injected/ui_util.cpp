@@ -829,3 +829,8 @@ void UI::copy_state(int from, int to)
 {
     ::copy_state(from, to);
 }
+
+StateMemory* UI::get_save_state(int slot)
+{
+    return ::get_save_state(slot);
+}

@@ -2801,6 +2801,23 @@ void toggle_lights()
     }
 }
 
+void load_state(int slot)
+{
+    StateMemory* target = UI::get_save_state(slot);
+    if (!target)
+        return;
+    if (g_state->screen == 14 && target->screen != 14)
+    {
+        g_state->screen = 12;
+        g_game_manager->journal_ui->fade_timer = 15;
+        g_game_manager->journal_ui->state = 5;
+        g_state->camera->focus_offset_x = 0;
+        g_state->camera->focus_offset_y = 0;
+        set_camera_bounds(true);
+    }
+    UI::copy_state(slot, 5);
+}
+
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     ImGuiContext& g = *GImGui;
@@ -3528,19 +3545,19 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("load_state_1", wParam))
     {
-        UI::copy_state(1, 5);
+        load_state(1);
     }
     else if (pressed("load_state_2", wParam))
     {
-        UI::copy_state(2, 5);
+        load_state(2);
     }
     else if (pressed("load_state_3", wParam))
     {
-        UI::copy_state(3, 5);
+        load_state(3);
     }
     else if (pressed("load_state_4", wParam))
     {
-        UI::copy_state(4, 5);
+        load_state(4);
     }
     else
     {
@@ -8473,21 +8490,26 @@ void render_game_props()
     }
     if (submenu("State"))
     {
-        ImGui::Text("Save state");
         for (int i = 1; i <= 4; ++i)
         {
-            ImGui::SameLine();
             if (ImGui::Button(fmt::format(" {} ##SaveState{}", i, i).c_str()))
                 UI::copy_state(5, i);
+            tooltip("Save current level state", fmt::format("save_state_{}", i).c_str());
+            ImGui::SameLine();
         }
+        ImGui::Text("Save state");
 
-        ImGui::Text("Load state");
         for (int i = 1; i <= 4; ++i)
         {
-            ImGui::SameLine();
+            bool valid = UI::get_save_state(i) != nullptr;
+            ImGui::BeginDisabled(!valid);
             if (ImGui::Button(fmt::format(" {} ##LoadState{}", i, i).c_str()))
-                UI::copy_state(i, 5);
+                load_state(i);
+            ImGui::EndDisabled();
+            tooltip("Load current level state", fmt::format("load_state_{}", i).c_str());
+            ImGui::SameLine();
         }
+        ImGui::Text("Load state");
 
         render_screen("Current screen", g_state->screen);
         render_screen("Last screen", g_state->screen_last);

@@ -1933,3 +1933,23 @@ void copy_state(int from, int to)
         iterIdx = iterIdx + 2;
     } while (iterIdx != 0x400001);
 };
+
+StateMemory* get_save_state(int slot)
+{
+    size_t arr = get_address("save_states");
+    size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
+    auto state = reinterpret_cast<StateMemory*>(base + 0x4a0);
+    if (state->screen)
+        return state;
+    return nullptr;
+}
+
+void invalidate_save_states()
+{
+    for (int i = 1; i <= 4; ++i)
+    {
+        auto state = get_save_state(i);
+        if (state)
+            state->screen = 0;
+    }
+}

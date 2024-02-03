@@ -2259,8 +2259,16 @@ end
     /// Load current state from slot 1..4
     lua["load_state"] = [](int slot)
     {
-        if (slot >= 1 && slot <= 4)
+        if (slot >= 1 && slot <= 4 && get_save_state(slot))
             copy_state(slot, 5);
+    };
+
+    /// Get saved state from slot
+    lua["get_save_state"] = [](int slot) -> StateMemory*
+    {
+        if (slot >= 1 && slot <= 5)
+            return get_save_state(slot);
+        return nullptr;
     };
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
