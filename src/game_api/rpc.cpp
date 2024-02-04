@@ -1903,3 +1903,53 @@ void init_seeded(std::optional<uint32_t> seed)
     auto* state = State::get().ptr();
     isf(state, seed.value_or(state->seed));
 }
+
+void copy_state(int from, int to)
+{
+    size_t arr = get_address("save_states");
+    size_t iterIdx = 1;
+    size_t fromBaseState = memory_read<size_t>(arr + (from - 1) * 8);
+    size_t toBaseState = memory_read<size_t>(arr + (to - 1) * 8);
+    do
+    {
+        size_t copyContent = *(size_t*)((fromBaseState - 8) + iterIdx * 8);
+        // variable used to fix pointers that point somewhere in the same Thread
+        size_t diff = toBaseState - fromBaseState;
+        if (copyContent >= fromBaseState + 0x2000000 || copyContent <= fromBaseState)
+        {
+            diff = 0;
+        }
+        *(size_t*)(toBaseState + iterIdx * 8 + -8) = diff + copyContent;
+
+        // Almost same code as before, but on the next value, idk why
+        copyContent = *(size_t*)(fromBaseState + iterIdx * 8);
+        diff = toBaseState - fromBaseState;
+        if (copyContent >= fromBaseState + 0x2000000 || copyContent <= fromBaseState)
+        {
+            diff = 0;
+        }
+        *(size_t*)(toBaseState + iterIdx * 8) = diff + copyContent;
+
+        iterIdx = iterIdx + 2;
+    } while (iterIdx != 0x400001);
+};
+
+StateMemory* get_save_state(int slot)
+{
+    size_t arr = get_address("save_states");
+    size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
+    auto state = reinterpret_cast<StateMemory*>(base + 0x4a0);
+    if (state->screen)
+        return state;
+    return nullptr;
+}
+
+void invalidate_save_states()
+{
+    for (int i = 1; i <= 4; ++i)
+    {
+        auto state = get_save_state(i);
+        if (state)
+            state->screen = 0;
+    }
+}
