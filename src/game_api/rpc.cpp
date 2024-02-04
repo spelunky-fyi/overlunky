@@ -39,6 +39,7 @@
 #include "math.hpp"                     // for AABB
 #include "memory.hpp"                   // for write_mem_prot, write_mem_recoverable
 #include "movable.hpp"                  // for Movable
+#include "online.hpp"                   // for Online
 #include "particles.hpp"                // for ParticleEmitterInfo
 #include "screen.hpp"                   //
 #include "search.hpp"                   // for get_address, find_inst
@@ -1946,6 +1947,9 @@ StateMemory* get_save_state(int slot)
 
 void invalidate_save_states()
 {
+    auto online = get_online();
+    if (online->lobby.code != 0)
+        return;
     for (int i = 1; i <= 4; ++i)
     {
         auto state = get_save_state(i);
