@@ -13,8 +13,12 @@ register_option_callback('buttons', nil, function(ctx)
     if ctx:win_button('Quick Load') then load_state(1) end
 end)
 
+function save_early()
+    return options.save_early and state.theme ~= THEME.OLMEC --typical olmec crashing stuff again
+end
+
 set_callback(function()
-    if not options.save_early then
+    if not save_early() then
         save_state(1)
     end
     for _, p in pairs(players) do
@@ -26,7 +30,7 @@ set_callback(function()
 end, ON.LEVEL)
 
 set_callback(function()
-    if options.save_early then
+    if save_early() then
         -- for whatever prng related reason, loading a save created at this point will reroll the level rng, which is a neat I guess
         save_state(1)
     end
