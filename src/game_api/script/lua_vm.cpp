@@ -2249,21 +2249,21 @@ end
     /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
 
-    /// Save current state to slot 1..4
+    /// Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
     lua["save_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4)
             copy_state(5, slot);
     };
 
-    /// Load current state from slot 1..4
+    /// Load level state from slot 1..4, if a save_state was made in this level.
     lua["load_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4 && get_save_state(slot))
             copy_state(slot, 5);
     };
 
-    /// Get saved state from slot
+    /// Get StateMemory from a save_state slot.
     lua["get_save_state"] = [](int slot) -> StateMemory*
     {
         if (slot >= 1 && slot <= 5)
