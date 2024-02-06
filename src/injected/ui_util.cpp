@@ -348,6 +348,8 @@ void UI::steam_achievements(bool on)
 }
 int32_t UI::destroy_entity_items(Entity* ent)
 {
+    if (ent->type->search_flags & 0x80)
+        return 0;
     auto items = entity_get_items_by(ent->uid, 0, 0);
     if (items.size() == 0)
         return -1;
@@ -356,6 +358,8 @@ int32_t UI::destroy_entity_items(Entity* ent)
     while (it != items.rend())
     {
         auto item = get_entity_ptr(*it);
+        if (item->type->search_flags & 0x81)
+            continue;
         UI::destroy_entity_items(item);
         UI::safe_destroy(item, false, false);
         it++;

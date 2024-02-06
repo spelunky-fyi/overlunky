@@ -1322,9 +1322,16 @@ void smart_delete(Entity* ent, bool unsafe = false)
 {
     static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
-    ent->flags = set_flag(ent->flags, 1);
-    for (auto item : ent->items.entities())
-        item->flags = set_flag(item->flags, 1);
+    if (!ent->is_player())
+        ent->flags = set_flag(ent->flags, 1);
+    if ((ent->type->search_flags & 0x80) == 0)
+    {
+        for (auto item : ent->items.entities())
+        {
+            if (!item->is_player())
+                item->flags = set_flag(item->flags, 1);
+        }
+    }
     UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
