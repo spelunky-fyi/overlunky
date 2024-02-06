@@ -230,6 +230,7 @@ std::map<std::string, int64_t> default_keys{
     {"speedhack_slow", VK_NEXT},
     {"toggle_uncapped_fps", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
     {"respawn", OL_KEY_CTRL | 'R'},
+    {"clear_messages", OL_KEY_CTRL | VK_BACK},
     //{ "", 0x },
 };
 
@@ -284,7 +285,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
+     enable_noclip = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -381,6 +382,8 @@ std::map<std::string, bool> options = {
     {"pause_last_instance", false},
     {"update_check", true},
     {"modifiers_clear_input", true},
+    {"load_scripts", true},
+    {"load_packs", false},
 };
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
@@ -803,7 +806,7 @@ bool SliderByte(const char* label, char* value, char min = 0, char max = 0, cons
 void refresh_script_files()
 {
     g_script_files.clear();
-    if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    if (options["load_scripts"] && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         for (const auto& file : std::filesystem::directory_iterator(scriptpath))
         {
@@ -813,7 +816,7 @@ void refresh_script_files()
             }
         }
     }
-    else if (!load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    else if (!options["load_scripts"] && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
@@ -831,7 +834,7 @@ void refresh_script_files()
         }
     }
 
-    if (load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    if (options["load_packs"] && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         for (const auto& file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
         {
@@ -841,7 +844,7 @@ void refresh_script_files()
             }
         }
     }
-    else if (!load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    else if (!options["load_packs"] && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
@@ -2818,6 +2821,16 @@ void load_state(int slot)
     UI::copy_state(slot, 5);
 }
 
+void clear_script_messages()
+{
+    for (auto& [name, script] : g_scripts)
+        script->consume_messages();
+    for (auto& [name, script] : g_ui_scripts)
+        script->consume_messages();
+    g_Console->consume_messages();
+    g_ConsoleMessages.clear();
+}
+
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     ImGuiContext& g = *GImGui;
@@ -3558,6 +3571,10 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("load_state_4", wParam))
     {
         load_state(4);
+    }
+    else if (pressed("clear_messages", wParam))
+    {
+        clear_script_messages();
     }
     else
     {
@@ -6512,13 +6529,17 @@ void render_scripts()
     ImGui::SameLine();
     ImGui::Checkbox("to console##ConsoleScriptMessages", &options["console_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
-    if (ImGui::Checkbox("Load scripts from script directory##LoadScriptsDefault", &load_script_dir))
+    ImGui::SameLine();
+    if (ImGui::Button("Clear##ClearMessages"))
+        clear_script_messages();
+    tooltip("Clear all script messages from screen", "clear_messages");
+    if (ImGui::Checkbox("Load scripts from script directory##LoadScriptsDefault", &options["load_scripts"]))
         refresh_script_files();
     ImGui::SameLine();
-    if (ImGui::Button("Set##SetScriptDir"))
+    if (ImGui::Button("Change##SetScriptDir"))
         set_script_dir();
     tooltip(scriptpath.c_str());
-    if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
+    if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &options["load_packs"]))
         refresh_script_files();
     if (ImGui::Button("Create new quick script"))
     {
