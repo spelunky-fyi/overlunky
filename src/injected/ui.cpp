@@ -5161,7 +5161,7 @@ void render_clickhandler()
         {
             g_bucket->overlunky->hovered_uid = -1;
         }
-        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered())
+        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered() && io.MouseDrawCursor)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
