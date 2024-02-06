@@ -5536,7 +5536,7 @@ void render_clickhandler()
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(mouse_pos());
-            if (g_held_entity && g_held_entity->is_movable())
+            if (g_held_entity && g_held_entity->is_movable() && drag_delta("mouse_grab_throw") > 10.0f)
                 UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -5550,7 +5550,7 @@ void render_clickhandler()
             io.MouseDrawCursor = true;
             if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
-            if (options["snap_to_grid"] && g_held_entity->is_movable())
+            if (options["snap_to_grid"] && g_held_entity->is_movable() && (drag_delta("mouse_grab") > 10.0f || drag_delta("mouse_grab_unsafe") > 10.0f))
             {
                 UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             }
