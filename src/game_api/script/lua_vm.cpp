@@ -2253,14 +2253,14 @@ end
     lua["save_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4)
-            copy_state(5, slot);
+            copy_save_slot(5, slot);
     };
 
     /// Load level state from slot 1..4, if a save_state was made in this level.
     lua["load_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4 && get_save_state(slot))
-            copy_state(slot, 5);
+            copy_save_slot(slot, 5);
     };
 
     /// Get StateMemory from a save_state slot.
@@ -2270,6 +2270,8 @@ end
             return get_save_state(slot);
         return nullptr;
     };
+
+    lua.new_usertype<SaveState>("SaveState", sol::constructors<SaveState()>(), "load", &SaveState::load, "save", &SaveState::save, "clear", &SaveState::clear, "get", &SaveState::get);
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 

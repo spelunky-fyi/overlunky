@@ -1905,12 +1905,17 @@ void init_seeded(std::optional<uint32_t> seed)
     isf(state, seed.value_or(state->seed));
 }
 
-void copy_state(int from, int to)
+void copy_save_slot(int from, int to)
 {
     size_t arr = get_address("save_states");
-    size_t iterIdx = 1;
     size_t fromBaseState = memory_read<size_t>(arr + (from - 1) * 8);
     size_t toBaseState = memory_read<size_t>(arr + (to - 1) * 8);
+    copy_state(fromBaseState, toBaseState);
+};
+
+void copy_state(size_t fromBaseState, size_t toBaseState)
+{
+    size_t iterIdx = 1;
     do
     {
         size_t copyContent = *(size_t*)((fromBaseState - 8) + iterIdx * 8);
@@ -1956,4 +1961,47 @@ void invalidate_save_states()
         if (state)
             state->screen = 0;
     }
+}
+
+SaveState::SaveState()
+{
+    size_t from = (size_t)(State::get().ptr_main()) - 0x4a0;
+    addr = (size_t)malloc(8 * 0x400000);
+    copy_state(from, addr);
+}
+
+SaveState::~SaveState()
+{
+    clear();
+}
+
+StateMemory* SaveState::get()
+{
+    if (!addr)
+        return nullptr;
+    return reinterpret_cast<StateMemory*>(addr + 0x4a0);
+}
+
+void SaveState::load()
+{
+    if (!addr)
+        return;
+    size_t to = (size_t)(State::get().ptr_main()) - 0x4a0;
+    copy_state(addr, to);
+}
+
+void SaveState::save()
+{
+    if (!addr)
+        return;
+    size_t from = (size_t)(State::get().ptr_main()) - 0x4a0;
+    copy_state(from, addr);
+}
+
+void SaveState::clear()
+{
+    if (!addr)
+        return;
+    free((void*)addr);
+    addr = 0;
 }

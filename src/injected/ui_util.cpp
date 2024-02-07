@@ -831,7 +831,7 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
 
 void UI::copy_state(int from, int to)
 {
-    ::copy_state(from, to);
+    ::copy_save_slot(from, to);
 }
 
 StateMemory* UI::get_save_state(int slot)

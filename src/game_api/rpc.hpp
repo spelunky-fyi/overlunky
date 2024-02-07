@@ -19,6 +19,20 @@ struct AABB;
 struct Layer;
 struct StateMemory;
 
+class SaveState
+{
+  public:
+    SaveState();
+    ~SaveState();
+    StateMemory* get();
+    void load();
+    void save();
+    void clear();
+
+  private:
+    size_t addr;
+};
+
 void attach_entity(Entity* overlay, Entity* attachee);
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid);
 int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y);
@@ -137,6 +151,7 @@ void set_speedhack(std::optional<float> multiplier);
 float get_speedhack();
 void init_adventure();
 void init_seeded(std::optional<uint32_t> seed);
-void copy_state(int from, int to);
+void copy_save_slot(int from, int to);
+void copy_state(size_t fromBaseState, size_t toBaseState);
 StateMemory* get_save_state(int slot);
 void invalidate_save_states();
