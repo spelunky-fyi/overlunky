@@ -10,6 +10,7 @@
 #include "constants.hpp"          // for no_return_str
 #include "level_api_types.hpp"    // for LevelGenRoomData
 #include "rpc.hpp"                // for game_log, get_adventure_seed
+#include "savestate.hpp"          // for invalidate_save_slots
 #include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
 #include "settings_api.hpp"       // for restore_original_settings
 #include "state.hpp"              // for StateMemory, State
@@ -80,7 +81,7 @@ bool pre_unload_level()
     if (!block)
     {
         g_level_loaded = false;
-        invalidate_save_states();
+        invalidate_save_slots();
     }
     return block;
 }

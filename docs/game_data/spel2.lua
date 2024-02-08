@@ -1378,7 +1378,7 @@ function play_adventure() end
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
----Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
+---Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see SaveState if you need more.
 ---@param slot integer
 ---@return nil
 function save_state(slot) end
@@ -1876,6 +1876,12 @@ function get_bucket() end
 do
 
 ---@class Players
+
+---@class SaveState
+    ---@field load fun(self): nil @Load a SaveState
+    ---@field save fun(self): nil @Save over a previously allocated SaveState
+    ---@field clear fun(self): nil @Delete the SaveState and free the memory. The SaveState can't be used after this.
+    ---@field get_state fun(self): StateMemory @Access the StateMemory inside a SaveState
 
 ---@class SaveContext
     ---@field save fun(self, data: string): boolean
@@ -6471,6 +6477,11 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
+
+SaveState = nil
+---Create a new temporary SaveState/clone of the main level state. Unlike save_state slots that are preallocated by the game anyway, these will use 32MiB a pop and aren't freed automatically, so make sure to clear them or reuse the same one to save memory.
+---@return SaveState
+function SaveState:new() end
 ---Create a new color - defaults to black
 ---@return Color
 function Color:new() end

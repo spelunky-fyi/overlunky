@@ -1787,7 +1787,7 @@ Runs the [ON](#ON).SAVE callback. Fails and returns false, if you're trying to s
 
 #### nil save_state(int slot)
 
-Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
+Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see [SaveState](#SaveState) if you need more.
 
 ### script_enabled
 

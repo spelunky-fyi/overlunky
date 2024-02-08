@@ -24,6 +24,7 @@
 #include "memory.hpp"                //
 #include "render_api.hpp"            // for RenderInfo
 #include "rpc.hpp"                   // for get_entities_at, entity_get_ite...
+#include "savestate.hpp"             // for copy_save_slot
 #include "search.hpp"                //
 #include "spawn_api.hpp"             // for spawn_liquid, spawn_companion
 #include "state.hpp"                 // for State, StateMemory
