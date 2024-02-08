@@ -24,7 +24,7 @@ set_callback(function(ctx)
         end
         ctx:win_separator()
         for i, v in pairs(states) do
-            if ctx:win_button(F "Load #{i}: frame {v:get().time_level}") then
+            if ctx:win_button(F "Load #{i}: frame {v:get_state().time_level}") then
                 do_load = v
             end
         end
