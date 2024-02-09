@@ -1815,10 +1815,17 @@ void LuaBackend::on_post(ON event)
     }
 }
 
-void LuaBackend::on_clone_heap(ON event, StateMemory* from, StateMemory* to)
+void LuaBackend::pre_clone_heap(StateMemory* from, StateMemory* to)
 {
     if (!get_enabled())
         return;
+    if (local_datas.contains(from)) {
+        sol::object from_data = local_datas[from];
+        if (from_data != sol::lua_nil)
+        {
+            local_datas[to] = (*vm)["deepcopy_object"](from_data);
+        }
+    }
 
     auto now = get_frame_count();
     for (auto& [id, callback] : callbacks)
@@ -1826,7 +1833,7 @@ void LuaBackend::on_clone_heap(ON event, StateMemory* from, StateMemory* to)
         if (is_callback_cleared(id))
             continue;
 
-        if (callback.screen == event)
+        if (callback.screen == ON::PRE_CLONE_HEAP)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, from, to);

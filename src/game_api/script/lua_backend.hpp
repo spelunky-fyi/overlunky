@@ -319,6 +319,7 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
+    std::unordered_map<StateMemory*, sol::object> local_datas;
     bool manual_save{false};
     uint32_t last_save{0};
 
@@ -442,7 +443,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
-    void on_clone_heap(ON event, StateMemory* from, StateMemory* to);
+    void pre_clone_heap(StateMemory* from, StateMemory* to);
 };
 
 template <class Inheriting>

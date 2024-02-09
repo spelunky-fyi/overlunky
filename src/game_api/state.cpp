@@ -703,9 +703,9 @@ void HeapClone(uint64_t heap_to, uint64_t heap_container_from)
     uint64_t location = memory_read<uint64_t>(State::get().location);
     StateMemory* state_from = reinterpret_cast<StateMemory*>(memory_read<uint64_t>(heap_container_from + 0x88) + location);
     StateMemory* state_to = reinterpret_cast<StateMemory*>(heap_to + location);
-    heap_clone_event(ON::PRE_CLONE_HEAP, state_from, state_to);
     // g_heap_clone_trampoline(heap_container_to, heap_container_from, heap_to);
     // heap_clone_event(ON::POST_CLONE_HEAP, state_from,state_to);
+    pre_heap_clone_event(state_from, state_to);
 }
 
 // Original function params: clone_heap(ThreadStorageContainer to, ThreadStorageContainer from)

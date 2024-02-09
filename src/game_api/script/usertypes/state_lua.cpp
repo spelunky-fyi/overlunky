@@ -22,6 +22,7 @@
 #include "screen_arena.hpp"   // IWYU pragma: keep
 #include "state.hpp"          // for StateMemory, State, StateMemory::a...
 #include "state_structs.hpp"  // for ArenaConfigArenas, ArenaConfigItems
+#include "script/lua_backend.hpp" // for LuaBackend
 
 namespace NState
 {
@@ -410,6 +411,24 @@ void register_usertypes(sol::state& lua)
     statememory_type["liquid"] = &StateMemory::liquid_physics;
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
     statememory_type["room_owners"] = &StateMemory::room_owners;
+        
+    auto get_local_data = [](StateMemory& state) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto local_datas = backend->local_datas;
+        if (local_datas.contains(&state)) {
+            return local_datas[&state];
+        }
+        return sol::nil;
+    };
+    
+    auto set_local_data = [](StateMemory& state, sol::object user_data) -> void
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->local_datas[&state] = user_data;
+    };
+
+    statememory_type["local_data"] = sol::property(get_local_data, set_local_data);
 
     lua.create_named_table("FADE", "NONE", 0, "OUT", 1, "LOAD", 2, "IN", 3);
 
