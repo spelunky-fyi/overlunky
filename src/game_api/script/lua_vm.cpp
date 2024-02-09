@@ -2730,7 +2730,7 @@ end
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
     // LEVEL_GEN_FLOOR_SPREADING
-    // Only procs during floor spreading, both horizontal and vertical
+    // Includes solid floor type spreading (i.e. floorstyled bleeding to existing generic floor) but also corner filling of empty tiles.
     // LEVEL_GEN_GENERAL
     // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT

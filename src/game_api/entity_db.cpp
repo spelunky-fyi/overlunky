@@ -1,3 +1,4 @@
+#include "entity_db.hpp"
 #include "entity.hpp"
 
 #include <Windows.h> // for IsBadWritePtr
@@ -36,32 +37,6 @@ EntityDB::EntityDB(const ENT_TYPE other)
 }
 
 using namespace std::chrono_literals;
-using EntityMap = std::unordered_map<std::string, uint16_t>;
-
-struct EntityBucket
-{
-    void** begin;
-    void** current; // Note, counts down from end to begin instead of up from begin to end :shrug:
-    void** end;
-};
-struct EntityPool
-{
-    std::uint32_t slot_size;
-    std::uint32_t initial_slots;
-    std::uint32_t slots_growth;
-    std::uint32_t current_slots;
-    std::uint64_t _ulong_0;
-    EntityBucket* _some_bucket;
-    EntityBucket* bucket;
-};
-struct EntityFactory
-{
-    EntityDB types[0x395];
-    bool type_set[0x395];
-    std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map;
-    EntityMap entity_map;
-    void* _ptr_7;
-};
 
 EntityFactory* entity_factory()
 {
