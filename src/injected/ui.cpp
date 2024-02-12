@@ -148,6 +148,14 @@ std::map<std::string, int64_t> default_keys{
     {"hotbar_8", '8'},
     {"hotbar_9", '9'},
     {"hotbar_0", '0'},
+    {"load_state_1", OL_KEY_SHIFT | VK_F1},
+    {"load_state_2", OL_KEY_SHIFT | VK_F2},
+    {"load_state_3", OL_KEY_SHIFT | VK_F3},
+    {"load_state_4", OL_KEY_SHIFT | VK_F4},
+    {"save_state_1", OL_KEY_SHIFT | VK_F5},
+    {"save_state_2", OL_KEY_SHIFT | VK_F6},
+    {"save_state_3", OL_KEY_SHIFT | VK_F7},
+    {"save_state_4", OL_KEY_SHIFT | VK_F8},
     {"toggle_hotbar", OL_KEY_CTRL | OL_KEY_SHIFT | 'B'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
@@ -222,6 +230,7 @@ std::map<std::string, int64_t> default_keys{
     {"speedhack_slow", VK_NEXT},
     {"toggle_uncapped_fps", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
     {"respawn", OL_KEY_CTRL | 'R'},
+    {"clear_messages", OL_KEY_CTRL | VK_BACK},
     //{ "", 0x },
 };
 
@@ -276,7 +285,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
+     enable_noclip = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -373,6 +382,8 @@ std::map<std::string, bool> options = {
     {"pause_last_instance", false},
     {"update_check", true},
     {"modifiers_clear_input", true},
+    {"load_scripts", true},
+    {"load_packs", false},
 };
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
@@ -795,7 +806,7 @@ bool SliderByte(const char* label, char* value, char min = 0, char max = 0, cons
 void refresh_script_files()
 {
     g_script_files.clear();
-    if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    if (options["load_scripts"] && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         for (const auto& file : std::filesystem::directory_iterator(scriptpath))
         {
@@ -805,7 +816,7 @@ void refresh_script_files()
             }
         }
     }
-    else if (!load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    else if (!options["load_scripts"] && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
@@ -823,7 +834,7 @@ void refresh_script_files()
         }
     }
 
-    if (load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    if (options["load_packs"] && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         for (const auto& file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
         {
@@ -833,7 +844,7 @@ void refresh_script_files()
             }
         }
     }
-    else if (!load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    else if (!options["load_packs"] && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
@@ -1311,9 +1322,16 @@ void smart_delete(Entity* ent, bool unsafe = false)
 {
     static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
-    ent->flags = set_flag(ent->flags, 1);
-    for (auto item : ent->items.entities())
-        item->flags = set_flag(item->flags, 1);
+    if (!ent->is_player())
+        ent->flags = set_flag(ent->flags, 1);
+    if ((ent->type->search_flags & 0x80) == 0)
+    {
+        for (auto item : ent->items.entities())
+        {
+            if (!item->is_player())
+                item->flags = set_flag(item->flags, 1);
+        }
+    }
     UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
@@ -2793,6 +2811,33 @@ void toggle_lights()
     }
 }
 
+void load_state(int slot)
+{
+    StateMemory* target = UI::get_save_state(slot);
+    if (!target)
+        return;
+    if (g_state->screen == 14 && target->screen != 14)
+    {
+        g_state->screen = 12;
+        g_game_manager->journal_ui->fade_timer = 15;
+        g_game_manager->journal_ui->state = 5;
+        g_state->camera->focus_offset_x = 0;
+        g_state->camera->focus_offset_y = 0;
+        set_camera_bounds(true);
+    }
+    UI::copy_state(slot, 5);
+}
+
+void clear_script_messages()
+{
+    for (auto& [name, script] : g_scripts)
+        script->consume_messages();
+    for (auto& [name, script] : g_ui_scripts)
+        script->consume_messages();
+    g_Console->consume_messages();
+    g_ConsoleMessages.clear();
+}
+
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     ImGuiContext& g = *GImGui;
@@ -3501,6 +3546,42 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     else if (pressed("peek_layer", wParam))
     {
         peek_layer = true;
+    }
+    else if (pressed("save_state_1", wParam))
+    {
+        UI::copy_state(5, 1);
+    }
+    else if (pressed("save_state_2", wParam))
+    {
+        UI::copy_state(5, 2);
+    }
+    else if (pressed("save_state_3", wParam))
+    {
+        UI::copy_state(5, 3);
+    }
+    else if (pressed("save_state_4", wParam))
+    {
+        UI::copy_state(5, 4);
+    }
+    else if (pressed("load_state_1", wParam))
+    {
+        load_state(1);
+    }
+    else if (pressed("load_state_2", wParam))
+    {
+        load_state(2);
+    }
+    else if (pressed("load_state_3", wParam))
+    {
+        load_state(3);
+    }
+    else if (pressed("load_state_4", wParam))
+    {
+        load_state(4);
+    }
+    else if (pressed("clear_messages", wParam))
+    {
+        clear_script_messages();
     }
     else
     {
@@ -5104,7 +5185,7 @@ void render_clickhandler()
         {
             g_bucket->overlunky->hovered_uid = -1;
         }
-        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered())
+        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered() && io.MouseDrawCursor)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
@@ -5462,7 +5543,7 @@ void render_clickhandler()
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(mouse_pos());
-            if (g_held_entity && g_held_entity->is_movable())
+            if (g_held_entity && g_held_entity->is_movable() && drag_delta("mouse_grab_throw") > 10.0f)
                 UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -5476,7 +5557,7 @@ void render_clickhandler()
             io.MouseDrawCursor = true;
             if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
-            if (options["snap_to_grid"] && g_held_entity->is_movable())
+            if (options["snap_to_grid"] && g_held_entity->is_movable() && (drag_delta("mouse_grab") > 10.0f || drag_delta("mouse_grab_unsafe") > 10.0f))
             {
                 UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             }
@@ -6455,13 +6536,17 @@ void render_scripts()
     ImGui::SameLine();
     ImGui::Checkbox("to console##ConsoleScriptMessages", &options["console_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
-    if (ImGui::Checkbox("Load scripts from script directory##LoadScriptsDefault", &load_script_dir))
+    ImGui::SameLine();
+    if (ImGui::Button("Clear##ClearMessages"))
+        clear_script_messages();
+    tooltip("Clear all script messages from screen", "clear_messages");
+    if (ImGui::Checkbox("Load scripts from script directory##LoadScriptsDefault", &options["load_scripts"]))
         refresh_script_files();
     ImGui::SameLine();
-    if (ImGui::Button("Set##SetScriptDir"))
+    if (ImGui::Button("Change##SetScriptDir"))
         set_script_dir();
     tooltip(scriptpath.c_str());
-    if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
+    if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &options["load_packs"]))
         refresh_script_files();
     if (ImGui::Button("Create new quick script"))
     {
@@ -8433,6 +8518,27 @@ void render_game_props()
     }
     if (submenu("State"))
     {
+        for (int i = 1; i <= 4; ++i)
+        {
+            if (ImGui::Button(fmt::format(" {} ##SaveState{}", i, i).c_str()))
+                UI::copy_state(5, i);
+            tooltip("Save current level state", fmt::format("save_state_{}", i).c_str());
+            ImGui::SameLine();
+        }
+        ImGui::Text("Save state");
+
+        for (int i = 1; i <= 4; ++i)
+        {
+            bool valid = UI::get_save_state(i) != nullptr;
+            ImGui::BeginDisabled(!valid);
+            if (ImGui::Button(fmt::format(" {} ##LoadState{}", i, i).c_str()))
+                load_state(i);
+            ImGui::EndDisabled();
+            tooltip("Load current level state", fmt::format("load_state_{}", i).c_str());
+            ImGui::SameLine();
+        }
+        ImGui::Text("Load state");
+
         render_screen("Current screen", g_state->screen);
         render_screen("Last screen", g_state->screen_last);
         render_screen("Next screen", g_state->screen_next);

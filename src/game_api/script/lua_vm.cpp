@@ -2258,6 +2258,29 @@ end
             return res
         end
     )##");
+
+    /// Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
+    lua["save_state"] = [](int slot)
+    {
+        if (slot >= 1 && slot <= 4)
+            copy_state(5, slot);
+    };
+
+    /// Load level state from slot 1..4, if a save_state was made in this level.
+    lua["load_state"] = [](int slot)
+    {
+        if (slot >= 1 && slot <= 4 && get_save_state(slot))
+            copy_state(slot, 5);
+    };
+
+    /// Get StateMemory from a save_state slot.
+    lua["get_save_state"] = [](int slot) -> StateMemory*
+    {
+        if (slot >= 1 && slot <= 5)
+            return get_save_state(slot);
+        return nullptr;
+    };
+
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
     lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);
@@ -2719,7 +2742,7 @@ end
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
     // LEVEL_GEN_FLOOR_SPREADING
-    // Only procs during floor spreading, both horizontal and vertical
+    // Includes solid floor type spreading (i.e. floorstyled bleeding to existing generic floor) but also corner filling of empty tiles.
     // LEVEL_GEN_GENERAL
     // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT

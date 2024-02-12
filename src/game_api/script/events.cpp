@@ -78,7 +78,10 @@ bool pre_unload_level()
             return !block;
         });
     if (!block)
+    {
         g_level_loaded = false;
+        invalidate_save_states();
+    }
     return block;
 }
 bool pre_init_level()

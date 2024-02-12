@@ -819,6 +819,9 @@
                             <a href="#get_performance_frequency" class="toc-h3 toc-link" data-title="get_performance_frequency">get_performance_frequency</a>
                           </li>
                           <li>
+                            <a href="#get_save_state" class="toc-h3 toc-link" data-title="get_save_state">get_save_state</a>
+                          </li>
+                          <li>
                             <a href="#get_setting" class="toc-h3 toc-link" data-title="get_setting">get_setting</a>
                           </li>
                           <li>
@@ -870,6 +873,9 @@
                             <a href="#load_screen" class="toc-h3 toc-link" data-title="load_screen">load_screen</a>
                           </li>
                           <li>
+                            <a href="#load_state" class="toc-h3 toc-link" data-title="load_state">load_state</a>
+                          </li>
+                          <li>
                             <a href="#lowbias32" class="toc-h3 toc-link" data-title="lowbias32">lowbias32</a>
                           </li>
                           <li>
@@ -895,6 +901,9 @@
                           </li>
                           <li>
                             <a href="#save_script" class="toc-h3 toc-link" data-title="save_script">save_script</a>
+                          </li>
+                          <li>
+                            <a href="#save_state" class="toc-h3 toc-link" data-title="save_state">save_state</a>
                           </li>
                           <li>
                             <a href="#script_enabled" class="toc-h3 toc-link" data-title="script_enabled">script_enabled</a>
@@ -3893,7 +3902,8 @@
 <li>This doc and the examples are written for a person who already knows <a href="http://lua-users.org/wiki/TutorialDirectory">how to program in Lua</a>.</li>
 <li>This doc doesn&#39;t cover how to actually load scripts. Check the <a href="https://github.com/spelunky-fyi/overlunky/#scripts">README</a> for instructions.</li>
 <li>This doc is up to date for the Overlunky <a href="https://github.com/spelunky-fyi/overlunky/releases/tag/whip">WHIP build</a> and Playlunky <a href="https://github.com/spelunky-fyi/Playlunky/releases/tag/nightly">nightly build</a>. If you&#39;re using a stable release from the past, you might find some things here don&#39;t work.</li>
-<li>Set <code>OL_DEBUG=1</code> in the same environment where the game is running to keep the Overlunky terminal open for better debug prints. This could be <code>cmd</code> or even the system environment variables if playing on Steam. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the <code>-console</code> switch.</li>
+<li>Use <code>Overlunky.exe --console</code> command line switch to keep the Overlunky terminal open for better debug prints. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the <code>-console</code> switch.</li>
+<li>Testing functions, exploring the types, and most inline Lua examples in here can be used in the in-game REPL console, default opened with the tilde key or regional equivalent. Full script examples can be found in the Overlunky Scripts menu if the script bundle is installed.</li>
 </ul>
 <h2 id='External-Function-Library'>External Function Library</h2>
 <p>If you use a text editor/IDE that has a Lua linter available you can download <a href="https://raw.githubusercontent.com/spelunky-fyi/overlunky/main/docs/game_data/spel2.lua">spel2.lua</a>, place it in a folder of your choice and specify that folder as a &quot;external function library&quot;. For example <a href="https://code.visualstudio.com/">VSCode</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=sumneko.lua">Lua Extension</a> offers this feature. This will allow you to get auto-completion of API functions along with linting</p>
@@ -5146,6 +5156,12 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 </blockquote>
 <h4 id='int-get_performance_frequency'>int get_performance_frequency()</h4>
 <p>Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.</p>
+<h3 id='get_save_state'>get_save_state</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_save_state">get_save_state</a></p>
+</blockquote>
+<h4 id='StateMemory-get_save_state-int-slot'><a href="#StateMemory">StateMemory</a> get_save_state(int slot)</h4>
+<p>Get <a href="#StateMemory">StateMemory</a> from a save_state slot.</p>
 <h3 id='get_setting'>get_setting</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_setting">get_setting</a></p>
@@ -5256,6 +5272,12 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 </blockquote>
 <h4 id='nil-load_screen'>nil load_screen()</h4>
 <p>Immediately load a screen based on <a href="#state">state</a>.screen_next and stuff</p>
+<h3 id='load_state'>load_state</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_state">load_state</a></p>
+</blockquote>
+<h4 id='nil-load_state-int-slot'>nil load_state(int slot)</h4>
+<p>Load level state from slot 1..4, if a save_state was made in this level.</p>
 <h3 id='lowbias32'>lowbias32</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lowbias32">lowbias32</a></p>
@@ -5310,6 +5332,12 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 </blockquote>
 <h4 id='bool-save_script'>bool save_script()</h4>
 <p>Runs the <a href="#ON">ON</a>.SAVE callback. Fails and returns false, if you&#39;re trying to save too often (2s).</p>
+<h3 id='save_state'>save_state</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=save_state">save_state</a></p>
+</blockquote>
+<h4 id='nil-save_state-int-slot'>nil save_state(int slot)</h4>
+<p>Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn&#39;t use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).</p>
 <h3 id='script_enabled'>script_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=script_enabled">script_enabled</a></p>
@@ -33953,7 +33981,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SPAWN_TYPE.LEVEL_GEN_FLOOR_SPREADING">LEVEL_GEN_FLOOR_SPREADING</a></td>
 <td>SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING</td>
-<td>Only procs during floor spreading, both horizontal and vertical<br/></td>
+<td>Includes solid floor type spreading (i.e. floorstyled bleeding to existing generic floor) but also corner filling of empty tiles.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SPAWN_TYPE.LEVEL_GEN_GENERAL">LEVEL_GEN_GENERAL</a></td>

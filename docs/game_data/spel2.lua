@@ -1378,6 +1378,18 @@ function play_adventure() end
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
+---Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
+---@param slot integer
+---@return nil
+function save_state(slot) end
+---Load level state from slot 1..4, if a save_state was made in this level.
+---@param slot integer
+---@return nil
+function load_state(slot) end
+---Get StateMemory from a save_state slot.
+---@param slot integer
+---@return StateMemory
+function get_save_state(slot) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean

@@ -1515,6 +1515,15 @@ Retrieves the current value of the performance counter, which is a high resoluti
 
 Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
 
+### get_save_state
+
+
+> Search script examples for [get_save_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_save_state)
+
+#### [StateMemory](#StateMemory) get_save_state(int slot)
+
+Get [StateMemory](#StateMemory) from a save_state slot.
+
 ### get_setting
 
 
@@ -1681,6 +1690,15 @@ Immediately ends the run with the death screen, also calls the [save_progress](#
 
 Immediately load a screen based on [state](#state).screen_next and stuff
 
+### load_state
+
+
+> Search script examples for [load_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_state)
+
+#### nil load_state(int slot)
+
+Load level state from slot 1..4, if a save_state was made in this level.
+
 ### lowbias32
 
 
@@ -1761,6 +1779,15 @@ Saves the game to savegame.sav, unless game saves are blocked in the settings. A
 #### bool save_script()
 
 Runs the [ON](#ON).SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+
+### save_state
+
+
+> Search script examples for [save_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_state)
+
+#### nil save_state(int slot)
+
+Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
 
 ### script_enabled
 

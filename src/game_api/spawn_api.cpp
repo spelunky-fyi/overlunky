@@ -18,6 +18,7 @@
 #include "entities_liquids.hpp"         // for Lava
 #include "entities_monsters.hpp"        // for Shopkeeper, RoomOwner
 #include "entity.hpp"                   // for to_id, Entity, get_entity_ptr, Enti...
+#include "entity_db.hpp"                // for EntityFactory
 #include "illumination.hpp"             //
 #include "items.hpp"                    //
 #include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x
@@ -613,18 +614,30 @@ void pop_spawn_type_flags(SPAWN_TYPE flags)
     update_spawn_type_flags();
 }
 
-struct EntityFactory;
-
 using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool, Entity*, bool);
 SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
-    const auto theme_floor = State::get().ptr_local()->current_theme->get_floor_spreading_type();
-    const bool is_floor_spreading = (entity_type == theme_floor) && (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) && !(g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
+    // TODO: This still might not work very well and corner fill isn't actually floor spreading per level config definition, and should have a different SPAWN_TYPE (corner fill still happens when floor spreading chance is set to 0)
+    // const auto theme_floor = State::get().ptr_local()->current_theme->get_floor_spreading_type();
+    // const auto theme_floor2 = State::get().ptr_local()->current_theme->get_floor_spreading_type2();
+    const bool is_decorated = (entity_factory->types[entity_type].properties_flags & 0x1) == 0x1;
+    const bool is_styled = (entity_factory->types[entity_type].properties_flags & 0x2) == 0x2;
+    const bool is_border = entity_type < 4;
+    const bool is_floor_spreading = (is_decorated || is_styled) && !is_border && (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) && !(g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
     if (is_floor_spreading)
     {
         push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING);
     }
+
+    /* testing
+    auto entity_db = entity_factory->types[entity_type];
+    // solid floor that's not from a tilecode
+    const bool is_floor_replaced = (entity_db.search_flags & 0x100 && entity_db.default_flags & 0x4) && (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) && !(g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
+    if (is_floor_replaced)
+    {
+        push_spawn_type_flags(SPAWN_TYPE_LEVEL_GEN_FLOOR_REPLACED);
+    }*/
 
     Entity* spawned_ent{nullptr};
     if (g_SpawnNonReplacable == 0)
