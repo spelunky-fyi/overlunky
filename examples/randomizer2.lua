@@ -1,6 +1,6 @@
 meta.name = "Randomizer Two"
 meta.description = [[Unless some horrible game breaking glitches emerge, this is the final version of Randomizer. I have tried to make it more chaotic, more balanced, easier, harder, shorter, longer, but the main problem seems to be any changes to anything. Just disable the settings you don't like or unsubscribe.]]
-meta.version = "2.9z"
+meta.version = "2.9zz"
 meta.author = "Dregu"
 
 --[[OPTIONS]]
@@ -2021,7 +2021,18 @@ set_post_entity_spawn(function(ent)
     ent.level = 1
     ent.world = 1
     ent.theme = 1
-end, SPAWN_TYPE.SYSTEMIC, 0, ENT_TYPE.LOGICAL_PORTAL)
+    if state.theme == THEME.TIAMAT then
+        ent:set_post_update_state_machine(function(ent)
+            if ent.timer > 240 then
+                spawn_critical(ENT_TYPE.FX_MODERNEXPLOSION, ent.x, ent.y, ent.layer, 0, 0)
+                for _,v in pairs(get_entities_by_type(ENT_TYPE.FX_PORTAL)) do
+                    get_entity(v):destroy()
+                end
+                ent:destroy()
+            end
+        end)
+    end
+end, SPAWN_TYPE.ANY, 0, ENT_TYPE.LOGICAL_PORTAL)
 
 set_post_entity_spawn(function(ent)
     if prng:random() < options.pot_chance/100 then
