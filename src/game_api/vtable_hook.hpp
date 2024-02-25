@@ -106,10 +106,10 @@ void hook_vtable(T* obj, HookFunT&& hook_fun, std::size_t dtor_index = 0)
             // Just throw this directly into the dtor
             hook_dtor(
                 obj,
-                [hook_fun = std::forward<HookFunT>(hook_fun)](void* self)
+                [hook_fun_ = std::forward<HookFunT>(hook_fun)](void* self)
                 {
                     // Pass a nullop as the original, it's not okay to skip dtors
-                    hook_fun((T*)self, [](T*) {});
+                    hook_fun_((T*)self, [](T*) {});
                 },
                 dtor_index);
             return;
