@@ -118,7 +118,7 @@ uint8_t CustomMovableBehavior::get_next_state_id(Movable* movable)
 void CustomMovableBehavior::hook_movable(Movable* movable)
 {
     using_movables[movable] =
-        movable->set_on_dtor([=](Entity*)
+        movable->set_on_dtor([=, this](Entity*)
                              { using_movables.erase(movable); });
 }
 
