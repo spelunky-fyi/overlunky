@@ -13,13 +13,14 @@ jobs:
     strategy:
       matrix:
         build_type: [Debug, Release]
-        toolset_name: [MSVC, Clang]
+        toolset_name: [MSVC, Ninja]
         build_dll: [false, true]
         include:
           - toolset_name: MSVC
-            toolset: v143
-          - toolset_name: Clang
-            toolset: ClangCL
+            toolset: -T v143
+          - toolset_name: Ninja
+            toolset: -G"Ninja Multi-Config"
+            cmake_opts: -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
           - build_dll: false
             additional_opts: -DBUILD_OVERLUNKY=ON -DBUILD_INFO_DUMP=ON -DBUILD_SPEL2_DLL=OFF
             target_name: overlunky
@@ -28,6 +29,8 @@ jobs:
             target_name: spel2.dll
 
     steps:
+      - uses: llvm/actions/install-ninja@main
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
@@ -42,9 +45,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -Wno-dev -A x64 -T ${{ matrix.toolset }} ${{ matrix.additional_opts }}
+          cmake .. -Wno-dev -A x64 ${{ matrix.toolset }} ${{ matrix.additional_opts }} ${{ matrix.cmake_opts }}
 
       - name: Build
         run: |
           cd build
-          cmake --build . --config ${{ matrix.build_type }} --target ALL_BUILD
+          cmake --build . --config ${{ matrix.build_type }}
