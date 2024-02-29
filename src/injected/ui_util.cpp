@@ -839,3 +839,8 @@ StateMemory* UI::get_save_state(int slot)
 {
     return ::get_save_state(slot);
 }
+
+void UI::set_camera_layer_control_enabled(bool enable)
+{
+    ::set_camera_layer_control_enabled(enable);
+}
