@@ -7,17 +7,17 @@
 
 void copy_save_slot(int from, int to)
 {
-    if ((from == 5 && pre_save_state(to, get_save_state(to), get_save_state(from))) ||
-        (to == 5 && pre_load_state(from, get_save_state(to), get_save_state(from))))
+    if ((from == 5 && pre_save_state(to, get_save_state(to))) ||
+        (to == 5 && pre_load_state(from, get_save_state(from))))
         return;
     size_t arr = get_address("save_states");
     size_t fromBaseState = memory_read<size_t>(arr + (from - 1) * 8);
     size_t toBaseState = memory_read<size_t>(arr + (to - 1) * 8);
     copy_state(fromBaseState, toBaseState);
     if (from == 5)
-        post_save_state(to, get_save_state(to), get_save_state(from));
+        post_save_state(to, get_save_state(to));
     else if (to == 5)
-        post_load_state(from, get_save_state(to), get_save_state(from));
+        post_load_state(from, get_save_state(from));
 };
 
 void copy_state(size_t fromBaseState, size_t toBaseState)
@@ -94,10 +94,10 @@ void SaveState::load()
         return;
     size_t to = (size_t)(State::get().ptr_main()) - 0x4a0;
     auto state = reinterpret_cast<StateMemory*>(addr + 0x4a0);
-    if (pre_load_state(-1, State::get().ptr_main(), state))
+    if (pre_load_state(-1, state))
         return;
     copy_state(addr, to);
-    post_load_state(-1, State::get().ptr_main(), state);
+    post_load_state(-1, state);
 }
 
 void SaveState::save()
@@ -106,10 +106,10 @@ void SaveState::save()
         return;
     size_t from = (size_t)(State::get().ptr_main()) - 0x4a0;
     auto state = reinterpret_cast<StateMemory*>(addr + 0x4a0);
-    if (pre_save_state(-1, state, State::get().ptr_main()))
+    if (pre_save_state(-1, state))
         return;
     copy_state(from, addr);
-    post_save_state(-1, state, State::get().ptr_main());
+    post_save_state(-1, state);
 }
 
 void SaveState::clear()

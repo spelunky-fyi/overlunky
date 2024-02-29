@@ -2684,16 +2684,16 @@ end
     // Runs right after the main engine loop.
     // PRE_SAVE_STATE
     // Runs right before the main StateMemory is manually saved to a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState. Return true to block save.
-    // Params: int slot, StateMemory current, StateMemory saved
+    // Params: int slot, StateMemory saved
     // POST_SAVE_STATE
     // Runs right after the main StateMemory is manually saved to a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState.
-    // Params: int slot, StateMemory current, StateMemory saved
+    // Params: int slot, StateMemory saved
     // PRE_LOAD_STATE
     // Runs right before the main StateMemory is manually loaded from a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState. Return true to block load.
-    // Params: int slot, StateMemory current, StateMemory loaded
+    // Params: int slot, StateMemory loaded
     // POST_LOAD_STATE
     // Runs right after the main StateMemory is manually loaded from a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState.
-    // Params: int slot, StateMemory current, StateMemory loaded
+    // Params: int slot, StateMemory loaded
     // BLOCKED_UPDATE
     // Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when Overlunky blocks a PRE_UPDATE.
     // BLOCKED_GAME_LOOP

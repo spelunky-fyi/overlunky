@@ -121,25 +121,25 @@ bool pre_init_layer(LAYER layer)
     return block;
 }
 
-bool pre_save_state(int slot, StateMemory* current, StateMemory* saved)
+bool pre_save_state(int slot, StateMemory* saved)
 {
     bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            block = backend->pre_save_state(slot, current, saved);
+            block = backend->pre_save_state(slot, saved);
             return !block;
         });
     return block;
 }
 
-bool pre_load_state(int slot, StateMemory* current, StateMemory* loaded)
+bool pre_load_state(int slot, StateMemory* loaded)
 {
     bool block{false};
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            block = backend->pre_load_state(slot, current, loaded);
+            block = backend->pre_load_state(slot, loaded);
             return !block;
         });
     return block;
@@ -190,21 +190,21 @@ void post_unload_layer(LAYER layer)
             return true;
         });
 }
-void post_save_state(int slot, StateMemory* current, StateMemory* saved)
+void post_save_state(int slot, StateMemory* saved)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->post_save_state(slot, current, saved);
+            backend->post_save_state(slot, saved);
             return true;
         });
 }
-void post_load_state(int slot, StateMemory* current, StateMemory* loaded)
+void post_load_state(int slot, StateMemory* loaded)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->post_load_state(slot, current, loaded);
+            backend->post_load_state(slot, loaded);
             return true;
         });
 }

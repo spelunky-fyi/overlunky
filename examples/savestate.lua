@@ -42,7 +42,8 @@ set_callback(function(ctx)
             tp = SaveState:new()
         end
         box_frame = state.time_level
-        players[1]:set_post_update_state_machine(function(e)
+
+        players[1]:topmost_mount():set_post_update_state_machine(function(e)
             clear_callback()
             box = get_hitbox(e.uid)
             box_color = 0xcc33ff33
@@ -67,13 +68,13 @@ end, ON.LEVEL)
 
 set_callback(clear_states, ON.PRE_LEVEL_DESTRUCTION)
 
-set_callback(function(slot, current, loading)
+set_callback(function(slot, loading)
     if slot > 0 then
         print(F "Loading save slot {slot}...")
     else
         print("Loading custom save slot...")
     end
-    rewind = current.time_level - loading.time_level
+    rewind = state.time_level - loading.time_level
     if rewind < 0 then
         print(F "Not forwarding {-rewind} frames, that would break spacetime!")
         return true
@@ -82,7 +83,7 @@ set_callback(function(slot, current, loading)
     end
 end, ON.PRE_LOAD_STATE)
 
-set_callback(function(slot, current, loaded)
+set_callback(function(slot, loaded)
     print(F "Rewinded {rewind} frames!")
     rewind = nil
 end, ON.POST_LOAD_STATE)
