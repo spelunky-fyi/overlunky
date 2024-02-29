@@ -54,7 +54,6 @@
 #include "rpc.hpp"                                 // for get_entities_by
 #include "safe_cb.hpp"                             // for make_safe_clearable_cb
 #include "savedata.hpp"                            // IWYU pragma: keep
-#include "savestate.hpp"                           // for SaveState
 #include "screen.hpp"                              // for get_screen_ptr
 #include "script.hpp"                              // for ScriptMessage
 #include "script_util.hpp"                         // for sanitize, get_say
@@ -2250,30 +2249,6 @@ end
     /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
 
-    /// Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see SaveState if you need more.
-    lua["save_state"] = [](int slot)
-    {
-        if (slot >= 1 && slot <= 4)
-            copy_save_slot(5, slot);
-    };
-
-    /// Load level state from slot 1..4, if a save_state was made in this level.
-    lua["load_state"] = [](int slot)
-    {
-        if (slot >= 1 && slot <= 4 && get_save_state(slot))
-            copy_save_slot(slot, 5);
-    };
-
-    /// Get StateMemory from a save_state slot.
-    lua["get_save_state"] = [](int slot) -> StateMemory*
-    {
-        if (slot >= 1 && slot <= 5)
-            return get_save_state(slot);
-        return nullptr;
-    };
-
-    lua.new_usertype<SaveState>("SaveState", sol::constructors<SaveState()>(), "load", &SaveState::load, "save", &SaveState::save, "clear", &SaveState::clear, "get_state", &SaveState::get_state);
-
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
     lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);
@@ -2455,6 +2430,14 @@ end
         ON::PRE_GAME_LOOP,
         "POST_GAME_LOOP",
         ON::POST_GAME_LOOP,
+        "PRE_SAVE_STATE",
+        ON::PRE_SAVE_STATE,
+        "POST_SAVE_STATE",
+        ON::POST_SAVE_STATE,
+        "PRE_LOAD_STATE",
+        ON::PRE_LOAD_STATE,
+        "POST_LOAD_STATE",
+        ON::POST_LOAD_STATE,
         "BLOCKED_UPDATE",
         ON::BLOCKED_UPDATE,
         "BLOCKED_GAME_LOOP",

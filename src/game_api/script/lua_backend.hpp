@@ -132,6 +132,10 @@ enum class ON
     POST_PROCESS_INPUT,
     PRE_GAME_LOOP,
     POST_GAME_LOOP,
+    PRE_SAVE_STATE,
+    POST_SAVE_STATE,
+    PRE_LOAD_STATE,
+    POST_LOAD_STATE,
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
@@ -383,12 +387,16 @@ class LuaBackend
     bool pre_init_layer(LAYER layer);
     bool pre_unload_level();
     bool pre_unload_layer(LAYER layer);
+    bool pre_save_state(int slot, StateMemory* current, StateMemory* saved);
+    bool pre_load_state(int slot, StateMemory* current, StateMemory* loaded);
 
     void post_room_generation();
     void post_level_generation();
     void post_load_screen();
     void post_init_layer(LAYER layer);
     void post_unload_layer(LAYER layer);
+    void post_save_state(int slot, StateMemory* current, StateMemory* saved);
+    void post_load_state(int slot, StateMemory* current, StateMemory* loaded);
 
     void on_death_message(STRINGID stringid);
     std::optional<bool> pre_get_feat(FEAT feat);
