@@ -17,7 +17,7 @@ jobs:
         build_dll: [false, true]
         include:
           - toolset_name: MSVC
-            toolset: -T v143
+            toolset: -A x64 -T v143
           - toolset_name: Ninja
             toolset: -G"Ninja Multi-Config"
             cmake_opts: -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -Wno-dev -A x64 ${{ matrix.toolset }} ${{ matrix.additional_opts }} ${{ matrix.cmake_opts }}
+          cmake .. -Wno-dev ${{ matrix.toolset }} ${{ matrix.additional_opts }} ${{ matrix.cmake_opts }}
 
       - name: Build
         run: |
