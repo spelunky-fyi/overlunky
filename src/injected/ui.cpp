@@ -7077,7 +7077,7 @@ void render_powerup(PowerupCapable* ent, int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("Remove"))
+    if (ImGui::Button("Remove##RemovePowerup"))
     {
         ent->as<Player>()->remove_powerup(ptype);
     }
