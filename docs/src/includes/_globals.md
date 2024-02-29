@@ -1258,6 +1258,15 @@ Change the amount of frames after the damage from poison is applied
 
 Clear cache for a file path or the whole directory
 
+### clear_state
+
+
+> Search script examples for [clear_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_state)
+
+#### nil clear_state(int slot)
+
+Clear save state from slot 1..4.
+
 ### clr_mask
 
 
