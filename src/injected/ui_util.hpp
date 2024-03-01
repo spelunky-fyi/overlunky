@@ -100,4 +100,5 @@ class UI
     static void set_adventure_seed(int64_t first, int64_t second);
     static void copy_state(int from, int to);
     static StateMemory* get_save_state(int slot);
+    static void set_camera_layer_control_enabled(bool enable);
 };

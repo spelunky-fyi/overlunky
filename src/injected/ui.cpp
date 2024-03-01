@@ -377,9 +377,8 @@ std::map<std::string, bool> options = {
     {"console_alt_keys", false},
     {"vsync", true},
     {"uncap_unfocused_fps", true},
-    {"pause_loading", false},
-    {"pause_update_camera", false},
-    {"pause_last_instance", false},
+    {"pause_update_camera", true},
+    {"pause_last_instance", true},
     {"update_check", true},
     {"modifiers_clear_input", true},
     {"load_scripts", true},
@@ -2841,8 +2840,11 @@ void clear_script_messages()
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     ImGuiContext& g = *GImGui;
+    int repeat = (lParam >> 30) & 1U;
+    auto& io = ImGui::GetIO();
+    ImGuiWindow* current = g.NavWindow;
 
-    if (nCode == WM_KEYUP)
+    if (nCode == WM_KEYUP && !io.WantCaptureKeyboard)
     {
         if (pressed("speedhack_turbo", wParam))
         {
@@ -2854,9 +2856,13 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             UI::speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
-        else if (pressed("peek_layer", wParam))
+        else if (pressed("peek_layer", wParam) && peek_layer)
         {
             peek_layer = false;
+            g_state->layer_transition_timer = 15;
+            g_state->transition_to_layer = (g_state->camera_layer + 1) % 2;
+            g_state->camera_layer = g_state->transition_to_layer;
+            UI::set_camera_layer_control_enabled(!peek_layer);
         }
     }
 
@@ -2865,9 +2871,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         return false;
     }
 
-    int repeat = (lParam >> 30) & 1U;
-    auto& io = ImGui::GetIO();
-    ImGuiWindow* current = g.NavWindow;
     g_speedhack_ui_multiplier = UI::get_speedhack();
 
     if (current != nullptr && current == ImGui::FindWindowByName("KeyCapture"))
@@ -3543,9 +3546,13 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
         g_selected_ids.clear();
     }
-    else if (pressed("peek_layer", wParam))
+    else if (pressed("peek_layer", wParam) && !repeat)
     {
         peek_layer = true;
+        UI::set_camera_layer_control_enabled(!peek_layer);
+        g_state->layer_transition_timer = 15;
+        g_state->transition_to_layer = (g_state->camera_layer + 1) % 2;
+        g_state->camera_layer = g_state->transition_to_layer;
     }
     else if (pressed("save_state_1", wParam))
     {
@@ -4509,7 +4516,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     {
         for (unsigned int y = 0; y < g_state->h; ++y)
         {
-            auto room_temp = UI::get_room_template(x, y, peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer);
+            auto room_temp = UI::get_room_template(x, y, g_state->camera_layer);
             if (room_temp.has_value())
             {
                 auto room_name = UI::get_room_template_name(room_temp.value());
@@ -5079,7 +5086,7 @@ void render_clickhandler()
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer)))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -5133,17 +5140,17 @@ void render_clickhandler()
                 to_id("ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR"),
                 to_id("ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR"),
             };
-            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // FLOOR | ACTIVEFLOOR
+            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)g_state->camera_layer)) // FLOOR | ACTIVEFLOOR
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
             }
-            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // LOGICAL
+            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)g_state->camera_layer)) // LOGICAL
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             }
-            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // DOOR
+            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)g_state->camera_layer)) // DOOR
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 180, 45, 150), false, true);
@@ -5201,7 +5208,7 @@ void render_clickhandler()
     back_fill.Value.w = 0.25f;
     if (update_entity())
     {
-        auto this_layer = (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer) == g_entity->layer;
+        auto this_layer = g_state->camera_layer == g_entity->layer;
         render_hitbox(g_entity, true, this_layer ? front_col : back_col);
     }
     for (auto entity : g_selected_ids)
@@ -5209,7 +5216,7 @@ void render_clickhandler()
         auto ent = get_entity_ptr(entity);
         if (ent)
         {
-            if (ent->layer == (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))
+            if (ent->layer == g_state->camera_layer)
                 render_hitbox(ent, false, front_fill, true);
             else
                 render_hitbox(ent, false, back_fill, true);
@@ -7078,7 +7085,7 @@ void render_powerup(PowerupCapable* ent, int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("Remove"))
+    if (ImGui::Button("Remove##RemovePowerup"))
     {
         ent->as<Player>()->remove_powerup(ptype);
     }
@@ -8161,17 +8168,6 @@ struct TextureViewer
 static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
-    if (peek_layer && g_state->layer_transition_timer == 0)
-    {
-        uint8_t other_layer = g_state->camera_layer ? 0 : 1;
-        auto [bbox_left, bbox_top] = UI::click_position(-1.0f, 1.0f);
-        auto [bbox_right, bbox_bottom] = UI::click_position(1.0f, -1.0f);
-        for (uint8_t i = 52; i > 0; --i)
-        {
-            render_draw_depth(g_state->layers[other_layer], i, bbox_left, bbox_bottom, bbox_right, bbox_top);
-        }
-    }
-
     if (!hide_ui && options["draw_hotbar"])
         render_hotbar_textures();
 

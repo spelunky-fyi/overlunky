@@ -1814,3 +1814,99 @@ void LuaBackend::on_post(ON event)
         }
     }
 }
+
+bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_SAVE_STATE)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func, slot, saved).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+
+    return false;
+}
+
+bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
+{
+    if (!get_enabled())
+        return false;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::PRE_LOAD_STATE)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            auto return_value = handle_function<bool>(this, callback.func, slot, loaded).value_or(false);
+            clear_current_callback();
+            callback.lastRan = now;
+            if (return_value)
+                return return_value;
+        }
+    }
+
+    return false;
+}
+
+void LuaBackend::post_save_state(int slot, StateMemory* saved)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_SAVE_STATE)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, slot, saved);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
+
+void LuaBackend::post_load_state(int slot, StateMemory* loaded)
+{
+    if (!get_enabled())
+        return;
+
+    auto now = get_frame_count();
+
+    for (auto& [id, callback] : callbacks)
+    {
+        if (is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == ON::POST_LOAD_STATE)
+        {
+            set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(this, callback.func, slot, loaded);
+            clear_current_callback();
+            callback.lastRan = now;
+        }
+    }
+}
