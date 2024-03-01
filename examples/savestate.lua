@@ -1,4 +1,4 @@
-meta.name = "Teleport predictor and advanced SaveStates"
+meta.name = "Teleport predictor and SaveStates"
 meta.author = "Dregu"
 meta.version = "1.0"
 
@@ -64,6 +64,8 @@ set_callback(function()
     if #states == 0 then
         states[1] = SaveState:new()
     end
+    box = nil
+    box_frame = nil
 end, ON.LEVEL)
 
 set_callback(clear_states, ON.PRE_LEVEL_DESTRUCTION)

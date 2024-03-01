@@ -5,6 +5,14 @@
 #include "script/events.hpp" // for pre_load_state
 #include "state.hpp"         // for State, get_state_ptr, enum_to_layer
 
+size_t get_state_offset()
+{
+    auto addr = get_address("state_location");
+    if (addr)
+        return memory_read<size_t>(addr);
+    return 0x4a0;
+}
+
 void copy_save_slot(int from, int to)
 {
     if ((from == 5 && pre_save_state(to, get_save_state(to))) ||
@@ -51,7 +59,7 @@ StateMemory* get_save_state(int slot)
 {
     size_t arr = get_address("save_states");
     size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
-    auto state = reinterpret_cast<StateMemory*>(base + 0x4a0);
+    auto state = reinterpret_cast<StateMemory*>(base + get_state_offset());
     if (state->screen)
         return state;
     return nullptr;
@@ -85,15 +93,15 @@ StateMemory* SaveState::get_state()
 {
     if (!addr)
         return nullptr;
-    return reinterpret_cast<StateMemory*>(addr + 0x4a0);
+    return reinterpret_cast<StateMemory*>(addr + get_state_offset());
 }
 
 void SaveState::load()
 {
     if (!addr)
         return;
-    size_t to = (size_t)(State::get().ptr_main()) - 0x4a0;
-    auto state = reinterpret_cast<StateMemory*>(addr + 0x4a0);
+    size_t to = (size_t)(State::get().ptr_main()) - get_state_offset();
+    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
     if (pre_load_state(-1, state))
         return;
     copy_state(addr, to);
@@ -104,8 +112,8 @@ void SaveState::save()
 {
     if (!addr)
         return;
-    size_t from = (size_t)(State::get().ptr_main()) - 0x4a0;
-    auto state = reinterpret_cast<StateMemory*>(addr + 0x4a0);
+    size_t from = (size_t)(State::get().ptr_main()) - get_state_offset();
+    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
     if (pre_save_state(-1, state))
         return;
     copy_state(from, addr);
