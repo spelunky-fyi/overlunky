@@ -546,13 +546,23 @@ end
             }
         });
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
-    /// Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused.
+    /// Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Doesn't work well with OL-PL interaction, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky state.
     /// <br/>The callback signature is nil on_hotkey(KEY key)
-    lua["set_hotkey"] = sol::overload([](sol::function cb, KEY key, bool global = false) -> CallbackId
+    lua["set_hotkey"] = sol::overload([](sol::function cb, KEY key, HOTKEY_TYPE flags) -> CallbackId
                                       {
         auto backend = LuaBackend::get_calling_backend();
         auto luaCb = HotKeyCallback{cb, key, -1, false, 0};
-        return backend->register_hotkey(luaCb, global); });
+        return backend->register_hotkey(luaCb, flags); });
+
+    lua.create_named_table("HOTKEY_TYPE", "NORMAL", HOTKEY_TYPE::NORMAL, "GLOBAL", HOTKEY_TYPE::GLOBAL, "INPUT", HOTKEY_TYPE::INPUT);
+    /* HOTKEY_TYPE
+    // NORMAL
+    // Suppressed when the game window is inactive or inputting text in this tool instance (get_io().wantkeyboard == true). Can't detect if OL is in a text input and script is running in PL though. Use ImGuiIO if you need to do that.
+    // GLOBAL
+    // Enabled even when the game window is inactive and will capture keys even from other programs.
+    // INPUT
+    // Enabled even when inputting text and will override normal text input keys.
+    */
 
     /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");

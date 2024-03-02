@@ -11,6 +11,7 @@
 #include <vector>       // for vector
 
 #include "aliases.hpp"                      // for IMAGE, JournalPageType
+#include "bucket.hpp"                       // for Bucket
 #include "constants.hpp"                    // for no_return_str
 #include "entities_chars.hpp"               // for Player
 #include "entity.hpp"                       // for Entity, get_entity_ptr
@@ -326,8 +327,15 @@ bool LuaBackend::update()
             callbacks.erase(id);
             load_callbacks.erase(id);
             save_callbacks.erase(id);
-            if (hotkey_callbacks.contains(id) && g_hotkeys.contains(hotkey_callbacks[id].hotkeyid) && g_hotkeys[hotkey_callbacks[id].hotkeyid].active)
-                UnregisterHotKey(get_window(), hotkey_callbacks[id].hotkeyid);
+            if (hotkey_callbacks.contains(id))
+            {
+                if (g_hotkeys.contains(hotkey_callbacks[id].hotkeyid))
+                {
+                    if (g_hotkeys[hotkey_callbacks[id].hotkeyid].active)
+                        UnregisterHotKey(get_window(), hotkey_callbacks[id].hotkeyid);
+                    g_hotkeys.erase(hotkey_callbacks[id].hotkeyid);
+                }
+            }
             hotkey_callbacks.erase(id);
 
             std::erase_if(pre_tile_code_callbacks, [id](auto& cb)
@@ -576,6 +584,7 @@ bool LuaBackend::update()
 
 void LuaBackend::draw(ImDrawList* dl)
 {
+    static const auto bucket = Bucket::get();
     if (!pre_draw() || !get_enabled())
         return;
 
@@ -613,6 +622,15 @@ void LuaBackend::draw(ImDrawList* dl)
         {
             if (is_callback_cleared(id))
                 continue;
+
+            if (g_hotkeys.contains(callback.hotkeyid) && (g_hotkeys[callback.hotkeyid].flags & HOTKEY_TYPE::INPUT) != HOTKEY_TYPE::INPUT && (g_hotkeys[callback.hotkeyid].suppressflags == HOTKEY_TYPE::NORMAL))
+            {
+                if (g_hotkeys[callback.hotkeyid].active && (ImGui::GetIO().WantCaptureKeyboard || bucket->io->WantCaptureKeyboard.value_or(false)))
+                    UnregisterHotKey(get_window(), callback.hotkeyid);
+                else if (!g_hotkeys[callback.hotkeyid].active && !(ImGui::GetIO().WantCaptureKeyboard || bucket->io->WantCaptureKeyboard.value_or(false)))
+                    RegisterHotKey(get_window(), callback.hotkeyid, g_hotkeys[callback.hotkeyid].mod, g_hotkeys[callback.hotkeyid].key);
+                g_hotkeys[callback.hotkeyid].active = !(ImGui::GetIO().WantCaptureKeyboard || bucket->io->WantCaptureKeyboard.value_or(false));
+            }
 
             auto now = get_frame_count();
             while (callback.queue > 0)
@@ -1944,7 +1962,7 @@ void LuaBackend::post_load_state(int slot, StateMemory* loaded)
     }
 }
 
-int LuaBackend::register_hotkey(HotKeyCallback cb, bool global)
+int LuaBackend::register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags)
 {
     const int OL_KEY_CTRL = 0x100;
     const int OL_KEY_SHIFT = 0x200;
@@ -1964,7 +1982,7 @@ int LuaBackend::register_hotkey(HotKeyCallback cb, bool global)
     if (RegisterHotKey(get_window(), id, mod, vk))
     {
         cb.hotkeyid = id;
-        auto hotkey = HotKey{mod, vk, this, cbcount, true, global};
+        auto hotkey = HotKey{mod, vk, this, cbcount, true, flags, HOTKEY_TYPE::NORMAL};
         g_hotkeys[id] = hotkey;
         hotkey_callbacks[cbcount] = cb;
         g_hotkey_count++;
@@ -2000,14 +2018,16 @@ void LuaBackend::wm_activate(bool active)
             {
                 RegisterHotKey(get_window(), id, hotkey.mod, hotkey.key);
                 hotkey.active = true;
+                hotkey.suppressflags &= ~HOTKEY_TYPE::GLOBAL;
             }
         }
         else
         {
-            if (!hotkey.global && hotkey.active)
+            if (hotkey.active && (hotkey.flags & HOTKEY_TYPE::GLOBAL) != HOTKEY_TYPE::GLOBAL)
             {
                 UnregisterHotKey(get_window(), id);
                 hotkey.active = false;
+                hotkey.suppressflags |= HOTKEY_TYPE::GLOBAL;
             }
         }
     }

@@ -460,7 +460,7 @@ class LuaBackend
     void on_post(ON event);
 
     void hotkey_callback(int cb);
-    int register_hotkey(HotKeyCallback cb, bool global);
+    int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);
     static void wm_activate(bool active);
     static void wm_hotkey(int keyid);
 };
@@ -485,5 +485,6 @@ struct HotKey
     LuaBackend* backend;
     int cb;
     bool active;
-    bool global;
+    HOTKEY_TYPE flags;
+    HOTKEY_TYPE suppressflags;
 };

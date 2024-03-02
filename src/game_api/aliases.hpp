@@ -72,6 +72,14 @@ using RAW_KEY = int8_t; // NoAlias
 
 inline constexpr uint8_t MAX_PLAYERS = 4;
 
+enum class HOTKEY_TYPE : int32_t
+{
+    NORMAL = 0,
+    GLOBAL = 1 << 0,
+    INPUT = 1 << 1,
+};
+ENUM_CLASS_FLAGS(HOTKEY_TYPE);
+
 enum class LAYER : int32_t
 {
     FRONT = 0,
