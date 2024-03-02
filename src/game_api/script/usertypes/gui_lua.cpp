@@ -20,6 +20,7 @@
 #include <utility>          // for max, min, pair, get, make_pair
 #include <xinput.h>         // for XINPUT_STATE, XINPUT_CAPABILITIES
 
+#include "bucket.hpp"
 #include "file_api.hpp"                   // for create_d3d11_texture_from_file
 #include "math.hpp"                       // for Vec2
 #include "script.hpp"                     // for ScriptMessage, ScriptImage
@@ -818,7 +819,13 @@ void register_usertypes(sol::state& lua)
         "framerate",
         &ImGuiIO::Framerate,
         "wantkeyboard",
-        &ImGuiIO::WantCaptureKeyboard,
+        sol::property([](ImGuiIO& io) -> bool
+                      { return io.WantCaptureKeyboard; },
+                      [](ImGuiIO& io, bool want)
+                      {
+                          Bucket::get()->io->WantCaptureKeyboard = want;
+                          io.WantCaptureKeyboard = want;
+                      }),
         /// NoDoc
         "keysdown",
         sol::property([](ImGuiIO& io)
@@ -841,7 +848,13 @@ void register_usertypes(sol::state& lua)
         "keysuper",
         &ImGuiIO::KeySuper,
         "wantmouse",
-        &ImGuiIO::WantCaptureMouse,
+        sol::property([](ImGuiIO& io) -> bool
+                      { return io.WantCaptureMouse; },
+                      [](ImGuiIO& io, bool want)
+                      {
+                          Bucket::get()->io->WantCaptureMouse = want;
+                          io.WantCaptureMouse = want;
+                      }),
         "mousepos",
         sol::property([](ImGuiIO& io) -> Vec2
                       { return Vec2(io.MousePos) /**/; }),

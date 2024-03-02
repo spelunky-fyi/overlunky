@@ -17,6 +17,7 @@ Bucket* Bucket::get()
     auto new_bucket = new Bucket();
     write_mem_prot(bucket_offset, new_bucket, true);
     new_bucket->pause_api = new PauseAPI();
+    new_bucket->io = new SharedIO();
     return new_bucket;
 }
 

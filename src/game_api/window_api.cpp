@@ -13,6 +13,7 @@
 #include "bucket.hpp"
 #include "logger.h"
 #include "memory.hpp"
+#include "state.hpp"
 
 bool detect_wine()
 {
@@ -121,6 +122,10 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
         bucket->pause_api->modifiers_down |= 0x800;
 
     bool consumed_input = g_OnInputCallback ? g_OnInputCallback(message, wParam, lParam) : false;
+
+    if (get_forward_events() && bucket->io->WantCaptureMouse.value_or(false) && message >= WM_LBUTTONDOWN && message <= WM_MOUSEWHEEL)
+        consumed_input = true;
+
     if (!consumed_input)
     {
         LRESULT imgui_result = ImGui_ImplWin32_WndProcHandler(window, message, wParam, lParam);
@@ -129,6 +134,7 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
             return imgui_result;
         }
     }
+
     if (ImGui::GetIO().WantCaptureKeyboard && message == WM_KEYDOWN)
     {
         return DefWindowProc(window, message, wParam, lParam);
@@ -222,6 +228,8 @@ LRESULT CALLBACK hkKeyboard(const int code, const WPARAM wParam, const LPARAM lP
 static bool skip_hkPresent = false;
 HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
+    ImGuiContext& g = *GImGui;
+    static const auto bucket = Bucket::get();
     SyncInterval = g_SyncInterval;
 
     if (skip_hkPresent)
@@ -246,6 +254,19 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
         {
             return g_OrigSwapChainPresent(pSwapChain, SyncInterval, Flags);
         }
+    }
+
+    if (!get_forward_events())
+    {
+        bucket->io->WantCaptureMouse = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && g.HoveredWindow && strcmp(g.HoveredWindow->Name, "Clickhandler");
+        bucket->io->WantCaptureKeyboard = ImGui::GetIO().WantCaptureKeyboard;
+    }
+    else
+    {
+        if (bucket->io->WantCaptureKeyboard.has_value())
+            ImGui::GetIO().WantCaptureKeyboard = bucket->io->WantCaptureKeyboard.value();
+        if (bucket->io->WantCaptureMouse.has_value())
+            ImGui::GetIO().WantCaptureMouse = bucket->io->WantCaptureMouse.value();
     }
 
     if (g_PreDrawCallback)
@@ -303,6 +324,12 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
     if (g_PostDrawCallback)
     {
         g_PostDrawCallback();
+    }
+
+    if (get_forward_events())
+    {
+        bucket->io->WantCaptureKeyboard = std::nullopt;
+        bucket->io->WantCaptureMouse = std::nullopt;
     }
 
     return g_OrigSwapChainPresent(pSwapChain, SyncInterval, Flags);
