@@ -151,6 +151,8 @@ class Bucket
     bool blocked_event{false};
     /// Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     SharedIO* io{nullptr};
+    /// Number of API instances present
+    int count{0};
 
   private:
     Bucket() = default;

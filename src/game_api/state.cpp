@@ -309,6 +309,7 @@ State& State::get()
             init_game_loop_hook();
 
             auto bucket = Bucket::get();
+            bucket->count++;
             if (!bucket->patches_applied)
             {
                 DEBUG("Applying patches");

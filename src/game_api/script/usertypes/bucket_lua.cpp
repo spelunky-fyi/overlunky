@@ -65,6 +65,7 @@ void register_usertypes(sol::state& lua)
     bucket_type["overlunky"] = sol::readonly(&Bucket::overlunky);
     bucket_type["pause"] = &Bucket::pause_api;
     bucket_type["io"] = &Bucket::io;
+    bucket_type["count"] = sol::readonly(&Bucket::count);
 
     /// Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
     // lua["get_bucket"] = []() -> Bucket*

@@ -564,6 +564,97 @@ void GuiDrawContext::draw_layer(DRAW_LAYER layer)
 
 namespace NGui
 {
+const int OL_KEY_CTRL = 0x100;
+const int OL_KEY_SHIFT = 0x200;
+const int OL_KEY_ALT = 0x800;
+const int OL_BUTTON_MOUSE = 0x400;
+const int OL_MOUSE_WHEEL = 0x10;
+const int OL_WHEEL_DOWN = 0x11;
+const int OL_WHEEL_UP = 0x12;
+
+bool modifierdown(int chord)
+{
+    int key = chord & 0xff;
+    if (ImGui::GetIO().KeyCtrl)
+        key |= OL_KEY_CTRL;
+    if (ImGui::GetIO().KeyShift)
+        key |= OL_KEY_SHIFT;
+    if (ImGui::GetIO().KeyAlt)
+        key |= OL_KEY_ALT;
+    return chord == key;
+};
+
+std::string keystring(int64_t keycode)
+{
+    UCHAR virtualKey = keycode & 0xff;
+    CHAR szName[128];
+    int result = 0;
+    std::string name;
+    if ((keycode & 0xff) == 0)
+    {
+        name = "None";
+    }
+    else if (!(keycode & OL_BUTTON_MOUSE)) // keyboard
+    {
+        UINT scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
+        switch (virtualKey)
+        {
+        case VK_LEFT:
+        case VK_UP:
+        case VK_RIGHT:
+        case VK_DOWN:
+        case VK_RCONTROL:
+        case VK_RMENU:
+        case VK_LWIN:
+        case VK_RWIN:
+        case VK_APPS:
+        case VK_PRIOR:
+        case VK_NEXT:
+        case VK_END:
+        case VK_HOME:
+        case VK_INSERT:
+        case VK_DELETE:
+        case VK_DIVIDE:
+        case VK_NUMLOCK:
+            scanCode |= KF_EXTENDED;
+            [[fallthrough]];
+        default:
+            result = GetKeyNameTextA(scanCode << 16, szName, 128);
+        }
+        if (result == 0)
+        {
+            name = "Mystery key";
+        }
+        std::string keyname(szName);
+        name = keyname;
+    }
+    else // mouse
+    {
+        std::stringstream buttonss;
+        if (!(keycode & OL_MOUSE_WHEEL))
+            buttonss << "Mouse" << (keycode & 0xff);
+        else if ((keycode & 0xff) == OL_WHEEL_DOWN)
+            buttonss << "WheelDown";
+        else if ((keycode & 0xff) == OL_WHEEL_UP)
+            buttonss << "WheelUp";
+        name = buttonss.str();
+    }
+
+    if (keycode & OL_KEY_SHIFT)
+    {
+        name = "Shift+" + name;
+    }
+    if (keycode & OL_KEY_CTRL)
+    {
+        name = "Ctrl+" + name;
+    }
+    if (keycode & OL_KEY_ALT)
+    {
+        name = "Alt+" + name;
+    }
+    return name;
+}
+
 void register_usertypes(sol::state& lua)
 {
     const char* xinput_dll_names[] =
@@ -778,7 +869,7 @@ void register_usertypes(sol::state& lua)
     auto keydown = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyDown((ImGuiKey)keycode);
+            return modifierdown(keycode) && ImGui::IsKeyDown((ImGuiKey)(keycode & 0xff));
         },
         [](char key)
         {
@@ -787,11 +878,11 @@ void register_usertypes(sol::state& lua)
     auto keypressed = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyPressed((ImGuiKey)keycode, false);
+            return modifierdown(keycode) && ImGui::IsKeyPressed((ImGuiKey)(keycode & 0xff), false);
         },
         [](int keycode, bool repeat)
         {
-            return ImGui::IsKeyPressed((ImGuiKey)keycode, repeat);
+            return modifierdown(keycode) && ImGui::IsKeyPressed((ImGuiKey)(keycode & 0xff), repeat);
         },
         [](char key)
         {
@@ -804,7 +895,7 @@ void register_usertypes(sol::state& lua)
     auto keyreleased = sol::overload(
         [](int keycode)
         {
-            return ImGui::IsKeyReleased((ImGuiKey)keycode);
+            return modifierdown(keycode) && ImGui::IsKeyReleased((ImGuiKey)(keycode & 0xff));
         },
         [](char key)
         {
@@ -847,6 +938,10 @@ void register_usertypes(sol::state& lua)
         &ImGuiIO::KeyAlt,
         "keysuper",
         &ImGuiIO::KeySuper,
+        "modifierdown",
+        modifierdown,
+        "keystring",
+        keystring,
         "wantmouse",
         sol::property([](ImGuiIO& io) -> bool
                       { return io.WantCaptureMouse; },
@@ -885,19 +980,34 @@ void register_usertypes(sol::state& lua)
 
     /* ImGuiIO
     // keys
-    // ZeroIndexArray<bool>, use KEY to index
+    // ZeroIndexArray<bool> of currently held keys, indexed by KEY <= 0xFF
     // keydown
-    // bool keydown(KEY keycode)
+    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) is down.
+    // bool keydown(KEY keychord)
     // bool keydown(char key)
     // keypressed
-    // bool keypressed(KEY keycode, bool repeat = false)
+    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was pressed this frame.
+    // bool keypressed(KEY keychord, bool repeat = false)
     // bool keypressed(char key, bool repeat = false)
     // keyreleased
-    // bool keyreleased(KEY keycode)
+    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was released this frame.
+    // bool keyreleased(KEY keychord)
     // bool keyreleased(char key)
+    // modifierdown
+    // bool modifierdown(KEY keychord)
+    // Returns true if modifiers (e.g. `KEY.OL_MOD_CTRL | KEY.OL_MOD_SHIFT | KEY.OL_MOD_ALT`) are down, ignores other keys in chord.
+    // keystring
+    // string keystring(KEY keychord)
+    // Returns human readable string from KEY (e.g. "Ctrl+X")
     // gamepads
     // Gamepad gamepads(int index)
     // This is the XInput index 1..4, might not be the same as the player slot.
+    // wantkeyboard
+    // True if anything else (i.e. some input box) is already capturing keyboard and you should probably ignore it.
+    // Set to true if you want to capture keyboard to override Overlunky key bindings and game keys.
+    // wantmouse
+    // True if anything else (i.e. some input box) is already capturing mouse and you should probably ignore it.
+    // Set to true if you want to capture mouse and override Overlunky mouse binding.
     */
 
     lua.create_named_table("GAMEPAD", "UP", 0x0001, "DOWN", 0x0002, "LEFT", 0x0004, "RIGHT", 0x0008, "START", 0x0010, "BACK", 0x0020, "LEFT_THUMB", 0x0040, "RIGHT_THUMB", 0x0080, "LEFT_SHOULDER", 0x0100, "RIGHT_SHOULDER", 0x0200, "A", 0x1000, "B", 0x2000, "X", 0x4000, "Y", 0x8000);

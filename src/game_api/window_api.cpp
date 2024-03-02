@@ -123,7 +123,10 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
 
     bool consumed_input = g_OnInputCallback ? g_OnInputCallback(message, wParam, lParam) : false;
 
-    if (get_forward_events() && bucket->io->WantCaptureMouse.value_or(false) && message >= WM_LBUTTONDOWN && message <= WM_MOUSEWHEEL)
+    /*if (bucket->io->WantCaptureKeyboard.value_or(false) && (message == WM_KEYDOWN || message == WM_KEYUP))
+        consumed_input = true;*/
+
+    if (bucket->io->WantCaptureMouse.value_or(false) && message >= WM_LBUTTONDOWN && message <= WM_MOUSEWHEEL)
         consumed_input = true;
 
     if (!consumed_input)
@@ -256,17 +259,20 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
         }
     }
 
-    if (!get_forward_events())
+    if (bucket->count > 1)
     {
-        bucket->io->WantCaptureMouse = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && g.HoveredWindow && strcmp(g.HoveredWindow->Name, "Clickhandler");
-        bucket->io->WantCaptureKeyboard = ImGui::GetIO().WantCaptureKeyboard;
-    }
-    else
-    {
-        if (bucket->io->WantCaptureKeyboard.has_value())
-            ImGui::GetIO().WantCaptureKeyboard = bucket->io->WantCaptureKeyboard.value();
-        if (bucket->io->WantCaptureMouse.has_value())
-            ImGui::GetIO().WantCaptureMouse = bucket->io->WantCaptureMouse.value();
+        if (!get_forward_events())
+        {
+            bucket->io->WantCaptureMouse = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && g.HoveredWindow && strcmp(g.HoveredWindow->Name, "Clickhandler");
+            bucket->io->WantCaptureKeyboard = ImGui::GetIO().WantCaptureKeyboard;
+        }
+        else
+        {
+            if (bucket->io->WantCaptureKeyboard.has_value())
+                ImGui::GetIO().WantCaptureKeyboard = bucket->io->WantCaptureKeyboard.value();
+            if (bucket->io->WantCaptureMouse.has_value())
+                ImGui::GetIO().WantCaptureMouse = bucket->io->WantCaptureMouse.value();
+        }
     }
 
     if (g_PreDrawCallback)
@@ -297,7 +303,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
     }
 
     {
-        if (ImGui::GetIO().WantCaptureKeyboard)
+        if (ImGui::GetIO().WantCaptureKeyboard || bucket->io->WantCaptureKeyboard.value_or(false))
         {
             if (HWND window = HID_GetRegisteredDeviceWindow(g_HidKeyboard))
             {
@@ -326,7 +332,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
         g_PostDrawCallback();
     }
 
-    if (get_forward_events())
+    if (get_forward_events() || bucket->count == 1)
     {
         bucket->io->WantCaptureKeyboard = std::nullopt;
         bucket->io->WantCaptureMouse = std::nullopt;
