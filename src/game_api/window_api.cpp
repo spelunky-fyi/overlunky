@@ -13,6 +13,7 @@
 #include "bucket.hpp"
 #include "logger.h"
 #include "memory.hpp"
+#include "script/lua_backend.hpp"
 #include "state.hpp"
 
 bool detect_wine()
@@ -112,6 +113,11 @@ bool HID_UnregisterDevice(USHORT usage)
 LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static const auto bucket = Bucket::get();
+
+    if (message == WM_HOTKEY)
+        LuaBackend::wm_hotkey((int)wParam);
+    else if (message == WM_ACTIVATE)
+        LuaBackend::wm_activate((bool)wParam);
 
     bucket->pause_api->modifiers_down = 0;
     if (ImGui::GetIO().KeyCtrl)

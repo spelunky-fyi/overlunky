@@ -33,9 +33,12 @@
 #include "usertypes/level_lua.hpp"          // for PreHandleRoomTilesContext
 #include "usertypes/save_context.hpp"       // for LoadContext, SaveContext
 #include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
+#include "window_api.hpp"                   // for get_window
 
 std::recursive_mutex g_all_backends_mutex;
 std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>> g_all_backends;
+std::unordered_map<int, HotKey> g_hotkeys;
+int g_hotkey_count = 0;
 
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
@@ -115,6 +118,17 @@ void LuaBackend::clear_all_callbacks()
         g_state->level_gen->data->undefine_extra_spawn(id);
     }
     extra_spawn_callbacks.clear();
+
+    for (auto& [id, callback] : hotkey_callbacks)
+    {
+        if (g_hotkeys.contains(callback.hotkeyid))
+        {
+            if (g_hotkeys[callback.hotkeyid].active)
+                UnregisterHotKey(get_window(), callback.hotkeyid);
+            g_hotkeys.erase(callback.hotkeyid);
+        }
+    }
+    hotkey_callbacks.clear();
 
     HookHandler<Entity, CallbackType::Entity>::clear_all_hooks();
     HookHandler<RenderInfo, CallbackType::Entity>::clear_all_hooks();
@@ -312,6 +326,9 @@ bool LuaBackend::update()
             callbacks.erase(id);
             load_callbacks.erase(id);
             save_callbacks.erase(id);
+            if (hotkey_callbacks.contains(id) && g_hotkeys.contains(hotkey_callbacks[id].hotkeyid) && g_hotkeys[hotkey_callbacks[id].hotkeyid].active)
+                UnregisterHotKey(get_window(), hotkey_callbacks[id].hotkeyid);
+            hotkey_callbacks.erase(id);
 
             std::erase_if(pre_tile_code_callbacks, [id](auto& cb)
                           { return cb.id == id; });
@@ -589,6 +606,22 @@ void LuaBackend::draw(ImDrawList* dl)
                 handle_function<void>(this, callback.func, draw_ctx);
                 clear_current_callback();
                 callback.lastRan = now;
+            }
+        }
+
+        for (auto& [id, callback] : hotkey_callbacks)
+        {
+            if (is_callback_cleared(id))
+                continue;
+
+            auto now = get_frame_count();
+            while (callback.queue > 0)
+            {
+                set_current_callback(-1, id, CallbackType::HotKey);
+                handle_function<void>(this, callback.func, callback.key);
+                clear_current_callback();
+                callback.lastRan = now;
+                callback.queue--;
             }
         }
     }
@@ -1907,6 +1940,75 @@ void LuaBackend::post_load_state(int slot, StateMemory* loaded)
             handle_function<void>(this, callback.func, slot, loaded);
             clear_current_callback();
             callback.lastRan = now;
+        }
+    }
+}
+
+int LuaBackend::register_hotkey(HotKeyCallback cb, bool global)
+{
+    const int OL_KEY_CTRL = 0x100;
+    const int OL_KEY_SHIFT = 0x200;
+    const int OL_KEY_ALT = 0x800;
+
+    int vk = cb.key & 0xff;
+    int mod = 0;
+    if (cb.key & OL_KEY_CTRL)
+        mod |= MOD_CONTROL;
+    if (cb.key & OL_KEY_SHIFT)
+        mod |= MOD_SHIFT;
+    if (cb.key & OL_KEY_ALT)
+        mod |= MOD_ALT;
+
+    int id = g_hotkey_count;
+
+    if (RegisterHotKey(get_window(), id, mod, vk))
+    {
+        cb.hotkeyid = id;
+        auto hotkey = HotKey{mod, vk, this, cbcount, true, global};
+        g_hotkeys[id] = hotkey;
+        hotkey_callbacks[cbcount] = cb;
+        g_hotkey_count++;
+        return cbcount++;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+void LuaBackend::hotkey_callback(int cb)
+{
+    if (!hotkey_callbacks.contains(cb))
+        return;
+    hotkey_callbacks[cb].queue++;
+}
+
+void LuaBackend::wm_hotkey(int keyid)
+{
+    if (!g_hotkeys.contains(keyid))
+        return;
+    g_hotkeys[keyid].backend->hotkey_callback(g_hotkeys[keyid].cb);
+}
+
+void LuaBackend::wm_activate(bool active)
+{
+    for (auto& [id, hotkey] : g_hotkeys)
+    {
+        if (active)
+        {
+            if (!hotkey.active)
+            {
+                RegisterHotKey(get_window(), id, hotkey.mod, hotkey.key);
+                hotkey.active = true;
+            }
+        }
+        else
+        {
+            if (!hotkey.global && hotkey.active)
+            {
+                UnregisterHotKey(get_window(), id);
+                hotkey.active = false;
+            }
         }
     }
 }

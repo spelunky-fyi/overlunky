@@ -545,6 +545,14 @@ end
                 break;
             }
         });
+    /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
+    /// Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused.
+    /// <br/>The callback signature is nil on_hotkey(KEY key)
+    lua["set_hotkey"] = sol::overload([](sol::function cb, KEY key, bool global = false) -> CallbackId
+                                      {
+        auto backend = LuaBackend::get_calling_backend();
+        auto luaCb = HotKeyCallback{cb, key, -1, false, 0};
+        return backend->register_hotkey(luaCb, global); });
 
     /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");
