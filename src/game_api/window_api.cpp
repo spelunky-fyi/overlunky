@@ -132,7 +132,7 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
     /*if (bucket->io->WantCaptureKeyboard.value_or(false) && (message == WM_KEYDOWN || message == WM_KEYUP))
         consumed_input = true;*/
 
-    if (bucket->io->WantCaptureMouse.value_or(false) && message >= WM_LBUTTONDOWN && message <= WM_MOUSEWHEEL)
+    if (get_forward_events() && bucket->io->WantCaptureMouse.value_or(false) && message >= WM_LBUTTONDOWN && message <= WM_MOUSEWHEEL)
         consumed_input = true;
 
     if (!consumed_input)

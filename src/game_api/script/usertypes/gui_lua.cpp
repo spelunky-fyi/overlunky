@@ -640,6 +640,10 @@ std::string keystring(int64_t keycode)
         name = buttonss.str();
     }
 
+    if (keycode & OL_KEY_ALT)
+    {
+        name = "Alt+" + name;
+    }
     if (keycode & OL_KEY_SHIFT)
     {
         name = "Shift+" + name;
@@ -647,10 +651,6 @@ std::string keystring(int64_t keycode)
     if (keycode & OL_KEY_CTRL)
     {
         name = "Ctrl+" + name;
-    }
-    if (keycode & OL_KEY_ALT)
-    {
-        name = "Alt+" + name;
     }
     return name;
 }
@@ -901,7 +901,12 @@ void register_usertypes(sol::state& lua)
         {
             return ImGui::IsKeyReleased((ImGuiKey)(int)key);
         });
-    /// Used in [get_io](#get_io)
+    /// Used in [get_io](#get_io), also see [set_hotkey](#set_hotkey).
+    ///
+    /// - The clicked/pressed actions only make sense in `ON.GUIFRAME`, but get_io() can be used anywhere for the other parts.
+    /// - You can use KEY or standard VK keycodes to index `keys` or the other functions.
+    /// - Setting `wantkeyboard` early (e.g. already when `modifierdown(KEY.OL_MOD_CTRL)`) will prevent the game and UI from reacting to your actual combo later (e.g. `keypressed(KEY.OL_MOD_CTRL | KEY.X)`)
+    /// - Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
     lua.new_usertype<ImGuiIO>(
         "ImGuiIO",
         "displaysize",
@@ -986,16 +991,16 @@ void register_usertypes(sol::state& lua)
     // bool keydown(KEY keychord)
     // bool keydown(char key)
     // keypressed
-    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was pressed this frame.
+    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was pressed this GUIFRAME.
     // bool keypressed(KEY keychord, bool repeat = false)
     // bool keypressed(char key, bool repeat = false)
     // keyreleased
-    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was released this frame.
+    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was released this GUIFRAME.
     // bool keyreleased(KEY keychord)
     // bool keyreleased(char key)
     // modifierdown
     // bool modifierdown(KEY keychord)
-    // Returns true if modifiers (e.g. `KEY.OL_MOD_CTRL | KEY.OL_MOD_SHIFT | KEY.OL_MOD_ALT`) are down, ignores other keys in chord.
+    // Returns true if modifiers in chord (e.g. `KEY.OL_MOD_CTRL | KEY.OL_MOD_SHIFT | KEY.OL_MOD_ALT`) are down, ignores other keys in chord.
     // keystring
     // string keystring(KEY keychord)
     // Returns human readable string from KEY (e.g. "Ctrl+X")
@@ -1003,11 +1008,15 @@ void register_usertypes(sol::state& lua)
     // Gamepad gamepads(int index)
     // This is the XInput index 1..4, might not be the same as the player slot.
     // wantkeyboard
-    // True if anything else (i.e. some input box) is already capturing keyboard and you should probably ignore it.
-    // Set to true if you want to capture keyboard to override Overlunky key bindings and game keys.
+    // True if anyone else (i.e. some input box, OL hotkey) is already capturing keyboard or reacted to this keypress and you probably shouldn't.
+    // Set this to true every GUIFRAME while you want to capture keyboard and disable UI key bindings and game keys. Won't affect UI or game keys on this frame though, that train has already sailed. Also see Bucket::Overlunky for other ways to override key bindings.
+    // Do not set this to false, unless you want the player input to bleed through input fields.
     // wantmouse
-    // True if anything else (i.e. some input box) is already capturing mouse and you should probably ignore it.
-    // Set to true if you want to capture mouse and override Overlunky mouse binding.
+    // True if anyone else (i.e. hovering some window) is already capturing mouse and you probably shouldn't.
+    // Set this to true if you want to capture mouse and override UI mouse binding.
+    // showcursor
+    // True when the cursor is visible.
+    // Set to true to force the cursor visible.
     */
 
     lua.create_named_table("GAMEPAD", "UP", 0x0001, "DOWN", 0x0002, "LEFT", 0x0004, "RIGHT", 0x0008, "START", 0x0010, "BACK", 0x0020, "LEFT_THUMB", 0x0040, "RIGHT_THUMB", 0x0080, "LEFT_SHOULDER", 0x0100, "RIGHT_SHOULDER", 0x0200, "A", 0x1000, "B", 0x2000, "X", 0x4000, "Y", 0x8000);
@@ -1017,13 +1026,22 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("INPUT_FLAG", "JUMP", 1, "WHIP", 2, "BOMB", 3, "ROPE", 4, "RUN", 5, "DOOR", 6, "MENU", 7, "JOURNAL", 8, "LEFT", 9, "RIGHT", 10, "UP", 11, "DOWN", 12);
 
     /// Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
-    ///
-    /// - Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
-    /// - Note: You can use KEY or standard VK keycodes to index `keys` or the other functions.
-    /// - Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-    /// - Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
     // lua["get_io"] = []() -> ImGuiIO
     lua["get_io"] = ImGui::GetIO;
+
+    /// Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
+    /// Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Doesn't work well with OL-PL interaction, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky state.
+    /// <br/>The callback signature is nil on_hotkey(KEY key)
+    lua["set_hotkey"] = sol::overload([](sol::function cb, KEY key, HOTKEY_TYPE flags) -> CallbackId
+                                      {
+        auto backend = LuaBackend::get_calling_backend() /**/;
+        auto luaCb = HotKeyCallback{cb, key, -1, false, 0};
+        return backend->register_hotkey(luaCb, flags) /**/; },
+                                      [](sol::function cb, KEY key) -> CallbackId
+                                      {
+        auto backend = LuaBackend::get_calling_backend() /**/;
+        auto luaCb = HotKeyCallback{cb, key, -1, false, 0};
+        return backend->register_hotkey(luaCb, HOTKEY_TYPE::NORMAL) /**/; });
 
     lua.create_named_table("DRAW_LAYER", "BACKGROUND", DRAW_LAYER::BACKGROUND, "FOREGROUND", DRAW_LAYER::FOREGROUND, "WINDOW", DRAW_LAYER::WINDOW);
 

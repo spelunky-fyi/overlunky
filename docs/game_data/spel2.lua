@@ -1706,13 +1706,16 @@ function get_image_size(path) end
 ---@return number, number
 function mouse_position() end
 ---Returns: [ImGuiIO](https://spelunky-fyi.github.io/overlunky/#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
----
----- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
----- Note: You can use KEY or standard VK keycodes to index `keys` or the other functions.
----- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
----- Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
 function get_io() end
+---Returns unique id >= 0 for the callback to be used in [clear_callback](https://spelunky-fyi.github.io/overlunky/#clear_callback) or -1 if the key could not be registered.
+---Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Doesn't work well with OL-PL interaction, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky state.
+---The callback signature is nil on_hotkey(KEY key)
+---@param cb fun(key: KEY): nil
+---@param key KEY
+---@param flags HOTKEY_TYPE
+---@return CallbackId
+function set_hotkey(cb, key, flags) end
 ---Force the LUT texture for the given layer (or both) until it is reset.
 ---Pass `nil` in the first parameter to reset
 ---@param texture_id TEXTURE?
@@ -5118,6 +5121,8 @@ function GuiDrawContext:win_pushid(id) end
     ---@field keyshift boolean
     ---@field keyalt boolean
     ---@field keysuper boolean
+    ---@field modifierdown any @modifierdown
+    ---@field keystring any @keystring
     ---@field wantmouse boolean
     ---@field mousepos Vec2
     ---@field mousedown boolean[] @size: 5
@@ -6438,10 +6443,16 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field modifiers_block integer @Bitmask of modifier KEYs that will block all game input
     ---@field modifiers_clear_input boolean @Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
 
+---@class SharedIO
+    ---@field wantkeyboard boolean?
+    ---@field wantmouse boolean?
+
 ---@class Bucket
     ---@field data table<string, any> @You can store arbitrary simple values here in Playlunky to be read in on Overlunky script for example.
     ---@field overlunky Overlunky @Access Overlunky options here, nil if Overlunky is not loaded.
     ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
+    ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
+    ---@field count integer @Number of API instances present
 
 end
 --## Static class functions

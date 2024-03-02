@@ -782,6 +782,10 @@ std::string key_string(int64_t keycode)
         name = buttonss.str();
     }
 
+    if (keycode & OL_KEY_ALT)
+    {
+        name = "Alt+" + name;
+    }
     if (keycode & OL_KEY_SHIFT)
     {
         name = "Shift+" + name;
@@ -789,10 +793,6 @@ std::string key_string(int64_t keycode)
     if (keycode & OL_KEY_CTRL)
     {
         name = "Ctrl+" + name;
-    }
-    if (keycode & OL_KEY_ALT)
-    {
-        name = "Alt+" + name;
     }
     return name;
 }

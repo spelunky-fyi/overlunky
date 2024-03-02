@@ -606,6 +606,8 @@ Type | Name | Description
 map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data) | You can store arbitrary simple values here in Playlunky to be read in on [Overlunky](#Overlunky) script for example.
 [Overlunky](#Overlunky) | [overlunky](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlunky) | Access [Overlunky](#Overlunky) options here, nil if [Overlunky](#Overlunky) is not loaded.
 [PauseAPI](#PauseAPI) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | [PauseAPI](#PauseAPI) is used by [Overlunky](#Overlunky) and can be used to control the [Overlunky](#Overlunky) pause options from scripts. Can be accessed from the global `pause` more easily.
+[SharedIO](#SharedIO) | [io](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=io) | Shared part of [ImGuiIO](#ImGuiIO) to block keyboard/mouse input across API instances.
+int | [count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) | Number of API instances present
 
 ### Color
 
@@ -967,6 +969,14 @@ nil | [save()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) | 
 nil | [clear()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear) | Delete the [SaveState](#SaveState) and free the memory. The [SaveState](#SaveState) can't be used after this.
 [StateMemory](#StateMemory) | [get_state()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state) | Access the [StateMemory](#StateMemory) inside a [SaveState](#SaveState)
 
+### SharedIO
+
+
+Type | Name | Description
+---- | ---- | -----------
+optional&lt;bool&gt; | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
+optional&lt;bool&gt; | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
+
 ### ShortTileCodeDef
 
 Used in [get_short_tile_code](#get_short_tile_code), [get_short_tile_code_definition](#get_short_tile_code_definition) and [PostRoomGenerationContext](#PostRoomGenerationContext)
@@ -1068,23 +1078,30 @@ float | [ry](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ry) |
 
 ### ImGuiIO
 
-Used in [get_io](#get_io)
+Used in [get_io](#get_io), also see [set_hotkey](#set_hotkey).
+
+- The clicked/pressed actions only make sense in `ON.GUIFRAME`, but get_io() can be used anywhere for the other parts.
+- You can use [KEY](#KEY) or standard VK keycodes to index `keys` or the other functions.
+- Setting `wantkeyboard` early (e.g. already when `modifierdown(KEY.OL_MOD_CTRL)`) will prevent the game and UI from reacting to your actual combo later (e.g. `keypressed(KEY.OL_MOD_CTRL | KEY.X)`)
+- [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 
 Type | Name | Description
 ---- | ---- | -----------
 [Vec2](#Vec2) | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
 float | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
-bool | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | 
+bool | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | True if anyone else (i.e. some input box, OL hotkey) is already capturing keyboard or reacted to this keypress and you probably shouldn't.<br/>Set this to true every GUIFRAME while you want to capture keyboard and disable UI key bindings and game keys. Won't affect UI or game keys on this frame though, that train has already sailed. Also see [Bucket](#Bucket)::[Overlunky](#Overlunky) for other ways to override key bindings.<br/>Do not set this to false, unless you want the player input to bleed through input fields.<br/> 
 bool | [keysdown[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysdown) | 
-bool | [keys[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | ZeroIndexArray<bool>, use [KEY](#KEY) to index<br/> 
- | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | bool keydown([KEY](#KEY) keycode)<br/>bool keydown(char key)<br/> 
- | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | bool keypressed([KEY](#KEY) keycode, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
- | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | bool keyreleased([KEY](#KEY) keycode)<br/>bool keyreleased(char key)<br/> 
+bool | [keys[ImGuiKey_COUNT]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | ZeroIndexArray<bool> of currently held keys, indexed by [KEY](#KEY) <= 0xFF<br/> 
+ | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) is down.<br/>bool keydown(KEY keychord)<br/>bool keydown(char key)<br/> 
+ | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was pressed this GUIFRAME.<br/>bool keypressed(KEY keychord, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
+ | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was released this GUIFRAME.<br/>bool keyreleased(KEY keychord)<br/>bool keyreleased(char key)<br/> 
 bool | [keyctrl](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyctrl) | 
 bool | [keyshift](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyshift) | 
 bool | [keyalt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyalt) | 
 bool | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysuper) | 
-bool | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | 
+ | [modifierdown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifierdown) | bool modifierdown([KEY](#KEY) keychord)<br/>Returns true if modifiers in chord (e.g. `KEY.OL_MOD_CTRL | KEY.OL_MOD_SHIFT | KEY.OL_MOD_ALT`) are down, ignores other keys in chord.<br/> 
+ | [keystring](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keystring) | string keystring([KEY](#KEY) keychord)<br/>Returns human readable string from [KEY](#KEY) (e.g. "Ctrl+X")<br/> 
+bool | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | True if anyone else (i.e. hovering some window) is already capturing mouse and you probably shouldn't.<br/>Set this to true if you want to capture mouse and override UI mouse binding.<br/> 
 [Vec2](#Vec2) | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
 bool | [mousedown[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
 bool | [mouseclicked[5]](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
@@ -1092,7 +1109,7 @@ bool | [mousedoubleclicked[5]](https://github.com/spelunky-fyi/overlunky/search?
 float | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
 [Gamepad](#Gamepad) | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
  | [gamepads](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepads) | [Gamepad](#Gamepad) gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/> 
-bool | [showcursor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=showcursor) | 
+bool | [showcursor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=showcursor) | True when the cursor is visible.<br/>Set to true to force the cursor visible.<br/> 
 
 ### InputMapping
 
