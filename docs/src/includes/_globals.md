@@ -1925,7 +1925,7 @@ Set engine target frametime when game is unfocused (1/framerate, default 1/33). 
 #### [CallbackId](#Aliases) set_hotkey([](function cb, [KEY](#KEY) key, [HOTKEY_TYPE](#HOTKEY_TYPE) flags)
 
 Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
-Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Doesn't work well with OL-PL interaction, use [ImGuiIO](#ImGuiIO) if you need Playlunky hotkeys to react to [Overlunky](#Overlunky) state.
+Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use [ImGuiIO](#ImGuiIO) if you need Playlunky hotkeys to react to [Overlunky](#Overlunky) input state. Key is a [KEY](#KEY) combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
 <br/>The callback signature is nil on_hotkey([KEY](#KEY) key)
 
 ### set_infinite_loop_detection_enabled
@@ -3499,6 +3499,14 @@ Will return the string of currently choosen language
 
 Convert the hash to stringid
 Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+
+### key_name
+
+
+> Search script examples for [key_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_name)
+
+#### nil key_name()
+
 
 ### set_level_string
 

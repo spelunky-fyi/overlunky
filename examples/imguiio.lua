@@ -19,7 +19,7 @@ set_callback(function()
   if iio.mouseclicked[1] then
     local x, y = mouse_position()
     if iio.wantmouse then
-      print("Clicked inside Overlunky window, plz ignore")
+      print("Clicked inside Overlunky window or 'Mouse Controls' is enabled, plz ignore")
     else
       print(F "Clicked {x},{y} and it's fair game")
     end
@@ -104,7 +104,11 @@ set_hotkey(hotkey_handler, KEY.X | KEY.OL_MOD_ALT, HOTKEY_TYPE.GLOBAL | HOTKEY_T
 -- opens the key picker when any key is still unbound,
 -- checks if ui is already capturing input
 -- and tells overlunky to ignore picked keys
-keys = {}
+keys = {
+  first = KEY.OL_MOD_CTRL | KEY.A,
+  second = nil, -- choose with key picker when enabled
+  third = -1,   -- choose with key picker when enabled
+}
 function key_handler(ctx, name)
   if not keys[name] or keys[name] == -1 then
     keys[name] = ctx:key_picker(F "Pick key for: {name}", KEY_TYPE.ANY)
@@ -118,7 +122,9 @@ function key_handler(ctx, name)
         end
       end
     end
-  elseif not get_io().wantkeyboard then
+  elseif not test_mask(keys[name], KEY_TYPE.MOUSE) and not get_io().wantkeyboard then
+    return get_io().keypressed(keys[name])
+  elseif test_mask(keys[name], KEY_TYPE.MOUSE) and not get_io().wantmouse then
     return get_io().keypressed(keys[name])
   end
 end

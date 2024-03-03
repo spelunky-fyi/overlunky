@@ -647,6 +647,19 @@ Name | Data | Description
 [A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY.A) | 65 | 
 ...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
 
+## KEY_TYPE
+
+
+> Search script examples for [KEY_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.ANY) | KEY_TYPE::ANY | 
+[KEYBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.KEYBOARD) | KEY_TYPE::KEYBOARD | 
+[MOUSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.MOUSE) | KEY_TYPE::MOUSE | 
+
 ## LAYER
 
 

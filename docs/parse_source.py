@@ -670,6 +670,8 @@ def run_parse():
                 if not var:
                     continue
                 var = var.split(",")
+                if len(var) < 2:
+                    continue
                 if var[0] == "sol::base_classes" or var[0] == "sol::no_constructor":
                     continue
                 if "NoDoc" in var[0]:

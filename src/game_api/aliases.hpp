@@ -46,7 +46,7 @@
                    static_cast<std::underlying_type_t<Enum>>(Rhs)); \
     }
 
-using CallbackId = uint32_t;
+using CallbackId = int32_t;
 using Flags = uint32_t;
 using uColor = uint32_t;
 using SPAWN_TYPE = uint32_t;                  // NoAlias
@@ -80,11 +80,11 @@ enum class HOTKEY_TYPE : int32_t
 };
 ENUM_CLASS_FLAGS(HOTKEY_TYPE);
 
-enum class KEY_TYPE : int8_t
+enum class KEY_TYPE : int32_t
 {
     ANY = 0,
-    KEYBOARD = 1 << 0,
-    MOUSE = 1 << 1,
+    KEYBOARD = 0xFF,
+    MOUSE = 0x400,
 };
 ENUM_CLASS_FLAGS(KEY_TYPE);
 

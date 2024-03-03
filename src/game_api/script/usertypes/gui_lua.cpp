@@ -581,9 +581,14 @@ int64_t GuiDrawContext::key_picker(std::string message, KEY_TYPE flags)
     static bool active{false};
     // make sure no keys are held before we open the picker initially
     if (!active)
+    {
         for (int i = 0; i < 0xFF; ++i)
             if (ImGui::IsKeyDown((ImGuiKey)i) || ImGui::IsKeyReleased((ImGuiKey)i))
                 return ret;
+        for (int i = 0; i < ImGuiMouseButton_COUNT; ++i)
+            if (ImGui::GetIO().MouseDown[i] || ImGui::GetIO().MouseReleased[i])
+                return ret;
+    }
     active = true;
     ImGuiIO& io = ImGui::GetIO();
     io.WantCaptureKeyboard = true;
@@ -686,7 +691,7 @@ namespace NGui
 {
 bool modifierdown(int chord)
 {
-    int key = chord & 0xff;
+    int key = chord & 0x4ff;
     if (key == VK_RMENU)
     {
         if (ImGui::GetIO().KeyShift)
@@ -992,10 +997,8 @@ void register_usertypes(sol::state& lua)
             {
                 if (!(keycode & OL_MOUSE_WHEEL))
                 {
-                    unsigned int butt = (keycode & 0xff) - 1;
-                    if (butt > 4)
-                        return false;
-                    return modifierdown(keycode) && ImGui::GetIO().MouseDown[butt];
+                    auto butt = (ImGuiKey)(ImGuiKey_Mouse_BEGIN + (keycode & 0xff) - 1);
+                    return modifierdown(keycode) && ImGui::IsKeyDown(butt);
                 }
                 else if ((keycode & 0xff) == OL_WHEEL_DOWN)
                     return ImGui::GetIO().MouseWheel < 0;
@@ -1016,15 +1019,13 @@ void register_usertypes(sol::state& lua)
         {
             if (!(keycode & OL_MOUSE_WHEEL))
             {
-                unsigned int butt = (keycode & 0xff) - 1;
-                if (butt > 4)
-                    return false;
-                return modifierdown(keycode) && ImGui::GetIO().MouseClicked[butt];
+                auto butt = (ImGuiKey)(ImGuiKey_Mouse_BEGIN + (keycode & 0xff) - 1);
+                return modifierdown(keycode) && ImGui::IsKeyPressed(butt, repeat);
             }
             else if ((keycode & 0xff) == OL_WHEEL_DOWN)
-                return ImGui::GetIO().MouseWheel < 0;
+                return modifierdown(keycode) && ImGui::GetIO().MouseWheel < 0;
             else if ((keycode & 0xff) == OL_WHEEL_UP)
-                return ImGui::GetIO().MouseWheel > 0;
+                return modifierdown(keycode) && ImGui::GetIO().MouseWheel > 0;
             return false;
         }
         else
@@ -1054,10 +1055,8 @@ void register_usertypes(sol::state& lua)
             {
                 if (!(keycode & OL_MOUSE_WHEEL))
                 {
-                    unsigned int butt = (keycode & 0xff) - 1;
-                    if (butt > 4)
-                        return false;
-                    return modifierdown(keycode) && ImGui::GetIO().MouseReleased[butt];
+                    auto butt = (ImGuiKey)(ImGuiKey_Mouse_BEGIN + (keycode & 0xff) - 1);
+                    return modifierdown(keycode) && ImGui::IsKeyReleased(butt);
                 }
                 else if ((keycode & 0xff) == OL_WHEEL_DOWN)
                     return ImGui::GetIO().MouseWheel < 0;
@@ -1072,92 +1071,80 @@ void register_usertypes(sol::state& lua)
         {
             return ImGui::IsKeyReleased((ImGuiKey)(int)key);
         });
+
+    auto wantmouse = sol::property([](ImGuiIO& io) -> bool
+                                   {
+                        ImGuiContext& g = *GImGui;
+                        if (ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && g.HoveredWindow && strcmp(g.HoveredWindow->Name, "Clickhandler") == 0)
+                            return Bucket::get()->io->WantCaptureMouse.value_or(io.WantCaptureMouse) /**/;
+                        return io.WantCaptureMouse; },
+                                   [](ImGuiIO& io, bool want)
+                                   {
+                                       Bucket::get()->io->WantCaptureMouse = want;
+                                       io.WantCaptureMouse = want;
+                                   });
+
+    auto wantkeyboard = sol::property([](ImGuiIO& io) -> bool
+                                      { return io.WantCaptureKeyboard; },
+                                      [](ImGuiIO& io, bool want)
+                                      {
+                                          Bucket::get()->io->WantCaptureKeyboard = want;
+                                          io.WantCaptureKeyboard = want;
+                                      });
+
     /// Used in [get_io](#get_io), also see [set_hotkey](#set_hotkey) and GuiDrawContext::key_picker.
     ///
     /// - Functions are static, not class methods expecting `self` (call with `get_io().keydown(key)`, not `:`)
-    /// - You can also use mouse buttons (e.g. `KEY.OL_MOUSE_1`) or anything returned by GuiDrawContext:key_picker in the keydown/keypressed/keyreleased functions.
     /// - The clicked/pressed actions only work in `ON.GUIFRAME` (they are true for one GUIFRAME), but get_io() can be used anywhere for the other parts.
-    /// - You can use `KEY`, `KEY.X | KEY.OL_MOD_CTRL` or other standard VK keycodes to index `keys[]` or in the functions. `keysdown[]` uses the messed up Lua indexing.
-    /// - A modifier as an actual keycode (`keypressed(KEY.LCONTROL)`) is not the same as modifier flags. `keypressed(KEY.OL_MOD_CTRL | KEY.LSHIFT)` will trigger on "Ctrl+Shift" but not "Shift+Ctrl"
+    /// - You can use `KEY` or other standard virtual keycodes < 0xFF to index `keys[]` or in the functions.
+    /// - You can use chords `KEY.OL_MOD_CTRL | KEY.X` in the keydown/keypressed/keyreleased functions.
+    /// - You can also use mouse buttons (e.g. `KEY.OL_MOUSE_1`) or anything returned by GuiDrawContext:key_picker in the keydown/keypressed/keyreleased functions.
+    /// - A modifier key as a keycode (`keypressed(KEY.LCONTROL)`) is not the same as modifier flags OL_MOD_... `keypressed(KEY.OL_MOD_CTRL)` won't work, `keypressed(KEY.OL_MOD_CTRL | KEY.LSHIFT)` will trigger on "Ctrl+Shift" but not "Shift+Ctrl"
+    /// - All held modifiers must be present in the chord, e.g. `keypressed(KEY.OL_MOD_CTRL | KEY.X)` won't trigger when Ctrl+Shift+X is pressed, `keydown(KEY.Y)` won't trigger when Ctrl+Y is pressed.
     /// - Most fields are read only, except `wantkeyboard`, `wantmouse` and `showcursor`.
-    /// - Setting `wantkeyboard` early (e.g. already when `modifierdown(KEY.OL_MOD_CTRL)`) will prevent the game and UI from reacting to your actual combo later (e.g. `keypressed(KEY.OL_MOD_CTRL | KEY.X)`)
+    /// - Setting `wantkeyboard` early (e.g. already when `modifierdown(KEY.OL_MOD_CTRL | KEY.X)`) will prevent the game and UI from reacting to your actual combo later (e.g. `keypressed(KEY.OL_MOD_CTRL | KEY.X)`)
     /// - Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
-    lua.new_usertype<ImGuiIO>(
-        "ImGuiIO",
-        "displaysize",
+    auto imguiio_type = lua.new_usertype<ImGuiIO>("ImGuiIO", sol::no_constructor);
+    imguiio_type["displaysize"] =
         sol::property([](ImGuiIO& io) -> Vec2
-                      { return Vec2(io.DisplaySize) /**/; }),
-        "framerate",
-        &ImGuiIO::Framerate,
-        "wantkeyboard",
-        sol::property([](ImGuiIO& io) -> bool
-                      { return io.WantCaptureKeyboard; },
-                      [](ImGuiIO& io, bool want)
-                      {
-                          Bucket::get()->io->WantCaptureKeyboard = want;
-                          io.WantCaptureKeyboard = want;
-                      }),
-        /// NoDoc
-        "keysdown",
-        sol::property([](ImGuiIO& io)
-                      { return std::ref(io.KeysDown) /**/; }),
-        "keys",
-        sol::property([](ImGuiIO& io)
-                      { return ZeroIndexArray<bool>(io.KeysDown) /**/; }),
-        "keydown",
-        keydown,
-        "keypressed",
-        keypressed,
-        "keyreleased",
-        keyreleased,
-        "keyctrl",
-        &ImGuiIO::KeyCtrl,
-        "keyshift",
-        &ImGuiIO::KeyShift,
-        "keyalt",
-        &ImGuiIO::KeyAlt,
-        "keysuper",
-        &ImGuiIO::KeySuper,
-        "modifierdown",
-        modifierdown,
-        "wantmouse",
-        sol::property([](ImGuiIO& io) -> bool
-                      { return io.WantCaptureMouse; },
-                      [](ImGuiIO& io, bool want)
-                      {
-                          Bucket::get()->io->WantCaptureMouse = want;
-                          io.WantCaptureMouse = want;
-                      }),
-        "mousepos",
-        sol::property([](ImGuiIO& io) -> Vec2
-                      { return Vec2(io.MousePos) /**/; }),
-        "mousedown",
-        sol::property([](ImGuiIO& io)
-                      { return std::ref(io.MouseDown) /**/; }),
-        "mouseclicked",
-        sol::property([](ImGuiIO& io)
-                      { return std::ref(io.MouseClicked) /**/; }),
-        "mousedoubleclicked",
-        sol::property([](ImGuiIO& io)
-                      { return std::ref(io.MouseDoubleClicked) /**/; }),
-        "mousereleased",
-        sol::property([](ImGuiIO& io)
-                      { return std::ref(io.MouseReleased) /**/; }),
-        "mousewheel",
-        &ImGuiIO::MouseWheel,
-        "gamepad",
-        sol::property([]() -> Gamepad
-                      {
+                      { return Vec2(io.DisplaySize) /**/; });
+    imguiio_type["framerate"] = &ImGuiIO::Framerate;
+    imguiio_type["wantkeyboard"] = std::move(wantkeyboard);
+    /// NoDoc
+    imguiio_type["keysdown"] = sol::property([](ImGuiIO& io)
+                                             { return std::ref(io.KeysDown) /**/; });
+    imguiio_type["keys"] = sol::property([](ImGuiIO& io)
+                                         { return ZeroIndexArray<bool>(io.KeysDown) /**/; });
+    imguiio_type["keydown"] = keydown;
+    imguiio_type["keypressed"] = keypressed;
+    imguiio_type["keyreleased"] = keyreleased;
+    imguiio_type["keyctrl"] = &ImGuiIO::KeyCtrl;
+    imguiio_type["keyshift"] = &ImGuiIO::KeyShift;
+    imguiio_type["keyalt"] = &ImGuiIO::KeyAlt;
+    imguiio_type["keysuper"] = &ImGuiIO::KeySuper;
+    imguiio_type["modifierdown"] = modifierdown;
+    imguiio_type["wantmouse"] = std::move(wantmouse);
+    imguiio_type["mousepos"] = sol::property([](ImGuiIO& io) -> Vec2
+                                             { return Vec2(io.MousePos); });
+    imguiio_type["mousedown"] = sol::property([](ImGuiIO& io)
+                                              { return std::ref(io.MouseDown); });
+    imguiio_type["mouseclicked"] = sol::property([](ImGuiIO& io)
+                                                 { return std::ref(io.MouseClicked); });
+    imguiio_type["mousedoubleclicked"] = sol::property([](ImGuiIO& io)
+                                                       { return std::ref(io.MouseDoubleClicked); });
+    imguiio_type["mousereleased"] = sol::property([](ImGuiIO& io)
+                                                  { return std::ref(io.MouseReleased); });
+    imguiio_type["mousewheel"] = &ImGuiIO::MouseWheel;
+    imguiio_type["gamepad"] = sol::property([]() -> Gamepad
+                                            {
         g_WantUpdateHasGamepad = true;
-        return get_gamepad(1) /**/; }),
-        "gamepads",
-        [](unsigned int index)
-        {
-            g_WantUpdateHasGamepad = true;
-            return get_gamepad(index) /**/;
-        },
-        "showcursor",
-        &ImGuiIO::MouseDrawCursor);
+        return get_gamepad(1); });
+    imguiio_type["gamepads"] = [](unsigned int index)
+    {
+        g_WantUpdateHasGamepad = true;
+        return get_gamepad(index);
+    };
+    imguiio_type["showcursor"] = &ImGuiIO::MouseDrawCursor;
 
     /* ImGuiIO
     // keys
@@ -1210,14 +1197,14 @@ void register_usertypes(sol::state& lua)
     /// Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
     /// Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky input state. Key is a KEY combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
     /// <br/>The callback signature is nil on_hotkey(KEY key)
-    lua["set_hotkey"] = sol::overload([](sol::function cb, KEY key, HOTKEY_TYPE flags) -> int
+    lua["set_hotkey"] = sol::overload([](sol::function cb, KEY key, HOTKEY_TYPE flags) -> CallbackId
                                       {
         if (key & OL_BUTTON_MOUSE)
             return -1;
         auto backend = LuaBackend::get_calling_backend() /**/;
         auto luaCb = HotKeyCallback{cb, key, -1, false, 0};
         return backend->register_hotkey(luaCb, flags) /**/; },
-                                      [](sol::function cb, KEY key) -> int
+                                      [](sol::function cb, KEY key) -> CallbackId
                                       {
         if (key & OL_BUTTON_MOUSE)
             return -1;

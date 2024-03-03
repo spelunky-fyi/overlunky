@@ -1705,11 +1705,13 @@ function get_image_size(path) end
 ---Current mouse cursor position in screen coordinates.
 ---@return number, number
 function mouse_position() end
+---@return nil
+function key_name() end
 ---Returns: [ImGuiIO](https://spelunky-fyi.github.io/overlunky/#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 ---@return ImGuiIO
 function get_io() end
 ---Returns unique id >= 0 for the callback to be used in [clear_callback](https://spelunky-fyi.github.io/overlunky/#clear_callback) or -1 if the key could not be registered.
----Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Doesn't work well with OL-PL interaction, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky state.
+---Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky input state. Key is a KEY combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
 ---The callback signature is nil on_hotkey(KEY key)
 ---@param cb fun(key: KEY): nil
 ---@param key KEY
@@ -2327,6 +2329,7 @@ do
     ---@field slide_position number
 
 ---@class GameProps
+    ---@field buttons integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input_previous integer[] @size: MAX_PLAYERS
     ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
@@ -4013,6 +4016,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field smoke2 ParticleEmitterInfo
 
 ---@class CookFire : Torch
+    ---@field lit any @&Torch::is_lit
     ---@field emitted_light Illumination
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
@@ -5010,6 +5014,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
     ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
+    ---@field key_picker fun(self, message: string, flags: KEY_TYPE): integer @Returns KEY flags including held OL_MOD modifiers, or -1 before any key has been pressed and released, or mouse button pressed. Also returns -1 before all initially held keys are released before the picker was opened, or if another key picker is already waiting for keys. If a modifier is released, that modifier is returned as an actual keycode (e.g. `KEY.LSHIFT`) while the other held modifiers are returned as `KEY.OL_MOD_...` flags.<br/>Shows a fullscreen key picker with a message, with the accepted input type (keyboard/mouse) filtered by flags. The picker won't show before all previously held keys have been released and other key pickers have returned a valid key.
 local GuiDrawContext = nil
 ---Draws a rectangle on screen from top-left to bottom-right.
 ---@param left number
@@ -5111,8 +5116,7 @@ function GuiDrawContext:win_pushid(id) end
 ---@class ImGuiIO
     ---@field displaysize Vec2
     ---@field framerate number
-    ---@field wantkeyboard boolean
-    ---@field keysdown boolean[] @size: ImGuiKey_COUNT
+    ---@field wantkeyboard any @wantkeyboard
     ---@field keys boolean[] @size: ImGuiKey_COUNT
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
@@ -5122,15 +5126,15 @@ function GuiDrawContext:win_pushid(id) end
     ---@field keyalt boolean
     ---@field keysuper boolean
     ---@field modifierdown any @modifierdown
-    ---@field keystring any @keystring
-    ---@field wantmouse boolean
+    ---@field wantmouse any @wantmouse
     ---@field mousepos Vec2
     ---@field mousedown boolean[] @size: 5
     ---@field mouseclicked boolean[] @size: 5
     ---@field mousedoubleclicked boolean[] @size: 5
+    ---@field mousereleased boolean[] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
-    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
+    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
