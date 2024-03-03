@@ -98,3 +98,33 @@ set_hotkey(hotkey_handler, KEY.Z | KEY.OL_MOD_CTRL, HOTKEY_TYPE.NORMAL)
 
 -- won't be suppressed by inactive window or input fields
 set_hotkey(hotkey_handler, KEY.X | KEY.OL_MOD_ALT, HOTKEY_TYPE.GLOBAL | HOTKEY_TYPE.INPUT)
+
+
+-- smart key handler that reacts to named key presses, but also
+-- opens the key picker when any key is still unbound,
+-- checks if ui is already capturing input
+-- and tells overlunky to ignore picked keys
+keys = {}
+function key_handler(ctx, name)
+  if not keys[name] or keys[name] == -1 then
+    keys[name] = ctx:key_picker(F "Pick key for: {name}", KEY_TYPE.ANY)
+    -- key picker will return -1 until a key has been released
+    if keys[name] ~= -1 then
+      print(F "Picked {keys[name]} {key_name(keys[name])} {name}")
+      if get_bucket().overlunky then
+        get_bucket().overlunky.ignore_keycodes:clear()
+        for _, v in pairs(keys) do
+          get_bucket().overlunky.ignore_keycodes:insert(nil, v)
+        end
+      end
+    end
+  elseif not get_io().wantkeyboard then
+    return get_io().keypressed(keys[name])
+  end
+end
+
+set_callback(function(ctx)
+  if key_handler(ctx, "first") then print("First action with " .. key_name(keys.first)) end
+  if key_handler(ctx, "second") then print("Second action with " .. key_name(keys.second)) end
+  if key_handler(ctx, "third") then print("Third action with " .. key_name(keys.third)) end
+end, ON.GUIFRAME)

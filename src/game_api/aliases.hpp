@@ -80,6 +80,14 @@ enum class HOTKEY_TYPE : int32_t
 };
 ENUM_CLASS_FLAGS(HOTKEY_TYPE);
 
+enum class KEY_TYPE : int8_t
+{
+    ANY = 0,
+    KEYBOARD = 1 << 0,
+    MOUSE = 1 << 1,
+};
+ENUM_CLASS_FLAGS(KEY_TYPE);
+
 enum class LAYER : int32_t
 {
     FRONT = 0,
