@@ -528,6 +528,7 @@ end
             switch (caller.type)
             {
             case CallbackType::Normal:
+            case CallbackType::HotKey:
                 backend->clear_callbacks.push_back(caller.id);
                 break;
             case CallbackType::Entity:

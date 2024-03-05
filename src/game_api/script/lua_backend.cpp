@@ -1996,7 +1996,7 @@ int LuaBackend::register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags)
 
 void LuaBackend::hotkey_callback(int cb)
 {
-    if (!hotkey_callbacks.contains(cb))
+    if (!get_enabled() || !hotkey_callbacks.contains(cb))
         return;
     hotkey_callbacks[cb].queue++;
 }
