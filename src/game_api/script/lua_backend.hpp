@@ -277,6 +277,11 @@ class SoundManager;
 class LuaConsole;
 struct RenderInfo;
 
+struct LocalStateData
+{
+    sol::object user_data;
+};
+
 class LuaBackend
     : public HookHandler<Entity, CallbackType::Entity>,
       public HookHandler<RenderInfo, CallbackType::Entity>,
@@ -323,7 +328,7 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
-    std::unordered_map<StateMemory*, sol::object> local_datas;
+    std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
     bool manual_save{false};
     uint32_t last_save{0};
 
@@ -342,6 +347,8 @@ class LuaBackend
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
 
+    LocalStateData& get_locals();
+    void copy_locals(StateMemory* from, StateMemory* to);
     void clear();
     void clear_all_callbacks();
     bool update();

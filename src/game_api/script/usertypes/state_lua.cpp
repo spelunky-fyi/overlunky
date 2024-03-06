@@ -417,9 +417,9 @@ void register_usertypes(sol::state& lua)
     auto get_local_data = [](StateMemory& state) -> sol::object
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto local_datas = backend->local_datas;
+        auto local_datas = backend->local_state_datas;
         if (local_datas.contains(&state)) {
-            return local_datas[&state];
+            return local_datas[&state].user_data;
         }
         return sol::nil;
     };
@@ -427,7 +427,7 @@ void register_usertypes(sol::state& lua)
     auto set_local_data = [](StateMemory& state, sol::object user_data) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->local_datas[&state] = user_data;
+        backend->local_state_datas[&state].user_data = user_data;
     };
 
     statememory_type["local_data"] = sol::property(get_local_data, set_local_data);

@@ -78,6 +78,11 @@ LuaBackend::~LuaBackend()
     }
 }
 
+LocalStateData& LuaBackend::get_locals()
+{
+    return local_state_datas[State::get().ptr()];
+}
+
 void LuaBackend::clear()
 {
     clear_all_callbacks();
@@ -1819,11 +1824,11 @@ void LuaBackend::pre_clone_heap(StateMemory* from, StateMemory* to)
 {
     if (!get_enabled())
         return;
-    if (local_datas.contains(from)) {
-        sol::object from_data = local_datas[from];
+    if (local_state_datas.contains(from)) {
+        sol::object from_data = local_state_datas[from].user_data;
         if (from_data != sol::lua_nil)
         {
-            local_datas[to] = (*vm)["deepcopy_object"](from_data);
+            local_state_datas[to].user_data = (*vm)["deepcopy_object"](from_data);
         }
     }
 
