@@ -254,7 +254,7 @@ void init_behavior_hooks()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
 
     g_entity_turn_trampoline = (EntityTurn*)memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::MONS_SNAKE, 0x10));
     DetourAttach((void**)&g_entity_turn_trampoline, &entity_turn);

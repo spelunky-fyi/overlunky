@@ -47,7 +47,7 @@
 #include "thread_utils.hpp"             // for OnHeapPointer
 #include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
 
-uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
+uint32_t setflag(uint32_t flags, int bit)
 {
     return flags | (1U << (bit - 1));
 }
@@ -711,7 +711,7 @@ void set_time_ghost_enabled(bool b)
     static size_t offset_toast_trigger = 0;
     if (offset_trigger == 0)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         offset_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
         offset_toast_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TOAST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
     }
@@ -728,7 +728,7 @@ void set_time_ghost_enabled(bool b)
 
 void set_time_jelly_enabled(bool b)
 {
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
     static const size_t offset = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_COSMIC_OCEAN, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
     if (b)
         recover_mem("set_time_jelly_enabled");
@@ -1164,8 +1164,8 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
     {
         if (!offsets[0])
         {
-            auto memory = Memory::get();
-            size_t offset = size_minus_one - memory.exe_ptr;
+            auto& memory = Memory::get();
+            size_t offset = size_minus_one - memory.exe_address();
             const auto limit_size = offset + 0x200;
 
             offsets[0] = find_inst(memory.exe(), "\x41\x80\xBF\x17\x01\x00\x00"sv, offset, limit_size, "ankh_health_gain_1");
@@ -1458,7 +1458,7 @@ void activate_tiamat_position_hack(bool activate)
 
 void activate_crush_elevator_hack(bool activate)
 {
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
     static size_t offsets[3];
     if (offsets[0] == 0)
     {
@@ -1502,7 +1502,7 @@ void activate_hundun_hack(bool activate)
 
     if (offsets[0] == 0)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         auto func_offset = get_virtual_function_address(VTABLE_OFFSET::MONS_HUNDUN, 78);
         offsets[0] = find_inst(memory.exe(), "\x41\xF6\x85\x61\x01\x00\x00\x08"sv, func_offset, func_offset + 0x1420, "activate_hundun_hack");
         if (offsets[0] == 0)
@@ -1602,12 +1602,12 @@ void set_boss_door_control_enabled(bool enable)
     static size_t offsets[2];
     if (offsets[0] == 0)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         offsets[0] = get_address("hundun_door_control");
         if (offsets[0] == 0)
             return;
         // find tiamat door control (the same pattern)
-        offsets[1] = find_inst(memory.exe(), "\x4A\x8B\xB4\xC8\x80\xF4\x00\x00"sv, offsets[0] - memory.exe_ptr + 0x777, std::nullopt, "set_boss_door_control_enabled");
+        offsets[1] = find_inst(memory.exe(), "\x4A\x8B\xB4\xC8\x80\xF4\x00\x00"sv, offsets[0] - memory.exe_address() + 0x777, std::nullopt, "set_boss_door_control_enabled");
         if (offsets[1] == 0)
         {
             offsets[0] = 0;

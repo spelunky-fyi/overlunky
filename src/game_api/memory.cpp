@@ -39,7 +39,21 @@ void ExecutableMemory::deleter_t::operator()(std::byte* mem) const
     VirtualFree(mem, 0, MEM_RELEASE);
 }
 
-size_t round_up(size_t i, size_t div)
+Memory& Memory::get()
+{
+    static Memory mem{[]()
+                      {
+                          auto exe = (size_t)GetModuleHandleA(NULL);
+
+                          // Skipping bundle for faster memory search
+                          auto after_bundle_ = find_after_bundle(exe);
+
+                          return Memory{exe, after_bundle_};
+                      }()};
+    return mem;
+}
+
+static size_t round_up(size_t i, size_t div)
 {
     return ((i + div - 1) / div) * div;
 }
@@ -82,13 +96,13 @@ size_t function_start(size_t off, uint8_t outside_byte)
 
 LPVOID alloc_mem_rel32(size_t addr, size_t size)
 {
-    const size_t limit_addr = Memory::get().exe_ptr;
+    const size_t limit_addr = Memory::get().exe_address();
     LPVOID new_array = nullptr;
 
     size_t test_addr = addr + 0x10000; // dunno why, without this it can get address that is more than 32bit away
 
     if (test_addr <= INT32_MAX) // redunded check as you probably won't get address that is less than INT32_MAX from "zero"
-        test_addr = 8;          // but i did it just in case so you can't get overflow, also can't feed 0 to the VirtualAlloc as that just means: find memory wherever
+        test_addr = 0x1000;     // but i did it just in case so you can't get overflow
     else
         test_addr -= INT32_MAX;
 

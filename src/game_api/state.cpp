@@ -193,7 +193,7 @@ void hook_godmode_functions()
     static bool functions_hooked = false;
     if (!functions_hooked)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
         auto addr_insta = get_address("insta_gib");
 

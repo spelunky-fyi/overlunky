@@ -83,7 +83,7 @@ const char* current_spelunky_version()
     if (!version_searched)
     {
         version_searched = true;
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         PIMAGE_NT_HEADERS nt_header = RtlImageNtHeader((PVOID)memory.exe());
         size_t rdata_start = 0;
         size_t rdata_size = 0;
@@ -316,9 +316,9 @@ class PatternCommandBuffer
         return *this;
     }
 
-    std::optional<size_t> operator()(Memory mem, const char* exe, std::string_view address_name) const
+    std::optional<size_t> operator()(Memory& mem, const char* exe, std::string_view address_name) const
     {
-        size_t offset = mem.after_bundle;
+        size_t offset = mem.after_bundle_address();
         bool optional{false};
 
 #ifdef DEBUG
@@ -390,7 +390,7 @@ class PatternCommandBuffer
                 offset = mem.at_exe(offset);
                 break;
             case CommandType::FromExe:
-                offset = offset - mem.exe_ptr;
+                offset = offset - mem.exe_address();
                 break;
             case CommandType::FunctionStart:
                 offset = ::function_start(offset, data.outside_byte);
@@ -475,7 +475,7 @@ class PatternCommandBuffer
     std::vector<Command> commands;
 };
 
-using AddressRule = std::function<std::optional<size_t>(Memory mem, const char* exe, std::string_view address_name)>;
+using AddressRule = std::function<std::optional<size_t>(Memory& mem, const char* exe, std::string_view address_name)>;
 std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "game_malloc"sv,
@@ -2115,7 +2115,7 @@ std::unordered_map<std::string_view, size_t> g_cached_addresses;
 
 void preload_addresses()
 {
-    Memory mem = Memory::get();
+    Memory& mem = Memory::get();
     const char* exe = mem.exe();
     for (auto [address_name, rule] : g_address_rules)
     {
@@ -2137,7 +2137,7 @@ size_t load_address(std::string_view address_name)
     auto it = g_address_rules.find(address_name);
     if (it != g_address_rules.end())
     {
-        Memory mem = Memory::get();
+        Memory& mem = Memory::get();
         if (auto address = it->second(mem, mem.exe(), address_name))
         {
             g_cached_addresses[address_name] = address.value();

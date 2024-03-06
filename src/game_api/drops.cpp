@@ -335,9 +335,9 @@ void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
         auto& entry = dropchance_entries.at(dropchance_id);
         if (entry.offset == 0)
         {
-            auto memory = Memory::get();
+            auto& memory = Memory::get();
             size_t offset = memory.at_exe(find_inst(memory.exe(), entry.pattern, get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)));
-            if (offset > memory.exe_ptr)
+            if (offset > memory.exe_address())
             {
                 entry.offset = offset;
             }
@@ -381,12 +381,12 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         }
         if (entry.offsets[0] == 0)
         {
-            auto memory = Memory::get();
+            auto& memory = Memory::get();
             size_t offset = 0;
             const auto drop_name{"DROP." + entry.caption};
 
             if (entry.vtable_offset == VTABLE_OFFSET::NONE)
-                offset = memory.after_bundle;
+                offset = memory.after_bundle_address();
             else
                 offset = get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset);
 
