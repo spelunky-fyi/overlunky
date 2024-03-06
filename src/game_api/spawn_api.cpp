@@ -621,9 +621,13 @@ Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, f
     // TODO: This still might not work very well and corner fill isn't actually floor spreading per level config definition, and should have a different SPAWN_TYPE (corner fill still happens when floor spreading chance is set to 0)
     // const auto theme_floor = State::get().ptr_local()->current_theme->get_floor_spreading_type();
     // const auto theme_floor2 = State::get().ptr_local()->current_theme->get_floor_spreading_type2();
+    auto state = State::get().ptr();
+    auto [ax, ay, bx, by] = std::make_tuple(2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f);
+    static const auto border_octo = to_id("ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS");
+    static const auto border_dust = to_id("ENT_TYPE_FLOOR_DUSTWALL");
     const bool is_decorated = (entity_factory->types[entity_type].properties_flags & 0x1) == 0x1;
     const bool is_styled = (entity_factory->types[entity_type].properties_flags & 0x2) == 0x2;
-    const bool is_border = entity_type < 4;
+    const bool is_border = entity_type <= border_octo || entity_type == border_dust || x < ax || x > bx || y > ay || y < by;
     const bool is_floor_spreading = (is_decorated || is_styled) && !is_border && (g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN) && !(g_SpawnTypeFlags & SPAWN_TYPE_LEVEL_GEN_TILE_CODE);
     if (is_floor_spreading)
     {

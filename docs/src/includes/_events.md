@@ -634,6 +634,34 @@ Runs right before the main engine loop. Return true to block state updates and m
 
 Runs right after the main engine loop.<br/>
 
+## ON.PRE_SAVE_STATE
+
+
+> Search script examples for [ON.PRE_SAVE_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_SAVE_STATE)
+
+Runs right before the main [StateMemory](#StateMemory) is manually saved to a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState). Return true to block save.<br/>Params: int slot, [StateMemory](#StateMemory) saved<br/>
+
+## ON.POST_SAVE_STATE
+
+
+> Search script examples for [ON.POST_SAVE_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_SAVE_STATE)
+
+Runs right after the main [StateMemory](#StateMemory) is manually saved to a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState).<br/>Params: int slot, [StateMemory](#StateMemory) saved<br/>
+
+## ON.PRE_LOAD_STATE
+
+
+> Search script examples for [ON.PRE_LOAD_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_STATE)
+
+Runs right before the main [StateMemory](#StateMemory) is manually loaded from a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState). Return true to block load.<br/>Params: int slot, [StateMemory](#StateMemory) loaded<br/>
+
+## ON.POST_LOAD_STATE
+
+
+> Search script examples for [ON.POST_LOAD_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_STATE)
+
+Runs right after the main [StateMemory](#StateMemory) is manually loaded from a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState).<br/>Params: int slot, [StateMemory](#StateMemory) loaded<br/>
+
 ## ON.BLOCKED_UPDATE
 
 

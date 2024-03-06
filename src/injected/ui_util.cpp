@@ -24,6 +24,7 @@
 #include "memory.hpp"                //
 #include "render_api.hpp"            // for RenderInfo
 #include "rpc.hpp"                   // for get_entities_at, entity_get_ite...
+#include "savestate.hpp"             // for copy_save_slot
 #include "search.hpp"                //
 #include "spawn_api.hpp"             // for spawn_liquid, spawn_companion
 #include "state.hpp"                 // for State, StateMemory
@@ -831,10 +832,15 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
 
 void UI::copy_state(int from, int to)
 {
-    ::copy_state(from, to);
+    ::copy_save_slot(from, to);
 }
 
 StateMemory* UI::get_save_state(int slot)
 {
     return ::get_save_state(slot);
+}
+
+void UI::set_camera_layer_control_enabled(bool enable)
+{
+    ::set_camera_layer_control_enabled(enable);
 }

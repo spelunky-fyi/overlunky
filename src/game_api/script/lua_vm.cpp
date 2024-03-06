@@ -2259,28 +2259,6 @@ end
         end
     )##");
 
-    /// Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
-    lua["save_state"] = [](int slot)
-    {
-        if (slot >= 1 && slot <= 4)
-            copy_state(5, slot);
-    };
-
-    /// Load level state from slot 1..4, if a save_state was made in this level.
-    lua["load_state"] = [](int slot)
-    {
-        if (slot >= 1 && slot <= 4 && get_save_state(slot))
-            copy_state(slot, 5);
-    };
-
-    /// Get StateMemory from a save_state slot.
-    lua["get_save_state"] = [](int slot) -> StateMemory*
-    {
-        if (slot >= 1 && slot <= 5)
-            return get_save_state(slot);
-        return nullptr;
-    };
-
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
     lua.create_named_table("MENU_INPUT", "NONE", 0x0, "SELECT", 0x1, "BACK", 0x2, "DELETE", 0x4, "RANDOM", 0x8, "JOURNAL", 0x10, "LEFT", 0x20, "RIGHT", 0x40, "UP", 0x80, "DOWN", 0x100);
@@ -2462,6 +2440,14 @@ end
         ON::PRE_GAME_LOOP,
         "POST_GAME_LOOP",
         ON::POST_GAME_LOOP,
+        "PRE_SAVE_STATE",
+        ON::PRE_SAVE_STATE,
+        "POST_SAVE_STATE",
+        ON::POST_SAVE_STATE,
+        "PRE_LOAD_STATE",
+        ON::PRE_LOAD_STATE,
+        "POST_LOAD_STATE",
+        ON::POST_LOAD_STATE,
         "BLOCKED_UPDATE",
         ON::BLOCKED_UPDATE,
         "BLOCKED_GAME_LOOP",
@@ -2708,6 +2694,18 @@ end
     // Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.
     // POST_GAME_LOOP
     // Runs right after the main engine loop.
+    // PRE_SAVE_STATE
+    // Runs right before the main StateMemory is manually saved to a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState. Return true to block save.
+    // Params: int slot, StateMemory saved
+    // POST_SAVE_STATE
+    // Runs right after the main StateMemory is manually saved to a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState.
+    // Params: int slot, StateMemory saved
+    // PRE_LOAD_STATE
+    // Runs right before the main StateMemory is manually loaded from a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState. Return true to block load.
+    // Params: int slot, StateMemory loaded
+    // POST_LOAD_STATE
+    // Runs right after the main StateMemory is manually loaded from a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState.
+    // Params: int slot, StateMemory loaded
     // BLOCKED_UPDATE
     // Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when Overlunky blocks a PRE_UPDATE.
     // BLOCKED_GAME_LOOP

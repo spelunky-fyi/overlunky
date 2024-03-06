@@ -1378,18 +1378,6 @@ function play_adventure() end
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
----Save current level state to slot 1..4. These save states are invalid after you exit the level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE).
----@param slot integer
----@return nil
-function save_state(slot) end
----Load level state from slot 1..4, if a save_state was made in this level.
----@param slot integer
----@return nil
-function load_state(slot) end
----Get StateMemory from a save_state slot.
----@param slot integer
----@return StateMemory
-function get_save_state(slot) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1398,6 +1386,22 @@ function speechbubble_visible() end
 function cancel_toast() end
 ---@return nil
 function cancel_speechbubble() end
+---Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see SaveState if you need more.
+---@param slot integer
+---@return nil
+function save_state(slot) end
+---Load level state from slot 1..4, if a save_state was made in this level.
+---@param slot integer
+---@return nil
+function load_state(slot) end
+---Clear save state from slot 1..4.
+---@param slot integer
+---@return nil
+function clear_state(slot) end
+---Get StateMemory from a save_state slot.
+---@param slot integer
+---@return StateMemory
+function get_save_state(slot) end
 ---Returns RawInput, a game structure for raw keyboard and controller state
 ---@return RawInput
 function get_raw_input() end
@@ -2256,6 +2260,12 @@ do
     ---@field layer integer
     ---@field room_index integer
     ---@field owner_uid integer
+
+---@class SaveState
+    ---@field load fun(self): nil @Load a SaveState
+    ---@field save fun(self): nil @Save over a previously allocated SaveState
+    ---@field clear fun(self): nil @Delete the SaveState and free the memory. The SaveState can't be used after this.
+    ---@field get_state fun(self): StateMemory @Access the StateMemory inside a SaveState
 
 ---@class BackgroundMusic
     ---@field game_startup BackgroundSound
@@ -6471,6 +6481,11 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
+
+SaveState = nil
+---Create a new temporary SaveState/clone of the main level state. Unlike save_state slots that are preallocated by the game anyway, these will use 32MiB a pop and aren't freed automatically, so make sure to clear them or reuse the same one to save memory. The garbage collector will eventually clear the SaveStates you don't have a handle to any more though.
+---@return SaveState
+function SaveState:new() end
 ---Create a new color - defaults to black
 ---@return Color
 function Color:new() end
@@ -8171,6 +8186,7 @@ ENT_TYPE = {
   POWERUPCAPABLE = 1250,
   PROTOSHOPKEEPER = 1251,
   PUNISHBALL = 1252,
+  PURCHASABLE = 1334,
   PUSHBLOCK = 1253,
   QILIN = 1254,
   QUICKSAND = 1255,
@@ -8764,10 +8780,9 @@ ON = {
   ARENA_SCORE = 27,
   ARENA_SELECT = 24,
   ARENA_STAGES = 22,
-  BLOCKED_GAME_LOOP = 159,
-  BLOCKED_LEVEL_GENERATION = 157,
-  BLOCKED_PROCESS_INPUT = 160,
-  BLOCKED_UPDATE = 158,
+  BLOCKED_GAME_LOOP = 162,
+  BLOCKED_PROCESS_INPUT = 163,
+  BLOCKED_UPDATE = 161,
   CAMP = 11,
   CHARACTER_SELECT = 9,
   CONSTELLATION = 19,
@@ -8796,8 +8811,10 @@ ON = {
   POST_LEVEL_GENERATION = 112,
   POST_LOAD_JOURNAL_CHAPTER = 139,
   POST_LOAD_SCREEN = 136,
+  POST_LOAD_STATE = 160,
   POST_PROCESS_INPUT = 154,
   POST_ROOM_GENERATION = 111,
+  POST_SAVE_STATE = 158,
   POST_UPDATE = 143,
   PRE_GAME_LOOP = 155,
   PRE_GET_FEAT = 140,
@@ -8811,7 +8828,9 @@ ON = {
   PRE_LOAD_JOURNAL_CHAPTER = 138,
   PRE_LOAD_LEVEL_FILES = 109,
   PRE_LOAD_SCREEN = 135,
+  PRE_LOAD_STATE = 159,
   PRE_PROCESS_INPUT = 153,
+  PRE_SAVE_STATE = 157,
   PRE_SET_FEAT = 141,
   PRE_UPDATE = 142,
   PROLOGUE = 2,

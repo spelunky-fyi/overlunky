@@ -117,6 +117,7 @@ header_files = [
     "../src/game_api/search.hpp",
     "../src/game_api/bucket.hpp",
     "../src/game_api/socket.hpp",
+    "../src/game_api/savestate.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -685,7 +686,7 @@ def run_parse():
 
                 var_name = var[0]
                 cpp = var[1]
-                    
+
                 if var[1].startswith("sol::property"):
                     param_match = re.match(
                         rf"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
