@@ -46,7 +46,7 @@
                    static_cast<std::underlying_type_t<Enum>>(Rhs)); \
     }
 
-using CallbackId = uint32_t;
+using CallbackId = int32_t;
 using Flags = uint32_t;
 using uColor = uint32_t;
 using SPAWN_TYPE = uint32_t;                  // NoAlias
@@ -71,6 +71,22 @@ using KEY = int64_t;    // NoAlias
 using RAW_KEY = int8_t; // NoAlias
 
 inline constexpr uint8_t MAX_PLAYERS = 4;
+
+enum class HOTKEY_TYPE : int32_t
+{
+    NORMAL = 0,
+    GLOBAL = 1 << 0,
+    INPUT = 1 << 1,
+};
+ENUM_CLASS_FLAGS(HOTKEY_TYPE);
+
+enum class KEY_TYPE : int32_t
+{
+    ANY = 0,
+    KEYBOARD = 0xFF,
+    MOUSE = 0x400,
+};
+ENUM_CLASS_FLAGS(KEY_TYPE);
 
 enum class LAYER : int32_t
 {

@@ -765,7 +765,7 @@ std::string key_string(int64_t keycode)
         }
         if (result == 0)
         {
-            name = "Mystery key";
+            name = "Unknown";
         }
         std::string keyname(szName);
         name = keyname;
@@ -786,13 +786,13 @@ std::string key_string(int64_t keycode)
     {
         name = "Shift+" + name;
     }
-    if (keycode & OL_KEY_CTRL)
-    {
-        name = "Ctrl+" + name;
-    }
     if (keycode & OL_KEY_ALT)
     {
         name = "Alt+" + name;
+    }
+    if (keycode & OL_KEY_CTRL)
+    {
+        name = "Ctrl+" + name;
     }
     return name;
 }
@@ -2844,7 +2844,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     auto& io = ImGui::GetIO();
     ImGuiWindow* current = g.NavWindow;
 
-    if (nCode == WM_KEYUP && !io.WantCaptureKeyboard)
+    if (nCode == WM_KEYUP && !io.WantCaptureKeyboard && !g_bucket->io->WantCaptureKeyboard.value_or(false))
     {
         if (pressed("speedhack_turbo", wParam))
         {
@@ -2893,6 +2893,9 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
         return true;
     }
+
+    if (g_bucket->io->WantCaptureKeyboard.value_or(false))
+        return false;
 
     if (pressed("hide_ui", wParam))
     {
@@ -5060,7 +5063,7 @@ void render_clickhandler()
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
     if (ImGui::IsWindowHovered())
         io.WantCaptureMouse = options["mouse_control"];
-    if (io.MouseWheel != 0 && ImGui::IsWindowHovered())
+    if (io.MouseWheel != 0 && ImGui::IsWindowHovered() && !g_bucket->io->WantCaptureMouse.value_or(false))
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
         {
@@ -5272,7 +5275,7 @@ void render_clickhandler()
     }
     using namespace std::chrono_literals;
     auto now = std::chrono::system_clock::now();
-    if (options["mouse_control"] && now > last_focus_time + 200ms && (!options["menu_ui"] || mouse_pos().y > ImGui::GetTextLineHeight()))
+    if (options["mouse_control"] && now > last_focus_time + 200ms && (!options["menu_ui"] || mouse_pos().y > ImGui::GetTextLineHeight()) && !g_bucket->io->WantCaptureMouse.value_or(false))
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         if (ImGui::BeginDragDropTarget())
@@ -5888,10 +5891,12 @@ void render_keyconfig()
             if (io.MouseDown[i])
             {
                 size_t keycode = 0x400 + i + 1;
-                if (io.KeysDown[VK_CONTROL])
+                if (ImGui::GetIO().KeyCtrl)
                     keycode += 0x100;
-                if (io.KeysDown[VK_SHIFT])
+                if (ImGui::GetIO().KeyShift)
                     keycode += 0x200;
+                if (ImGui::GetIO().KeyAlt)
+                    keycode += 0x800;
                 keys[g_change_key] = keycode;
                 save_config(cfgfile);
                 g_change_key = "";
@@ -5906,19 +5911,21 @@ void render_keyconfig()
                 keycode += OL_WHEEL_DOWN;
             else if (io.MouseWheel > 0)
                 keycode += OL_WHEEL_UP;
-            if (io.KeysDown[VK_CONTROL])
+            if (ImGui::GetIO().KeyCtrl)
                 keycode += 0x100;
-            if (io.KeysDown[VK_SHIFT])
+            if (ImGui::GetIO().KeyShift)
                 keycode += 0x200;
+            if (ImGui::GetIO().KeyAlt)
+                keycode += 0x800;
             keys[g_change_key] = keycode;
             save_config(cfgfile);
             g_change_key = "";
         }
 
         // Keys
-        for (size_t i = 0; i < VK_LSHIFT; ++i)
+        for (size_t i = 0; i < 0xFF; ++i)
         {
-            if (ImGui::IsKeyDown((ImGuiKey)i))
+            if (ImGui::IsKeyReleased((ImGuiKey)i))
             {
                 size_t keycode = i;
                 if (ImGui::GetIO().KeyCtrl)

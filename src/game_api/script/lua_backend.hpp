@@ -270,6 +270,15 @@ struct SavedUserData
     std::unordered_map<uint32_t, sol::object> powerups;
 };
 
+struct HotKeyCallback
+{
+    sol::function func;
+    KEY key;
+    int lastRan;
+    int queue;
+    int hotkeyid;
+};
+
 struct StateMemory;
 class SoundManager;
 class LuaConsole;
@@ -303,6 +312,7 @@ class LuaBackend
     std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
     std::unordered_map<int, ScreenCallback> save_callbacks;
+    std::unordered_map<int, HotKeyCallback> hotkey_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_tile_code_callbacks;
     std::vector<LevelGenCallback> post_tile_code_callbacks;
@@ -448,6 +458,11 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
+
+    void hotkey_callback(int cb);
+    int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);
+    static void wm_activate(bool active);
+    static void wm_hotkey(int keyid);
 };
 
 template <class Inheriting>
@@ -461,4 +476,15 @@ class LockableLuaBackend : public LuaBackend
     {
         return self->LockAs<Inheriting>();
     }
+};
+
+struct HotKey
+{
+    int mod;
+    int key;
+    LuaBackend* backend;
+    int cb;
+    bool active;
+    HOTKEY_TYPE flags;
+    HOTKEY_TYPE suppressflags;
 };

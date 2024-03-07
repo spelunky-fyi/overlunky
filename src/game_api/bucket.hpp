@@ -122,6 +122,12 @@ struct PauseAPI
     void post_input();
 };
 
+struct SharedIO
+{
+    std::optional<bool> WantCaptureKeyboard;
+    std::optional<bool> WantCaptureMouse;
+};
+
 class Bucket
 {
   public:
@@ -143,6 +149,10 @@ class Bucket
     bool forward_blocked_events{false};
     // Set to true when the callback was blocked by Overlunky and should also be blocked in Playlunky
     bool blocked_event{false};
+    /// Shared part of ImGuiIO to block keyboard/mouse input across API instances.
+    SharedIO* io{nullptr};
+    /// Number of API instances present
+    int count{0};
 
   private:
     Bucket() = default;
