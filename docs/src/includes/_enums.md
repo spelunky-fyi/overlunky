@@ -455,6 +455,19 @@ Name | Data | Description
 [SMALL_SAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_SAD) | GHOST_BEHAVIOR::SMALL_SAD | 
 [SMALL_HAPPY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_HAPPY) | GHOST_BEHAVIOR::SMALL_HAPPY | 
 
+## HOTKEY_TYPE
+
+
+> Search script examples for [HOTKEY_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NORMAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE.NORMAL) | HOTKEY_TYPE::NORMAL | Suppressed when the game window is inactive or inputting text in this tool instance (get_io().wantkeyboard == true). Can't detect if OL is in a text input and script is running in PL though. Use [ImGuiIO](#ImGuiIO) if you need to do that.<br/>
+[GLOBAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE.GLOBAL) | HOTKEY_TYPE::GLOBAL | Enabled even when the game window is inactive and will capture keys even from other programs.<br/>
+[INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE.INPUT) | HOTKEY_TYPE::INPUT | Enabled even when inputting text and will override normal text input keys.<br/>
+
 ## HUNDUNFLAGS
 
 
@@ -633,6 +646,19 @@ Name | Data | Description
 ---- | ---- | -----------
 [A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY.A) | 65 | 
 ...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
+
+## KEY_TYPE
+
+
+> Search script examples for [KEY_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.ANY) | KEY_TYPE::ANY | 
+[KEYBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.KEYBOARD) | KEY_TYPE::KEYBOARD | 
+[MOUSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.MOUSE) | KEY_TYPE::MOUSE | 
 
 ## LAYER
 

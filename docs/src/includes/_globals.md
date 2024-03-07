@@ -1917,6 +1917,17 @@ Set engine target frametime (1/framerate, default 1/60). Always capped by your G
 
 Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
 
+### set_hotkey
+
+
+> Search script examples for [set_hotkey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_hotkey)
+
+#### [CallbackId](#Aliases) set_hotkey([](function cb, [KEY](#KEY) key, [HOTKEY_TYPE](#HOTKEY_TYPE) flags)
+
+Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
+Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use [ImGuiIO](#ImGuiIO) if you need Playlunky hotkeys to react to [Overlunky](#Overlunky) input state. Key is a [KEY](#KEY) combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
+<br/>The callback signature is nil on_hotkey([KEY](#KEY) key)
+
 ### set_infinite_loop_detection_enabled
 
 
@@ -2164,11 +2175,6 @@ Converts (x, y, BUTTON) to [INPUTS](#INPUTS)
 #### [ImGuiIO](#ImGuiIO) get_io()
 
 Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
-
-- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
-- Note: You can use [KEY](#KEY) or standard VK keycodes to index `keys` or the other functions.
-- Note: [Overlunky](#Overlunky)/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-- Note: [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 
 ### get_raw_input
 
@@ -3493,6 +3499,14 @@ Will return the string of currently choosen language
 
 Convert the hash to stringid
 Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+
+### key_name
+
+
+> Search script examples for [key_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_name)
+
+#### nil key_name()
+
 
 ### set_level_string
 

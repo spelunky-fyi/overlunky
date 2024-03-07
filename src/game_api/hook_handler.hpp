@@ -10,7 +10,8 @@ enum class CallbackType
     Normal,
     Entity,
     Screen,
-    Theme
+    Theme,
+    HotKey
 };
 
 template <
