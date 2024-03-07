@@ -45,15 +45,15 @@ set_callback(function()
 
   -- capture keyboard input from game and ui while holding ctrl + alt
   if iio.modifierdown(KEY.OL_MOD_CTRL | KEY.OL_MOD_ALT) then
-    -- if we set this early, it will unregister the games raw input for the next bit,
+    -- if we set this early, it will unregister the games raw input for the next part,
     -- disabling game keys, and also ui keys
     iio.wantkeyboard = true
   end
 
   -- capture single hotkey combo
   if iio.keypressed(KEY.OL_MOD_CTRL | KEY.OL_MOD_ALT | KEY.A) then
-    print(iio.keystring(KEY.OL_MOD_CTRL | KEY.OL_MOD_ALT | KEY.A))
-    -- this is too late to try to get exclusive input for this key combo, it has already passed through the ui, and it's also too late to disable the rawinput
+    print(key_name(KEY.OL_MOD_CTRL | KEY.OL_MOD_ALT | KEY.A))
+    -- this is too late to try to get exclusive input for this key combo, it has already passed through the ui, and it's also too late to disable the rawinput handle the game uses
     --io.wantkeyboard = true
   end
 end, ON.GUIFRAME)
@@ -91,7 +91,7 @@ set_callback(function()
 end, ON.POST_UPDATE)
 
 -- create some global hotkeys
-function hotkey_handler(key) print(get_io().keystring(key)) end
+function hotkey_handler(key) print(key_name(key)) end
 
 -- will be suppressed by inactive window or active input fields in this tool instance
 set_hotkey(hotkey_handler, KEY.Z | KEY.OL_MOD_CTRL, HOTKEY_TYPE.NORMAL)
