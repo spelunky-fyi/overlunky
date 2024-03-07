@@ -21,6 +21,7 @@
 #include "lua_libs/lua_libs.hpp"  // for require_serpent_lua
 #include "lua_vm.hpp"             // for execute_lua, expose_unsafe_libraries
 #include "script/lua_backend.hpp" // for LuaBackend
+#include "util.hpp"               // for ON_SCOPE_EXIT
 
 class SoundManager;
 
@@ -1047,8 +1048,17 @@ ConsoleResult LuaConsole::execute(std::string str, bool raw)
     if (res.get_type() == sol::type::nil || res.get_type() == sol::type::none)
         return ConsoleResult{"", false};
 
-    sol::function dump_string = lua["dump_string"];
-    return ConsoleResult{dump_string(res, 2), false};
+    LuaBackend::push_calling_backend(this);
+    ON_SCOPE_EXIT(LuaBackend::pop_calling_backend(this));
+
+    sol::protected_function dump_string = lua["dump_string"];
+    sol::protected_function_result out = dump_string(res, 2);
+    if (!out.valid())
+    {
+        sol::error err = out;
+        return ConsoleResult{err.what(), true};
+    }
+    return ConsoleResult{out, false};
 }
 
 sol::protected_function_result LuaConsole::execute_raw(std::string str)
