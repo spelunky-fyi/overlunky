@@ -1705,7 +1705,8 @@ function get_image_size(path) end
 ---Current mouse cursor position in screen coordinates.
 ---@return number, number
 function mouse_position() end
----@return nil
+---Returns human readable string from KEY chord (e.g. "Ctrl+X", "Unknown" or "None")
+---@return string
 function key_name() end
 ---Returns: [ImGuiIO](https://spelunky-fyi.github.io/overlunky/#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
 ---@return ImGuiIO

@@ -1179,7 +1179,8 @@ void register_usertypes(sol::state& lua)
     // Set to true to force the cursor visible.
     */
 
-    // Returns human readable string from KEY chord (e.g. "Ctrl+X", "Unknown" or "None")
+    /// Returns human readable string from KEY chord (e.g. "Ctrl+X", "Unknown" or "None")
+    // lua["key_name"] = []() -> string;
     lua["key_name"] = key_name;
 
     lua.create_named_table("KEY_TYPE", "ANY", KEY_TYPE::ANY, "KEYBOARD", KEY_TYPE::KEYBOARD, "MOUSE", KEY_TYPE::MOUSE);
@@ -1197,6 +1198,7 @@ void register_usertypes(sol::state& lua)
     /// Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
     /// Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky input state. Key is a KEY combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
     /// <br/>The callback signature is nil on_hotkey(KEY key)
+    // lua["set_hotkey"] = [](sol::function cb, KEY key, HOTKEY_TYPE flags = HOTKEY_TYPE.NORMAL) -> CallbackId
     lua["set_hotkey"] = sol::overload([](sol::function cb, KEY key, HOTKEY_TYPE flags) -> CallbackId
                                       {
         if (key & OL_BUTTON_MOUSE)

@@ -1922,7 +1922,7 @@ Set engine target frametime when game is unfocused (1/framerate, default 1/33). 
 
 > Search script examples for [set_hotkey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_hotkey)
 
-#### [CallbackId](#Aliases) set_hotkey([](function cb, [KEY](#KEY) key, [HOTKEY_TYPE](#HOTKEY_TYPE) flags)
+#### [CallbackId](#Aliases) set_hotkey(function cb, [KEY](#KEY) key, [HOTKEY_TYPE](#HOTKEY_TYPE) flags = [HOTKEY_TYPE](#HOTKEY_TYPE).NORMAL)
 
 Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
 Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use [ImGuiIO](#ImGuiIO) if you need Playlunky hotkeys to react to [Overlunky](#Overlunky) input state. Key is a [KEY](#KEY) combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
@@ -3505,8 +3505,9 @@ Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main
 
 > Search script examples for [key_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_name)
 
-#### nil key_name()
+#### string key_name()
 
+Returns human readable string from [KEY](#KEY) chord (e.g. "Ctrl+X", "Unknown" or "None")
 
 ### set_level_string
 
