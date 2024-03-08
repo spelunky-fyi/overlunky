@@ -5468,7 +5468,7 @@ Look at the example on how to mimic game layer switching behavior</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_hotkey">set_hotkey</a></p>
 </blockquote>
-<h4 id='CallbackId-set_hotkey'><a href="#Aliases">CallbackId</a> set_hotkey(<a href="function%20cb,%20[KEY](#KEY)%20key,%20[HOTKEY_TYPE](#HOTKEY_TYPE)%20flags"></a></h4>
+<h4 id='CallbackId-set_hotkey-function-cb-KEY-key-HOTKEY_TYPE-flags-HOTKEY_TYPE-NORMAL'><a href="#Aliases">CallbackId</a> set_hotkey(function cb, <a href="#KEY">KEY</a> key, <a href="#HOTKEY_TYPE">HOTKEY_TYPE</a> flags = <a href="#HOTKEY_TYPE">HOTKEY_TYPE</a>.NORMAL)</h4>
 <p>Returns unique id &gt;= 0 for the callback to be used in <a href="#clear_callback">clear_callback</a> or -1 if the key could not be registered.
 Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won&#39;t let anything else use the same key combo. Can&#39;t detect if input is active in another instance, use <a href="#ImGuiIO">ImGuiIO</a> if you need Playlunky hotkeys to react to <a href="#Overlunky">Overlunky</a> input state. Key is a <a href="#KEY">KEY</a> combo (e.g. <code>KEY.OL_MOD_CTRL | KEY.X</code>), possibly returned by GuiDrawContext:key_picker. Doesn&#39;t work with mouse buttons.
 <br/>The callback signature is nil on_hotkey(<a href="#KEY">KEY</a> key)</p>
@@ -6518,7 +6518,9 @@ Check <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_dat
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=key_name">key_name</a></p>
 </blockquote>
-<h4 id='nil-key_name'>nil key_name()</h4><h3 id='set_level_string'>set_level_string</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- set the level string shown in hud, journal and game over</span>
+<h4 id='string-key_name'>string key_name()</h4>
+<p>Returns human readable string from <a href="#KEY">KEY</a> chord (e.g. &quot;Ctrl+X&quot;, &quot;Unknown&quot; or &quot;None&quot;)</p>
+<h3 id='set_level_string'>set_level_string</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- set the level string shown in hud, journal and game over</span>
 <span class="c1">-- also change the one used in transitions for consistency</span>
 <span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">state</span><span class="p">.</span><span class="n">screen_next</span> <span class="o">==</span> <span class="n">SCREEN</span><span class="p">.</span><span class="n">LEVEL</span> <span class="k">then</span>
