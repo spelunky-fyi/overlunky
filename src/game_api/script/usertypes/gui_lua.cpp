@@ -1150,20 +1150,20 @@ void register_usertypes(sol::state& lua)
     // keys
     // ZeroIndexArray<bool> of currently held keys, indexed by KEY <= 0xFF
     // keydown
-    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) is down.
+    // Returns true if key or chord (e.g `KEY.X \| KEY.OL_MOD_CTRL`) is down.
     // bool keydown(KEY keychord)
     // bool keydown(char key)
     // keypressed
-    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was pressed this GUIFRAME.
+    // Returns true if key or chord (e.g `KEY.X \| KEY.OL_MOD_CTRL`) was pressed this GUIFRAME.
     // bool keypressed(KEY keychord, bool repeat = false)
     // bool keypressed(char key, bool repeat = false)
     // keyreleased
-    // Returns true if key or chord (e.g `KEY.X | KEY.OL_MOD_CTRL`) was released this GUIFRAME.
+    // Returns true if key or chord (e.g `KEY.X \| KEY.OL_MOD_CTRL`) was released this GUIFRAME.
     // bool keyreleased(KEY keychord)
     // bool keyreleased(char key)
     // modifierdown
     // bool modifierdown(KEY keychord)
-    // Returns true if modifiers in chord (e.g. `KEY.OL_MOD_CTRL | KEY.OL_MOD_SHIFT | KEY.OL_MOD_ALT`) are down, ignores other keys in chord.
+    // Returns true if modifiers in chord (e.g. `KEY.OL_MOD_CTRL \| KEY.OL_MOD_SHIFT \| KEY.OL_MOD_ALT`) are down, ignores other keys in chord.
     // gamepads
     // Gamepad gamepads(int index)
     // This is the XInput index 1..4, might not be the same as the player slot.
