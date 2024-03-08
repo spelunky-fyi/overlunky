@@ -3678,16 +3678,16 @@ bool render_uid(int uid, const char* section, bool rembtn = false)
     ImGui::Text("%s", typec.c_str());
     ImGui::SameLine();
     ImGui::Text("%s", pname.c_str());
+    auto remove = false;
     if (rembtn)
     {
         ImGui::SameLine();
         ImGui::PushID(uid);
-        if (ImGui::Button("Remove"))
-            g_entity->remove_item(uid);
+        remove = ImGui::Button("Remove##RemoveItem");
         ImGui::PopID();
     }
     ImGui::PopID();
-    return true;
+    return remove;
 }
 
 void render_light(const char* name, LightParams* light)
@@ -4196,8 +4196,9 @@ void render_camera()
 {
     if (submenu("Focus and bounds"))
     {
-        if (render_uid(g_state->camera->focused_entity_uid, "FocusedEntity"))
+        if (g_state->camera->focused_entity_uid != 0 && g_state->camera->focused_entity_uid != UINT32_MAX)
         {
+            render_uid(g_state->camera->focused_entity_uid, "FocusedEntity");
             ImGui::SameLine(0, 4.0f);
             if (ImGui::Button("Unfocus"))
                 g_state->camera->focused_entity_uid = -1;
@@ -7072,12 +7073,12 @@ void render_savegame()
     ImGui::PopID();
 }
 
-void render_powerup(PowerupCapable* ent, int uid, const char* section)
+bool render_powerup(int uid, const char* section)
 {
     std::string uidc = std::to_string(uid);
     int ptype = UI::get_entity_type(uid);
     if (ptype == 0)
-        return;
+        return false;
     std::string typec = std::to_string(ptype);
     const char* pname = entity_names[ptype].c_str();
     ImGui::PushID(section);
@@ -7092,12 +7093,10 @@ void render_powerup(PowerupCapable* ent, int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("Remove##RemovePowerup"))
-    {
-        ent->as<Player>()->remove_powerup(ptype);
-    }
+    auto remove = ImGui::Button("Remove##RemovePowerup");
     ImGui::PopID();
     ImGui::PopID();
+    return remove;
 }
 
 void render_state(const char* label, uint8_t state)
@@ -7733,16 +7732,24 @@ void render_entity_props(int uid, bool detached = false)
         if (entity->type->search_flags & 0x7)
         {
             auto entity_pow = entity->as<PowerupCapable>();
+            int removed_uid = 0;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0) && !entity_pow->has_powerup(ent->type->id))
-                    render_uid(ent->uid, "EntityItems", true);
+                    if (render_uid(ent->uid, "EntityItems", true))
+                        removed_uid = ent->uid;
             }
+            if (removed_uid)
+                entity_pow->remove_item(removed_uid);
             ImGui::SeparatorText("Powerups");
+            int removed_powerup = 0;
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
             {
-                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
+                if (render_powerup(powerup_entity->uid, "Powerups"))
+                    removed_powerup = powerup_entity->type->id;
             }
+            if (removed_powerup)
+                entity_pow->remove_powerup(removed_powerup);
             ImGui::PushItemWidth(160);
             static const char* chosenPowerup = "";
             static uint8_t chosenPowerupIndex = 0;
@@ -7806,11 +7813,15 @@ void render_entity_props(int uid, bool detached = false)
         }
         else
         {
+            int removed_uid = 0;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0))
-                    render_uid(ent->uid, "EntityItems", true);
+                    if (render_uid(ent->uid, "EntityItems", true))
+                        removed_uid = ent->uid;
             }
+            if (removed_uid)
+                entity->remove_item(removed_uid);
         }
         endmenu();
     }
