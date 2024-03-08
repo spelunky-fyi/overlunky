@@ -634,6 +634,10 @@ uint32_t State::get_frame_count() const
 {
     return memory_read<uint32_t>((size_t)ptr() - 0xd0);
 }
+uint32_t State::get_frame_count(StateMemory* state)
+{
+    return memory_read<uint32_t>((size_t)state - 0xd0);
+}
 int64_t get_global_frame_count()
 {
     return global_frame_count;

@@ -289,6 +289,7 @@ struct RenderInfo;
 struct LocalStateData
 {
     sol::object user_data;
+    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
 };
 
 class LuaBackend
@@ -307,7 +308,6 @@ class LuaBackend
     std::unordered_set<std::string> loaded_modules;
 
     std::string result;
-    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
     CurrentCallback current_cb = {0, 0, CallbackType::None};
