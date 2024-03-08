@@ -10765,17 +10765,17 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keydown">keydown</a></td>
-<td>Returns true if key or chord (e.g `KEY.X \</td>
+<td>Returns true if key or chord is down.<br/>bool keydown(<a href="#KEY">KEY</a> keychord)<br/>bool keydown(char key)<br/></td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keypressed">keypressed</a></td>
-<td>Returns true if key or chord (e.g `KEY.X \</td>
+<td>Returns true if key or chord was pressed this GUIFRAME.<br/>bool keypressed(<a href="#KEY">KEY</a> keychord, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/></td>
 </tr>
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keyreleased">keyreleased</a></td>
-<td>Returns true if key or chord (e.g `KEY.X \</td>
+<td>Returns true if key or chord was released this GUIFRAME.<br/>bool keyreleased(<a href="#KEY">KEY</a> keychord)<br/>bool keyreleased(char key)<br/></td>
 </tr>
 <tr>
 <td>bool</td>
@@ -10800,7 +10800,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modifierdown">modifierdown</a></td>
-<td>bool modifierdown(<a href="#KEY">KEY</a> keychord)<br/>Returns true if modifiers in chord (e.g. `KEY.OL_MOD_CTRL \</td>
+<td>bool modifierdown(<a href="#KEY">KEY</a> keychord)<br/>Returns true if modifiers in chord are down, ignores other keys in chord.<br/></td>
 </tr>
 <tr>
 <td></td>
