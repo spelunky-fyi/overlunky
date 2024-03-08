@@ -389,6 +389,7 @@ struct State
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
 
     size_t location;
+
   private:
     State(size_t addr)
         : location(addr){};

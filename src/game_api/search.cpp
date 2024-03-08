@@ -1833,7 +1833,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("4c 8d 05 f4 ca 27 00"_gh)
             .find_next_inst("eb 27"_gh)
             .offset(-0xC)
-            .at_exe()
+            .at_exe(),
     },
     {
         // ^ writes to state.pause on state.loading == 3
