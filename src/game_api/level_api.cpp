@@ -743,6 +743,7 @@ struct ChanceLogicProviderImpl
 std::mutex g_chance_logic_providers_lock;
 std::uint32_t g_current_chance_logic_provider_id{0};
 std::vector<ChanceLogicProviderImpl> g_chance_logic_providers;
+std::vector<ChanceLogicProviderImpl*> g_enabled_chance_logic_providers;
 
 struct ExtraSpawnLogicProviderImpl
 {
@@ -1292,13 +1293,13 @@ bool handle_chance(SpawnInfo* spawn_info)
     }
     {
         std::lock_guard lock{g_chance_logic_providers_lock};
-        for (const ChanceLogicProviderImpl& chance_provider : g_chance_logic_providers)
+        for (const ChanceLogicProviderImpl* chance_provider : g_enabled_chance_logic_providers)
         {
-            if (chance_provider.provider.is_valid(spawn_info->x, spawn_info->y, layer))
+            if (chance_provider->provider.is_valid(spawn_info->x, spawn_info->y, layer))
             {
-                if (g_test_chance(&level_gen_data, chance_provider.chance_id))
+                if (g_test_chance(&level_gen_data, chance_provider->chance_id))
                 {
-                    chance_provider.provider.do_spawn(spawn_info->x, spawn_info->y, layer);
+                    chance_provider->provider.do_spawn(spawn_info->x, spawn_info->y, layer);
                     return true;
                 }
             }
@@ -1844,6 +1845,19 @@ void LevelGenSystem::populate_level_hook(ThemeInfo* self, uint64_t param_2, uint
         {
             provider.transient_num_remaining_spawns_frontlayer = provider.num_extra_spawns_frontlayer;
             provider.transient_num_remaining_spawns_backlayer = provider.num_extra_spawns_backlayer;
+        }
+    }
+    {
+        std::lock_guard lock{g_chance_logic_providers_lock};
+        g_enabled_chance_logic_providers.clear();
+        LevelGenSystem* level_gen = State::get().ptr()->level_gen;
+
+        for (ChanceLogicProviderImpl& provider : g_chance_logic_providers)
+        {
+            if (level_gen->get_procedural_spawn_chance(provider.chance_id) != 0)
+            {
+                g_enabled_chance_logic_providers.push_back(&provider);
+            }
         }
     }
 
