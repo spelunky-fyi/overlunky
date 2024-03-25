@@ -539,22 +539,22 @@ void register_usertypes(sol::state& lua)
 
     lua["toast_visible"] = []() -> bool
     {
-        return State::get().ptr()->toast != 0;
+        return State::ptr()->toast != 0;
     };
 
     lua["speechbubble_visible"] = []() -> bool
     {
-        return State::get().ptr()->speechbubble != 0;
+        return State::ptr()->speechbubble != 0;
     };
 
     lua["cancel_toast"] = []()
     {
-        State::get().ptr()->toast_timer = 1000;
+        State::ptr()->toast_timer = 1000;
     };
 
     lua["cancel_speechbubble"] = []()
     {
-        State::get().ptr()->speechbubble_timer = 1000;
+        State::ptr()->speechbubble_timer = 1000;
     };
 
     /// Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see SaveState if you need more.
@@ -577,14 +577,14 @@ void register_usertypes(sol::state& lua)
     lua["clear_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4 && get_save_state(slot))
-            get_save_state(slot)->screen = 0;
+            get_save_state(slot)->state.screen = 0;
     };
 
     /// Get StateMemory from a save_state slot.
     lua["get_save_state"] = [](int slot) -> StateMemory*
     {
         if (slot >= 1 && slot <= 5)
-            return get_save_state(slot);
+            return &get_save_state(slot)->state;
         return nullptr;
     };
 

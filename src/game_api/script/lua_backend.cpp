@@ -44,11 +44,16 @@ int g_hotkey_count = 0;
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
 {
-    g_state = State::get().ptr_main();
+    State* base_state = State::get();
+    if (base_state == nullptr)
+    {
+        base_state = State::get_main();
+    }
+    g_state = &base_state->state;
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
-    state.time_global = get_frame_count_main();
+    state.time_global = base_state->frame_count;
     state.frame = state.frame;
     state.loading = g_state->loading;
     state.reset = (g_state->quest_flags & 1);
@@ -851,7 +856,7 @@ bool LuaBackend::pre_load_screen()
 
     auto now = get_frame_count();
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = State::ptr();
     if ((ON)state_ptr->screen_next <= ON::LEVEL && (ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
     {
         using namespace std::string_view_literals;
@@ -876,7 +881,7 @@ bool LuaBackend::pre_load_screen()
 
     if ((ON)state_ptr->screen == ON::LEVEL && (ON)state_ptr->screen_next != ON::DEATH && (state_ptr->quest_flags & 1) == 0)
     {
-        for (auto layer : State::get().ptr()->layers)
+        for (auto layer : State::ptr()->layers)
         {
             auto it = layer->entities_by_mask.find(1);
             if (it == layer->entities_by_mask.end())
@@ -1020,7 +1025,7 @@ void LuaBackend::post_room_generation()
 
 void LuaBackend::load_user_data()
 {
-    for (auto layer : State::get().ptr()->layers)
+    for (auto layer : State::ptr()->layers)
     {
         auto it = layer->entities_by_mask.find(1);
         if (it == layer->entities_by_mask.end())
@@ -1073,7 +1078,7 @@ void LuaBackend::post_level_generation()
 
     auto now = get_frame_count();
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = State::ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)
     {
         load_user_data();
@@ -1120,7 +1125,7 @@ void LuaBackend::post_load_screen()
     if (!get_enabled())
         return;
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = State::ptr();
     if ((ON)state_ptr->screen == ON::TRANSITION)
     {
         load_user_data();
@@ -1866,7 +1871,7 @@ void LuaBackend::on_post(ON event)
     }
 }
 
-bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
+bool LuaBackend::pre_save_state(int slot, State* saved)
 {
     if (!get_enabled())
         return false;
@@ -1881,7 +1886,7 @@ bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
         if (callback.screen == ON::PRE_SAVE_STATE)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            auto return_value = handle_function<bool>(this, callback.func, slot, saved).value_or(false);
+            auto return_value = handle_function<bool>(this, callback.func, slot, &saved->state).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
             if (return_value)
@@ -1892,7 +1897,7 @@ bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
     return false;
 }
 
-bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
+bool LuaBackend::pre_load_state(int slot, State* loaded)
 {
     if (!get_enabled())
         return false;
@@ -1907,7 +1912,7 @@ bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
         if (callback.screen == ON::PRE_LOAD_STATE)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            auto return_value = handle_function<bool>(this, callback.func, slot, loaded).value_or(false);
+            auto return_value = handle_function<bool>(this, callback.func, slot, &loaded->state).value_or(false);
             clear_current_callback();
             callback.lastRan = now;
             if (return_value)
@@ -1918,7 +1923,7 @@ bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
     return false;
 }
 
-void LuaBackend::post_save_state(int slot, StateMemory* saved)
+void LuaBackend::post_save_state(int slot, State* saved)
 {
     if (!get_enabled())
         return;
@@ -1933,14 +1938,14 @@ void LuaBackend::post_save_state(int slot, StateMemory* saved)
         if (callback.screen == ON::POST_SAVE_STATE)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, slot, saved);
+            handle_function<void>(this, callback.func, slot, &saved->state);
             clear_current_callback();
             callback.lastRan = now;
         }
     }
 }
 
-void LuaBackend::post_load_state(int slot, StateMemory* loaded)
+void LuaBackend::post_load_state(int slot, State* loaded)
 {
     if (!get_enabled())
         return;
@@ -1955,7 +1960,7 @@ void LuaBackend::post_load_state(int slot, StateMemory* loaded)
         if (callback.screen == ON::POST_LOAD_STATE)
         {
             set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, slot, loaded);
+            handle_function<void>(this, callback.func, slot, &loaded->state);
             clear_current_callback();
             callback.lastRan = now;
         }

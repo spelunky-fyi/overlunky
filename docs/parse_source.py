@@ -77,6 +77,7 @@ header_files = [
     "../src/game_api/movable_behavior.hpp",
     "../src/game_api/game_manager.hpp",
     "../src/game_api/state.hpp",
+    "../src/game_api/mod_api.hpp",
     "../src/game_api/state_structs.hpp",
     "../src/game_api/illumination.hpp",
     "../src/game_api/prng.hpp",

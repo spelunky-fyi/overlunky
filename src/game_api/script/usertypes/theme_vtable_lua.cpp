@@ -18,7 +18,7 @@ void register_usertypes(sol::state& lua)
     HookHandler<ThemeInfo, CallbackType::Theme>::set_hook_dtor_impl(
         [](std::uint32_t theme_id, std::function<void(std::uint32_t)> fun)
         {
-            auto state = State::get().ptr_main();
+            auto state = State::ptr_main();
             ThemeInfo* theme = state->level_gen->themes[theme_id - 1];
             std::uint32_t callback_id = theme_vtable.reserve_callback_id(theme);
             theme_vtable.set_pre<void(ThemeInfo*), 0x0>(
@@ -31,7 +31,7 @@ void register_usertypes(sol::state& lua)
     HookHandler<ThemeInfo, CallbackType::Theme>::set_unhook_impl(
         [](std::uint32_t callback_id, std::uint32_t theme_id)
         {
-            auto state = State::get().ptr_main();
+            auto state = State::ptr_main();
             ThemeInfo* theme = state->level_gen->themes[theme_id - 1];
             theme_vtable.unhook(theme, callback_id);
         });

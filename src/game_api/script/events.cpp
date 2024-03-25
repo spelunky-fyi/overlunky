@@ -32,7 +32,7 @@ void pre_load_level_files()
 bool pre_load_screen()
 {
     static int64_t prev_seed = 0;
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     if (state->screen_next == 12 && (state->quest_flags & 1) != 0)
     {
         if ((state->quest_flags & (1U << 6)) > 0)
@@ -121,7 +121,7 @@ bool pre_init_layer(LAYER layer)
     return block;
 }
 
-bool pre_save_state(int slot, StateMemory* saved)
+bool pre_save_state(int slot, State* saved)
 {
     bool block{false};
     LuaBackend::for_each_backend(
@@ -133,7 +133,7 @@ bool pre_save_state(int slot, StateMemory* saved)
     return block;
 }
 
-bool pre_load_state(int slot, StateMemory* loaded)
+bool pre_load_state(int slot, State* loaded)
 {
     bool block{false};
     LuaBackend::for_each_backend(
@@ -190,7 +190,7 @@ void post_unload_layer(LAYER layer)
             return true;
         });
 }
-void post_save_state(int slot, StateMemory* saved)
+void post_save_state(int slot, State* saved)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
@@ -199,7 +199,7 @@ void post_save_state(int slot, StateMemory* saved)
             return true;
         });
 }
-void post_load_state(int slot, StateMemory* loaded)
+void post_load_state(int slot, State* loaded)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)

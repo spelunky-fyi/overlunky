@@ -5,6 +5,7 @@
 #include "game_manager.hpp"
 #include "items.hpp"
 #include "memory.hpp"
+#include "mod_api.hpp"
 #include "screen.hpp"
 #include "state.hpp"
 
@@ -23,13 +24,13 @@ Bucket* Bucket::get()
 
 PAUSE_TYPE PauseAPI::get_pause()
 {
-    pause = (PAUSE_TYPE)(State::get().ptr()->pause | ((uint32_t)pause & ~0x3f));
+    pause = (PAUSE_TYPE)(State::ptr()->pause | ((uint32_t)pause & ~0x3f));
     return pause;
 }
 
 void PauseAPI::set_pause(PAUSE_TYPE flags)
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     pause = flags;
     state->pause = (uint8_t)(((uint32_t)flags) & 0x3f);
 }
@@ -70,7 +71,7 @@ void PauseAPI::apply()
 bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
 {
     bool match = false;
-    auto state = State::get().ptr();
+    auto state = State::ptr();
 
     if (state->loading == 2 && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen == PAUSE_SCREEN::NONE || (screen & (PAUSE_SCREEN)(1 << state->screen_next)) != PAUSE_SCREEN::NONE))
         match = true;
@@ -95,7 +96,7 @@ bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
 
 bool PauseAPI::loading()
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     auto gm = get_game_manager();
     bool loading = state->loading > 0 || state->fade_timer > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed)) || state->logic->ouroboros;
     if ((state->loading == 3 && (state->fade_timer <= 1 || state->fade_length == 0)) || (state->loading == 1 && state->fade_timer == state->fade_length))
@@ -107,7 +108,7 @@ bool PauseAPI::event(PAUSE_TYPE pause_event)
 {
     bool block = false;
     std::optional<bool> force;
-    auto state = State::get().ptr();
+    auto state = State::ptr();
 
     if (skip_fade)
     {
@@ -180,7 +181,7 @@ void PauseAPI::pre_loop()
 
 void PauseAPI::post_loop()
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     if (skip)
         state->pause |= (uint8_t)pause_type & 0x3f;
     skip = false;
@@ -194,7 +195,7 @@ bool PauseAPI::pre_input()
         return false;
 
     auto gm = get_game_manager();
-    auto state = State::get().ptr();
+    auto state = State::ptr();
 
     if (bucket->pause_api->modifiers_block & bucket->pause_api->modifiers_down)
     {

@@ -1282,7 +1282,7 @@ void run()
         // file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }
 
-    auto state = State::get().ptr_main();
+    auto state = State::ptr_main();
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {

@@ -13,6 +13,7 @@
 #include "bucket.hpp"
 #include "logger.h"
 #include "memory.hpp"
+#include "mod_api.hpp"
 #include "script/lua_backend.hpp"
 #include "state.hpp"
 

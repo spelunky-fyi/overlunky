@@ -21,12 +21,12 @@
 #include "level_api.hpp"                         // for LevelGenSystem, LevelGenSystem::(ano...
 #include "logger.h"                              // for DEBUG
 #include "memory.hpp"                            // for write_mem_prot, memory_read
+#include "mod_api.hpp"                           // for savedata
 #include "movable.hpp"                           // for Movable
 #include "movable_behavior.hpp"                  // for init_behavior_hooks
 #include "render_api.hpp"                        // for init_render_api_hooks
 #include "savedata.hpp"                          // for SaveData
 #include "screen.hpp"                            // for Screen
-#include "script/events.hpp"                     // for pre_entity_instagib
 #include "script/lua_vm.hpp"                     // for get_lua_vm
 #include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
 #include "search.hpp"                            // for get_address
@@ -38,15 +38,6 @@
 #include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
 #include "vtable_hook.hpp"                       // for hook_vtable
 
-static int64_t global_frame_count{0};
-static int64_t global_update_count{0};
-static bool g_forward_blocked_events{false};
-
-bool get_forward_events()
-{
-    return g_forward_blocked_events;
-}
-
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
     return (correct_ushabti + (correct_ushabti / 10) * 2);
@@ -57,11 +48,11 @@ void StateMemory::set_correct_ushabti(uint16_t animation_frame)
 }
 StateMemory* get_state_ptr()
 {
-    return State::get().ptr();
+    return State::ptr();
 }
 void fix_liquid_out_of_bounds()
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     if (!state || !state->liquid_physics)
         return;
 
@@ -88,266 +79,30 @@ void fix_liquid_out_of_bounds()
     }
 }
 
-inline bool& get_is_init()
+StateMemory* State::ptr_main()
 {
-    static bool is_init{false};
-    return is_init;
+    return &reinterpret_cast<State*>(heap_base())->state;
 }
 
-inline bool& get_do_hooks()
-{
-    static bool do_hooks{true};
-    return do_hooks;
-}
-void State::set_do_hooks(bool do_hooks)
-{
-    if (get_is_init())
-    {
-        DEBUG("Too late to disable hooks...");
-    }
-    else
-    {
-        get_do_hooks() = do_hooks;
-    }
-}
-
-void do_write_load_opt()
-{
-    write_mem_prot(get_address("write_load_opt"), "\x90\x90"sv, true);
-}
-bool& get_write_load_opt()
-{
-    static bool allowed{true};
-    return allowed;
-}
-void State::set_write_load_opt(bool write_load_opt)
-{
-    if (get_is_init())
-    {
-        if (write_load_opt && !get_write_load_opt())
-        {
-            do_write_load_opt();
-        }
-        else if (!write_load_opt && get_write_load_opt())
-        {
-            DEBUG("Can not unwrite the load optimization...");
-        }
-    }
-    else
-    {
-        get_write_load_opt() = write_load_opt;
-    }
-}
-
-static bool g_godmode_player_active = false;
-static bool g_godmode_companions_active = false;
-
-bool is_active_player(Entity* e)
-{
-    auto state = State::get().ptr();
-    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
-    {
-        auto player = state->items->player(i);
-        if (player && player == e)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-using OnDamageFun = bool(Entity*, Entity*, int8_t, uint32_t, float*, uint8_t, uint16_t, uint8_t, bool);
-OnDamageFun* g_on_damage_trampoline{nullptr};
-bool on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint32_t unknown1, float* velocities, uint8_t unknown2, uint16_t stun_amount, uint8_t iframes, bool unknown3)
-{
-    if (g_godmode_player_active && is_active_player(victim))
-    {
-        return false;
-    }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
-    {
-        return false;
-    }
-
-    return g_on_damage_trampoline(victim, damage_dealer, damage_amount, unknown1, velocities, unknown2, stun_amount, iframes, unknown3);
-}
-
-using OnInstaGibFun = void(Entity*, bool, size_t);
-OnInstaGibFun* g_on_instagib_trampoline{nullptr};
-void on_instagib(Entity* victim, bool destroy_corpse, size_t param_3)
-{
-    if (g_godmode_player_active && is_active_player(victim))
-    {
-        return;
-    }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
-    {
-        return;
-    }
-
-    const bool skip_orig = pre_entity_instagib(victim) && !(victim->as<Movable>()->health == 0);
-
-    if (!skip_orig)
-    {
-        g_on_instagib_trampoline(victim, destroy_corpse, param_3);
-    }
-}
-
-void hook_godmode_functions()
-{
-    static bool functions_hooked = false;
-    if (!functions_hooked)
-    {
-        auto memory = Memory::get();
-        auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
-        auto addr_insta = get_address("insta_gib");
-
-        g_on_damage_trampoline = (OnDamageFun*)addr_damage;
-        g_on_instagib_trampoline = (OnInstaGibFun*)addr_insta;
-
-        DetourTransactionBegin();
-        DetourUpdateThread(GetCurrentThread());
-
-        DetourAttach((void**)&g_on_damage_trampoline, &on_damage);
-        DetourAttach((void**)&g_on_instagib_trampoline, &on_instagib);
-
-        const LONG error = DetourTransactionCommit();
-        if (error != NO_ERROR)
-        {
-            DEBUG("Failed hooking on_damage/instagib: {}\n", error);
-        }
-
-        functions_hooked = true;
-    }
-}
-
-void State::godmode(bool g)
-{
-    g_godmode_player_active = g;
-}
-
-void State::godmode_companions(bool g)
-{
-    g_godmode_companions_active = g;
-}
-
-struct ThemeHookImpl
-{
-    template <class FunT, class HookFunT>
-    struct lua_wrapper;
-    template <class... ArgsT, class HookFunT>
-    struct lua_wrapper<void(ArgsT...), HookFunT>
-    {
-        static auto make(HookFunT* fun)
-        {
-            return [=](ArgsT... args)
-            {
-                thread_local bool tester;
-                tester = true;
-                fun(args..., [](ArgsT...)
-                    { tester = false; });
-                return tester;
-            };
-        }
-    };
-
-    template <class FunT, size_t Index, class HookFunT>
-    void hook(ThemeInfo* theme, HookFunT* fun)
-    {
-        if (get_do_hooks())
-        {
-            auto& vtable = NThemeVTables::get_theme_info_vtable(get_lua_vm());
-            vtable.set_pre<FunT, Index>(theme, vtable.reserve_callback_id(theme), lua_wrapper<FunT, HookFunT>::make(fun));
-        }
-        else
-        {
-            hook_vtable<FunT, Index>(theme, fun);
-        }
-    }
-};
-
-void State::init(class SoundManager* sound_manager)
-{
-    State::get();
-    if (sound_manager)
-        get_lua_vm(sound_manager);
-}
-void State::post_init()
-{
-    if (get_is_init())
-    {
-        StateMemory& state{*State::get().ptr_main()};
-        state.level_gen->hook_themes(ThemeHookImpl{});
-    }
-}
-
-State& State::get()
-{
-    static State STATE{0x4A0};
-    if (!get_is_init())
-    {
-        if (get_write_load_opt())
-        {
-            do_write_load_opt();
-        }
-        if (auto addr_location = get_address("state_location"); addr_location != 0)
-            STATE.location = addr_location;
-
-        get_is_init() = true;
-
-        if (get_do_hooks())
-        {
-            STATE.ptr_main()->level_gen->init();
-            init_spawn_hooks();
-            init_behavior_hooks();
-            init_render_api_hooks();
-            init_achievement_hooks();
-            hook_godmode_functions();
-            strings_init();
-            init_state_update_hook();
-            init_process_input_hook();
-            init_game_loop_hook();
-
-            auto bucket = Bucket::get();
-            bucket->count++;
-            if (!bucket->patches_applied)
-            {
-                DEBUG("Applying patches");
-                patch_tiamat_kill_crash();
-                patch_orbs_limit();
-                patch_olmec_kill_crash();
-                patch_liquid_OOB();
-                patch_ushabti_error();
-                patch_entering_closed_door_crash();
-                bucket->patches_applied = true;
-                bucket->forward_blocked_events = true;
-            }
-            else
-            {
-                DEBUG("Not applying patches, someone has already done it");
-                if (bucket->forward_blocked_events)
-                    g_forward_blocked_events = true;
-            }
-        }
-    }
-    return STATE;
-}
-
-StateMemory* State::ptr_main() const
-{
-    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
-    return p.decode();
-}
-
-StateMemory* State::ptr() const
+StateMemory* State::ptr()
 {
     return ptr_local();
 }
 
-StateMemory* State::ptr_local() const
+StateMemory* State::ptr_local()
 {
-    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
-    return p.decode_local();
+    State* state = reinterpret_cast<State*>(local_heap_base());
+    return state != nullptr ? &state->state : nullptr;
+}
+
+State* State::get_main()
+{
+    return reinterpret_cast<State*>(heap_base());
+}
+
+State* State::get()
+{
+    return reinterpret_cast<State*>(local_heap_base());
 }
 
 float get_zoom_level()
@@ -356,7 +111,7 @@ float get_zoom_level()
     return game_api->get_current_zoom();
 }
 
-std::pair<float, float> State::click_position(float x, float y)
+std::pair<float, float> StateMemory::click_position(float x, float y)
 {
     float cz = get_zoom_level();
     auto [cx, cy] = get_camera_position();
@@ -365,7 +120,7 @@ std::pair<float, float> State::click_position(float x, float y)
     return {rx, ry};
 }
 
-std::pair<float, float> State::screen_position(float x, float y)
+std::pair<float, float> StateMemory::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
     auto [cx, cy] = get_camera_position();
@@ -376,9 +131,9 @@ std::pair<float, float> State::screen_position(float x, float y)
 
 void State::zoom(float level)
 {
-    auto roomx = ptr()->w;
     if (level == 0.0)
     {
+        auto roomx = ptr()->w;
         switch (roomx)
         {
         case 1:
@@ -437,28 +192,13 @@ void StateMemory::force_current_theme(THEME t)
 {
     if (t > 0 && t < 19)
     {
-        auto state = State::get().ptr();
-        if (t == 10 && !state->level_gen->theme_cosmicocean->sub_theme)
-            state->level_gen->theme_cosmicocean->sub_theme = state->level_gen->theme_dwelling; // just set it to something, can't edit this atm
-        state->current_theme = state->level_gen->themes[t - 1];
+        if (t == 10 && !this->level_gen->theme_cosmicocean->sub_theme)
+            this->level_gen->theme_cosmicocean->sub_theme = this->level_gen->theme_dwelling; // just set it to something, can't edit this atm
+        this->current_theme = this->level_gen->themes[t - 1];
     }
 }
 
-void State::darkmode(bool g)
-{
-    static const size_t addr_dark = get_address("force_dark_level");
-
-    if (g)
-    {
-        write_mem_recoverable("darkmode", addr_dark, "\x90\x90"sv, true);
-    }
-    else
-    {
-        recover_mem("darkmode");
-    }
-}
-
-std::pair<float, float> State::get_camera_position()
+std::pair<float, float> StateMemory::get_camera_position()
 {
     static const auto addr = (float*)get_address("camera_position");
     auto cx = *addr;
@@ -466,51 +206,51 @@ std::pair<float, float> State::get_camera_position()
     return {cx, cy};
 }
 
-void State::set_camera_position(float cx, float cy)
+void StateMemory::set_camera_position(float cx, float cy)
 {
     static const auto addr = (float*)get_address("camera_position");
-    auto camera = ptr()->camera;
-    camera->focus_x = cx;
-    camera->focus_y = cy;
-    camera->adjusted_focus_x = cx;
-    camera->adjusted_focus_y = cy;
-    camera->calculated_focus_x = cx;
-    camera->calculated_focus_y = cy;
+    auto cam = this->camera;
+    cam->focus_x = cx;
+    cam->focus_y = cy;
+    cam->adjusted_focus_x = cx;
+    cam->adjusted_focus_y = cy;
+    cam->calculated_focus_x = cx;
+    cam->calculated_focus_y = cy;
     *addr = cx;
     *(addr + 1) = cy;
 }
 
-void State::warp(uint8_t w, uint8_t l, uint8_t t)
+void StateMemory::warp(uint8_t target_world, uint8_t target_level, uint8_t target_theme)
 {
     // if (ptr()->screen < 11 || ptr()->screen > 20)
     //     return;
-    if (ptr()->items->player_count < 1)
+    if (this->items->player_count < 1)
     {
-        ptr()->items->player_select_slots[0].activated = true;
-        ptr()->items->player_select_slots[0].character = savedata()->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 285; // TODO: magic numbers
-        ptr()->items->player_count = 1;
+        this->items->player_select_slots[0].activated = true;
+        this->items->player_select_slots[0].character = ModAPI::savedata()->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        this->items->player_select_slots[0].texture_id = ModAPI::savedata()->players[0] + 285; // TODO: magic numbers
+        this->items->player_count = 1;
     }
-    ptr()->world_next = w;
-    ptr()->level_next = l;
-    ptr()->theme_next = t;
-    if (ptr()->world_start < 1 || ptr()->level_start < 1 || ptr()->theme_start < 1 || ptr()->theme == 17)
+    this->world_next = target_world;
+    this->level_next = target_level;
+    this->theme_next = target_theme;
+    if (this->world_start < 1 || this->level_start < 1 || this->theme_start < 1 || this->theme == 17)
     {
-        ptr()->world_start = w;
-        ptr()->level_start = l;
-        ptr()->theme_start = t;
-        ptr()->quest_flags = 1;
+        this->world_start = target_world;
+        this->level_start = target_level;
+        this->theme_start = target_theme;
+        this->quest_flags = 1;
     }
-    if (t != 17)
+    if (target_theme != 17)
     {
-        ptr()->screen_next = 12;
+        this->screen_next = 12;
     }
     else
     {
-        ptr()->screen_next = 11;
+        this->screen_next = 11;
     }
-    ptr()->win_state = 0;
-    ptr()->loading = 1;
+    this->win_state = 0;
+    this->loading = 1;
 
     static auto gm = get_game_manager();
     if (gm->main_menu_music)
@@ -520,27 +260,22 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     }
 }
 
-void State::set_seed(uint32_t seed)
+void StateMemory::set_seed(uint32_t new_seed)
 {
-    if (ptr()->screen < 11 || ptr()->screen > 20)
+    if (this->screen < 11 || this->screen > 20)
         return;
-    ptr()->seed = seed;
-    ptr()->world_start = 1;
-    ptr()->level_start = 1;
-    ptr()->theme_start = 1;
-    ptr()->world_next = 1;
-    ptr()->level_next = 1;
-    ptr()->theme_next = 1;
-    ptr()->quest_flags = 0x1e | 0x41;
-    ptr()->screen_next = 12;
-    ptr()->loading = 1;
+    this->seed = new_seed;
+    this->world_start = 1;
+    this->level_start = 1;
+    this->theme_start = 1;
+    this->world_next = 1;
+    this->level_next = 1;
+    this->theme_next = 1;
+    this->quest_flags = 0x1e | 0x41;
+    this->screen_next = 12;
+    this->loading = 1;
 }
 
-SaveData* State::savedata()
-{
-    auto gm = get_game_manager();
-    return gm->save_related->savedata.decode();
-}
 uint32_t lowbias32(uint32_t x)
 {
     x ^= x >> 16;
@@ -559,7 +294,7 @@ uint32_t lowbias32_r(uint32_t x)
     x ^= x >> 16;
     return x;
 }
-Entity* State::find(StateMemory* state, uint32_t uid)
+Entity* StateMemory::find(uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
 
@@ -569,12 +304,12 @@ Entity* State::find(StateMemory* state, uint32_t uid)
         return nullptr;
     }
 
-    const uint32_t mask = state->uid_to_entity_mask;
+    const uint32_t mask = this->uid_to_entity_mask;
     const uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
     while (true)
     {
-        auto entry = state->uid_to_entity_data[cur_index];
+        auto entry = this->uid_to_entity_data[cur_index];
         if (entry.uid_plus_one == target_uid_plus_one)
         {
             return entry.entity;
@@ -594,9 +329,8 @@ Entity* State::find(StateMemory* state, uint32_t uid)
     }
 }
 
-LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
+LiquidPhysicsEngine* StateMemory::get_correct_liquid_engine(ENT_TYPE liquid_type)
 {
-    const auto state = ptr();
     static const ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
     static const ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);
     static const ENT_TYPE LIQUID_LAVA = to_id("ENT_TYPE_LIQUID_LAVA"sv);
@@ -604,211 +338,36 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
     static const ENT_TYPE LIQUID_COARSE_LAVA = to_id("ENT_TYPE_LIQUID_COARSE_LAVA"sv);
     if (liquid_type == LIQUID_WATER)
     {
-        return state->liquid_physics->water_physics_engine;
+        return this->liquid_physics->water_physics_engine;
     }
     else if (liquid_type == LIQUID_COARSE_WATER)
     {
-        return state->liquid_physics->coarse_water_physics_engine;
+        return this->liquid_physics->coarse_water_physics_engine;
     }
     else if (liquid_type == LIQUID_LAVA)
     {
-        return state->liquid_physics->lava_physics_engine;
+        return this->liquid_physics->lava_physics_engine;
     }
     else if (liquid_type == LIQUID_STAGNANT_LAVA)
     {
-        return state->liquid_physics->stagnant_lava_physics_engine;
+        return this->liquid_physics->stagnant_lava_physics_engine;
     }
     else if (liquid_type == LIQUID_COARSE_LAVA)
     {
-        return state->liquid_physics->coarse_lava_physics_engine;
+        return this->liquid_physics->coarse_lava_physics_engine;
     }
     return nullptr;
 }
 
-uint32_t State::get_frame_count_main() const
+std::vector<int64_t> State::read_prng()
 {
-    return memory_read<uint32_t>((size_t)ptr_main() - 0xd0);
-}
-uint32_t State::get_frame_count() const
-{
-    return memory_read<uint32_t>((size_t)ptr() - 0xd0);
-}
-int64_t get_global_frame_count()
-{
-    return global_frame_count;
-};
-int64_t get_global_update_count()
-{
-    return global_update_count;
-};
-
-std::vector<int64_t> State::read_prng() const
-{
-    std::vector<int64_t> prng;
+    std::vector<int64_t> prng_vec;
+    size_t prng_addr = reinterpret_cast<size_t>(&this->prng);
     for (int i = 0; i < 20; ++i)
     {
-        prng.push_back(memory_read<int64_t>((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
+        prng_vec.push_back(memory_read<int64_t>(prng_addr + 8 * static_cast<size_t>(i)));
     }
-    return prng;
-}
-
-using OnStateUpdate = void(StateMemory*);
-OnStateUpdate* g_state_update_trampoline{nullptr};
-void StateUpdate(StateMemory* s)
-{
-    global_update_count++;
-    static const auto bucket = Bucket::get();
-    if (bucket->blocked_event)
-    {
-        pre_event(ON::PRE_UPDATE);
-        post_event(ON::BLOCKED_UPDATE);
-        return;
-    }
-    static const auto pa = bucket->pause_api;
-    auto block = pre_event(ON::PRE_UPDATE);
-    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_UPDATE))
-        block = true;
-    if (!block)
-    {
-        g_state_update_trampoline(s);
-        post_event(ON::POST_UPDATE);
-    }
-    else
-    {
-        post_event(ON::BLOCKED_UPDATE);
-        if (g_forward_blocked_events)
-        {
-            bucket->blocked_event = true;
-            g_state_update_trampoline(s);
-            bucket->blocked_event = false;
-        }
-    }
-    update_backends();
-}
-
-void init_state_update_hook()
-{
-    g_state_update_trampoline = (OnStateUpdate*)get_address("state_refresh");
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    DetourAttach((void**)&g_state_update_trampoline, &StateUpdate);
-
-    const LONG error = DetourTransactionCommit();
-    if (error != NO_ERROR)
-    {
-        DEBUG("Failed hooking state_refresh stuff: {}\n", error);
-    }
-}
-
-using OnProcessInput = void(void*);
-OnProcessInput* g_process_input_trampoline{nullptr};
-void ProcessInput(void* s)
-{
-    static bool had_focus;
-    static const auto bucket = Bucket::get();
-    static const auto gm = get_game_manager();
-    if (bucket->blocked_event)
-    {
-        pre_event(ON::PRE_PROCESS_INPUT);
-        post_event(ON::BLOCKED_PROCESS_INPUT);
-        return;
-    }
-    static const auto pa = bucket->pause_api;
-    if ((!g_forward_blocked_events || !pa->last_instance) && pa->pre_input())
-        return;
-    auto block = pre_event(ON::PRE_PROCESS_INPUT);
-    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_PROCESS_INPUT))
-        block = true;
-    if (!block || (gm->game_props->game_has_focus && !had_focus))
-    {
-        g_process_input_trampoline(s);
-        post_event(ON::POST_PROCESS_INPUT);
-    }
-    else
-    {
-        post_event(ON::BLOCKED_PROCESS_INPUT);
-        if (g_forward_blocked_events)
-        {
-            bucket->blocked_event = true;
-            g_process_input_trampoline(s);
-            bucket->blocked_event = false;
-        }
-    }
-    if (!g_forward_blocked_events || !pa->last_instance)
-        pa->post_input();
-    had_focus = gm->game_props->game_has_focus;
-}
-
-void init_process_input_hook()
-{
-    g_process_input_trampoline = (OnProcessInput*)get_address("process_input");
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    DetourAttach((void**)&g_process_input_trampoline, &ProcessInput);
-
-    const LONG error = DetourTransactionCommit();
-    if (error != NO_ERROR)
-    {
-        DEBUG("Failed hooking process_input stuff: {}\n", error);
-    }
-}
-
-using OnGameLoop = void(void* a, float b, void* c);
-OnGameLoop* g_game_loop_trampoline{nullptr};
-void GameLoop(void* a, float b, void* c)
-{
-    static const auto bucket = Bucket::get();
-    static const auto pa = bucket->pause_api;
-    auto& state = State::get();
-
-    if (global_frame_count < state.get_frame_count_main())
-        global_frame_count = state.get_frame_count_main();
-    else
-        global_frame_count++;
-
-    if (bucket->blocked_event)
-    {
-        pre_event(ON::PRE_GAME_LOOP);
-        post_event(ON::BLOCKED_GAME_LOOP);
-        return;
-    }
-
-    if (!g_forward_blocked_events || !pa->last_instance)
-        pa->pre_loop();
-    auto block = pre_event(ON::PRE_GAME_LOOP);
-    if ((!g_forward_blocked_events || !pa->last_instance) && pa->event(PAUSE_TYPE::PRE_GAME_LOOP))
-        block = true;
-    if (!block)
-    {
-        g_game_loop_trampoline(a, b, c);
-        post_event(ON::POST_GAME_LOOP);
-    }
-    else
-    {
-        post_event(ON::BLOCKED_GAME_LOOP);
-        if (g_forward_blocked_events)
-        {
-            bucket->blocked_event = true;
-            g_game_loop_trampoline(a, b, c);
-            bucket->blocked_event = false;
-        }
-    }
-    if (!g_forward_blocked_events || !pa->last_instance)
-        pa->post_loop();
-}
-
-void init_game_loop_hook()
-{
-    g_game_loop_trampoline = (OnGameLoop*)get_address("game_loop");
-    DetourTransactionBegin();
-    DetourUpdateThread(GetCurrentThread());
-    DetourAttach((void**)&g_game_loop_trampoline, &GameLoop);
-
-    const LONG error = DetourTransactionCommit();
-    if (error != NO_ERROR)
-    {
-        DEBUG("Failed hooking game_loop stuff: {}\n", error);
-    }
+    return prng_vec;
 }
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)
@@ -827,7 +386,7 @@ uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_positio
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get().ptr();
+        auto state = State::ptr();
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
@@ -848,7 +407,7 @@ uint8_t enum_to_layer(const LAYER layer)
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get().ptr();
+        auto state = State::ptr();
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
@@ -1106,7 +665,7 @@ void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
 
 void update_camera_position()
 {
-    auto camera = State::get().ptr()->camera;
+    auto camera = State::ptr()->camera;
     static const size_t offset = get_address("update_camera_position");
     typedef void update_camera_func(Camera*);
     static update_camera_func* ucf = (update_camera_func*)(offset);

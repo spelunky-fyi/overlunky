@@ -48,6 +48,7 @@
 #include "lua_require.hpp"                         // for register_custom_r...
 #include "math.hpp"                                // for AABB
 #include "memory.hpp"                              // for Memory
+#include "mod_api.hpp"                             // for ModAPI::savedata
 #include "movable.hpp"                             // for Movable
 #include "online.hpp"                              // for get_online
 #include "overloaded.hpp"                          // for overloaded
@@ -143,10 +144,10 @@ struct Players
 
     void update()
     {
-        StateMemory* local_state = State::get().ptr_local();
+        StateMemory* local_state = State::ptr_local();
         if (local_state == nullptr)
         {
-            StateMemory* main_state = State::get().ptr_main();
+            StateMemory* main_state = State::ptr_main();
             p = get_players(main_state);
         }
         else
@@ -300,7 +301,7 @@ end
     NLogic::register_usertypes(lua);
     NBucket::register_usertypes(lua);
 
-    StateMemory* main_state = State::get().ptr_main();
+    StateMemory* main_state = State::ptr_main();
 
     /// NoDoc
     lua.new_usertype<Players>(
@@ -322,7 +323,7 @@ end
     auto get_player = sol::overload(
         [&lua](int8_t slot) -> sol::object // -> Player
         {
-            for (auto player : get_players(State::get().ptr()))
+            for (auto player : get_players(State::ptr()))
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -331,7 +332,7 @@ end
         },
         [&lua](int8_t slot, bool or_ghost) -> sol::object
         {
-            for (auto player : get_players(State::get().ptr()))
+            for (auto player : get_players(State::ptr()))
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -364,7 +365,7 @@ end
         return nullptr;
     };
     /// Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
-    lua["savegame"] = State::get().savedata();
+    lua["savegame"] = ModAPI::savedata();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
@@ -465,7 +466,7 @@ end
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto state = State::get().ptr_main();
+        auto state = State::ptr_main();
         auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -969,20 +970,20 @@ end
     lua["set_seed"] = set_seed;
     /// Enable/disable godmode for players.
     lua["god"] = [](bool g)
-    { State::get().godmode(g); };
+    { ModAPI::godmode(g); };
     /// Enable/disable godmode for companions.
     lua["god_companions"] = [](bool g)
-    { State::get().godmode_companions(g); };
+    { ModAPI::godmode_companions(g); };
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     lua["force_dark_level"] = [](bool g)
-    { State::get().darkmode(g); };
+    { ModAPI::darkmode(g); };
     /// Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
     lua["zoom"] = [](float level)
-    { State::get().zoom(level); };
+    { State::zoom(level); };
     /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
     lua["zoom_reset"] = []()
-    { State::get().zoom_reset(); };
+    { State::zoom_reset(); };
     auto move_entity_abs = sol::overload(
         static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
         static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
@@ -1130,10 +1131,10 @@ end
     };
     /// Get the game coordinates at the screen position (`x`, `y`)
     lua["game_position"] = [](float x, float y) -> std::pair<float, float>
-    { return State::click_position(x, y); };
+    { return StateMemory::click_position(x, y); };
     /// Translate an entity position to screen position to be used in drawing functions
     lua["screen_position"] = [](float x, float y) -> std::pair<float, float>
-    { return State::screen_position(x, y); };
+    { return StateMemory::screen_position(x, y); };
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
@@ -1267,19 +1268,19 @@ end
     /// inside these boundaries. The order is: left x, top y, right x, bottom y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
-        auto state = State::get().ptr();
+        auto state = State::ptr();
         return std::make_tuple(2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f);
     };
     /// Same as [get_bounds](#get_bounds) but returns AABB struct instead of loose floats
     lua["get_aabb_bounds"] = []() -> AABB
     {
-        auto state = State::get().ptr();
+        auto state = State::ptr();
         return {2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f};
     };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = []() -> std::pair<float, float>
     {
-        return State::get_camera_position();
+        return StateMemory::get_camera_position();
     };
     /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
     lua["set_camera_position"] = set_camera_position;
@@ -1952,7 +1953,7 @@ end
     lua["save_progress"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        if (backend->last_save <= State::ptr()->time_startup - 120)
         {
             backend->manual_save = true;
             save_progress();
@@ -1986,13 +1987,13 @@ end
     /// Get the thread-local version of state
     lua["get_local_state"] = []()
     {
-        return State::get().ptr_local();
+        return State::ptr_local();
     };
 
     /// Get the thread-local version of players
     lua["get_local_players"] = []()
     {
-        return get_players(State::get().ptr_local());
+        return get_players(State::ptr_local());
     };
 
     /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
@@ -2083,9 +2084,9 @@ end
         float ax = -0.98f;
         float f = 1.0f;
         uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
-        if (hs == 0 || State::get().ptr()->items->player_count > 3)
+        if (hs == 0 || State::ptr()->items->player_count > 3)
             f = 1.0f;
-        else if (hs == 1 || State::get().ptr()->items->player_count > 2)
+        else if (hs == 1 || State::ptr()->items->player_count > 2)
             f = 1.15f;
         else
             f = 1.3f;
