@@ -32,6 +32,7 @@ void post_init_layer(LAYER layer);
 void post_unload_layer(LAYER layer);
 void post_room_generation();
 void post_level_generation();
+void pre_heap_clone_event(StateMemory* from, StateMemory* to);
 void post_save_state(int slot, StateMemory* saved);
 void post_load_state(int slot, StateMemory* loaded);
 

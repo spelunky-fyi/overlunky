@@ -12,18 +12,19 @@
 #include <type_traits>            // for move, declval, decay_t, reference_...
 #include <utility>                // for min, max
 
-#include "entities_chars.hpp" // IWYU pragma: keep
-#include "entity.hpp"         // IWYU pragma: keep
-#include "illumination.hpp"   // IWYU pragma: keep
-#include "items.hpp"          // for Items, SelectPlayerSlot, Items::is...
-#include "level_api.hpp"      // IWYU pragma: keep
-#include "online.hpp"         // for OnlinePlayer, OnlineLobby, Online
-#include "savestate.hpp"      // for SaveState
-#include "screen.hpp"         // IWYU pragma: keep
-#include "screen_arena.hpp"   // IWYU pragma: keep
-#include "script/events.hpp"  // for pre_load_state
-#include "state.hpp"          // for StateMemory, State, StateMemory::a...
-#include "state_structs.hpp"  // for ArenaConfigArenas, ArenaConfigItems
+#include "entities_chars.hpp"     // IWYU pragma: keep
+#include "entity.hpp"             // IWYU pragma: keep
+#include "illumination.hpp"       // IWYU pragma: keep
+#include "items.hpp"              // for Items, SelectPlayerSlot, Items::is...
+#include "level_api.hpp"          // IWYU pragma: keep
+#include "online.hpp"             // for OnlinePlayer, OnlineLobby, Online
+#include "savestate.hpp"          // for SaveState
+#include "screen.hpp"             // IWYU pragma: keep
+#include "screen_arena.hpp"       // IWYU pragma: keep
+#include "script/events.hpp"      // for pre_load_state
+#include "script/lua_backend.hpp" // for LuaBackend
+#include "state.hpp"              // for StateMemory, State, StateMemory::a...
+#include "state_structs.hpp"      // for ArenaConfigArenas, ArenaConfigItems
 
 namespace NState
 {
@@ -412,6 +413,25 @@ void register_usertypes(sol::state& lua)
     statememory_type["liquid"] = &StateMemory::liquid_physics;
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
     statememory_type["room_owners"] = &StateMemory::room_owners;
+
+    auto get_local_data = [](StateMemory& state) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto local_datas = backend->local_state_datas;
+        if (local_datas.contains(&state))
+        {
+            return local_datas[&state].user_data;
+        }
+        return sol::nil;
+    };
+
+    auto set_local_data = [](StateMemory& state, sol::object user_data) -> void
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->local_state_datas[&state].user_data = user_data;
+    };
+
+    statememory_type["local_data"] = sol::property(get_local_data, set_local_data);
 
     lua.create_named_table("FADE", "NONE", 0, "OUT", 1, "LOAD", 2, "IN", 3);
 
