@@ -31,8 +31,7 @@ Entity* Layer::spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx
     }
     else if (screen)
     {
-        auto& state = State::get();
-        std::tie(x, y) = state.click_position(x, y);
+        std::tie(x, y) = StateMemory::click_position(x, y);
         min_speed_check = 0.04f;
         if (snap && abs(vx) + abs(vy) <= min_speed_check)
         {
@@ -120,7 +119,7 @@ Entity* Layer::get_entity_at(float x, float y, uint32_t search_flags, uint32_t i
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
-    auto screen = State::get().ptr()->screen_next;
+    auto screen = State::ptr()->screen_next;
     Entity* door;
     switch (screen)
     {

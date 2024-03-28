@@ -8,6 +8,7 @@
 
 #include "aliases.hpp"                  // for ENT_TYPE, LAYER
 #include "containers/custom_vector.hpp" //
+#include "prng.hpp"                     // for PRNG
 #include "state_structs.hpp"            // for JournalProgressStickerSlot, ...
 
 class Entity;
@@ -316,88 +317,48 @@ struct StateMemory
     /// Returns animation_frame of the correct ushabti
     uint16_t get_correct_ushabti();
     void set_correct_ushabti(uint16_t animation_frame);
-};
-#pragma pack(pop)
-
-StateMemory* get_state_ptr();
-
-struct State
-{
-    static void set_do_hooks(bool do_hooks);
-
-    static void set_write_load_opt(bool allow);
-
-    static void init(class SoundManager* sound_manager = nullptr);
-    static void post_init();
-
-    static State& get();
-
-    // Returns the main-thread version of StateMemory*
-    StateMemory* ptr_main() const;
-    // Returns the local-thread version of StateMemory*
-    StateMemory* ptr() const;
-    StateMemory* ptr_local() const;
-
-    // TODO: rest of the functions should probably be just static or moved out of here as they don't need State
-    // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
-    // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
-
-    // use only if you only want the layer, otherwise use `ptr()->layers`
-    Layer* layer(uint8_t index) const
-    {
-        return ptr()->layers[index];
-    }
-
-    void godmode(bool g);
-    void godmode_companions(bool g);
-    void darkmode(bool g);
-
-    void zoom(float level);
-    void zoom_reset();
 
     static std::pair<float, float> click_position(float x, float y);
     static std::pair<float, float> screen_position(float x, float y);
-
-    uint32_t flags() const
-    {
-        return ptr()->level_flags;
-    }
-
-    void set_flags(uint32_t f)
-    {
-        ptr()->level_flags = f;
-    }
-
-    void set_pause(uint8_t p)
-    {
-        ptr()->pause = p;
-    }
-
-    uint32_t get_frame_count_main() const;
-    uint32_t get_frame_count() const;
-
-    std::vector<int64_t> read_prng() const;
-
-    static Entity* find(StateMemory* state, uint32_t uid);
 
     static std::pair<float, float> get_camera_position();
     void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
-    SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
 
-  private:
-    State(size_t addr)
-        : location(addr){};
-
-    size_t location;
-    State(const State&) = delete;
-    State& operator=(const State&) = delete;
+    Entity* find(uint32_t uid);
 };
-void init_state_update_hook();
-void init_process_input_hook();
-void init_game_loop_hook();
+
+struct State
+{
+    uint8_t unknown1[0x3d0];
+    uint32_t frame_count;
+    uint8_t unknown2[0x1c];
+    PRNG prng;
+    uint8_t unknown3[0x10];
+    StateMemory state;
+
+    // Returns the main-thread version of StateMemory*
+    static StateMemory* ptr_main();
+    // Returns the local-thread version of StateMemory*
+    static StateMemory* ptr();
+    static StateMemory* ptr_local();
+    static State* get();
+    static State* get_main();
+
+    // TODO: rest of the functions should probably be just static or moved out of here as they don't need State
+    // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
+    // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
+
+    static void zoom(float level);
+    static void zoom_reset();
+
+    std::vector<int64_t> read_prng();
+};
+#pragma pack(pop)
+
+StateMemory* get_state_ptr();
 
 uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
 uint8_t enum_to_layer(const LAYER layer);
@@ -405,8 +366,4 @@ uint8_t enum_to_layer(const LAYER layer);
 uint32_t lowbias32(uint32_t x);
 uint32_t lowbias32_r(uint32_t x);
 
-int64_t get_global_frame_count();
-int64_t get_global_update_count();
 void update_camera_position();
-
-bool get_forward_events();

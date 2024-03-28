@@ -1,5 +1,6 @@
 #pragma once
 
+struct State;
 struct StateMemory;
 
 class SaveState
@@ -22,10 +23,10 @@ class SaveState
     void clear();
 
   private:
-    size_t addr;
+    State* addr;
 };
 
 void copy_save_slot(int from, int to);
-void copy_state(size_t fromBaseState, size_t toBaseState);
-StateMemory* get_save_state(int slot);
+void copy_state(State* fromBaseState, State* toBaseState);
+State* get_save_state(int slot);
 void invalidate_save_slots();

@@ -88,8 +88,8 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
     Floor* neighbours[4]{};
     bool neighbours_same[4]{};
 
-    auto& state = State::get();
-    auto layer_ptr = state.layer(layer);
+    StateMemory* state = State::ptr();
+    auto layer_ptr = state->layers[layer];
 
     for (size_t i = 0; i < 4; i++)
     {
@@ -188,8 +188,8 @@ void Floor::add_decoration(FLOOR_SIDE side)
         return;
     }
 
-    auto& state = State::get();
-    auto layer_ptr = state.layer(layer);
+    StateMemory* state = State::ptr();
+    auto layer_ptr = state->layers[layer];
     add_decoration_opt(side, decoration_entity_type, layer_ptr);
 }
 void Floor::remove_decoration(FLOOR_SIDE side)
@@ -741,7 +741,7 @@ void Door::unlock(bool unlock)
     static const ENT_TYPE eggchild_room_door = to_id("ENT_TYPE_FLOOR_DOOR_MOAI_STATUE");
     static const ENT_TYPE EW_door = to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
     const auto ent_type = this->type->id;
-    auto& state = State::get();
+    StateMemory* state = State::ptr();
 
     if (ent_type == locked_door || ent_type == locked_door + 1) // plus one for DOOR_LOCKED_PEN
     {
@@ -772,7 +772,7 @@ void Door::unlock(bool unlock)
         if (ent_type == entrence_door || ent_type == entrence_door + 1 || ent_type == entrence_door + 3)
         {
             static const ENT_TYPE door_bg = to_id("ENT_TYPE_BG_DOOR");
-            const auto state_layer = state.layer(this->layer);
+            const auto state_layer = state->layers[this->layer];
             for (const auto& item : state_layer->entities_overlaping_grid[static_cast<int>(y)][static_cast<int>(x)].entities())
             {
                 if (item->type->id == door_bg)
@@ -807,7 +807,7 @@ void Door::unlock(bool unlock)
             {
                 if (!main_door->door_blocker)
                 {
-                    main_door->door_blocker = state.layer(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
+                    main_door->door_blocker = state->layers[layer]->spawn_entity_over(door_bg_large, this, 0, 2.0);
                     main_door->door_blocker->animation_frame = 1;
                 }
             }

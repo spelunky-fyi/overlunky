@@ -5,22 +5,14 @@
 #include "script/events.hpp" // for pre_load_state
 #include "state.hpp"         // for State, get_state_ptr, enum_to_layer
 
-size_t get_state_offset()
-{
-    auto addr = get_address("state_location");
-    if (addr)
-        return memory_read<size_t>(addr);
-    return 0x4a0;
-}
-
 void copy_save_slot(int from, int to)
 {
     if ((from == 5 && pre_save_state(to, get_save_state(to))) ||
         (to == 5 && pre_load_state(from, get_save_state(from))))
         return;
     size_t arr = get_address("save_states");
-    size_t fromBaseState = memory_read<size_t>(arr + (from - 1) * 8);
-    size_t toBaseState = memory_read<size_t>(arr + (to - 1) * 8);
+    State* fromBaseState = memory_read<State*>(arr + (from - 1) * 8);
+    State* toBaseState = memory_read<State*>(arr + (to - 1) * 8);
     copy_state(fromBaseState, toBaseState);
     if (from == 5)
         post_save_state(to, get_save_state(to));
@@ -28,8 +20,10 @@ void copy_save_slot(int from, int to)
         post_load_state(from, get_save_state(from));
 };
 
-void copy_state(size_t fromBaseState, size_t toBaseState)
+void copy_state(State* fromBaseStatePtr, State* toBaseStatePtr)
 {
+    size_t fromBaseState = reinterpret_cast<size_t>(fromBaseStatePtr);
+    size_t toBaseState = reinterpret_cast<size_t>(toBaseStatePtr);
     size_t iterIdx = 1;
     do
     {
@@ -55,12 +49,11 @@ void copy_state(size_t fromBaseState, size_t toBaseState)
     } while (iterIdx != 0x400001);
 };
 
-StateMemory* get_save_state(int slot)
+State* get_save_state(int slot)
 {
     size_t arr = get_address("save_states");
-    size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
-    auto state = reinterpret_cast<StateMemory*>(base + get_state_offset());
-    if (state->screen)
+    State* state = memory_read<State*>(arr + (slot - 1) * 8);
+    if (state->state.screen)
         return state;
     return nullptr;
 }
@@ -74,13 +67,13 @@ void invalidate_save_slots()
     {
         auto state = get_save_state(i);
         if (state)
-            state->screen = 0;
+            state->state.screen = 0;
     }
 }
 
 SaveState::SaveState()
 {
-    addr = (size_t)malloc(8 * 0x400000);
+    addr = static_cast<State*>(malloc(8 * 0x400000));
     save();
 }
 
@@ -91,17 +84,15 @@ SaveState::~SaveState()
 
 StateMemory* SaveState::get_state()
 {
-    if (!addr)
-        return nullptr;
-    return reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    return &addr->state;
 }
 
 void SaveState::load()
 {
     if (!addr)
         return;
-    size_t to = (size_t)(State::get().ptr_main()) - get_state_offset();
-    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    auto to = State::get_main();
+    auto state = addr;
     if (pre_load_state(-1, state))
         return;
     copy_state(addr, to);
@@ -112,8 +103,8 @@ void SaveState::save()
 {
     if (!addr)
         return;
-    size_t from = (size_t)(State::get().ptr_main()) - get_state_offset();
-    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    auto from = State::get_main();
+    auto state = addr;
     if (pre_save_state(-1, state))
         return;
     copy_state(from, addr);

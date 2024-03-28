@@ -54,8 +54,7 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
     {
         // screen coordinates -1..1
         // log::debug!("Teleporting to screen {}, {}", x, y);
-        auto& state = State::get();
-        auto [x_pos, y_pos] = state.click_position(dx, dy);
+        auto [x_pos, y_pos] = StateMemory::click_position(dx, dy);
         if (snap && abs(vx) + abs(vy) <= 0.04f)
         {
             x_pos = round(x_pos);
@@ -96,20 +95,20 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == dest_layer)
         return;
 
-    auto& state = State::get();
+    StateMemory* state = State::ptr();
     if (this != this->topmost_mount())
         this->topmost_mount()->set_layer(layer_to);
 
     if (layer == 0 || layer == 1)
     {
-        auto ptr_from = state.ptr()->layers[layer];
+        auto ptr_from = state->layers[layer];
 
         using RemoveFromLayer = void(Layer*, Entity*);
         static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
         remove_from_layer(ptr_from, this);
     }
 
-    auto ptr_to = state.ptr()->layers[dest_layer];
+    auto ptr_to = state->layers[dest_layer];
 
     using AddToLayer = void(Layer*, Entity*);
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
@@ -123,7 +122,7 @@ void Entity::set_layer(LAYER layer_to)
 
 void Entity::apply_layer()
 {
-    auto ptr_to = State::get().ptr()->layers[layer];
+    auto ptr_to = State::ptr()->layers[layer];
 
     using AddToLayer = void(Layer*, Entity*);
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
@@ -139,8 +138,7 @@ void Entity::remove()
 {
     if (layer != 2)
     {
-        auto& state = State::get();
-        auto ptr_from = state.ptr()->layers[layer];
+        auto ptr_from = State::ptr()->layers[layer];
         if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
         {
             using RemoveFromLayer = void(Layer*, Entity*);
@@ -289,7 +287,7 @@ std::tuple<float, float> get_velocity(uint32_t uid)
         }
         else if (ent->is_liquid())
         {
-            auto liquid_engine = State::get().get_correct_liquid_engine(ent->type->id);
+            auto liquid_engine = State::ptr()->get_correct_liquid_engine(ent->type->id);
             vx = liquid_engine->entity_velocities->first;
             vy = liquid_engine->entity_velocities->second;
         }
@@ -387,7 +385,7 @@ std::span<uint32_t> Entity::get_items()
 
 Entity* get_entity_ptr(uint32_t uid)
 {
-    auto p = State::find(State::get().ptr(), uid);
+    auto p = State::ptr()->find(uid);
     // if (IsBadWritePtr(p, 0x178))
     //     return nullptr;
     return p;
@@ -472,8 +470,9 @@ void Movable::set_position(float to_x, float to_y)
         rendering_info->x_dupe4 += dx;
         rendering_info->y_dupe4 += dy;
     }
-    if (State::get().ptr()->camera->focused_entity_uid == uid)
-        State::get().set_camera_position(dx, dy);
+    StateMemory* state_mem = State::ptr();
+    if (state_mem->camera->focused_entity_uid == uid)
+        state_mem->set_camera_position(dx, dy);
 }
 
 template <typename F>

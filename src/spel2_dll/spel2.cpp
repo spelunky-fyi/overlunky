@@ -5,6 +5,7 @@
 #include "entity.hpp"
 #include "file_api.hpp"
 #include "memory.hpp"
+#include "mod_api.hpp"
 #include "render_api.hpp"
 #include "screen.hpp"
 #include "script.hpp"
@@ -22,19 +23,19 @@ SpelunkyConsole* g_Console{nullptr};
 
 void Spelunky_SetDoHooks(bool do_hooks)
 {
-    State::set_do_hooks(do_hooks);
+    ModAPI::set_do_hooks(do_hooks);
 }
 void Spelunky_SetWriteLoadOptimization(bool write_load_opt)
 {
-    State::set_write_load_opt(write_load_opt);
+    ModAPI::set_write_load_opt(write_load_opt);
 }
 void Spelunky_InitState()
 {
-    State::init();
+    ModAPI::init();
 }
 void Spelunky_PostInitState()
 {
-    State::post_init();
+    ModAPI::post_init();
 }
 
 void Spelunky_RegisterApplicationVersion(const char* version)
@@ -349,7 +350,7 @@ void SpelunkyConsole_LoadHistory(SpelunkyConsole* console, const char* path)
 
 StateMemory& get_state()
 {
-    static StateMemory* state = State::get().ptr();
+    static StateMemory* state = State::ptr();
     return *state;
 }
 

@@ -47,6 +47,7 @@
 #include "level_api.hpp"
 #include "logger.h"
 #include "math.hpp"
+#include "mod_api.hpp"
 #include "savedata.hpp"
 #include "screen.hpp"
 #include "script.hpp"
@@ -1495,7 +1496,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                 }
                 uint32_t i_x = static_cast<uint32_t>(floor->x + 0.5f);
                 uint32_t i_y = static_cast<uint32_t>(floor->y + 0.5f);
-                State::get().layer(floor->layer)->grid_entities[i_y][i_x] = floor;
+                State::ptr()->layers[floor->layer]->grid_entities[i_y][i_x] = floor;
                 fix_decorations_at(floor->x, floor->y, (LAYER)floor->layer);
             }
         }
@@ -2812,10 +2813,10 @@ void toggle_lights()
 
 void load_state(int slot)
 {
-    StateMemory* target = UI::get_save_state(slot);
+    State* target = UI::get_save_state(slot);
     if (!target)
         return;
-    if (g_state->screen == 14 && target->screen != 14)
+    if (g_state->screen == 14 && target->state.screen != 14)
     {
         g_state->screen = 12;
         g_game_manager->journal_ui->fade_timer = 15;
@@ -4222,15 +4223,15 @@ void render_camera()
             tooltip("Focus the selected entity");
         }
 
-        auto [cx, cy] = State::get_camera_position();
+        auto [cx, cy] = StateMemory::get_camera_position();
         ImGui::PushItemWidth(120.0f);
         ImGui::InputFloat("##CameraPosX", &cx, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            State::ptr()->set_camera_position(cx, cy);
         ImGui::SameLine(0, 4.0f);
         ImGui::InputFloat("Position##CameraPosY", &cy, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            State::ptr()->set_camera_position(cx, cy);
 
         ImGui::InputFloat("##CameraFocusX", &g_state->camera->focus_x, 0.1f, 1.0f);
         ImGui::SameLine(0, 4.0f);
@@ -5648,7 +5649,7 @@ void render_clickhandler()
                 g_state->camera->focus_x -= (current_pos.first - oryginal_pos.first) * g_camera_speed;
                 g_state->camera->focus_y -= (current_pos.second - oryginal_pos.second) * g_camera_speed;
                 if (g_state->pause != 0 || g_bucket->pause_api->paused() || !options["smooth_camera"])
-                    State::get().set_camera_position(g_state->camera->focus_x, g_state->camera->focus_y);
+                    State::ptr()->set_camera_position(g_state->camera->focus_x, g_state->camera->focus_y);
                 startpos = normalize(mouse_pos());
                 enable_camera_bounds = false;
                 set_camera_bounds(enable_camera_bounds);
@@ -10030,10 +10031,10 @@ void init_ui()
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    State::init(g_SoundManager.get());
-    State::post_init();
+    ModAPI::init(g_SoundManager.get());
+    ModAPI::post_init();
 
-    g_state = State::get().ptr_main();
+    g_state = State::ptr_main();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();
     g_bucket = Bucket::get();

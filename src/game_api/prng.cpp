@@ -6,15 +6,12 @@
 
 PRNG& PRNG::get_main()
 {
-    const auto& state = State::get();
-    static PRNG* prng = (PRNG*)((size_t)state.ptr_main() - 0xb0);
+    static PRNG* prng = &State::get_main()->prng;
     return *prng;
 }
 PRNG& PRNG::get_local()
 {
-    const auto& state = State::get();
-    PRNG* prng = (PRNG*)((size_t)state.ptr_local() - 0xb0);
-    return *prng;
+    return State::get()->prng;
 }
 
 void PRNG::seed(int64_t seed)

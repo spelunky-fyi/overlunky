@@ -162,7 +162,7 @@ void ScriptImpl::set_enabled(bool enbl)
     if (enbl != enabled)
     {
         auto cb_type = enbl ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
-        auto now = State::get().get_frame_count();
+        auto now = State::get()->frame_count;
         for (auto& [id, callback] : callbacks)
         {
             if (callback.screen == cb_type)

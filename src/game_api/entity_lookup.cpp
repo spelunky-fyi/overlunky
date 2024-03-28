@@ -43,10 +43,10 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 
 int32_t get_grid_entity_at(float x, float y, LAYER layer)
 {
-    auto& state = State::get();
+    StateMemory* state = State::ptr();
     uint8_t actual_layer = enum_to_layer(layer);
 
-    if (Entity* ent = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    if (Entity* ent = state->layers[actual_layer]->get_grid_entity_at(x, y))
         return ent->uid;
 
     return -1;
@@ -102,7 +102,7 @@ void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
 
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
 
@@ -170,7 +170,7 @@ std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER
 std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
     // TODO: use entity regions?
-    auto& state = State::get();
+    StateMemory* state = State::ptr();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     auto push_entities_at = [&x, &y, &radius, &proper_types, &found](const EntityList& entities)
@@ -187,12 +187,12 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     };
     if (layer == LAYER::BOTH)
     {
-        foreach_mask(mask, state.layer(0), push_entities_at);
-        foreach_mask(mask, state.layer(1), push_entities_at);
+        foreach_mask(mask, state->layers[0], push_entities_at);
+        foreach_mask(mask, state->layers[1], push_entities_at);
     }
     else
     {
-        foreach_mask(mask, state.layer(enum_to_layer(layer)), push_entities_at);
+        foreach_mask(mask, state->layers[enum_to_layer(layer)], push_entities_at);
     }
     return found;
 }
@@ -205,20 +205,20 @@ std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float
 std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
 {
     // TODO: use entity regions?
-    auto& state = State::get();
+    StateMemory* state = State::ptr();
     std::vector<uint32_t> result;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     if (layer == LAYER::BOTH)
     {
         std::vector<uint32_t> result2;
-        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
-        result2 = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
+        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state->layers[0]);
+        result2 = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state->layers[1]);
         result.insert(result.end(), result2.begin(), result2.end());
     }
     else
     {
         uint8_t actual_layer = enum_to_layer(layer);
-        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
+        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state->layers[actual_layer]);
     }
     return result;
 }
@@ -325,7 +325,7 @@ std::vector<uint32_t> get_entities_by_draw_depth(uint8_t draw_depth, LAYER l)
 
 std::vector<uint32_t> get_entities_by_draw_depth(std::vector<uint8_t> draw_depths, LAYER l)
 {
-    auto state = State::get().ptr_local();
+    auto state = State::ptr_local();
     std::vector<uint32_t> found;
     auto actual_layer = enum_to_layer(l);
     for (auto draw_depth : draw_depths)

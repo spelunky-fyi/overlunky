@@ -103,7 +103,7 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
         static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
 
         auto [x, y, l] = get_position(uid);
-        auto* layer_ptr = State::get().layer(l);
+        auto* layer_ptr = State::ptr()->layers[l];
 
         PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, x + off_x, y + off_y, false, 0.0f, 0.0f, false);
 
@@ -188,7 +188,7 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
     auto entity = get_entity_ptr(uid)->as<Liquid>();
     if (entity)
     {
-        auto liquid_engine = State::get().get_correct_liquid_engine(entity->type->id);
+        auto liquid_engine = State::ptr()->get_correct_liquid_engine(entity->type->id);
         if (liquid_engine)
         {
             liquid_engine->entity_coordinates[*entity->liquid_id] = {x, y};
@@ -237,14 +237,12 @@ int get_entity_ai_state(uint32_t uid)
 
 uint32_t get_level_flags()
 {
-    auto& state = State::get();
-    return state.flags();
+    return State::ptr()->level_flags;
 }
 
 void set_level_flags(uint32_t flags)
 {
-    auto& state = State::get();
-    state.set_flags(flags);
+    State::ptr()->level_flags = flags;
 }
 
 ENT_TYPE get_entity_type(uint32_t uid)
@@ -260,7 +258,7 @@ std::vector<Player*> get_players(StateMemory* state)
 {
     state = state != nullptr
                 ? state
-                : State::get().ptr();
+                : State::ptr();
 
     std::vector<Player*> found;
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
@@ -274,15 +272,15 @@ std::vector<Player*> get_players(StateMemory* state)
 
 std::tuple<float, float, float, float> screen_aabb(float left, float top, float right, float bottom)
 {
-    auto [sx1, sy1] = State::screen_position(left, top);
-    auto [sx2, sy2] = State::screen_position(right, bottom);
+    auto [sx1, sy1] = StateMemory::screen_position(left, top);
+    auto [sx2, sy2] = StateMemory::screen_position(right, bottom);
     return std::tuple{sx1, sy1, sx2, sy2};
 }
 
 float screen_distance(float x)
 {
-    auto a = State::screen_position(0, 0);
-    auto b = State::screen_position(x, 0);
+    auto a = StateMemory::screen_position(0, 0);
+    auto b = StateMemory::screen_position(x, 0);
     return b.first - a.first;
 }
 
@@ -392,13 +390,11 @@ void unlock_door_at(float x, float y)
 
 uint32_t get_frame_count_main()
 {
-    auto& state = State::get();
-    return state.get_frame_count_main();
+    return State::get_main()->frame_count;
 }
 uint32_t get_frame_count()
 {
-    auto& state = State::get();
-    return state.get_frame_count();
+    return State::get()->frame_count;
 }
 
 void carry(uint32_t mount_uid, uint32_t rider_uid)
@@ -448,20 +444,20 @@ void flip_entity(uint32_t uid)
 
 void set_camera_position(float cx, float cy)
 {
-    auto& state = State::get();
-    state.set_camera_position(cx, cy);
+    StateMemory* state = State::ptr();
+    state->set_camera_position(cx, cy);
 }
 
 void warp(uint8_t world, uint8_t level, uint8_t theme)
 {
-    auto& state = State::get();
-    state.warp(world, level, theme);
+    StateMemory* state = State::ptr();
+    state->warp(world, level, theme);
 }
 
 void set_seed(uint32_t seed)
 {
-    auto& state = State::get();
-    state.set_seed(seed);
+    StateMemory* state = State::ptr();
+    state->set_seed(seed);
 }
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
@@ -563,8 +559,8 @@ void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscap
 
 std::vector<int64_t> read_prng()
 {
-    auto& state = State::get();
-    return state.read_prng();
+    State* state = State::get();
+    return state->read_prng();
 }
 
 void pick_up(uint32_t who_uid, uint32_t what_uid)
@@ -757,7 +753,7 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
 
     static const size_t offset = get_address("coord_inside_shop_zone");
-    auto state = State::get().ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
+    auto state = State::ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
     typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
     coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
     return ciszf(state->level_gen, enum_to_layer(layer), x, y);
@@ -1210,10 +1206,10 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto& state = State::get();
+        StateMemory* state = State::ptr();
         std::pair<float, float> offset;
         const auto actual_layer = enum_to_layer(layer, offset);
-        state.layer(entity->layer)->move_grid_entity(entity, offset.first + x, offset.first + y, state.layer(actual_layer));
+        state->layers[entity->layer]->move_grid_entity(entity, offset.first + x, offset.first + y, state->layers[actual_layer]);
         entity->teleport_abs(offset.first + x, offset.first + y, 0, 0);
         entity->set_layer(layer);
     }
@@ -1223,19 +1219,19 @@ void destroy_grid(int32_t uid)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto& state = State::get();
-        state.layer(entity->layer)->destroy_grid_entity(entity);
+        StateMemory* state = State::ptr();
+        state->layers[entity->layer]->destroy_grid_entity(entity);
     }
 }
 
 void destroy_grid(float x, float y, LAYER layer)
 {
-    auto& state = State::get();
+    StateMemory* state = State::ptr();
     uint8_t actual_layer = enum_to_layer(layer);
 
-    if (Entity* entity = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    if (Entity* entity = state->layers[actual_layer]->get_grid_entity_at(x, y))
     {
-        state.layer(entity->layer)->destroy_grid_entity(entity);
+        state->layers[entity->layer]->destroy_grid_entity(entity);
     }
 }
 
@@ -1258,7 +1254,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                auto state = State::get().ptr();
+                auto state = State::ptr();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
                 state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
@@ -1302,7 +1298,7 @@ std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start)
         auto bucket = Bucket::get();
         if (bucket->adventure_seed.first != 0)
             return bucket->adventure_seed;
-        auto state = State::get().ptr();
+        auto state = State::ptr();
         auto current = get_adventure_seed(false);
         for (uint8_t i = 0; i < state->level_count + (state->screen == 12 || state->screen == 14 ? 1 : 0); ++i)
             current.second -= current.first;
@@ -1360,7 +1356,7 @@ void game_log(std::string message)
 
 void load_death_screen()
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     state->screen_death->init();
 }
 
@@ -1628,7 +1624,7 @@ void set_boss_door_control_enabled(bool enable)
 void update_state()
 {
     static const size_t offset = get_address("state_refresh");
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     typedef void refresh_func(StateMemory*);
     static refresh_func* rf = (refresh_func*)(offset);
     rf(state);
@@ -1676,7 +1672,7 @@ ENT_TYPE add_custom_type()
 
 int32_t get_current_money()
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     int32_t money = state->money_shop_total;
     for (auto& inventory : state->items->player_inventories)
     {
@@ -1688,7 +1684,7 @@ int32_t get_current_money()
 
 int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     auto hud = get_hud();
     state->money_shop_total += amount;
     hud->money.counter += amount;
@@ -1698,7 +1694,7 @@ int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
 
 int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_t> display_time)
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     auto hud = get_hud();
     uint8_t slot = player_slot - 1;
     if (slot > 3)
@@ -1713,13 +1709,13 @@ int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_
 void destroy_layer(uint8_t layer)
 {
     static const size_t offset = get_address("unload_layer");
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     for (auto i = 0; i < MAX_PLAYERS; ++i)
     {
         if (state->items->players[i] && state->items->players[i]->layer == layer)
             state->items->players[i] = nullptr;
     }
-    auto* layer_ptr = State::get().layer(layer);
+    auto* layer_ptr = State::ptr()->layers[layer];
     typedef void destroy_func(Layer*);
     static destroy_func* df = (destroy_func*)(offset);
     df(layer_ptr);
@@ -1734,7 +1730,7 @@ void destroy_level()
 void create_layer(uint8_t layer)
 {
     static const size_t offset = get_address("init_layer");
-    auto* layer_ptr = State::get().layer(layer);
+    auto* layer_ptr = State::ptr()->layers[layer];
     typedef void init_func(Layer*);
     static init_func* ilf = (init_func*)(offset);
     ilf(layer_ptr);
@@ -1748,7 +1744,7 @@ void create_level()
 
 void set_level_logic_enabled(bool enable)
 {
-    auto state = State::get().ptr();
+    auto state = State::ptr();
     static const size_t offset = get_virtual_function_address(state->screen_level, 1);
 
     if (!enable)
@@ -1901,6 +1897,6 @@ void init_seeded(std::optional<uint32_t> seed)
     static const size_t offset = get_address("init_seeded");
     typedef void init_func(void*, uint32_t);
     static init_func* isf = (init_func*)(offset);
-    auto* state = State::get().ptr();
+    auto* state = State::ptr();
     isf(state, seed.value_or(state->seed));
 }
