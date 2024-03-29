@@ -125,5 +125,8 @@ struct Items
 
     uint8_t player_count;
 
-    Player* player(uint8_t index);
+    Player* player(uint8_t index) const
+    {
+        return players[index];
+    }
 };

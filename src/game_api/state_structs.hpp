@@ -511,7 +511,10 @@ class LogicMagmamanSpawn : public Logic
   public:
     custom_vector<MagmamanSpawnPosition> magmaman_positions;
 
-    void add_spawn(uint32_t x, uint32_t y);
+    void add_spawn(uint32_t x, uint32_t y)
+    {
+        magmaman_positions.emplace_back(x, y);
+    }
     void add_spawn(MagmamanSpawnPosition ms)
     {
         add_spawn(ms.x, ms.y);

@@ -41,15 +41,15 @@ void ExecutableMemory::deleter_t::operator()(std::byte* mem) const
 
 Memory& Memory::get()
 {
-    static Memory mem{[]()
-                      {
-                          auto exe = (size_t)GetModuleHandleA(NULL);
+    static Memory mem = []()
+    {
+        auto exe = (size_t)GetModuleHandleA(NULL);
 
-                          // Skipping bundle for faster memory search
-                          auto after_bundle_ = find_after_bundle(exe);
+        // Skipping bundle for faster memory search
+        auto after_bundle_ = find_after_bundle(exe);
 
-                          return Memory{exe, after_bundle_};
-                      }()};
+        return Memory{exe, after_bundle_};
+    }();
     return mem;
 }
 

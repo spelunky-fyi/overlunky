@@ -81,7 +81,7 @@ struct Memory
     ~Memory(){};
 };
 
-LPVOID alloc_mem_rel32(size_t addr, size_t size);
+[[nodiscard]] LPVOID alloc_mem_rel32(size_t addr, size_t size);
 void write_mem_prot(size_t addr, std::string_view payload, bool prot);
 void write_mem_prot(size_t addr, std::string payload, bool prot);
 void write_mem(size_t addr, std::string payload);

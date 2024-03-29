@@ -892,7 +892,10 @@ class JournalPage
     }
 
     /// background.x < 0
-    bool is_right_side_page();
+    bool is_right_side_page() const
+    {
+        return (this->background.x < 0);
+    }
     void set_page_background_side(bool right);
     JOURNAL_PAGE_TYPE get_type();
 

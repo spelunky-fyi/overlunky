@@ -112,19 +112,3 @@ std::optional<std::int64_t> PRNG::random_int(std::int64_t min, std::int64_t max,
     }
     return std::nullopt;
 }
-std::pair<int64_t, int64_t> PRNG::get_pair(PRNG_CLASS type)
-{
-    if (type >= 0 && type <= 9)
-    {
-        return pairs[type];
-    }
-    return {0, 0};
-}
-void PRNG::set_pair(PRNG_CLASS type, int64_t first, int64_t second)
-{
-    if (type >= 0 && type <= 9)
-    {
-        pairs[type].first = first;
-        pairs[type].second = second;
-    }
-}

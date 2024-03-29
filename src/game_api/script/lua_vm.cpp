@@ -2000,7 +2000,7 @@ end
     {
         std::vector<std::string> files;
         auto backend = LuaBackend::get_calling_backend();
-        auto base = backend->get_root_path();
+        const auto& base = backend->get_root_path();
         auto path = base / std::filesystem::path(dir.value_or("."));
         if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
             return sol::make_object(lua, sol::lua_nil);

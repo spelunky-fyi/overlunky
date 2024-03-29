@@ -208,9 +208,9 @@ void register_usertypes(sol::state& lua)
     auto user_data = sol::property(get_user_data, set_user_data);
 
     auto overlaps_with = sol::overload(
-        static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
+        static_cast<bool (Entity::*)(Entity*) const>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(AABB) const>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(float, float, float, float) const>(&Entity::overlaps_with));
 
     auto kill_recursive = sol::overload(
         static_cast<void (Entity::*)(bool, Entity*)>(&Entity::kill_recursive),

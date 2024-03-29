@@ -34,8 +34,22 @@ struct PRNG
     using prng_pair = std::pair<std::uint64_t, std::uint64_t>;
     prng_pair get_and_advance(PRNG_CLASS type);
 
-    std::pair<int64_t, int64_t> get_pair(PRNG_CLASS type);
-    void set_pair(PRNG_CLASS type, int64_t first, int64_t second);
+    std::pair<int64_t, int64_t> get_pair(PRNG_CLASS type) const
+    {
+        if (type >= 0 && type <= 9)
+        {
+            return pairs[type];
+        }
+        return {0, 0};
+    }
+    void set_pair(PRNG_CLASS type, int64_t first, int64_t second)
+    {
+        if (type >= 0 && type <= 9)
+        {
+            pairs[type].first = first;
+            pairs[type].second = second;
+        }
+    }
 
     /// Generate a random integer in the range `[0, size)`
     std::int64_t internal_random_index(std::int64_t size, PRNG_CLASS type);

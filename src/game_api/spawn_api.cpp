@@ -144,7 +144,8 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float
         liquid_spawn_info->spawn_velocity_x = velocityx;
         liquid_spawn_info->spawn_velocity_y = velocityy;
         liquid_spawn_info->liquidtile_liquid_amount = amount;
-        if (blobs_separation != INFINITY)
+
+        if (!std::isinf(blobs_separation))
             liquid_spawn_info->blobs_separation = blobs_separation;
 
         spawn_liquid(entity_type, x, y);
@@ -266,10 +267,6 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     return State::get().layer(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
-int32_t spawn_tree(float x, float y, LAYER layer)
-{
-    return spawn_tree(x, y, layer, 0);
-}
 int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
@@ -354,10 +351,6 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     return base_piece->uid;
 }
 
-int32_t spawn_mushroom(float x, float y, LAYER l)
-{
-    return spawn_mushroom(x, y, l, 0);
-}
 int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height relates to trunk
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);

@@ -2122,7 +2122,7 @@ void preload_addresses()
 {
     Memory& mem = Memory::get();
     const char* exe = mem.exe();
-    for (auto [address_name, rule] : g_address_rules)
+    for (auto& [address_name, rule] : g_address_rules)
     {
         if (auto address = rule(mem, exe, address_name))
         {

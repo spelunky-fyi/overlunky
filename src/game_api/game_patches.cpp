@@ -320,7 +320,7 @@ void patch_entering_closed_door_crash()
         if (rva == 0)
             return;
         size_t jump_addr = memory.at_exe(rva + 3);
-        size_t offset = memory_read<int32_t>(jump_addr + 2);
+        int32_t offset = memory_read<int32_t>(jump_addr + 2);
         return_addr = jump_addr + 6 + offset;
     }
     std::string_view new_code{

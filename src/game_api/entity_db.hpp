@@ -106,7 +106,7 @@ struct EntityDB
     float default_special_offsety;
     uint8_t init;
 
-    EntityDB(const EntityDB& other);
+    EntityDB(const EntityDB& other) = default;
     EntityDB(const ENT_TYPE other);
 };
 

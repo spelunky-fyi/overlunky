@@ -85,7 +85,7 @@ bool is_room_flipped(float x, float y)
 {
     thread_local StateMemory* state_ptr = State::get().ptr_local();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
-    return state_ptr->level_gen->flipped_rooms->rooms[ix + iy * 8];
+    return state_ptr->level_gen->flipped_rooms->rooms[ix + iy * 8ull];
 }
 
 struct CommunityTileCode
@@ -1124,7 +1124,7 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_size, std::uint32_t 
             {
                 const auto random_idx = static_cast<std::size_t>(prng.internal_random_index(valid_pos.size(), PRNG::EXTRA_SPAWNS));
                 const auto idx = random_idx < valid_pos.size() ? random_idx : 0;
-                const auto [x, y] = valid_pos[idx];
+                const auto& [x, y] = valid_pos[idx];
                 provider.provider.do_spawn(x, y, layer);
 
                 valid_pos.erase(valid_pos.begin() + idx);
@@ -1244,11 +1244,11 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
     }
 
     LevelGenRoomData room_data{};
-    std::memcpy(room_data.front_layer.data(), front_room_data, 10 * 8);
+    std::memcpy(room_data.front_layer.data(), front_room_data, 10 * 8ull);
     if (dual_room)
     {
         room_data.back_layer.emplace();
-        std::memcpy(room_data.back_layer.value().data(), front_room_data, 10 * 8);
+        std::memcpy(room_data.back_layer.value().data(), front_room_data, 10 * 8ull);
     }
     std::optional<LevelGenRoomData> changed_data = pre_handle_room_tiles(room_data, room_idx_x, room_idx_y, room_template);
     if (changed_data)
@@ -1529,15 +1529,6 @@ void LevelGenData::init()
     g_test_chance = (TestChance*)get_address("level_gen_test_spawn_chance");
 }
 
-std::optional<std::uint32_t> LevelGenData::get_tile_code(const std::string& tile_code)
-{
-    auto it = tile_codes.find((game_string&)tile_code);
-    if (it != tile_codes.end())
-    {
-        return it->second.id;
-    }
-    return {};
-}
 std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
 {
     if (auto existing = get_tile_code(tile_code))
@@ -1553,30 +1544,6 @@ std::uint32_t LevelGenData::define_tile_code(std::string tile_code)
     return it->second.id;
 }
 
-std::optional<uint8_t> LevelGenData::get_short_tile_code(ShortTileCodeDef short_tile_code_def)
-{
-    for (auto& [i, def] : short_tile_codes)
-    {
-        if (def == short_tile_code_def)
-        {
-            return i;
-        }
-    }
-    return std::nullopt;
-}
-std::optional<ShortTileCodeDef> LevelGenData::get_short_tile_code_def(uint8_t short_tile_code)
-{
-    auto it = short_tile_codes.find(short_tile_code);
-    if (it != short_tile_codes.end())
-    {
-        return it->second;
-    }
-    return {};
-}
-void LevelGenData::change_short_tile_code(uint8_t short_tile_code, ShortTileCodeDef short_tile_code_def)
-{
-    short_tile_codes[short_tile_code] = short_tile_code_def;
-}
 std::optional<uint8_t> LevelGenData::define_short_tile_code(ShortTileCodeDef short_tile_code_def)
 {
     // Try all printable chars, note that all chars are allowed since we won't need to parse this anymore
@@ -1624,24 +1591,6 @@ std::pair<const game_string, ChanceDef>& get_or_emplace_chance(game_unordered_ma
     return node.first->value;
 }
 
-std::optional<std::uint32_t> LevelGenData::get_chance(const std::string& chance)
-{
-    {
-        auto it = monster_chances.find((game_string&)chance);
-        if (it != monster_chances.end())
-        {
-            return it->second.id;
-        }
-    }
-    {
-        auto it = trap_chances.find((game_string&)chance);
-        if (it != trap_chances.end())
-        {
-            return it->second.id;
-        }
-    }
-    return {};
-}
 std::uint32_t LevelGenData::define_chance(std::string chance)
 {
     if (auto existing = get_chance(chance))
@@ -1731,15 +1680,6 @@ void LevelGenData::undefine_extra_spawn(std::uint32_t extra_spawn_id)
                   { return provider.extra_spawn_id == extra_spawn_id; });
 }
 
-std::optional<std::uint16_t> LevelGenData::get_room_template(const std::string& room_template)
-{
-    auto it = room_templates.find((game_string&)room_template);
-    if (it != room_templates.end())
-    {
-        return it->second.id;
-    }
-    return {};
-}
 std::uint16_t LevelGenData::define_room_template(std::string room_template, RoomTemplateType type)
 {
     if (auto existing = get_room_template(room_template))
@@ -1770,7 +1710,7 @@ bool LevelGenData::set_room_template_size(std::uint16_t room_template, uint16_t 
     }
     return false;
 }
-RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_template)
+RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_template) const
 {
     auto it = std::find_if(g_room_template_types.begin(), g_room_template_types.end(), [room_template](auto& t)
                            { return t.first == room_template; });
@@ -1780,7 +1720,7 @@ RoomTemplateType LevelGenData::get_room_template_type(std::uint16_t room_templat
     }
     return RoomTemplateType::None;
 }
-uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template)
+uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template) const
 {
     switch (get_room_template_type(room_template))
     {
@@ -1796,7 +1736,7 @@ uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template)
     }
 }
 
-uint32_t ThemeInfo::get_aux_id()
+uint32_t ThemeInfo::get_aux_id() const
 {
     thread_local const LevelGenSystem* level_gen_system = State::get().ptr_local()->level_gen;
     for (size_t i = 0; i < std::size(level_gen_system->themes); i++)
@@ -1884,7 +1824,7 @@ std::pair<float, float> LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
         static_cast<float>(x * 10) + 2.5f,
         122.5f - static_cast<float>(y * 8)};
 }
-std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, uint8_t l)
+std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, uint8_t l) const
 {
     auto* state_ptr = State::get().ptr_local();
 
@@ -1920,7 +1860,7 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t r
     return true;
 }
 
-bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y)
+bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
 {
     auto* state_ptr = State::get().ptr_local();
 
@@ -1929,7 +1869,7 @@ bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y)
 
     return flipped_rooms->rooms[x + y * 8];
 }
-bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y)
+bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y) const
 {
     auto* state_ptr = State::get().ptr_local();
 
@@ -1979,7 +1919,7 @@ bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE 
     return true;
 }
 
-std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template)
+std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template) const
 {
     for (const auto& [name, room_tpl] : data->room_templates)
     {
@@ -2017,7 +1957,7 @@ std::optional<std::string_view> LevelGenSystem::get_procedural_spawn_chance_name
     return std::nullopt;
 }
 
-uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id)
+uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id) const
 {
     if (g_monster_chance_id_to_name.contains(chance_id))
     {
@@ -2181,11 +2121,6 @@ void force_co_subtheme(COSUBTHEME subtheme)
     }
 }
 
-void grow_vines(LAYER l, uint32_t max_lengh)
-{
-    grow_vines(l, max_lengh, {0, 0, 0, 0}, false);
-}
-
 void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 {
     area.abs();
@@ -2262,11 +2197,6 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
     {
         grow_vines(LAYER::BACK, max_lengh, area, destroy_broken);
     }
-}
-
-void grow_poles(LAYER l, uint32_t max_lengh)
-{
-    grow_poles(l, max_lengh, {0, 0, 0, 0}, false);
 }
 
 void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)

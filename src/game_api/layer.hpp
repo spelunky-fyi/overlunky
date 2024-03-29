@@ -205,7 +205,7 @@ struct Layer
 
     Entity* spawn_apep(float x, float y, bool right);
 
-    Entity* get_grid_entity_at(float x, float y);
+    Entity* get_grid_entity_at(float x, float y) const;
 
     Entity* get_entity_at(float x, float y, uint32_t search_flags, uint32_t include_flags, uint32_t exclude_flags, uint32_t one_of_flags);
 
