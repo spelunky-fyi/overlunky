@@ -518,12 +518,12 @@ void post_event(ON event)
         });
 }
 
-void pre_heap_clone_event(StateMemory* from, StateMemory* to)
+void pre_copy_state_event(StateMemory* from, StateMemory* to)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)
         {
-            backend->pre_clone_heap(from, to);
+            backend->pre_copy_state(from, to);
             return true;
         });
 }

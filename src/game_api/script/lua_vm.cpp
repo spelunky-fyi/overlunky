@@ -2465,8 +2465,8 @@ end
         ON::BLOCKED_GAME_LOOP,
         "BLOCKED_PROCESS_INPUT",
         ON::BLOCKED_PROCESS_INPUT,
-        "PRE_CLONE_HEAP",
-        ON::PRE_CLONE_HEAP);
+        "PRE_COPY_STATE",
+        ON::PRE_COPY_STATE);
 
     /* ON
     // LOGO
@@ -2723,6 +2723,9 @@ end
     // Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when Overlunky blocks a PRE_GAME_LOOP.
     // BLOCKED_PROCESS_INPUT
     // Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when Overlunky blocks a PRE_PROCESS_INPUT.
+    // PRE_COPY_STATE
+    // Runs before the game copies a state to another in an online multiplayer game.
+    // Params: StateMemory from, StateMemory to
     */
 
     lua.create_named_table(

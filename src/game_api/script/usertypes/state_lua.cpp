@@ -414,7 +414,7 @@ void register_usertypes(sol::state& lua)
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
     statememory_type["room_owners"] = &StateMemory::room_owners;
 
-    auto get_local_data = [](StateMemory& state) -> sol::object
+    auto state_get_user_data = [](StateMemory& state) -> sol::object
     {
         auto backend = LuaBackend::get_calling_backend();
         auto local_datas = backend->local_state_datas;
@@ -425,13 +425,18 @@ void register_usertypes(sol::state& lua)
         return sol::nil;
     };
 
-    auto set_local_data = [](StateMemory& state, sol::object user_data) -> void
+    auto state_set_user_data = [](StateMemory& state, sol::object user_data) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
         backend->local_state_datas[&state].user_data = user_data;
     };
+    auto user_data = sol::property(state_get_user_data, state_set_user_data);
 
-    statememory_type["local_data"] = sol::property(get_local_data, set_local_data);
+    statememory_type["user_data"] = std::move(user_data);
+    /* StateMemory
+    // user_data
+    // You can put any arbitrary lua object here and it will work correctly in online multiplayer, by having a copy on each state and being copied when the game does.
+    */
 
     lua.create_named_table("FADE", "NONE", 0, "OUT", 1, "LOAD", 2, "IN", 3);
 

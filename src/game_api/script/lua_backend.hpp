@@ -139,8 +139,7 @@ enum class ON
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
-    PRE_CLONE_HEAP,
-    POST_CLONE_HEAP,
+    PRE_COPY_STATE,
 };
 
 struct IntOption
@@ -468,7 +467,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
-    void pre_clone_heap(StateMemory* from, StateMemory* to);
+    void pre_copy_state(StateMemory* from, StateMemory* to);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);

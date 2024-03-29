@@ -922,6 +922,7 @@ Name | Data | Description
 [BLOCKED_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_UPDATE) | ON::BLOCKED_UPDATE | Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_UPDATE.<br/>
 [BLOCKED_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_GAME_LOOP) | ON::BLOCKED_GAME_LOOP | Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_GAME_LOOP.<br/>
 [BLOCKED_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_PROCESS_INPUT) | ON::BLOCKED_PROCESS_INPUT | Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_PROCESS_INPUT.<br/>
+[PRE_COPY_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_COPY_STATE) | ON::PRE_COPY_STATE | Runs before the game copies a state to another in an online multiplayer game.<br/>Params: [StateMemory](#StateMemory) from, [StateMemory](#StateMemory) to<br/>
 
 ## PARTICLEEMITTER
 
