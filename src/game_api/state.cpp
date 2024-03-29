@@ -42,6 +42,11 @@ static int64_t global_frame_count{0};
 static int64_t global_update_count{0};
 static bool g_forward_blocked_events{false};
 
+bool get_forward_events()
+{
+    return g_forward_blocked_events;
+}
+
 uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
 {
     return (correct_ushabti + (correct_ushabti / 10) * 2);
@@ -304,6 +309,7 @@ State& State::get()
             init_game_loop_hook();
 
             auto bucket = Bucket::get();
+            bucket->count++;
             if (!bucket->patches_applied)
             {
                 DEBUG("Applying patches");

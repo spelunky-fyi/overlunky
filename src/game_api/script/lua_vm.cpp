@@ -528,6 +528,7 @@ end
             switch (caller.type)
             {
             case CallbackType::Normal:
+            case CallbackType::HotKey:
                 backend->clear_callbacks.push_back(caller.id);
                 break;
             case CallbackType::Entity:
@@ -545,6 +546,16 @@ end
                 break;
             }
         });
+
+    lua.create_named_table("HOTKEY_TYPE", "NORMAL", HOTKEY_TYPE::NORMAL, "GLOBAL", HOTKEY_TYPE::GLOBAL, "INPUT", HOTKEY_TYPE::INPUT);
+    /* HOTKEY_TYPE
+    // NORMAL
+    // Suppressed when the game window is inactive or inputting text in this tool instance (get_io().wantkeyboard == true). Can't detect if OL is in a text input and script is running in PL though. Use ImGuiIO if you need to do that.
+    // GLOBAL
+    // Enabled even when the game window is inactive and will capture keys even from other programs.
+    // INPUT
+    // Enabled even when inputting text and will override normal text input keys.
+    */
 
     /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");
@@ -2430,6 +2441,14 @@ end
         ON::PRE_GAME_LOOP,
         "POST_GAME_LOOP",
         ON::POST_GAME_LOOP,
+        "PRE_SAVE_STATE",
+        ON::PRE_SAVE_STATE,
+        "POST_SAVE_STATE",
+        ON::POST_SAVE_STATE,
+        "PRE_LOAD_STATE",
+        ON::PRE_LOAD_STATE,
+        "POST_LOAD_STATE",
+        ON::POST_LOAD_STATE,
         "BLOCKED_UPDATE",
         ON::BLOCKED_UPDATE,
         "BLOCKED_GAME_LOOP",
@@ -2674,6 +2693,18 @@ end
     // Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.
     // POST_GAME_LOOP
     // Runs right after the main engine loop.
+    // PRE_SAVE_STATE
+    // Runs right before the main StateMemory is manually saved to a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState. Return true to block save.
+    // Params: int slot, StateMemory saved
+    // POST_SAVE_STATE
+    // Runs right after the main StateMemory is manually saved to a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState.
+    // Params: int slot, StateMemory saved
+    // PRE_LOAD_STATE
+    // Runs right before the main StateMemory is manually loaded from a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState. Return true to block load.
+    // Params: int slot, StateMemory loaded
+    // POST_LOAD_STATE
+    // Runs right after the main StateMemory is manually loaded from a slot or a custom SaveState. Slot is 1..4 or -1 on custom SaveState.
+    // Params: int slot, StateMemory loaded
     // BLOCKED_UPDATE
     // Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when Overlunky blocks a PRE_UPDATE.
     // BLOCKED_GAME_LOOP
@@ -2708,7 +2739,7 @@ end
     // LEVEL_GEN_PROCEDURAL
     // Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.
     // LEVEL_GEN_FLOOR_SPREADING
-    // Only procs during floor spreading, both horizontal and vertical
+    // Includes solid floor type spreading (i.e. floorstyled bleeding to existing generic floor) but also corner filling of empty tiles.
     // LEVEL_GEN_GENERAL
     // Covers all spawns during level gen that are not covered by the other two.
     // SCRIPT

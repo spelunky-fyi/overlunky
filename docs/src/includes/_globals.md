@@ -1258,6 +1258,15 @@ Change the amount of frames after the damage from poison is applied
 
 Clear cache for a file path or the whole directory
 
+### clear_state
+
+
+> Search script examples for [clear_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_state)
+
+#### nil clear_state(int slot)
+
+Clear save state from slot 1..4.
+
 ### clr_mask
 
 
@@ -1515,6 +1524,15 @@ Retrieves the current value of the performance counter, which is a high resoluti
 
 Retrieves the frequency of the performance counter. The frequency of the performance counter is fixed at system boot and is consistent across all processors. Therefore, the frequency need only be queried upon application initialization, and the result can be cached.
 
+### get_save_state
+
+
+> Search script examples for [get_save_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_save_state)
+
+#### [StateMemory](#StateMemory) get_save_state(int slot)
+
+Get [StateMemory](#StateMemory) from a save_state slot.
+
 ### get_setting
 
 
@@ -1681,6 +1699,15 @@ Immediately ends the run with the death screen, also calls the [save_progress](#
 
 Immediately load a screen based on [state](#state).screen_next and stuff
 
+### load_state
+
+
+> Search script examples for [load_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_state)
+
+#### nil load_state(int slot)
+
+Load level state from slot 1..4, if a save_state was made in this level.
+
 ### lowbias32
 
 
@@ -1761,6 +1788,15 @@ Saves the game to savegame.sav, unless game saves are blocked in the settings. A
 #### bool save_script()
 
 Runs the [ON](#ON).SAVE callback. Fails and returns false, if you're trying to save too often (2s).
+
+### save_state
+
+
+> Search script examples for [save_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save_state)
+
+#### nil save_state(int slot)
+
+Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see [SaveState](#SaveState) if you need more.
 
 ### script_enabled
 
@@ -1880,6 +1916,17 @@ Set engine target frametime (1/framerate, default 1/60). Always capped by your G
 #### nil set_frametime_unfocused(optional<double> frametime)
 
 Set engine target frametime when game is unfocused (1/framerate, default 1/33). Always capped by the engine frametime. Set to 0 to go as fast as possible. Call without arguments to reset.
+
+### set_hotkey
+
+
+> Search script examples for [set_hotkey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_hotkey)
+
+#### [CallbackId](#Aliases) set_hotkey(function cb, [KEY](#KEY) key, [HOTKEY_TYPE](#HOTKEY_TYPE) flags = [HOTKEY_TYPE](#HOTKEY_TYPE).NORMAL)
+
+Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
+Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use [ImGuiIO](#ImGuiIO) if you need Playlunky hotkeys to react to [Overlunky](#Overlunky) input state. Key is a [KEY](#KEY) combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
+<br/>The callback signature is nil on_hotkey([KEY](#KEY) key)
 
 ### set_infinite_loop_detection_enabled
 
@@ -2128,11 +2175,6 @@ Converts (x, y, BUTTON) to [INPUTS](#INPUTS)
 #### [ImGuiIO](#ImGuiIO) get_io()
 
 Returns: [ImGuiIO](#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
-
-- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
-- Note: You can use [KEY](#KEY) or standard VK keycodes to index `keys` or the other functions.
-- Note: [Overlunky](#Overlunky)/etc will eat all keys it is currently configured to use, your script will only get leftovers.
-- Note: [Gamepad](#Gamepad) is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 
 ### get_raw_input
 
@@ -3457,6 +3499,15 @@ Will return the string of currently choosen language
 
 Convert the hash to stringid
 Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
+
+### key_name
+
+
+> Search script examples for [key_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_name)
+
+#### string key_name()
+
+Returns human readable string from [KEY](#KEY) chord (e.g. "Ctrl+X", "Unknown" or "None")
 
 ### set_level_string
 

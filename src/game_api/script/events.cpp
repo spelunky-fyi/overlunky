@@ -10,6 +10,7 @@
 #include "constants.hpp"          // for no_return_str
 #include "level_api_types.hpp"    // for LevelGenRoomData
 #include "rpc.hpp"                // for game_log, get_adventure_seed
+#include "savestate.hpp"          // for invalidate_save_slots
 #include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
 #include "settings_api.hpp"       // for restore_original_settings
 #include "state.hpp"              // for StateMemory, State
@@ -78,7 +79,10 @@ bool pre_unload_level()
             return !block;
         });
     if (!block)
+    {
         g_level_loaded = false;
+        invalidate_save_slots();
+    }
     return block;
 }
 bool pre_init_level()
@@ -112,6 +116,30 @@ bool pre_init_layer(LAYER layer)
         [&](LuaBackend::LockedBackend backend)
         {
             block = backend->pre_init_layer(layer);
+            return !block;
+        });
+    return block;
+}
+
+bool pre_save_state(int slot, StateMemory* saved)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_save_state(slot, saved);
+            return !block;
+        });
+    return block;
+}
+
+bool pre_load_state(int slot, StateMemory* loaded)
+{
+    bool block{false};
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            block = backend->pre_load_state(slot, loaded);
             return !block;
         });
     return block;
@@ -159,6 +187,24 @@ void post_unload_layer(LAYER layer)
         [&](LuaBackend::LockedBackend backend)
         {
             backend->post_unload_layer(layer);
+            return true;
+        });
+}
+void post_save_state(int slot, StateMemory* saved)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_save_state(slot, saved);
+            return true;
+        });
+}
+void post_load_state(int slot, StateMemory* loaded)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_load_state(slot, loaded);
             return true;
         });
 }

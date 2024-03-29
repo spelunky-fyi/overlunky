@@ -119,6 +119,9 @@ class GuiDrawContext
     void win_indent(float width);
     /// Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
     void win_width(float width);
+    /// Returns KEY flags including held OL_MOD modifiers, or -1 before any key has been pressed and released, or mouse button pressed. Also returns -1 before all initially held keys are released before the picker was opened, or if another key picker is already waiting for keys. If a modifier is released, that modifier is returned as an actual keycode (e.g. `KEY.LSHIFT`) while the other held modifiers are returned as `KEY.OL_MOD_...` flags.
+    /// Shows a fullscreen key picker with a message, with the accepted input type (keyboard/mouse) filtered by flags. The picker won't show before all previously held keys have been released and other key pickers have returned a valid key.
+    int64_t key_picker(std::string message, KEY_TYPE flags);
 
   private:
     class LuaBackend* backend;

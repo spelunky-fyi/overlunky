@@ -55,11 +55,17 @@ void register_usertypes(sol::state& lua)
     /// NoDoc
     lua["pause"][sol::metatable_key]["__call"] = &PauseAPI::set_paused;
 
+    auto sharedio_type = lua.new_usertype<SharedIO>("SharedIO", sol::no_constructor);
+    sharedio_type["wantkeyboard"] = &SharedIO::WantCaptureKeyboard;
+    sharedio_type["wantmouse"] = &SharedIO::WantCaptureMouse;
+
     /// Shared memory structure used for Playlunky-Overlunky interoperability
     auto bucket_type = lua.new_usertype<Bucket>("Bucket", sol::no_constructor);
     bucket_type["data"] = &Bucket::data;
     bucket_type["overlunky"] = sol::readonly(&Bucket::overlunky);
     bucket_type["pause"] = &Bucket::pause_api;
+    bucket_type["io"] = &Bucket::io;
+    bucket_type["count"] = sol::readonly(&Bucket::count);
 
     /// Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
     // lua["get_bucket"] = []() -> Bucket*

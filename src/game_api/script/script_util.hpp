@@ -15,13 +15,4 @@ void AddImageRotated(ImDrawList* draw_list, ImTextureID user_texture_id, const I
 
 std::string sanitize(std::string data);
 
-struct InputTextCallback_UserData
-{
-    std::string* Str;
-    ImGuiInputTextCallback ChainCallback;
-    void* ChainCallbackUserData;
-};
-
-int InputTextCallback(ImGuiInputTextCallbackData* data);
-
 bool InputString(const char* label, std::string* str, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data);

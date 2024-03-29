@@ -148,6 +148,14 @@ std::map<std::string, int64_t> default_keys{
     {"hotbar_8", '8'},
     {"hotbar_9", '9'},
     {"hotbar_0", '0'},
+    {"load_state_1", OL_KEY_SHIFT | VK_F1},
+    {"load_state_2", OL_KEY_SHIFT | VK_F2},
+    {"load_state_3", OL_KEY_SHIFT | VK_F3},
+    {"load_state_4", OL_KEY_SHIFT | VK_F4},
+    {"save_state_1", OL_KEY_SHIFT | VK_F5},
+    {"save_state_2", OL_KEY_SHIFT | VK_F6},
+    {"save_state_3", OL_KEY_SHIFT | VK_F7},
+    {"save_state_4", OL_KEY_SHIFT | VK_F8},
     {"toggle_hotbar", OL_KEY_CTRL | OL_KEY_SHIFT | 'B'},
     {"spawn_layer_door", OL_KEY_SHIFT | VK_RETURN},
     {"spawn_warp_door", OL_KEY_CTRL | OL_KEY_SHIFT | VK_RETURN},
@@ -222,6 +230,7 @@ std::map<std::string, int64_t> default_keys{
     {"speedhack_slow", VK_NEXT},
     {"toggle_uncapped_fps", OL_KEY_CTRL | OL_KEY_SHIFT | 'U'},
     {"respawn", OL_KEY_CTRL | 'R'},
+    {"clear_messages", OL_KEY_CTRL | VK_BACK},
     //{ "", 0x },
 };
 
@@ -276,7 +285,7 @@ std::vector<uint32_t> g_selected_ids;
 bool set_focus_entity = false, set_focus_world = false, set_focus_finder = false, set_focus_uid = false, scroll_to_entity = false, scroll_top = false, click_teleport = false,
      throw_held = false, show_app_metrics = false, lock_entity = false, lock_player = false,
      freeze_last = false, freeze_level = false, freeze_total = false, hide_ui = false,
-     enable_noclip = false, load_script_dir = true, load_packs_dir = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
+     enable_noclip = false, enable_camp_camera = true, enable_camera_bounds = true, freeze_quest_yang = false, freeze_quest_sisters = false, freeze_quest_horsing = false, freeze_quest_sparrow = false, freeze_quest_tusk = false, freeze_quest_beg = false, run_finder = false, in_menu = false, zooming = false, g_inv = false, edit_last_id = false, edit_achievements = false, peek_layer = false, death_disable = false;
 std::optional<int8_t> quest_yang_state, quest_sisters_state, quest_horsing_state, quest_sparrow_state, quest_tusk_state, quest_beg_state;
 Entity* g_entity = 0;
 Entity* g_held_entity = 0;
@@ -368,11 +377,12 @@ std::map<std::string, bool> options = {
     {"console_alt_keys", false},
     {"vsync", true},
     {"uncap_unfocused_fps", true},
-    {"pause_loading", false},
-    {"pause_update_camera", false},
-    {"pause_last_instance", false},
+    {"pause_update_camera", true},
+    {"pause_last_instance", true},
     {"update_check", true},
     {"modifiers_clear_input", true},
+    {"load_scripts", true},
+    {"load_packs", false},
 };
 
 double g_engine_fps = 60.0, g_unfocused_fps = 33.0;
@@ -755,7 +765,7 @@ std::string key_string(int64_t keycode)
         }
         if (result == 0)
         {
-            name = "Mystery key";
+            name = "Unknown";
         }
         std::string keyname(szName);
         name = keyname;
@@ -776,13 +786,13 @@ std::string key_string(int64_t keycode)
     {
         name = "Shift+" + name;
     }
-    if (keycode & OL_KEY_CTRL)
-    {
-        name = "Ctrl+" + name;
-    }
     if (keycode & OL_KEY_ALT)
     {
         name = "Alt+" + name;
+    }
+    if (keycode & OL_KEY_CTRL)
+    {
+        name = "Ctrl+" + name;
     }
     return name;
 }
@@ -795,7 +805,7 @@ bool SliderByte(const char* label, char* value, char min = 0, char max = 0, cons
 void refresh_script_files()
 {
     g_script_files.clear();
-    if (load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    if (options["load_scripts"] && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         for (const auto& file : std::filesystem::directory_iterator(scriptpath))
         {
@@ -805,7 +815,7 @@ void refresh_script_files()
             }
         }
     }
-    else if (!load_script_dir && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
+    else if (!options["load_scripts"] && std::filesystem::exists(scriptpath) && std::filesystem::is_directory(scriptpath))
     {
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
@@ -823,7 +833,7 @@ void refresh_script_files()
         }
     }
 
-    if (load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    if (options["load_packs"] && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         for (const auto& file : std::filesystem::recursive_directory_iterator("Mods/Packs"))
         {
@@ -833,7 +843,7 @@ void refresh_script_files()
             }
         }
     }
-    else if (!load_packs_dir && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
+    else if (!options["load_packs"] && std::filesystem::exists("Mods/Packs") && std::filesystem::is_directory("Mods/Packs"))
     {
         std::vector<std::string> unload_scripts;
         for (const auto& script : g_scripts)
@@ -1311,9 +1321,16 @@ void smart_delete(Entity* ent, bool unsafe = false)
 {
     static auto first_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
-    ent->flags = set_flag(ent->flags, 1);
-    for (auto item : ent->items.entities())
-        item->flags = set_flag(item->flags, 1);
+    if (!ent->is_player())
+        ent->flags = set_flag(ent->flags, 1);
+    if ((ent->type->search_flags & 0x80) == 0)
+    {
+        for (auto item : ent->items.entities())
+        {
+            if (!item->is_player())
+                item->flags = set_flag(item->flags, 1);
+        }
+    }
     UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
@@ -2793,11 +2810,41 @@ void toggle_lights()
     }
 }
 
+void load_state(int slot)
+{
+    StateMemory* target = UI::get_save_state(slot);
+    if (!target)
+        return;
+    if (g_state->screen == 14 && target->screen != 14)
+    {
+        g_state->screen = 12;
+        g_game_manager->journal_ui->fade_timer = 15;
+        g_game_manager->journal_ui->state = 5;
+        g_state->camera->focus_offset_x = 0;
+        g_state->camera->focus_offset_y = 0;
+        set_camera_bounds(true);
+    }
+    UI::copy_state(slot, 5);
+}
+
+void clear_script_messages()
+{
+    for (auto& [name, script] : g_scripts)
+        script->consume_messages();
+    for (auto& [name, script] : g_ui_scripts)
+        script->consume_messages();
+    g_Console->consume_messages();
+    g_ConsoleMessages.clear();
+}
+
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
     ImGuiContext& g = *GImGui;
+    int repeat = (lParam >> 30) & 1U;
+    auto& io = ImGui::GetIO();
+    ImGuiWindow* current = g.NavWindow;
 
-    if (nCode == WM_KEYUP)
+    if (nCode == WM_KEYUP && !io.WantCaptureKeyboard && !g_bucket->io->WantCaptureKeyboard.value_or(false))
     {
         if (pressed("speedhack_turbo", wParam))
         {
@@ -2809,9 +2856,13 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             UI::speedhack(g_speedhack_old_multiplier);
             g_speedhack_old_multiplier = 1.0f;
         }
-        else if (pressed("peek_layer", wParam))
+        else if (pressed("peek_layer", wParam) && peek_layer)
         {
             peek_layer = false;
+            g_state->layer_transition_timer = 15;
+            g_state->transition_to_layer = (g_state->camera_layer + 1) % 2;
+            g_state->camera_layer = g_state->transition_to_layer;
+            UI::set_camera_layer_control_enabled(!peek_layer);
         }
     }
 
@@ -2820,9 +2871,6 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         return false;
     }
 
-    int repeat = (lParam >> 30) & 1U;
-    auto& io = ImGui::GetIO();
-    ImGuiWindow* current = g.NavWindow;
     g_speedhack_ui_multiplier = UI::get_speedhack();
 
     if (current != nullptr && current == ImGui::FindWindowByName("KeyCapture"))
@@ -2845,6 +2893,9 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
         return true;
     }
+
+    if (g_bucket->io->WantCaptureKeyboard.value_or(false))
+        return false;
 
     if (pressed("hide_ui", wParam))
     {
@@ -3498,9 +3549,49 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
         }
         g_selected_ids.clear();
     }
-    else if (pressed("peek_layer", wParam))
+    else if (pressed("peek_layer", wParam) && !repeat)
     {
         peek_layer = true;
+        UI::set_camera_layer_control_enabled(!peek_layer);
+        g_state->layer_transition_timer = 15;
+        g_state->transition_to_layer = (g_state->camera_layer + 1) % 2;
+        g_state->camera_layer = g_state->transition_to_layer;
+    }
+    else if (pressed("save_state_1", wParam))
+    {
+        UI::copy_state(5, 1);
+    }
+    else if (pressed("save_state_2", wParam))
+    {
+        UI::copy_state(5, 2);
+    }
+    else if (pressed("save_state_3", wParam))
+    {
+        UI::copy_state(5, 3);
+    }
+    else if (pressed("save_state_4", wParam))
+    {
+        UI::copy_state(5, 4);
+    }
+    else if (pressed("load_state_1", wParam))
+    {
+        load_state(1);
+    }
+    else if (pressed("load_state_2", wParam))
+    {
+        load_state(2);
+    }
+    else if (pressed("load_state_3", wParam))
+    {
+        load_state(3);
+    }
+    else if (pressed("load_state_4", wParam))
+    {
+        load_state(4);
+    }
+    else if (pressed("clear_messages", wParam))
+    {
+        clear_script_messages();
     }
     else
     {
@@ -3587,16 +3678,16 @@ bool render_uid(int uid, const char* section, bool rembtn = false)
     ImGui::Text("%s", typec.c_str());
     ImGui::SameLine();
     ImGui::Text("%s", pname.c_str());
+    auto remove = false;
     if (rembtn)
     {
         ImGui::SameLine();
         ImGui::PushID(uid);
-        if (ImGui::Button("Remove"))
-            g_entity->remove_item(uid);
+        remove = ImGui::Button("Remove##RemoveItem");
         ImGui::PopID();
     }
     ImGui::PopID();
-    return true;
+    return remove;
 }
 
 void render_light(const char* name, LightParams* light)
@@ -4105,8 +4196,9 @@ void render_camera()
 {
     if (submenu("Focus and bounds"))
     {
-        if (render_uid(g_state->camera->focused_entity_uid, "FocusedEntity"))
+        if (g_state->camera->focused_entity_uid != 0 && g_state->camera->focused_entity_uid != UINT32_MAX)
         {
+            render_uid(g_state->camera->focused_entity_uid, "FocusedEntity");
             ImGui::SameLine(0, 4.0f);
             if (ImGui::Button("Unfocus"))
                 g_state->camera->focused_entity_uid = -1;
@@ -4428,7 +4520,7 @@ void render_grid(ImColor gridcolor = ImColor(1.0f, 1.0f, 1.0f, 0.2f))
     {
         for (unsigned int y = 0; y < g_state->h; ++y)
         {
-            auto room_temp = UI::get_room_template(x, y, peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer);
+            auto room_temp = UI::get_room_template(x, y, g_state->camera_layer);
             if (room_temp.has_value())
             {
                 auto room_name = UI::get_room_template_name(room_temp.value());
@@ -4972,7 +5064,7 @@ void render_clickhandler()
             ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNavInputs | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDocking);
     if (ImGui::IsWindowHovered())
         io.WantCaptureMouse = options["mouse_control"];
-    if (io.MouseWheel != 0 && ImGui::IsWindowHovered())
+    if (io.MouseWheel != 0 && ImGui::IsWindowHovered() && !g_bucket->io->WantCaptureMouse.value_or(false))
     {
         if (clicked("mouse_zoom_out") || (held("mouse_camera_drag") && io.MouseWheel < 0))
         {
@@ -4998,7 +5090,7 @@ void render_clickhandler()
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer)))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -5052,17 +5144,17 @@ void render_clickhandler()
                 to_id("ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR"),
                 to_id("ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR"),
             };
-            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // FLOOR | ACTIVEFLOOR
+            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)g_state->camera_layer)) // FLOOR | ACTIVEFLOOR
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
             }
-            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // LOGICAL
+            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)g_state->camera_layer)) // LOGICAL
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             }
-            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)(peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))) // DOOR
+            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)g_state->camera_layer)) // DOOR
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 180, 45, 150), false, true);
@@ -5104,7 +5196,7 @@ void render_clickhandler()
         {
             g_bucket->overlunky->hovered_uid = -1;
         }
-        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered())
+        if (options["draw_entity_tooltip"] && ImGui::IsWindowHovered() && io.MouseDrawCursor)
         {
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {4.0f, 4.0f});
             tooltip(coords.c_str(), true);
@@ -5120,7 +5212,7 @@ void render_clickhandler()
     back_fill.Value.w = 0.25f;
     if (update_entity())
     {
-        auto this_layer = (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer) == g_entity->layer;
+        auto this_layer = g_state->camera_layer == g_entity->layer;
         render_hitbox(g_entity, true, this_layer ? front_col : back_col);
     }
     for (auto entity : g_selected_ids)
@@ -5128,7 +5220,7 @@ void render_clickhandler()
         auto ent = get_entity_ptr(entity);
         if (ent)
         {
-            if (ent->layer == (peek_layer ? g_state->camera_layer ^ 1 : g_state->camera_layer))
+            if (ent->layer == g_state->camera_layer)
                 render_hitbox(ent, false, front_fill, true);
             else
                 render_hitbox(ent, false, back_fill, true);
@@ -5184,7 +5276,7 @@ void render_clickhandler()
     }
     using namespace std::chrono_literals;
     auto now = std::chrono::system_clock::now();
-    if (options["mouse_control"] && now > last_focus_time + 200ms && (!options["menu_ui"] || mouse_pos().y > ImGui::GetTextLineHeight()))
+    if (options["mouse_control"] && now > last_focus_time + 200ms && (!options["menu_ui"] || mouse_pos().y > ImGui::GetTextLineHeight()) && !g_bucket->io->WantCaptureMouse.value_or(false))
     {
         ImGui::InvisibleButton("canvas", ImGui::GetContentRegionMax(), ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
         if (ImGui::BeginDragDropTarget())
@@ -5462,7 +5554,7 @@ void render_clickhandler()
                 g_held_entity->flags = g_held_flags;
             set_pos(startpos);
             set_vel(mouse_pos());
-            if (g_held_entity && g_held_entity->is_movable())
+            if (g_held_entity && g_held_entity->is_movable() && drag_delta("mouse_grab_throw") > 10.0f)
                 UI::move_entity(g_held_id, g_x, g_y, true, g_vx, g_vy, options["snap_to_grid"]);
             g_x = 0;
             g_y = 0;
@@ -5476,7 +5568,7 @@ void render_clickhandler()
             io.MouseDrawCursor = true;
             if (g_held_entity)
                 g_held_entity->flags = g_held_flags;
-            if (options["snap_to_grid"] && g_held_entity->is_movable())
+            if (options["snap_to_grid"] && g_held_entity->is_movable() && (drag_delta("mouse_grab") > 10.0f || drag_delta("mouse_grab_unsafe") > 10.0f))
             {
                 UI::move_entity(g_held_id, g_x, g_y, true, 0, 0, options["snap_to_grid"]);
             }
@@ -5800,10 +5892,12 @@ void render_keyconfig()
             if (io.MouseDown[i])
             {
                 size_t keycode = 0x400 + i + 1;
-                if (io.KeysDown[VK_CONTROL])
+                if (ImGui::GetIO().KeyCtrl)
                     keycode += 0x100;
-                if (io.KeysDown[VK_SHIFT])
+                if (ImGui::GetIO().KeyShift)
                     keycode += 0x200;
+                if (ImGui::GetIO().KeyAlt)
+                    keycode += 0x800;
                 keys[g_change_key] = keycode;
                 save_config(cfgfile);
                 g_change_key = "";
@@ -5818,19 +5912,21 @@ void render_keyconfig()
                 keycode += OL_WHEEL_DOWN;
             else if (io.MouseWheel > 0)
                 keycode += OL_WHEEL_UP;
-            if (io.KeysDown[VK_CONTROL])
+            if (ImGui::GetIO().KeyCtrl)
                 keycode += 0x100;
-            if (io.KeysDown[VK_SHIFT])
+            if (ImGui::GetIO().KeyShift)
                 keycode += 0x200;
+            if (ImGui::GetIO().KeyAlt)
+                keycode += 0x800;
             keys[g_change_key] = keycode;
             save_config(cfgfile);
             g_change_key = "";
         }
 
         // Keys
-        for (size_t i = 0; i < VK_LSHIFT; ++i)
+        for (size_t i = 0; i < 0xFF; ++i)
         {
-            if (ImGui::IsKeyDown((ImGuiKey)i))
+            if (ImGui::IsKeyReleased((ImGuiKey)i))
             {
                 size_t keycode = i;
                 if (ImGui::GetIO().KeyCtrl)
@@ -6455,13 +6551,17 @@ void render_scripts()
     ImGui::SameLine();
     ImGui::Checkbox("to console##ConsoleScriptMessages", &options["console_script_messages"]);
     ImGui::Checkbox("Fade script messages##FadeScriptMessages", &options["fade_script_messages"]);
-    if (ImGui::Checkbox("Load scripts from script directory##LoadScriptsDefault", &load_script_dir))
+    ImGui::SameLine();
+    if (ImGui::Button("Clear##ClearMessages"))
+        clear_script_messages();
+    tooltip("Clear all script messages from screen", "clear_messages");
+    if (ImGui::Checkbox("Load scripts from script directory##LoadScriptsDefault", &options["load_scripts"]))
         refresh_script_files();
     ImGui::SameLine();
-    if (ImGui::Button("Set##SetScriptDir"))
+    if (ImGui::Button("Change##SetScriptDir"))
         set_script_dir();
     tooltip(scriptpath.c_str());
-    if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &load_packs_dir))
+    if (ImGui::Checkbox("Load scripts from Mods/Packs##LoadScriptsPacks", &options["load_packs"]))
         refresh_script_files();
     if (ImGui::Button("Create new quick script"))
     {
@@ -6973,12 +7073,12 @@ void render_savegame()
     ImGui::PopID();
 }
 
-void render_powerup(PowerupCapable* ent, int uid, const char* section)
+bool render_powerup(int uid, const char* section)
 {
     std::string uidc = std::to_string(uid);
     int ptype = UI::get_entity_type(uid);
     if (ptype == 0)
-        return;
+        return false;
     std::string typec = std::to_string(ptype);
     const char* pname = entity_names[ptype].c_str();
     ImGui::PushID(section);
@@ -6993,12 +7093,10 @@ void render_powerup(PowerupCapable* ent, int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("Remove"))
-    {
-        ent->as<Player>()->remove_powerup(ptype);
-    }
+    auto remove = ImGui::Button("Remove##RemovePowerup");
     ImGui::PopID();
     ImGui::PopID();
+    return remove;
 }
 
 void render_state(const char* label, uint8_t state)
@@ -7634,16 +7732,24 @@ void render_entity_props(int uid, bool detached = false)
         if (entity->type->search_flags & 0x7)
         {
             auto entity_pow = entity->as<PowerupCapable>();
+            int removed_uid = 0;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0) && !entity_pow->has_powerup(ent->type->id))
-                    render_uid(ent->uid, "EntityItems", true);
+                    if (render_uid(ent->uid, "EntityItems", true))
+                        removed_uid = ent->uid;
             }
+            if (removed_uid)
+                entity_pow->remove_item(removed_uid);
             ImGui::SeparatorText("Powerups");
+            int removed_powerup = 0;
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
             {
-                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
+                if (render_powerup(powerup_entity->uid, "Powerups"))
+                    removed_powerup = powerup_entity->type->id;
             }
+            if (removed_powerup)
+                entity_pow->remove_powerup(removed_powerup);
             ImGui::PushItemWidth(160);
             static const char* chosenPowerup = "";
             static uint8_t chosenPowerupIndex = 0;
@@ -7707,11 +7813,15 @@ void render_entity_props(int uid, bool detached = false)
         }
         else
         {
+            int removed_uid = 0;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0))
-                    render_uid(ent->uid, "EntityItems", true);
+                    if (render_uid(ent->uid, "EntityItems", true))
+                        removed_uid = ent->uid;
             }
+            if (removed_uid)
+                entity->remove_item(removed_uid);
         }
         endmenu();
     }
@@ -8076,17 +8186,6 @@ struct TextureViewer
 static TextureViewer texture_viewer{0, -1};
 void render_vanilla_stuff()
 {
-    if (peek_layer && g_state->layer_transition_timer == 0)
-    {
-        uint8_t other_layer = g_state->camera_layer ? 0 : 1;
-        auto [bbox_left, bbox_top] = UI::click_position(-1.0f, 1.0f);
-        auto [bbox_right, bbox_bottom] = UI::click_position(1.0f, -1.0f);
-        for (uint8_t i = 52; i > 0; --i)
-        {
-            render_draw_depth(g_state->layers[other_layer], i, bbox_left, bbox_bottom, bbox_right, bbox_top);
-        }
-    }
-
     if (!hide_ui && options["draw_hotbar"])
         render_hotbar_textures();
 
@@ -8433,6 +8532,27 @@ void render_game_props()
     }
     if (submenu("State"))
     {
+        for (int i = 1; i <= 4; ++i)
+        {
+            if (ImGui::Button(fmt::format(" {} ##SaveState{}", i, i).c_str()))
+                UI::copy_state(5, i);
+            tooltip("Save current level state", fmt::format("save_state_{}", i).c_str());
+            ImGui::SameLine();
+        }
+        ImGui::Text("Save state");
+
+        for (int i = 1; i <= 4; ++i)
+        {
+            bool valid = UI::get_save_state(i) != nullptr;
+            ImGui::BeginDisabled(!valid);
+            if (ImGui::Button(fmt::format(" {} ##LoadState{}", i, i).c_str()))
+                load_state(i);
+            ImGui::EndDisabled();
+            tooltip("Load current level state", fmt::format("load_state_{}", i).c_str());
+            ImGui::SameLine();
+        }
+        ImGui::Text("Load state");
+
         render_screen("Current screen", g_state->screen);
         render_screen("Last screen", g_state->screen_last);
         render_screen("Next screen", g_state->screen_next);

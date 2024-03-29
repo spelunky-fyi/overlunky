@@ -153,7 +153,10 @@ print(
     "- This doc is up to date for the Overlunky [WHIP build](https://github.com/spelunky-fyi/overlunky/releases/tag/whip) and Playlunky [nightly build](https://github.com/spelunky-fyi/Playlunky/releases/tag/nightly). If you're using a stable release from the past, you might find some things here don't work."
 )
 print(
-    "- Set `OL_DEBUG=1` in the same environment where the game is running to keep the Overlunky terminal open for better debug prints. This could be `cmd` or even the system environment variables if playing on Steam. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the `-console` switch."
+    "- Use `Overlunky.exe --console` command line switch to keep the Overlunky terminal open for better debug prints. Playlunky will also print the messages to terminal (even from Overlunky) if ran with the `-console` switch."
+)
+print(
+    "- Testing functions, exploring the types, and most inline Lua examples in here can be used in the in-game REPL console, default opened with the tilde key or regional equivalent. Full script examples can be found in the Overlunky Scripts menu if the script bundle is installed."
 )
 
 print("\n## External Function Library")

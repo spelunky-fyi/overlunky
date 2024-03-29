@@ -455,6 +455,19 @@ Name | Data | Description
 [SMALL_SAD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_SAD) | GHOST_BEHAVIOR::SMALL_SAD | 
 [SMALL_HAPPY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GHOST_BEHAVIOR.SMALL_HAPPY) | GHOST_BEHAVIOR::SMALL_HAPPY | 
 
+## HOTKEY_TYPE
+
+
+> Search script examples for [HOTKEY_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NORMAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE.NORMAL) | HOTKEY_TYPE::NORMAL | Suppressed when the game window is inactive or inputting text in this tool instance (get_io().wantkeyboard == true). Can't detect if OL is in a text input and script is running in PL though. Use [ImGuiIO](#ImGuiIO) if you need to do that.<br/>
+[GLOBAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE.GLOBAL) | HOTKEY_TYPE::GLOBAL | Enabled even when the game window is inactive and will capture keys even from other programs.<br/>
+[INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=HOTKEY_TYPE.INPUT) | HOTKEY_TYPE::INPUT | Enabled even when inputting text and will override normal text input keys.<br/>
+
 ## HUNDUNFLAGS
 
 
@@ -633,6 +646,19 @@ Name | Data | Description
 ---- | ---- | -----------
 [A](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY.A) | 65 | 
 ...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
+
+## KEY_TYPE
+
+
+> Search script examples for [KEY_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[ANY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.ANY) | KEY_TYPE::ANY | 
+[KEYBOARD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.KEYBOARD) | KEY_TYPE::KEYBOARD | 
+[MOUSE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=KEY_TYPE.MOUSE) | KEY_TYPE::MOUSE | 
 
 ## LAYER
 
@@ -889,6 +915,10 @@ Name | Data | Description
 [POST_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_PROCESS_INPUT) | ON::POST_PROCESS_INPUT | Runs right after the game gets input from various devices and writes to a bunch of buttons-variables. Probably the first chance you have to capture or edit buttons_gameplay or buttons_menu sort of things.<br/>
 [PRE_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GAME_LOOP) | ON::PRE_GAME_LOOP | Runs right before the main engine loop. Return true to block state updates and menu updates, i.e. to pause inside menus.<br/>
 [POST_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_GAME_LOOP) | ON::POST_GAME_LOOP | Runs right after the main engine loop.<br/>
+[PRE_SAVE_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_SAVE_STATE) | ON::PRE_SAVE_STATE | Runs right before the main [StateMemory](#StateMemory) is manually saved to a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState). Return true to block save.<br/>Params: int slot, [StateMemory](#StateMemory) saved<br/>
+[POST_SAVE_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_SAVE_STATE) | ON::POST_SAVE_STATE | Runs right after the main [StateMemory](#StateMemory) is manually saved to a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState).<br/>Params: int slot, [StateMemory](#StateMemory) saved<br/>
+[PRE_LOAD_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_LOAD_STATE) | ON::PRE_LOAD_STATE | Runs right before the main [StateMemory](#StateMemory) is manually loaded from a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState). Return true to block load.<br/>Params: int slot, [StateMemory](#StateMemory) loaded<br/>
+[POST_LOAD_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_STATE) | ON::POST_LOAD_STATE | Runs right after the main [StateMemory](#StateMemory) is manually loaded from a slot or a custom [SaveState](#SaveState). Slot is 1..4 or -1 on custom [SaveState](#SaveState).<br/>Params: int slot, [StateMemory](#StateMemory) loaded<br/>
 [BLOCKED_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_UPDATE) | ON::BLOCKED_UPDATE | Runs instead of POST_UPDATE when anything blocks a PRE_UPDATE. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_UPDATE.<br/>
 [BLOCKED_GAME_LOOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_GAME_LOOP) | ON::BLOCKED_GAME_LOOP | Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_GAME_LOOP.<br/>
 [BLOCKED_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_PROCESS_INPUT) | ON::BLOCKED_PROCESS_INPUT | Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_PROCESS_INPUT.<br/>
@@ -1403,7 +1433,7 @@ Name | Data | Description
 [LEVEL_GEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN) | SPAWN_TYPE_LEVEL_GEN | For any spawn happening during level generation, even if the call happened from the Lua API during a tile code callback.<br/>
 [LEVEL_GEN_TILE_CODE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_TILE_CODE) | SPAWN_TYPE_LEVEL_GEN_TILE_CODE | Similar to LEVEL_GEN but only triggers on tile code spawns.<br/>
 [LEVEL_GEN_PROCEDURAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_PROCEDURAL) | SPAWN_TYPE_LEVEL_GEN_PROCEDURAL | Similar to LEVEL_GEN but only triggers on random level spawns, like snakes or bats.<br/>
-[LEVEL_GEN_FLOOR_SPREADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_FLOOR_SPREADING) | SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING | Only procs during floor spreading, both horizontal and vertical<br/>
+[LEVEL_GEN_FLOOR_SPREADING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_FLOOR_SPREADING) | SPAWN_TYPE_LEVEL_GEN_FLOOR_SPREADING | Includes solid floor type spreading (i.e. floorstyled bleeding to existing generic floor) but also corner filling of empty tiles.<br/>
 [LEVEL_GEN_GENERAL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.LEVEL_GEN_GENERAL) | SPAWN_TYPE_LEVEL_GEN_GENERAL | Covers all spawns during level gen that are not covered by the other two.<br/>
 [SCRIPT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.SCRIPT) | SPAWN_TYPE_SCRIPT | Runs for any spawn happening through a call from the Lua API, also during level generation.<br/>
 [SYSTEMIC](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=SPAWN_TYPE.SYSTEMIC) | SPAWN_TYPE_SYSTEMIC | Covers all other spawns, such as items from crates or the player throwing bombs.<br/>

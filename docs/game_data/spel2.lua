@@ -1386,6 +1386,22 @@ function speechbubble_visible() end
 function cancel_toast() end
 ---@return nil
 function cancel_speechbubble() end
+---Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see SaveState if you need more.
+---@param slot integer
+---@return nil
+function save_state(slot) end
+---Load level state from slot 1..4, if a save_state was made in this level.
+---@param slot integer
+---@return nil
+function load_state(slot) end
+---Clear save state from slot 1..4.
+---@param slot integer
+---@return nil
+function clear_state(slot) end
+---Get StateMemory from a save_state slot.
+---@param slot integer
+---@return StateMemory
+function get_save_state(slot) end
 ---Returns RawInput, a game structure for raw keyboard and controller state
 ---@return RawInput
 function get_raw_input() end
@@ -1689,14 +1705,20 @@ function get_image_size(path) end
 ---Current mouse cursor position in screen coordinates.
 ---@return number, number
 function mouse_position() end
+---Returns human readable string from KEY chord (e.g. "Ctrl+X", "Unknown" or "None")
+---@return string
+function key_name() end
 ---Returns: [ImGuiIO](https://spelunky-fyi.github.io/overlunky/#ImGuiIO) for raw keyboard, mouse and xinput gamepad stuff.
----
----- Note: The clicked/pressed actions only make sense in `ON.GUIFRAME`.
----- Note: You can use KEY or standard VK keycodes to index `keys` or the other functions.
----- Note: Overlunky/etc will eat all keys it is currently configured to use, your script will only get leftovers.
----- Note: Gamepad is basically [XINPUT_GAMEPAD](https://docs.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad) but variables are renamed and values are normalized to -1.0..1.0 range.
 ---@return ImGuiIO
 function get_io() end
+---Returns unique id >= 0 for the callback to be used in [clear_callback](https://spelunky-fyi.github.io/overlunky/#clear_callback) or -1 if the key could not be registered.
+---Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use ImGuiIO if you need Playlunky hotkeys to react to Overlunky input state. Key is a KEY combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
+---The callback signature is nil on_hotkey(KEY key)
+---@param cb fun(key: KEY): nil
+---@param key KEY
+---@param flags HOTKEY_TYPE
+---@return CallbackId
+function set_hotkey(cb, key, flags) end
 ---Force the LUT texture for the given layer (or both) until it is reset.
 ---Pass `nil` in the first parameter to reset
 ---@param texture_id TEXTURE?
@@ -2245,6 +2267,12 @@ do
     ---@field room_index integer
     ---@field owner_uid integer
 
+---@class SaveState
+    ---@field load fun(self): nil @Load a SaveState
+    ---@field save fun(self): nil @Save over a previously allocated SaveState
+    ---@field clear fun(self): nil @Delete the SaveState and free the memory. The SaveState can't be used after this.
+    ---@field get_state fun(self): StateMemory @Access the StateMemory inside a SaveState
+
 ---@class BackgroundMusic
     ---@field game_startup BackgroundSound
     ---@field main_backgroundtrack BackgroundSound
@@ -2302,6 +2330,7 @@ do
     ---@field slide_position number
 
 ---@class GameProps
+    ---@field buttons integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input_previous integer[] @size: MAX_PLAYERS
     ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
@@ -3988,6 +4017,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field smoke2 ParticleEmitterInfo
 
 ---@class CookFire : Torch
+    ---@field lit any @&Torch::is_lit
     ---@field emitted_light Illumination
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
@@ -4986,6 +5016,7 @@ function CustomSound:play(paused, sound_type) end
     ---@field win_section fun(self, title: string, callback: function): nil @Add a collapsing accordion section, put contents in the callback function.
     ---@field win_indent fun(self, width: number): nil @Indent contents, or unindent if negative
     ---@field win_width fun(self, width: number): nil @Sets next item width (width>1: width in pixels, width<0: to the right of window, -1<width<1: fractional, multiply by available window width)
+    ---@field key_picker fun(self, message: string, flags: KEY_TYPE): integer @Returns KEY flags including held OL_MOD modifiers, or -1 before any key has been pressed and released, or mouse button pressed. Also returns -1 before all initially held keys are released before the picker was opened, or if another key picker is already waiting for keys. If a modifier is released, that modifier is returned as an actual keycode (e.g. `KEY.LSHIFT`) while the other held modifiers are returned as `KEY.OL_MOD_...` flags.<br/>Shows a fullscreen key picker with a message, with the accepted input type (keyboard/mouse) filtered by flags. The picker won't show before all previously held keys have been released and other key pickers have returned a valid key.
 local GuiDrawContext = nil
 ---Draws a rectangle on screen from top-left to bottom-right.
 ---@param left number
@@ -5087,8 +5118,7 @@ function GuiDrawContext:win_pushid(id) end
 ---@class ImGuiIO
     ---@field displaysize Vec2
     ---@field framerate number
-    ---@field wantkeyboard boolean
-    ---@field keysdown boolean[] @size: ImGuiKey_COUNT
+    ---@field wantkeyboard any @wantkeyboard
     ---@field keys boolean[] @size: ImGuiKey_COUNT
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
@@ -5097,14 +5127,16 @@ function GuiDrawContext:win_pushid(id) end
     ---@field keyshift boolean
     ---@field keyalt boolean
     ---@field keysuper boolean
-    ---@field wantmouse boolean
+    ---@field modifierdown any @modifierdown
+    ---@field wantmouse any @wantmouse
     ---@field mousepos Vec2
     ---@field mousedown boolean[] @size: 5
     ---@field mouseclicked boolean[] @size: 5
     ---@field mousedoubleclicked boolean[] @size: 5
+    ---@field mousereleased boolean[] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
-    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true;returnget_gamepad(index)/**/;}
+    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
@@ -6417,10 +6449,16 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field modifiers_block integer @Bitmask of modifier KEYs that will block all game input
     ---@field modifiers_clear_input boolean @Enable to clear affected input when modifiers are held, disable to ignore all input events, i.e. keep held button state as it was before pressing the modifier key
 
+---@class SharedIO
+    ---@field wantkeyboard boolean?
+    ---@field wantmouse boolean?
+
 ---@class Bucket
     ---@field data table<string, any> @You can store arbitrary simple values here in Playlunky to be read in on Overlunky script for example.
     ---@field overlunky Overlunky @Access Overlunky options here, nil if Overlunky is not loaded.
     ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
+    ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
+    ---@field count integer @Number of API instances present
 
 end
 --## Static class functions
@@ -6460,6 +6498,11 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
+
+SaveState = nil
+---Create a new temporary SaveState/clone of the main level state. Unlike save_state slots that are preallocated by the game anyway, these will use 32MiB a pop and aren't freed automatically, so make sure to clear them or reuse the same one to save memory. The garbage collector will eventually clear the SaveStates you don't have a handle to any more though.
+---@return SaveState
+function SaveState:new() end
 ---Create a new color - defaults to black
 ---@return Color
 function Color:new() end
@@ -8160,6 +8203,7 @@ ENT_TYPE = {
   POWERUPCAPABLE = 1250,
   PROTOSHOPKEEPER = 1251,
   PUNISHBALL = 1252,
+  PURCHASABLE = 1334,
   PUSHBLOCK = 1253,
   QILIN = 1254,
   QUICKSAND = 1255,
@@ -8753,10 +8797,9 @@ ON = {
   ARENA_SCORE = 27,
   ARENA_SELECT = 24,
   ARENA_STAGES = 22,
-  BLOCKED_GAME_LOOP = 159,
-  BLOCKED_LEVEL_GENERATION = 157,
-  BLOCKED_PROCESS_INPUT = 160,
-  BLOCKED_UPDATE = 158,
+  BLOCKED_GAME_LOOP = 162,
+  BLOCKED_PROCESS_INPUT = 163,
+  BLOCKED_UPDATE = 161,
   CAMP = 11,
   CHARACTER_SELECT = 9,
   CONSTELLATION = 19,
@@ -8785,8 +8828,10 @@ ON = {
   POST_LEVEL_GENERATION = 112,
   POST_LOAD_JOURNAL_CHAPTER = 139,
   POST_LOAD_SCREEN = 136,
+  POST_LOAD_STATE = 160,
   POST_PROCESS_INPUT = 154,
   POST_ROOM_GENERATION = 111,
+  POST_SAVE_STATE = 158,
   POST_UPDATE = 143,
   PRE_GAME_LOOP = 155,
   PRE_GET_FEAT = 140,
@@ -8800,7 +8845,9 @@ ON = {
   PRE_LOAD_JOURNAL_CHAPTER = 138,
   PRE_LOAD_LEVEL_FILES = 109,
   PRE_LOAD_SCREEN = 135,
+  PRE_LOAD_STATE = 159,
   PRE_PROCESS_INPUT = 153,
+  PRE_SAVE_STATE = 157,
   PRE_SET_FEAT = 141,
   PRE_UPDATE = 142,
   PROLOGUE = 2,

@@ -24,6 +24,7 @@
 #include "memory.hpp"                //
 #include "render_api.hpp"            // for RenderInfo
 #include "rpc.hpp"                   // for get_entities_at, entity_get_ite...
+#include "savestate.hpp"             // for copy_save_slot
 #include "search.hpp"                //
 #include "spawn_api.hpp"             // for spawn_liquid, spawn_companion
 #include "state.hpp"                 // for State, StateMemory
@@ -348,6 +349,8 @@ void UI::steam_achievements(bool on)
 }
 int32_t UI::destroy_entity_items(Entity* ent)
 {
+    if (ent->type->search_flags & 0x80)
+        return 0;
     auto items = entity_get_items_by(ent->uid, 0, 0);
     if (items.size() == 0)
         return -1;
@@ -356,6 +359,8 @@ int32_t UI::destroy_entity_items(Entity* ent)
     while (it != items.rend())
     {
         auto item = get_entity_ptr(*it);
+        if (item->type->search_flags & 0x81)
+            continue;
         UI::destroy_entity_items(item);
         UI::safe_destroy(item, false, false);
         it++;
@@ -823,4 +828,19 @@ std::pair<int64_t, int64_t> UI::get_adventure_seed(std::optional<bool> run_start
 void UI::set_adventure_seed(int64_t first, int64_t second)
 {
     ::set_adventure_seed(first, second);
+}
+
+void UI::copy_state(int from, int to)
+{
+    ::copy_save_slot(from, to);
+}
+
+StateMemory* UI::get_save_state(int slot)
+{
+    return ::get_save_state(slot);
+}
+
+void UI::set_camera_layer_control_enabled(bool enable)
+{
+    ::set_camera_layer_control_enabled(enable);
 }

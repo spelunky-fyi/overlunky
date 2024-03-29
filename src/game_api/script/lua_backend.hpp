@@ -132,6 +132,10 @@ enum class ON
     POST_PROCESS_INPUT,
     PRE_GAME_LOOP,
     POST_GAME_LOOP,
+    PRE_SAVE_STATE,
+    POST_SAVE_STATE,
+    PRE_LOAD_STATE,
+    POST_LOAD_STATE,
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
@@ -266,6 +270,15 @@ struct SavedUserData
     std::unordered_map<uint32_t, sol::object> powerups;
 };
 
+struct HotKeyCallback
+{
+    sol::function func;
+    KEY key;
+    int lastRan;
+    int queue;
+    int hotkeyid;
+};
+
 struct StateMemory;
 class SoundManager;
 class LuaConsole;
@@ -299,6 +312,7 @@ class LuaBackend
     std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
     std::unordered_map<int, ScreenCallback> save_callbacks;
+    std::unordered_map<int, HotKeyCallback> hotkey_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_tile_code_callbacks;
     std::vector<LevelGenCallback> post_tile_code_callbacks;
@@ -383,12 +397,16 @@ class LuaBackend
     bool pre_init_layer(LAYER layer);
     bool pre_unload_level();
     bool pre_unload_layer(LAYER layer);
+    bool pre_save_state(int slot, StateMemory* saved);
+    bool pre_load_state(int slot, StateMemory* loaded);
 
     void post_room_generation();
     void post_level_generation();
     void post_load_screen();
     void post_init_layer(LAYER layer);
     void post_unload_layer(LAYER layer);
+    void post_save_state(int slot, StateMemory* saved);
+    void post_load_state(int slot, StateMemory* loaded);
 
     void on_death_message(STRINGID stringid);
     std::optional<bool> pre_get_feat(FEAT feat);
@@ -440,6 +458,11 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
+
+    void hotkey_callback(int cb);
+    int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);
+    static void wm_activate(bool active);
+    static void wm_hotkey(int keyid);
 };
 
 template <class Inheriting>
@@ -453,4 +476,15 @@ class LockableLuaBackend : public LuaBackend
     {
         return self->LockAs<Inheriting>();
     }
+};
+
+struct HotKey
+{
+    int mod;
+    int key;
+    LuaBackend* backend;
+    int cb;
+    bool active;
+    HOTKEY_TYPE flags;
+    HOTKEY_TYPE suppressflags;
 };
