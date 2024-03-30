@@ -209,6 +209,12 @@ std::vector<DropEntry> drop_entries{
     /// Game does this (this value | 0x1) to get BOMBBAG (so depending on the chosen ENT_TYPE it can be + 1 or + 0)
     {"OLMEC_SISTERS_ROPEPILE", "\x0D\x00\x02\x00\x00\x83\xFB\x03"sv, VTABLE_OFFSET::NONE, 0, 1},
     {"OLMEC_SISTERS_BOMBBOX", "\xBA\x02\x02\x00\x00\x0F\x45\xD0"sv, VTABLE_OFFSET::NONE, 0, 1},
+    /// Challenge rewards:
+    {"CHALLENGESTAR_CLONEGUN", "\xB8\x4D\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_STAR_CHALLENGE, 1, 1},
+    {"CHALLENGESTAR_ELIXIR", "\xBD\x08\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_STAR_CHALLENGE, 1, 1},
+    /// Game will change texture based on the active player unless the item MASK is: FLOOR, DECORATION, BG, SHADOW, LOGICAL, WATER, LAVA, or the 16th bit that is normally unused
+    {"CHALLENGESUN_PLAYERBAG", "\xBA\x1F\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_SUN_CHALLENGE, 1, 1},
+    /// Mattock and Arrow of Light are build into the level, use level editor or `set_pre_entity_spawn` to replace them
 
     ///
     /// Attacks:
