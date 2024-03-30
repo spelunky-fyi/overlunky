@@ -369,23 +369,15 @@ function spawn_apep(x, y, layer, right) end
 ---@param x number
 ---@param y number
 ---@param layer LAYER
+---@param height integer
 ---@return integer
-function spawn_tree(x, y, layer) end
+function spawn_tree(x, y, layer, height) end
 ---Spawns and grows a tree
 ---@param x number
 ---@param y number
 ---@param layer LAYER
----@param height integer
 ---@return integer
-function spawn_tree(x, y, layer, height) end
----Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
----Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
----Returns uid of the base or -1 if it wasn't able to spawn
----@param x number
----@param y number
----@param l LAYER
----@return integer
-function spawn_mushroom(x, y, l) end
+function spawn_tree(x, y, layer) end
 ---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 ---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
 ---Returns uid of the base or -1 if it wasn't able to spawn
@@ -395,6 +387,14 @@ function spawn_mushroom(x, y, l) end
 ---@param height integer
 ---@return integer
 function spawn_mushroom(x, y, l, height) end
+---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+---Returns uid of the base or -1 if it wasn't able to spawn
+---@param x number
+---@param y number
+---@param l LAYER
+---@return integer
+function spawn_mushroom(x, y, l) end
 ---Spawns an already unrolled rope as if created by player
 ---@param x number
 ---@param y number
@@ -1286,16 +1286,16 @@ function add_custom_type(types) end
 function add_custom_type() end
 ---Get uids of entities by draw_depth. Can also use table of draw_depths.
 ---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
----@param draw_depth integer
----@param l LAYER
----@return integer[]
-function get_entities_by_draw_depth(draw_depth, l) end
----Get uids of entities by draw_depth. Can also use table of draw_depths.
----You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
 ---@param draw_depths integer[]
 ---@param l LAYER
 ---@return integer[]
 function get_entities_by_draw_depth(draw_depths, l) end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depth integer
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depth, l) end
 ---Just convenient way of getting the current amount of money
 ---short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
 ---@return integer
@@ -1604,20 +1604,15 @@ function set_level_config(config, value) end
 ---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
----@return nil
-function grow_vines(l, max_lengh) end
----Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
----@param l LAYER
----@param max_lengh integer
 ---@param area AABB
 ---@param destroy_broken boolean
 ---@return nil
 function grow_vines(l, max_lengh, area, destroy_broken) end
----Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
 ---@return nil
-function grow_poles(l, max_lengh) end
+function grow_vines(l, max_lengh) end
 ---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
@@ -1625,6 +1620,11 @@ function grow_poles(l, max_lengh) end
 ---@param destroy_broken boolean
 ---@return nil
 function grow_poles(l, max_lengh, area, destroy_broken) end
+---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---@param l LAYER
+---@param max_lengh integer
+---@return nil
+function grow_poles(l, max_lengh) end
 ---Grow chains from `ENT_TYPE_FLOOR_CHAIN_CEILING` and chain with blocks on it from `ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level.
 ---To limit it use the parameters, so x = 10 will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
 ---@return boolean
@@ -2499,7 +2499,7 @@ function PRNG:random(min, max) end
     ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
     ---@field apply_layer fun(self): nil @Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
     ---@field remove fun(self): nil @Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
-    ---@field respawn fun(self, layer: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
+    ---@field respawn fun(self, layer_to: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
     ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil @Kills the entity, you can set responsible to `nil` to ignore it
     ---@field destroy fun(self): nil @Completely removes the entity from existence
     ---@field activate fun(self, activator: Entity): nil @Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
@@ -2708,15 +2708,15 @@ function Entity:destroy_recursive() end
     ---@field set_pre_crush fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool crush(Movable self, Entity)`
     ---@field set_post_crush fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil crush(Movable self, Entity)`
 local Movable = nil
----Move a movable according to its velocity, update physics, gravity, etc.
----Will also update `movable.animation_frame` and various timers and counters
----@return nil
-function Movable:generic_update_world() end
 ---Move a movable according to its velocity, can disable gravity
 ---Will also update `movable.animation_frame` and various timers and counters
 ---@param disable_gravity boolean
 ---@return nil
 function Movable:generic_update_world(disable_gravity) end
+---Move a movable according to its velocity, update physics, gravity, etc.
+---Will also update `movable.animation_frame` and various timers and counters
+---@return nil
+function Movable:generic_update_world() end
 ---Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
 ---held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
 ---movement via `on_rope`. Use this for example to update a custom enemy type.

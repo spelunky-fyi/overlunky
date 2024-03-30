@@ -32,6 +32,8 @@ replace_table = {
     " = nullopt": "",
     "void": "",
     "constexpr": "",
+    "inline": "",
+    "[[nodiscard]]": "",
     "...va:": "...ent_type:",
     "set<": "Array<",
     "span<": "Array<",

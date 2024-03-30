@@ -412,6 +412,7 @@ for func in ps.funcs:
             "dump_network",
             "dump",
             "dump_string",
+            "get_address",
         ]
     ):
         cat = "Debug functions"

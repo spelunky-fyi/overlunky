@@ -60,6 +60,8 @@ replace_table = {
     "SoundCallbackFunction": "function",
     "object ": "any ",
     "BucketItem": "any",
+    "[[nodiscard]]": "",
+    "inline": "",
 }
 
 header_files = [

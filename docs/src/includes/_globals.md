@@ -389,6 +389,15 @@ Dump the object (table, container, class) as a recursive table, for pretty print
 
 Hook the sendto and recvfrom functions and start dumping network data to terminal
 
+### get_address
+
+
+> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
+
+#### nil get_address([[maybe_unused]] any o)
+
+Get memory address from a lua object
+
 ### get_rva
 
 
@@ -631,9 +640,9 @@ Recommended to always set the mask, even if you look for one entity type
 
 > Search script examples for [get_entities_by_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_draw_depth)
 
-#### vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
-
 #### vector&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
+
+#### vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
 
 Get uids of entities by draw_depth. Can also use table of draw_depths.
 You can later use [filter_entities](#filter_entities) if you want specific entity
@@ -1371,15 +1380,6 @@ Flips the nth bit in a number. This doesn't actually change the variable you pas
 
 Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
 
-### get_address
-
-
-> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
-
-#### nil get_address([[maybe_unused]] any o)
-
-Get memory address from a lua object
-
 ### get_adventure_seed
 
 
@@ -1595,9 +1595,9 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 
 > Search script examples for [grow_poles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_poles)
 
-#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
-
 #### nil grow_poles([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
 
 Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
@@ -1606,9 +1606,9 @@ Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is w
 
 > Search script examples for [grow_vines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_vines)
 
-#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
-
 #### nil grow_vines([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
 
 Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
@@ -3325,9 +3325,9 @@ Don't overuse this, you are still restricted by the liquid pool sizes and thus m
 
 > Search script examples for [spawn_mushroom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_mushroom)
 
-#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l)
-
 #### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l, int height)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l)
 
 Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
@@ -3376,9 +3376,9 @@ or change it's `player_inputs` to the `input` of real player so he can control i
 
 > Search script examples for [spawn_tree](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
 
-#### int spawn_tree(float x, float y, [LAYER](#LAYER) layer)
-
 #### int spawn_tree(float x, float y, [LAYER](#LAYER) layer, int height)
+
+#### int spawn_tree(float x, float y, [LAYER](#LAYER) layer)
 
 Spawns and grows a tree
 
