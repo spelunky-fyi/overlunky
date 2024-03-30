@@ -1822,7 +1822,9 @@ end
     /// Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
     lua["refresh_illumination"] = refresh_illumination;
 
-    /// Removes all liquid that is about to go out of bounds, which crashes the game.
+    /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+    /// The patch however does not destroy the liquids that fall pass the level bounds,
+    /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
     /// Return the name of the first matching number in an enum table
