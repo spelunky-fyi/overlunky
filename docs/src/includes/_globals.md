@@ -394,7 +394,7 @@ Hook the sendto and recvfrom functions and start dumping network data to termina
 
 > Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
 
-#### nil get_address([[maybe_unused]] any o)
+#### nil get_address(any o)
 
 Get memory address from a lua object
 
@@ -1111,12 +1111,30 @@ Set the visibility of a feat
 
 Clears the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
+### clr_mask
+
+
+> Search script examples for [clr_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_mask)
+
+#### [Flags](#Aliases) clr_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
 ### flip_flag
 
 
 > Search script examples for [flip_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_flag)
 
 #### [Flags](#Aliases) flip_flag([Flags](#Aliases) flags, int bit)
+
+Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
+### flip_mask
+
+
+> Search script examples for [flip_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_mask)
+
+#### [Flags](#Aliases) flip_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
 
 Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
@@ -1183,6 +1201,15 @@ Set the nth bit in a number. This doesn't actually change the variable you pass,
 
 Set `state.level_flags`
 
+### set_mask
+
+
+> Search script examples for [set_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_mask)
+
+#### [Flags](#Aliases) set_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
 ### test_flag
 
 
@@ -1191,6 +1218,15 @@ Set `state.level_flags`
 #### bool test_flag([Flags](#Aliases) flags, int bit)
 
 Returns true if the nth bit is set in the number.
+
+### test_mask
+
+
+> Search script examples for [test_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_mask)
+
+#### bool test_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Returns true if a bitmask is set in the number.
 
 ## Generic functions
 
@@ -1276,15 +1312,6 @@ Clear cache for a file path or the whole directory
 
 Clear save state from slot 1..4.
 
-### clr_mask
-
-
-> Search script examples for [clr_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_mask)
-
-#### [Flags](#Aliases) clr_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
-
-Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
-
 ### create_image
 
 
@@ -1361,15 +1388,6 @@ Destroys all layers and all entities in the level. Usually a bad idea, unless yo
 #### bool disable_floor_embeds(bool disable)
 
 Disable all crust item spawns, returns whether they were already disabled before the call
-
-### flip_mask
-
-
-> Search script examples for [flip_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_mask)
-
-#### [Flags](#Aliases) flip_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
-
-Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
 ### force_journal
 
@@ -1964,15 +1982,6 @@ Set the value for the specified config
 
 Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
 
-### set_mask
-
-
-> Search script examples for [set_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_mask)
-
-#### [Flags](#Aliases) set_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
-
-Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
-
 ### set_seed
 
 
@@ -2095,15 +2104,6 @@ Set layer to search for storage items on
 #### nil show_journal([JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, int page)
 
 Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
-
-### test_mask
-
-
-> Search script examples for [test_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_mask)
-
-#### bool test_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
-
-Returns true if a bitmask is set in the number.
 
 ### toggle_journal
 

@@ -427,7 +427,7 @@ for func in ps.funcs:
         for subs in ["interval", "timeout", "callback", "set_on", "set_pre", "set_post"]
     ):
         cat = "Callback functions"
-    elif any(subs in func["name"] for subs in ["flag"]):
+    elif any(subs in func["name"] for subs in ["flag", "clr_mask", "flip_mask", "set_mask", "test_mask"]):
         cat = "Flag functions"
     elif any(subs in func["name"] for subs in ["shop"]):
         cat = "Shop functions"

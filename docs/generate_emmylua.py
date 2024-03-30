@@ -34,6 +34,7 @@ replace_table = {
     "constexpr": "",
     "inline": "",
     "[[nodiscard]]": "",
+    "[[maybe_unused]]": "",
     "...va:": "...ent_type:",
     "set<": "Array<",
     "span<": "Array<",
