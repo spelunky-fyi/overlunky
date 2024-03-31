@@ -2645,7 +2645,9 @@ set_callback(fix_liquid_out_of_bounds, ON.FRAME)
 
 #### nil fix_liquid_out_of_bounds()
 
-Removes all liquid that is about to go out of bounds, which crashes the game.
+Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+The patch however does not destroy the liquids that fall pass the level bounds,
+so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
 
 ### game_position
 
@@ -3094,7 +3096,6 @@ Use empty table as argument to reset to the game default
 
 Change [ENT_TYPE](#ENT_TYPE)'s spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:<br/>
 {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
-Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance").
 Use empty table as argument to reset to the game default
 
 ### default_spawn_is_valid

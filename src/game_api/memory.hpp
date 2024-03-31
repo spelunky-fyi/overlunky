@@ -86,6 +86,8 @@ void write_mem_prot(size_t addr, std::string_view payload, bool prot);
 void write_mem_prot(size_t addr, std::string payload, bool prot);
 void write_mem(size_t addr, std::string payload);
 size_t function_start(size_t off, uint8_t outside_byte = '\xcc');
+// save copy of the oryginal memory so it can be later recovered via recover_mem
+void save_mem_recoverable(std::string name, size_t addr, size_t size, bool prot);
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot);
 void recover_mem(std::string name, size_t addr = NULL);
 bool mem_written(std::string name);

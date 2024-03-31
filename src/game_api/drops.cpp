@@ -212,7 +212,7 @@ std::vector<DropEntry> drop_entries{
     /// Challenge rewards:
     {"CHALLENGESTAR_CLONEGUN", "\xB8\x4D\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_STAR_CHALLENGE, 1, 1},
     {"CHALLENGESTAR_ELIXIR", "\xBD\x08\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_STAR_CHALLENGE, 1, 1},
-    /// Game will change texture based on the active player unless the item MASK is: FLOOR, DECORATION, BG, SHADOW, LOGICAL, WATER, LAVA, or the 16th bit that is normally unused
+    /// Game will change texture based on the active player unless the item search_flags/MASK is: FLOOR, DECORATION, BG, SHADOW, LOGICAL, WATER, LAVA, or the 16th bit that is normally unused
     {"CHALLENGESUN_PLAYERBAG", "\xBA\x1F\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_SUN_CHALLENGE, 1, 1},
     /// Mattock and Arrow of Light are build into the level, use level editor or `set_pre_entity_spawn` to replace them
 
@@ -267,7 +267,7 @@ std::vector<DropEntry> drop_entries{
     /// Spawn:
     ///
 
-    /// It set's move_state for them for sleep and wake_up_timer, so i has to be movable and entity + 0x150 can't be something important
+    /// It set's move_state for them for sleep and wake_up_timer, so i has to be movable and entity offset 0x150 can't be something important
     {"COOKFIRE_CAVEMAN_1", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC3"sv, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
     {"COOKFIRE_CAVEMAN_2", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC6"sv, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
     {"BONEBLOCK_SKELETON", "\xBA\xE3\x00\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
@@ -306,7 +306,7 @@ std::vector<DropEntry> drop_entries{
     {"KAPALA_HEALTH", "\xBA\x01\x00\x00\x00\xB8\x01"sv, VTABLE_OFFSET::NONE, 0, 1},
     /* can't do elixir as there are some calculations for cursed, poisoned etc.
     can't do pet, it has some complex calculation for some reason
-    can't do ankh made a separete function for that (see modify_ankh_health_gain)
+    can't do ankh, made a separete function for that (see modify_ankh_health_gain)
     can't do initial health (camp, level, duat, coffin) as it's a word/byte
     can't do drops for: humphead, yetiking, yetiqueen, alien queen, pangxie (gems) those are stored in array, need special funciton for that
     */

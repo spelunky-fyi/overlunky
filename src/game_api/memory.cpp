@@ -53,7 +53,7 @@ Memory& Memory::get()
     return mem;
 }
 
-static size_t round_up(size_t i, size_t div)
+inline size_t round_up(size_t i, size_t div)
 {
     return ((i + div - 1) / div) * div;
 }
@@ -65,12 +65,12 @@ void write_mem_prot(size_t addr, std::string_view payload, bool prot)
     auto size = round_up((addr + payload.size() - page), 0x1000);
     if (prot)
     {
-        VirtualProtect((void*)page, size, PAGE_EXECUTE_READWRITE, &old_protect);
+        VirtualProtect(reinterpret_cast<LPVOID>(page), size, PAGE_EXECUTE_READWRITE, &old_protect);
     }
     memcpy((void*)addr, payload.data(), payload.size());
     if (prot)
     {
-        VirtualProtect((LPVOID)page, size, old_protect, &old_protect);
+        VirtualProtect(reinterpret_cast<LPVOID>(page), size, old_protect, &old_protect);
     }
 }
 void write_mem_prot(size_t addr, std::string payload, bool prot)
@@ -111,24 +111,24 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
 
     for (; test_addr < limit_addr; test_addr += 0x1000) // add 4KB memory page size
     {
-        new_array = VirtualAlloc((LPVOID)test_addr, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        new_array = VirtualAlloc(reinterpret_cast<LPVOID>(test_addr), size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
         if (new_array)
             break;
     }
     return new_array;
 }
 
-void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
+void save_mem_recoverable(std::string name, size_t addr, size_t size, bool prot)
 {
     static const auto bucket = Bucket::get();
     auto map_it = bucket->original_memory.find(name);
     if (map_it == bucket->original_memory.end())
     {
-        char* old_data = (char*)VirtualAlloc(0, payload.size(), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        char* old_data = static_cast<char*>(VirtualAlloc(0, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
         if (old_data)
         {
-            memcpy(old_data, (char*)addr, payload.size());
-            bucket->original_memory.emplace(name, EditedMemory{{{addr, old_data, payload.size(), prot}}, true});
+            std::memcpy(old_data, reinterpret_cast<char*>(addr), size);
+            bucket->original_memory.emplace(std::move(name), EditedMemory{{{addr, old_data, size, prot}}, true});
         }
     }
     else
@@ -144,14 +144,20 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
         }
         if (new_addr)
         {
-            char* old_data = (char*)VirtualAlloc(0, payload.size(), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+            char* old_data = static_cast<char*>(VirtualAlloc(0, size, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
             if (old_data)
             {
-                memcpy(old_data, (char*)addr, payload.size());
-                map_it->second.mem.emplace_back(addr, old_data, payload.size(), prot);
+                std::memcpy(old_data, reinterpret_cast<char*>(addr), size);
+                map_it->second.mem.emplace_back(addr, old_data, size, prot);
             }
         }
     }
+}
+
+void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot)
+{
+    static const auto bucket = Bucket::get();
+    save_mem_recoverable(name, addr, payload.size(), prot);
     bucket->original_memory[name].dirty = true;
     write_mem_prot(addr, payload, prot);
 }
@@ -159,14 +165,15 @@ void write_mem_recoverable(std::string name, size_t addr, std::string_view paylo
 void recover_mem(std::string name, size_t addr)
 {
     static const auto bucket = Bucket::get();
-    if (bucket->original_memory.contains(name))
+    auto it = bucket->original_memory.find(name);
+    if (it != bucket->original_memory.end())
     {
         size_t fixed = 0;
-        for (auto& it : bucket->original_memory[name].mem)
+        for (auto& mem : it->second.mem)
         {
-            if (!addr || addr == it.address)
+            if (!addr || addr == mem.address)
             {
-                write_mem_prot(it.address, std::string_view{it.old_data, it.size}, it.prot_used);
+                write_mem_prot(mem.address, std::string_view{mem.old_data, mem.size}, mem.prot_used);
                 if (++fixed == bucket->original_memory[name].mem.size())
                     bucket->original_memory[name].dirty = false;
             }
@@ -177,7 +184,8 @@ void recover_mem(std::string name, size_t addr)
 bool mem_written(std::string name)
 {
     static const auto bucket = Bucket::get();
-    return bucket->original_memory.contains(name) && bucket->original_memory[name].dirty;
+    auto it = bucket->original_memory.find(name);
+    return it != bucket->original_memory.end() && it->second.dirty;
 }
 
 size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_view payload, bool just_nop, size_t return_to_addr, bool game_code_first)
@@ -195,39 +203,35 @@ size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_vi
     const size_t target = std::max(return_to_addr, addr);
     const auto new_memory_size = payload.size() + data_size_to_move + jump_size;
 
-    auto new_code = (char*)alloc_mem_rel32(target, new_memory_size);
+    auto new_code = static_cast<char*>(alloc_mem_rel32(target, new_memory_size));
     if (new_code == nullptr)
         return 0;
 
     if (game_code_first && !just_nop)
     {
-        std::memcpy(new_code, (void*)addr, data_size_to_move);
+        std::memcpy(new_code, reinterpret_cast<void*>(addr), data_size_to_move);
         std::memcpy(new_code + data_size_to_move, payload.data(), payload.size());
     }
     else
     {
-        std::memcpy(new_code + data_size_to_move, payload.data(), payload.size());
+        std::memcpy(new_code, payload.data(), payload.size());
 
         if (!just_nop)
-            std::memcpy(new_code, (void*)addr, data_size_to_move);
+            std::memcpy(new_code + payload.size(), reinterpret_cast<void*>(addr), data_size_to_move);
     }
 
-    size_t return_addr = addr + replace_size;
-    if (return_to_addr != 0)
-    {
-        return_addr = return_to_addr;
-    }
-    int32_t rel_back = static_cast<int32_t>(return_addr - (size_t)(new_code + new_memory_size));
+    size_t return_addr = return_to_addr == 0 ? addr + replace_size : return_to_addr;
+    int32_t rel_back = static_cast<int32_t>(return_addr - reinterpret_cast<size_t>(new_code + new_memory_size));
     const std::string jump_back = fmt::format("\xE9{}"sv, to_le_bytes(rel_back));
     std::memcpy(new_code + payload.size() + data_size_to_move, jump_back.data(), jump_size);
 
     DWORD dummy;
     VirtualProtect(new_code, new_memory_size, PAGE_EXECUTE_READ, &dummy);
 
-    int32_t rel = static_cast<int32_t>((size_t)new_code - (addr + jump_size));
+    int32_t rel = static_cast<int32_t>(reinterpret_cast<size_t>(new_code) - (addr + jump_size));
     const std::string redirect_code = fmt::format("\xE9{}{}"sv, to_le_bytes(rel), get_nop(replace_size - jump_size));
     write_mem_prot(addr, redirect_code, true);
-    return (size_t)new_code;
+    return reinterpret_cast<size_t>(new_code);
 }
 
 std::string get_nop(size_t size, bool true_nop)

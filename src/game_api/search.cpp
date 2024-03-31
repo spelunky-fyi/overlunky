@@ -1641,11 +1641,12 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
-        // execute to the return two times, you should see this array right above
+        // execute to the return two times, you should see this array right above the call
         // It's pointer to array[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
+        // we want the address to the `shift right` instruction since we gonna replace it all, but not mess with PRNG stuff
         "sun_chalenge_generator_ent_types"sv,
         PatternCommandBuffer{}
-            .find_after_inst("\x48\x89\x4A\x38\x48\xC1\xE8\x1C\x83\xE0"sv)
+            .find_inst("\x48\x89\x4A\x38\x48\xC1\xE8\x1C\x83\xE0"sv)
             .offset(0x4)
             .at_exe(),
     },

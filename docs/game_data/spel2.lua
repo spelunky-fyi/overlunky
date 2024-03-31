@@ -1030,7 +1030,6 @@ function clear_custom_name(uid) end
 function enter_door(player_uid, door_uid) end
 ---Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
 ---{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
----Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance").
 ---Use empty table as argument to reset to the game default
 ---@param ent_types ENT_TYPE[]
 ---@return nil
@@ -1107,7 +1106,9 @@ function create_illumination(color, size, uid) end
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
----Removes all liquid that is about to go out of bounds, which crashes the game.
+---Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+---The patch however does not destroy the liquids that fall pass the level bounds,
+---so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
 ---@return nil
 function fix_liquid_out_of_bounds() end
 ---Return the name of the first matching number in an enum table

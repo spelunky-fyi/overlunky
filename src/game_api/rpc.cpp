@@ -920,63 +920,57 @@ void enter_door(int32_t player_uid, int32_t door_uid)
 
 void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
 {
-    static bool modified = false;
-
-    uint32_t ent_types_size = static_cast<uint32_t>(ent_types.size());
-    static const auto offset = get_address("sun_chalenge_generator_ent_types");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(offset) + offset + 4);
-
-    if (ent_types_size == 0)
+    // [Known_Issue]: as all the functions that base some functionality on static, this can break if used in PL and OV simultaneously
+    static uintptr_t offset;
+    static uintptr_t new_code_address;
+    if (offset == 0)
     {
-        if (modified)
+        offset = get_address("sun_chalenge_generator_ent_types");
+
+        // just so we can recover the oryginal later
+        save_mem_recoverable("sunchallenge_spawn", offset, 14, true);
+    }
+    const size_t table_offset = offset + 10; // offset to the offset of ent_type table
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(table_offset) + table_offset + 4);
+    bool was_edited_before = mem_written("sunchallenge_spawn");
+    if (ent_types.size() == 0)
+    {
+        recover_mem("sunchallenge_spawn");
+        if (was_edited_before)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
 
-        recover_mem("sunchallenge_spawn");
-        modified = false;
-        return;
-    }
-
-    const uint8_t old_size = ((memory_read<uint8_t>(offset - 4)) >> 2) + 1;
-
-    if (ent_types_size >= 32)
-        ent_types_size = 32;
-    else if ((ent_types_size & (ent_types_size - 1))) // if the size is not power of 2
-    {
-        auto get_previous_power_of_two = [](uint32_t x)
+        // just free it since it's just easier to put the code again
+        if (new_code_address != 0)
         {
-            x = x | (x >> 1);
-            x = x | (x >> 2);
-            x = x | (x >> 4);
-            x = x | (x >> 8);
-            x = x | (x >> 16);
-            return x ^ (x >> 1);
-        };
-        ent_types_size = get_previous_power_of_two(ent_types_size);
-    }
-
-    if (old_size == ent_types_size)
-    {
-        for (uint32_t i = 0; i < ent_types_size; ++i)
-            write_mem_recoverable("sunchallenge_spawn", (size_t)&old_types_array[i], ent_types[i], true);
-
+            VirtualFree(reinterpret_cast<LPVOID>(new_code_address), 0, MEM_RELEASE);
+            new_code_address = 0;
+        }
         return;
     }
-
-    const auto data_size = ent_types_size * sizeof(ENT_TYPE);
-    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(offset + 4, data_size);
+    const auto data_size = ent_types.size() * sizeof(ENT_TYPE);
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(table_offset + 4, data_size);
     if (new_array)
     {
-        if (modified)
+        std::memcpy(new_array, ent_types.data(), data_size);
+        int32_t rel = static_cast<int32_t>((size_t)new_array - (table_offset + 4));
+        write_mem_prot(table_offset, rel, true);
+
+        if (new_code_address == 0)
+        {
+            std::string new_code = fmt::format("\x31\xD2\xB9{}\xF7\xF1\x67\x8D\x04\x95\x00\x00\x00\x00"sv, to_le_bytes(static_cast<uint32_t>(ent_types.size())));
+            // xor edx, edx                 ; dividend high half = 0.
+            // mov ecx, ent_types.size()    ; dividend low half
+            // div ecx                      ; division, (divisor already in rax)
+            //                              ; edx - remainder
+            // lea eax,[edx * 4 + 0]        ; multiply by 4 (sizeof ENT_TYPE) and put result in rax
+
+            new_code_address = patch_and_redirect(offset, 7, new_code, true);
+        }
+        else // update the size since the code is in place
+            write_mem_prot(new_code_address + 3, to_le_bytes(static_cast<uint32_t>(ent_types.size())), true);
+
+        if (was_edited_before)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
-
-        memcpy(new_array, ent_types.data(), data_size);
-        int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
-        write_mem_recoverable("sunchallenge_spawn", offset, rel, true);
-
-        // the game does bitwise "and" with value 12 (0xC), so it would get 0, 4, 8 or 12 (4 positions in table)
-        int8_t new_value = static_cast<int8_t>((ent_types_size - 1) << 2);
-        write_mem_recoverable("sunchallenge_spawn", offset - 4, new_value, true);
-        modified = true;
     }
 }
 
