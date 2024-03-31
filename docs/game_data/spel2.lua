@@ -2360,7 +2360,7 @@ do
     ---@field random_float fun(self, type: PRNG_CLASS): number @Generate a random floating point number in the range `[0, 1)`
     ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean @Returns true with a chance of `1/inverse_chance`
     ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
-    ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
+    ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer @Generate a integer number in the range `[min, max]`
     ---@field get_pair fun(self, type: PRNG_CLASS): integer, integer
     ---@field set_pair fun(self, type: PRNG_CLASS, first: integer, second: integer): nil
 local PRNG = nil
@@ -2374,7 +2374,7 @@ function PRNG:random(i) end
 ---Drop-in replacement for `math.random(min, max)`
 ---@param min integer
 ---@param max integer
----@return integer?
+---@return integer
 function PRNG:random(min, max) end
 
 ---@class Color

@@ -827,10 +827,10 @@ nil | [seed(int seed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 float | [random_float(PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_float) | Generate a random floating point number in the range `[0, 1)`
 bool | [random_chance(int inverse_chance, PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_chance) | Returns true with a chance of `1/inverse_chance`
 optional&lt;int&gt; | [random_index(int i, PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_index) | Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
-optional&lt;int&gt; | [random_int(int min, int max, PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) | Generate a integer number in the range `[min, max]` or `nil` if `max < min`
+int | [random_int(int min, int max, PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random_int) | Generate a integer number in the range `[min, max]`
 float | [random()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random()`
 optional&lt;int&gt; | [random(int i)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(i)`
-optional&lt;int&gt; | [random(int min, int max)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(min, max)`
+int | [random(int min, int max)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(min, max)`
 tuple&lt;int, int&gt; | [get_pair(PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) | 
 nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) | 
 

@@ -1,7 +1,5 @@
 #include "prng.hpp"
 
-#include <limits> // for numeric_limits
-
 #include "state.hpp" // for State
 
 PRNG& PRNG::get_main()
@@ -57,14 +55,9 @@ PRNG::prng_pair PRNG::get_and_advance(PRNG_CLASS type)
     return copy;
 }
 
-std::int64_t PRNG::internal_random_index(std::int64_t size, PRNG_CLASS type)
+std::optional<std::int64_t> PRNG::internal_random_int(std::int64_t min, std::int64_t size, PRNG_CLASS type)
 {
-    prng_pair pair = get_and_advance(type);
-    return static_cast<std::int64_t>((pair.first & 0xffffffff) * size >> 0x20);
-}
-std::optional<std::int64_t> PRNG::internal_random_int(std::int64_t min, std::int64_t max, PRNG_CLASS type)
-{
-    if (max <= min)
+    if (size <= min)
     {
         return std::nullopt;
     }
@@ -83,32 +76,5 @@ std::optional<std::int64_t> PRNG::internal_random_int(std::int64_t min, std::int
 
     // Technically not a uniform distribution, but we have 64bit to map to a range that is many orders of magnitude smaller
     // So in the grand scheme this is close enough to a uniform distribution
-    return wrap(static_cast<std::int64_t>(pair.first), min, max);
-}
-
-bool PRNG::random_chance(std::int64_t inverse_chance, PRNG_CLASS type)
-{
-    if (inverse_chance <= 0ll)
-        return false;
-    if (inverse_chance == 1)
-        return true;
-    return random_int(0, inverse_chance - 1, type) == 0;
-}
-
-float PRNG::random_float(PRNG_CLASS type)
-{
-    prng_pair pair = get_and_advance(type);
-    return static_cast<float>(pair.first) / static_cast<float>(std::numeric_limits<std::uint64_t>::max());
-}
-std::optional<std::int64_t> PRNG::random_index(std::int64_t i, PRNG_CLASS type)
-{
-    return random_int(1, i, type);
-}
-std::optional<std::int64_t> PRNG::random_int(std::int64_t min, std::int64_t max, PRNG_CLASS type)
-{
-    if (min <= max)
-    {
-        return internal_random_int(min, max + 1, type);
-    }
-    return std::nullopt;
+    return wrap(static_cast<std::int64_t>(pair.first), min, size);
 }

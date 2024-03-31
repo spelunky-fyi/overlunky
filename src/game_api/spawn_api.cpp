@@ -326,7 +326,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
         auto spawn_deco = [&](Entity* branch, bool left)
         {
             Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
-            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION).value_or(0)) * 12;
+            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION)) * 12;
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
@@ -385,7 +385,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
         else
         {
             auto& prng = PRNG::get_local();
-            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(0));
+            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
         }
 
         i_y += 3;
@@ -816,5 +816,5 @@ MagmamanSpawnPosition::MagmamanSpawnPosition(uint32_t x_, uint32_t y_)
 {
     x = x_;
     y = y_;
-    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(10000));
+    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
 }
