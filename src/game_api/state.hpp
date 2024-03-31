@@ -387,13 +387,13 @@ struct State
     void set_seed(uint32_t seed);
     SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
-
-    size_t location;
+    size_t get_location();
 
   private:
     State(size_t addr)
         : location(addr){};
 
+    size_t location;
     State(const State&) = delete;
     State& operator=(const State&) = delete;
 };
