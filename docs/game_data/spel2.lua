@@ -544,6 +544,12 @@ function get_type(id) end
 ---@param layer LAYER
 ---@return integer
 function get_grid_entity_at(x, y, layer) end
+---Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer[]
+function get_entities_overlapping_grid(x, y, layer) end
 ---Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
 ---@param entities integer[]
 ---@param predicate function

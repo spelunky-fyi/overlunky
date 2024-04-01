@@ -670,6 +670,15 @@ Get uids of entities matching id. This function is variadic, meaning it accepts 
 You can even pass a table!
 This function can be slower than the [get_entities_by](#get_entities_by) with the mask parameter filled
 
+### get_entities_overlapping_grid
+
+
+> Search script examples for [get_entities_overlapping_grid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_grid)
+
+#### vector&lt;int&gt; get_entities_overlapping_grid(float x, float y, [LAYER](#LAYER) layer)
+
+Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+
 ### get_entities_overlapping_hitbox
 
 

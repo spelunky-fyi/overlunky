@@ -10,6 +10,8 @@ struct Layer;
 
 int32_t get_grid_entity_at(float x, float y, LAYER layer);
 
+std::vector<uint32_t> get_entities_overlapping_grid(float x, float y, LAYER layer);
+
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer);
 
 inline std::vector<uint32_t> get_entities()

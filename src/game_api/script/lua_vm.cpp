@@ -1040,6 +1040,8 @@ end
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
+    /// Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+    lua["get_entities_overlapping_grid"] = get_entities_overlapping_grid;
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;

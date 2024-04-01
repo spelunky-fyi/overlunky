@@ -49,6 +49,24 @@ int32_t get_grid_entity_at(float x, float y, LAYER layer)
     return -1;
 }
 
+std::vector<uint32_t> get_entities_overlapping_grid(float x, float y, LAYER layer)
+{
+    auto& state = State::get();
+    uint8_t actual_layer = enum_to_layer(layer);
+    std::vector<uint32_t> uids;
+    auto entities = state.layer(actual_layer)->get_entities_overlapping_grid_at(x, y);
+    if (entities)
+        uids.insert(uids.end(), entities->uids().begin(), entities->uids().end());
+    if (layer == LAYER::BOTH)
+    {
+        // enum_to_layer returns 0 for LAYER::BOTH, so we only need to add entities from second layer
+        auto entities2 = state.layer(1)->get_entities_overlapping_grid_at(x, y);
+        if (entities2)
+            uids.insert(uids.end(), entities2->uids().begin(), entities2->uids().end());
+    }
+    return uids;
+}
+
 template <class FunT>
 requires std::is_invocable_v<FunT, const EntityList&>
 void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)

@@ -149,7 +149,7 @@ struct Layer
     std::map<int32_t, EntityRegions> entity_regions; // key is uid, all entities except FX, FLOOR, DECORATION, BG, SHADOW and LOGICAL
 
     Entity* grid_entities[g_level_max_y][g_level_max_x];
-    EntityList entities_overlaping_grid[g_level_max_y][g_level_max_x]; // static entities (like midbg, decorations) that overlap this grid position
+    EntityList entities_overlapping_grid[g_level_max_y][g_level_max_x]; // static entities (like midbg, decorations) that overlap this grid position
 
     EntityList unknown_entities2;
     std::array<EntityList, 53> entities_by_draw_depth;
@@ -206,6 +206,8 @@ struct Layer
     Entity* spawn_apep(float x, float y, bool right);
 
     Entity* get_grid_entity_at(float x, float y) const;
+
+    EntityList* get_entities_overlapping_grid_at(float x, float y) const;
 
     Entity* get_entity_at(float x, float y, uint32_t search_flags, uint32_t include_flags, uint32_t exclude_flags, uint32_t one_of_flags);
 
