@@ -179,10 +179,8 @@ void recover_mem(std::string name, size_t addr)
             }
         }
     }
-    else
-    {
-        DEBUG("Warning: (recover_mem) tried to recover non existing memeory named: {}", name);
-    }
+    //else
+    //    DEBUG("Warning: (recover_mem) tried to recover non existing memeory named: {}", name);
 }
 
 bool mem_written(std::string name)
