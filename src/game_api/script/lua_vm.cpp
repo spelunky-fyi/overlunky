@@ -1922,6 +1922,7 @@ end
     /// Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
     lua["set_adventure_seed"] = set_adventure_seed;
     /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+    /// optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
     lua["update_liquid_collision_at"] = update_liquid_collision_at;
 
     /// Disable all crust item spawns, returns whether they were already disabled before the call
@@ -2262,6 +2263,15 @@ end
 
     /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
+
+    /// Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+    lua["set_liquid_layer"] = set_liquid_layer;
+
+    /// Attach liquid collision to entity by uid (this is what the push blocks use)
+    /// Collision is based on the entity's hitbox, collision in removed when the entity is destroyed (bodies of killed entities will still have the collision)
+    /// Use only for entities that can move around, (for static entities use [update_liquid_collision_at](#update_liquid_collision_at) )
+    /// optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
+    lua["add_entity_to_liquid_collision"] = add_entity_to_liquid_collision;
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 

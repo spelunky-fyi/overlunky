@@ -1797,9 +1797,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         // Go to the spawn function when spawning floor, there should be something like call r8, go into that function, inside there would be couple calls to virtuals (not entity virtuals)
         // one of them is the one that calls this function (can be recognize by the getting address for the LiquidPhysics)
-        "add_from_liquid_collision_map"sv,
+        "add_to_liquid_collision_map"sv,
         PatternCommandBuffer{}
-            .find_inst("\x31\xF6\x39\x6B\x20\x40\x0F\x92\xC6"sv)
+            .find_inst("\x31\xF6\x39\x6B\x20\x40\x0F\x92\xC6"sv) // other pattern: 48 81 EC 10 01 00 00 45 84 C9
             .at_exe()
             .function_start(),
     },
@@ -2009,7 +2009,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // kill exit door, crash the game by killing hundun. It crashes in the function that we need
         // this pattern is also using in set_boss_door_control_enabled function
         PatternCommandBuffer{}
-            .find_inst("\x4A\x8B\xB4\xC8\x80\xF4\x00\x00")
+            .find_inst("\x4A\x8B\xB4\xC8\x80\xF4\x00\x00"sv)
             .at_exe()
             .function_start(),
     },
@@ -2074,7 +2074,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "get_game_api"sv,
-        // can be found together with get_feat function
+        // can be found together with get_feat function, or rendering stuff
         PatternCommandBuffer{}
             .find_after_inst("49 89 CE 4C 8B 79 08"_gh)
             .find_inst("\xE8"sv)
@@ -2115,6 +2115,173 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "save_states"sv,
         PatternCommandBuffer{}
             .from_exe_base(0x22e0d1d0) // TODO
+    },
+    {
+        // look into spawn entity function when spawninig activefloor
+        // or set break point on write to the activefloors map in state.liquid_physics.activefloors
+        "add_movable_to_liquid_collision_map"sv, // jump
+        PatternCommandBuffer{}
+            .find_after_inst("4C 8B BF 80 03 00 00"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "spawn_liquid_layer"sv, // layer offset
+        PatternCommandBuffer{}
+            .get_address("spawn_liquid")
+            .find_after_inst("44 0F 28 C2 44 0F 28 D1"_gh)
+            .at_exe(),
+    },
+    {
+        "is_entity_in_liquid_check"sv, // jump
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::CHAR_AU, (VIRT_FUNC)12) // could probably be any entity
+            .find_inst("CC CC CC CC"_gh)                                         // end of the function
+            .offset(-5)                                                          // there is jump to the function that we need at the end
+            .decode_pc(1)
+            .find_after_inst("45 84 C9"_gh) // find the actual layer check
+            .at_exe(),
+    },
+    {
+        "liquid_render_layer"sv, // jump
+        PatternCommandBuffer{}
+            .find_after_inst("48 0F 44 D0 83 7A 14 01"_gh)
+            .offset(0xE)
+            .at_exe(),
+    },
+    {
+        // look for function that spawns ENT_TYPE_LOGICAL_STREAMWATER_SOUND_SOURCE, ENT_TYPE_LOGICAL_STREAMLAVA_SOUND_SOURCE and ENT_TYPE_LOGICAL_STATICLAVA_SOUND_SOURCE
+        "liquid_stream_spawner"sv, // multiple layer offset - will get specific address in the function itself
+        PatternCommandBuffer{}
+            .find_after_inst("FF 90 C0 00 00 00 48 8B 86 20 01 00 00"_gh)
+            .at_exe(),
+    },
+    {
+        // found this by looking what sets the swimming flag and then what part of the code runs when the entity fall into water and finally this stupid is layer 0 check
+        "entity_in_liquid_detection1"sv, // jump
+        PatternCommandBuffer{}
+            .find_after_inst("\x80\xB9\xB4\x03\x00\x00\x00\x0F\x84****\x31\xC0"sv)
+            .find_after_inst("45 84 C0"_gh)
+            .at_exe(),
+    },
+    {
+        // same pattern as above
+        "entity_in_liquid_detection2"sv, // jump
+        PatternCommandBuffer{}
+            .from_exe_base(0x22B6A118),
+    },
+    {
+        "layer_check_in_add_liquid_collision"sv, // jump
+        PatternCommandBuffer{}
+            .get_address("add_to_liquid_collision_map")
+            .find_after_inst("45 84 C9"_gh)
+            .at_exe(),
+    },
+    {
+        "layer_check_in_remove_liquid_collision"sv, // jump
+        PatternCommandBuffer{}
+            .get_address("remove_from_liquid_collision_map")
+            .find_after_inst("45 84 C9"_gh)
+            .at_exe(),
+    },
+    {
+        "layer_check_in_add_movable_liquid_collision"sv, // jump
+        PatternCommandBuffer{}
+            .get_address("add_movable_to_liquid_collision_map")
+            .find_after_inst("45 84 C0"_gh)
+            .at_exe(),
+    },
+    {
+        // set bp on write of 'is_lit' variable for Torch, jump into the water, execute til return, then go back into the call
+        // towards the end of the function is call to this function, look to a lot of stuff written to stack before a call, on of those is byte - layer
+        "check_if_collides_with_liquid_layer"sv, // layer byte or bool // unsure, seam to be only used for fire, even thou it has mask parameter
+        PatternCommandBuffer{}
+            .find_after_inst("4C 89 E0 F3 0F 58 60 44"_gh)
+            .find_after_inst("C6 44 24"_gh)
+            .offset(1)
+            .at_exe(),
+    },
+    {
+        // almost identical function
+        "check_if_collides_with_liquid_layer2"sv, // layer byte or bool
+        PatternCommandBuffer{}
+            .find_after_inst("44 0F 28 C3 44 0F 28 F2 44 0F 28 F9"_gh)
+            .find_after_inst("C6 44 24"_gh)
+            .offset(1)
+            .at_exe(),
+    },
+    {
+        // when he spews lava, go to hes current behavior, and to function `get_next_state_id`
+        // then find a few writes to stack and then a function call
+        // one of those writes is byte [+0x50] with value 0 (presumbly layer? or bool that means check both layers?)
+        "lavamander_spewing_lava"sv, // layer byte or bool
+        PatternCommandBuffer{}
+            .from_exe_base(0x22A45F94), // code too generic to find anything unique
+    },
+    {
+        // go into virtual Movable:sprint_factor for player, set bp, execute til return
+        // you will end up towards the end of a function, there is another call, go into it a look for comparison with offset +0xA0 (entity.layer)
+        "movement_calculations_layer_check"sv, // layer byte or bool
+        PatternCommandBuffer{}
+            .find_after_inst("F3 0F 58 4A 40 0F 2E 0D"_gh)
+            .find_after_inst("41 80 BC 24 A0 00 00 00"_gh)
+            .at_exe(),
+    },
+    {
+        // go into Movable:calculate_jump_height for player
+        // find the same check as above
+        "jump_calculations_layer_check"sv, // layer byte or bool
+        PatternCommandBuffer{}
+            .find_after_inst("\x77*\x80\xB9\xA0\x00\x00\x00"sv)
+            .at_exe(),
+    },
+    {
+        "tidepool_impostor_spawn"sv, // layer offset
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_TIDEPOOL, (VIRT_FUNC)15)
+            .find_inst("4C 8B AA"_gh)
+            .at_exe(),
+    },
+    {
+        "tiamat_impostor_spawn"sv, // layer offset
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_TIAMAT, (VIRT_FUNC)15)
+            .find_inst("48 8B 9A"_gh)
+            .at_exe(),
+    },
+    {
+        "olmec_impostor_spawn"sv, // layer offset
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_OLMEC, (VIRT_FUNC)15)
+            .find_inst("48 8B 8A"_gh)
+            .at_exe(),
+    },
+    {
+        "abzu_impostor_spawn"sv, // layer offset
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::THEME_ABZU, (VIRT_FUNC)15)
+            .find_inst("48 8B 9A"_gh)
+            .at_exe(),
+    },
+    {
+        // set bp on on_collision2 for plasma cannon (probably any entity works)
+        // execute till return, when in state update function, above the call to the collision virtual should entity lookup
+        // with the useal stack set, one of the params is byte 0 which we want to edit
+        "collision_mask_check_param"sv, // layer byte or bool
+        PatternCommandBuffer{}
+            .get_address("state_refresh")
+            .find_after_inst("48 8B 46 08 8B 40 3C"_gh)
+            .find_after_inst("C6 44 24"_gh)
+            .offset(1)
+            .at_exe(),
+    },
+    {
+        "robot_layer_check"sv, // different type of jump instruction
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::MONS_ROBOT, (VIRT_FUNC)78) // process input
+            .find_after_inst("84 C9"_gh)
+            .at_exe(),
+
     },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;

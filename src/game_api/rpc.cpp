@@ -1311,17 +1311,48 @@ std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start)
     }
 }
 
-void update_liquid_collision_at(float x, float y, bool add)
+void update_liquid_collision_at(float x, float y, bool add, std::optional<LAYER> layer)
 {
-    using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, bool); // setting last parameter to true just skips the whole function
+    using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, uint8_t);
     static UpdateLiquidCollision* RemoveLiquidCollision_fun = (UpdateLiquidCollision*)get_address("remove_from_liquid_collision_map");
-    static UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_from_liquid_collision_map");
+    static UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_to_liquid_collision_map");
     auto state = get_state_ptr();
+    uint8_t actual_layer = enum_to_layer(layer.value_or(LAYER::FRONT));
 
     if (add)
-        AddLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+        AddLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), actual_layer);
     else
-        RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+        RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), actual_layer);
+}
+
+void add_entity_to_liquid_collision(uint32_t uid, bool add, std::optional<LAYER> layer)
+{
+    using AddEntityLiquidCollision = void(LiquidPhysics*, Entity*, uint8_t);
+    static AddEntityLiquidCollision* add_entity_liquid_collision = (AddEntityLiquidCollision*)get_address("add_movable_to_liquid_collision_map");
+    auto state = get_state_ptr();
+    uint8_t actual_layer = enum_to_layer(layer.value_or(LAYER::FRONT));
+    auto entity = get_entity_ptr(uid);
+    if (!entity)
+        return;
+
+    auto map = state->liquid_physics->push_blocks;
+    if (!map)
+        return;
+
+    auto it = map->find(uid);
+
+    // if it already exists we can't add it again, since it will create the collision struct anyway and just overwrite the pointer to it in the map
+    // the actual collision struct is held somewhere else, unrelated to this map
+    if (add && it == map->end())
+        add_entity_liquid_collision(state->liquid_physics, entity, actual_layer);
+    else if (!add && it != map->end())
+    {
+        // very illegal, don't do this, we can because we're professionals xd
+        // game loops thru the map and checks if uid still exists, if not, it removes the collision
+        // which is some bigger struct held in some weird container, and the function is doing other stuff, so this is the easiest way besides killing the entity
+        auto test = const_cast<uint32_t*>(&it->first);
+        *test = ~0u;
+    }
 }
 
 bool disable_floor_embeds(bool disable)
@@ -1897,4 +1928,93 @@ void init_seeded(std::optional<uint32_t> seed)
     static init_func* isf = (init_func*)(offset);
     auto* state = State::get().ptr();
     isf(state, seed.value_or(state->seed));
+}
+
+void set_liquid_layer(LAYER l)
+{
+    static std::array<uintptr_t, 7> jumps;          // jne (0F85) -> je (0F84)
+    static std::array<uintptr_t, 11> layer_offsets; // 0x1300 -> 0x1308
+    static std::array<uintptr_t, 6> layer_byte;
+    static uintptr_t jump2;
+    if (jumps[0] == 0)
+    {
+        layer_byte[0] = get_address("check_if_collides_with_liquid_layer");
+        layer_byte[1] = get_address("check_if_collides_with_liquid_layer2");
+        layer_byte[2] = get_address("lavamander_spewing_lava");
+        layer_byte[3] = get_address("movement_calculations_layer_check");
+        layer_byte[4] = get_address("jump_calculations_layer_check");
+        // i don't actually know what this bit does, probably bool param, it's not just liquid relates as it's for all the entities with collision mask
+        // and it's not layer as well since other collision occur in back layer even with this set to 0 and vice versa
+        layer_byte[5] = get_address("collision_mask_check_param");
+
+        for (auto addr : layer_byte)
+            if (addr == 0)
+                return;
+
+        layer_offsets[0] = get_address("spawn_liquid_layer");
+        auto sound_stuff = get_address("liquid_stream_spawner");
+        {
+            if (sound_stuff == 0)
+                return;
+
+            auto& mem = Memory::get();
+            auto last_offset = sound_stuff - mem.exe_address();
+            bool skip = true;
+            for (uint8_t idx = 0; idx < 6; ++idx)
+            {
+                last_offset = find_inst(mem.exe(), "\x48\x8B\x8A"sv, last_offset, last_offset + 0x170, "set_liquid_layer");
+                if (idx == 5 && skip) // skip one, same instruction but not layer related
+                {
+                    idx = 4;
+                    skip = false;
+                    last_offset += 7;
+                    continue;
+                }
+                layer_offsets[idx + 1] = mem.at_exe(last_offset);
+                last_offset += 7;
+            }
+        }
+        layer_offsets[7] = get_address("tidepool_impostor_spawn");
+        layer_offsets[8] = get_address("tiamat_impostor_spawn");
+        layer_offsets[9] = get_address("olmec_impostor_spawn");
+        layer_offsets[10] = get_address("abzu_impostor_spawn");
+
+        for (auto addr : layer_offsets)
+            if (addr == 0)
+                return;
+
+        jump2 = get_address("robot_layer_check");
+        if (jump2 == 0)
+            return;
+
+        jumps[0] = get_address("layer_check_in_add_liquid_collision");
+        jumps[1] = get_address("layer_check_in_remove_liquid_collision");
+        jumps[2] = get_address("is_entity_in_liquid_check"); // TODO there is also layer offset nerby, test if it's related
+        jumps[3] = get_address("liquid_render_layer");
+        jumps[4] = get_address("entity_in_liquid_detection1");
+        jumps[5] = get_address("entity_in_liquid_detection2");
+        jumps[6] = get_address("layer_check_in_add_movable_liquid_collision");
+
+        for (auto addr : jumps)
+            if (addr == 0)
+            {
+                jumps[0] = 0;
+                return;
+            }
+    }
+    auto actual_layer = enum_to_layer(l);
+    uint8_t offset_ending = actual_layer == 0 ? 0 : 8;
+    uint8_t jump_oppcode = actual_layer == 0 ? 0x85 : 0x84;
+    uint8_t jump_oppcode2 = actual_layer == 0 ? 0x75 : 0x74;
+
+    for (auto addr : jumps)
+        write_mem_prot(addr + 1, jump_oppcode, true);
+
+    for (auto addr : layer_offsets)
+        write_mem_prot(addr + 3, offset_ending, true);
+
+    for (auto addr : layer_byte)
+        write_mem_prot(addr, actual_layer, true);
+
+    write_mem_prot(jump2, jump_oppcode2, true);
 }
