@@ -150,6 +150,12 @@ class Movable : public Entity
         this->collect_treasure(amount, coin);
     }
 
+    /// effect = true - plays the sound and spawn particle above entity
+    void set_cursed_fix(bool b, std::optional<bool> effect)
+    {
+        set_cursed(b, effect.value_or(true));
+    }
+
     /// Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
     virtual bool can_jump() = 0;                                             // 37
     virtual void get_collision_info(CollisionInfo* dest) = 0;                // 38
@@ -174,7 +180,7 @@ class Movable : public Entity
 
     /// Does not damage entity
     virtual void light_on_fire(uint8_t time) = 0;            // 53
-    virtual void set_cursed(bool b) = 0;                     // 54
+    virtual void set_cursed(bool b, bool other) = 0;         // 54
     virtual void on_spiderweb_collision() = 0;               // 55
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // 56, assigns player as last_owner_uid and also manipulates movable.b127
     virtual uint32_t get_last_owner_uid() = 0;               // 57, for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid

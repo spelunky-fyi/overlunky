@@ -345,7 +345,7 @@ void register_usertypes(sol::state& lua)
     movable_type["stun"] = &Movable::stun;
     movable_type["freeze"] = &Movable::freeze;
     movable_type["light_on_fire"] = light_on_fire;
-    movable_type["set_cursed"] = &Movable::set_cursed;
+    movable_type["set_cursed"] = &Movable::set_cursed_fix;
     movable_type["drop"] = &Movable::drop;
     movable_type["pick_up"] = &Movable::pick_up;
     movable_type["can_jump"] = &Movable::can_jump;
