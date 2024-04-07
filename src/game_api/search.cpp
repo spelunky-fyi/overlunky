@@ -2116,6 +2116,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .from_exe_base(0x22e0d1d0) // TODO
     },
+    //
+    // liquid layer stuff begin
+    //
     {
         // look into spawn entity function when spawninig activefloor
         // or set break point on write to the activefloors map in state.liquid_physics.activefloors
@@ -2281,8 +2284,26 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .get_virtual_function_address(VTABLE_OFFSET::MONS_ROBOT, (VIRT_FUNC)78) // process input
             .find_after_inst("84 C9"_gh)
             .at_exe(),
-
     },
+    {
+        // set bp on write to the pointer to the logic
+        // above you should see call to custom malloc and then this function in which we looking for layer offsets
+        "logic_volcana_gather_magman_spawn_locations"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("89 D2 48 69 FE B0 02 00 00"_gh)
+            .at_exe(),
+    },
+    {
+        "logic_volcana_gather_magman_spawn_locations2"sv,
+        PatternCommandBuffer{}
+            .get_address("logic_volcana_gather_magman_spawn_locations")
+            .find_inst("0F 28 D9"_gh)
+            .offset(-7)
+            .at_exe(),
+    },
+    //
+    // liquid layer stuff end
+    //
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

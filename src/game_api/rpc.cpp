@@ -1933,7 +1933,7 @@ void init_seeded(std::optional<uint32_t> seed)
 void set_liquid_layer(LAYER l)
 {
     static std::array<uintptr_t, 7> jumps;          // jne (0F85) -> je (0F84)
-    static std::array<uintptr_t, 11> layer_offsets; // 0x1300 -> 0x1308
+    static std::array<uintptr_t, 20> layer_offsets; // 0x1300 -> 0x1308
     static std::array<uintptr_t, 6> layer_byte;
     static uintptr_t jump2;
     if (jumps[0] == 0)
@@ -1951,18 +1951,19 @@ void set_liquid_layer(LAYER l)
             if (addr == 0)
                 return;
 
+        auto& mem = Memory::get();
         layer_offsets[0] = get_address("spawn_liquid_layer");
-        auto sound_stuff = get_address("liquid_stream_spawner");
+
         {
+            auto sound_stuff = get_address("liquid_stream_spawner");
             if (sound_stuff == 0)
                 return;
 
-            auto& mem = Memory::get();
             auto last_offset = sound_stuff - mem.exe_address();
             bool skip = true;
             for (uint8_t idx = 0; idx < 6; ++idx)
             {
-                last_offset = find_inst(mem.exe(), "\x48\x8B\x8A"sv, last_offset, last_offset + 0x170, "set_liquid_layer");
+                last_offset = find_inst(mem.exe(), "\x48\x8B\x8A"sv, last_offset, last_offset + 0x170, "set_liquid_layer-sound stuff");
                 if (idx == 5 && skip) // skip one, same instruction but not layer related
                 {
                     idx = 4;
@@ -1978,6 +1979,35 @@ void set_liquid_layer(LAYER l)
         layer_offsets[8] = get_address("tiamat_impostor_spawn");
         layer_offsets[9] = get_address("olmec_impostor_spawn");
         layer_offsets[10] = get_address("abzu_impostor_spawn");
+
+        {
+            auto logic_magman_spawn = get_virtual_function_address(VTABLE_OFFSET::LOGIC_VOLCANA_RELATED, 1);
+            if (logic_magman_spawn == 0)
+                return;
+
+            auto lookup_patterns = {
+                // in order
+                "\x48\x8B\x8D*\x13\x00\x00"sv,
+                "\x48\x03\xB7*\x13\x00\x00"sv,
+                "\x48\x8B\x89*\x13\x00\x00"sv,
+                "\x48\x03\x95*\x13\x00\x00"sv,
+                "\x48\x03\x95*\x13\x00\x00"sv,
+                "\x48\x03\x8D*\x13\x00\x00"sv,
+                "\x48\x8B\x8A*\x13\x00\x00"sv,
+            };
+            auto current_offset = logic_magman_spawn;
+            uint8_t idx = 11; // next free index
+            for (auto& pattern : lookup_patterns)
+            {
+                current_offset = find_inst(mem.exe(), pattern, current_offset + 7, logic_magman_spawn + 0x764, "set_liquid_layer-volcana");
+                if (current_offset == 0)
+                    return;
+
+                layer_offsets[idx++] = mem.at_exe(current_offset);
+            }
+        }
+        layer_offsets[18] = get_address("logic_volcana_gather_magman_spawn_locations");
+        layer_offsets[19] = get_address("logic_volcana_gather_magman_spawn_locations2");
 
         for (auto addr : layer_offsets)
             if (addr == 0)
