@@ -310,6 +310,10 @@ struct StateMemory
     uint8_t unknown43;
     uint32_t unknown44; // probably padding
 
+    /* for the autodoc
+    any user_data;
+    */
+
     /// This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     void force_current_theme(THEME t);
 
