@@ -1169,11 +1169,13 @@ function get_adventure_seed(run_start) end
 ---@return nil
 function set_adventure_seed(first, second) end
 ---Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+---optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
 ---@param x number
 ---@param y number
 ---@param add boolean
+---@param layer LAYER?
 ---@return nil
-function update_liquid_collision_at(x, y, add) end
+function update_liquid_collision_at(x, y, add, layer) end
 ---Disable all crust item spawns, returns whether they were already disabled before the call
 ---@param disable boolean
 ---@return boolean
@@ -1385,6 +1387,20 @@ function play_adventure() end
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
+---Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+---This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or placing them directly in level files)
+---Everything should be working more or less correctly (report on community discord if you find something unusual)
+---@param l LAYER
+---@return nil
+function set_liquid_layer(l) end
+---Attach liquid collision to entity by uid (this is what the push blocks use)
+---Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
+---Use only for entities that can move around, (for static prefer [update_liquid_collision_at](https://spelunky-fyi.github.io/overlunky/#update_liquid_collision_at) )
+---If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
+---@param uid integer
+---@param add boolean
+---@return nil
+function add_entity_to_liquid_collision(uid, add) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -2640,7 +2656,7 @@ function Entity:destroy_recursive() end
     ---@field stun fun(self, framecount: integer): nil
     ---@field freeze fun(self, framecount: integer): nil
     ---@field light_on_fire fun(self, time: integer): nil @Does not damage entity
-    ---@field set_cursed fun(self, b: boolean): nil
+    ---@field set_cursed fun(self, b: boolean, effect: boolean?): nil @effect = true - plays the sound and spawn particle above entity
     ---@field drop fun(self, entity_to_drop: Entity): nil @Called when dropping or throwing
     ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
     ---@field can_jump fun(self): boolean @Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
@@ -2680,8 +2696,8 @@ function Entity:destroy_recursive() end
     ---@field set_post_freeze fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil freeze(Movable self, integer framecount)`
     ---@field set_pre_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
     ---@field set_post_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
-    ---@field set_pre_set_cursed fun(self, fun: fun(self: Movable, b: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, boolean b)`
-    ---@field set_post_set_cursed fun(self, fun: fun(self: Movable, b: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, boolean b)`
+    ---@field set_pre_set_cursed fun(self, fun: fun(self: Movable, b: boolean, effect: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, boolean b, boolean effect)`
+    ---@field set_post_set_cursed fun(self, fun: fun(self: Movable, b: boolean, effect: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, boolean b, boolean effect)`
     ---@field set_pre_web_collision fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool web_collision(Movable self)`
     ---@field set_post_web_collision fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil web_collision(Movable self)`
     ---@field set_pre_check_out_of_bounds fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool check_out_of_bounds(Movable self)`
@@ -6275,7 +6291,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field tun_star_challenge LogicStarChallenge
     ---@field tun_sun_challenge LogicSunChallenge
     ---@field magmaman_spawn LogicMagmamanSpawn
-    ---@field water_bubbles LogicUnderwaterBubbles @Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
+    ---@field water_bubbles LogicUnderwaterBubbles @Only the bubbles that spawn from the floor (no border tiles, checks decoration flag), also spawn droplets falling from ceiling<br/>Even without it, entities moving in water still spawn bubbles
     ---@field olmec_cutscene LogicOlmecCutscene
     ---@field tiamat_cutscene LogicTiamatCutscene
     ---@field apep_spawner LogicApepTrigger @Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
@@ -6373,6 +6389,9 @@ function LogicMagmamanSpawn:remove_spawn(x, y) end
 function LogicMagmamanSpawn:remove_spawn(ms) end
 
 ---@class LogicUnderwaterBubbles : Logic
+    ---@field gravity_direction number @1.0 = normal, -1.0 = inversed, other values have undefined behavior<br/>this value basically have to be the same as return from `ThemeInfo:get_liquid_gravity()`
+    ---@field droplets_spawn_chance integer @It's inverse chance, so the lower the number the higher the chance, values below 10 may crash the game
+    ---@field droplets_enabled boolean @Enable/disable spawn of ENT_TYPE.FX_WATER_DROP from ceiling (or ground if liquid gravity is inverse)
 
 ---@class LogicOlmecCutscene : Logic
     ---@field fx_olmecpart_large Entity

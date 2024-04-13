@@ -2288,17 +2288,26 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         // set bp on write to the pointer to the logic
         // above you should see call to custom malloc and then this function in which we looking for layer offsets
-        "logic_volcana_gather_magman_spawn_locations"sv,
+        "logic_volcana_gather_magman_spawn_locations"sv, // layer offset
         PatternCommandBuffer{}
             .find_after_inst("89 D2 48 69 FE B0 02 00 00"_gh)
             .at_exe(),
     },
     {
-        "logic_volcana_gather_magman_spawn_locations2"sv,
+        "logic_volcana_gather_magman_spawn_locations2"sv, // layer offset
         PatternCommandBuffer{}
             .get_address("logic_volcana_gather_magman_spawn_locations")
             .find_inst("0F 28 D9"_gh)
             .offset(-7)
+            .at_exe(),
+    },
+    {
+        // the whole function runs twice (for each layer), there is variable on stack that is set at the end of looking thru layer 0
+        // this check skips spawn of the bubbles in the back layer, but still rolls for the droplets
+        "logic_underwater_bubbles_loop_check"sv, // different type of jump, also inversed compared to robot_layer_check
+        PatternCommandBuffer{}
+            .get_virtual_function_address(VTABLE_OFFSET::LOGIC_WATER_RELATED, (VIRT_FUNC)1)
+            .find_after_inst("F6 45 F4 01"_gh)
             .at_exe(),
     },
     //

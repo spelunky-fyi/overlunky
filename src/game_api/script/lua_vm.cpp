@@ -2265,12 +2265,14 @@ end
     lua["play_seeded"] = init_seeded;
 
     /// Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+    /// This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or placing them directly in level files)
+    /// Everything should be working more or less correctly (report on community discord if you find something unusual)
     lua["set_liquid_layer"] = set_liquid_layer;
 
     /// Attach liquid collision to entity by uid (this is what the push blocks use)
-    /// Collision is based on the entity's hitbox, collision in removed when the entity is destroyed (bodies of killed entities will still have the collision)
-    /// Use only for entities that can move around, (for static entities use [update_liquid_collision_at](#update_liquid_collision_at) )
-    /// optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
+    /// Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
+    /// Use only for entities that can move around, (for static prefer [update_liquid_collision_at](#update_liquid_collision_at) )
+    /// If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
     lua["add_entity_to_liquid_collision"] = add_entity_to_liquid_collision;
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);

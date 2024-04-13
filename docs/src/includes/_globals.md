@@ -457,6 +457,18 @@ Activate custom variables for speed and distance in the `ITEM_SPARK`
 note: because those the variables are custom and game does not initiate them, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
 default game values are: speed = -0.015, distance = 3.0
 
+### add_entity_to_liquid_collision
+
+
+> Search script examples for [add_entity_to_liquid_collision](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_entity_to_liquid_collision)
+
+#### nil add_entity_to_liquid_collision(int uid, bool add)
+
+Attach liquid collision to entity by uid (this is what the push blocks use)
+Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
+Use only for entities that can move around, (for static prefer [update_liquid_collision_at](#update_liquid_collision_at) )
+If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
+
 ### apply_entity_db
 
 
@@ -1991,6 +2003,17 @@ Set the value for the specified config
 
 Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
 
+### set_liquid_layer
+
+
+> Search script examples for [set_liquid_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_liquid_layer)
+
+#### nil set_liquid_layer([LAYER](#LAYER) l)
+
+Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or placing them directly in level files)
+Everything should be working more or less correctly (report on community discord if you find something unusual)
+
 ### set_seed
 
 
@@ -2142,9 +2165,10 @@ Gets line1_A, intersection point and line2_B and calls the 3 parameter version o
 
 > Search script examples for [update_liquid_collision_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_liquid_collision_at)
 
-#### nil update_liquid_collision_at(float x, float y, bool add)
+#### nil update_liquid_collision_at(float x, float y, bool add, optional<[LAYER](#LAYER)> layer = nullopt)
 
 Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
 
 ### update_state
 

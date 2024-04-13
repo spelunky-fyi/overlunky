@@ -1325,12 +1325,11 @@ void update_liquid_collision_at(float x, float y, bool add, std::optional<LAYER>
         RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), actual_layer);
 }
 
-void add_entity_to_liquid_collision(uint32_t uid, bool add, std::optional<LAYER> layer)
+void add_entity_to_liquid_collision(uint32_t uid, bool add)
 {
     using AddEntityLiquidCollision = void(LiquidPhysics*, Entity*, uint8_t);
     static AddEntityLiquidCollision* add_entity_liquid_collision = (AddEntityLiquidCollision*)get_address("add_movable_to_liquid_collision_map");
     auto state = get_state_ptr();
-    uint8_t actual_layer = enum_to_layer(layer.value_or(LAYER::FRONT));
     auto entity = get_entity_ptr(uid);
     if (!entity)
         return;
@@ -1344,7 +1343,7 @@ void add_entity_to_liquid_collision(uint32_t uid, bool add, std::optional<LAYER>
     // if it already exists we can't add it again, since it will create the collision struct anyway and just overwrite the pointer to it in the map
     // the actual collision struct is held somewhere else, unrelated to this map
     if (add && it == map->end())
-        add_entity_liquid_collision(state->liquid_physics, entity, actual_layer);
+        add_entity_liquid_collision(state->liquid_physics, entity, entity->layer);
     else if (!add && it != map->end())
     {
         // very illegal, don't do this, we can because we're professionals xd
@@ -1936,6 +1935,7 @@ void set_liquid_layer(LAYER l)
     static std::array<uintptr_t, 20> layer_offsets; // 0x1300 -> 0x1308
     static std::array<uintptr_t, 6> layer_byte;
     static uintptr_t jump2;
+    static uintptr_t jump3;
     if (jumps[0] == 0)
     {
         layer_byte[0] = get_address("check_if_collides_with_liquid_layer");
@@ -2014,7 +2014,8 @@ void set_liquid_layer(LAYER l)
                 return;
 
         jump2 = get_address("robot_layer_check");
-        if (jump2 == 0)
+        jump3 = get_address("logic_underwater_bubbles_loop_check");
+        if (jump2 == 0 || jump3 == 0)
             return;
 
         jumps[0] = get_address("layer_check_in_add_liquid_collision");
@@ -2036,6 +2037,7 @@ void set_liquid_layer(LAYER l)
     uint8_t offset_ending = actual_layer == 0 ? 0 : 8;
     uint8_t jump_oppcode = actual_layer == 0 ? 0x85 : 0x84;
     uint8_t jump_oppcode2 = actual_layer == 0 ? 0x75 : 0x74;
+    uint8_t jump_oppcode2_inverse = actual_layer == 0 ? 0x74 : 0x75;
 
     for (auto addr : jumps)
         write_mem_prot(addr + 1, jump_oppcode, true);
@@ -2047,4 +2049,5 @@ void set_liquid_layer(LAYER l)
         write_mem_prot(addr, actual_layer, true);
 
     write_mem_prot(jump2, jump_oppcode2, true);
+    write_mem_prot(jump3, jump_oppcode2_inverse, true);
 }

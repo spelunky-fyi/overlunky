@@ -1040,9 +1040,9 @@ Logic* LogicList::start_logic(LOGIC idx)
     if (idx == LOGIC::WATER_BUBBLES)
     {
         auto proper_type = (LogicUnderwaterBubbles*)new_logic;
-        proper_type->unknown1 = 1.0f;
-        proper_type->unknown2 = 1000;
-        proper_type->unknown3 = true;
+        proper_type->gravity_direction = 1.0f;
+        proper_type->droplets_spawn_chance = 1000;
+        proper_type->droplets_enabled = true;
     }
     else if (idx == LOGIC::OUROBOROS)
     {

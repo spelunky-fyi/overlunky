@@ -102,7 +102,7 @@ void change_poison_timer(int16_t frames);
 void set_adventure_seed(int64_t first, int64_t second);
 std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start);
 void update_liquid_collision_at(float x, float y, bool add, std::optional<LAYER> layer = std::nullopt);
-void add_entity_to_liquid_collision(uint32_t uid, bool add, std::optional<LAYER> layer);
+void add_entity_to_liquid_collision(uint32_t uid, bool add);
 bool disable_floor_embeds(bool disable);
 void set_cursepot_ghost_enabled(bool enable);
 void game_log(std::string message);

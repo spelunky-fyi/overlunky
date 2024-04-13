@@ -604,13 +604,14 @@ class LogicArenaLooseBombs : public Logic
 class LogicUnderwaterBubbles : public Logic
 {
   public:
-    // no idea what does are, messing with them can crash
-    float unknown1; // default: 1.0, excludes liquid from spawning the bubbles by y level from the top to bottom
-                    // is treated like number (calculations to get the right grid entity level)
-                    // it's more like a value in rooms than y coordinates
+    /// 1.0 = normal, -1.0 = inversed, other values have undefined behavior
+    /// this value basically have to be the same as return from `ThemeInfo:get_liquid_gravity()`
+    float gravity_direction;
 
-    int16_t unknown2; // default: 1000
-    bool unknown3;    // default: 1 or 0
+    /// It's inverse chance, so the lower the number the higher the chance, values below 10 may crash the game
+    int16_t droplets_spawn_chance;
+    /// Enable/disable spawn of ENT_TYPE.FX_WATER_DROP from ceiling (or ground if liquid gravity is inverse)
+    bool droplets_enabled;
 };
 
 class LogicTunPreChallenge : public Logic
@@ -660,7 +661,7 @@ struct LogicList
             LogicStarChallenge* tun_star_challenge;
             LogicSunChallenge* tun_sun_challenge;
             LogicMagmamanSpawn* magmaman_spawn;
-            /// Only the bubbles that spawn from the floor
+            /// Only the bubbles that spawn from the floor (no border tiles, checks decoration flag), also spawn droplets falling from ceiling
             /// Even without it, entities moving in water still spawn bubbles
             LogicUnderwaterBubbles* water_bubbles;
             LogicOlmecCutscene* olmec_cutscene;

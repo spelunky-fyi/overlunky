@@ -1576,7 +1576,7 @@ Type | Name | Description
 [LogicStarChallenge](#LogicStarChallenge) | [tun_star_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_star_challenge) | 
 [LogicSunChallenge](#LogicSunChallenge) | [tun_sun_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_sun_challenge) | 
 [LogicMagmamanSpawn](#LogicMagmamanSpawn) | [magmaman_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=magmaman_spawn) | 
-[LogicUnderwaterBubbles](#LogicUnderwaterBubbles) | [water_bubbles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=water_bubbles) | Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
+[LogicUnderwaterBubbles](#LogicUnderwaterBubbles) | [water_bubbles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=water_bubbles) | Only the bubbles that spawn from the floor (no border tiles, checks decoration flag), also spawn droplets falling from ceiling<br/>Even without it, entities moving in water still spawn bubbles
 [LogicOlmecCutscene](#LogicOlmecCutscene) | [olmec_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=olmec_cutscene) | 
 [LogicTiamatCutscene](#LogicTiamatCutscene) | [tiamat_cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiamat_cutscene) | 
 [LogicApepTrigger](#LogicApepTrigger) | [apep_spawner](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apep_spawner) | Triggers and spawns Apep only in rooms set as [ROOM_TEMPLATE](#ROOM_TEMPLATE).APEP
@@ -1718,6 +1718,9 @@ Derived from [Logic](#Logic)
 
 Type | Name | Description
 ---- | ---- | -----------
+float | [gravity_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gravity_direction) | 1.0 = normal, -1.0 = inversed, other values have undefined behavior<br/>this value basically have to be the same as return from `ThemeInfo:get_liquid_gravity()`
+int | [droplets_spawn_chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=droplets_spawn_chance) | It's inverse chance, so the lower the number the higher the chance, values below 10 may crash the game
+bool | [droplets_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=droplets_enabled) | Enable/disable spawn of [ENT_TYPE](#ENT_TYPE).FX_WATER_DROP from ceiling (or ground if liquid gravity is inverse)
 
 ## Online types
 
@@ -6864,7 +6867,7 @@ int | [price](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) |
 nil | [stun(int framecount)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun) | 
 nil | [freeze(int framecount)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freeze) | 
 nil | [light_on_fire(int time)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_on_fire) | Does not damage entity
-nil | [set_cursed(bool b)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) | 
+nil | [set_cursed(bool b, optional<bool> effect)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) | effect = true - plays the sound and spawn particle above entity
 nil | [drop(Entity entity_to_drop)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) | Called when dropping or throwing
 nil | [pick_up(Entity entity_to_pick_up)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) | 
 bool | [can_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) | Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
@@ -6907,8 +6910,8 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_freeze(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_freeze) | Hooks after the virtual function.<br/>The callback signature is `nil freeze(Movable self, int framecount)`
 [CallbackId](#Aliases) | [set_pre_light_on_fire(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_light_on_fire) | Hooks before the virtual function.<br/>The callback signature is `bool light_on_fire(Movable self, int time)`<br/>Virtual function docs:<br/>Does not damage entity
 [CallbackId](#Aliases) | [set_post_light_on_fire(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_light_on_fire) | Hooks after the virtual function.<br/>The callback signature is `nil light_on_fire(Movable self, int time)`<br/>Virtual function docs:<br/>Does not damage entity
-[CallbackId](#Aliases) | [set_pre_set_cursed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_set_cursed) | Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, bool b)`
-[CallbackId](#Aliases) | [set_post_set_cursed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_set_cursed) | Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, bool b)`
+[CallbackId](#Aliases) | [set_pre_set_cursed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_set_cursed) | Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, bool b, bool effect)`
+[CallbackId](#Aliases) | [set_post_set_cursed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_set_cursed) | Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, bool b, bool effect)`
 [CallbackId](#Aliases) | [set_pre_web_collision(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_web_collision) | Hooks before the virtual function.<br/>The callback signature is `bool web_collision(Movable self)`
 [CallbackId](#Aliases) | [set_post_web_collision(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_web_collision) | Hooks after the virtual function.<br/>The callback signature is `nil web_collision(Movable self)`
 [CallbackId](#Aliases) | [set_pre_check_out_of_bounds(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_check_out_of_bounds) | Hooks before the virtual function.<br/>The callback signature is `bool check_out_of_bounds(Movable self)`
