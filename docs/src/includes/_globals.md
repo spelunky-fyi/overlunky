@@ -2011,7 +2011,7 @@ Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly th
 #### nil set_liquid_layer([LAYER](#LAYER) l)
 
 Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
-This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or placing them directly in level files)
+This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
 Everything should be working more or less correctly (report on community discord if you find something unusual)
 
 ### set_seed

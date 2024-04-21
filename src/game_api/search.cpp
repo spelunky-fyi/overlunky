@@ -2128,9 +2128,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         PatternCommandBuffer{}
             .from_exe_base(0x22e0d1d0) // TODO
     },
-    //
-    // liquid layer stuff begin
-    //
     {
         // look into spawn entity function when spawninig activefloor
         // or set break point on write to the activefloors map in state.liquid_physics.activefloors
@@ -2140,6 +2137,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe()
             .function_start(),
     },
+    //
+    // liquid layer stuff begin
+    //
     {
         "spawn_liquid_layer"sv, // layer offset
         PatternCommandBuffer{}
@@ -2235,7 +2235,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // go into virtual Movable:sprint_factor for player, set bp, execute til return
-        // you will end up towards the end of a function, there is another call, go into it a look for comparison with offset +0xA0 (entity.layer)
+        // you will end up towards the end of a function, there is another call, go into it and look for comparison with offset +0xA0 (entity.layer)
         "movement_calculations_layer_check"sv, // layer byte or bool
         PatternCommandBuffer{}
             .find_after_inst("F3 0F 58 4A 40 0F 2E 0D"_gh)
@@ -2321,7 +2321,13 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .get_virtual_function_address(VTABLE_OFFSET::LOGIC_WATER_RELATED, (VIRT_FUNC)1)
             .find_after_inst("F6 45 F4 01"_gh)
             .at_exe(),
+        // there is also layer offset at 22B74A1F, no idea how to trigger that part of the code
     },
+    /* Other potential liquid lookups:
+     * 228BC562 - lookup with unknown mask
+     * 228BCB42 - same as above, runs all the time, so potentially unrelated
+     * 228BD4A5 - same as above
+     */
     //
     // liquid layer stuff end
     //

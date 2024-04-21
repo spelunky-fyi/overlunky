@@ -1349,8 +1349,8 @@ void add_entity_to_liquid_collision(uint32_t uid, bool add)
         // very illegal, don't do this, we can because we're professionals xd
         // game loops thru the map and checks if uid still exists, if not, it removes the collision
         // which is some bigger struct held in some weird container, and the function is doing other stuff, so this is the easiest way besides killing the entity
-        auto test = const_cast<uint32_t*>(&it->first);
-        *test = ~0u;
+        auto key = const_cast<uint32_t*>(&it->first);
+        *key = ~0u;
     }
 }
 
