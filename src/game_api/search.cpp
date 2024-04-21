@@ -246,29 +246,41 @@ class PatternCommandBuffer
         commands.push_back({CommandType::GetVirtualFunctionAddress, {.get_vfunc_addr_args = {.table_offset = table_offset, .function_index = function_index}}});
         return *this;
     }
-    PatternCommandBuffer& find_inst(std::string_view pattern)
+    template <typename T>
+    requires std::is_same_v<T, std::string_view>
+    PatternCommandBuffer& find_inst(T pattern)
     {
         commands.push_back({CommandType::FindInst, {.find_inst_args = {pattern}}});
         return *this;
     }
-    PatternCommandBuffer& find_after_inst(std::string_view pattern)
+    template <typename T>
+    requires std::is_same_v<T, std::string_view>
+    PatternCommandBuffer& find_after_inst(T pattern)
     {
         return find_inst(pattern).offset(pattern.size());
     }
-    PatternCommandBuffer& find_next_inst(std::string_view pattern)
+    template <typename T>
+    requires std::is_same_v<T, std::string_view>
+    PatternCommandBuffer& find_next_inst(T pattern)
     {
         return offset(0x1).find_inst(pattern);
     }
-    PatternCommandBuffer& find_inst_in_range(std::string_view pattern, size_t range)
+    template <typename T>
+    requires std::is_same_v<T, std::string_view>
+    PatternCommandBuffer& find_inst_in_range(T pattern, size_t range)
     {
         commands.push_back({CommandType::FindInst, {.find_inst_args = {.pattern = pattern, .range = range}}});
         return *this;
     }
-    PatternCommandBuffer& find_after_inst_in_range(std::string_view pattern, size_t range)
+    template <typename T>
+    requires std::is_same_v<T, std::string_view>
+    PatternCommandBuffer& find_after_inst_in_range(T pattern, size_t range)
     {
         return find_inst_in_range(pattern, range).offset(pattern.size());
     }
-    PatternCommandBuffer& find_next_inst_in_range(std::string_view pattern, size_t range)
+    template <typename T>
+    requires std::is_same_v<T, std::string_view>
+    PatternCommandBuffer& find_next_inst_in_range(T pattern, size_t range)
     {
         return offset(0x1).find_inst_in_range(pattern, range);
     }
