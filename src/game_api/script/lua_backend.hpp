@@ -139,7 +139,7 @@ enum class ON
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
-    PRE_COPY_STATE,
+    // PRE_COPY_STATE,
 };
 
 struct IntOption

@@ -1898,20 +1898,20 @@ void LuaBackend::pre_copy_state(StateMemory* from, StateMemory* to)
         return;
 
     copy_locals(from, to);
-    auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
+    // auto now = get_frame_count();
+    // for (auto& [id, callback] : callbacks)
+    // {
+    //     if (is_callback_cleared(id))
+    //         continue;
 
-        if (callback.screen == ON::PRE_COPY_STATE)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func, from, to);
-            clear_current_callback();
-            callback.lastRan = now;
-        }
-    }
+    //     if (callback.screen == ON::PRE_COPY_STATE)
+    //     {
+    //         set_current_callback(-1, id, CallbackType::Normal);
+    //         handle_function<void>(this, callback.func, from, to);
+    //         clear_current_callback();
+    //         callback.lastRan = now;
+    //     }
+    // }
 }
 bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
 {
