@@ -682,10 +682,3 @@ Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs i
 > Search script examples for [ON.BLOCKED_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.BLOCKED_PROCESS_INPUT)
 
 Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when [Overlunky](#Overlunky) blocks a PRE_PROCESS_INPUT.<br/>
-
-## ON.PRE_COPY_STATE
-
-
-> Search script examples for [ON.PRE_COPY_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_COPY_STATE)
-
-Runs before the game copies a state to another in an online multiplayer game.<br/>Params: [StateMemory](#StateMemory) from, [StateMemory](#StateMemory) to<br/>

@@ -2187,7 +2187,7 @@ do
     ---@field liquid LiquidPhysics
     ---@field next_entity_uid integer @Next entity spawned will have this uid
     ---@field room_owners RoomOwnersInfo @Holds info about owned rooms and items (shops, challenge rooms, vault etc.)
-    ---@field user_data any @user_data
+    ---@field user_data any
 
 ---@class LightParams
     ---@field red number

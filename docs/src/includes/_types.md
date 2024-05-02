@@ -3084,7 +3084,7 @@ array&lt;[THEME](#THEME), 9&gt; | [journal_progress_theme_slots](https://github.
 [LiquidPhysics](#LiquidPhysics) | [liquid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid) | 
 int | [next_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_entity_uid) | Next entity spawned will have this uid
 [RoomOwnersInfo](#RoomOwnersInfo) | [room_owners](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=room_owners) | Holds info about owned rooms and items (shops, challenge rooms, vault etc.)
- | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here and it will work correctly in online multiplayer, by having a copy on each state and being copied when the game does.<br/> 
+any | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here and it will work correctly in online multiplayer, by having a copy on each state and being copied when the game does.<br/> 
 
 ## Texture types
 
