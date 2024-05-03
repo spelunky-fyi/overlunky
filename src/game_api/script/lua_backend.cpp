@@ -547,6 +547,10 @@ bool LuaBackend::update()
                         it = locals.level_timers.erase(it);
                         continue;
                     }
+                    else
+                    {
+                        locals.level_timers.increase_edit_num();
+                    }
                 }
                 ++it;
             }
