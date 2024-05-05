@@ -162,38 +162,11 @@ struct Layer
     EntityList expired_entities;
     bool is_layer_loading;
     bool unknown14;
-    uint8_t unknown15;
-    uint8_t unknown16;
-    uint32_t unknown17;
-    uint32_t unknown18;
-    uint32_t unknown19;
-    size_t entity_items_begin; // begin of the memory that holds the items of entities, maybe vector?
-    size_t unknown21;
-    size_t unknown22;
-    bool unknown23;
-    bool layer_freeze; // locking mechanism?
-    uint8_t unknown25;
-    uint8_t unknown26;
-    uint32_t unknown27;
-    uint64_t unknown28;
-    uint64_t unknown29;
-    uint64_t unknown30;
-    uint64_t unknown31;
-    uint64_t unknown32;
-    uint32_t unknown33;
-    uint32_t unknown34;
-    size_t unknown35; // maybe vector?
-    size_t unknown36;
-    size_t unknown37;
-    bool unknown38;
-    bool unknown39;
-    uint8_t unknown40;
-    uint8_t unknown41;
-    uint32_t unknown42;
-    uint64_t unknown43;
-    uint64_t unknown44;
-    uint64_t unknown45;
-    uint64_t unknown46; // next layer below
+
+    // probably just padding
+    // uint8_t unknown15;
+    // uint8_t unknown16;
+    // uint32_t unknown17;
 
     Entity* spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx, float vy, bool snap);
 
