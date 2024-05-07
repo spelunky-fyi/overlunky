@@ -1393,6 +1393,9 @@ function play_seeded(seed) end
 ---@param l LAYER
 ---@return nil
 function set_liquid_layer(l) end
+---Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
+---@return integer
+function get_liquid_layer() end
 ---Attach liquid collision to entity by uid (this is what the push blocks use)
 ---Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
 ---Use only for entities that can move around, (for static prefer [update_liquid_collision_at](https://spelunky-fyi.github.io/overlunky/#update_liquid_collision_at) )
@@ -2936,8 +2939,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field spawned_uid integer
     ---@field set_timer integer
     ---@field timer integer
-    ---@field start_counter integer @works only for star challenge
-    ---@field on_off boolean @works only for star challenge
+    ---@field start_counter integer @Applicable only for ENT_TYPE`.FLOOR_SUNCHALLENGE_GENERATOR`
+    ---@field on_off boolean @Applicable only for ENT_TYPE`.FLOOR_SUNCHALLENGE_GENERATOR`
 
 ---@class SlidingWallCeiling : Floor
     ---@field attached_piece Entity

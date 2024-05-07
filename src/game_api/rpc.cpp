@@ -2051,3 +2051,9 @@ void set_liquid_layer(LAYER l)
     write_mem_prot(jump2, jump_oppcode2, true);
     write_mem_prot(jump3, jump_oppcode2_inverse, true);
 }
+
+uint8_t get_liquid_layer()
+{
+    static auto addr = get_address("check_if_collides_with_liquid_layer");
+    return memory_read<uint8_t>(addr);
+}

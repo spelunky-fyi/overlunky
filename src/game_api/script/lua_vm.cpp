@@ -2269,6 +2269,9 @@ end
     /// Everything should be working more or less correctly (report on community discord if you find something unusual)
     lua["set_liquid_layer"] = set_liquid_layer;
 
+    /// Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](#set_liquid_layer)
+    lua["get_liquid_layer"] = get_liquid_layer;
+
     /// Attach liquid collision to entity by uid (this is what the push blocks use)
     /// Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
     /// Use only for entities that can move around, (for static prefer [update_liquid_collision_at](#update_liquid_collision_at) )

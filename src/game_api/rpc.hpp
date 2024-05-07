@@ -139,3 +139,4 @@ float get_speedhack();
 void init_adventure();
 void init_seeded(std::optional<uint32_t> seed);
 void set_liquid_layer(LAYER l);
+uint8_t get_liquid_layer();

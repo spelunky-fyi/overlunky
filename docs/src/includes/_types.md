@@ -3860,8 +3860,8 @@ Type | Name | Description
 int | [spawned_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawned_uid) | 
 int | [set_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_timer) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
-int | [start_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_counter) | works only for star challenge
-bool | [on_off](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_off) | works only for star challenge
+int | [start_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_counter) | Applicable only for [ENT_TYPE](#ENT_TYPE)`.FLOOR_SUNCHALLENGE_GENERATOR`
+bool | [on_off](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_off) | Applicable only for [ENT_TYPE](#ENT_TYPE)`.FLOOR_SUNCHALLENGE_GENERATOR`
 
 ### HorizontalForceField
 

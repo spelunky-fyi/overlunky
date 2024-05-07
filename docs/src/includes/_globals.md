@@ -1518,6 +1518,15 @@ Get your sanitized script id to be used in import.
 
 Gets the value for the specified config
 
+### get_liquid_layer
+
+
+> Search script examples for [get_liquid_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquid_layer)
+
+#### int get_liquid_layer()
+
+Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](#set_liquid_layer)
+
 ### get_local_prng
 
 
