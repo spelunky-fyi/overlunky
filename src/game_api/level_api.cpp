@@ -1279,9 +1279,10 @@ bool handle_chance(SpawnInfo* spawn_info)
 
     uint8_t layer = 0;
     auto* layer_ptr = State::get().layer(layer);
+    LevelGenSystem* level_gen = State::get().ptr()->level_gen;
     for (const CommunityChance& community_chance : g_community_chances)
     {
-        if (community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
+        if (level_gen->get_procedural_spawn_chance(community_chance.chance_id) != 0 && community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
         {
             if (g_test_chance(&level_gen_data, community_chance.chance_id))
             {
@@ -1294,7 +1295,7 @@ bool handle_chance(SpawnInfo* spawn_info)
         std::lock_guard lock{g_chance_logic_providers_lock};
         for (const ChanceLogicProviderImpl& chance_provider : g_chance_logic_providers)
         {
-            if (chance_provider.provider.is_valid(spawn_info->x, spawn_info->y, layer))
+            if (level_gen->get_procedural_spawn_chance(chance_provider.chance_id) != 0 && chance_provider.provider.is_valid(spawn_info->x, spawn_info->y, layer))
             {
                 if (g_test_chance(&level_gen_data, chance_provider.chance_id))
                 {
