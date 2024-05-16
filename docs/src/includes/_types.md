@@ -2496,6 +2496,7 @@ float | [play_scroll_descend_timer](https://github.com/spelunky-fyi/overlunky/se
 [STRINGID](#Aliases) | [scroll_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scroll_text) | 
 float | [shake_offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_offset_x) | 
 float | [shake_offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_offset_y) | 
+bool | [loaded_once](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loaded_once) | Set to true when going from title to menu screen for the first time, makes sure the animation play once
 
 ### ScreenOnlineLoading
 

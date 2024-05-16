@@ -5714,6 +5714,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field scroll_text STRINGID
     ---@field shake_offset_x number
     ---@field shake_offset_y number
+    ---@field loaded_once boolean @Set to true when going from title to menu screen for the first time, makes sure the animation play once
 
 ---@class ScreenOptions : Screen
     ---@field down boolean
