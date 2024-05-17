@@ -92,11 +92,16 @@ class Movable : public Entity
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison // Changes default poison_tick_timer
     bool is_poisoned();
 
-    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
-    /// Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-    bool damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint8_t iframes);
-    // the original damage function was added to the API without the iframes param, but for backwards compatibility we preserve the broken one
-    bool broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
+    /// NoDoc
+    bool broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, std::optional<uint8_t> iframes)
+    {
+        auto dealer = get_entity_ptr(damage_dealer_uid);
+
+        Vec2 velocity{velocity_x, velocity_y};
+        uint8_t unknown1{0};
+        bool unknown2{true};
+        return damage(dealer, damage_amount, 0x1, &velocity, unknown1, stun_time, iframes.value_or(80), unknown2);
+    }
 
     bool is_button_pressed(BUTTON button);
     bool is_button_held(BUTTON button);
@@ -149,7 +154,9 @@ class Movable : public Entity
     virtual void v46() = 0;                       // 46
     virtual void v47() = 0;                       // 47
 
-    virtual bool on_damage(Entity* damage_dealer, int8_t damage_amount, DAMAGE_TYPE damage_flags, Vec2* velocity, uint8_t unknown_damage_phase, uint16_t stun_amount, uint8_t iframes, bool unknown_is_final) = 0; // 48
+    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+    /// Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
+    virtual bool damage(Entity* damage_dealer, int8_t damage_amount, DAMAGE_TYPE damage_flags, Vec2* velocity, uint8_t unknown_damage_phase, uint16_t stun_amount, uint8_t iframes, bool unknown_is_final) = 0; // 48
 
     /// Hit by broken arrows etc that don't deal damage, calls on_damage with 0 damage.
     virtual void on_hit(Entity* damage_dealer) = 0; // 49
