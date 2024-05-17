@@ -154,7 +154,7 @@ class Movable : public Entity
     virtual void v46() = 0;                       // 46
     virtual void v47() = 0;                       // 47
 
-    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
+    /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.
     /// Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     virtual bool damage(Entity* damage_dealer, int8_t damage_amount, DAMAGE_TYPE damage_flags, Vec2* velocity, uint8_t unknown_damage_phase, uint16_t stun_amount, uint8_t iframes, bool unknown_is_final) = 0; // 48
 
