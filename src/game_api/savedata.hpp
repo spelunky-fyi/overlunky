@@ -68,7 +68,7 @@ struct ConstellationLine
 struct Constellation
 {
     uint8_t star_count;
-    uint8_t unknown[3];
+    uint8_t unknown[3]; // possibly something?
     std::array<ConstellationStar, 45> stars;
     float scale;
     uint8_t line_count;
