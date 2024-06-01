@@ -17,6 +17,7 @@ class Entity;
 inline constexpr uint32_t g_level_max_x = 0x56;
 inline constexpr uint32_t g_level_max_y = 0x7e;
 
+// Is always ordered by the uid
 struct EntityList
 {
     Entity** ent_list;
