@@ -13,11 +13,20 @@ size_t get_state_offset()
     return 0x4a0;
 }
 
+StateMemory* get_save_state_raw(int slot)
+{
+    size_t arr = get_address("save_states");
+    size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
+    auto state = reinterpret_cast<StateMemory*>(base + get_state_offset());
+    return state;
+}
+
 void copy_save_slot(int from, int to)
 {
     if ((from == 5 && pre_save_state(to, get_save_state(to))) ||
         (to == 5 && pre_load_state(from, get_save_state(from))))
         return;
+    pre_copy_state_event(get_save_state_raw(from), get_save_state_raw(to));
     size_t arr = get_address("save_states");
     size_t fromBaseState = memory_read<size_t>(arr + (from - 1) * 8);
     size_t toBaseState = memory_read<size_t>(arr + (to - 1) * 8);
@@ -57,9 +66,7 @@ void copy_state(size_t fromBaseState, size_t toBaseState)
 
 StateMemory* get_save_state(int slot)
 {
-    size_t arr = get_address("save_states");
-    size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
-    auto state = reinterpret_cast<StateMemory*>(base + get_state_offset());
+    auto state = get_save_state_raw(slot);
     if (state->screen)
         return state;
     return nullptr;
