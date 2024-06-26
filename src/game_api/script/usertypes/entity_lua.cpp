@@ -234,14 +234,14 @@ void register_usertypes(sol::state& lua)
     entity_type["abs_x"] = sol::property([](Entity& e) -> float
                                          {
         if (e.abs_x == -FLT_MAX)
-            return e.position().first;
+            return e.position().x;
         return e.abs_x; });
     // entity_type["abs_y"] = &Entity::abs_y;
     /// NoDoc
     entity_type["abs_y"] = sol::property([](Entity& e) -> float
                                          {
         if (e.abs_y == -FLT_MAX)
-            return e.position().second;
+            return e.position().y;
         return e.abs_y; });
     entity_type["layer"] = &Entity::layer;
     entity_type["width"] = &Entity::w;

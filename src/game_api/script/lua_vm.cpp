@@ -1261,7 +1261,7 @@ end
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
-            return (float)std::sqrt(std::pow(ea->position().first - eb->position().first, 2) + std::pow(ea->position().second - eb->position().second, 2));
+            return (float)std::sqrt(std::pow(ea->position().x - eb->position().x, 2) + std::pow(ea->position().y - eb->position().y, 2));
     };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
     /// inside these boundaries. The order is: left x, top y, right x, bottom y

@@ -760,7 +760,7 @@ struct ExtraSpawnLogicProviderImpl
             std::uint32_t transient_num_remaining_spawns_backlayer;
         };
     };
-    std::vector<std::pair<float, float>> transient_valid_positions;
+    std::vector<Vec2> transient_valid_positions;
 };
 std::mutex g_extra_spawn_logic_providers_lock;
 std::uint32_t g_current_extra_spawn_id{0};
@@ -1875,15 +1875,11 @@ void LevelGenSystem::do_procedural_spawn_hook(ThemeInfo* self, SpawnInfo* spawn_
 
 std::pair<int, int> LevelGenSystem::get_room_index(float x, float y)
 {
-    return std::pair<int, int>{
-        static_cast<int>(std::ceil(x - 3.5f)) / 10,
-        static_cast<int>(std::ceil(121.5f - y)) / 8};
+    return {static_cast<int>(std::ceil(x - 3.5f)) / 10, static_cast<int>(std::ceil(121.5f - y)) / 8};
 }
-std::pair<float, float> LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
+Vec2 LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
 {
-    return std::pair<float, float>{
-        static_cast<float>(x * 10) + 2.5f,
-        122.5f - static_cast<float>(y * 8)};
+    return {static_cast<float>(x * 10) + 2.5f, 122.5f - static_cast<float>(y * 8)};
 }
 std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, uint8_t l)
 {

@@ -18,7 +18,7 @@
 #include "entity_db.hpp"      // for EntityDB
 #include "entity_structs.hpp" // for CollisionInfo
 #include "layer.hpp"          // for EntityList
-#include "math.hpp"           // for AABB
+#include "math.hpp"           // for AABB, Vec2
 
 struct RenderInfo;
 struct Texture;
@@ -115,7 +115,7 @@ class Entity
         return (size_t)this;
     }
 
-    std::pair<float, float> position();
+    Vec2 position();
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
@@ -185,7 +185,7 @@ class Entity
         return overlaps_with(other_left, other_bottom, other_right, other_top);
     }
 
-    std::pair<float, float> position_self() const;
+    Vec2 position_self() const;
     void remove_item(uint32_t item_uid);
 
     TEXTURE get_texture();
