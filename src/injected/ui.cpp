@@ -1947,7 +1947,7 @@ void force_cheats()
             ent->onfire_effect_timer = 0;
             ent->wet_effect_timer = 0;
             ent->lock_input_timer = 0;
-            ent->set_cursed(false);
+            ent->set_cursed(false, false);
             ent->more_flags &= ~(1U << 16);
             UI::destroy_entity_item_type(ent, ink);
         }

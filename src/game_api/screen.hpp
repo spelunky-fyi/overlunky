@@ -249,7 +249,8 @@ class ScreenMenu : public Screen // ID: 4
     STRINGID scroll_text;
     float shake_offset_x;
     float shake_offset_y;
-    bool unknown30;
+    /// Set to true when going from title to menu screen for the first time, makes sure the animation play once
+    bool loaded_once;
     // maybe two more 32bit values? hard to tell
 };
 
@@ -892,7 +893,10 @@ class JournalPage
     }
 
     /// background.x < 0
-    bool is_right_side_page();
+    bool is_right_side_page() const
+    {
+        return (this->background.x < 0);
+    }
     void set_page_background_side(bool right);
     JOURNAL_PAGE_TYPE get_type();
 

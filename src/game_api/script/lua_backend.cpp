@@ -169,12 +169,6 @@ void LuaBackend::clear_all_callbacks()
     lua["on_screen"] = sol::lua_nil;
 }
 
-bool LuaBackend::reset()
-{
-    clear();
-    return true;
-}
-
 CustomMovableBehavior* LuaBackend::get_custom_movable_behavior(std::string_view name)
 {
     auto it = std::find_if(custom_movable_behaviors.begin(), custom_movable_behaviors.end(), [name](const CustomMovableBehaviorStorage& beh)
@@ -1654,7 +1648,7 @@ bool LuaBackend::pre_set_feat(FEAT feat)
     return false;
 }
 
-CurrentCallback LuaBackend::get_current_callback()
+CurrentCallback LuaBackend::get_current_callback() const
 {
     return current_cb;
 }

@@ -70,7 +70,10 @@ class PowerupCapable : public Movable
     void give_powerup(ENT_TYPE powerup_type);
 
     /// Checks whether the player/monster has a certain powerup
-    bool has_powerup(ENT_TYPE powerup_type);
+    bool has_powerup(ENT_TYPE powerup_type)
+    {
+        return powerups.find(powerup_type) != powerups.end();
+    }
 
     /// Return all powerups that the entity has
     std::vector<ENT_TYPE> get_powerups();

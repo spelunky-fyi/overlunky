@@ -100,7 +100,18 @@ Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
     return ent;
 }
 
-Entity* Layer::get_grid_entity_at(float x, float y)
+EntityList* Layer::get_entities_overlapping_grid_at(float x, float y) const
+{
+    const uint32_t ix = static_cast<uint32_t>(std::round(x));
+    const uint32_t iy = static_cast<uint32_t>(std::round(y));
+    if (ix < g_level_max_x && iy < g_level_max_y)
+    {
+        return const_cast<EntityList*>(&entities_overlapping_grid[iy][ix]);
+    }
+    return nullptr;
+}
+
+Entity* Layer::get_grid_entity_at(float x, float y) const
 {
     const uint32_t ix = static_cast<uint32_t>(std::round(x));
     const uint32_t iy = static_cast<uint32_t>(std::round(y));

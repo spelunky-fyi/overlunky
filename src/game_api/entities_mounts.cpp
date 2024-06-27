@@ -12,9 +12,3 @@ void Mount::carry(Movable* rider)
     rider->move_state = 0x11;
     return carry(this, rider);
 }
-
-void Mount::tame(bool value)
-{
-    tamed = value;
-    flags = flags | 0x20000;
-}

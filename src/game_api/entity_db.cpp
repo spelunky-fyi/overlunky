@@ -27,19 +27,12 @@
 #include "texture.hpp"               // for get_texture, Texture
 #include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...
 
-template <typename T>
-class OnHeapPointer;
-
-EntityDB::EntityDB(const EntityDB& other) = default;
 EntityDB::EntityDB(const ENT_TYPE other)
-    : EntityDB(*get_type(other))
-{
-}
-
-using namespace std::chrono_literals;
+    : EntityDB(*get_type(other)){};
 
 EntityFactory* entity_factory()
 {
+    using namespace std::chrono_literals;
     static EntityFactory* cache_entity_factory = *(EntityFactory**)get_address("entity_factory"sv);
     while (cache_entity_factory == 0)
     {

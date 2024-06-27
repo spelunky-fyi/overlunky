@@ -262,10 +262,6 @@ JournalPageStory* JournalPageStory::construct(bool right_side, uint32_t pn)
     return page;
 }
 
-bool JournalPage::is_right_side_page()
-{
-    return (this->background.x < 0);
-}
 void JournalPage::set_page_background_side(bool right)
 {
     if (right)

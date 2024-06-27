@@ -3,7 +3,7 @@
 #include <cstddef> // for size_t, ptrdiff_t
 #include <new>     // for operator new
 
-void* custom_malloc(std::size_t size);
+[[nodiscard]] void* custom_malloc(std::size_t size);
 void custom_free(void* mem);
 
 // This is an allocator that always uses the MemHeap implementations that the game provides

@@ -90,17 +90,32 @@ class Movable : public Entity
 
     /// NoDoc
     void poison(int16_t frames); // 1 - 32767 frames ; -1 = no poison // Changes default poison_tick_timer
-    bool is_poisoned();
+    bool is_poisoned() const
+    {
+        return (poison_tick_timer != -1);
+    }
 
     /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities
     /// Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     bool damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint8_t iframes);
     // the original damage function was added to the API without the iframes param, but for backwards compatibility we preserve the broken one
-    bool broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y);
+    bool broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y)
+    {
+        return damage(damage_dealer_uid, damage_amount, stun_time, velocity_x, velocity_y, 80);
+    }
 
-    bool is_button_pressed(BUTTON button);
-    bool is_button_held(BUTTON button);
-    bool is_button_released(BUTTON button);
+    bool is_button_pressed(BUTTON button) const
+    {
+        return (buttons & button) == button && (buttons_previous & button) == 0;
+    }
+    bool is_button_held(BUTTON button) const
+    {
+        return (buttons & button) == button && (buttons_previous & button) == button;
+    }
+    bool is_button_released(BUTTON button) const
+    {
+        return (buttons & button) == 0 && (buttons_previous & button) == button;
+    }
 
     void set_pre_statemachine(std::uint32_t reserved_callback_id, std::function<bool(Movable*)> pre_state_machine);
     void set_post_statemachine(std::uint32_t reserved_callback_id, std::function<void(Movable*)> post_state_machine);
@@ -135,6 +150,12 @@ class Movable : public Entity
         this->collect_treasure(amount, coin);
     }
 
+    /// effect = true - plays the sound and spawn particle above entity
+    void set_cursed_fix(bool b, std::optional<bool> effect)
+    {
+        set_cursed(b, effect.value_or(true));
+    }
+
     /// Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
     virtual bool can_jump() = 0;                                             // 37
     virtual void get_collision_info(CollisionInfo* dest) = 0;                // 38
@@ -159,7 +180,7 @@ class Movable : public Entity
 
     /// Does not damage entity
     virtual void light_on_fire(uint8_t time) = 0;            // 53
-    virtual void set_cursed(bool b) = 0;                     // 54
+    virtual void set_cursed(bool b, bool effect) = 0;        // 54
     virtual void on_spiderweb_collision() = 0;               // 55
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // 56, assigns player as last_owner_uid and also manipulates movable.b127
     virtual uint32_t get_last_owner_uid() = 0;               // 57, for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid

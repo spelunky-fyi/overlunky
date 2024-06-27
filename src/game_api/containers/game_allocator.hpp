@@ -3,7 +3,7 @@
 #include <cstddef> // for size_t, ptrdiff_t
 #include <new>     // for operator new
 
-void* game_malloc(std::size_t size);
+[[nodiscard]] void* game_malloc(std::size_t size);
 void game_free(void* mem);
 
 // This is an allocator that always uses the malloc/free implementations that the game provides

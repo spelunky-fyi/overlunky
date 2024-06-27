@@ -16,7 +16,7 @@ namespace NPRNG
 {
 void register_usertypes(sol::state& lua)
 {
-    auto random = sol::overload(static_cast<float (PRNG::*)()>(&PRNG::random), static_cast<std::optional<std::int64_t> (PRNG::*)(std::int64_t)>(&PRNG::random), static_cast<std::optional<std::int64_t> (PRNG::*)(std::int64_t, std::int64_t)>(&PRNG::random));
+    auto random = sol::overload(static_cast<float (PRNG::*)()>(&PRNG::random), static_cast<std::optional<std::int64_t> (PRNG::*)(std::int64_t)>(&PRNG::random), static_cast<std::int64_t (PRNG::*)(std::int64_t, std::int64_t)>(&PRNG::random));
 
     /// Seed the game prng.
     lua["seed_prng"] = [](int64_t seed)

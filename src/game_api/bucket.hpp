@@ -103,20 +103,46 @@ struct PauseAPI
     /// Set the current pause flags
     void set_pause(PAUSE_TYPE flags);
     /// Enable/disable the current pause_type flags in pause state
-    bool set_paused(bool enable = true);
+    bool set_paused(bool enable = true)
+    {
+        if (enable)
+            set_pause(get_pause() | pause_type);
+        else
+            set_pause(get_pause() & (~pause_type));
+        return paused();
+    }
     /// Is the game currently paused and that pause state matches any of the current the pause_type
-    bool paused();
+    bool paused()
+    {
+        return get_pause() != PAUSE_TYPE::NONE && (get_pause() & pause_type) != PAUSE_TYPE::NONE;
+    }
     /// Toggles pause state
-    bool toggle();
+    bool toggle()
+    {
+        if (paused())
+            set_paused(false);
+        else
+            set_paused(true);
+        return paused();
+    }
     /// Sets skip
-    void frame_advance();
+    void frame_advance()
+    {
+        skip = true;
+    }
     /// Is the game currently loading and PAUSE_SCREEN.LOADING would be triggered, based on state.loading and some arbitrary checks.
     bool loading();
 
-    void apply();
+    void apply()
+    {
+        set_pause(pause);
+    }
     bool event(PAUSE_TYPE event);
     bool check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen);
-    void pre_loop();
+    void pre_loop()
+    {
+        blocked = false;
+    }
     void post_loop();
     bool pre_input();
     void post_input();

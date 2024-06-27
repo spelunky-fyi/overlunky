@@ -29,7 +29,7 @@ void patch_orbs_limit()
     if (once)
         return;
 
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
     const auto function_offset = get_virtual_function_address(VTABLE_OFFSET::ITEM_FLOATING_ORB, (uint32_t)VIRT_FUNC::ENTITY_KILL);
     // finding exit of the loop that counts orbs, after jump there is unused code so we have enogh space for a our patch
     auto instance = find_inst(memory.exe(), "\xF3\x75"sv, function_offset, function_offset + 0x622, "patch_orbs_limit");
@@ -81,11 +81,11 @@ void patch_olmec_kill_crash()
 
     const auto offset = get_address("olmec_lookup_crash");
     constexpr auto code_to_move = 7;
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
     size_t return_addr;
     {
         // find address to escape to
-        size_t rva = offset - memory.exe_ptr;
+        size_t rva = offset - memory.exe_address();
         // below the patched code there are two jumps that performe long jump, at the end of it there is 'mov rax,qword ptr ds:[rdi]',
         // from this point find jump that's jumps over sond meta and fmod stuff, the jump ends up on code `mov eax,dword ptr ss:[rbp+10]`, that's our target for return_addr
         auto jump_out_lookup = find_inst(memory.exe(), "\x48\xC7\x40\x60\x00\x00\x00\x00"sv, rva, rva + 0x69D, "patch_olmec_kill_crash");
@@ -122,7 +122,7 @@ void patch_olmec_kill_crash()
     size_t addr_to_jump_to;
     {
         // find end of the function that sets the camera and stuff
-        size_t rva = patch_addr - memory.exe_ptr;
+        size_t rva = patch_addr - memory.exe_address();
         size_t rva_jumpout_to = find_inst(memory.exe(), "\x48\x8B\x06"sv, rva, rva + 0xA50, "patch_olmec_kill_crash");
         if (rva_jumpout_to == 0)
             return;
@@ -165,7 +165,7 @@ void patch_tiamat_kill_crash()
     if (once)
         return;
 
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
     const auto patch_addr = get_address("tiamat_lookup_in_theme");
     if (patch_addr == 0)
         return;
@@ -173,7 +173,7 @@ void patch_tiamat_kill_crash()
     size_t return_to_addr;
     {
         // find end of the function that sets the camera and stuff
-        auto rva = patch_addr - memory.exe_ptr;
+        auto rva = patch_addr - memory.exe_address();
         auto rva_jumpout_to = find_inst(memory.exe(), "\x49\x89\x0C\xC6"sv, rva, rva + 0x5C7, "patch_tiamat_kill_crash");
         if (rva_jumpout_to == 0)
             return;
@@ -228,8 +228,8 @@ void patch_liquid_OOB()
     size_t continue_addr;
     {
         // find address to continue the loop
-        auto memory = Memory::get();
-        auto rva = offset - memory.exe_ptr;
+        auto& memory = Memory::get();
+        auto rva = offset - memory.exe_address();
         // first `ja` loop
         auto jump_out_lookup = find_inst(memory.exe(), "\x0F\x87"sv, rva, rva + 0x7D, "patch_liquid_OOB");
         if (jump_out_lookup == 0)
@@ -315,12 +315,12 @@ void patch_entering_closed_door_crash()
     size_t addr = get_address("enter_closed_door_crash");
     size_t return_addr;
     {
-        auto memory = Memory::get();
-        auto rva = find_inst(memory.exe(), "\x49\x39\xD4", addr - memory.exe_ptr, addr - memory.exe_ptr + 0x3F5, "patch_entering_closed_door_crash");
+        auto& memory = Memory::get();
+        auto rva = find_inst(memory.exe(), "\x49\x39\xD4", addr - memory.exe_address(), addr - memory.exe_address() + 0x3F5, "patch_entering_closed_door_crash");
         if (rva == 0)
             return;
         size_t jump_addr = memory.at_exe(rva + 3);
-        size_t offset = memory_read<int32_t>(jump_addr + 2);
+        int32_t offset = memory_read<int32_t>(jump_addr + 2);
         return_addr = jump_addr + 6 + offset;
     }
     std::string_view new_code{

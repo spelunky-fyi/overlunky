@@ -144,7 +144,8 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float
         liquid_spawn_info->spawn_velocity_x = velocityx;
         liquid_spawn_info->spawn_velocity_y = velocityy;
         liquid_spawn_info->liquidtile_liquid_amount = amount;
-        if (blobs_separation != INFINITY)
+
+        if (!std::isinf(blobs_separation))
             liquid_spawn_info->blobs_separation = blobs_separation;
 
         spawn_liquid(entity_type, x, y);
@@ -266,10 +267,6 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     return State::get().layer(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
 }
 
-int32_t spawn_tree(float x, float y, LAYER layer)
-{
-    return spawn_tree(x, y, layer, 0);
-}
 int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
@@ -329,7 +326,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
         auto spawn_deco = [&](Entity* branch, bool left)
         {
             Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
-            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION).value_or(0)) * 12;
+            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION)) * 12;
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
@@ -354,10 +351,6 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     return base_piece->uid;
 }
 
-int32_t spawn_mushroom(float x, float y, LAYER l)
-{
-    return spawn_mushroom(x, y, l, 0);
-}
 int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height relates to trunk
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
@@ -392,7 +385,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
         else
         {
             auto& prng = PRNG::get_local();
-            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(0));
+            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
         }
 
         i_y += 3;
@@ -823,5 +816,5 @@ MagmamanSpawnPosition::MagmamanSpawnPosition(uint32_t x_, uint32_t y_)
 {
     x = x_;
     y = y_;
-    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(10000));
+    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
 }

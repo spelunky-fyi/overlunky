@@ -33,10 +33,16 @@ void spawn_backdoor_abs(float x, float y);
 
 int32_t spawn_apep(float x, float y, LAYER layer, bool right);
 
-int32_t spawn_tree(float x, float y, LAYER layer);
 int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height);
-int32_t spawn_mushroom(float x, float y, LAYER l);
+inline int32_t spawn_tree(float x, float y, LAYER layer)
+{
+    return spawn_tree(x, y, layer, 0);
+}
 int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height);
+inline int32_t spawn_mushroom(float x, float y, LAYER l)
+{
+    return spawn_mushroom(x, y, l, 0);
+}
 int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture);
 int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE texture, uint16_t max_length);
 
