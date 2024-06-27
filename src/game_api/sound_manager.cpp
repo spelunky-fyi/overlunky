@@ -194,9 +194,9 @@ PlayingSound CustomSound::play(bool paused, SOUND_TYPE sound_type)
 {
     return std::visit(
         overloaded{
-            [=](FMOD::Sound* sound)
+            [=, this](FMOD::Sound* sound)
             { return m_SoundManager->play_sound(sound, paused, sound_type == SOUND_TYPE::Music); },
-            [=](FMODStudio::EventDescription* event)
+            [=, this](FMODStudio::EventDescription* event)
             { return m_SoundManager->play_event(event, paused, sound_type == SOUND_TYPE::Music); },
             [](std::monostate)
             {

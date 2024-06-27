@@ -77,7 +77,7 @@ LuaBackend::~LuaBackend()
 
     {
         std::lock_guard lock{g_all_backends_mutex};
-        std::erase_if(g_all_backends, [=](const std::unique_ptr<ProtectedBackend>& protected_backend)
+        std::erase_if(g_all_backends, [this](const std::unique_ptr<ProtectedBackend>& protected_backend)
                       { return protected_backend.get() == self; });
     }
 }
