@@ -16,13 +16,13 @@
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/game_vector.hpp"        // for game_vector
 #include "math.hpp"                          // for Quad, AABB (ptr only)
-#include "particles.hpp"                     // for ParticleEmitterInfo
 #include "texture.hpp"                       // for Texture
 
 struct JournalUI;
 struct Layer;
 class Entity;
 struct Renderer;
+struct ParticleEmitterInfo;
 
 using VANILLA_TEXT_ALIGNMENT = uint32_t;
 using VANILLA_FONT_STYLE = uint32_t;

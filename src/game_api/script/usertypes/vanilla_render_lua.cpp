@@ -9,6 +9,7 @@
 #include <tuple>       // for get
 #include <type_traits> // for move, declval
 
+#include "particles.hpp"  // for ParticleEmitterInfo
 #include "render_api.hpp" // for TextureRenderingInfo, WorldShader, TextRen...
 #include "state.hpp"      // for enum_to_layer
 #include "texture.hpp"    // for Texture, get_texture
