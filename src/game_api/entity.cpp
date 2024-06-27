@@ -214,32 +214,6 @@ bool Movable::is_poisoned()
     return (poison_tick_timer != -1);
 }
 
-bool Movable::broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y)
-{
-    return damage(damage_dealer_uid, damage_amount, stun_time, velocity_x, velocity_y, 80);
-}
-
-bool Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint8_t iframes)
-{
-    /* why?
-    if ((flags & (1 << 28)) > 0)
-    {
-        return;
-    }*/
-
-    auto dealer = get_entity_ptr(damage_dealer_uid);
-    /* but it can be nil?
-    if (dealer == nullptr)
-    {
-        return;
-    }*/
-
-    Vec2 velocity{velocity_x, velocity_y};
-    uint8_t unknown1{0};
-    bool unknown2{true};
-    return on_damage(dealer, damage_amount, 0x1, &velocity, unknown1, stun_time, iframes, unknown2);
-}
-
 bool Movable::is_button_pressed(BUTTON button)
 {
     return (buttons & button) == button && (buttons_previous & button) == 0;
