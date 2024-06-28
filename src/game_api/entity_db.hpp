@@ -134,9 +134,9 @@ struct EntityPool
     std::uint32_t initial_slots;
     std::uint32_t slots_growth;
     std::uint32_t current_slots;
-    std::uint64_t _ulong_0;
-    custom_vector<Entity*>* _some_bucket;
-    custom_vector<size_t>* empty_buckets;
+    std::uint64_t unknown;
+    custom_vector<size_t>* pools_begin;   // saved the first entity address that causes the slot size to increase (including the initial)
+    custom_vector<size_t>* empty_buckets; // empty entity slots
 };
 struct EntityFactory
 {
