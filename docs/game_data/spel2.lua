@@ -2413,10 +2413,7 @@ function PRNG:random(min, max) end
     ---@field max_speed number
     ---@field sprint_factor number
     ---@field jump number
-    ---@field glow_red number
-    ---@field glow_green number
-    ---@field glow_blue number
-    ---@field glow_alpha number
+    ---@field default_color Color
     ---@field damage integer
     ---@field life integer
     ---@field sacrifice_value integer @Favor for sacrificing alive. Halved when dead (health == 0).

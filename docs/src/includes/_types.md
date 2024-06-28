@@ -470,10 +470,7 @@ float | [acceleration](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=
 float | [max_speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max_speed) | 
 float | [sprint_factor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sprint_factor) | 
 float | [jump](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump) | 
-float | [glow_red](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_red) | 
-float | [glow_green](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_green) | 
-float | [glow_blue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_blue) | 
-float | [glow_alpha](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=glow_alpha) | 
+[Color](#Color) | [default_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_color) | 
 int | [damage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | 
 int | [life](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) | 
 int | [sacrifice_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sacrifice_value) | Favor for sacrificing alive. Halved when dead (health == 0).

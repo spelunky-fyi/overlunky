@@ -90,6 +90,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["max_speed"] = &EntityDB::max_speed;
     entitydb_type["sprint_factor"] = &EntityDB::sprint_factor;
     entitydb_type["jump"] = &EntityDB::jump;
+    entitydb_type["default_color"] = &EntityDB::default_color;
     entitydb_type["glow_red"] = &EntityDB::glow_red;
     entitydb_type["glow_green"] = &EntityDB::glow_green;
     entitydb_type["glow_blue"] = &EntityDB::glow_blue;

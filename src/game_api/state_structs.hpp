@@ -713,8 +713,12 @@ struct LiquidPhysicsEngine
     std::list<size_t> unk1; // seams to be empty, or have one element 0?
     uint32_t resize_value;  // used to resive the arrays?
     uint32_t unk3b;         // padding probably
-    std::list<int32_t> liquid_ids;
-    std::list<int32_t> unknown44;                        // all of them are -1
+
+    // this is actually a pre C++11 version of std::list, which is different from current one!
+    std::pair<size_t, size_t> liquid_ids; // std::list<int32_t>
+    // this is actually a pre C++11 version of std::list, which is different from current one!
+    std::pair<size_t, size_t> unknown44; // std::list<int32_t> all of them are -1
+
     std::list<int32_t>::const_iterator* list_liquid_ids; // list of all iterators of liquid_ids?
     int32_t unknown45a;                                  // size related for the array above
     int32_t unknown45b;                                  // padding
