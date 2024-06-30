@@ -631,6 +631,7 @@ Type | Name | Description
 [Color](#Color) | [new(Color other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
 [Color](#Color) | [new(Color color)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
 [Color](#Color) | [new(float r_, float g_, float b_, float a_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | Create a new color by specifying its values
+[Color](#Color) | [new(string color_name, optional<int> alpha = nullopt)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=Color) | 
 float | [r](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=r) | 
 float | [g](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g) | 
 float | [b](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=b) | 
