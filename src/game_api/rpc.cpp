@@ -169,15 +169,15 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER l
     auto ent = get_entity_ptr(uid);
     if (ent)
     {
-        std::pair<float, float> offset;
+        Vec2 offset;
         enum_to_layer(layer, offset);
         if (ent->is_liquid())
         {
-            move_liquid_abs(uid, offset.first + x, offset.second + y, vx, vy);
+            move_liquid_abs(uid, offset.x + x, offset.y + y, vx, vy);
         }
         else
         {
-            ent->teleport_abs(offset.first + x, offset.second + y, vx, vy);
+            ent->teleport_abs(offset.x + x, offset.y + y, vx, vy);
             ent->set_layer(layer);
         }
     }
@@ -283,7 +283,7 @@ float screen_distance(float x)
 {
     auto a = State::screen_position(0, 0);
     auto b = State::screen_position(x, 0);
-    return b.first - a.first;
+    return b.x - a.x;
 }
 
 std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate)
@@ -1211,10 +1211,10 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
     if (auto entity = get_entity_ptr(uid))
     {
         auto& state = State::get();
-        std::pair<float, float> offset;
+        Vec2 offset;
         const auto actual_layer = enum_to_layer(layer, offset);
-        state.layer(entity->layer)->move_grid_entity(entity, offset.first + x, offset.first + y, state.layer(actual_layer));
-        entity->teleport_abs(offset.first + x, offset.first + y, 0, 0);
+        state.layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state.layer(actual_layer));
+        entity->teleport_abs(offset.x + x, offset.y + y, 0, 0);
         entity->set_layer(layer);
     }
 }

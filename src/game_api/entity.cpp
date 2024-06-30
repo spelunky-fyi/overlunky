@@ -168,7 +168,7 @@ void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
     tp(this, delta_x, delta_y);
 }
 
-std::pair<float, float> Entity::position()
+Vec2 Entity::position()
 {
     auto [x_pos, y_pos] = position_self();
 
@@ -183,9 +183,9 @@ std::pair<float, float> Entity::position()
     return {x_pos, y_pos};
 }
 
-std::pair<float, float> Entity::position_self() const
+Vec2 Entity::position_self() const
 {
-    return std::pair<float, float>(x, y);
+    return {x, y};
 }
 
 void Entity::remove_item(uint32_t item_uid)
@@ -257,7 +257,7 @@ std::tuple<float, float, uint8_t> get_position(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent)
-        return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
+        return std::make_tuple(ent->position().x, ent->position().y, ent->layer);
 
     return {0.0f, 0.0f, (uint8_t)0};
 }
@@ -290,8 +290,8 @@ std::tuple<float, float> get_velocity(uint32_t uid)
         else if (ent->is_liquid())
         {
             auto liquid_engine = State::get().get_correct_liquid_engine(ent->type->id);
-            vx = liquid_engine->entity_velocities->first;
-            vy = liquid_engine->entity_velocities->second;
+            vx = liquid_engine->entity_velocities->x;
+            vy = liquid_engine->entity_velocities->y;
         }
         if (ent->overlay)
         {

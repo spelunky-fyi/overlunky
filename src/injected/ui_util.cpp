@@ -109,7 +109,7 @@ float UI::screen_distance(float x)
 {
     auto a = State::screen_position(0, 0);
     auto b = State::screen_position(x, 0);
-    return b.first - a.first;
+    return b.x - a.x;
 }
 Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {

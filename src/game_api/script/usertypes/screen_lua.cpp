@@ -181,12 +181,12 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Screen>());
 
-    lua.new_usertype<SpearDanglerAnimFrames>(
-        "SpearDanglerAnimFrames",
+    lua.new_usertype<SpritePosition>(
+        "SpritePosition",
         "column",
-        &SpearDanglerAnimFrames::column,
+        &SpritePosition::column,
         "row",
-        &SpearDanglerAnimFrames::row);
+        &SpritePosition::row);
 
     auto screenmenu_type = lua.new_usertype<ScreenMenu>("ScreenMenu", sol::base_classes, sol::bases<Screen>());
     screenmenu_type["state"] = &ScreenMenu::state;

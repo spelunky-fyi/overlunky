@@ -518,7 +518,7 @@ void version_check(bool force = false)
 
     version_check_status.state = VERSION_CHECK::CHECKING;
     DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
-    new HttpRequest(std::move(version_check_url), get_version_info);
+    new HttpRequest(version_check_url, get_version_info);
 }
 
 void hook_savegame()
@@ -825,7 +825,7 @@ void refresh_script_files()
                 unload_scripts.push_back(script.second->get_file());
             }
         }
-        for (auto id : unload_scripts)
+        for (auto& id : unload_scripts)
         {
             auto it = g_scripts.find(id);
             if (it != g_scripts.end())
@@ -853,7 +853,7 @@ void refresh_script_files()
                 unload_scripts.push_back(script.second->get_file());
             }
         }
-        for (auto id : unload_scripts)
+        for (auto& id : unload_scripts)
         {
             auto it = g_scripts.find(id);
             if (it != g_scripts.end())
@@ -869,7 +869,7 @@ void refresh_script_files()
 
 void autorun_scripts()
 {
-    for (auto file : g_script_autorun)
+    for (auto& file : g_script_autorun)
     {
         std::string script = scriptpath + "/" + file;
         if (std::filesystem::exists(script) && std::filesystem::is_regular_file(script))
@@ -1336,15 +1336,15 @@ void smart_delete(Entity* ent, bool unsafe = false)
     {
         auto pos = ent->position();
         auto layer = (LAYER)ent->layer;
-        UI::cleanup_at(pos.first, pos.second, layer, ent->type->id);
+        UI::cleanup_at(pos.x, pos.y, layer, ent->type->id);
     }
     if (ent->type->search_flags & 0x180)
     {
         auto pos = ent->position();
         auto layer = (LAYER)ent->layer;
         ENT_TYPE type = ent->type->id;
-        fix_decorations_at(std::round(pos.first), std::round(pos.second), layer);
-        UI::cleanup_at(std::round(pos.first), std::round(pos.second), layer, type);
+        fix_decorations_at(std::round(pos.x), std::round(pos.y), layer);
+        UI::cleanup_at(std::round(pos.x), std::round(pos.y), layer, type);
     }
 }
 
@@ -4938,16 +4938,17 @@ void render_messages()
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
         std::tm time_buf;
         localtime_s(&time_buf, &in_time_t);
-        std::vector<ScriptMessage> messages;
+
         for (auto& [name, script] : g_scripts)
         {
+            std::vector<ScriptMessage> messages;
             for (auto&& message : script->consume_messages())
                 messages.push_back(message);
             if (messages.size() > 0)
                 g_Console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", script->get_name(), time_buf), std::move(messages));
         }
-        messages.clear();
         {
+            std::vector<ScriptMessage> messages;
             for (auto&& message : g_Console->consume_messages())
                 messages.push_back(message);
             if (messages.size() > 0)

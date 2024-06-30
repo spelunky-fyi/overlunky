@@ -145,12 +145,6 @@ class ScreenTitle : public Screen // ID: 3
     SoundMeta* torch_sound;
 };
 
-struct SpearDanglerAnimFrames
-{
-    uint32_t column;
-    uint32_t row;
-};
-
 struct MenuOption
 {
     // return and first param are the same, pointer on stack, it really seam to be just two 32bit fields
@@ -241,7 +235,7 @@ class ScreenMenu : public Screen // ID: 4
     uint32_t transfer_to_menu_id;
     float menu_text_opacity;
     std::array<float, 6> spear_position;
-    std::array<SpearDanglerAnimFrames, 6> spear_dangler;
+    std::array<SpritePosition, 6> spear_dangler;
     std::array<uint32_t, 6> spear_dangle_momentum;
     std::array<uint32_t, 6> spear_dangle_angle;
 

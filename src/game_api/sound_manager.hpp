@@ -257,7 +257,7 @@ struct SoundInfo
     int64_t unknown1;
     uint32_t sound_id;
     int32_t unknown2;       // padding probably
-    std::string sound_name; // not 100% sure it's standard
+    std::string sound_name; // not 100% sure if it's standard
 };
 
 struct SoundMeta
