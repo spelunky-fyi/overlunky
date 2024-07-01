@@ -66,6 +66,7 @@
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
 #include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes
+#include "usertypes/color_lua.hpp"                 // for register_usertypes
 #include "usertypes/drops_lua.hpp"                 // for register_usertypes
 #include "usertypes/entities_activefloors_lua.hpp" // for register_usertypes
 #include "usertypes/entities_backgrounds_lua.hpp"  // for register_usertypes
@@ -299,6 +300,7 @@ end
     NVTables::register_usertypes(lua);
     NLogic::register_usertypes(lua);
     NBucket::register_usertypes(lua);
+    NColor::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
 
