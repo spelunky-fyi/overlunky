@@ -442,7 +442,10 @@ struct Quad
         result.bottom = std::min({bottom_left_y, bottom_right_y, top_right_y, top_left_y});
         return result;
     }
-
+    Quad& offset(const Vec2& vec)
+    {
+        return offset(vec.x, vec.y);
+    }
     Quad& offset(float off_x, float off_y)
     {
         bottom_left_x += off_x;
