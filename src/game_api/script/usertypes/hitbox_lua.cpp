@@ -119,7 +119,7 @@ void register_usertypes(sol::state& lua)
 
     auto offset = sol::overload(
         self_return<static_cast<Triangle& (Triangle::*)(const Vec2&)>(&Triangle::offset)>(),
-        self_return < static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset)>());
+        self_return<static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset)>());
     auto is_point_inside_triangle = sol::overload(
         static_cast<bool (Triangle::*)(const Vec2) const>(&Triangle::is_point_inside),
         static_cast<bool (Triangle::*)(const Vec2, float) const>(&Triangle::is_point_inside),
