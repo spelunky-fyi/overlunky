@@ -71,8 +71,8 @@ struct ParticleDB
     ParticleDB(const ParticleDB& other) = default;
     ParticleDB(const PARTICLEEMITTER particle_id);
 
-    std::uint64_t get_texture();
-    bool set_texture(std::uint32_t texture_id);
+    TEXTURE get_texture();
+    bool set_texture(TEXTURE texture_id);
 };
 
 struct ParticleEmitter

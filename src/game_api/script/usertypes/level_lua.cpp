@@ -241,7 +241,7 @@ class CustomTheme : public ThemeInfo
 
     std::map<THEME_OVERRIDE, std::unique_ptr<ThemeOverride>> overrides;
     /// Add TEXTUREs here to override different dynamic textures.
-    std::map<DYNAMIC_TEXTURE, uint32_t> textures;
+    std::map<DYNAMIC_TEXTURE, TEXTURE> textures;
 
     void override(THEME_OVERRIDE index, bool enabled_)
     {
@@ -891,15 +891,15 @@ class CustomTheme : public ThemeInfo
         return allow_leprechaun;
     }
 
-    /// Add TEXTUREs to `textures` to override different dynamic textures easily.
-    uint32_t get_dynamic_texture(int32_t texture_id)
+    /// Add TEXTURE s to `textures` map of the CustomTheme to override different dynamic textures easily.
+    TEXTURE get_dynamic_texture(DYNAMIC_TEXTURE texture_id)
     {
         auto index = THEME_OVERRIDE::TEXTURE_DYNAMIC;
-        uint32_t ret = 0;
+        TEXTURE ret = 0;
         run_pre_func<std::monostate>(index, texture_id);
-        if (textures.find((DYNAMIC_TEXTURE)texture_id) != textures.end())
+        if (auto it = textures.find(texture_id); it != textures.end())
         {
-            ret = textures[(DYNAMIC_TEXTURE)texture_id];
+            ret = it->second;
         }
         else if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index, texture_id).value_or(ret);

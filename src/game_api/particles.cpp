@@ -19,11 +19,11 @@ ParticleDB* particle_db_ptr()
     return addr;
 }
 
-std::uint64_t ParticleDB::get_texture()
+TEXTURE ParticleDB::get_texture()
 {
     return texture->id;
 }
-bool ParticleDB::set_texture(std::uint32_t texture_id)
+bool ParticleDB::set_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = ::get_texture(texture_id))
     {
