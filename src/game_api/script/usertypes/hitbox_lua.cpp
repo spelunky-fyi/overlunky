@@ -46,6 +46,10 @@ void register_usertypes(sol::state& lua)
         return AABB{sx1, sy1, sx2, sy2};
     };
 
+    auto rotate = sol::overload(
+        self_return<static_cast<Vec2& (Vec2::*)(float, float, float)>(&Vec2::rotate)>(),
+        self_return<static_cast<Vec2& (Vec2::*)(float, const Vec2&)>(&Vec2::rotate)>());
+
     /// Simple object to hold pair of coordinates
     lua.new_usertype<Vec2>(
         "Vec2",
@@ -65,7 +69,7 @@ void register_usertypes(sol::state& lua)
         "y",
         &Vec2::y,
         "rotate",
-        self_return<&Vec2::rotate>(),
+        rotate,
         "distance_to",
         &Vec2::distance_to,
         "set",
@@ -74,10 +78,10 @@ void register_usertypes(sol::state& lua)
         // &Vec2::split); // for the autodoc
         &Vec2::operator std::pair<float, float>);
 
-    const auto extrude = sol::overload(
+    auto extrude = sol::overload(
         self_return<static_cast<AABB& (AABB::*)(float)>(&AABB::extrude)>(),
         self_return<static_cast<AABB& (AABB::*)(float, float)>(&AABB::extrude)>());
-    const auto is_point_inside = sol::overload(
+    auto is_point_inside = sol::overload(
         static_cast<bool (AABB::*)(const Vec2) const>(&AABB::is_point_inside),
         static_cast<bool (AABB::*)(float, float) const>(&AABB::is_point_inside));
 

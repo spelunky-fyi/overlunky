@@ -34,6 +34,10 @@ struct Vec2
         *this += p;
         return *this;
     }
+    Vec2& rotate(float angle, const Vec2& p)
+    {
+        return rotate(angle, p.x, p.y);
+    }
     /// Just simple pythagoras theorem
     float distance_to(const Vec2 other) const
     {
@@ -551,6 +555,8 @@ struct Quad
     /// Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
     bool is_point_inside_quad(Vec2 p, std::optional<float> epsilon);
     bool is_point_inside_quad(float x, float y, std::optional<float> epsilon);
+    Quad& offset_quad(const Vec2& off);
+    Quad& offset_quad(float off_x, float off_y);
     */
 
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left

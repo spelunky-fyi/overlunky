@@ -377,10 +377,10 @@ void Entity::set_enable_turning(bool enabled)
     set_entity_turning(this, enabled);
 }
 
-std::span<uint32_t> Entity::get_items()
+std::vector<uint32_t> Entity::get_items()
 {
     if (items.size)
-        return std::span<uint32_t>(items.uids().begin(), items.uids().end());
+        return std::vector<uint32_t>(items.uids().begin(), items.uids().end());
 
     return {};
 }

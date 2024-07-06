@@ -219,6 +219,7 @@ void register_usertypes(sol::state& lua)
         "is_pet_poisoned",
         &Items::is_pet_poisoned,
         "leader",
+        // &Items::leader,
         sol::property([](Items& s) -> uint8_t
                       { return s.leader + 1; },
                       [](Items& s, uint8_t leader)
