@@ -1099,7 +1099,7 @@ void register_usertypes(sol::state& lua)
     /// NoDoc
     imguiio_type["keysdown"] = sol::property([](ImGuiIO& io)
                                              { return std::ref(io.KeysDown) /**/; });
-    imguiio_type["keys"] = sol::property([](ImGuiIO& io) // -> bool[652]
+    imguiio_type["keys"] = sol::property([](ImGuiIO& io) // -> std::array<bool, 652>
                                          { return ZeroIndexArray<bool>(io.KeysDown) /**/; });
     imguiio_type["keydown"] = keydown;
     imguiio_type["keypressed"] = keypressed;
@@ -1125,13 +1125,13 @@ void register_usertypes(sol::state& lua)
                                               });
     imguiio_type["mousepos"] = sol::property([](ImGuiIO& io) -> Vec2
                                              { return Vec2(io.MousePos); });
-    imguiio_type["mousedown"] = sol::property([](ImGuiIO& io) // -> bool[5]
+    imguiio_type["mousedown"] = sol::property([](ImGuiIO& io) // -> std::array<bool, 5>
                                               { return std::ref(io.MouseDown); });
-    imguiio_type["mouseclicked"] = sol::property([](ImGuiIO& io) // -> bool[5]
+    imguiio_type["mouseclicked"] = sol::property([](ImGuiIO& io) // -> std::array<bool, 5>
                                                  { return std::ref(io.MouseClicked); });
-    imguiio_type["mousedoubleclicked"] = sol::property([](ImGuiIO& io) // -> bool[5]
+    imguiio_type["mousedoubleclicked"] = sol::property([](ImGuiIO& io) // -> std::array<bool, 5>
                                                        { return std::ref(io.MouseDoubleClicked); });
-    imguiio_type["mousereleased"] = sol::property([](ImGuiIO& io) // -> bool[5]
+    imguiio_type["mousereleased"] = sol::property([](ImGuiIO& io) // -> std::array<bool, 5>
                                                   { return std::ref(io.MouseReleased); });
     imguiio_type["mousewheel"] = &ImGuiIO::MouseWheel;
     imguiio_type["gamepad"] = sol::property([]() -> Gamepad

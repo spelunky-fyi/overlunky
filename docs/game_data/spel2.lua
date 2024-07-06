@@ -5130,7 +5130,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field displaysize Vec2
     ---@field framerate number
     ---@field wantkeyboard boolean
-    ---@field keys boolean[652]
+    ---@field keys boolean[] @size: 652
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean
@@ -5141,10 +5141,10 @@ function GuiDrawContext:win_pushid(id) end
     ---@field modifierdown fun(self, chord: integer): boolean
     ---@field wantmouse boolean
     ---@field mousepos Vec2
-    ---@field mousedown boolean[5]
-    ---@field mouseclicked boolean[5]
-    ---@field mousedoubleclicked boolean[5]
-    ---@field mousereleased boolean[5]
+    ---@field mousedown boolean[] @size: 5
+    ---@field mouseclicked boolean[] @size: 5
+    ---@field mousedoubleclicked boolean[] @size: 5
+    ---@field mousereleased boolean[] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
     ---@field gamepads fun(self, index: integer): Gamepad

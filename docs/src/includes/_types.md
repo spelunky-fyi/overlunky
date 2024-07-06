@@ -1099,7 +1099,7 @@ Type | Name | Description
 [Vec2](#Vec2) | [displaysize](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=displaysize) | 
 float | [framerate](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=framerate) | 
 bool | [wantkeyboard](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantkeyboard) | True if anyone else (i.e. some input box, OL hotkey) is already capturing keyboard or reacted to this keypress and you probably shouldn't.<br/>Set this to true every GUIFRAME while you want to capture keyboard and disable UI key bindings and game keys. Won't affect UI or game keys on this frame though, that train has already sailed. Also see [Bucket](#Bucket)::[Overlunky](#Overlunky) for other ways to override key bindings.<br/>Do not set this to false, unless you want the player input to bleed through input fields.<br/> 
-bool[652] | [keys](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | ZeroIndexArray<bool> of currently held keys, indexed by [KEY](#KEY) <= 0xFF<br/> 
+array&lt;bool, 652&gt; | [keys](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keys) | ZeroIndexArray<bool> of currently held keys, indexed by [KEY](#KEY) <= 0xFF<br/> 
  | [keydown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keydown) | Returns true if key or chord is down.<br/>bool keydown([KEY](#KEY) keychord)<br/>bool keydown(char key)<br/> 
  | [keypressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keypressed) | Returns true if key or chord was pressed this GUIFRAME.<br/>bool keypressed([KEY](#KEY) keychord, bool repeat = false)<br/>bool keypressed(char key, bool repeat = false)<br/> 
  | [keyreleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyreleased) | Returns true if key or chord was released this GUIFRAME.<br/>bool keyreleased([KEY](#KEY) keychord)<br/>bool keyreleased(char key)<br/> 
@@ -1110,10 +1110,10 @@ bool | [keysuper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keysu
 bool | [modifierdown(int chord)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=modifierdown) | bool modifierdown([KEY](#KEY) keychord)<br/>Returns true if modifiers in chord are down, ignores other keys in chord.<br/> 
 bool | [wantmouse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wantmouse) | True if anyone else (i.e. hovering some window) is already capturing mouse and you probably shouldn't.<br/>Set this to true if you want to capture mouse and override UI mouse binding.<br/> 
 [Vec2](#Vec2) | [mousepos](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousepos) | 
-bool[5] | [mousedown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
-bool[5] | [mouseclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
-bool[5] | [mousedoubleclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
-bool[5] | [mousereleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousereleased) | 
+array&lt;bool, 5&gt; | [mousedown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedown) | 
+array&lt;bool, 5&gt; | [mouseclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mouseclicked) | 
+array&lt;bool, 5&gt; | [mousedoubleclicked](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousedoubleclicked) | 
+array&lt;bool, 5&gt; | [mousereleased](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousereleased) | 
 float | [mousewheel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=mousewheel) | 
 [Gamepad](#Gamepad) | [gamepad](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepad) | 
 [Gamepad](#Gamepad) | [gamepads(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gamepads) | [Gamepad](#Gamepad) gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/> 
