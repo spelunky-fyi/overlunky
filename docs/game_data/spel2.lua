@@ -2359,8 +2359,8 @@ do
     ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean @Returns true with a chance of `1/inverse_chance`
     ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
     ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
-    ---@field get_pair any @PRNG::get_tuple
-    ---@field set_pair any @PRNG::set_tuple
+    ---@field get_pair fun(self, type: PRNG_CLASS): integer, integer
+    ---@field set_pair fun(self, type: PRNG_CLASS, first: integer, second: integer): nil
 local PRNG = nil
 ---Drop-in replacement for `math.random()`
 ---@return number
@@ -2447,7 +2447,7 @@ function PRNG:random(min, max) end
     ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
     ---@field set_second_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_third_texture fun(self, texture_id: TEXTURE): boolean
-    ---@field set_texture_num fun(self, texture_id: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
+    ---@field set_texture_num fun(self, num: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
     ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -4015,7 +4015,6 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field smoke2 ParticleEmitterInfo
 
 ---@class CookFire : Torch
-    ---@field lit any @Torch::is_lit
     ---@field emitted_light Illumination
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
@@ -5376,7 +5375,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 function VanillaRenderContext:draw_world_poly_filled(points, color) end
 
 ---@class TextureRenderingInfo
-    ---@field new any @constructors<TextureRenderingInfo()
+    ---@field new any @constructors<TextureRenderingInfo(), TextureRenderingInfo(TextureRenderingInfo)>{}
     ---@field x number
     ---@field y number
     ---@field destination_bottom_left_x number @destination is relative to the x,y centerpoint

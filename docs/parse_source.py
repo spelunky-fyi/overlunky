@@ -221,9 +221,9 @@ def custom_split(var):
             current = ""
         else:
             current += char
-            if char == '[' or char == '(':
+            if char == '[' or char == '(' or char == '<':
                 level += 1
-            elif char == ']' or char == ')':
+            elif char == ']' or char == ')' or char == '>':
                 level -= 1
     result.append(current.strip())
     return result
@@ -632,7 +632,6 @@ def run_parse():
         data = open(file, "r").read()
         data = data.replace("\n", "")
         data = fix_spaces(data)
-        #data = re.sub(r" ", "", data)
         reParticleHelper = re.compile(r"MakeParticleMemberAccess<(.+?)>\(\)")
         data = reParticleHelper.sub(r"\1", data)
         m = re.findall(
@@ -640,14 +639,14 @@ def run_parse():
             data,
         )
         for type in m:
-            container = type[1].strip()
-            cpp_type = type[2].strip()
-            name = type[3].strip()
-            attr = type[4].strip()
+            container = type[1]
+            cpp_type = type[2]
+            name = type[3]
+            attr = type[4]
             if container:
                 extra = []
                 n = re.findall(
-                    r"(?<! NoDoc )" + container + r'\[("[^"]+")\] = ([^;]+);', data
+                    r"(?<! NoDoc )" + container + r'\[([\w":]+)\] = ([^;]+);', data
                 )
                 for var in n:
                     extra.append(",".join(var))
@@ -693,9 +692,7 @@ def run_parse():
                 var = custom_split(var)
                 if len(var) < 2:
                     continue
-                var[0] = var[0].strip()
-                var[1] = var[1].strip()
-                if var[0] == "sol::base_classes" or var[0] == "sol::no_constructor":
+                if var[0] == "sol::no_constructor":
                     continue
                 if "NoDoc" in var[0]:
                     skip = True
@@ -712,7 +709,7 @@ def run_parse():
                 var_name = var[0]
                 cpp = replace_fun(var[1])
 
-                if var[1].startswith("property"):
+                if var[1].startswith("sol::property"):
                     param_match = re.match(
                         rf"property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
                         cpp,
@@ -730,8 +727,8 @@ def run_parse():
                         cpp_name = cpp
                 else:
                     cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
-
-                if var[0].startswith("sol::constructors"):
+                
+                if var_name.startswith("sol::constructors"):
                     for fun in underlying_cpp_type["member_funs"][cpp_type]:
                         param = fun["param"]
 
@@ -752,20 +749,26 @@ def run_parse():
                             ret = "nil"
                             
                         sig = param_match.group(1)
-                        if sig.startswith(cpp_type):
+                        if sig.startswith(cpp_type): # remove the self parameter if present
                             first_param_end = sig.find(",") + 1
                             if first_param_end == 0:
-                                first_param_end = len(")")
-                            sig = ""
+                                sig = ""
+                            else:
+                                sig = sig[first_param_end:].strip()
                         vars.append(
                             {
                                 "name": var_name,
                                 "type": cpp,
                                 "signature": f"{ret} {var_name}({sig})",
+                                "comment": "",
                                 "function": True,
+                                "cb_signature": "",
                             }
                         )
-                        
+                elif var_name.startswith("sol::base_classes"):
+                    bm = re.search(r"bases<([^\]]*)", cpp)
+                    if bm:
+                        base = bm.group(1).replace(" ", "")
                 elif cpp_name in underlying_cpp_type["member_funs"]:
                     for fun in underlying_cpp_type["member_funs"][cpp_name]:
                         ret = fun["return"] or "nil"
