@@ -2445,6 +2445,8 @@ function PRNG:random(min, max) end
     ---@field texture_num integer
     ---@field get_entity fun(self): Entity
     ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
+    ---@field get_second_texture fun(self): TEXTURE?
+    ---@field get_third_texture fun(self): TEXTURE?
     ---@field set_second_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_third_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_texture_num fun(self, num: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
@@ -11436,12 +11438,10 @@ YANG = {
 ---@alias YANG integer
 local MAX_PLAYERS = 4
 
----@alias in_port_t number
 ---@class Logic
 
 ---@alias OnlinePlayerShort any
 ---@alias UdpServer any
----@alias Texture any
 ---@alias SpearDanglerAnimFrames any
 ---@alias OnlineLobbyScreenPlayer any
 ---@alias SoundCallbackFunction function

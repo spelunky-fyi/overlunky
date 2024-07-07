@@ -2492,7 +2492,7 @@ end
     // WIN
     // Runs when entering any winning cutscene, including the constellation.
     // CREDITS
-    // Runs when entering the credits.
+    // Runs when entering the credits screen.
     // SCORES
     // Runs when entering the final score celebration screen of a normal or hard ending.
     // CONSTELLATION

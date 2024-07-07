@@ -297,8 +297,6 @@ function F(f_string) end
                 else ""
             )
             if "function" in var and var["function"]:
-                # if var["name"] == "clear_behaviors":
-                #    gu.breakpoint()
                 signature = var["signature"]
                 m = re.search(r"\s*(.*)\s+([^\(]*)\((.*)\)", signature)
                 if m:
@@ -442,12 +440,10 @@ function F(f_string) end
     print(
         """local MAX_PLAYERS = 4
 
----@alias in_port_t number
 ---@class Logic
 
 ---@alias OnlinePlayerShort any
 ---@alias UdpServer any
----@alias Texture any
 ---@alias SpearDanglerAnimFrames any
 ---@alias OnlineLobbyScreenPlayer any
 ---@alias SoundCallbackFunction function"""
