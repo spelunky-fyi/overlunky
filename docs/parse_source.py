@@ -707,7 +707,7 @@ def run_parse():
                     var[1] = var[1][:-1]
 
                 var_name = var[0]
-                cpp = replace_fun(var[1])
+                cpp = replace_fun(var[1]) # should probably be done later, so the regex doesn't have to relay on some of the changes, also generate_emmylua.py uses some unique formats replacements
 
                 if var[1].startswith("sol::property"):
                     param_match = re.match(
