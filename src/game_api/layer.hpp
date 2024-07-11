@@ -153,6 +153,7 @@ struct Layer
 
     EntityList unknown_entities2;
     std::array<EntityList, 53> entities_by_draw_depth;
+    EntityList unknown_entities2a;
     EntityList unknown_entities3;        // debris, explosions, laserbeams etc. ?
     EntityList unknown_entities4;        // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
     std::vector<Entity*> unknown_vector; // add_to_layer uses this
