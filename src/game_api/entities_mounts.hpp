@@ -26,7 +26,11 @@ class Mount : public PowerupCapable
 
     void carry(Movable* rider);
 
-    void tame(bool value);
+    void tame(bool value)
+    {
+        tamed = value;
+        flags = flags | 0x20000;
+    }
 
     virtual std::pair<float, float>& get_special_offset(std::pair<float, float>& offset) = 0; // gets special offset for the raider when jumping on mount
     virtual std::pair<float, float>& v96(std::pair<float, float>& value) = 0;                 // gets something for when crouching on mount

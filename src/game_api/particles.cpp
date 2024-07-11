@@ -19,7 +19,7 @@ ParticleDB* particle_db_ptr()
     return addr;
 }
 
-TEXTURE ParticleDB::get_texture()
+TEXTURE ParticleDB::get_texture() const
 {
     return texture->id;
 }
@@ -31,78 +31,6 @@ bool ParticleDB::set_texture(TEXTURE texture_id)
         return true;
     }
     return false;
-}
-
-EmittedParticlesInfo::Iterator EmittedParticlesInfo::begin()
-{
-    return Iterator{this, 0};
-}
-EmittedParticlesInfo::Iterator EmittedParticlesInfo::end()
-{
-    return Iterator{this, particle_count};
-}
-EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::begin() const
-{
-    return cbegin();
-}
-EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::end() const
-{
-    return cend();
-}
-EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::cbegin() const
-{
-    return ConstIterator{this, 0};
-}
-EmittedParticlesInfo::ConstIterator EmittedParticlesInfo::cend() const
-{
-    return ConstIterator{this, particle_count};
-}
-
-Particle EmittedParticlesInfo::front()
-{
-    return (*this)[0];
-}
-Particle EmittedParticlesInfo::back()
-{
-    return (*this)[particle_count - 1];
-}
-const Particle EmittedParticlesInfo::front() const
-{
-    return (*this)[0];
-}
-const Particle EmittedParticlesInfo::back() const
-{
-    return (*this)[particle_count - 1];
-}
-
-bool EmittedParticlesInfo::empty()
-{
-    return particle_count == 0;
-}
-EmittedParticlesInfo::size_type EmittedParticlesInfo::size()
-{
-    return particle_count;
-}
-
-Particle EmittedParticlesInfo::operator[](const size_type idx)
-{
-    return static_cast<const EmittedParticlesInfo&>(*this)[idx];
-}
-const Particle EmittedParticlesInfo::operator[](const size_type idx) const
-{
-    return {
-        max_lifetimes + idx,
-        lifetimes + idx,
-        x_positions + idx,
-        y_positions + idx,
-        unknown_x_positions + idx,
-        unknown_y_positions + idx,
-        colors + idx,
-        widths + idx,
-        heights + idx,
-        x_velocities + idx,
-        y_velocities + idx,
-    };
 }
 
 ParticleDB* get_particle_type(PARTICLEEMITTER id)

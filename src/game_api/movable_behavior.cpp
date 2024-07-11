@@ -82,14 +82,6 @@ T call_custom_or_original(const auto& custom, VanillaMovableBehavior* base, T fa
     return fallback_return;
 }
 
-uint8_t CustomMovableBehavior::get_state_id() const
-{
-    return state_id;
-}
-uint8_t CustomMovableBehavior::secondary_sort_id() const
-{
-    return 255;
-}
 bool CustomMovableBehavior::force_state(Movable* movable)
 {
     return call_custom_or_original<&VanillaMovableBehavior::force_state>(custom_force_state, base_behavior, false, movable);
@@ -183,10 +175,6 @@ void clear_behaviors(Movable* movable)
 
 using UpdateMovable = void(Movable&, const Vec2&, float, bool, bool, bool, bool);
 
-void update_movable(Movable* movable)
-{
-    update_movable(movable, false);
-}
 void update_movable(Movable* movable, bool disable_gravity)
 {
     Vec2 null{};
@@ -254,7 +242,7 @@ void init_behavior_hooks()
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
 
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
 
     g_entity_turn_trampoline = (EntityTurn*)memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::MONS_SNAKE, 0x10));
     DetourAttach((void**)&g_entity_turn_trampoline, &entity_turn);

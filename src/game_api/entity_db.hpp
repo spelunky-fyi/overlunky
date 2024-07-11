@@ -58,7 +58,7 @@ struct EntityDB
     };
     /// MASK, will only call collision2 when colliding with entities that match this mask.
     int32_t collision2_mask;
-    /// MASK used for collision with floors.
+    /// MASK used for collision with floors, walls etc.
     int32_t collision_mask;
     int32_t field_44;
     int32_t default_flags;
@@ -77,9 +77,13 @@ struct EntityDB
         Color default_color;
         struct
         {
+            /// NoDoc
             float glow_red;
+            /// NoDoc
             float glow_green;
+            /// NoDoc
             float glow_blue;
+            /// NoDoc
             float glow_alpha;
         };
     };
@@ -106,7 +110,7 @@ struct EntityDB
     float default_special_offsety;
     uint8_t init;
 
-    EntityDB(const EntityDB& other);
+    EntityDB(const EntityDB& other) = default;
     EntityDB(const ENT_TYPE other);
 };
 
