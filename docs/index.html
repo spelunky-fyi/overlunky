@@ -795,6 +795,9 @@
                             <a href="#get_character_heart_color" class="toc-h3 toc-link" data-title="get_character_heart_color">get_character_heart_color</a>
                           </li>
                           <li>
+                            <a href="#get_color" class="toc-h3 toc-link" data-title="get_color">get_color</a>
+                          </li>
+                          <li>
                             <a href="#get_current_money" class="toc-h3 toc-link" data-title="get_current_money">get_current_money</a>
                           </li>
                           <li>
@@ -5157,6 +5160,12 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 </blockquote>
 <h4 id='Color-get_character_heart_color-ENT_TYPE-type_id'><a href="#Color">Color</a> get_character_heart_color(<a href="#ENT_TYPE">ENT_TYPE</a> type_id)</h4>
 <p>Same as <code>Player.get_heart_color</code></p>
+<h3 id='get_color'>get_color</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_color">get_color</a></p>
+</blockquote>
+<h4 id='uColor-get_color-string-color_name-optional-alpha-nullopt'><a href="#Aliases">uColor</a> get_color(string color_name, optional<int> alpha = nullopt)</h4>
+<p>Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with &#39;#&#39; symbol You can also convert hex string into a color, prefix it with &#39;0x&#39;, but use it only if you need to since lua allows for hex values directly too. Default apha value will be 0xFF, unless it&#39;s specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR</p>
 <h3 id='get_current_money'>get_current_money</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_current_money">get_current_money</a></p>
@@ -9337,6 +9346,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="#Color">Color</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(float r_, float g_, float b_, float a_)</a></td>
 <td>Create a new color by specifying its values</td>
+</tr>
+<tr>
+<td><a href="#Color">Color</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(string color_name, optional<int> alpha = nullopt)</a></td>
+<td></td>
 </tr>
 <tr>
 <td>float</td>
