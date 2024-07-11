@@ -23,7 +23,6 @@
 #include "render_api.hpp"                // for RenderInfo, RenderInfo::flip_horiz...
 #include "script/lua_backend.hpp"        // for LuaBackend
 #include "script/safe_cb.hpp"            // for make_safe_cb
-#include "script/sol_helper.hpp"         // for self_return
 
 namespace NEntity
 {

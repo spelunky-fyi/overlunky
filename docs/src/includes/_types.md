@@ -3213,9 +3213,10 @@ Type | Name | Description
 [CustomTheme](#CustomTheme) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=CustomTheme) | Create a new theme with base dwelling and id 100.
 string | [level_file](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_file) | Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
-int | [base_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) | Base [THEME](#THEME) to load enabled functions from, when no other theme is specified.
 map&lt;[DYNAMIC_TEXTURE](#DYNAMIC_TEXTURE), [TEXTURE](#TEXTURE)&gt; | [textures](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) | Add TEXTUREs here to override different dynamic textures.
- | [override](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | `override(THEME_OVERRIDE override, bool enabled)` To disable or enable theme functions using the base_theme.<br/>`override(THEME_OVERRIDE override, THEME theme)` To override a theme function with another theme.<br/>`override(THEME_OVERRIDE override, function func)` To override a theme function with a lua function.<br/> 
+nil | [override(THEME_OVERRIDE index, bool enabled_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | To disable or enable theme functions using the base_theme.
+nil | [override(THEME_OVERRIDE index, int theme_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | To override a theme function with another theme.
+nil | [override(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | To override a theme function with a lua function.
 nil | [pre(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre) | Set a callback to be called before this theme function.
 nil | [post(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post) | Set a callback to be called after this theme function, to fix some changes it did for example.
 int | [base_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) | Base [THEME](#THEME) to load enabled functions from, when no other theme is specified.

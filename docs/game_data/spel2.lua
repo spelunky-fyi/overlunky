@@ -4732,9 +4732,7 @@ function MovableBehavior:get_state_id() end
 ---@class CustomTheme : ThemeInfo
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
     ---@field theme integer @Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
-    ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
     ---@field textures table<DYNAMIC_TEXTURE, TEXTURE> @Add TEXTUREs here to override different dynamic textures.
-    ---@field override any @theme_override
     ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called before this theme function.
     ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called after this theme function, to fix some changes it did for example.
     ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.

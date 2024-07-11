@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <span>
 #include <stdexcept>
+#include <tuple>
 
 template <class T>
 struct ZeroIndexArray
