@@ -369,23 +369,15 @@ function spawn_apep(x, y, layer, right) end
 ---@param x number
 ---@param y number
 ---@param layer LAYER
+---@param height integer
 ---@return integer
-function spawn_tree(x, y, layer) end
+function spawn_tree(x, y, layer, height) end
 ---Spawns and grows a tree
 ---@param x number
 ---@param y number
 ---@param layer LAYER
----@param height integer
 ---@return integer
-function spawn_tree(x, y, layer, height) end
----Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
----Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
----Returns uid of the base or -1 if it wasn't able to spawn
----@param x number
----@param y number
----@param l LAYER
----@return integer
-function spawn_mushroom(x, y, l) end
+function spawn_tree(x, y, layer) end
 ---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 ---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
 ---Returns uid of the base or -1 if it wasn't able to spawn
@@ -395,6 +387,14 @@ function spawn_mushroom(x, y, l) end
 ---@param height integer
 ---@return integer
 function spawn_mushroom(x, y, l, height) end
+---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+---Returns uid of the base or -1 if it wasn't able to spawn
+---@param x number
+---@param y number
+---@param l LAYER
+---@return integer
+function spawn_mushroom(x, y, l) end
 ---Spawns an already unrolled rope as if created by player
 ---@param x number
 ---@param y number
@@ -544,6 +544,12 @@ function get_type(id) end
 ---@param layer LAYER
 ---@return integer
 function get_grid_entity_at(x, y, layer) end
+---Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer[]
+function get_entities_overlapping_grid(x, y, layer) end
 ---Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
 ---@param entities integer[]
 ---@param predicate function
@@ -1030,7 +1036,6 @@ function clear_custom_name(uid) end
 function enter_door(player_uid, door_uid) end
 ---Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
 ---{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
----Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance").
 ---Use empty table as argument to reset to the game default
 ---@param ent_types ENT_TYPE[]
 ---@return nil
@@ -1107,7 +1112,9 @@ function create_illumination(color, size, uid) end
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
----Removes all liquid that is about to go out of bounds, which crashes the game.
+---Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+---The patch however does not destroy the liquids that fall pass the level bounds,
+---so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
 ---@return nil
 function fix_liquid_out_of_bounds() end
 ---Return the name of the first matching number in an enum table
@@ -1162,11 +1169,13 @@ function get_adventure_seed(run_start) end
 ---@return nil
 function set_adventure_seed(first, second) end
 ---Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+---optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
 ---@param x number
 ---@param y number
 ---@param add boolean
+---@param layer LAYER?
 ---@return nil
-function update_liquid_collision_at(x, y, add) end
+function update_liquid_collision_at(x, y, add, layer) end
 ---Disable all crust item spawns, returns whether they were already disabled before the call
 ---@param disable boolean
 ---@return boolean
@@ -1286,16 +1295,16 @@ function add_custom_type(types) end
 function add_custom_type() end
 ---Get uids of entities by draw_depth. Can also use table of draw_depths.
 ---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
----@param draw_depth integer
----@param l LAYER
----@return integer[]
-function get_entities_by_draw_depth(draw_depth, l) end
----Get uids of entities by draw_depth. Can also use table of draw_depths.
----You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
 ---@param draw_depths integer[]
 ---@param l LAYER
 ---@return integer[]
 function get_entities_by_draw_depth(draw_depths, l) end
+---Get uids of entities by draw_depth. Can also use table of draw_depths.
+---You can later use [filter_entities](https://spelunky-fyi.github.io/overlunky/#filter_entities) if you want specific entity
+---@param draw_depth integer
+---@param l LAYER
+---@return integer[]
+function get_entities_by_draw_depth(draw_depth, l) end
 ---Just convenient way of getting the current amount of money
 ---short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
 ---@return integer
@@ -1378,6 +1387,23 @@ function play_adventure() end
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
+---Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+---This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+---Everything should be working more or less correctly (report on community discord if you find something unusual)
+---@param l LAYER
+---@return nil
+function set_liquid_layer(l) end
+---Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
+---@return integer
+function get_liquid_layer() end
+---Attach liquid collision to entity by uid (this is what the push blocks use)
+---Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
+---Use only for entities that can move around, (for static prefer [update_liquid_collision_at](https://spelunky-fyi.github.io/overlunky/#update_liquid_collision_at) )
+---If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
+---@param uid integer
+---@param add boolean
+---@return nil
+function add_entity_to_liquid_collision(uid, add) end
 ---@return boolean
 function toast_visible() end
 ---@return boolean
@@ -1604,20 +1630,15 @@ function set_level_config(config, value) end
 ---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
----@return nil
-function grow_vines(l, max_lengh) end
----Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
----@param l LAYER
----@param max_lengh integer
 ---@param area AABB
 ---@param destroy_broken boolean
 ---@return nil
 function grow_vines(l, max_lengh, area, destroy_broken) end
----Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
 ---@return nil
-function grow_poles(l, max_lengh) end
+function grow_vines(l, max_lengh) end
 ---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
 ---@param max_lengh integer
@@ -1625,6 +1646,11 @@ function grow_poles(l, max_lengh) end
 ---@param destroy_broken boolean
 ---@return nil
 function grow_poles(l, max_lengh, area, destroy_broken) end
+---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
+---@param l LAYER
+---@param max_lengh integer
+---@return nil
+function grow_poles(l, max_lengh) end
 ---Grow chains from `ENT_TYPE_FLOOR_CHAIN_CEILING` and chain with blocks on it from `ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level.
 ---To limit it use the parameters, so x = 10 will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
 ---@return boolean
@@ -2359,7 +2385,7 @@ do
     ---@field random_float fun(self, type: PRNG_CLASS): number @Generate a random floating point number in the range `[0, 1)`
     ---@field random_chance fun(self, inverse_chance: integer, type: PRNG_CLASS): boolean @Returns true with a chance of `1/inverse_chance`
     ---@field random_index fun(self, i: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[1, i]` or `nil` if `i < 1`
-    ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer? @Generate a integer number in the range `[min, max]` or `nil` if `max < min`
+    ---@field random_int fun(self, min: integer, max: integer, type: PRNG_CLASS): integer @Generate a integer number in the range `[min, max]`
     ---@field get_pair fun(self, type: PRNG_CLASS): integer, integer
     ---@field set_pair fun(self, type: PRNG_CLASS, first: integer, second: integer): nil
 local PRNG = nil
@@ -2373,7 +2399,7 @@ function PRNG:random(i) end
 ---Drop-in replacement for `math.random(min, max)`
 ---@param min integer
 ---@param max integer
----@return integer?
+---@return integer
 function PRNG:random(min, max) end
 
 ---@class Color
@@ -2413,10 +2439,7 @@ function PRNG:random(min, max) end
     ---@field max_speed number
     ---@field sprint_factor number
     ---@field jump number
-    ---@field glow_red number
-    ---@field glow_green number
-    ---@field glow_blue number
-    ---@field glow_alpha number
+    ---@field default_color Color
     ---@field damage integer
     ---@field life integer
     ---@field sacrifice_value integer @Favor for sacrificing alive. Halved when dead (health == 0).
@@ -2499,7 +2522,7 @@ function PRNG:random(min, max) end
     ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
     ---@field apply_layer fun(self): nil @Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
     ---@field remove fun(self): nil @Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
-    ---@field respawn fun(self, layer: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
+    ---@field respawn fun(self, layer_to: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
     ---@field kill fun(self, destroy_corpse: boolean, responsible: Entity): nil @Kills the entity, you can set responsible to `nil` to ignore it
     ---@field destroy fun(self): nil @Completely removes the entity from existence
     ---@field activate fun(self, activator: Entity): nil @Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
@@ -2633,7 +2656,7 @@ function Entity:destroy_recursive() end
     ---@field stun fun(self, framecount: integer): nil
     ---@field freeze fun(self, framecount: integer): nil
     ---@field light_on_fire fun(self, time: integer): nil @Does not damage entity
-    ---@field set_cursed fun(self, b: boolean): nil
+    ---@field set_cursed fun(self, b: boolean, effect: boolean?): nil @effect = true - plays the sound and spawn particle above entity
     ---@field drop fun(self, entity_to_drop: Entity): nil @Called when dropping or throwing
     ---@field pick_up fun(self, entity_to_pick_up: Entity): nil
     ---@field can_jump fun(self): boolean @Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
@@ -2673,8 +2696,8 @@ function Entity:destroy_recursive() end
     ---@field set_post_freeze fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil freeze(Movable self, integer framecount)`
     ---@field set_pre_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
     ---@field set_post_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
-    ---@field set_pre_set_cursed fun(self, fun: fun(self: Movable, b: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, boolean b)`
-    ---@field set_post_set_cursed fun(self, fun: fun(self: Movable, b: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, boolean b)`
+    ---@field set_pre_set_cursed fun(self, fun: fun(self: Movable, b: boolean, effect: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, boolean b, boolean effect)`
+    ---@field set_post_set_cursed fun(self, fun: fun(self: Movable, b: boolean, effect: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, boolean b, boolean effect)`
     ---@field set_pre_web_collision fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool web_collision(Movable self)`
     ---@field set_post_web_collision fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil web_collision(Movable self)`
     ---@field set_pre_check_out_of_bounds fun(self, fun: fun(self: Movable): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool check_out_of_bounds(Movable self)`
@@ -2708,15 +2731,15 @@ function Entity:destroy_recursive() end
     ---@field set_pre_crush fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool crush(Movable self, Entity)`
     ---@field set_post_crush fun(self, fun: fun(self: Movable, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil crush(Movable self, Entity)`
 local Movable = nil
----Move a movable according to its velocity, update physics, gravity, etc.
----Will also update `movable.animation_frame` and various timers and counters
----@return nil
-function Movable:generic_update_world() end
 ---Move a movable according to its velocity, can disable gravity
 ---Will also update `movable.animation_frame` and various timers and counters
 ---@param disable_gravity boolean
 ---@return nil
 function Movable:generic_update_world(disable_gravity) end
+---Move a movable according to its velocity, update physics, gravity, etc.
+---Will also update `movable.animation_frame` and various timers and counters
+---@return nil
+function Movable:generic_update_world() end
 ---Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
 ---held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
 ---movement via `on_rope`. Use this for example to update a custom enemy type.
@@ -2913,8 +2936,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field spawned_uid integer
     ---@field set_timer integer
     ---@field timer integer
-    ---@field start_counter integer @works only for star challenge
-    ---@field on_off boolean @works only for star challenge
+    ---@field start_counter integer @Applicable only for ENT_TYPE`.FLOOR_SUNCHALLENGE_GENERATOR`
+    ---@field on_off boolean @Applicable only for ENT_TYPE`.FLOOR_SUNCHALLENGE_GENERATOR`
 
 ---@class SlidingWallCeiling : Floor
     ---@field attached_piece Entity
@@ -4794,6 +4817,7 @@ function MovableBehavior:get_state_id() end
     ---@field flags integer
     ---@field flags2 integer
     ---@field flags3 integer
+    ---@field level_config integer[]
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
@@ -5687,6 +5711,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field scroll_text STRINGID
     ---@field shake_offset_x number
     ---@field shake_offset_y number
+    ---@field loaded_once boolean @Set to true when going from title to menu screen for the first time, makes sure the animation play once
 
 ---@class ScreenOptions : Screen
     ---@field down boolean
@@ -6267,7 +6292,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field tun_star_challenge LogicStarChallenge
     ---@field tun_sun_challenge LogicSunChallenge
     ---@field magmaman_spawn LogicMagmamanSpawn
-    ---@field water_bubbles LogicUnderwaterBubbles @Only the bubbles that spawn from the floor<br/>Even without it, entities moving in water still spawn bubbles
+    ---@field water_bubbles LogicUnderwaterBubbles @Only the bubbles that spawn from the floor (no border tiles, checks decoration flag), also spawn droplets falling from ceiling<br/>Even without it, entities moving in water still spawn bubbles
     ---@field olmec_cutscene LogicOlmecCutscene
     ---@field tiamat_cutscene LogicTiamatCutscene
     ---@field apep_spawner LogicApepTrigger @Triggers and spawns Apep only in rooms set as ROOM_TEMPLATE.APEP
@@ -6365,6 +6390,9 @@ function LogicMagmamanSpawn:remove_spawn(x, y) end
 function LogicMagmamanSpawn:remove_spawn(ms) end
 
 ---@class LogicUnderwaterBubbles : Logic
+    ---@field gravity_direction number @1.0 = normal, -1.0 = inversed, other values have undefined behavior<br/>this value basically have to be the same as return from `ThemeInfo:get_liquid_gravity()`
+    ---@field droplets_spawn_chance integer @It's inverse chance, so the lower the number the higher the chance, values below 10 may crash the game
+    ---@field droplets_enabled boolean @Enable/disable spawn of ENT_TYPE.FX_WATER_DROP from ceiling (or ground if liquid gravity is inverse)
 
 ---@class LogicOlmecCutscene : Logic
     ---@field fx_olmecpart_large Entity

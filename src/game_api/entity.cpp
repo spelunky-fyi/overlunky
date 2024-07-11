@@ -156,11 +156,6 @@ void Entity::remove()
     }
 }
 
-void Entity::respawn(LAYER layer_to)
-{
-    set_layer(layer_to);
-}
-
 void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
 {
     using TeleportFun = void(Entity*, uint8_t, uint8_t);
@@ -168,7 +163,7 @@ void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
     tp(this, delta_x, delta_y);
 }
 
-std::pair<float, float> Entity::position()
+std::pair<float, float> Entity::position() const
 {
     auto [x_pos, y_pos] = position_self();
 
@@ -181,11 +176,6 @@ std::pair<float, float> Entity::position()
         overlay_nested = overlay_nested->overlay;
     }
     return {x_pos, y_pos};
-}
-
-std::pair<float, float> Entity::position_self() const
-{
-    return std::pair<float, float>(x, y);
 }
 
 void Entity::remove_item(uint32_t item_uid)
@@ -207,24 +197,6 @@ void Movable::poison(int16_t frames)
     }
     write_mem_prot(offset_first, frames, true);
     write_mem_prot(offset_subsequent, frames, true);
-}
-
-bool Movable::is_poisoned()
-{
-    return (poison_tick_timer != -1);
-}
-
-bool Movable::is_button_pressed(BUTTON button)
-{
-    return (buttons & button) == button && (buttons_previous & button) == 0;
-}
-bool Movable::is_button_held(BUTTON button)
-{
-    return (buttons & button) == button && (buttons_previous & button) == button;
-}
-bool Movable::is_button_released(BUTTON button)
-{
-    return (buttons & button) == 0 && (buttons_previous & button) == button;
 }
 
 std::tuple<float, float, uint8_t> get_position(uint32_t uid)
@@ -293,7 +265,7 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
     return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
-TEXTURE Entity::get_texture()
+TEXTURE Entity::get_texture() const
 {
     if (texture)
         return texture->id;
@@ -310,17 +282,17 @@ bool Entity::set_texture(TEXTURE texture_id)
     return false;
 }
 
-bool Entity::is_player()
+bool Entity::is_player() const
 {
     if (type->search_flags & 1)
     {
-        Player* pl = this->as<Player>();
+        auto pl = static_cast<const Player*>(this);
         return pl->ai == nullptr;
     }
     return false;
 }
 
-bool Entity::is_movable()
+bool Entity::is_movable() const
 {
     static const ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
     if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
@@ -332,7 +304,7 @@ bool Entity::is_movable()
     return false;
 }
 
-bool Entity::is_liquid()
+bool Entity::is_liquid() const
 {
     static const ENT_TYPE liquid_water = to_id("ENT_TYPE_LIQUID_WATER");
     static const ENT_TYPE liquid_coarse_water = to_id("ENT_TYPE_LIQUID_COARSE_WATER");

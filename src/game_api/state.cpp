@@ -47,14 +47,6 @@ bool get_forward_events()
     return g_forward_blocked_events;
 }
 
-uint16_t StateMemory::get_correct_ushabti() // returns animation_frame of ushabti
-{
-    return (correct_ushabti + (correct_ushabti / 10) * 2);
-}
-void StateMemory::set_correct_ushabti(uint16_t animation_frame)
-{
-    correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
-}
 StateMemory* get_state_ptr()
 {
     return State::get().ptr();
@@ -198,7 +190,7 @@ void hook_godmode_functions()
     static bool functions_hooked = false;
     if (!functions_hooked)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         auto addr_damage = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::CHAR_ANA_SPELUNKY, 48));
         auto addr_insta = get_address("insta_gib");
 
@@ -374,7 +366,7 @@ std::pair<float, float> State::screen_position(float x, float y)
     return {rx, ry};
 }
 
-void State::zoom(float level)
+void State::zoom(float level) const
 {
     auto roomx = ptr()->w;
     if (level == 0.0)
@@ -469,7 +461,7 @@ std::pair<float, float> State::get_camera_position()
 void State::set_camera_position(float cx, float cy)
 {
     static const auto addr = (float*)get_address("camera_position");
-    auto camera = ptr()->camera;
+    auto* camera = ptr()->camera;
     camera->focus_x = cx;
     camera->focus_y = cy;
     camera->adjusted_focus_x = cx;
@@ -594,7 +586,7 @@ Entity* State::find(StateMemory* state, uint32_t uid)
     }
 }
 
-LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type)
+LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type) const
 {
     const auto state = ptr();
     static const ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
@@ -1048,9 +1040,9 @@ Logic* LogicList::start_logic(LOGIC idx)
     if (idx == LOGIC::WATER_BUBBLES)
     {
         auto proper_type = (LogicUnderwaterBubbles*)new_logic;
-        proper_type->unknown1 = 1.0f;
-        proper_type->unknown2 = 1000;
-        proper_type->unknown3 = true;
+        proper_type->gravity_direction = 1.0f;
+        proper_type->droplets_spawn_chance = 1000;
+        proper_type->droplets_enabled = true;
     }
     else if (idx == LOGIC::OUROBOROS)
     {
@@ -1086,11 +1078,6 @@ void LogicList::stop_logic(Logic* log)
     auto idx = log->logic_index;
     delete log;
     logic_indexed[(uint32_t)idx] = nullptr;
-}
-
-void LogicMagmamanSpawn::add_spawn(uint32_t x, uint32_t y)
-{
-    magmaman_positions.emplace_back(x, y);
 }
 
 void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
