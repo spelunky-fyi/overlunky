@@ -112,13 +112,14 @@ struct UnknownAPIStuff
 
 struct STEAM_CALLBACK // just guessing
 {
-    size_t _vtable; // 4 functions, last one is destructor
-    uint8_t unknown1;
+    size_t _vtable;   // 4 functions, last one is destructor
+    uint8_t unknown1; // probably bool?
     uint8_t padding1[3];
     uint32_t padding2; // probably base class padding
 
     // subclass OnGameOverlayActivated ?
     bool steam_overlay_open;
+    // padding
     uint32_t unknown_timer;
     float unknown_timer_related;
     uint32_t unknown11; // padding?
@@ -149,6 +150,4 @@ struct GameAPI
     size_t unknown7; // some offset, OnHeapPointer?
     size_t unknown8; // function pointer?
     STEAM_CALLBACK SteamAPI_Callback;
-
-    size_t unknown12; // garbage?
 };
