@@ -8788,7 +8788,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
 <td></td>
 </tr>
@@ -12857,13 +12857,13 @@ Derived from <a href="#Logic">Logic</a></p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_texture">get_texture()</a></td>
 <td></td>
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_texture">set_texture(int texture_id)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_texture">set_texture(TEXTURE texture_id)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -16994,7 +16994,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
 <td></td>
 </tr>
@@ -17609,7 +17609,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_texture_id">special_texture_id</a></td>
 <td>Used to draw buttons and stuff, default is -1 wich uses the buttons texture</td>
 </tr>
@@ -17911,7 +17911,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Base <a href="#THEME">THEME</a> to load enabled functions from, when no other theme is specified.</td>
 </tr>
 <tr>
-<td>map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, int&gt;</td>
+<td>map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, <a href="#TEXTURE">TEXTURE</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=textures">textures</a></td>
 <td>Add TEXTUREs here to override different dynamic textures.</td>
 </tr>
@@ -18146,9 +18146,9 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a></td>
-<td>Add TEXTUREs to <code>textures</code> to override different dynamic textures easily.</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(DYNAMIC_TEXTURE texture_id)</a></td>
+<td>Add <a href="#TEXTURE">TEXTURE</a> s to <code>textures</code> map of the CustomTheme to override different dynamic textures easily.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -18392,12 +18392,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Returns: <a href="#THEME">THEME</a>, or logical base <a href="#THEME">THEME</a> for special levels (Abzu-&gt;Tide Pool etc)</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type">get_floor_spreading_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for floor spreading (generic or one of the styled floors)</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type2">get_floor_spreading_type2()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for floor spreading (stone or one of the styled floors)</td>
 </tr>
@@ -18412,22 +18412,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to)<br/>Returns: 85 by default, except for: olmec: 15, cog: 23</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_transition_styled_floor_type">get_transition_styled_floor_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for the transition floor</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backwall_type">get_backwall_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for the backwall (BG_LEVEL_BACKWALL by default)</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_border_type">get_border_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> to use for the border tiles</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_critter_type">get_critter_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> for theme specific critter</td>
 </tr>
@@ -18472,8 +18472,8 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Returns: allow_beehive or allow_leprechaun flag<br/>Params: index: 0 or 1</td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a></td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(DYNAMIC_TEXTURE texture_id)</a></td>
 <td>Returns: <a href="#TEXTURE">TEXTURE</a> based on texture_id<br/>Params: <a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a> texture_id</td>
 </tr>
 <tr>
