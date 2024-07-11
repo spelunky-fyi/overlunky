@@ -182,7 +182,7 @@ struct TextRenderingInfo
     uint16_t unknown8;              // padding probably
 
     /// Used to draw buttons and stuff, default is -1 wich uses the buttons texture
-    int32_t special_texture_id;
+    TEXTURE special_texture_id;
 
     uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
     uint8_t padding1[3];

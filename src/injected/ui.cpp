@@ -8125,7 +8125,7 @@ void render_hotbar_textures()
             if (type->texture_id < 0)
             {
                 const auto theme = g_state->current_theme ? g_state->current_theme : g_state->level_gen->themes[0];
-                texture = get_texture(theme->get_dynamic_texture(type->texture_id));
+                texture = get_texture(theme->get_dynamic_texture((DYNAMIC_TEXTURE)type->texture_id));
             }
             if (!texture)
                 continue;

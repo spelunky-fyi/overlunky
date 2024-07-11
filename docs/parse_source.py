@@ -169,6 +169,7 @@ api_files = [
     "../src/game_api/script/usertypes/steam_lua.cpp",
     "../src/game_api/script/usertypes/logic_lua.cpp",
     "../src/game_api/script/usertypes/bucket_lua.cpp",
+    "../src/game_api/script/usertypes/color_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",

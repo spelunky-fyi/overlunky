@@ -77,7 +77,8 @@ TEXTURE define_texture(TextureDefinition data)
     auto* textures = get_textures();
 
     Texture new_texture{
-        static_cast<int64_t>(textures->texture_map.size() + render.custom_textures.size() + 1),
+        static_cast<TEXTURE>(textures->texture_map.size() + render.custom_textures.size() + 1),
+        0,
         nullptr,
         data.width,
         data.height,
@@ -145,7 +146,8 @@ std::optional<TEXTURE> get_texture(TextureDefinition data)
     auto* textures = get_textures();
 
     Texture new_texture{
-        static_cast<int64_t>(textures->texture_map.size() + render.custom_textures.size() + 1),
+        static_cast<TEXTURE>(textures->texture_map.size() + render.custom_textures.size() + 1),
+        0,
         nullptr,
         data.width,
         data.height,

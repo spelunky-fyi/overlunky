@@ -143,7 +143,7 @@ Name | Data | Description
 
 > Search script examples for [DAMAGE_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE)
 
-16bit bitmask used in [Movable](#Movable)::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+16bit bitmask used in [Movable](#Movable)::damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
 
 Name | Data | Description
 ---- | ---- | -----------
