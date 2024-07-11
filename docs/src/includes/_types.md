@@ -462,7 +462,7 @@ float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitbo
 float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
 int | [collision2_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision2_mask) | [MASK](#MASK), will only call collision2 when colliding with entities that match this mask.
-int | [collision_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision_mask) | [MASK](#MASK) used for collision with floors.
+int | [collision_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision_mask) | [MASK](#MASK) used for collision with floors, walls etc.
 float | [friction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) | 
 float | [elasticity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) | 
 float | [weight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=weight) | 
@@ -1378,7 +1378,7 @@ array&lt;[ThemeInfo](#ThemeInfo), 18&gt; | [themes](https://github.com/spelunky-
 int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
 int | [flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags2) | 
 int | [flags3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags3) | 
-array&lt;int&gt; | [level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_config) | 
+array&lt;int, 17&gt; | [level_config](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_config) | 
 
 ## Lighting types
 

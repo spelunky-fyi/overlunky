@@ -33,7 +33,7 @@ replace_table = {
     " = nullopt": "",
     "void": "",
     "constexpr": "",
-    "inline": "",
+    "inline ": "",
     "[[nodiscard]]": "",
     "[[maybe_unused]]": "",
     "self_return<&": "",

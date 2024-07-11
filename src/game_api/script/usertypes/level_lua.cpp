@@ -1368,8 +1368,8 @@ void register_usertypes(sol::state& lua)
     ///  kept for backward compatibility, don't use, check LevelGenSystem.exit_doors
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    auto level_config = [](LevelGenSystem& level_gen)
-    { return ZeroIndexArray<uint32_t>(level_gen.data->level_config); };
+    // auto level_config = [](LevelGenSystem& level_gen)
+    //{ return ZeroIndexArray<uint32_t>(level_gen.data->level_config); };
 
     /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect, used in StateMemory
     lua.new_usertype<LevelGenSystem>(
@@ -1404,8 +1404,8 @@ void register_usertypes(sol::state& lua)
         "flags3",
         &LevelGenSystem::flags3,
         "level_config",
-        sol::property([&level_config](LevelGenSystem& lg) // -> array<int>
-                      { return level_config(lg) /**/; }));
+        sol::property([](LevelGenSystem& lg) // -> array<int, 17>
+                      { return ZeroIndexArray<uint32_t>(lg.data->level_config) /**/; }));
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.

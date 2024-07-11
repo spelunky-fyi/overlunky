@@ -55,7 +55,7 @@ replace_table = {
     "static": "",
     "[[nodiscard]]": "",
     "[[maybe_unused]]": "",
-    "inline": "",
+    "inline ": "",
     "self_return<&": "",
     ">()": "",
     "unsigned": "",

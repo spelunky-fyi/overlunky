@@ -2430,7 +2430,7 @@ function PRNG:random(min, max) end
     ---@field hitboxy number
     ---@field draw_depth integer
     ---@field collision2_mask integer @MASK, will only call collision2 when colliding with entities that match this mask.
-    ---@field collision_mask integer @MASK used for collision with floors.
+    ---@field collision_mask integer @MASK used for collision with floors, walls etc.
     ---@field friction number
     ---@field elasticity number
     ---@field weight number
@@ -4831,7 +4831,7 @@ function CustomTheme:override(index, func_) end
     ---@field flags integer
     ---@field flags2 integer
     ---@field flags3 integer
-    ---@field level_config integer[]
+    ---@field level_config integer[] @size: 17
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
