@@ -1446,6 +1446,16 @@ Returns the [Bucket](#Bucket) of data stored in shared memory between [Overlunky
 
 Same as `Player.get_heart_color`
 
+### get_color
+
+
+> Search script examples for [get_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_color)
+
+#### [uColor](#Aliases) get_color(string color_name, optional<int> alpha = nullopt)
+
+Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too. Default apha value will be 0xFF, unless it's specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
+
+
 ### get_current_money
 
 

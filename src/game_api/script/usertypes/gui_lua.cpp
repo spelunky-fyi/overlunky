@@ -855,11 +855,6 @@ void register_usertypes(sol::state& lua)
     guidrawcontext_type["win_width"] = &GuiDrawContext::win_width;
     guidrawcontext_type["key_picker"] = &GuiDrawContext::key_picker;
 
-    /// Converts a color to int to be used in drawing functions. Use values from `0..255`.
-    lua["rgba"] = [](int r, int g, int b, int a) -> uColor
-    {
-        return (uColor)(a << 24) + (b << 16) + (g << 8) + (r);
-    };
     /// Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
     lua["draw_text_size"] = [](float size, std::string text) -> std::pair<float, float>
     {

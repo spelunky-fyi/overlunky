@@ -1698,13 +1698,6 @@ function clear_vanilla_sound_callback(id) end
 ---@param source_uid integer
 ---@return SoundMeta
 function play_sound(sound, source_uid) end
----Converts a color to int to be used in drawing functions. Use values from `0..255`.
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return uColor
-function rgba(r, g, b, a) end
 ---Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
 ---@param size number
 ---@param text string
@@ -1907,6 +1900,21 @@ function pause() end
 ---Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
 ---@return Bucket
 function get_bucket() end
+---Converts a color to int to be used in drawing functions. Use values from `0..255`.
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return uColor
+function rgba(r, g, b, a) end
+---Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol
+---You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too.
+---Default apha value will be 0xFF, unless it's specified
+---Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
+---@param color_name string
+---@param alpha integer?
+---@return uColor
+function get_color(color_name, alpha) end
 
 --## Types
 do
@@ -2401,17 +2409,6 @@ function PRNG:random(i) end
 ---@param max integer
 ---@return integer
 function PRNG:random(min, max) end
-
----@class Color
-    ---@field r number
-    ---@field g number
-    ---@field b number
-    ---@field a number
-    ---@field get_rgba fun(self): integer, integer, integer, integer @Returns RGBA colors in 0..255 range
-    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
-    ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
-    ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
-    ---@field set fun(self, other: Color): Color @Copies the values of different Color to this one
 
 ---@class Animation
     ---@field id integer
@@ -6487,6 +6484,17 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     ---@field count integer @Number of API instances present
 
+---@class Color
+    ---@field r number
+    ---@field g number
+    ---@field b number
+    ---@field a number
+    ---@field get_rgba fun(self): integer, integer, integer, integer @Returns RGBA colors in 0..255 range
+    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
+    ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
+    ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
+    ---@field set fun(self, other: Color): Color @Copies the values of different Color to this one
+
 end
 --## Static class functions
 
@@ -6530,22 +6538,6 @@ SaveState = nil
 ---Create a new temporary SaveState/clone of the main level state. Unlike save_state slots that are preallocated by the game anyway, these will use 32MiB a pop and aren't freed automatically, so make sure to clear them or reuse the same one to save memory. The garbage collector will eventually clear the SaveStates you don't have a handle to any more though.
 ---@return SaveState
 function SaveState:new() end
----Create a new color - defaults to black
----@return Color
-function Color:new() end
----@param other Color
----@return Color
-function Color:new(other) end
----@param color Color
----@return Color
-function Color:new(color) end
----Create a new color by specifying its values
----@param r_ number
----@param g_ number
----@param b_ number
----@param a_ number
----@return Color
-function Color:new(r_, g_, b_, a_) end
 
 EntityDB = nil
 ---@param other EntityDB
@@ -6661,6 +6653,26 @@ MagmamanSpawnPosition = nil
 ---@param y_ integer
 ---@return MagmamanSpawnPosition
 function MagmamanSpawnPosition:new(x_, y_) end
+---Create a new color - defaults to black
+---@return Color
+function Color:new() end
+---@param other Color
+---@return Color
+function Color:new(other) end
+---@param color Color
+---@return Color
+function Color:new(color) end
+---Create a new color by specifying its values
+---@param r_ number
+---@param g_ number
+---@param b_ number
+---@param a_ number
+---@return Color
+function Color:new(r_, g_, b_, a_) end
+---@param color_name string
+---@param alpha integer?
+---@return Color
+function Color:new(color_name, alpha) end
 
 --## Enums
 
