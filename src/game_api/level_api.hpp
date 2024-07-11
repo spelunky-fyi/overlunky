@@ -95,15 +95,55 @@ struct LevelGenData
 {
     void init();
 
-    std::optional<std::uint32_t> get_tile_code(const std::string& tile_code);
+    std::optional<std::uint32_t> get_tile_code(const std::string& tile_code) const
+    {
+        auto it = tile_codes.find((game_string&)tile_code);
+        if (it != tile_codes.end())
+        {
+            return it->second.id;
+        }
+        return {};
+    }
     std::uint32_t define_tile_code(std::string tile_code);
 
-    std::optional<uint8_t> get_short_tile_code(ShortTileCodeDef short_tile_code_def);
-    std::optional<ShortTileCodeDef> get_short_tile_code_def(uint8_t short_tile_code);
-    void change_short_tile_code(uint8_t short_tile_code, ShortTileCodeDef short_tile_code_def);
+    std::optional<uint8_t> get_short_tile_code(ShortTileCodeDef short_tile_code_def) const
+    {
+        for (auto& [i, def] : short_tile_codes)
+        {
+            if (def == short_tile_code_def)
+            {
+                return i;
+            }
+        }
+        return {};
+    }
+    std::optional<ShortTileCodeDef> get_short_tile_code_def(uint8_t short_tile_code) const
+    {
+        auto it = short_tile_codes.find(short_tile_code);
+        if (it != short_tile_codes.end())
+        {
+            return it->second;
+        }
+        return {};
+    }
+    void change_short_tile_code(uint8_t short_tile_code, ShortTileCodeDef short_tile_code_def)
+    {
+        short_tile_codes[short_tile_code] = short_tile_code_def;
+    }
     std::optional<uint8_t> define_short_tile_code(ShortTileCodeDef short_tile_code_def);
 
-    std::optional<std::uint32_t> get_chance(const std::string& chance);
+    std::optional<std::uint32_t> get_chance(const std::string& chance) const
+    {
+        if (auto it = monster_chances.find((game_string&)chance); it != monster_chances.end())
+        {
+            return it->second.id;
+        }
+        if (auto it = trap_chances.find((game_string&)chance); it != trap_chances.end())
+        {
+            return it->second.id;
+        }
+        return {};
+    }
     std::uint32_t define_chance(std::string chance);
 
     std::uint32_t register_chance_logic_provider(std::uint32_t chance_id, SpawnLogicProvider provider);
@@ -114,15 +154,23 @@ struct LevelGenData
     std::pair<std::uint32_t, std::uint32_t> get_missing_extra_spawns(std::uint32_t extra_spawn_id);
     void undefine_extra_spawn(std::uint32_t extra_spawn_id);
 
-    std::optional<std::uint16_t> get_room_template(const std::string& room_template);
+    std::optional<std::uint16_t> get_room_template(const std::string& room_template) const
+    {
+        auto it = room_templates.find((game_string&)room_template);
+        if (it != room_templates.end())
+        {
+            return it->second.id;
+        }
+        return {};
+    }
     std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
     bool set_room_template_size(std::uint16_t room_template, uint16_t width, uint16_t height);
-    RoomTemplateType get_room_template_type(std::uint16_t room_template);
-    uint16_t get_pretend_room_template(std::uint16_t room_template);
+    RoomTemplateType get_room_template_type(std::uint16_t room_template) const;
+    uint16_t get_pretend_room_template(std::uint16_t room_template) const;
 
     union
     {
-        std::array<uint32_t, 18> level_config;
+        std::array<uint32_t, 17> level_config;
         struct
         {
             uint32_t back_room_chance;
@@ -142,7 +190,7 @@ struct LevelGenData
             uint32_t machine_rewardroom_chance;
             uint32_t max_liquid_particles;
             uint32_t flagged_liquid_rooms;
-            uint32_t unknown_config; //
+            uint32_t unknown_config; // padding
         };
     };
 
@@ -368,7 +416,7 @@ class ThemeInfo
     /// Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
     virtual void do_procedural_spawn(SpawnInfo* info) = 0;
 
-    uint32_t get_aux_id();
+    uint32_t get_aux_id() const;
 };
 static_assert(sizeof(ThemeInfo) == 0x20);
 
@@ -529,19 +577,19 @@ struct LevelGenSystem
 
     static std::pair<int, int> get_room_index(float x, float y);
     static Vec2 get_room_pos(uint32_t x, uint32_t y);
-    std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l);
+    std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l) const;
     bool set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template);
 
-    bool is_room_flipped(uint32_t x, uint32_t y);
-    bool is_machine_room_origin(uint32_t x, uint32_t y);
+    bool is_room_flipped(uint32_t x, uint32_t y) const;
+    bool is_machine_room_origin(uint32_t x, uint32_t y) const;
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
     bool mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room);
 
-    bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE shop_type);
+    static bool set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE shop_type);
 
-    std::string_view get_room_template_name(uint16_t room_template);
-    std::optional<std::string_view> get_procedural_spawn_chance_name(uint32_t chance_id);
-    uint32_t get_procedural_spawn_chance(uint32_t chance_id);
+    std::string_view get_room_template_name(uint16_t room_template) const;
+    static std::optional<std::string_view> get_procedural_spawn_chance_name(uint32_t chance_id);
+    uint32_t get_procedural_spawn_chance(uint32_t chance_id) const;
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
 
     ~LevelGenSystem() = delete; // cuz it was complaining
@@ -557,11 +605,17 @@ using COSUBTHEME = int8_t; // NoAlias
 COSUBTHEME get_co_subtheme();
 void force_co_subtheme(COSUBTHEME subtheme);
 
-void grow_vines(LAYER l, uint32_t max_lengh);
 void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken);
+inline void grow_vines(LAYER l, uint32_t max_lengh)
+{
+    grow_vines(l, max_lengh, {0, 0, 0, 0}, false);
+}
 
-void grow_poles(LAYER l, uint32_t max_lengh);
 void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken);
+inline void grow_poles(LAYER l, uint32_t max_lengh)
+{
+    grow_poles(l, max_lengh, {0, 0, 0, 0}, false);
+}
 
 bool grow_chain_and_blocks();
 bool grow_chain_and_blocks(uint32_t x, uint32_t y);

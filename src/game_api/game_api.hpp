@@ -124,12 +124,15 @@ struct STEAM_CALLBACK // just guessing
     uint32_t unknown11; // padding?
 };
 
-struct GameAPI // size 0x60
+struct GameAPI
 {
     static GameAPI* get();
 
-    float get_current_zoom();
-    float get_target_zoom();
+    float get_current_zoom() const;
+    float get_target_zoom() const
+    {
+        return renderer->target_zoom + renderer->target_zoom_offset;
+    }
 
     void set_zoom(std::optional<float> current, std::optional<float> target);
 

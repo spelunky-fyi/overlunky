@@ -76,7 +76,7 @@ class Button : public Movable
     int8_t seen;
     int8_t unknown11;
     int16_t padding3;
-    int64_t unknown12;
+    bool (*check_leader_autorun_status)(); // used to create correct graphics in the basecamp tutorial
 };
 
 class FxTornJournalPage : public Movable

@@ -209,6 +209,12 @@ std::vector<DropEntry> drop_entries{
     /// Game does this (this value | 0x1) to get BOMBBAG (so depending on the chosen ENT_TYPE it can be + 1 or + 0)
     {"OLMEC_SISTERS_ROPEPILE", "\x0D\x00\x02\x00\x00\x83\xFB\x03"sv, VTABLE_OFFSET::NONE, 0, 1},
     {"OLMEC_SISTERS_BOMBBOX", "\xBA\x02\x02\x00\x00\x0F\x45\xD0"sv, VTABLE_OFFSET::NONE, 0, 1},
+    /// Challenge rewards:
+    {"CHALLENGESTAR_CLONEGUN", "\xB8\x4D\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_STAR_CHALLENGE, 1, 1},
+    {"CHALLENGESTAR_ELIXIR", "\xBD\x08\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_STAR_CHALLENGE, 1, 1},
+    /// Game will change texture based on the active player unless the item search_flags/MASK is: FLOOR, DECORATION, BG, SHADOW, LOGICAL, WATER, LAVA, or the 16th bit that is normally unused
+    {"CHALLENGESUN_PLAYERBAG", "\xBA\x1F\x02\x00\x00"sv, VTABLE_OFFSET::LOGIC_TUN_SUN_CHALLENGE, 1, 1},
+    /// Mattock and Arrow of Light are build into the level, use level editor or `set_pre_entity_spawn` to replace them
 
     ///
     /// Attacks:
@@ -261,7 +267,7 @@ std::vector<DropEntry> drop_entries{
     /// Spawn:
     ///
 
-    /// It set's move_state for them for sleep and wake_up_timer, so i has to be movable and entity + 0x150 can't be something important
+    /// It set's move_state for them for sleep and wake_up_timer, so i has to be movable and entity offset 0x150 can't be something important
     {"COOKFIRE_CAVEMAN_1", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC3"sv, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
     {"COOKFIRE_CAVEMAN_2", "\xBA\xE1\x00\x00\x00\x0F\x28\xD7\xE8****\x48\x89\xC6"sv, VTABLE_OFFSET::ITEM_COOKFIRE, 75, 1},
     {"BONEBLOCK_SKELETON", "\xBA\xE3\x00\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 75, 1},
@@ -300,7 +306,7 @@ std::vector<DropEntry> drop_entries{
     {"KAPALA_HEALTH", "\xBA\x01\x00\x00\x00\xB8\x01"sv, VTABLE_OFFSET::NONE, 0, 1},
     /* can't do elixir as there are some calculations for cursed, poisoned etc.
     can't do pet, it has some complex calculation for some reason
-    can't do ankh made a separete function for that (see modify_ankh_health_gain)
+    can't do ankh, made a separete function for that (see modify_ankh_health_gain)
     can't do initial health (camp, level, duat, coffin) as it's a word/byte
     can't do drops for: humphead, yetiking, yetiqueen, alien queen, pangxie (gems) those are stored in array, need special funciton for that
     */
@@ -335,9 +341,9 @@ void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
         auto& entry = dropchance_entries.at(dropchance_id);
         if (entry.offset == 0)
         {
-            auto memory = Memory::get();
+            auto& memory = Memory::get();
             size_t offset = memory.at_exe(find_inst(memory.exe(), entry.pattern, get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset)));
-            if (offset > memory.exe_ptr)
+            if (offset > memory.exe_address())
             {
                 entry.offset = offset;
             }
@@ -381,12 +387,12 @@ void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
         }
         if (entry.offsets[0] == 0)
         {
-            auto memory = Memory::get();
+            auto& memory = Memory::get();
             size_t offset = 0;
             const auto drop_name{"DROP." + entry.caption};
 
             if (entry.vtable_offset == VTABLE_OFFSET::NONE)
-                offset = memory.after_bundle;
+                offset = memory.after_bundle_address();
             else
                 offset = get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset);
 

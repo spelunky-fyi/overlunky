@@ -27,7 +27,11 @@ class Mount : public PowerupCapable
 
     void carry(Movable* rider);
 
-    void tame(bool value);
+    void tame(bool value)
+    {
+        tamed = value;
+        flags = flags | 0x20000;
+    }
 
     virtual Vec2& get_special_offset(Vec2& offset) = 0; // gets special offset for the raider when jumping on mount
     virtual Vec2& v96(Vec2& value) = 0;                 // gets something for when crouching on mount
