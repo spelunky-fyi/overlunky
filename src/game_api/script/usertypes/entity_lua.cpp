@@ -294,9 +294,8 @@ void register_usertypes(sol::state& lua)
     */
 
     auto damage = sol::overload(
-        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
-        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint8_t)>(&Movable::damage),
-        &Movable::on_damage);
+        &Movable::broken_damage,
+        &Movable::damage);
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
@@ -495,7 +494,7 @@ void register_usertypes(sol::state& lua)
     // Value of 0, treated by all the functions as ANY mask
     */
 
-    /// 16bit bitmask used in Movable::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+    /// 16bit bitmask used in Movable::damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
     lua.create_named_table(
         "DAMAGE_TYPE",
         "GENERIC",
