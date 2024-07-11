@@ -27427,8 +27427,8 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=damage">damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</a></td>
-<td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=damage">damage(Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)</a></td>
+<td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. <code>damage_dealer</code> can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td>vector&lt;int&gt;</td>
@@ -27558,12 +27558,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_damage">set_pre_damage(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; damage(Movable self, Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. <code>damage_dealer</code> can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_damage">set_post_damage(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil damage(Movable self, Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. <code>damage_dealer</code> can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -29987,7 +29987,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE">DAMAGE_TYPE</a></p>
 </blockquote>
 
-<p>16bit bitmask used in <a href="#Movable">Movable</a>::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.</p>
+<p>16bit bitmask used in <a href="#Movable">Movable</a>::damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.</p>
 
 <table><thead>
 <tr>
