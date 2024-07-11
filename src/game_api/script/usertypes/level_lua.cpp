@@ -1368,9 +1368,6 @@ void register_usertypes(sol::state& lua)
     ///  kept for backward compatibility, don't use, check LevelGenSystem.exit_doors
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    // auto level_config = [](LevelGenSystem& level_gen)
-    //{ return ZeroIndexArray<uint32_t>(level_gen.data->level_config); };
-
     /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect, used in StateMemory
     lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
