@@ -46,7 +46,7 @@ const int OL_MOUSE_WHEEL = 0x10;
 const int OL_WHEEL_DOWN = 0x11;
 const int OL_WHEEL_UP = 0x12;
 
-Vec2::Vec2(const ImVec2& p)
+Vec2::Vec2(const ImVec2& p) noexcept
     : x(p.x), y(p.y){};
 
 struct Gamepad : XINPUT_GAMEPAD

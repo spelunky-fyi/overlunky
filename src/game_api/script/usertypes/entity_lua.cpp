@@ -91,6 +91,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["max_speed"] = &EntityDB::max_speed;
     entitydb_type["sprint_factor"] = &EntityDB::sprint_factor;
     entitydb_type["jump"] = &EntityDB::jump;
+    entitydb_type["default_color"] = &EntityDB::default_color;
     entitydb_type["glow_red"] = &EntityDB::glow_red;
     entitydb_type["glow_green"] = &EntityDB::glow_green;
     entitydb_type["glow_blue"] = &EntityDB::glow_blue;
@@ -209,9 +210,9 @@ void register_usertypes(sol::state& lua)
     auto user_data = sol::property(get_user_data, set_user_data);
 
     auto overlaps_with = sol::overload(
-        static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
+        static_cast<bool (Entity::*)(Entity*) const>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(AABB) const>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(float, float, float, float) const>(&Entity::overlaps_with));
 
     auto kill_recursive = sol::overload(
         static_cast<void (Entity::*)(bool, Entity*)>(&Entity::kill_recursive),
@@ -346,7 +347,7 @@ void register_usertypes(sol::state& lua)
     movable_type["stun"] = &Movable::stun;
     movable_type["freeze"] = &Movable::freeze;
     movable_type["light_on_fire"] = light_on_fire;
-    movable_type["set_cursed"] = &Movable::set_cursed;
+    movable_type["set_cursed"] = &Movable::set_cursed_fix;
     movable_type["drop"] = &Movable::drop;
     movable_type["pick_up"] = &Movable::pick_up;
     movable_type["can_jump"] = &Movable::can_jump;

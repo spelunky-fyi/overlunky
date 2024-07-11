@@ -511,7 +511,10 @@ class LogicMagmamanSpawn : public Logic
   public:
     custom_vector<MagmamanSpawnPosition> magmaman_positions;
 
-    void add_spawn(uint32_t x, uint32_t y);
+    void add_spawn(uint32_t x, uint32_t y)
+    {
+        magmaman_positions.emplace_back(x, y);
+    }
     void add_spawn(MagmamanSpawnPosition ms)
     {
         add_spawn(ms.x, ms.y);
@@ -601,13 +604,14 @@ class LogicArenaLooseBombs : public Logic
 class LogicUnderwaterBubbles : public Logic
 {
   public:
-    // no idea what does are, messing with them can crash
-    float unknown1; // default: 1.0, excludes liquid from spawning the bubbles by y level from the top to bottom
-                    // is treated like number (calculations to get the right grid entity level)
-                    // it's more like a value in rooms than y coordinates
+    /// 1.0 = normal, -1.0 = inversed, other values have undefined behavior
+    /// this value basically have to be the same as return from `ThemeInfo:get_liquid_gravity()`
+    float gravity_direction;
 
-    int16_t unknown2; // default: 1000
-    bool unknown3;    // default: 1 or 0
+    /// It's inverse chance, so the lower the number the higher the chance, values below 10 may crash the game
+    int16_t droplets_spawn_chance;
+    /// Enable/disable spawn of ENT_TYPE.FX_WATER_DROP from ceiling (or ground if liquid gravity is inverse)
+    bool droplets_enabled;
 };
 
 class LogicTunPreChallenge : public Logic
@@ -657,7 +661,7 @@ struct LogicList
             LogicStarChallenge* tun_star_challenge;
             LogicSunChallenge* tun_sun_challenge;
             LogicMagmamanSpawn* magmaman_spawn;
-            /// Only the bubbles that spawn from the floor
+            /// Only the bubbles that spawn from the floor (no border tiles, checks decoration flag), also spawn droplets falling from ceiling
             /// Even without it, entities moving in water still spawn bubbles
             LogicUnderwaterBubbles* water_bubbles;
             LogicOlmecCutscene* olmec_cutscene;
@@ -713,8 +717,12 @@ struct LiquidPhysicsEngine
     std::list<size_t> unk1; // seams to be empty, or have one element 0?
     uint32_t resize_value;  // used to resive the arrays?
     uint32_t unk3b;         // padding probably
-    std::list<int32_t> liquid_ids;
-    std::list<int32_t> unknown44;                        // all of them are -1
+
+    // this is actually a pre C++11 version of std::list, which is different from current one!
+    std::pair<size_t, size_t> liquid_ids; // std::list<int32_t>
+    // this is actually a pre C++11 version of std::list, which is different from current one!
+    std::pair<size_t, size_t> unknown44; // std::list<int32_t> all of them are -1
+
     std::list<int32_t>::const_iterator* list_liquid_ids; // list of all iterators of liquid_ids?
     int32_t unknown45a;                                  // size related for the array above
     int32_t unknown45b;                                  // padding
@@ -859,13 +867,13 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    std::map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seams to be the same as in push_blocks
-    std::map<uint32_t, size_t*>* push_blocks;               // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
-    custom_vector<LiquidLake> impostor_lakes;               //
-    uint32_t total_liquid_spawned;                          // Total number of spawned liquid entities, all types.
-    uint32_t unknown8;                                      // padding probably
-    uint8_t* unknown9;                                      // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
-                                                            // always allocates after the LiquidPhysics
+    custom_map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seams to be the same as in push_blocks
+    custom_map<uint32_t, size_t*>* push_blocks;               // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
+    custom_vector<LiquidLake> impostor_lakes;                 //
+    uint32_t total_liquid_spawned;                            // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;                                        // padding probably
+    uint8_t* unknown9;                                        // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
+                                                              // always allocates after the LiquidPhysics
 
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
     bool unknown12;

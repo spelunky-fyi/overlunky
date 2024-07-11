@@ -29,6 +29,7 @@
 #include "script/handle_lua_function.hpp"    // for handle_function
 #include "script/lua_backend.hpp"            // for LuaBackend, LevelGenCal...
 #include "script/safe_cb.hpp"                // for make_safe_cb
+#include "script/sol_helper.hpp"             // for ZeroIndexArray
 #include "state.hpp"                         // for State, StateMemory, enu...
 #include "state_structs.hpp"                 // for QuestsInfo, Camera, Que...
 
@@ -1367,6 +1368,9 @@ void register_usertypes(sol::state& lua)
     ///  kept for backward compatibility, don't use, check LevelGenSystem.exit_doors
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
+    auto level_config = [](LevelGenSystem& level_gen)
+    { return ZeroIndexArray<uint32_t>(level_gen.data->level_config); };
+
     /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect, used in StateMemory
     lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
@@ -1398,7 +1402,10 @@ void register_usertypes(sol::state& lua)
         "flags2",
         &LevelGenSystem::flags2,
         "flags3",
-        &LevelGenSystem::flags3);
+        &LevelGenSystem::flags3,
+        "level_config",
+        sol::property([&level_config](LevelGenSystem& lg) // -> array<int>
+                      { return level_config(lg) /**/; }));
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.

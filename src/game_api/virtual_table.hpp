@@ -990,4 +990,8 @@ enum class VTABLE_OFFSET
 };
 
 size_t get_virtual_function_address(VTABLE_OFFSET table_entry, uint32_t function_index);
-size_t get_virtual_function_address(void* object, uint32_t function_index);
+inline size_t get_virtual_function_address(void* object, uint32_t function_index)
+{
+    auto v_table = *static_cast<size_t**>(object);
+    return *(v_table + function_index);
+}

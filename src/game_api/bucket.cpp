@@ -34,39 +34,6 @@ void PauseAPI::set_pause(PAUSE_TYPE flags)
     state->pause = (uint8_t)(((uint32_t)flags) & 0x3f);
 }
 
-bool PauseAPI::paused()
-{
-    return get_pause() != PAUSE_TYPE::NONE && (get_pause() & pause_type) != PAUSE_TYPE::NONE;
-}
-
-bool PauseAPI::set_paused(bool enable)
-{
-    if (enable)
-        set_pause(get_pause() | pause_type);
-    else
-        set_pause(get_pause() & (~pause_type));
-    return paused();
-}
-
-bool PauseAPI::toggle()
-{
-    if (paused())
-        set_paused(false);
-    else
-        set_paused(true);
-    return paused();
-}
-
-void PauseAPI::frame_advance()
-{
-    skip = true;
-}
-
-void PauseAPI::apply()
-{
-    set_pause(pause);
-}
-
 bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
 {
     bool match = false;
@@ -171,11 +138,6 @@ bool PauseAPI::event(PAUSE_TYPE pause_event)
         blocked = block;
 
     return block;
-}
-
-void PauseAPI::pre_loop()
-{
-    blocked = false;
 }
 
 void PauseAPI::post_loop()
