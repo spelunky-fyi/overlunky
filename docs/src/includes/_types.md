@@ -475,7 +475,7 @@ int | [damage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) 
 int | [life](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) | 
 int | [sacrifice_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sacrifice_value) | Favor for sacrificing alive. Halved when dead (health == 0).
 int | [blood_content](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) | 
-int | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
+[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
 map&lt;int, [Animation](#Animation)&gt; | [animations](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) | 
 int | [properties_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=properties_flags) | 
 int | [default_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_flags) | 
@@ -1808,8 +1808,8 @@ int | [green](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=green) |
 int | [blue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blue) | 
 bool | [permanent](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=permanent) | 
 bool | [invisible](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invisible) | 
-int | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
-bool | [set_texture(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) | 
+[TEXTURE](#TEXTURE) | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
+bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) | 
 
 ### ParticleEmitterInfo
 
@@ -2967,7 +2967,7 @@ Type | Name | Description
 ---- | ---- | -----------
 bool | [activated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=activated) | 
 [ENT_TYPE](#ENT_TYPE) | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 
-int | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
+[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
 
 ### StateMemory
 
@@ -3102,7 +3102,7 @@ float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) |
 int | [text_length](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_length) | You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
-int | [special_texture_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_texture_id) | Used to draw buttons and stuff, default is -1 wich uses the buttons texture
+[TEXTURE](#TEXTURE) | [special_texture_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_texture_id) | Used to draw buttons and stuff, default is -1 wich uses the buttons texture
 span&lt;[Letter](#Letter)&gt; | [get_dest()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dest) | Returns refrence to the letter coordinates relative to the x,y position
 span&lt;[Letter](#Letter)&gt; | [get_source()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_source) | Returns refrence to the letter coordinates in the texture
 tuple&lt;float, float&gt; | [text_size()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=text_size) | {width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
@@ -3213,7 +3213,7 @@ Type | Name | Description
 string | [level_file](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_file) | Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
 int | [base_theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=base_theme) | Base [THEME](#THEME) to load enabled functions from, when no other theme is specified.
-map&lt;[DYNAMIC_TEXTURE](#DYNAMIC_TEXTURE), int&gt; | [textures](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) | Add TEXTUREs here to override different dynamic textures.
+map&lt;[DYNAMIC_TEXTURE](#DYNAMIC_TEXTURE), [TEXTURE](#TEXTURE)&gt; | [textures](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=textures) | Add TEXTUREs here to override different dynamic textures.
  | [override](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=override) | `override(THEME_OVERRIDE override, bool enabled)` To disable or enable theme functions using the base_theme.<br/>`override(THEME_OVERRIDE override, THEME theme)` To override a theme function with another theme.<br/>`override(THEME_OVERRIDE override, function func)` To override a theme function with a lua function.<br/> 
 nil | [pre(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre) | Set a callback to be called before this theme function.
 nil | [post(THEME_OVERRIDE index, function func_)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post) | Set a callback to be called after this theme function, to fix some changes it did for example.
@@ -3260,7 +3260,7 @@ float | [get_backlayer_light_level()](https://github.com/spelunky-fyi/overlunky/
 bool | [get_loop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_loop) | 
 int | [get_vault_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_vault_level) | 
 bool | [get_theme_flag(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_flag) | 
-int | [get_dynamic_texture(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dynamic_texture) | Add TEXTUREs to `textures` to override different dynamic textures easily.
+[TEXTURE](#TEXTURE) | [get_dynamic_texture(DYNAMIC_TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dynamic_texture) | Add [TEXTURE](#TEXTURE) s to `textures` map of the CustomTheme to override different dynamic textures easily.
 nil | [pre_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre_transition) | 
 int | [get_exit_room_y_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_exit_room_y_level) | 
 int | [get_shop_chance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_shop_chance) | 
@@ -3343,14 +3343,14 @@ nil | [spawn_effects()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 string | [get_level_file()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_level_file) | Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
 int | [get_theme_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_id) | Returns: [THEME](#THEME), or subtheme in CO
 int | [get_base_id()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_id) | Returns: [THEME](#THEME), or logical base [THEME](#THEME) for special levels (Abzu->Tide Pool etc)
-int | [get_floor_spreading_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type) | Returns: [ENT_TYPE](#ENT_TYPE) used for floor spreading (generic or one of the styled floors)
-int | [get_floor_spreading_type2()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type2) | Returns: [ENT_TYPE](#ENT_TYPE) used for floor spreading (stone or one of the styled floors)
+[ENT_TYPE](#ENT_TYPE) | [get_floor_spreading_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type) | Returns: [ENT_TYPE](#ENT_TYPE) used for floor spreading (generic or one of the styled floors)
+[ENT_TYPE](#ENT_TYPE) | [get_floor_spreading_type2()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_floor_spreading_type2) | Returns: [ENT_TYPE](#ENT_TYPE) used for floor spreading (stone or one of the styled floors)
 bool | [get_transition_styled_floor()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_transition_styled_floor) | Returns: true if transition should use styled floor
 int | [get_transition_floor_modifier()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_transition_floor_modifier) | Determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to)<br/>Returns: 85 by default, except for: olmec: 15, cog: 23
-int | [get_transition_styled_floor_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_transition_styled_floor_type) | Returns: [ENT_TYPE](#ENT_TYPE) used for the transition floor
-int | [get_backwall_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_backwall_type) | Returns: [ENT_TYPE](#ENT_TYPE) used for the backwall (BG_LEVEL_BACKWALL by default)
-int | [get_border_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_border_type) | Returns: [ENT_TYPE](#ENT_TYPE) to use for the border tiles
-int | [get_critter_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_critter_type) | Returns: [ENT_TYPE](#ENT_TYPE) for theme specific critter
+[ENT_TYPE](#ENT_TYPE) | [get_transition_styled_floor_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_transition_styled_floor_type) | Returns: [ENT_TYPE](#ENT_TYPE) used for the transition floor
+[ENT_TYPE](#ENT_TYPE) | [get_backwall_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_backwall_type) | Returns: [ENT_TYPE](#ENT_TYPE) used for the backwall (BG_LEVEL_BACKWALL by default)
+[ENT_TYPE](#ENT_TYPE) | [get_border_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_border_type) | Returns: [ENT_TYPE](#ENT_TYPE) to use for the border tiles
+[ENT_TYPE](#ENT_TYPE) | [get_critter_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_critter_type) | Returns: [ENT_TYPE](#ENT_TYPE) for theme specific critter
 float | [get_liquid_gravity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquid_gravity) | Returns: gravity used to initialize liquid pools (-1..1)
 bool | [get_player_damage()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player_damage) | Returns: false to disable most player damage and the usage of bombs and ropes. Enabled in parts of base camp.
 bool | [get_explosion_soot()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_explosion_soot) | Returns: true if explosions should spawn background soot
@@ -3359,7 +3359,7 @@ float | [get_backlayer_light_level()](https://github.com/spelunky-fyi/overlunky/
 bool | [get_loop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_loop) | Returns: true if the loop rendering should be enabled (Combine with the right get_border_type)
 int | [get_vault_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_vault_level) | Returns: highest y-level a vault can spawn
 bool | [get_theme_flag(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_theme_flag) | Returns: allow_beehive or allow_leprechaun flag<br/>Params: index: 0 or 1
-int | [get_dynamic_texture(int texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dynamic_texture) | Returns: [TEXTURE](#TEXTURE) based on texture_id<br/>Params: [DYNAMIC_TEXTURE](#DYNAMIC_TEXTURE) texture_id
+[TEXTURE](#TEXTURE) | [get_dynamic_texture(DYNAMIC_TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_dynamic_texture) | Returns: [TEXTURE](#TEXTURE) based on texture_id<br/>Params: [DYNAMIC_TEXTURE](#DYNAMIC_TEXTURE) texture_id
 nil | [pre_transition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pre_transition) | Sets state.level_next, world_next and theme_next (or state.win_state) based on level number. Runs when exiting a level.
 int | [get_exit_room_y_level()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_exit_room_y_level) | Returns: usually state.height - 1. For special levels fixed heights are returned.
 int | [get_shop_chance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_shop_chance) | Returns: inverse shop chance

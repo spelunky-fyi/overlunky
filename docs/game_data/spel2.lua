@@ -2075,7 +2075,7 @@ do
 ---@class SelectPlayerSlot
     ---@field activated boolean
     ---@field character ENT_TYPE
-    ---@field texture integer
+    ---@field texture TEXTURE
 
 ---@class Items
     ---@field player_count integer
@@ -2441,7 +2441,7 @@ function PRNG:random(min, max) end
     ---@field life integer
     ---@field sacrifice_value integer @Favor for sacrificing alive. Halved when dead (health == 0).
     ---@field blood_content integer
-    ---@field texture integer
+    ---@field texture TEXTURE
     ---@field animations table<integer, Animation>
     ---@field properties_flags integer
     ---@field default_flags integer
@@ -4537,8 +4537,8 @@ function MovableBehavior:get_state_id() end
     ---@field blue integer
     ---@field permanent boolean
     ---@field invisible boolean
-    ---@field get_texture fun(self): integer
-    ---@field set_texture fun(self, texture_id: integer): boolean
+    ---@field get_texture fun(self): TEXTURE
+    ---@field set_texture fun(self, texture_id: TEXTURE): boolean
 
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
@@ -4600,14 +4600,14 @@ function MovableBehavior:get_state_id() end
     ---@field get_level_file fun(self): string @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     ---@field get_theme_id fun(self): integer @Returns: THEME, or subtheme in CO
     ---@field get_base_id fun(self): integer @Returns: THEME, or logical base THEME for special levels (Abzu->Tide Pool etc)
-    ---@field get_floor_spreading_type fun(self): integer @Returns: ENT_TYPE used for floor spreading (generic or one of the styled floors)
-    ---@field get_floor_spreading_type2 fun(self): integer @Returns: ENT_TYPE used for floor spreading (stone or one of the styled floors)
+    ---@field get_floor_spreading_type fun(self): ENT_TYPE @Returns: ENT_TYPE used for floor spreading (generic or one of the styled floors)
+    ---@field get_floor_spreading_type2 fun(self): ENT_TYPE @Returns: ENT_TYPE used for floor spreading (stone or one of the styled floors)
     ---@field get_transition_styled_floor fun(self): boolean @Returns: true if transition should use styled floor
     ---@field get_transition_floor_modifier fun(self): integer @Determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to)<br/>Returns: 85 by default, except for: olmec: 15, cog: 23
-    ---@field get_transition_styled_floor_type fun(self): integer @Returns: ENT_TYPE used for the transition floor
-    ---@field get_backwall_type fun(self): integer @Returns: ENT_TYPE used for the backwall (BG_LEVEL_BACKWALL by default)
-    ---@field get_border_type fun(self): integer @Returns: ENT_TYPE to use for the border tiles
-    ---@field get_critter_type fun(self): integer @Returns: ENT_TYPE for theme specific critter
+    ---@field get_transition_styled_floor_type fun(self): ENT_TYPE @Returns: ENT_TYPE used for the transition floor
+    ---@field get_backwall_type fun(self): ENT_TYPE @Returns: ENT_TYPE used for the backwall (BG_LEVEL_BACKWALL by default)
+    ---@field get_border_type fun(self): ENT_TYPE @Returns: ENT_TYPE to use for the border tiles
+    ---@field get_critter_type fun(self): ENT_TYPE @Returns: ENT_TYPE for theme specific critter
     ---@field get_liquid_gravity fun(self): number @Returns: gravity used to initialize liquid pools (-1..1)
     ---@field get_player_damage fun(self): boolean @Returns: false to disable most player damage and the usage of bombs and ropes. Enabled in parts of base camp.
     ---@field get_explosion_soot fun(self): boolean @Returns: true if explosions should spawn background soot
@@ -4616,7 +4616,7 @@ function MovableBehavior:get_state_id() end
     ---@field get_loop fun(self): boolean @Returns: true if the loop rendering should be enabled (Combine with the right get_border_type)
     ---@field get_vault_level fun(self): integer @Returns: highest y-level a vault can spawn
     ---@field get_theme_flag fun(self, index: integer): boolean @Returns: allow_beehive or allow_leprechaun flag<br/>Params: index: 0 or 1
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @Returns: TEXTURE based on texture_id<br/>Params: DYNAMIC_TEXTURE texture_id
+    ---@field get_dynamic_texture fun(self, texture_id: DYNAMIC_TEXTURE): TEXTURE @Returns: TEXTURE based on texture_id<br/>Params: DYNAMIC_TEXTURE texture_id
     ---@field pre_transition fun(self): nil @Sets state.level_next, world_next and theme_next (or state.win_state) based on level number. Runs when exiting a level.
     ---@field get_exit_room_y_level fun(self): integer @Returns: usually state.height - 1. For special levels fixed heights are returned.
     ---@field get_shop_chance fun(self): integer @Returns: inverse shop chance
@@ -4734,7 +4734,7 @@ function MovableBehavior:get_state_id() end
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
     ---@field theme integer @Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
     ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
-    ---@field textures table<DYNAMIC_TEXTURE, integer> @Add TEXTUREs here to override different dynamic textures.
+    ---@field textures table<DYNAMIC_TEXTURE, TEXTURE> @Add TEXTUREs here to override different dynamic textures.
     ---@field override any @theme_override
     ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called before this theme function.
     ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called after this theme function, to fix some changes it did for example.
@@ -4781,7 +4781,7 @@ function MovableBehavior:get_state_id() end
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
     ---@field get_theme_flag fun(self, index: integer): boolean
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @Add TEXTUREs to `textures` to override different dynamic textures easily.
+    ---@field get_dynamic_texture fun(self, texture_id: DYNAMIC_TEXTURE): TEXTURE @Add TEXTURE s to `textures` map of the CustomTheme to override different dynamic textures easily.
     ---@field pre_transition fun(self): nil
     ---@field get_exit_room_y_level fun(self): integer
     ---@field get_shop_chance fun(self): integer
@@ -5423,7 +5423,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field text_length integer @You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
     ---@field width number
     ---@field height number
-    ---@field special_texture_id integer @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
+    ---@field special_texture_id TEXTURE @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
     ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
     ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
