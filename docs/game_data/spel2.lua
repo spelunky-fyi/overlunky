@@ -2431,7 +2431,7 @@ function PRNG:random(min, max) end
     ---@field hitboxy number
     ---@field draw_depth integer
     ---@field collision2_mask integer @MASK, will only call collision2 when colliding with entities that match this mask.
-    ---@field collision_mask integer @MASK used for collision with floors.
+    ---@field collision_mask integer @MASK used for collision with floors, walls etc.
     ---@field friction number
     ---@field elasticity number
     ---@field weight number
