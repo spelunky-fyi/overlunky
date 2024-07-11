@@ -53,6 +53,9 @@ replace_table = {
     "constexpr": "",
     "const": "",
     "static": "",
+    "[[nodiscard]]": "",
+    "[[maybe_unused]]": "",
+    "inline": "",
     # special
     "variadic_args va": "ENT_TYPE, ENT_TYPE...",
     "EmittedParticlesInfo": "array<Particle>",
