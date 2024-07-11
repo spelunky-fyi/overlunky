@@ -772,12 +772,22 @@ void Door::unlock(bool unlock)
         if (ent_type == entrence_door || ent_type == entrence_door + 1 || ent_type == entrence_door + 3)
         {
             static const ENT_TYPE door_bg = to_id("ENT_TYPE_BG_DOOR");
-            const auto state_layer = state.layer(this->layer);
-            for (const auto& item : state_layer->entities_overlaping_grid[static_cast<int>(y)][static_cast<int>(x)].entities())
+            const auto entities = state.layer(this->layer)->get_entities_overlapping_grid_at(x, y);
+            if (entities == nullptr)
+                return;
+            for (const auto& item : entities->entities())
             {
+                // technically for exit door the bg is uid + 3, but it feels wrong to do it that way
                 if (item->type->id == door_bg)
                 {
                     item->animation_frame = unlock ? 1 : 0;
+                    // for Hundun door
+                    // there is locked door sprite in both textures, so we don't mess with it and just use animation_frame when locking back up
+                    // added example in the API doc on how to do the texture correctly for the other variant
+                    if (unlock && item->get_texture() == 202) // TEXTURE.DATA_TEXTURES_DECO_EGGPLANT_0
+                    {
+                        item->set_texture(200); // TEXTURE.DATA_TEXTURES_FLOOR_SUNKEN_3
+                    }
                     break;
                 }
             }
