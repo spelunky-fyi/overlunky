@@ -4,6 +4,7 @@
 #include "containers/custom_map.hpp"
 #include "containers/custom_vector.hpp"
 #include "layer.hpp"
+#include "math.h" // for AABB, Vec2
 #include "render_api.hpp"
 #include <array>
 #include <cstdint>
@@ -137,17 +138,30 @@ struct Camera
     float shake_multiplier_x; // set to 0 to eliminate horizontal shake; negative inverts direction
     float shake_multiplier_y; // set to 0 to eliminate vertical shake; negative inverts direction
     bool uniform_shake;       // if false, the shake gets randomized a bit
-    uint8_t padding1;
-    uint8_t padding2;
-    uint8_t padding3;
-    int32_t focused_entity_uid; // if set to -1, you have free control over camera focus through focus_x, focus_y
-    uint32_t freeze_timer;      // if > 0, disables camera movement for this amount of frames
-    uint32_t unknown4;
+    uint8_t padding1[3];
+    /// if set to -1, you have free control over camera focus through focus_x, focus_y
+    int32_t focused_entity_uid;
+    /// amount of frames to freeze camera in place and move to the peek_layer
+    /// during the peek you can freely set camera position no matter if focused_entity_uid is set to -1 or not
+    uint32_t peek_timer;
+    uint8_t peek_layer;
+    uint8_t padding2[3];
+
     /// This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
     float inertia;
     uint32_t unknown5;
-    uint32_t unknown6;
-    uint32_t unknown7;
+
+    AABB get_bounds() const
+    {
+        return AABB(bounds_left, bounds_top, bounds_right, bounds_bottom);
+    }
+    void set_bounds(const AABB& bounds)
+    {
+        bounds_left = bounds.left;
+        bounds_right = bounds.right;
+        bounds_bottom = bounds.bottom;
+        bounds_top = bounds.top;
+    }
 };
 
 struct JournalProgressStickerSlot
@@ -729,10 +743,10 @@ struct LiquidPhysicsEngine
     uint32_t* liquid_flags;                              // array
     int32_t unknown47a;                                  // size related for the array above
     int32_t unknown47b;                                  // padding
-    std::pair<float, float>* entity_coordinates;         // array
+    Vec2* entity_coordinates;                            // array
     int32_t unknown49a;                                  // size related for the array above
     int32_t unknown49b;                                  // padding
-    std::pair<float, float>* entity_velocities;          // array
+    Vec2* entity_velocities;                             // array
     int32_t unknown51a;                                  // size related for the array above
     int32_t unknown51b;                                  // padding
     std::pair<float, float>* unknown52;                  // not sure about the type, it's defenetly a 64bit
@@ -1026,7 +1040,7 @@ struct MultiLineTextRendering
     size_t* timer;                         // some struct? game increments this value and one at +0x40, seam to be related to rendering, touching just the first one freezes the game
     std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
     float x;                               // center of the text box?
-    float z;                               // center of the text box?
+    float y;                               // center of the text box?
 };
 
 struct EntityLookup

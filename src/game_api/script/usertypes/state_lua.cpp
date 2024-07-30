@@ -493,6 +493,10 @@ void register_usertypes(sol::state& lua)
     camera_type["uniform_shake"] = &Camera::uniform_shake;
     camera_type["focused_entity_uid"] = &Camera::focused_entity_uid;
     camera_type["inertia"] = &Camera::inertia;
+    camera_type["peek_timer"] = &Camera::peek_timer;
+    camera_type["peek_layer"] = &Camera::peek_layer;
+    camera_type["get_bounds"] = &Camera::get_bounds;
+    camera_type["set_bounds"] = &Camera::set_bounds;
 
     /// Can be accessed via global [online](#online)
     lua.new_usertype<Online>(

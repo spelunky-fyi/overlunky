@@ -361,8 +361,8 @@ struct State
     void zoom(float level) const;
     static void zoom_reset();
 
-    static std::pair<float, float> click_position(float x, float y);
-    static std::pair<float, float> screen_position(float x, float y);
+    static Vec2 click_position(float x, float y);
+    static Vec2 screen_position(float x, float y);
 
     uint32_t flags() const
     {
@@ -386,7 +386,7 @@ struct State
 
     static Entity* find(StateMemory* state, uint32_t uid);
 
-    static std::pair<float, float> get_camera_position();
+    static Vec2 get_camera_position();
     void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
@@ -405,7 +405,7 @@ void init_state_update_hook();
 void init_process_input_hook();
 void init_game_loop_hook();
 
-uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
+uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
 uint8_t enum_to_layer(const LAYER layer);
 
 uint32_t lowbias32(uint32_t x);

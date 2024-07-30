@@ -2270,8 +2270,12 @@ do
     ---@field shake_multiplier_x number
     ---@field shake_multiplier_y number
     ---@field uniform_shake boolean
-    ---@field focused_entity_uid integer
+    ---@field focused_entity_uid integer @if set to -1, you have free control over camera focus through focus_x, focus_y
     ---@field inertia number @This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
+    ---@field peek_timer integer @amount of frames to freeze camera in place and move to the peek_layer<br/>during the peek you can freely set camera position no matter if focused_entity_uid is set to -1 or not
+    ---@field peek_layer integer
+    ---@field get_bounds fun(self): AABB
+    ---@field set_bounds fun(self, bounds: AABB): nil
 
 ---@class Online
     ---@field online_players OnlinePlayer[] @size: 4
@@ -5453,11 +5457,12 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field ropes integer
     ---@field ankh boolean
     ---@field kapala boolean
-    ---@field kapala_blood integer
+    ---@field kapala_sprite SpritePosition
     ---@field poison boolean
     ---@field curse boolean
     ---@field elixir boolean
     ---@field crown ENT_TYPE @Powerup type or 0
+    ---@field powerup_sprites SpritePosition[] @size: 18
     ---@field item_count integer @Amount of generic pickup items at the bottom. Set to 0 to not draw them.
 
 ---@class HudElement
@@ -5480,16 +5485,38 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field udjat boolean
     ---@field money_total integer
     ---@field money_counter integer
-    ---@field time_total integer
-    ---@field time_level integer
+    ---@field time_total integer @in ms
+    ---@field time_level integer @in ms
     ---@field world_num integer
     ---@field level_num integer
+    ---@field angry_shopkeeper boolean
+    ---@field seed_shown boolean
     ---@field seed integer
     ---@field opacity number
+    ---@field roll_in number
     ---@field players HudPlayer[] @size: MAX_PLAYERS
     ---@field money HudMoney
+    ---@field money_increase_sparkles ParticleEmitterInfo
     ---@field timer HudElement
     ---@field level HudElement
+    ---@field clover_falling_apart_timer number
+    ---@field player_cursed_particles ParticleEmitterInfo[] @size: MAX_PLAYERS
+    ---@field player_poisoned_particles ParticleEmitterInfo[] @size: MAX_PLAYERS
+    ---@field player_highlight TextureRenderingInfo @For player related icons, they use the same TextureRendering, just offset while drawing
+    ---@field player_heart TextureRenderingInfo
+    ---@field player_ankh TextureRenderingInfo
+    ---@field kapala_icon TextureRenderingInfo
+    ---@field player_crown TextureRenderingInfo
+    ---@field player_bomb TextureRenderingInfo
+    ---@field player_rope TextureRenderingInfo
+    ---@field udjat_icon TextureRenderingInfo
+    ---@field money_and_time_highlight TextureRenderingInfo @Money and time use the same TextureRendering, just offset while drawing
+    ---@field dollar_icon TextureRenderingInfo
+    ---@field hourglass_icon TextureRenderingInfo
+    ---@field clover_icon TextureRenderingInfo
+    ---@field level_highlight TextureRenderingInfo
+    ---@field level_icon TextureRenderingInfo
+    ---@field seed_background TextureRenderingInfo
 
 ---@class Hud
     ---@field y number
@@ -5694,7 +5721,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field music SoundMeta
     ---@field torch_sound SoundMeta
 
----@class SpearDanglerAnimFrames
+---@class SpritePosition
     ---@field column integer
     ---@field row integer
 
@@ -5730,7 +5757,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field transfer_to_menu_id integer
     ---@field menu_text_opacity number
     ---@field spear_position number[] @size: 6
-    ---@field spear_dangler SpearDanglerAnimFrames[] @size: 6
+    ---@field spear_dangler SpritePosition[] @size: 6
     ---@field spear_dangle_momentum integer[] @size: 6
     ---@field spear_dangle_angle integer[] @size: 6
     ---@field play_scroll_descend_timer number

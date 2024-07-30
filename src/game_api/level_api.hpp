@@ -445,9 +445,7 @@ struct LevelGenRoomsMeta
 class SpecialLevelGeneration
 {
   public:
-    virtual ~SpecialLevelGeneration()
-    {
-    }
+    virtual ~SpecialLevelGeneration(){};
 
     // For bees, sets rooms to be behive rooms.
     virtual void set_rooms() = 0;
@@ -590,7 +588,7 @@ struct LevelGenSystem
     uint32_t unknown52;
 
     static std::pair<int, int> get_room_index(float x, float y);
-    static std::pair<float, float> get_room_pos(uint32_t x, uint32_t y);
+    static Vec2 get_room_pos(uint32_t x, uint32_t y);
     std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l) const;
     bool set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template);
 

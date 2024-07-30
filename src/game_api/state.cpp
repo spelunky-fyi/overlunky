@@ -64,10 +64,10 @@ void fix_liquid_out_of_bounds()
             for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
             {
                 auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
-                if (liquid_coordinates->second < 0                      // y < 0
-                    || liquid_coordinates->first < 0                    // x < 0
-                    || liquid_coordinates->first > g_level_max_x        // x > g_level_max_x
-                    || liquid_coordinates->second > g_level_max_y + 16) // y > g_level_max_y
+                if (liquid_coordinates->y < 0                      // y < 0
+                    || liquid_coordinates->x < 0                   // x < 0
+                    || liquid_coordinates->x > g_level_max_x       // x > g_level_max_x
+                    || liquid_coordinates->y > g_level_max_y + 16) // y > g_level_max_y
                 {
                     if (!*(it.physics_engine->unknown61 + i)) // just some bs
                         continue;
@@ -348,7 +348,7 @@ float get_zoom_level()
     return game_api->get_current_zoom();
 }
 
-std::pair<float, float> State::click_position(float x, float y)
+Vec2 State::click_position(float x, float y)
 {
     float cz = get_zoom_level();
     auto [cx, cy] = get_camera_position();
@@ -357,7 +357,7 @@ std::pair<float, float> State::click_position(float x, float y)
     return {rx, ry};
 }
 
-std::pair<float, float> State::screen_position(float x, float y)
+Vec2 State::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
     auto [cx, cy] = get_camera_position();
@@ -450,7 +450,7 @@ void State::darkmode(bool g)
     }
 }
 
-std::pair<float, float> State::get_camera_position()
+Vec2 State::get_camera_position()
 {
     static const auto addr = (float*)get_address("camera_position");
     auto cx = *addr;
@@ -531,7 +531,7 @@ void State::set_seed(uint32_t seed)
 SaveData* State::savedata()
 {
     auto gm = get_game_manager();
-    return gm->save_related->savedata.decode();
+    return gm->save_related->savedata.decode(); // wondering if it matters if it's local or not?
 }
 uint32_t lowbias32(uint32_t x)
 {
@@ -803,7 +803,7 @@ void init_game_loop_hook()
     }
 }
 
-uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position)
+uint8_t enum_to_layer(const LAYER layer, Vec2& player_position)
 {
     if (layer == LAYER::FRONT)
     {

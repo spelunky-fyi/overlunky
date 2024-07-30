@@ -498,11 +498,12 @@ int | [bombs](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs) |
 int | [ropes](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ropes) | 
 bool | [ankh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ankh) | 
 bool | [kapala](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala) | 
-int | [kapala_blood](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood) | 
+[SpritePosition](#SpritePosition) | [kapala_sprite](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_sprite) | 
 bool | [poison](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=poison) | 
 bool | [curse](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=curse) | 
 bool | [elixir](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elixir) | 
 [ENT_TYPE](#ENT_TYPE) | [crown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=crown) | [Powerup](#Powerup) type or 0
+array&lt;[SpritePosition](#SpritePosition), 18&gt; | [powerup_sprites](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=powerup_sprites) | 
 int | [item_count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_count) | Amount of generic pickup items at the bottom. Set to 0 to not draw them.
 
 ### Inventory
@@ -705,16 +706,38 @@ array&lt;[HudInventory](#HudInventory), MAX_PLAYERS&gt; | [inventory](https://gi
 bool | [udjat](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udjat) | 
 int | [money_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_total) | 
 int | [money_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_counter) | 
-int | [time_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) | 
-int | [time_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) | 
+int | [time_total](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_total) | in ms
+int | [time_level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=time_level) | in ms
 int | [world_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world_num) | 
 int | [level_num](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_num) | 
+bool | [angry_shopkeeper](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=angry_shopkeeper) | 
+bool | [seed_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_shown) | 
 int | [seed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed) | 
 float | [opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=opacity) | 
+float | [roll_in](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=roll_in) | 
 array&lt;[HudPlayer](#HudPlayer), MAX_PLAYERS&gt; | [players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=players) | 
 [HudMoney](#HudMoney) | [money](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money) | 
+[ParticleEmitterInfo](#ParticleEmitterInfo) | [money_increase_sparkles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_increase_sparkles) | 
 [HudElement](#HudElement) | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 [HudElement](#HudElement) | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) | 
+float | [clover_falling_apart_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clover_falling_apart_timer) | 
+array&lt;[ParticleEmitterInfo](#ParticleEmitterInfo), MAX_PLAYERS&gt; | [player_cursed_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_cursed_particles) | 
+array&lt;[ParticleEmitterInfo](#ParticleEmitterInfo), MAX_PLAYERS&gt; | [player_poisoned_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_poisoned_particles) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [player_highlight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_highlight) | For player related icons, they use the same TextureRendering, just offset while drawing
+[TextureRenderingInfo](#TextureRenderingInfo) | [player_heart](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_heart) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [player_ankh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_ankh) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [kapala_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_icon) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [player_crown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_crown) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [player_bomb](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_bomb) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [player_rope](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_rope) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [udjat_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udjat_icon) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [money_and_time_highlight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=money_and_time_highlight) | Money and time use the same TextureRendering, just offset while drawing
+[TextureRenderingInfo](#TextureRenderingInfo) | [dollar_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dollar_icon) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [hourglass_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hourglass_icon) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [clover_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clover_icon) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [level_highlight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_highlight) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [level_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level_icon) | 
+[TextureRenderingInfo](#TextureRenderingInfo) | [seed_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seed_background) | 
 
 ### HudElement
 
@@ -997,7 +1020,7 @@ Type | Name | Description
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
 
-### SpearDanglerAnimFrames
+### SpritePosition
 
 
 Type | Name | Description
@@ -2489,7 +2512,7 @@ int | [menu_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_id
 int | [transfer_to_menu_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=transfer_to_menu_id) | 
 float | [menu_text_opacity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=menu_text_opacity) | 
 array&lt;float, 6&gt; | [spear_position](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_position) | 
-array&lt;[SpearDanglerAnimFrames](#SpearDanglerAnimFrames), 6&gt; | [spear_dangler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler) | 
+array&lt;[SpritePosition](#SpritePosition), 6&gt; | [spear_dangler](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangler) | 
 array&lt;int, 6&gt; | [spear_dangle_momentum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangle_momentum) | 
 array&lt;int, 6&gt; | [spear_dangle_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spear_dangle_angle) | 
 float | [play_scroll_descend_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_scroll_descend_timer) | 
@@ -2837,8 +2860,12 @@ float | [shake_amplitude](https://github.com/spelunky-fyi/overlunky/search?l=Lua
 float | [shake_multiplier_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_x) | 
 float | [shake_multiplier_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shake_multiplier_y) | 
 bool | [uniform_shake](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uniform_shake) | 
-int | [focused_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) | 
+int | [focused_entity_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=focused_entity_uid) | if set to -1, you have free control over camera focus through focus_x, focus_y
 float | [inertia](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=inertia) | This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)
+int | [peek_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=peek_timer) | amount of frames to freeze camera in place and move to the peek_layer<br/>during the peek you can freely set camera position no matter if focused_entity_uid is set to -1 or not
+int | [peek_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=peek_layer) | 
+[AABB](#AABB) | [get_bounds()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bounds) | 
+nil | [set_bounds(AABB bounds)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_bounds) | 
 
 ### GameManager
 
