@@ -4258,7 +4258,7 @@
 </tr>
 <tr>
 <td>any</td>
-<td>set:find(any value)</td>
+<td>set:find(any key)</td>
 <td>Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable</td>
 </tr>
 <tr>
@@ -4273,13 +4273,13 @@
 </tr>
 <tr>
 <td>nil</td>
-<td>set:erase(any value)</td>
+<td>set:erase(any key)</td>
 <td>Removes element from set</td>
 </tr>
 <tr>
 <td>nil</td>
 <td>map:erase(any key)</td>
-<td>Removes element from map by key</td>
+<td>Removes element from map</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -4303,12 +4303,12 @@
 </tr>
 <tr>
 <td>nil</td>
-<td>set:insert(int order, any element)</td>
+<td>set:insert(int order, any key)</td>
 <td>The order param doesn&#39;t acutally matter and can be set to nil</td>
 </tr>
 <tr>
 <td>nil</td>
-<td>map:insert(any key, any value)</td>
+<td>map:insert(any key, any value)?</td>
 <td>unsure, probably easier to just use <code>map[key] = value</code></td>
 </tr>
 </tbody></table>
@@ -8983,6 +8983,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td>Metadata of the held item (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
 <tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=saved_pets_count">saved_pets_count</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mount_type">mount_type</a></td>
 <td>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
@@ -9970,11 +9975,6 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>Current pause state bitmask. Use custom <a href="#PAUSE_TYPE">PAUSE_TYPE</a>.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching <a href="#ON">ON</a> update callbacks, so can be set on the same callback you want to block at the latest. Vanilla <a href="#PAUSE">PAUSE</a> flags will be forwarded to state.pause, but use of vanilla <a href="#PAUSE">PAUSE</a> flags is discouraged and might not work with other <a href="#PauseAPI">PauseAPI</a> features.</td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause">pause</a></td>
-<td></td>
-</tr>
-<tr>
 <td><a href="#PAUSE_TYPE">PAUSE_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pause_type">pause_type</a></td>
 <td>Pause mask to toggle when using the <a href="#PauseAPI">PauseAPI</a> methods to set or get pause state.</td>
@@ -10175,6 +10175,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Quad">Quad</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(Vec2 off)</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Quad">Quad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset">offset(float off_x, float off_y)</a></td>
 <td></td>
 </tr>
@@ -10299,12 +10304,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td>optional&lt;<a href="#TEXTURE">TEXTURE</a>&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_second_texture">get_second_texture</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_second_texture">get_second_texture()</a></td>
 <td></td>
 </tr>
 <tr>
 <td>optional&lt;<a href="#TEXTURE">TEXTURE</a>&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_third_texture">get_third_texture</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_third_texture">get_third_texture()</a></td>
 <td></td>
 </tr>
 <tr>
@@ -10319,7 +10324,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_texture_num">set_texture_num(int texture_id)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_texture_num">set_texture_num(int num)</a></td>
 <td>Set the number of textures that may be used, need to have them set before for it to work</td>
 </tr>
 <tr>
@@ -10681,6 +10686,11 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, Vec2 p)</a></td>
+<td></td>
+</tr>
+<tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance_to">distance_to(Vec2 other)</a></td>
 <td>Just simple pythagoras theorem</td>
@@ -10795,13 +10805,13 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td></td>
+<td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=wantkeyboard">wantkeyboard</a></td>
 <td>True if anyone else (i.e. some input box, OL hotkey) is already capturing keyboard or reacted to this keypress and you probably shouldn&#39;t.<br/>Set this to true every GUIFRAME while you want to capture keyboard and disable UI key bindings and game keys. Won&#39;t affect UI or game keys on this frame though, that train has already sailed. Also see <a href="#Bucket">Bucket</a>::<a href="#Overlunky">Overlunky</a> for other ways to override key bindings.<br/>Do not set this to false, unless you want the player input to bleed through input fields.<br/></td>
 </tr>
 <tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keys">keys[ImGuiKey_COUNT]</a></td>
+<td>array&lt;bool, 652&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=keys">keys</a></td>
 <td>ZeroIndexArray<bool> of currently held keys, indexed by <a href="#KEY">KEY</a> &lt;= 0xFF<br/></td>
 </tr>
 <tr>
@@ -10840,12 +10850,12 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modifierdown">modifierdown</a></td>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=modifierdown">modifierdown(int chord)</a></td>
 <td>bool modifierdown(<a href="#KEY">KEY</a> keychord)<br/>Returns true if modifiers in chord are down, ignores other keys in chord.<br/></td>
 </tr>
 <tr>
-<td></td>
+<td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=wantmouse">wantmouse</a></td>
 <td>True if anyone else (i.e. hovering some window) is already capturing mouse and you probably shouldn&#39;t.<br/>Set this to true if you want to capture mouse and override UI mouse binding.<br/></td>
 </tr>
@@ -10855,23 +10865,23 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousedown">mousedown[5]</a></td>
+<td>array&lt;bool, 5&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousedown">mousedown</a></td>
 <td></td>
 </tr>
 <tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mouseclicked">mouseclicked[5]</a></td>
+<td>array&lt;bool, 5&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mouseclicked">mouseclicked</a></td>
 <td></td>
 </tr>
 <tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousedoubleclicked">mousedoubleclicked[5]</a></td>
+<td>array&lt;bool, 5&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousedoubleclicked">mousedoubleclicked</a></td>
 <td></td>
 </tr>
 <tr>
-<td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousereleased">mousereleased[5]</a></td>
+<td>array&lt;bool, 5&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mousereleased">mousereleased</a></td>
 <td></td>
 </tr>
 <tr>
@@ -10885,8 +10895,8 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gamepads">gamepads</a></td>
+<td><a href="#Gamepad">Gamepad</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=gamepads">gamepads(int index)</a></td>
 <td><a href="#Gamepad">Gamepad</a> gamepads(int index)<br/>This is the XInput index 1..4, might not be the same as the player slot.<br/></td>
 </tr>
 <tr>
@@ -11658,7 +11668,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
-<td>array&lt;int&gt;</td>
+<td>array&lt;int, 17&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_config">level_config</a></td>
 <td></td>
 </tr>
@@ -13457,7 +13467,7 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=opacity">opacity</a></td>
 <td></td>
 </tr>
@@ -14936,7 +14946,7 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td></td>
 </tr>
 <tr>
-<td>float</td>
+<td>string</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=constellation_text">constellation_text</a></td>
 <td></td>
 </tr>
@@ -16689,11 +16699,6 @@ You can just discard this handle if you do not need extended control anymore</p>
 </thead><tbody>
 <tr>
 <td>array&lt;int, MAX_PLAYERS&gt;</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=buttons">buttons</a></td>
-<td>Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in <a href="#ON">ON</a>.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.</td>
-</tr>
-<tr>
-<td>array&lt;int, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=input">input</a></td>
 <td>Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in <a href="#ON">ON</a>.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.</td>
 </tr>
@@ -16746,7 +16751,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=saved_pets_count">saved_pets_count</a></td>
-<td></td>
+<td>Only for the level transition, the actual number is held in player inventory</td>
 </tr>
 <tr>
 <td>array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, 4&gt;</td>
@@ -17650,7 +17655,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 </tr>
 </tbody></table>
 <h3 id='TextureDefinition'>TextureDefinition</h3>
-<p>Use <code>TextureDefinition.new()</code> to get a new instance to this and pass it to define_entity_texture.
+<p>Use <code>TextureDefinition.new()</code> to get a new instance to this and pass it to <a href="#define_texture">define_texture</a>.
 <code>width</code> and <code>height</code> always have to be the size of the image file. They should be divisible by <code>tile_width</code> and <code>tile_height</code> respectively.
 <code>tile_width</code> and <code>tile_height</code> define the size of a single tile, the image will automatically be divided into these tiles.
 Tiles are labeled in sequence starting at the top left, going right and down at the end of the image (you know, like sentences work in the English language). Use those numbers in <code>Entity::animation_frame</code>.
@@ -17906,19 +17911,24 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Theme index. Probably shouldn&#39;t collide with the vanilla ones. Purpose unknown.</td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=base_theme">base_theme</a></td>
-<td>Base <a href="#THEME">THEME</a> to load enabled functions from, when no other theme is specified.</td>
-</tr>
-<tr>
 <td>map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, <a href="#TEXTURE">TEXTURE</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=textures">textures</a></td>
 <td>Add TEXTUREs here to override different dynamic textures.</td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override">override</a></td>
-<td><code>override(THEME_OVERRIDE override, bool enabled)</code> To disable or enable theme functions using the base_theme.<br/><code>override(THEME_OVERRIDE override, THEME theme)</code> To override a theme function with another theme.<br/><code>override(THEME_OVERRIDE override, function func)</code> To override a theme function with a lua function.<br/></td>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override">override(THEME_OVERRIDE index, bool enabled_)</a></td>
+<td>To disable or enable theme functions using the base_theme.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override">override(THEME_OVERRIDE index, int theme_)</a></td>
+<td>To override a theme function with another theme.</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=override">override(THEME_OVERRIDE index, function func_)</a></td>
+<td>To override a theme function with a lua function.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -17929,6 +17939,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post">post(THEME_OVERRIDE index, function func_)</a></td>
 <td>Set a callback to be called after this theme function, to fix some changes it did for example.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=base_theme">base_theme</a></td>
+<td>Base <a href="#THEME">THEME</a> to load enabled functions from, when no other theme is specified.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -17986,8 +18001,8 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td></td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_feeling">add_feeling</a></td>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_special_feeling">add_special_feeling()</a></td>
 <td></td>
 </tr>
 <tr>
@@ -20908,7 +20923,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td></td>
 </tr>
 <tr>
-<td>span&lt;int&gt;</td>
+<td>vector&lt;int&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_items">get_items()</a></td>
 <td></td>
 </tr>
@@ -25585,11 +25600,6 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 </thead><tbody>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lit">lit</a></td>
-<td></td>
-</tr>
-<tr>
 <td><a href="#Illumination">Illumination</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=emitted_light">emitted_light</a></td>
 <td></td>
@@ -27485,8 +27495,8 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td></td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_cutscene">clear_cutscene</a></td>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clear_cutscene">clear_cutscene()</a></td>
 <td></td>
 </tr>
 <tr>
@@ -29140,7 +29150,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.CREDITS">ON.CREDITS</a></p>
 </blockquote>
 
-<p>Runs when entering the credits.<br/></p>
+<p>Runs when entering the credits screen.<br/></p>
 <h2 id='ON-SCORES'>ON.SCORES</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.SCORES">ON.SCORES</a></p>
@@ -32316,7 +32326,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.CREDITS">CREDITS</a></td>
 <td>ON::CREDITS</td>
-<td>Runs when entering the credits.<br/></td>
+<td>Runs when entering the credits screen.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.SCORES">SCORES</a></td>
