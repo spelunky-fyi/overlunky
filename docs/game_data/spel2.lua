@@ -2435,7 +2435,7 @@ function PRNG:random(min, max) end
     ---@field hitboxy number
     ---@field draw_depth integer
     ---@field collision2_mask integer @MASK, will only call collision2 when colliding with entities that match this mask.
-    ---@field collision_mask integer @MASK used for collision with floors.
+    ---@field collision_mask integer @MASK used for collision with floors, walls etc.
     ---@field friction number
     ---@field elasticity number
     ---@field weight number
@@ -5489,8 +5489,8 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field timer HudElement
     ---@field level HudElement
     ---@field clover_falling_apart_timer number
-    ---@field player_cursed_paricles ParticleEmitterInfo[] @size: MAX_PLAYERS
-    ---@field player_poisoned_paricles ParticleEmitterInfo[] @size: MAX_PLAYERS
+    ---@field player_cursed_particles ParticleEmitterInfo[] @size: MAX_PLAYERS
+    ---@field player_poisoned_particles ParticleEmitterInfo[] @size: MAX_PLAYERS
     ---@field player_highlight TextureRenderingInfo @For player related icons, they use the same TextureRendering, just offset while drawing
     ---@field player_heart TextureRenderingInfo
     ---@field player_ankh TextureRenderingInfo

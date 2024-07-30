@@ -462,7 +462,7 @@ float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitbo
 float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
 int | [collision2_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision2_mask) | [MASK](#MASK), will only call collision2 when colliding with entities that match this mask.
-int | [collision_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision_mask) | [MASK](#MASK) used for collision with floors.
+int | [collision_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision_mask) | [MASK](#MASK) used for collision with floors, walls etc.
 float | [friction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) | 
 float | [elasticity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) | 
 float | [weight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=weight) | 
@@ -719,8 +719,8 @@ array&lt;[HudPlayer](#HudPlayer), MAX_PLAYERS&gt; | [players](https://github.com
 [HudElement](#HudElement) | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 [HudElement](#HudElement) | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) | 
 float | [clover_falling_apart_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clover_falling_apart_timer) | 
-array&lt;[ParticleEmitterInfo](#ParticleEmitterInfo), MAX_PLAYERS&gt; | [player_cursed_paricles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_cursed_paricles) | 
-array&lt;[ParticleEmitterInfo](#ParticleEmitterInfo), MAX_PLAYERS&gt; | [player_poisoned_paricles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_poisoned_paricles) | 
+array&lt;[ParticleEmitterInfo](#ParticleEmitterInfo), MAX_PLAYERS&gt; | [player_cursed_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_cursed_particles) | 
+array&lt;[ParticleEmitterInfo](#ParticleEmitterInfo), MAX_PLAYERS&gt; | [player_poisoned_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_poisoned_particles) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [player_highlight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_highlight) | For player related icons, they use the same TextureRendering, just offset while drawing
 [TextureRenderingInfo](#TextureRenderingInfo) | [player_heart](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_heart) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [player_ankh](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_ankh) | 

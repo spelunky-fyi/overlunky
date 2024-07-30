@@ -947,8 +947,8 @@ void register_usertypes(sol::state& lua)
     huddata_type["timer"] = &HudData::timer;
     huddata_type["level"] = &HudData::level;
     huddata_type["clover_falling_apart_timer"] = &HudData::clover_falling_apart_timer;
-    huddata_type["player_cursed_paricles"] = &HudData::player_cursed_paricles;
-    huddata_type["player_poisoned_paricles"] = &HudData::player_poisoned_paricles;
+    huddata_type["player_cursed_particles"] = &HudData::player_cursed_particles;
+    huddata_type["player_poisoned_particles"] = &HudData::player_poisoned_particles;
 
     huddata_type["player_highlight"] = &HudData::player_highlight;
     huddata_type["player_heart"] = &HudData::player_heart;

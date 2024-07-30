@@ -529,8 +529,8 @@ struct HudData
     bool unknown48;
     // uint8_t unknown49[3]; //probably padding
     float unknown51;
-    std::array<ParticleEmitterInfo*, MAX_PLAYERS> player_cursed_paricles;
-    std::array<ParticleEmitterInfo*, MAX_PLAYERS> player_poisoned_paricles;
+    std::array<ParticleEmitterInfo*, MAX_PLAYERS> player_cursed_particles;
+    std::array<ParticleEmitterInfo*, MAX_PLAYERS> player_poisoned_particles;
 };
 // static_assert(sizeof(HudData) <= 0xa00);
 
