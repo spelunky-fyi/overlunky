@@ -1883,7 +1883,7 @@
                             <a href="#SpawnInfo" class="toc-h3 toc-link" data-title="SpawnInfo">SpawnInfo</a>
                           </li>
                           <li>
-                            <a href="#SpearDanglerAnimFrames" class="toc-h3 toc-link" data-title="SpearDanglerAnimFrames">SpearDanglerAnimFrames</a>
+                            <a href="#SpritePosition" class="toc-h3 toc-link" data-title="SpritePosition">SpritePosition</a>
                           </li>
                           <li>
                             <a href="#Triangle" class="toc-h3 toc-link" data-title="Triangle">Triangle</a>
@@ -8882,8 +8882,8 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala_blood">kapala_blood</a></td>
+<td><a href="#SpritePosition">SpritePosition</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala_sprite">kapala_sprite</a></td>
 <td></td>
 </tr>
 <tr>
@@ -8905,6 +8905,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=crown">crown</a></td>
 <td><a href="#Powerup">Powerup</a> type or 0</td>
+</tr>
+<tr>
+<td>array&lt;<a href="#SpritePosition">SpritePosition</a>, 18&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=powerup_sprites">powerup_sprites</a></td>
+<td></td>
 </tr>
 <tr>
 <td>int</td>
@@ -9579,12 +9584,12 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_total">time_total</a></td>
-<td></td>
+<td>in ms</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_level">time_level</a></td>
-<td></td>
+<td>in ms</td>
 </tr>
 <tr>
 <td>int</td>
@@ -9594,6 +9599,16 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_num">level_num</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=angry_shopkeeper">angry_shopkeeper</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed_shown">seed_shown</a></td>
 <td></td>
 </tr>
 <tr>
@@ -9607,6 +9622,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 <tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=roll_in">roll_in</a></td>
+<td></td>
+</tr>
+<tr>
 <td>array&lt;<a href="#HudPlayer">HudPlayer</a>, MAX_PLAYERS&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=players">players</a></td>
 <td></td>
@@ -9617,6 +9637,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 <tr>
+<td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money_increase_sparkles">money_increase_sparkles</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#HudElement">HudElement</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
 <td></td>
@@ -9624,6 +9649,96 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td><a href="#HudElement">HudElement</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level">level</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clover_falling_apart_timer">clover_falling_apart_timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#ParticleEmitterInfo">ParticleEmitterInfo</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_cursed_particles">player_cursed_particles</a></td>
+<td></td>
+</tr>
+<tr>
+<td>array&lt;<a href="#ParticleEmitterInfo">ParticleEmitterInfo</a>, MAX_PLAYERS&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_poisoned_particles">player_poisoned_particles</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_highlight">player_highlight</a></td>
+<td>For player related icons, they use the same TextureRendering, just offset while drawing</td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_heart">player_heart</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_ankh">player_ankh</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala_icon">kapala_icon</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_crown">player_crown</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_bomb">player_bomb</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=player_rope">player_rope</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udjat_icon">udjat_icon</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=money_and_time_highlight">money_and_time_highlight</a></td>
+<td>Money and time use the same TextureRendering, just offset while drawing</td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dollar_icon">dollar_icon</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hourglass_icon">hourglass_icon</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=clover_icon">clover_icon</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_highlight">level_highlight</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=level_icon">level_icon</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seed_background">seed_background</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -10518,7 +10633,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 </tbody></table>
-<h3 id='SpearDanglerAnimFrames'>SpearDanglerAnimFrames</h3>
+<h3 id='SpritePosition'>SpritePosition</h3>
 <table><thead>
 <tr>
 <th>Type</th>
@@ -15313,7 +15428,7 @@ Derived from <a href="#Screen">Screen</a> <a href="#ScreenCodeInput">ScreenCodeI
 <td></td>
 </tr>
 <tr>
-<td>array&lt;<a href="#SpearDanglerAnimFrames">SpearDanglerAnimFrames</a>, 6&gt;</td>
+<td>array&lt;<a href="#SpritePosition">SpritePosition</a>, 6&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spear_dangler">spear_dangler</a></td>
 <td></td>
 </tr>
@@ -16550,12 +16665,32 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=focused_entity_uid">focused_entity_uid</a></td>
-<td></td>
+<td>if set to -1, you have free control over camera focus through focus_x, focus_y</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=inertia">inertia</a></td>
 <td>This is a bad name, but it represents the camera tweening speed. [0..5] where 0=still, 1=default (move 20% of distance per frame), 5=max (move 5*20% or 100% aka instantly to destination per frame)</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=peek_timer">peek_timer</a></td>
+<td>amount of frames to freeze camera in place and move to the peek_layer<br/>during the peek you can freely set camera position no matter if focused_entity_uid is set to -1 or not</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=peek_layer">peek_layer</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#AABB">AABB</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_bounds">get_bounds()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_bounds">set_bounds(AABB bounds)</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='GameManager'>GameManager</h3>
