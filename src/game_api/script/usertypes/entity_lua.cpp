@@ -336,7 +336,7 @@ void register_usertypes(sol::state& lua)
     movable_type["set_position"] = &Movable::set_position;
     movable_type["process_input"] = &Movable::process_input;
     movable_type["cutscene"] = sol::readonly(&Movable::cutscene_behavior);
-    movable_type["clear_cutscene"] = [](Movable& movable)
+    movable_type["clear_cutscene"] = [](Movable& movable) -> void
     {
         delete movable.cutscene_behavior;
         movable.cutscene_behavior = nullptr;

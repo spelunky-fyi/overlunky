@@ -224,7 +224,7 @@ class Entity
 
     void set_enable_turning(bool enabled);
 
-    std::span<uint32_t> get_items();
+    std::vector<uint32_t> get_items();
 
     /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's

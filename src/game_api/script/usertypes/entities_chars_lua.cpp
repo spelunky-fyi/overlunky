@@ -68,6 +68,7 @@ void register_usertypes(sol::state& lua)
     inventory_type["time_of_death"] = &Inventory::time_of_death;
     inventory_type["held_item"] = &Inventory::held_item;
     inventory_type["held_item_metadata"] = &Inventory::held_item_metadata;
+    inventory_type["saved_pets_count"] = &Inventory::saved_pets_count;
     inventory_type["mount_type"] = &Inventory::mount_type;
     inventory_type["mount_metadata"] = &Inventory::mount_metadata;
     inventory_type["kills_level"] = &Inventory::kills_level;

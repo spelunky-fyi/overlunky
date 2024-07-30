@@ -37,7 +37,7 @@ struct Inventory
     /// Used to transfer information to transition/next level. Is not updated during a level
     /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     int16_t held_item_metadata;
-    uint8_t unknown5c; // padding?
+    uint8_t saved_pets_count;
 
     int8_t player_slot;
     /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
@@ -121,6 +121,7 @@ struct Items
     std::array<ENT_TYPE, 4> saved_pets;
     std::array<bool, 4> is_pet_cursed;
     std::array<bool, 4> is_pet_poisoned;
+    /// Only for the level transition, the actual number is held in player inventory
     uint8_t saved_pets_count;
 
     uint8_t player_count;

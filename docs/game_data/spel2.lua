@@ -2079,7 +2079,7 @@ do
 
 ---@class Items
     ---@field player_count integer
-    ---@field saved_pets_count integer
+    ---@field saved_pets_count integer @Only for the level transition, the actual number is held in player inventory
     ---@field saved_pets ENT_TYPE[] @size: 4 @Pet information for level transition
     ---@field is_pet_cursed boolean[] @size: 4
     ---@field is_pet_poisoned boolean[] @size: 4
@@ -2364,7 +2364,6 @@ do
     ---@field slide_position number
 
 ---@class GameProps
-    ---@field buttons integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input_previous integer[] @size: MAX_PLAYERS
     ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
@@ -2466,11 +2465,11 @@ function PRNG:random(min, max) end
     ---@field texture_num integer
     ---@field get_entity fun(self): Entity
     ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
-    ---@field get_second_texture TEXTURE?
-    ---@field get_third_texture TEXTURE?
+    ---@field get_second_texture fun(self): TEXTURE?
+    ---@field get_third_texture fun(self): TEXTURE?
     ---@field set_second_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_third_texture fun(self, texture_id: TEXTURE): boolean
-    ---@field set_texture_num fun(self, texture_id: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
+    ---@field set_texture_num fun(self, num: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
     ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -2669,7 +2668,7 @@ function Entity:destroy_recursive() end
     ---@field set_position fun(self, to_x: number, to_y: number): nil @Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
     ---@field process_input fun(self): nil
     ---@field cutscene CutsceneBehavior
-    ---@field clear_cutscene any @[](Movable&movable){deletemovable.cutscene_behavior
+    ---@field clear_cutscene fun(self): nil
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior @Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
@@ -2771,6 +2770,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field time_of_death integer @Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
     ---@field held_item ENT_TYPE @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field held_item_metadata integer @Metadata of the held item (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field saved_pets_count integer
     ---@field mount_type ENT_TYPE @Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field mount_metadata integer @Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field kills_level integer
@@ -4037,7 +4037,6 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field smoke2 ParticleEmitterInfo
 
 ---@class CookFire : Torch
-    ---@field lit any @&Torch::is_lit
     ---@field emitted_light Illumination
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
@@ -4733,11 +4732,10 @@ function MovableBehavior:get_state_id() end
 ---@class CustomTheme : ThemeInfo
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
     ---@field theme integer @Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
-    ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
     ---@field textures table<DYNAMIC_TEXTURE, TEXTURE> @Add TEXTUREs here to override different dynamic textures.
-    ---@field override any @theme_override
     ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called before this theme function.
     ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called after this theme function, to fix some changes it did for example.
+    ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
     ---@field reset_theme_flags fun(self): nil
     ---@field init_flags fun(self): nil
     ---@field init_level fun(self): nil
@@ -4749,7 +4747,7 @@ function MovableBehavior:get_state_id() end
     ---@field add_idol fun(self): nil
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
-    ---@field add_feeling any @&CustomTheme::add_feeling
+    ---@field add_special_feeling fun(self): nil
     ---@field spawn_level fun(self): nil
     ---@field spawn_border fun(self): nil
     ---@field post_process_level fun(self): nil
@@ -4789,6 +4787,22 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
     ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
+local CustomTheme = nil
+---To disable or enable theme functions using the base_theme.
+---@param index THEME_OVERRIDE
+---@param enabled_ boolean
+---@return nil
+function CustomTheme:override(index, enabled_) end
+---To override a theme function with another theme.
+---@param index THEME_OVERRIDE
+---@param theme_ integer
+---@return nil
+function CustomTheme:override(index, theme_) end
+---To override a theme function with a lua function.
+---@param index THEME_OVERRIDE
+---@param func_ function
+---@return nil
+function CustomTheme:override(index, func_) end
 
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
@@ -4814,7 +4828,7 @@ function MovableBehavior:get_state_id() end
     ---@field flags integer
     ---@field flags2 integer
     ---@field flags3 integer
-    ---@field level_config integer[]
+    ---@field level_config integer[] @size: 17
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
@@ -5138,8 +5152,8 @@ function GuiDrawContext:win_pushid(id) end
 ---@class ImGuiIO
     ---@field displaysize Vec2
     ---@field framerate number
-    ---@field wantkeyboard any @wantkeyboard
-    ---@field keys boolean[] @size: ImGuiKey_COUNT
+    ---@field wantkeyboard boolean
+    ---@field keys boolean[] @size: 652
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean
@@ -5147,8 +5161,8 @@ function GuiDrawContext:win_pushid(id) end
     ---@field keyshift boolean
     ---@field keyalt boolean
     ---@field keysuper boolean
-    ---@field modifierdown any @modifierdown
-    ---@field wantmouse any @wantmouse
+    ---@field modifierdown fun(self, chord: integer): boolean
+    ---@field wantmouse boolean
     ---@field mousepos Vec2
     ---@field mousedown boolean[] @size: 5
     ---@field mouseclicked boolean[] @size: 5
@@ -5156,7 +5170,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field mousereleased boolean[] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
-    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true
+    ---@field gamepads fun(self, index: integer): Gamepad
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
@@ -5384,7 +5398,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 function VanillaRenderContext:draw_world_poly_filled(points, color) end
 
 ---@class TextureRenderingInfo
-    ---@field new any @sol::constructors<TextureRenderingInfo()
+    ---@field new any @constructors<TextureRenderingInfo(), TextureRenderingInfo(TextureRenderingInfo)>{}
     ---@field x number
     ---@field y number
     ---@field destination_bottom_left_x number @destination is relative to the x,y centerpoint
@@ -5417,7 +5431,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field center fun(self): Vec2 @Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
 
 ---@class TextRenderingInfo
-    ---@field new any @sol::initializers(&TextRenderingInfo_ctor
+    ---@field new any @initializers(TextRenderingInfo_ctor, TextRenderingInfo_ctor2)
     ---@field x number
     ---@field y number
     ---@field text_length integer @You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
@@ -5496,10 +5510,19 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 ---@class Vec2
     ---@field x number
     ---@field y number
-    ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
     ---@field distance_to fun(self, other: Vec2): number @Just simple pythagoras theorem
     ---@field set fun(self, other: Vec2): Vec2
     ---@field split fun(self): number, number
+local Vec2 = nil
+---@param angle number
+---@param px number
+---@param py number
+---@return Vec2
+function Vec2:rotate(angle, px, py) end
+---@param angle number
+---@param p Vec2
+---@return Vec2
+function Vec2:rotate(angle, p) end
 
 ---@class AABB
     ---@field left number
@@ -5577,13 +5600,19 @@ function Triangle:is_point_inside(x, y, epsilon) end
     ---@field top_left_x number
     ---@field top_left_y number
     ---@field get_AABB fun(self): AABB @Returns the max/min values of the Quad
-    ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad @Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
     ---@field set fun(self, other: Quad): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 local Quad = nil
+---@param off Vec2
+---@return Quad
+function Quad:offset(off) end
+---@param off_x number
+---@param off_y number
+---@return Quad
+function Quad:offset(off_x, off_y) end
 ---Check if point lies inside of triangle
 ---Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
 ---@param p Vec2
@@ -5953,7 +5982,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
-    ---@field constellation_text number
+    ---@field constellation_text string
     ---@field explosion_and_loop SoundMeta
     ---@field music SoundMeta
 
@@ -6022,7 +6051,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field entire_book TextureRenderingInfo
     ---@field fade_timer integer
     ---@field page_timer integer
-    ---@field opacity integer
+    ---@field opacity number
     ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ---@class JournalPage
@@ -6447,7 +6476,6 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
 
 ---@class PauseAPI
     ---@field pause PAUSE_TYPE @Current pause state bitmask. Use custom PAUSE_TYPE.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching ON update callbacks, so can be set on the same callback you want to block at the latest. Vanilla PAUSE flags will be forwarded to state.pause, but use of vanilla PAUSE flags is discouraged and might not work with other PauseAPI features.
-    ---@field pause any @sol::property(&PauseAPI::get_pause
     ---@field pause_type PAUSE_TYPE @Pause mask to toggle when using the PauseAPI methods to set or get pause state.
     ---@field pause_trigger PAUSE_TRIGGER @Bitmask for conditions when the current `pause_type` should be automatically enabled in `pause`, can have multiple conditions.
     ---@field pause_screen PAUSE_SCREEN @Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
@@ -11450,12 +11478,10 @@ YANG = {
 ---@alias YANG integer
 local MAX_PLAYERS = 4
 
----@alias in_port_t number
 ---@class Logic
 
 ---@alias OnlinePlayerShort any
 ---@alias UdpServer any
----@alias Texture any
 ---@alias SpearDanglerAnimFrames any
 ---@alias OnlineLobbyScreenPlayer any
 ---@alias SoundCallbackFunction function

@@ -5,6 +5,7 @@
 
 #include "aliases.hpp"
 #include "color.hpp"
+#include "script/sol_helper.hpp" // for self_return
 
 namespace NColor
 {
@@ -43,9 +44,9 @@ void register_usertypes(sol::state& lua)
     color_type["fuchsia"] = &Color::fuchsia;
     color_type["purple"] = &Color::purple;
     color_type["get_rgba"] = &Color::get_rgba;
-    color_type["set_rgba"] = &Color::set_rgba;
+    color_type["set_rgba"] = self_return<&Color::set_rgba>();
     color_type["get_ucolor"] = &Color::get_ucolor;
-    color_type["set_ucolor"] = &Color::set_ucolor;
-    color_type["set"] = &Color::set;
+    color_type["set_ucolor"] = self_return<&Color::set_ucolor>();
+    color_type["set"] = self_return<&Color::set>();
 }
 } // namespace NColor

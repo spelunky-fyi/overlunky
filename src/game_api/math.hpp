@@ -21,7 +21,7 @@ struct Vec2
     /// NoDoc
     Vec2(const ImVec2&) noexcept;
 
-    Vec2& rotate(float angle, float px, float py) noexcept
+    Vec2& rotate(float angle, float px, float py)
     {
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
@@ -34,6 +34,10 @@ struct Vec2
         *this += p;
         return *this;
     }
+    Vec2& rotate(float angle, const Vec2& p)
+    {
+        return rotate(angle, p.x, p.y);
+    }
     /// Just simple pythagoras theorem
     float distance_to(const Vec2 other) const noexcept
     {
@@ -41,7 +45,7 @@ struct Vec2
         diff *= diff; // pow
         return (float)std::sqrt(diff.x + diff.y);
     }
-    Vec2& set(const Vec2& other) noexcept
+    Vec2& set(const Vec2& other)
     {
         *this = other;
         return *this;
@@ -177,7 +181,7 @@ struct AABB
     }
 
     /// Fixes the AABB if any of the sides have negative length
-    AABB& abs() noexcept
+    AABB& abs()
     {
         if (left > right)
             std::swap(left, right);
@@ -188,13 +192,13 @@ struct AABB
 
     /// Grows or shrinks the AABB by the given amount in all directions.
     /// If `amount < 0` and `abs(amount) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
-    AABB& extrude(float amount) noexcept
+    AABB& extrude(float amount)
     {
         return extrude(amount, amount);
     }
     /// Grows or shrinks the AABB by the given amount in each direction.
     /// If `amount_x/y < 0` and `abs(amount_x/y) > right/top - left/bottom` the respective dimension of the AABB will become `0`.
-    AABB& extrude(float amount_x, float amount_y) noexcept
+    AABB& extrude(float amount_x, float amount_y)
     {
         left -= amount_x;
         right += amount_x;
@@ -214,7 +218,7 @@ struct AABB
         return *this;
     }
     /// Offsets the AABB by the given offset.
-    AABB& offset(float off_x, float off_y) noexcept
+    AABB& offset(float off_x, float off_y)
     {
         left += off_x;
         bottom += off_y;
@@ -276,7 +280,7 @@ struct AABB
 
         return false;
     }
-    AABB& set(const AABB& other) noexcept
+    AABB& set(const AABB& other)
     {
         *this = other;
         return *this;
@@ -305,14 +309,14 @@ struct Triangle
     Triangle(float ax, float ay, float bx, float by, float cx, float cy) noexcept
         : A(ax, ay), B(bx, by), C(cx, cy){};
 
-    Triangle& offset(const Vec2& off) noexcept
+    Triangle& offset(const Vec2& off)
     {
         A += off;
         B += off;
         C += off;
         return *this;
     }
-    Triangle& offset(float x, float y) noexcept
+    Triangle& offset(float x, float y)
     {
         return offset({x, y});
     }
@@ -330,7 +334,7 @@ struct Triangle
     }
     Triangle& operator=(const Triangle& a) = default;
     /// Rotate triangle by an angle, the px/py are just coordinates, not offset from the center
-    Triangle& rotate(float angle, float px, float py) noexcept
+    Triangle& rotate(float angle, float px, float py)
     {
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
@@ -367,7 +371,7 @@ struct Triangle
         float a_cab = std::abs(std::atan2(ab.y * ac.x - ab.x * ac.y, ab.x * ac.x + ab.y * ac.y));
         return {a_abc, a_cab, a_bca};
     }
-    Triangle& scale(float scale) noexcept
+    Triangle& scale(float scale)
     {
         Vec2 centroid = center();
         A = (A - centroid) * scale + centroid;
@@ -392,7 +396,7 @@ struct Triangle
     {
         return is_point_inside(Vec2{x, y}, epsilon);
     }
-    Triangle& set(const Triangle& other) noexcept
+    Triangle& set(const Triangle& other)
     {
         *this = other;
         return *this;
@@ -442,8 +446,11 @@ struct Quad
         result.bottom = std::min({bottom_left_y, bottom_right_y, top_right_y, top_left_y});
         return result;
     }
-
-    Quad& offset(float off_x, float off_y) noexcept
+    Quad& offset(const Vec2& vec)
+    {
+        return offset(vec.x, vec.y);
+    }
+    Quad& offset(float off_x, float off_y)
     {
         bottom_left_x += off_x;
         bottom_right_x += off_x;
@@ -478,7 +485,7 @@ struct Quad
     }
 
     /// Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
-    Quad& rotate(float angle, float px, float py) noexcept
+    Quad& rotate(float angle, float px, float py)
     {
         const float sin_a{std::sin(angle)};
         const float cos_a{std::cos(angle)};
@@ -502,7 +509,7 @@ struct Quad
         return *this;
     }
 
-    Quad& flip_horizontally() noexcept
+    Quad& flip_horizontally()
     {
         std::swap(top_left_x, top_right_x);
         std::swap(top_left_y, top_right_y);
@@ -512,7 +519,7 @@ struct Quad
         return *this;
     }
 
-    Quad& flip_vertically() noexcept
+    Quad& flip_vertically()
     {
         std::swap(top_left_x, bottom_left_x);
         std::swap(top_left_y, bottom_left_y);
@@ -535,7 +542,7 @@ struct Quad
     {
         return is_point_inside(Vec2{x, y}, epsilon);
     }
-    Quad& set(const Quad& other) noexcept
+    Quad& set(const Quad& other)
     {
         *this = other;
         return *this;
@@ -548,6 +555,8 @@ struct Quad
     /// Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
     bool is_point_inside_quad(Vec2 p, std::optional<float> epsilon);
     bool is_point_inside_quad(float x, float y, std::optional<float> epsilon);
+    Quad& offset_quad(const Vec2& off);
+    Quad& offset_quad(float off_x, float off_y);
     */
 
     /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left

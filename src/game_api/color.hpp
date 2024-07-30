@@ -129,7 +129,7 @@ struct Color
         return {toRGB(r), toRGB(g), toRGB(b), toRGB(a)};
     }
     /// Changes color based on given RGBA colors in 0..255 range
-    Color& set_rgba(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha) noexcept
+    Color& set_rgba(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
     {
         r = red / 255.0f;
         g = green / 255.0f;
@@ -143,7 +143,7 @@ struct Color
         return (toRGB(a) << 24) + (toRGB(b) << 16) + (toRGB(g) << 8) + (toRGB(r));
     }
     /// Changes color based on given uColor
-    Color& set_ucolor(const uColor color) noexcept
+    Color& set_ucolor(const uColor color)
     {
         uint8_t red = color & 0xFF;
         uint8_t green = (color >> 8U) & 0xFF;
@@ -153,7 +153,7 @@ struct Color
     }
 
     /// Copies the values of different Color to this one
-    Color& set(Color& other) noexcept
+    Color& set(Color& other)
     {
         *this = other;
         return *this;
