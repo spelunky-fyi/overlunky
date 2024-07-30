@@ -242,8 +242,8 @@ class CustomTheme : public ThemeInfo
 
     std::map<THEME_OVERRIDE, std::unique_ptr<ThemeOverride>> overrides;
     /// Add TEXTUREs here to override different dynamic textures.
-    std::map<DYNAMIC_TEXTURE, uint32_t> textures;
-
+    std::map<DYNAMIC_TEXTURE, TEXTURE> textures;
+    /// To disable or enable theme functions using the base_theme.
     void override(THEME_OVERRIDE index, bool enabled_)
     {
         if (overrides.find(index) == overrides.end())
@@ -251,7 +251,7 @@ class CustomTheme : public ThemeInfo
         else
             overrides[index]->enabled = enabled_;
     }
-
+    /// To override a theme function with another theme.
     void override(THEME_OVERRIDE index, uint8_t theme_)
     {
         if (overrides.find(index) == overrides.end())
@@ -259,7 +259,7 @@ class CustomTheme : public ThemeInfo
         else
             overrides[index]->theme = theme_;
     }
-
+    /// To override a theme function with a lua function.
     void override(THEME_OVERRIDE index, sol::function func_)
     {
         if (overrides.find(index) == overrides.end())
@@ -892,15 +892,15 @@ class CustomTheme : public ThemeInfo
         return allow_leprechaun;
     }
 
-    /// Add TEXTUREs to `textures` to override different dynamic textures easily.
-    uint32_t get_dynamic_texture(int32_t texture_id)
+    /// Add TEXTURE s to `textures` map of the CustomTheme to override different dynamic textures easily.
+    TEXTURE get_dynamic_texture(DYNAMIC_TEXTURE texture_id)
     {
         auto index = THEME_OVERRIDE::TEXTURE_DYNAMIC;
-        uint32_t ret = 0;
+        TEXTURE ret = 0;
         run_pre_func<std::monostate>(index, texture_id);
-        if (textures.find((DYNAMIC_TEXTURE)texture_id) != textures.end())
+        if (auto it = textures.find(texture_id); it != textures.end())
         {
-            ret = textures[(DYNAMIC_TEXTURE)texture_id];
+            ret = it->second;
         }
         else if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index, texture_id).value_or(ret);
@@ -1237,7 +1237,7 @@ void register_usertypes(sol::state& lua)
     themeinfo_type["spawn_extra"] = &ThemeInfo::spawn_extra;
     themeinfo_type["do_procedural_spawn"] = &ThemeInfo::do_procedural_spawn;
 
-    auto theme_override = sol::overload(
+    auto override = sol::overload(
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, bool)>(&CustomTheme::override),
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, uint8_t)>(&CustomTheme::override),
         static_cast<void (CustomTheme::*)(THEME_OVERRIDE, sol::function)>(&CustomTheme::override));
@@ -1246,11 +1246,12 @@ void register_usertypes(sol::state& lua)
     auto customtheme_type = lua.new_usertype<CustomTheme>("CustomTheme", sol::constructors<CustomTheme(), CustomTheme(uint8_t, uint8_t), CustomTheme(uint8_t, uint8_t, bool)>(), sol::base_classes, sol::bases<ThemeInfo>());
     customtheme_type["level_file"] = &CustomTheme::level_file;
     customtheme_type["theme"] = &CustomTheme::theme;
+    // NoDoc
     customtheme_type["base_theme"] = sol::property([](CustomTheme& ct) -> uint8_t
                                                    {
-                          if (ct.base_theme < UINT8_MAX)
-                              return ct.base_theme + 1;
-                          return UINT8_MAX; },
+                                                       if (ct.base_theme < UINT8_MAX)
+                                                           return ct.base_theme + 1;
+                                                       return UINT8_MAX; },
                                                    [](CustomTheme& ct, uint8_t bt)
                                                    {
                                                        if (bt > 0 && bt < UINT8_MAX)
@@ -1259,11 +1260,12 @@ void register_usertypes(sol::state& lua)
                                                            ct.base_theme = 0;
                                                    });
     customtheme_type["textures"] = &CustomTheme::textures;
-    customtheme_type["override"] = theme_override;
+    customtheme_type["override"] = override;
     customtheme_type["pre"] = &CustomTheme::pre;
     customtheme_type["post"] = &CustomTheme::post;
 
     /*
+    customtheme_type["base_theme"] = &CustomTheme::base_theme;
     customtheme_type["reset_theme_flags"] = &CustomTheme::reset_theme_flags;
     customtheme_type["init_flags"] = &CustomTheme::init_flags;
     customtheme_type["init_level"] = &CustomTheme::init_level;
@@ -1275,7 +1277,7 @@ void register_usertypes(sol::state& lua)
     customtheme_type["add_idol"] = &CustomTheme::add_idol;
     customtheme_type["add_vault"] = &CustomTheme::add_vault;
     customtheme_type["add_coffin"] = &CustomTheme::add_coffin;
-    customtheme_type["add_feeling"] = &CustomTheme::add_feeling;
+    customtheme_type["add_special_feeling"] = &CustomTheme::add_special_feeling;
     customtheme_type["spawn_level"] = &CustomTheme::spawn_level;
     customtheme_type["spawn_border"] = &CustomTheme::spawn_border;
     customtheme_type["post_process_level"] = &CustomTheme::post_process_level;
@@ -1315,13 +1317,6 @@ void register_usertypes(sol::state& lua)
     customtheme_type["spawn_decoration2"] = &CustomTheme::spawn_decoration2;
     customtheme_type["spawn_extra"] = &CustomTheme::spawn_extra;
     customtheme_type["do_procedural_spawn"] = &CustomTheme::do_procedural_spawn;
-    */
-
-    /* CustomTheme
-    // override
-    // `override(THEME_OVERRIDE override, bool enabled)` To disable or enable theme functions using the base_theme.
-    // `override(THEME_OVERRIDE override, THEME theme)` To override a theme function with another theme.
-    // `override(THEME_OVERRIDE override, function func)` To override a theme function with a lua function.
     */
 
     lua.create_named_table("DYNAMIC_TEXTURE", "INVISIBLE", DYNAMIC_TEXTURE::INVISIBLE, "BACKGROUND", DYNAMIC_TEXTURE::BACKGROUND, "FLOOR", DYNAMIC_TEXTURE::FLOOR, "DOOR", DYNAMIC_TEXTURE::DOOR, "DOOR_LAYER", DYNAMIC_TEXTURE::DOOR_LAYER, "BACKGROUND_DECORATION", DYNAMIC_TEXTURE::BACKGROUND_DECORATION, "KALI_STATUE", DYNAMIC_TEXTURE::KALI_STATUE, "COFFIN", DYNAMIC_TEXTURE::COFFIN);
@@ -1373,9 +1368,6 @@ void register_usertypes(sol::state& lua)
     ///  kept for backward compatibility, don't use, check LevelGenSystem.exit_doors
     lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
 
-    auto level_config = [](LevelGenSystem& level_gen)
-    { return ZeroIndexArray<uint32_t>(level_gen.data->level_config); };
-
     /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect, used in StateMemory
     lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
@@ -1409,8 +1401,8 @@ void register_usertypes(sol::state& lua)
         "flags3",
         &LevelGenSystem::flags3,
         "level_config",
-        sol::property([&level_config](LevelGenSystem& lg) // -> array<int>
-                      { return level_config(lg) /**/; }));
+        sol::property([](LevelGenSystem& lg) // -> array<int, 17>
+                      { return ZeroIndexArray<uint32_t>(lg.data->level_config) /**/; }));
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.

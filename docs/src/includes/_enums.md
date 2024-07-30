@@ -143,7 +143,7 @@ Name | Data | Description
 
 > Search script examples for [DAMAGE_TYPE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=DAMAGE_TYPE)
 
-16bit bitmask used in [Movable](#Movable)::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+16bit bitmask used in [Movable](#Movable)::damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
 
 Name | Data | Description
 ---- | ---- | -----------
@@ -845,7 +845,7 @@ Name | Data | Description
 [DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.DEATH) | ON::DEATH | Runs when entering the death screen.<br/>
 [SPACESHIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPACESHIP) | ON::SPACESHIP | Runs when entering the olmecship cutscene after [Tiamat](#Tiamat).<br/>
 [WIN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.WIN) | ON::WIN | Runs when entering any winning cutscene, including the constellation.<br/>
-[CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CREDITS) | ON::CREDITS | Runs when entering the credits.<br/>
+[CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CREDITS) | ON::CREDITS | Runs when entering the credits screen.<br/>
 [SCORES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCORES) | ON::SCORES | Runs when entering the final score celebration screen of a normal or hard ending.<br/>
 [CONSTELLATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CONSTELLATION) | ON::CONSTELLATION | Runs when entering the turning into constellation cutscene after cosmic ocean.<br/>
 [RECAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RECAP) | ON::RECAP | Runs when entering the Dear Journal screen after final scores.<br/>

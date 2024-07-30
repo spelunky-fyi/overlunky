@@ -1698,13 +1698,6 @@ function clear_vanilla_sound_callback(id) end
 ---@param source_uid integer
 ---@return SoundMeta
 function play_sound(sound, source_uid) end
----Converts a color to int to be used in drawing functions. Use values from `0..255`.
----@param r integer
----@param g integer
----@param b integer
----@param a integer
----@return uColor
-function rgba(r, g, b, a) end
 ---Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
 ---@param size number
 ---@param text string
@@ -1907,6 +1900,21 @@ function pause() end
 ---Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
 ---@return Bucket
 function get_bucket() end
+---Converts a color to int to be used in drawing functions. Use values from `0..255`.
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return uColor
+function rgba(r, g, b, a) end
+---Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol
+---You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too.
+---Default apha value will be 0xFF, unless it's specified
+---Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
+---@param color_name string
+---@param alpha integer?
+---@return uColor
+function get_color(color_name, alpha) end
 
 --## Types
 do
@@ -2067,11 +2075,11 @@ do
 ---@class SelectPlayerSlot
     ---@field activated boolean
     ---@field character ENT_TYPE
-    ---@field texture integer
+    ---@field texture TEXTURE
 
 ---@class Items
     ---@field player_count integer
-    ---@field saved_pets_count integer
+    ---@field saved_pets_count integer @Only for the level transition, the actual number is held in player inventory
     ---@field saved_pets ENT_TYPE[] @size: 4 @Pet information for level transition
     ---@field is_pet_cursed boolean[] @size: 4
     ---@field is_pet_poisoned boolean[] @size: 4
@@ -2360,7 +2368,6 @@ do
     ---@field slide_position number
 
 ---@class GameProps
-    ---@field buttons integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input integer[] @size: MAX_PLAYERS @Used for player input and might be used for some menu inputs not found in buttons_menu. You can probably capture and edit this in ON.POST_PROCESS_INPUT. These are raw inputs, without things like autorun applied.
     ---@field input_previous integer[] @size: MAX_PLAYERS
     ---@field input_menu MENU_INPUT @Inputs used to control all the menus, separate from player inputs. You can probably capture and edit this in ON.POST_PROCESS_INPUT
@@ -2406,17 +2413,6 @@ function PRNG:random(i) end
 ---@return integer
 function PRNG:random(min, max) end
 
----@class Color
-    ---@field r number
-    ---@field g number
-    ---@field b number
-    ---@field a number
-    ---@field get_rgba fun(self): integer, integer, integer, integer @Returns RGBA colors in 0..255 range
-    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
-    ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
-    ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
-    ---@field set fun(self, other: Color): Color @Copies the values of different Color to this one
-
 ---@class Animation
     ---@field id integer
     ---@field first_tile integer
@@ -2448,7 +2444,7 @@ function PRNG:random(min, max) end
     ---@field life integer
     ---@field sacrifice_value integer @Favor for sacrificing alive. Halved when dead (health == 0).
     ---@field blood_content integer
-    ---@field texture integer
+    ---@field texture TEXTURE
     ---@field animations table<integer, Animation>
     ---@field properties_flags integer
     ---@field default_flags integer
@@ -2473,11 +2469,11 @@ function PRNG:random(min, max) end
     ---@field texture_num integer
     ---@field get_entity fun(self): Entity
     ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
-    ---@field get_second_texture TEXTURE?
-    ---@field get_third_texture TEXTURE?
+    ---@field get_second_texture fun(self): TEXTURE?
+    ---@field get_third_texture fun(self): TEXTURE?
     ---@field set_second_texture fun(self, texture_id: TEXTURE): boolean
     ---@field set_third_texture fun(self, texture_id: TEXTURE): boolean
-    ---@field set_texture_num fun(self, texture_id: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
+    ---@field set_texture_num fun(self, num: integer): boolean @Set the number of textures that may be used, need to have them set before for it to work
     ---@field set_pre_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: RENDER_INFO_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -2667,7 +2663,7 @@ function Entity:destroy_recursive() end
     ---@field standing_on fun(self): Entity
     ---@field collect_treasure fun(self, value: integer, treasure: ENT_TYPE): nil @Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
     ---@field is_on_fire fun(self): boolean
-    ---@field damage fun(self, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean @Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
+    ---@field damage fun(self, damage_dealer: Entity, damage_amount: integer, damage_flags: DAMAGE_TYPE, velocity: Vec2, unknown_damage_phase: integer, stun_amount: integer, iframes: integer, unknown_is_final: boolean): boolean @Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field get_all_behaviors fun(self): integer[] @Get all avaible behavior ids
     ---@field set_behavior fun(self, behavior_id: integer): boolean @Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
     ---@field get_behavior fun(self): integer @Get the current behavior id
@@ -2676,7 +2672,7 @@ function Entity:destroy_recursive() end
     ---@field set_position fun(self, to_x: number, to_y: number): nil @Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
     ---@field process_input fun(self): nil
     ---@field cutscene CutsceneBehavior
-    ---@field clear_cutscene any @[](Movable&movable){deletemovable.cutscene_behavior
+    ---@field clear_cutscene fun(self): nil
     ---@field get_base_behavior fun(self, state_id: integer): VanillaMovableBehavior @Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
     ---@field add_behavior fun(self, behavior: MovableBehavior): nil @Add a behavior to this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`
     ---@field clear_behavior fun(self, behavior: MovableBehavior): nil @Clear a specific behavior of this movable, can be either a `VanillaMovableBehavior` or a<br/>`CustomMovableBehavior`, a behavior with this behaviors `state_id` may be required to<br/>run this movables statemachine without crashing, so add a new one if you are not sure
@@ -2690,8 +2686,8 @@ function Entity:destroy_recursive() end
     ---@field set_post_stomp_damage fun(self, fun: fun(self: Movable): integer?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stomp_damage(Movable self)`
     ---@field set_pre_is_on_fire fun(self, fun: fun(self: Movable): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> is_on_fire(Movable self)`
     ---@field set_post_is_on_fire fun(self, fun: fun(self: Movable): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil is_on_fire(Movable self)`
-    ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-    ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer_uid: integer, damage_amount: integer, stun_time: integer, velocity_x: number, velocity_y: number, iframes: integer): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, integer damage_dealer_uid, integer damage_amount, integer stun_time, number velocity_x, number velocity_y, integer iframes)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
+    ---@field set_pre_damage fun(self, fun: fun(self: Movable, damage_dealer: Entity, damage_amount: integer, damage_flags: DAMAGE_TYPE, velocity: Vec2, unknown_damage_phase: integer, stun_amount: integer, iframes: integer, unknown_is_final: boolean): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> damage(Movable self, Entity damage_dealer, integer damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, integer unknown_damage_phase, integer stun_amount, integer iframes, boolean unknown_is_final)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
+    ---@field set_post_damage fun(self, fun: fun(self: Movable, damage_dealer: Entity, damage_amount: integer, damage_flags: DAMAGE_TYPE, velocity: Vec2, unknown_damage_phase: integer, stun_amount: integer, iframes: integer, unknown_is_final: boolean): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, Entity damage_dealer, integer damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, integer unknown_damage_phase, integer stun_amount, integer iframes, boolean unknown_is_final)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
     ---@field set_pre_on_hit fun(self, fun: fun(self: Movable, damage_dealer: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_hit(Movable self, Entity damage_dealer)`<br/>Virtual function docs:<br/>Hit by broken arrows etc that don't deal damage, calls on_damage with 0 damage.
     ---@field set_post_on_hit fun(self, fun: fun(self: Movable, damage_dealer: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_hit(Movable self, Entity damage_dealer)`<br/>Virtual function docs:<br/>Hit by broken arrows etc that don't deal damage, calls on_damage with 0 damage.
     ---@field set_pre_stun fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stun(Movable self, integer framecount)`
@@ -2778,6 +2774,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field time_of_death integer @Is set to state.time_total when player dies in coop (to determinate who should be first to re-spawn from coffin)
     ---@field held_item ENT_TYPE @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field held_item_metadata integer @Metadata of the held item (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field saved_pets_count integer
     ---@field mount_type ENT_TYPE @Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field mount_metadata integer @Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field kills_level integer
@@ -4044,7 +4041,6 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field smoke2 ParticleEmitterInfo
 
 ---@class CookFire : Torch
-    ---@field lit any @&Torch::is_lit
     ---@field emitted_light Illumination
     ---@field particles_smoke ParticleEmitterInfo
     ---@field particles_flames ParticleEmitterInfo
@@ -4544,8 +4540,8 @@ function MovableBehavior:get_state_id() end
     ---@field blue integer
     ---@field permanent boolean
     ---@field invisible boolean
-    ---@field get_texture fun(self): integer
-    ---@field set_texture fun(self, texture_id: integer): boolean
+    ---@field get_texture fun(self): TEXTURE
+    ---@field set_texture fun(self, texture_id: TEXTURE): boolean
 
 ---@class ParticleEmitterInfo
     ---@field particle_type ParticleDB
@@ -4607,14 +4603,14 @@ function MovableBehavior:get_state_id() end
     ---@field get_level_file fun(self): string @Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
     ---@field get_theme_id fun(self): integer @Returns: THEME, or subtheme in CO
     ---@field get_base_id fun(self): integer @Returns: THEME, or logical base THEME for special levels (Abzu->Tide Pool etc)
-    ---@field get_floor_spreading_type fun(self): integer @Returns: ENT_TYPE used for floor spreading (generic or one of the styled floors)
-    ---@field get_floor_spreading_type2 fun(self): integer @Returns: ENT_TYPE used for floor spreading (stone or one of the styled floors)
+    ---@field get_floor_spreading_type fun(self): ENT_TYPE @Returns: ENT_TYPE used for floor spreading (generic or one of the styled floors)
+    ---@field get_floor_spreading_type2 fun(self): ENT_TYPE @Returns: ENT_TYPE used for floor spreading (stone or one of the styled floors)
     ---@field get_transition_styled_floor fun(self): boolean @Returns: true if transition should use styled floor
     ---@field get_transition_floor_modifier fun(self): integer @Determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to)<br/>Returns: 85 by default, except for: olmec: 15, cog: 23
-    ---@field get_transition_styled_floor_type fun(self): integer @Returns: ENT_TYPE used for the transition floor
-    ---@field get_backwall_type fun(self): integer @Returns: ENT_TYPE used for the backwall (BG_LEVEL_BACKWALL by default)
-    ---@field get_border_type fun(self): integer @Returns: ENT_TYPE to use for the border tiles
-    ---@field get_critter_type fun(self): integer @Returns: ENT_TYPE for theme specific critter
+    ---@field get_transition_styled_floor_type fun(self): ENT_TYPE @Returns: ENT_TYPE used for the transition floor
+    ---@field get_backwall_type fun(self): ENT_TYPE @Returns: ENT_TYPE used for the backwall (BG_LEVEL_BACKWALL by default)
+    ---@field get_border_type fun(self): ENT_TYPE @Returns: ENT_TYPE to use for the border tiles
+    ---@field get_critter_type fun(self): ENT_TYPE @Returns: ENT_TYPE for theme specific critter
     ---@field get_liquid_gravity fun(self): number @Returns: gravity used to initialize liquid pools (-1..1)
     ---@field get_player_damage fun(self): boolean @Returns: false to disable most player damage and the usage of bombs and ropes. Enabled in parts of base camp.
     ---@field get_explosion_soot fun(self): boolean @Returns: true if explosions should spawn background soot
@@ -4623,7 +4619,7 @@ function MovableBehavior:get_state_id() end
     ---@field get_loop fun(self): boolean @Returns: true if the loop rendering should be enabled (Combine with the right get_border_type)
     ---@field get_vault_level fun(self): integer @Returns: highest y-level a vault can spawn
     ---@field get_theme_flag fun(self, index: integer): boolean @Returns: allow_beehive or allow_leprechaun flag<br/>Params: index: 0 or 1
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @Returns: TEXTURE based on texture_id<br/>Params: DYNAMIC_TEXTURE texture_id
+    ---@field get_dynamic_texture fun(self, texture_id: DYNAMIC_TEXTURE): TEXTURE @Returns: TEXTURE based on texture_id<br/>Params: DYNAMIC_TEXTURE texture_id
     ---@field pre_transition fun(self): nil @Sets state.level_next, world_next and theme_next (or state.win_state) based on level number. Runs when exiting a level.
     ---@field get_exit_room_y_level fun(self): integer @Returns: usually state.height - 1. For special levels fixed heights are returned.
     ---@field get_shop_chance fun(self): integer @Returns: inverse shop chance
@@ -4740,11 +4736,10 @@ function MovableBehavior:get_state_id() end
 ---@class CustomTheme : ThemeInfo
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
     ---@field theme integer @Theme index. Probably shouldn't collide with the vanilla ones. Purpose unknown.
-    ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
-    ---@field textures table<DYNAMIC_TEXTURE, integer> @Add TEXTUREs here to override different dynamic textures.
-    ---@field override any @theme_override
+    ---@field textures table<DYNAMIC_TEXTURE, TEXTURE> @Add TEXTUREs here to override different dynamic textures.
     ---@field pre fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called before this theme function.
     ---@field post fun(self, index: THEME_OVERRIDE, func_: function): nil @Set a callback to be called after this theme function, to fix some changes it did for example.
+    ---@field base_theme integer @Base THEME to load enabled functions from, when no other theme is specified.
     ---@field reset_theme_flags fun(self): nil
     ---@field init_flags fun(self): nil
     ---@field init_level fun(self): nil
@@ -4756,7 +4751,7 @@ function MovableBehavior:get_state_id() end
     ---@field add_idol fun(self): nil
     ---@field add_vault fun(self): nil
     ---@field add_coffin fun(self): nil
-    ---@field add_feeling any @&CustomTheme::add_feeling
+    ---@field add_special_feeling fun(self): nil
     ---@field spawn_level fun(self): nil
     ---@field spawn_border fun(self): nil
     ---@field post_process_level fun(self): nil
@@ -4788,7 +4783,7 @@ function MovableBehavior:get_state_id() end
     ---@field get_loop fun(self): boolean
     ---@field get_vault_level fun(self): integer
     ---@field get_theme_flag fun(self, index: integer): boolean
-    ---@field get_dynamic_texture fun(self, texture_id: integer): integer @Add TEXTUREs to `textures` to override different dynamic textures easily.
+    ---@field get_dynamic_texture fun(self, texture_id: DYNAMIC_TEXTURE): TEXTURE @Add TEXTURE s to `textures` map of the CustomTheme to override different dynamic textures easily.
     ---@field pre_transition fun(self): nil
     ---@field get_exit_room_y_level fun(self): integer
     ---@field get_shop_chance fun(self): integer
@@ -4796,6 +4791,22 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_decoration2 fun(self): nil
     ---@field spawn_extra fun(self): nil
     ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil
+local CustomTheme = nil
+---To disable or enable theme functions using the base_theme.
+---@param index THEME_OVERRIDE
+---@param enabled_ boolean
+---@return nil
+function CustomTheme:override(index, enabled_) end
+---To override a theme function with another theme.
+---@param index THEME_OVERRIDE
+---@param theme_ integer
+---@return nil
+function CustomTheme:override(index, theme_) end
+---To override a theme function with a lua function.
+---@param index THEME_OVERRIDE
+---@param func_ function
+---@return nil
+function CustomTheme:override(index, func_) end
 
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
@@ -4821,7 +4832,7 @@ function MovableBehavior:get_state_id() end
     ---@field flags integer
     ---@field flags2 integer
     ---@field flags3 integer
-    ---@field level_config integer[]
+    ---@field level_config integer[] @size: 17
 
 ---@class PostRoomGenerationContext
     ---@field set_room_template fun(self, x: integer, y: integer, layer: LAYER, room_template: ROOM_TEMPLATE): boolean @Set the room template at the given index and layer, returns `false` if the index is outside of the level.
@@ -5145,8 +5156,8 @@ function GuiDrawContext:win_pushid(id) end
 ---@class ImGuiIO
     ---@field displaysize Vec2
     ---@field framerate number
-    ---@field wantkeyboard any @wantkeyboard
-    ---@field keys boolean[] @size: ImGuiKey_COUNT
+    ---@field wantkeyboard boolean
+    ---@field keys boolean[] @size: 652
     ---@field keydown fun(key: number | string): boolean
     ---@field keypressed fun(key: number | string, repeat?: boolean ): boolean
     ---@field keyreleased fun(key: number | string): boolean
@@ -5154,8 +5165,8 @@ function GuiDrawContext:win_pushid(id) end
     ---@field keyshift boolean
     ---@field keyalt boolean
     ---@field keysuper boolean
-    ---@field modifierdown any @modifierdown
-    ---@field wantmouse any @wantmouse
+    ---@field modifierdown fun(self, chord: integer): boolean
+    ---@field wantmouse boolean
     ---@field mousepos Vec2
     ---@field mousedown boolean[] @size: 5
     ---@field mouseclicked boolean[] @size: 5
@@ -5163,7 +5174,7 @@ function GuiDrawContext:win_pushid(id) end
     ---@field mousereleased boolean[] @size: 5
     ---@field mousewheel number
     ---@field gamepad Gamepad
-    ---@field gamepads any @[](unsignedintindex){g_WantUpdateHasGamepad=true
+    ---@field gamepads fun(self, index: integer): Gamepad
     ---@field showcursor boolean
 
 ---@class VanillaRenderContext
@@ -5391,7 +5402,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 function VanillaRenderContext:draw_world_poly_filled(points, color) end
 
 ---@class TextureRenderingInfo
-    ---@field new any @sol::constructors<TextureRenderingInfo()
+    ---@field new any @constructors<TextureRenderingInfo(), TextureRenderingInfo(TextureRenderingInfo)>{}
     ---@field x number
     ---@field y number
     ---@field destination_bottom_left_x number @destination is relative to the x,y centerpoint
@@ -5424,13 +5435,13 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field center fun(self): Vec2 @Get's approximated center of a letter by finding the highest and lowest values, then finding the center of a rectangle build from those values
 
 ---@class TextRenderingInfo
-    ---@field new any @sol::initializers(&TextRenderingInfo_ctor
+    ---@field new any @initializers(TextRenderingInfo_ctor, TextRenderingInfo_ctor2)
     ---@field x number
     ---@field y number
     ---@field text_length integer @You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
     ---@field width number
     ---@field height number
-    ---@field special_texture_id integer @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
+    ---@field special_texture_id TEXTURE @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
     ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
     ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
@@ -5526,10 +5537,19 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 ---@class Vec2
     ---@field x number
     ---@field y number
-    ---@field rotate fun(self, angle: number, px: number, py: number): Vec2
     ---@field distance_to fun(self, other: Vec2): number @Just simple pythagoras theorem
     ---@field set fun(self, other: Vec2): Vec2
     ---@field split fun(self): number, number
+local Vec2 = nil
+---@param angle number
+---@param px number
+---@param py number
+---@return Vec2
+function Vec2:rotate(angle, px, py) end
+---@param angle number
+---@param p Vec2
+---@return Vec2
+function Vec2:rotate(angle, p) end
 
 ---@class AABB
     ---@field left number
@@ -5607,13 +5627,19 @@ function Triangle:is_point_inside(x, y, epsilon) end
     ---@field top_left_x number
     ---@field top_left_y number
     ---@field get_AABB fun(self): AABB @Returns the max/min values of the Quad
-    ---@field offset fun(self, off_x: number, off_y: number): Quad
     ---@field rotate fun(self, angle: number, px: number, py: number): Quad @Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
     ---@field set fun(self, other: Quad): Quad
     ---@field split fun(self): Vec2, Vec2, Vec2, Vec2 @Returns the corners in order: bottom_left, bottom_right, top_right, top_left
 local Quad = nil
+---@param off Vec2
+---@return Quad
+function Quad:offset(off) end
+---@param off_x number
+---@param off_y number
+---@return Quad
+function Quad:offset(off_x, off_y) end
 ---Check if point lies inside of triangle
 ---Because of the imprecise nature of floating point values, the `epsilon` value is needed to compare the floats, the default value is `0.00001`
 ---@param p Vec2
@@ -5983,7 +6009,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field sequence_state integer
     ---@field animation_timer integer
     ---@field constellation_text_opacity number
-    ---@field constellation_text number
+    ---@field constellation_text string
     ---@field explosion_and_loop SoundMeta
     ---@field music SoundMeta
 
@@ -6052,7 +6078,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field entire_book TextureRenderingInfo
     ---@field fade_timer integer
     ---@field page_timer integer
-    ---@field opacity integer
+    ---@field opacity number
     ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ---@class JournalPage
@@ -6477,7 +6503,6 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
 
 ---@class PauseAPI
     ---@field pause PAUSE_TYPE @Current pause state bitmask. Use custom PAUSE_TYPE.PRE_✱ (or multiple) to freeze the game at the specified callbacks automatically. Checked after the matching ON update callbacks, so can be set on the same callback you want to block at the latest. Vanilla PAUSE flags will be forwarded to state.pause, but use of vanilla PAUSE flags is discouraged and might not work with other PauseAPI features.
-    ---@field pause any @sol::property(&PauseAPI::get_pause
     ---@field pause_type PAUSE_TYPE @Pause mask to toggle when using the PauseAPI methods to set or get pause state.
     ---@field pause_trigger PAUSE_TRIGGER @Bitmask for conditions when the current `pause_type` should be automatically enabled in `pause`, can have multiple conditions.
     ---@field pause_screen PAUSE_SCREEN @Bitmask to only enable PAUSE_TRIGGER.SCREEN during specific SCREEN, or any screen when NONE.
@@ -6513,6 +6538,17 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     ---@field count integer @Number of API instances present
+
+---@class Color
+    ---@field r number
+    ---@field g number
+    ---@field b number
+    ---@field a number
+    ---@field get_rgba fun(self): integer, integer, integer, integer @Returns RGBA colors in 0..255 range
+    ---@field set_rgba fun(self, red: integer, green: integer, blue: integer, alpha: integer): Color @Changes color based on given RGBA colors in 0..255 range
+    ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
+    ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
+    ---@field set fun(self, other: Color): Color @Copies the values of different Color to this one
 
 end
 --## Static class functions
@@ -6557,22 +6593,6 @@ SaveState = nil
 ---Create a new temporary SaveState/clone of the main level state. Unlike save_state slots that are preallocated by the game anyway, these will use 32MiB a pop and aren't freed automatically, so make sure to clear them or reuse the same one to save memory. The garbage collector will eventually clear the SaveStates you don't have a handle to any more though.
 ---@return SaveState
 function SaveState:new() end
----Create a new color - defaults to black
----@return Color
-function Color:new() end
----@param other Color
----@return Color
-function Color:new(other) end
----@param color Color
----@return Color
-function Color:new(color) end
----Create a new color by specifying its values
----@param r_ number
----@param g_ number
----@param b_ number
----@param a_ number
----@return Color
-function Color:new(r_, g_, b_, a_) end
 
 EntityDB = nil
 ---@param other EntityDB
@@ -6688,6 +6708,26 @@ MagmamanSpawnPosition = nil
 ---@param y_ integer
 ---@return MagmamanSpawnPosition
 function MagmamanSpawnPosition:new(x_, y_) end
+---Create a new color - defaults to black
+---@return Color
+function Color:new() end
+---@param other Color
+---@return Color
+function Color:new(other) end
+---@param color Color
+---@return Color
+function Color:new(color) end
+---Create a new color by specifying its values
+---@param r_ number
+---@param g_ number
+---@param b_ number
+---@param a_ number
+---@return Color
+function Color:new(r_, g_, b_, a_) end
+---@param color_name string
+---@param alpha integer?
+---@return Color
+function Color:new(color_name, alpha) end
 
 --## Enums
 
@@ -11465,12 +11505,10 @@ YANG = {
 ---@alias YANG integer
 local MAX_PLAYERS = 4
 
----@alias in_port_t number
 ---@class Logic
 
 ---@alias OnlinePlayerShort any
 ---@alias UdpServer any
----@alias Texture any
 ---@alias SpearDanglerAnimFrames any
 ---@alias OnlineLobbyScreenPlayer any
 ---@alias SoundCallbackFunction function

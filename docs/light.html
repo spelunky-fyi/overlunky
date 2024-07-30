@@ -795,6 +795,9 @@
                             <a href="#get_character_heart_color" class="toc-h3 toc-link" data-title="get_character_heart_color">get_character_heart_color</a>
                           </li>
                           <li>
+                            <a href="#get_color" class="toc-h3 toc-link" data-title="get_color">get_color</a>
+                          </li>
+                          <li>
                             <a href="#get_current_money" class="toc-h3 toc-link" data-title="get_current_money">get_current_money</a>
                           </li>
                           <li>
@@ -5157,6 +5160,12 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 </blockquote>
 <h4 id='Color-get_character_heart_color-ENT_TYPE-type_id'><a href="#Color">Color</a> get_character_heart_color(<a href="#ENT_TYPE">ENT_TYPE</a> type_id)</h4>
 <p>Same as <code>Player.get_heart_color</code></p>
+<h3 id='get_color'>get_color</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_color">get_color</a></p>
+</blockquote>
+<h4 id='uColor-get_color-string-color_name-optional-alpha-nullopt'><a href="#Aliases">uColor</a> get_color(string color_name, optional<int> alpha = nullopt)</h4>
+<p>Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with &#39;#&#39; symbol You can also convert hex string into a color, prefix it with &#39;0x&#39;, but use it only if you need to since lua allows for hex values directly too. Default apha value will be 0xFF, unless it&#39;s specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR</p>
 <h3 id='get_current_money'>get_current_money</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_current_money">get_current_money</a></p>
@@ -8716,7 +8725,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=collision_mask">collision_mask</a></td>
-<td><a href="#MASK">MASK</a> used for collision with floors.</td>
+<td><a href="#MASK">MASK</a> used for collision with floors, walls etc.</td>
 </tr>
 <tr>
 <td>float</td>
@@ -8754,23 +8763,8 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 <tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=glow_red">glow_red</a></td>
-<td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=glow_green">glow_green</a></td>
-<td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=glow_blue">glow_blue</a></td>
-<td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=glow_alpha">glow_alpha</a></td>
+<td><a href="#Color">Color</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=default_color">default_color</a></td>
 <td></td>
 </tr>
 <tr>
@@ -8794,7 +8788,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
 <td></td>
 </tr>
@@ -9352,6 +9346,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="#Color">Color</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(float r_, float g_, float b_, float a_)</a></td>
 <td>Create a new color by specifying its values</td>
+</tr>
+<tr>
+<td><a href="#Color">Color</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=Color">new(string color_name, optional<int> alpha = nullopt)</a></td>
+<td></td>
 </tr>
 <tr>
 <td>float</td>
@@ -12858,13 +12857,13 @@ Derived from <a href="#Logic">Logic</a></p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_texture">get_texture()</a></td>
 <td></td>
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_texture">set_texture(int texture_id)</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_texture">set_texture(TEXTURE texture_id)</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -16995,7 +16994,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
 <td></td>
 </tr>
@@ -17610,7 +17609,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_texture_id">special_texture_id</a></td>
 <td>Used to draw buttons and stuff, default is -1 wich uses the buttons texture</td>
 </tr>
@@ -17912,7 +17911,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Base <a href="#THEME">THEME</a> to load enabled functions from, when no other theme is specified.</td>
 </tr>
 <tr>
-<td>map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, int&gt;</td>
+<td>map&lt;<a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a>, <a href="#TEXTURE">TEXTURE</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=textures">textures</a></td>
 <td>Add TEXTUREs here to override different dynamic textures.</td>
 </tr>
@@ -18147,9 +18146,9 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td></td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a></td>
-<td>Add TEXTUREs to <code>textures</code> to override different dynamic textures easily.</td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(DYNAMIC_TEXTURE texture_id)</a></td>
+<td>Add <a href="#TEXTURE">TEXTURE</a> s to <code>textures</code> map of the CustomTheme to override different dynamic textures easily.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -18393,12 +18392,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Returns: <a href="#THEME">THEME</a>, or logical base <a href="#THEME">THEME</a> for special levels (Abzu-&gt;Tide Pool etc)</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type">get_floor_spreading_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for floor spreading (generic or one of the styled floors)</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_floor_spreading_type2">get_floor_spreading_type2()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for floor spreading (stone or one of the styled floors)</td>
 </tr>
@@ -18413,22 +18412,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Determines the types of FLOOR_TUNNEL_NEXT/CURRENT (depending on where you are transitioning from/to)<br/>Returns: 85 by default, except for: olmec: 15, cog: 23</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_transition_styled_floor_type">get_transition_styled_floor_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for the transition floor</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_backwall_type">get_backwall_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> used for the backwall (BG_LEVEL_BACKWALL by default)</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_border_type">get_border_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> to use for the border tiles</td>
 </tr>
 <tr>
-<td>int</td>
+<td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_critter_type">get_critter_type()</a></td>
 <td>Returns: <a href="#ENT_TYPE">ENT_TYPE</a> for theme specific critter</td>
 </tr>
@@ -18473,8 +18472,8 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Returns: allow_beehive or allow_leprechaun flag<br/>Params: index: 0 or 1</td>
 </tr>
 <tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(int texture_id)</a></td>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dynamic_texture">get_dynamic_texture(DYNAMIC_TEXTURE texture_id)</a></td>
 <td>Returns: <a href="#TEXTURE">TEXTURE</a> based on texture_id<br/>Params: <a href="#DYNAMIC_TEXTURE">DYNAMIC_TEXTURE</a> texture_id</td>
 </tr>
 <tr>
@@ -27442,8 +27441,8 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=damage">damage(int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</a></td>
-<td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=damage">damage(Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)</a></td>
+<td>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. <code>damage_dealer</code> can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td>vector&lt;int&gt;</td>
@@ -27573,12 +27572,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_damage">set_pre_damage(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; damage(Movable self, Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. <code>damage_dealer</code> can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_damage">set_post_damage(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil damage(Movable self, int damage_dealer_uid, int damage_amount, int stun_time, float velocity_x, float velocity_y, int iframes)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil damage(Movable self, Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)</code><br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. <code>damage_dealer</code> can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -30002,7 +30001,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=DAMAGE_TYPE">DAMAGE_TYPE</a></p>
 </blockquote>
 
-<p>16bit bitmask used in <a href="#Movable">Movable</a>::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.</p>
+<p>16bit bitmask used in <a href="#Movable">Movable</a>::damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.</p>
 
 <table><thead>
 <tr>

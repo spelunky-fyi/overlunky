@@ -130,7 +130,7 @@ Runs when entering any winning cutscene, including the constellation.<br/>
 
 > Search script examples for [ON.CREDITS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.CREDITS)
 
-Runs when entering the credits.<br/>
+Runs when entering the credits screen.<br/>
 
 ## ON.SCORES
 

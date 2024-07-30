@@ -88,7 +88,7 @@ struct EntityDB
             float glow_alpha;
         };
     };
-    int32_t texture_id;
+    TEXTURE texture_id;
     int32_t technique;
     int32_t tile_x;
     int32_t tile_y;

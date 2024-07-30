@@ -165,17 +165,17 @@ any | set:at(int order) | Returns elements in order, it's not an index as sets d
 any | map:at(int order) | Returns elements in order, it's not an index as maps don't have one
 int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable
 int | span:find(any value) | Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable
-any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable
+any | set:find(any key) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable
 any | map:find(any key) | Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable
 nil | vector:erase(int index) | Removes element at given index, the rest of elements shift down so that the vector stays contiguous
-nil | set:erase(any value) | Removes element from set
-nil | map:erase(any key) | Removes element from map by key
+nil | set:erase(any key) | Removes element from set
+nil | map:erase(any key) | Removes element from map
 nil | vector:clear() | Removes all elements from vector
 nil | set:clear() | Removes all elements from set
 nil | map:clear() | Removes all elements from map
 nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up in index
-nil | set:insert(int order, any element) | The order param doesn't acutally matter and can be set to nil
-nil | map:insert(any key, any value) | unsure, probably easier to just use `map[key] = value`
+nil | set:insert(int order, any key) | The order param doesn't acutally matter and can be set to nil
+nil | map:insert(any key, any value)? | unsure, probably easier to just use `map[key] = value`
 # Functions
 The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 
@@ -1445,6 +1445,16 @@ Returns the [Bucket](#Bucket) of data stored in shared memory between [Overlunky
 #### [Color](#Color) get_character_heart_color([ENT_TYPE](#ENT_TYPE) type_id)
 
 Same as `Player.get_heart_color`
+
+### get_color
+
+
+> Search script examples for [get_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_color)
+
+#### [uColor](#Aliases) get_color(string color_name, optional<int> alpha = nullopt)
+
+Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too. Default apha value will be 0xFF, unless it's specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
+
 
 ### get_current_money
 

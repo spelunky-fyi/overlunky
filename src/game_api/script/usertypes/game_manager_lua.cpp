@@ -100,27 +100,18 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::timer,
         "slide_position",
         &JournalPopupUI::slide_position);
-    lua.new_usertype<GameProps>(
-        "GameProps",
-        /// NoDoc
-        "buttons",
-        sol::property([](GameProps& gp) -> uint32_t
-                      { return gp.buttons[0]; }),
-        "input",
-        &GameProps::buttons,
-        "input_previous",
-        &GameProps::buttons_previous,
-        "input_menu",
-        &GameProps::buttons_menu,
-        "input_menu_previous",
-        &GameProps::buttons_menu_previous,
-        "game_has_focus",
-        &GameProps::game_has_focus,
-        "menu_open", // -> bool
-        sol::property([](GameProps& gp) -> bool
-                      { return gp.menu_icon_slot != -1; }),
-        "input_index",
-        &GameProps::input_index);
+    auto gameprops_type = lua.new_usertype<GameProps>("GameProps");
+    /// NoDoc
+    gameprops_type["buttons"] = sol::property([](GameProps& gp) -> uint32_t
+                                              { return gp.buttons[0]; });
+    gameprops_type["input"] = &GameProps::buttons;
+    gameprops_type["input_previous"] = &GameProps::buttons_previous;
+    gameprops_type["input_menu"] = &GameProps::buttons_menu;
+    gameprops_type["input_menu_previous"] = &GameProps::buttons_menu_previous;
+    gameprops_type["game_has_focus"] = &GameProps::game_has_focus;
+    gameprops_type["menu_open"] = sol::property([](GameProps& gp) -> bool
+                                                { return gp.menu_icon_slot != -1; });
+    gameprops_type["input_index"] = &GameProps::input_index;
 
     lua.new_usertype<RawInput>(
         "RawInput",

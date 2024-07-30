@@ -230,6 +230,18 @@ struct SpawnInfo
     float y;
 };
 
+enum class DYNAMIC_TEXTURE : int32_t
+{
+    INVISIBLE = -2,
+    BACKGROUND = -4,
+    FLOOR = -5,
+    DOOR = -6,
+    DOOR_LAYER = -7,
+    BACKGROUND_DECORATION = -8,
+    KALI_STATUE = -9,
+    COFFIN = -10
+};
+
 class ThemeInfo
 {
   public:
@@ -341,11 +353,11 @@ class ThemeInfo
     // duat: 112 (ENT_TYPE_FLOORSTYLED_DUAT)
     // hundun: 107 (ENT_TYPE_FLOORSTYLED_SUNKEN)
     /// Returns: ENT_TYPE used for floor spreading (generic or one of the styled floors)
-    virtual uint32_t get_floor_spreading_type() = 0;
+    virtual ENT_TYPE get_floor_spreading_type() = 0;
 
     // similar to get_floor_spreading_type(), except now the default = 103 (ENT_TYPE_FLOORSTYLED_STONE)
     /// Returns: ENT_TYPE used for floor spreading (stone or one of the styled floors)
-    virtual uint32_t get_floor_spreading_type2() = 0;
+    virtual ENT_TYPE get_floor_spreading_type2() = 0;
 
     /// Returns: true if transition should use styled floor
     virtual bool get_transition_styled_floor() = 0;
@@ -355,16 +367,16 @@ class ThemeInfo
     virtual uint32_t get_transition_floor_modifier() = 0;
 
     /// Returns: ENT_TYPE used for the transition floor
-    virtual uint32_t get_transition_styled_floor_type() = 0;
+    virtual ENT_TYPE get_transition_styled_floor_type() = 0;
 
     /// Returns: ENT_TYPE used for the backwall (BG_LEVEL_BACKWALL by default)
-    virtual uint32_t get_backwall_type() = 0;
+    virtual ENT_TYPE get_backwall_type() = 0;
 
     /// Returns: ENT_TYPE to use for the border tiles
-    virtual uint32_t get_border_type() = 0;
+    virtual ENT_TYPE get_border_type() = 0;
 
     /// Returns: ENT_TYPE for theme specific critter
-    virtual uint32_t get_critter_type() = 0;
+    virtual ENT_TYPE get_critter_type() = 0;
 
     /// Returns: gravity used to initialize liquid pools (-1..1)
     virtual float get_liquid_gravity() = 0;
@@ -393,7 +405,7 @@ class ThemeInfo
 
     /// Returns: TEXTURE based on texture_id
     /// Params: DYNAMIC_TEXTURE texture_id
-    virtual uint32_t get_dynamic_texture(int32_t texture_id) = 0;
+    virtual TEXTURE get_dynamic_texture(DYNAMIC_TEXTURE texture_id) = 0;
 
     /// Sets state.level_next, world_next and theme_next (or state.win_state) based on level number. Runs when exiting a level.
     virtual void pre_transition() = 0;
@@ -621,18 +633,6 @@ bool grow_chain_and_blocks();
 bool grow_chain_and_blocks(uint32_t x, uint32_t y);
 
 void do_load_screen();
-
-enum class DYNAMIC_TEXTURE : int32_t
-{
-    INVISIBLE = -2,
-    BACKGROUND = -4,
-    FLOOR = -5,
-    DOOR = -6,
-    DOOR_LAYER = -7,
-    BACKGROUND_DECORATION = -8,
-    KALI_STATUE = -9,
-    COFFIN = -10
-};
 
 enum class THEME_OVERRIDE : uint8_t
 {
