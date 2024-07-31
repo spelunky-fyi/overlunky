@@ -34,7 +34,7 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> "$GITHUB_OUTPUT"
         shell: bash
 
       - name: Get release notes
@@ -46,7 +46,7 @@ jobs:
           content="${content//$'\n'/'%0A'}"
           content="${content//$'\r'/'%0D'}"
           echo $content
-          echo "::set-output name=NOTES::$content"
+          echo "NOTES=$content" >> "$GITHUB_OUTPUT"
 
       - name: Create artifacts
         run: |
