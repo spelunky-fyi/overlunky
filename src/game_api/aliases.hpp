@@ -190,3 +190,25 @@ enum class PAUSE_SCREEN : int64_t
     EXIT = 1 << 31,
 };
 ENUM_CLASS_FLAGS(PAUSE_SCREEN);
+
+enum class ENTITY_MASK
+{
+    PLAYER = 0x1,
+    MOUNT = 0x2,
+    MONSTER = 0x4,
+    ITEM = 0x8,
+    EXPLOSION = 0x10,
+    ROPE = 0x20,
+    FX = 0x40,
+    ACTIVEFLOOR = 0x80,
+    FLOOR = 0x100,
+    DECORATION = 0x200,
+    BG = 0x400,
+    SHADOW = 0x800,
+    LOGICAL = 0x1000,
+    WATER = 0x2000,
+    LAVA = 0x4000,
+    LIQUID = 0x6000,
+    NONE = 0x0,
+};
+ENUM_CLASS_FLAGS(ENTITY_MASK)

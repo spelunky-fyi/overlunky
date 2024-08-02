@@ -63,6 +63,7 @@ replace_table = {
     "SoundCallbackFunction": "function",
     "object ": "any ",
     "BucketItem": "any",
+    "ENTITY_MASK": "MASK",
 }
 
 header_files = [

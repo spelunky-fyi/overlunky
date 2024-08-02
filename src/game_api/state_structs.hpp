@@ -842,6 +842,14 @@ struct LiquidLake
     Entity* impostor_lake;
 };
 
+// Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is 6
+// Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6
+struct LiquidAmounts
+{
+    uint8_t lava;
+    uint8_t water;
+};
+
 struct LiquidPhysics
 {
     size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
@@ -867,16 +875,16 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    custom_map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seams to be the same as in push_blocks
-    custom_map<uint32_t, size_t*>* push_blocks;               // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
-    custom_vector<LiquidLake> impostor_lakes;                 //
-    uint32_t total_liquid_spawned;                            // Total number of spawned liquid entities, all types.
-    uint32_t unknown8;                                        // padding probably
-    uint8_t* unknown9;                                        // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
-                                                              // always allocates after the LiquidPhysics
+    custom_map<std::pair<uint8_t, uint8_t>, size_t*>* floors;   // key is a grid position, the struct seams to be the same as in push_blocks
+    custom_map<uint32_t, size_t*>* push_blocks;                 // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
+    custom_vector<LiquidLake> impostor_lakes;                   //
+    uint32_t total_liquid_spawned;                              // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;                                          // padding probably
+    LiquidAmounts (*liquids_by_third_of_tile)[126 * 3][86 * 3]; // array byte* game allocates 0x2F9E8 bytes for it ((126 * 3) * (86 * 3) * 2 : y, x, liquid_type).
+                                                                // always allocates after the LiquidPhysics
 
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
-    bool unknown12;
+    bool unknown12;                 // if false, I think the game should check for liquids by looking for liquid entities rather than using the previous liquids array. Is set to true by the game actively
     uint8_t padding12a;
     uint8_t padding12b;
     uint8_t padding12c;
