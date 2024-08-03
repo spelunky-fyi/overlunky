@@ -436,7 +436,8 @@ void register_usertypes(sol::state& lua)
     statememory_type["user_data"] = std::move(user_data);
     /* StateMemory
     // user_data
-    // You can put any arbitrary lua object here and it will work correctly in online multiplayer, by having a copy on each state and being copied when the game does.
+    // You can store a table (or lua primitive) here and it will store data correctly in online multiplayer, by having a different copy on each state and being copied over when the game does.
+    // Doesn't support recursive tables / cyclic references. Metatables will be transferred by reference instead of being copied
     */
 
     lua.create_named_table("FADE", "NONE", 0, "OUT", 1, "LOAD", 2, "IN", 3);

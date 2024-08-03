@@ -2266,16 +2266,6 @@ end
     /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
 
-    lua.script(R"##(
-        function deepcopy_object(obj)
-            if type(obj) ~= 'table' then return obj end
-            local res = {}
-            for k, v in pairs(obj) do res[deepcopy_object(k)] = deepcopy_object(v) end
-            res = setmetatable(res, getmetatable(obj))
-            return res
-        end
-    )##");
-
     /// Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
     /// This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
     /// Everything should be working more or less correctly (report on community discord if you find something unusual)
