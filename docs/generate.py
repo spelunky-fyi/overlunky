@@ -365,20 +365,20 @@ print("any | map:at(int order) | Returns elements in order, it's not an index as
 
 print("int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable")
 print("int | span:find(any value) | Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable")
-print("any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable")
+print("any | set:find(any key) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable")
 print("any | map:find(any key) | Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable")
 
 print("nil | vector:erase(int index) | Removes element at given index, the rest of elements shift down so that the vector stays contiguous")
-print("nil | set:erase(any value) | Removes element from set")
-print("nil | map:erase(any key) | Removes element from map by key")
+print("nil | set:erase(any key) | Removes element from set")
+print("nil | map:erase(any key) | Removes element from map")
 
 print("nil | vector:clear() | Removes all elements from vector")
 print("nil | set:clear() | Removes all elements from set")
 print("nil | map:clear() | Removes all elements from map")
 
 print("nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up in index")
-print("nil | set:insert(int order, any element) | The order param doesn't acutally matter and can be set to nil")
-print("nil | map:insert(any key, any value) | unsure, probably easier to just use `map[key] = value`")
+print("nil | set:insert(int order, any key) | The order param doesn't acutally matter and can be set to nil")
+print("nil | map:insert(any key, any value)? | unsure, probably easier to just use `map[key] = value`")
 
 
 print("# Functions")
@@ -412,6 +412,7 @@ for func in ps.funcs:
             "dump_network",
             "dump",
             "dump_string",
+            "get_address",
         ]
     ):
         cat = "Debug functions"
@@ -426,7 +427,7 @@ for func in ps.funcs:
         for subs in ["interval", "timeout", "callback", "set_on", "set_pre", "set_post"]
     ):
         cat = "Callback functions"
-    elif any(subs in func["name"] for subs in ["flag"]):
+    elif any(subs in func["name"] for subs in ["flag", "clr_mask", "flip_mask", "set_mask", "test_mask"]):
         cat = "Flag functions"
     elif any(subs in func["name"] for subs in ["shop"]):
         cat = "Shop functions"

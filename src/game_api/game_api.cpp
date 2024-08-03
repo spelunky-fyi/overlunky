@@ -6,20 +6,16 @@
 
 GameAPI* GameAPI::get()
 {
+    static_assert(sizeof(GameAPI) == 0x60);
     using GetGameAPI = GameAPI*();
     static auto addr = (GetGameAPI*)get_address("get_game_api");
     return addr();
 }
 
-float GameAPI::get_current_zoom()
+float GameAPI::get_current_zoom() const
 {
     auto state = State::get().ptr();
     return renderer->current_zoom + get_layer_transition_zoom_offset(state->camera_layer);
-}
-
-float GameAPI::get_target_zoom()
-{
-    return renderer->target_zoom + renderer->target_zoom_offset;
 }
 
 void GameAPI::set_zoom(std::optional<float> current, std::optional<float> target)

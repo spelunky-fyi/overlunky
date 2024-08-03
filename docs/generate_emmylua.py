@@ -26,12 +26,18 @@ replace_table = {
     "u16string": "string",
     "char16_t*": "string",
     "string_view": "string",
-    "pair": "tuple",
+    "std::pair": "tuple",
     "std::": "",
     "sol::": "",
+    "unsigned": "",
     " = nullopt": "",
     "void": "",
     "constexpr": "",
+    "inline ": "",
+    "[[nodiscard]]": "",
+    "[[maybe_unused]]": "",
+    "self_return<&": "",
+    ">()": "",
     "...va:": "...ent_type:",
     "set<": "Array<",
     "span<": "Array<",
@@ -294,8 +300,6 @@ function F(f_string) end
                 else ""
             )
             if "function" in var and var["function"]:
-                # if var["name"] == "clear_behaviors":
-                #    gu.breakpoint()
                 signature = var["signature"]
                 m = re.search(r"\s*(.*)\s+([^\(]*)\((.*)\)", signature)
                 if m:
@@ -439,12 +443,10 @@ function F(f_string) end
     print(
         """local MAX_PLAYERS = 4
 
----@alias in_port_t number
 ---@class Logic
 
 ---@alias OnlinePlayerShort any
 ---@alias UdpServer any
----@alias Texture any
 ---@alias SpearDanglerAnimFrames any
 ---@alias OnlineLobbyScreenPlayer any
 ---@alias SoundCallbackFunction function"""
@@ -461,13 +463,10 @@ function F(f_string) end
 
     # Replace some things
     final_replace_stuff = {
-        "    ---@field menu_text_opacity number\n    ---@field menu_text_opacity number": "---@field menu_text_opacity number",
         "---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): Array<tuple<integer, integer, LAYER>>": "---@field find_all_short_tile_codes fun(self, layer: LAYER, short_tile_code: SHORT_TILE_CODE): integer[][]",
-        "---@field keysdown boolean       [] @size: ImGuiKey_COUNT": "---@field keysdown boolean[] @size: ImGuiKey_COUNT. Note: lua starts indexing at 1, you need `keysdown[string.byte('A') + 1]` to find the A key.",
         "---@field keydown any @keydown": "---@field keydown fun(key: number | string): boolean",
         "---@field keypressed any @keypressed": "---@field keypressed fun(key: number | string, repeat?: boolean ): boolean",
         "---@field keyreleased any @keyreleased": "---@field keyreleased fun(key: number | string): boolean",
-        "---@field gamepad any @sol::property([](){g_WantUpdateHasGamepad=true;returnget_gamepad()/**/;})": "---@field gamepad Gamepad",
         "---@field user_data fun(self): nil": "---@field user_data table?",
         """---@param number> p tuple<number,
 ---@return Vec2

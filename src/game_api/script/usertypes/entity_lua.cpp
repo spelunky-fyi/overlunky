@@ -28,33 +28,6 @@ namespace NEntity
 {
 void register_usertypes(sol::state& lua)
 {
-    auto color_type = lua.new_usertype<Color>("Color", sol::constructors<Color(), Color(const Color&), Color(float, float, float, float)>{}, sol::meta_function::equal_to, &Color::operator==);
-    color_type["r"] = &Color::r;
-    color_type["g"] = &Color::g;
-    color_type["b"] = &Color::b;
-    color_type["a"] = &Color::a;
-    color_type["white"] = &Color::white;
-    color_type["silver"] = &Color::silver;
-    color_type["gray"] = &Color::gray;
-    color_type["black"] = &Color::black;
-    color_type["red"] = &Color::red;
-    color_type["maroon"] = &Color::maroon;
-    color_type["yellow"] = &Color::yellow;
-    color_type["olive"] = &Color::olive;
-    color_type["lime"] = &Color::lime;
-    color_type["green"] = &Color::green;
-    color_type["aqua"] = &Color::aqua;
-    color_type["teal"] = &Color::teal;
-    color_type["blue"] = &Color::blue;
-    color_type["navy"] = &Color::navy;
-    color_type["fuchsia"] = &Color::fuchsia;
-    color_type["purple"] = &Color::purple;
-    color_type["get_rgba"] = &Color::get_rgba;
-    color_type["set_rgba"] = &Color::set_rgba;
-    color_type["get_ucolor"] = &Color::get_ucolor;
-    color_type["set_ucolor"] = &Color::set_ucolor;
-    color_type["set"] = &Color::set;
-
     /// Used in EntityDB
     lua.new_usertype<Animation>(
         "Animation",
@@ -90,6 +63,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["max_speed"] = &EntityDB::max_speed;
     entitydb_type["sprint_factor"] = &EntityDB::sprint_factor;
     entitydb_type["jump"] = &EntityDB::jump;
+    entitydb_type["default_color"] = &EntityDB::default_color;
     entitydb_type["glow_red"] = &EntityDB::glow_red;
     entitydb_type["glow_green"] = &EntityDB::glow_green;
     entitydb_type["glow_blue"] = &EntityDB::glow_blue;
@@ -208,9 +182,9 @@ void register_usertypes(sol::state& lua)
     auto user_data = sol::property(get_user_data, set_user_data);
 
     auto overlaps_with = sol::overload(
-        static_cast<bool (Entity::*)(Entity*)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(AABB)>(&Entity::overlaps_with),
-        static_cast<bool (Entity::*)(float, float, float, float)>(&Entity::overlaps_with));
+        static_cast<bool (Entity::*)(Entity*) const>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(AABB) const>(&Entity::overlaps_with),
+        static_cast<bool (Entity::*)(float, float, float, float) const>(&Entity::overlaps_with));
 
     auto kill_recursive = sol::overload(
         static_cast<void (Entity::*)(bool, Entity*)>(&Entity::kill_recursive),
@@ -234,14 +208,14 @@ void register_usertypes(sol::state& lua)
     entity_type["abs_x"] = sol::property([](Entity& e) -> float
                                          {
         if (e.abs_x == -FLT_MAX)
-            return e.position().first;
+            return e.position().x;
         return e.abs_x; });
     // entity_type["abs_y"] = &Entity::abs_y;
     /// NoDoc
     entity_type["abs_y"] = sol::property([](Entity& e) -> float
                                          {
         if (e.abs_y == -FLT_MAX)
-            return e.position().second;
+            return e.position().y;
         return e.abs_y; });
     entity_type["layer"] = &Entity::layer;
     entity_type["width"] = &Entity::w;
@@ -293,9 +267,8 @@ void register_usertypes(sol::state& lua)
     */
 
     auto damage = sol::overload(
-        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float)>(&Movable::broken_damage),
-        static_cast<bool (Movable::*)(uint32_t, int8_t, uint16_t, float, float, uint8_t)>(&Movable::damage),
-        &Movable::on_damage);
+        &Movable::broken_damage,
+        &Movable::damage);
     auto light_on_fire = sol::overload(
         static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
@@ -345,7 +318,7 @@ void register_usertypes(sol::state& lua)
     movable_type["stun"] = &Movable::stun;
     movable_type["freeze"] = &Movable::freeze;
     movable_type["light_on_fire"] = light_on_fire;
-    movable_type["set_cursed"] = &Movable::set_cursed;
+    movable_type["set_cursed"] = &Movable::set_cursed_fix;
     movable_type["drop"] = &Movable::drop;
     movable_type["pick_up"] = &Movable::pick_up;
     movable_type["can_jump"] = &Movable::can_jump;
@@ -363,7 +336,7 @@ void register_usertypes(sol::state& lua)
     movable_type["set_position"] = &Movable::set_position;
     movable_type["process_input"] = &Movable::process_input;
     movable_type["cutscene"] = sol::readonly(&Movable::cutscene_behavior);
-    movable_type["clear_cutscene"] = [](Movable& movable)
+    movable_type["clear_cutscene"] = [](Movable& movable) -> void
     {
         delete movable.cutscene_behavior;
         movable.cutscene_behavior = nullptr;
@@ -494,7 +467,7 @@ void register_usertypes(sol::state& lua)
     // Value of 0, treated by all the functions as ANY mask
     */
 
-    /// 16bit bitmask used in Movable::regular_damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
+    /// 16bit bitmask used in Movable::damage. Can be many things, like 0x2024 = hit by a burning object that was thrown by an explosion.
     lua.create_named_table(
         "DAMAGE_TYPE",
         "GENERIC",

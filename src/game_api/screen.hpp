@@ -145,12 +145,6 @@ class ScreenTitle : public Screen // ID: 3
     SoundMeta* torch_sound;
 };
 
-struct SpearDanglerAnimFrames
-{
-    uint32_t column;
-    uint32_t row;
-};
-
 struct MenuOption
 {
     // return and first param are the same, pointer on stack, it really seam to be just two 32bit fields
@@ -241,7 +235,7 @@ class ScreenMenu : public Screen // ID: 4
     uint32_t transfer_to_menu_id;
     float menu_text_opacity;
     std::array<float, 6> spear_position;
-    std::array<SpearDanglerAnimFrames, 6> spear_dangler;
+    std::array<SpritePosition, 6> spear_dangler;
     std::array<uint32_t, 6> spear_dangle_momentum;
     std::array<uint32_t, 6> spear_dangle_angle;
 
@@ -249,7 +243,8 @@ class ScreenMenu : public Screen // ID: 4
     STRINGID scroll_text;
     float shake_offset_x;
     float shake_offset_y;
-    bool unknown30;
+    /// Set to true when going from title to menu screen for the first time, makes sure the animation play once
+    bool loaded_once;
     // maybe two more 32bit values? hard to tell
 };
 
@@ -892,7 +887,10 @@ class JournalPage
     }
 
     /// background.x < 0
-    bool is_right_side_page();
+    bool is_right_side_page() const
+    {
+        return (this->background.x < 0);
+    }
     void set_page_background_side(bool right);
     JOURNAL_PAGE_TYPE get_type();
 

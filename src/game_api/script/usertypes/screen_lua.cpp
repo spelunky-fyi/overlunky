@@ -181,12 +181,12 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Screen>());
 
-    lua.new_usertype<SpearDanglerAnimFrames>(
-        "SpearDanglerAnimFrames",
+    lua.new_usertype<SpritePosition>(
+        "SpritePosition",
         "column",
-        &SpearDanglerAnimFrames::column,
+        &SpritePosition::column,
         "row",
-        &SpearDanglerAnimFrames::row);
+        &SpritePosition::row);
 
     auto screenmenu_type = lua.new_usertype<ScreenMenu>("ScreenMenu", sol::base_classes, sol::bases<Screen>());
     screenmenu_type["state"] = &ScreenMenu::state;
@@ -227,6 +227,7 @@ void register_usertypes(sol::state& lua)
     screenmenu_type["scroll_text"] = &ScreenMenu::scroll_text;
     screenmenu_type["shake_offset_x"] = &ScreenMenu::shake_offset_x;
     screenmenu_type["shake_offset_y"] = &ScreenMenu::shake_offset_y;
+    screenmenu_type["loaded_once"] = &ScreenMenu::loaded_once;
 
     auto screenoptions_type = lua.new_usertype<ScreenOptions>("ScreenOptions", sol::base_classes, sol::bases<Screen>());
     screenoptions_type["down"] = &ScreenOptions::down;

@@ -144,7 +144,8 @@ void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float
         liquid_spawn_info->spawn_velocity_x = velocityx;
         liquid_spawn_info->spawn_velocity_y = velocityy;
         liquid_spawn_info->liquidtile_liquid_amount = amount;
-        if (blobs_separation != INFINITY)
+
+        if (!std::isinf(blobs_separation))
             liquid_spawn_info->blobs_separation = blobs_separation;
 
         spawn_liquid(entity_type, x, y);
@@ -171,10 +172,10 @@ int32_t spawn_entity_abs(ENT_TYPE entity_type, float x, float y, LAYER layer, fl
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset_position;
+    Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, vx, vy, false)->uid;
+    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, vx, vy, false)->uid;
 }
 
 int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -183,10 +184,10 @@ int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset_position;
+    Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.first, y + offset_position.second)->uid;
+    return State::get().layer(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.x, y + offset_position.y)->uid;
 }
 
 int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -195,10 +196,10 @@ int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER 
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset_position;
+    Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.first, y + offset_position.second, false, 0.0f, 0.0f, true)->uid;
+    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, 0.0f, 0.0f, true)->uid;
 }
 
 int32_t spawn_entity_abs_nonreplaceable(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
@@ -232,10 +233,10 @@ int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset_position;
+    Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_door(x + offset_position.first, y + offset_position.second, w, l, t)->uid;
+    return State::get().layer(actual_layer)->spawn_door(x + offset_position.x, y + offset_position.y, w, l, t)->uid;
 }
 
 void spawn_backdoor_abs(float x, float y)
@@ -260,27 +261,23 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset_position;
+    Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_apep(x + offset_position.first, y + offset_position.second, right)->uid;
+    return State::get().layer(actual_layer)->spawn_apep(x + offset_position.x, y + offset_position.y, right)->uid;
 }
 
-int32_t spawn_tree(float x, float y, LAYER layer)
-{
-    return spawn_tree(x, y, layer, 0);
-}
 int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset_position;
+    Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    x = std::roundf(x + offset_position.first);
-    y = std::roundf(y + offset_position.second);
+    x = std::roundf(x + offset_position.x);
+    y = std::roundf(y + offset_position.y);
 
     Layer* layer_ptr = State::get().layer(actual_layer);
 
@@ -329,19 +326,19 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
         auto spawn_deco = [&](Entity* branch, bool left)
         {
             Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
-            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION).value_or(0)) * 12;
+            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION)) * 12;
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
         auto test_pos = current_piece->position();
 
-        if (static_cast<int>(test_pos.first) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.first + 1, test_pos.second) == nullptr &&
+        if (static_cast<int>(test_pos.x) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.x + 1, test_pos.y) == nullptr &&
             prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
             Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, 1.02f, 0.0f);
             spawn_deco(branch, false);
         }
-        if (static_cast<int>(test_pos.first) - 1 > 0 && layer_ptr->get_grid_entity_at(test_pos.first - 1, test_pos.second) == nullptr &&
+        if (static_cast<int>(test_pos.x) - 1 > 0 && layer_ptr->get_grid_entity_at(test_pos.x - 1, test_pos.y) == nullptr &&
             prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
             Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, -1.02f, 0.0f);
@@ -354,21 +351,17 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     return base_piece->uid;
 }
 
-int32_t spawn_mushroom(float x, float y, LAYER l)
-{
-    return spawn_mushroom(x, y, l, 0);
-}
 int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height relates to trunk
 {
     push_spawn_type_flags(SPAWN_TYPE_SCRIPT);
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset(0.0f, 0.0f);
+    Vec2 offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(l, offset);
     const auto layer_ptr = State::get().layer(actual_layer);
-    const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
-    uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
+    const uint32_t i_x = static_cast<uint32_t>(x + offset.x + 0.5f);
+    uint32_t i_y = static_cast<uint32_t>(y + offset.y + 0.5f);
     static const auto base = to_id("ENT_TYPE_FLOOR_MUSHROOM_BASE");
     static const auto trunk = to_id("ENT_TYPE_FLOOR_MUSHROOM_TRUNK");
     static const auto top = to_id("ENT_TYPE_FLOOR_MUSHROOM_TOP");
@@ -392,7 +385,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
         else
         {
             auto& prng = PRNG::get_local();
-            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(0));
+            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
         }
 
         i_y += 3;
@@ -433,11 +426,11 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
     static const auto setup_top_rope_rendering_info_two = (setup_top_rope_rendering_info_two_fun*)get_address("setup_top_rope_rendering_info_two"sv);
     static const auto rope_ent = to_id("ENT_TYPE_ITEM_CLIMBABLE_ROPE");
 
-    std::pair<float, float> offset(0.0f, 0.0f);
+    Vec2 offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(layer, offset);
     const auto layer_ptr = State::get().layer(actual_layer);
-    const uint32_t i_x = static_cast<uint32_t>(x + offset.first + 0.5f);
-    const uint32_t i_y = static_cast<uint32_t>(y + offset.second + 0.5f);
+    const uint32_t i_x = static_cast<uint32_t>(x + offset.x + 0.5f);
+    const uint32_t i_y = static_cast<uint32_t>(y + offset.y + 0.5f);
     const float g_x = static_cast<float>(i_x);
     const float g_y = static_cast<float>(i_y);
 
@@ -523,10 +516,10 @@ Entity* spawn_impostor_lake(AABB aabb, LAYER layer, ENT_TYPE impostor_type, floa
         OnScopeExit pop{[]
                         { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-        std::pair<float, float> offset_position;
+        Vec2 offset_position;
         uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-        aabb.offset(offset_position.first, offset_position.second);
+        aabb.offset(offset_position.x, offset_position.y);
 
         auto [x, y] = aabb.center();
 
@@ -735,10 +728,10 @@ int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
         typedef Player* spawn_companion_func(StateMemory*, float x, float y, size_t layer, uint32_t entity_type);
         static spawn_companion_func* sc = (spawn_companion_func*)(offset);
 
-        std::pair<float, float> pos_offset;
+        Vec2 pos_offset;
         const auto actual_layer = enum_to_layer(layer, pos_offset);
 
-        Player* spawned = sc(state, x + pos_offset.first, y + pos_offset.second, actual_layer, companion_type);
+        Player* spawned = sc(state, x + pos_offset.x, y + pos_offset.y, actual_layer, companion_type);
         return spawned->uid;
     }
     return -1;
@@ -796,7 +789,7 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    std::pair<float, float> offset;
+    Vec2 offset;
     const auto l = enum_to_layer(layer, offset);
     auto level_layer = State::get().layer(l);
 
@@ -809,7 +802,7 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     if (char_type < ana || char_type > egg_child)
         return -1;
 
-    auto player_ghost_entity = level_layer->spawn_entity(player_ghost, x + offset.first, y + offset.second, false, 0, 0, false)->as<PlayerGhost>();
+    auto player_ghost_entity = level_layer->spawn_entity(player_ghost, x + offset.x, y + offset.y, false, 0, 0, false)->as<PlayerGhost>();
     if (player_ghost_entity)
     {
         player_ghost_entity->player_inputs = &dummy_player_controls;
@@ -823,5 +816,5 @@ MagmamanSpawnPosition::MagmamanSpawnPosition(uint32_t x_, uint32_t y_)
 {
     x = x_;
     y = y_;
-    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS).value_or(10000));
+    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
 }

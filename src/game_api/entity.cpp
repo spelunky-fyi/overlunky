@@ -156,11 +156,6 @@ void Entity::remove()
     }
 }
 
-void Entity::respawn(LAYER layer_to)
-{
-    set_layer(layer_to);
-}
-
 void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
 {
     using TeleportFun = void(Entity*, uint8_t, uint8_t);
@@ -168,7 +163,7 @@ void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
     tp(this, delta_x, delta_y);
 }
 
-std::pair<float, float> Entity::position()
+Vec2 Entity::position() const
 {
     auto [x_pos, y_pos] = position_self();
 
@@ -181,11 +176,6 @@ std::pair<float, float> Entity::position()
         overlay_nested = overlay_nested->overlay;
     }
     return {x_pos, y_pos};
-}
-
-std::pair<float, float> Entity::position_self() const
-{
-    return std::pair<float, float>(x, y);
 }
 
 void Entity::remove_item(uint32_t item_uid)
@@ -209,55 +199,11 @@ void Movable::poison(int16_t frames)
     write_mem_prot(offset_subsequent, frames, true);
 }
 
-bool Movable::is_poisoned()
-{
-    return (poison_tick_timer != -1);
-}
-
-bool Movable::broken_damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y)
-{
-    return damage(damage_dealer_uid, damage_amount, stun_time, velocity_x, velocity_y, 80);
-}
-
-bool Movable::damage(uint32_t damage_dealer_uid, int8_t damage_amount, uint16_t stun_time, float velocity_x, float velocity_y, uint8_t iframes)
-{
-    /* why?
-    if ((flags & (1 << 28)) > 0)
-    {
-        return;
-    }*/
-
-    auto dealer = get_entity_ptr(damage_dealer_uid);
-    /* but it can be nil?
-    if (dealer == nullptr)
-    {
-        return;
-    }*/
-
-    Vec2 velocity{velocity_x, velocity_y};
-    uint8_t unknown1{0};
-    bool unknown2{true};
-    return on_damage(dealer, damage_amount, 0x1, &velocity, unknown1, stun_time, iframes, unknown2);
-}
-
-bool Movable::is_button_pressed(BUTTON button)
-{
-    return (buttons & button) == button && (buttons_previous & button) == 0;
-}
-bool Movable::is_button_held(BUTTON button)
-{
-    return (buttons & button) == button && (buttons_previous & button) == button;
-}
-bool Movable::is_button_released(BUTTON button)
-{
-    return (buttons & button) == 0 && (buttons_previous & button) == button;
-}
-
 std::tuple<float, float, uint8_t> get_position(uint32_t uid)
 {
     Entity* ent = get_entity_ptr(uid);
     if (ent)
-        return std::make_tuple(ent->position().first, ent->position().second, ent->layer);
+        return std::make_tuple(ent->position().x, ent->position().y, ent->layer);
 
     return {0.0f, 0.0f, (uint8_t)0};
 }
@@ -290,8 +236,8 @@ std::tuple<float, float> get_velocity(uint32_t uid)
         else if (ent->is_liquid())
         {
             auto liquid_engine = State::get().get_correct_liquid_engine(ent->type->id);
-            vx = liquid_engine->entity_velocities->first;
-            vy = liquid_engine->entity_velocities->second;
+            vx = liquid_engine->entity_velocities->x;
+            vy = liquid_engine->entity_velocities->y;
         }
         if (ent->overlay)
         {
@@ -319,7 +265,7 @@ AABB get_hitbox(uint32_t uid, bool use_render_pos)
     return AABB{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
-TEXTURE Entity::get_texture()
+TEXTURE Entity::get_texture() const
 {
     if (texture)
         return texture->id;
@@ -336,17 +282,17 @@ bool Entity::set_texture(TEXTURE texture_id)
     return false;
 }
 
-bool Entity::is_player()
+bool Entity::is_player() const
 {
     if (type->search_flags & 1)
     {
-        Player* pl = this->as<Player>();
+        auto pl = static_cast<const Player*>(this);
         return pl->ai == nullptr;
     }
     return false;
 }
 
-bool Entity::is_movable()
+bool Entity::is_movable() const
 {
     static const ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
     if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
@@ -358,7 +304,7 @@ bool Entity::is_movable()
     return false;
 }
 
-bool Entity::is_liquid()
+bool Entity::is_liquid() const
 {
     static const ENT_TYPE liquid_water = to_id("ENT_TYPE_LIQUID_WATER");
     static const ENT_TYPE liquid_coarse_water = to_id("ENT_TYPE_LIQUID_COARSE_WATER");
@@ -377,10 +323,10 @@ void Entity::set_enable_turning(bool enabled)
     set_entity_turning(this, enabled);
 }
 
-std::span<uint32_t> Entity::get_items()
+std::vector<uint32_t> Entity::get_items()
 {
     if (items.size)
-        return std::span<uint32_t>(items.uids().begin(), items.uids().end());
+        return std::vector<uint32_t>(items.uids().begin(), items.uids().end());
 
     return {};
 }

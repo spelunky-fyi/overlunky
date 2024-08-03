@@ -110,12 +110,30 @@ struct UnknownAPIStuff
     uint32_t unknown7; // padding?
 };
 
-struct GameAPI // size 0x60
+struct STEAM_CALLBACK // just guessing
+{
+    size_t _vtable;   // 4 functions, last one is destructor
+    uint8_t unknown1; // probably bool?
+    uint8_t padding1[3];
+    uint32_t padding2; // probably base class padding
+
+    // subclass OnGameOverlayActivated ?
+    bool steam_overlay_open;
+    // padding
+    uint32_t unknown_timer;
+    float unknown_timer_related;
+    uint32_t unknown11; // padding?
+};
+
+struct GameAPI
 {
     static GameAPI* get();
 
-    float get_current_zoom();
-    float get_target_zoom();
+    float get_current_zoom() const;
+    float get_target_zoom() const
+    {
+        return renderer->target_zoom + renderer->target_zoom_offset;
+    }
 
     void set_zoom(std::optional<float> current, std::optional<float> target);
 
@@ -125,15 +143,11 @@ struct GameAPI // size 0x60
     uint32_t window_width;
     uint32_t window_height;
 
-    size_t unknown5;          // garbage?
-    size_t unknown6;          // exe start
-    size_t unknown7;          // some offset
-    size_t unknown8;          // garbage?
-    size_t SteamAPI_Callback; // just vtable? don't know much about steam stuff
+    // all this below can probably be steam related stuff
 
-    uint8_t unknown10a; // bool ?
-    uint32_t unknown10b;
-
-    size_t unknown11; // garbage?
-    size_t unknown12; // garbage?
+    size_t unknown5; // steam related?
+    size_t exe_begin;
+    size_t unknown7; // some offset, OnHeapPointer?
+    size_t unknown8; // function pointer?
+    STEAM_CALLBACK SteamAPI_Callback;
 };

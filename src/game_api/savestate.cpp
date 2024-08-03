@@ -87,16 +87,11 @@ void invalidate_save_slots()
 
 SaveState::SaveState()
 {
-    addr = (size_t)malloc(8 * 0x400000);
+    addr = (size_t)malloc(8ull * 0x400000);
     save();
 }
 
-SaveState::~SaveState()
-{
-    clear();
-}
-
-StateMemory* SaveState::get_state()
+StateMemory* SaveState::get_state() const
 {
     if (!addr)
         return nullptr;

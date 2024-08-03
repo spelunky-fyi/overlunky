@@ -81,7 +81,7 @@ LuaBackend::~LuaBackend()
 
     {
         std::lock_guard lock{global_lua_lock};
-        std::erase_if(g_all_backends, [=](const std::unique_ptr<ProtectedBackend>& protected_backend)
+        std::erase_if(g_all_backends, [this](const std::unique_ptr<ProtectedBackend>& protected_backend)
                       { return protected_backend.get() == self; });
     }
 }
@@ -176,12 +176,6 @@ void LuaBackend::clear_all_callbacks()
     lua["on_death"] = sol::lua_nil;
     lua["on_win"] = sol::lua_nil;
     lua["on_screen"] = sol::lua_nil;
-}
-
-bool LuaBackend::reset()
-{
-    clear();
-    return true;
 }
 
 CustomMovableBehavior* LuaBackend::get_custom_movable_behavior(std::string_view name)
@@ -1665,7 +1659,7 @@ bool LuaBackend::pre_set_feat(FEAT feat)
     return false;
 }
 
-CurrentCallback LuaBackend::get_current_callback()
+CurrentCallback LuaBackend::get_current_callback() const
 {
     return current_cb;
 }
