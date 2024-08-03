@@ -12,12 +12,14 @@ using CustomFreeFun = void*(void*, void*);
 void* custom_malloc(std::size_t size)
 {
     static CustomMallocFun* _malloc = (CustomMallocFun*)get_address("custom_malloc"sv);
-    static void* _alloc_base = OnHeapPointer<void>(*(size_t*)get_address("malloc_base"sv)).decode(); // probably should be decode_local
+    static size_t _heap_ptr_malloc_base = *reinterpret_cast<size_t*>(get_address("malloc_base"sv));
+    void* _alloc_base = OnHeapPointer<void>(_heap_ptr_malloc_base).decode_local();
     return _malloc(_alloc_base, size);
 }
 void custom_free(void* mem)
 {
     static CustomFreeFun* _free = (CustomFreeFun*)get_address("custom_free"sv);
-    static void* _alloc_base = OnHeapPointer<void>(*(size_t*)get_address("malloc_base"sv)).decode(); // probably should be decode_local
+    static size_t _heap_ptr_malloc_base = *reinterpret_cast<size_t*>(get_address("malloc_base"sv));
+    void* _alloc_base = OnHeapPointer<void>(_heap_ptr_malloc_base).decode_local();
     _free(_alloc_base, mem);
 }

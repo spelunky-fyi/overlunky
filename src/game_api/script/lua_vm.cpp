@@ -1990,13 +1990,13 @@ end
     lua["set_ending_unlock"] = set_ending_unlock;
 
     /// Get the thread-local version of state
-    lua["get_local_state"] = []()
+    lua["get_local_state"] = []() -> StateMemory*
     {
         return State::get().ptr_local();
     };
 
     /// Get the thread-local version of players
-    lua["get_local_players"] = []()
+    lua["get_local_players"] = []() -> std::vector<Player*>
     {
         return get_players(State::get().ptr_local());
     };
