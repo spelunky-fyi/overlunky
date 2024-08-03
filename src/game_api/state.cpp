@@ -699,7 +699,7 @@ void init_state_update_hook()
 
 void HeapClone(uint64_t heap_to, uint64_t heap_container_from)
 {
-    uint64_t location = memory_read<uint64_t>(State::get().get_location());
+    uint64_t location = State::get().get_offset();
     StateMemory* state_from = reinterpret_cast<StateMemory*>(memory_read<uint64_t>(heap_container_from + 0x88) + location);
     StateMemory* state_to = reinterpret_cast<StateMemory*>(heap_to + location);
     pre_copy_state_event(state_from, state_to);

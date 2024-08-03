@@ -8,6 +8,7 @@
 
 #include "aliases.hpp"                  // for ENT_TYPE, LAYER
 #include "containers/custom_vector.hpp" //
+#include "memory.hpp"                   // for memory_read
 #include "state_structs.hpp"            // for JournalProgressStickerSlot, ...
 
 class Entity;
@@ -397,9 +398,10 @@ struct State
     void set_seed(uint32_t seed);
     SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type) const;
-    size_t get_location()
+    // Get the 0x4A0 offset
+    size_t get_offset() const
     {
-        return this->location;
+        return memory_read<size_t>(location);
     }
 
   private:
