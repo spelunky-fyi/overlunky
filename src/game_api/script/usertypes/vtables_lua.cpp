@@ -32,6 +32,8 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"trigger_action", 0x18, void(Entity*)>,
         VTableEntry<"activate", 0x19, void(Entity*)>,
         VTableEntry<"on_collision2", 0x1a, void(Entity*)>,
+        VTableEntry<"get_metadata", 0x1b, uint16_t()>,
+        VTableEntry<"apply_metadata", 0x1c, void(uint16_t)>,
         VTableEntry<"walked_on", 0x1d, void(Entity*)>,
         VTableEntry<"walked_off", 0x1e, void(Entity*)>,
         VTableEntry<"ledge_grab", 0x1f, void(Entity*)>,
