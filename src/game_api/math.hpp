@@ -38,7 +38,7 @@ struct Vec2
     {
         return rotate(angle, p.x, p.y);
     }
-    /// Just simple pythagoras theorem
+    /// Just simple Pythagoras theorem
     float distance_to(const Vec2 other) const noexcept
     {
         auto diff{*this - other};
@@ -484,7 +484,7 @@ struct Quad
                && top_left_x == 0 && top_left_y == 0 && top_right_x == 0 && top_right_y == 0;
     }
 
-    /// Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
+    /// Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for symmetrical quadrangle
     Quad& rotate(float angle, float px, float py)
     {
         const float sin_a{std::sin(angle)};
@@ -578,7 +578,7 @@ struct Quad
 /// Find intersection point of two lines [A, B] and [C, D], returns INFINITY if the lines don't intersect each other [parallel]
 Vec2 intersection(const Vec2 A, const Vec2 B, const Vec2 C, const Vec2 D) noexcept;
 
-/// Mesures angle between two lines with one common point
+/// Measures angle between two lines with one common point
 float two_lines_angle(const Vec2 A, const Vec2 common, const Vec2 B) noexcept;
 
 /// Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function

@@ -72,7 +72,7 @@ class BGShootingStar : public BGRelativeElement
     float light_size; // UNSURE if you make it the same as size it starts to flicker, making this bigger increases the size as well
 };
 
-class BGShopEntrence : public Entity
+class BGShopEntrance : public Entity
 {
   public:
     bool on_entering;

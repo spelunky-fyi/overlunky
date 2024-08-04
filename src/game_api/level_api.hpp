@@ -425,7 +425,7 @@ class ThemeInfo
     /// Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
     virtual void spawn_extra() = 0;
 
-    /// Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
+    /// Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)
     virtual void do_procedural_spawn(SpawnInfo* info) = 0;
 
     uint32_t get_aux_id() const;
@@ -447,7 +447,7 @@ class SpecialLevelGeneration
   public:
     virtual ~SpecialLevelGeneration(){};
 
-    // For bees, sets rooms to be behive rooms.
+    // For bees, sets rooms to be beehive rooms.
     virtual void set_rooms() = 0;
 
     // For bees, spawns the hive background and midbgs.
@@ -455,7 +455,7 @@ class SpecialLevelGeneration
 
     // For bees, spawns bees and honey.
     // For leprechauns, spawns leprechaun, pot of gold, and rainbow.
-    virtual void procedual_spawns() = 0;
+    virtual void procedural_spawns() = 0;
 };
 
 enum class SHOP_TYPE : uint8_t
@@ -617,16 +617,16 @@ using COSUBTHEME = int8_t; // NoAlias
 COSUBTHEME get_co_subtheme();
 void force_co_subtheme(COSUBTHEME subtheme);
 
-void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken);
-inline void grow_vines(LAYER l, uint32_t max_lengh)
+void grow_vines(LAYER l, uint32_t max_length, AABB area, bool destroy_broken);
+inline void grow_vines(LAYER l, uint32_t max_length)
 {
-    grow_vines(l, max_lengh, {0, 0, 0, 0}, false);
+    grow_vines(l, max_length, {0, 0, 0, 0}, false);
 }
 
-void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken);
-inline void grow_poles(LAYER l, uint32_t max_lengh)
+void grow_poles(LAYER l, uint32_t max_length, AABB area, bool destroy_broken);
+inline void grow_poles(LAYER l, uint32_t max_length)
 {
-    grow_poles(l, max_lengh, {0, 0, 0, 0}, false);
+    grow_poles(l, max_length, {0, 0, 0, 0}, false);
 }
 
 bool grow_chain_and_blocks();

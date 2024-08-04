@@ -194,7 +194,7 @@ struct EmittedParticlesInfo
     }
     Particle back()
     {
-        return (*this)[particle_count - 1];
+        return (*this)[particle_count - 1]; // TODO particle_count can be 0
     }
     const Particle front() const
     {
@@ -202,7 +202,7 @@ struct EmittedParticlesInfo
     }
     const Particle back() const
     {
-        return (*this)[particle_count - 1];
+        return (*this)[particle_count - 1]; // TODO particle_count can be 0
     }
 
     bool empty() const noexcept

@@ -124,7 +124,7 @@ std::vector<DropEntry> drop_entries{
     {"FACTORY_GENERATOR_SCRAP", "\x48\x89\xF9\xBA\xE6\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
     /// Keep in mind that shopkeeper generator spawns two types of entities, the second one will be this + 1
     {"SHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"sv, VTABLE_OFFSET::NONE, 0, 2},
-    /* set conditional bp on load_item for spider, break some scrap until you hit bp, execute return, you will see spaider id right above the spawn function
+    /* set conditional bp on load_item for spider, break some scrap until you hit bp, execute return, you will see spider id right above the spawn function
      * scroll up to find the same pattern but for snake
      * just above the snake you can find cobra and scorpion id, with jump to the spawn function after snake
      * little higher up, same thing for alien */
@@ -163,7 +163,7 @@ std::vector<DropEntry> drop_entries{
     {"QUILLBACK_COOKEDTURKEY", "\xBA\x06\x02\x00\x00"sv, VTABLE_OFFSET::MONS_CAVEMAN_BOSS, 3, 1},
     {"LAVAPOT_MAGMAMAN", "\xBA\xEF\x00\x00\x00"sv, VTABLE_OFFSET::ITEM_LAVAPOT, 3, 1},
     /// Always spawns 5 of them
-    {"LAVAMANDER_RUBY", "\xBA\xF4\x01\x00\x00"sv, VTABLE_OFFSET::MONS_LAVAMANDER, 3, 1}, // 41 80 FE 05 - 05 ammount
+    {"LAVAMANDER_RUBY", "\xBA\xF4\x01\x00\x00"sv, VTABLE_OFFSET::MONS_LAVAMANDER, 3, 1}, // 41 80 FE 05 - 05 amount
     {"CATMUMMY_DIAMOND", "\xBA\xF1\x01\x00\x00"sv, VTABLE_OFFSET::MONS_CATMUMMY, 3, 1},
     /// Has to be ENT_TYPE_CHAR_*
     {"HUMPHEAD_HIREDHAND", "\xC7\x44\x24\x20\xD7\x00\x00\x00"sv, VTABLE_OFFSET::MONS_GIANTFISH, 3, 4},
@@ -180,7 +180,7 @@ std::vector<DropEntry> drop_entries{
     {"CRUSHTRAP_NUGGET", "\xBA\xF5\x01\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_CRUSH_TRAP_LARGE, 3, 1},
     /// COG
     {"SLIDINGWALL_NUGGET", "\xBA\xF5\x01\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_SLIDINGWALL, 3, 1},
-    /// Can sapwn this + 5 (for NUGGET_SMALL)
+    /// Can spawn this + 5 (for NUGGET_SMALL)
     {"EMBED_NUGGET", "\x81\xC2\xF5\x01\x00\x00"sv, VTABLE_OFFSET::EMBED_GOLD, 3, 2},
     /// Can be +1 for SAPPHIRE_SMALL
     {"CHEST_SMALLEMERALD", "\xBA\xF7\x01\x00\x00"sv, VTABLE_OFFSET::ITEM_CHEST, 3, 1},
@@ -306,9 +306,9 @@ std::vector<DropEntry> drop_entries{
     {"KAPALA_HEALTH", "\xBA\x01\x00\x00\x00\xB8\x01"sv, VTABLE_OFFSET::NONE, 0, 1},
     /* can't do elixir as there are some calculations for cursed, poisoned etc.
     can't do pet, it has some complex calculation for some reason
-    can't do ankh, made a separete function for that (see modify_ankh_health_gain)
+    can't do ankh, made a separate function for that (see modify_ankh_health_gain)
     can't do initial health (camp, level, duat, coffin) as it's a word/byte
-    can't do drops for: humphead, yetiking, yetiqueen, alien queen, pangxie (gems) those are stored in array, need special funciton for that
+    can't do drops for: humphead, yetiking, yetiqueen, alien queen, pangxie (gems) those are stored in array, need special function for that
     */
 
     /// maybe TODO: if someone wants all the explosions (from damage/death/crush), could also be added
