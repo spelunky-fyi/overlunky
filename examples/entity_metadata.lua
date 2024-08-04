@@ -36,7 +36,7 @@ function get_metadata_override(ent)
         metadata_table[uid] = {
             metadata = org_data,
             data = Vec2:new(ent.width, ent.height)
-            -- can get most types of data from entity, even user_data
+            -- can get most types of data from entity, also stuff from user_data
             -- exception for color, since game changes it to black when going thru layer door
         }
         return uid
