@@ -77,7 +77,7 @@ class LogicalTrapTrigger : public Entity
 class JungleTrapTrigger : public LogicalTrapTrigger
 {
   public:
-    int32_t counter1; // one of those wierd counters that counts all the traps, not only this single one
+    int32_t counter1; // one of those weird counters that counts all the traps, not only this single one
     int32_t counter2; // also there are 3 of them?
     int32_t counter3;
 };
@@ -174,8 +174,8 @@ class LimbAnchor : public Entity
     float y_pos;
     float hand_feet_x_offset;
     float hand_feet_y_offset;
-    float x_unk5; // all of those are offsets/positions of different joints, i'm too lazy to document thme all
-    float y_unk6; // if anywa wants to, go ahed
+    float x_unk5; // all of those are offsets/positions of different joints, i'm too lazy to document them all
+    float y_unk6; // if anyone wants to, go ahead
     float x_unk7;
     float y_unk8;
     float x_unk9;
@@ -278,7 +278,7 @@ class EggplantThrower : public Entity
 class LogicalMiniGame : public Entity
 {
   public:
-    /// Delay between spwning ufo
+    /// Delay between spawning ufo
     uint16_t timer;
 };
 

@@ -37,7 +37,7 @@ class Ai
     int16_t unknown11b;
     int32_t timer;
     /// AI state (patrol, sleep, attack, aggro...)
-    int8_t state; // 8 = HH agro
+    int8_t state; // 8 = HH aggro
     int8_t last_state;
     /// Levels completed with, 0..3
     uint8_t trust;
@@ -45,7 +45,7 @@ class Ai
     uint8_t whipped;
     int8_t unknown15;
     int8_t unknown16;
-    /// positive: walking, negative: wating/idle
+    /// positive: walking, negative: waiting/idle
     int16_t walk_pause_timer;
     int16_t unknown19;
     int16_t unknown20; // distance to target?
@@ -95,10 +95,10 @@ class PowerupCapable : public Movable
     /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
     int32_t worn_backitem();
 
-    // thoes could be wrong becous of the update
+    // those could be wrong because of the update
     virtual void on_blood_collision() = 0; // only triggers when player has kapala
 
-    // called for stunned entities, check bounch of stuff like state, hold entity, standing on entity etc. runs until returned 1
+    // called for stunned entities, check bunch of stuff like state, hold entity, standing on entity etc. runs until returned 1
     // this is used to clear the last_owner of stunned entity when it is no longed stunned
     virtual bool can_clear_last_owner() = 0;
 };

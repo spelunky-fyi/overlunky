@@ -22,8 +22,8 @@ void patch_orbs_limit()
     /*
      * The idea: we nuke jump instruction and some nop's after it
      * in new code we check if the number of orbs is greater than 3
-     * if yes we set it as 3 (2 becouse of 0 - 2 range)
-     * we jump back to the place of oryginal jump
+     * if yes we set it as 3 (2 because of 0 - 2 range)
+     * we jump back to the place of original jump
      */
     static bool once = false;
     if (once)
@@ -31,7 +31,7 @@ void patch_orbs_limit()
 
     auto& memory = Memory::get();
     const auto function_offset = get_virtual_function_address(VTABLE_OFFSET::ITEM_FLOATING_ORB, (uint32_t)VIRT_FUNC::ENTITY_KILL);
-    // finding exit of the loop that counts orbs, after jump there is unused code so we have enogh space for a our patch
+    // finding exit of the loop that counts orbs, after jump there is unused code so we have enough space for a our patch
     auto instance = find_inst(memory.exe(), "\xF3\x75"sv, function_offset, function_offset + 0x622, "patch_orbs_limit");
     auto offset = memory.at_exe(instance) + 3;
 
@@ -86,7 +86,7 @@ void patch_olmec_kill_crash()
     {
         // find address to escape to
         size_t rva = offset - memory.exe_address();
-        // below the patched code there are two jumps that performe long jump, at the end of it there is 'mov rax,qword ptr ds:[rdi]',
+        // below the patched code there are two jumps that performs long jump, at the end of it there is 'mov rax,qword ptr ds:[rdi]',
         // from this point find jump that's jumps over sond meta and fmod stuff, the jump ends up on code `mov eax,dword ptr ss:[rbp+10]`, that's our target for return_addr
         auto jump_out_lookup = find_inst(memory.exe(), "\x48\xC7\x40\x60\x00\x00\x00\x00"sv, rva, rva + 0x69D, "patch_olmec_kill_crash");
         if (jump_out_lookup == 0)
@@ -96,7 +96,7 @@ void patch_olmec_kill_crash()
     }
 
     /* The idea:
-     * if it's not the end of the array it's looking for olmec, jump back to the oryginal code via jump in `new_code`
+     * if it's not the end of the array it's looking for olmec, jump back to the original code via jump in `new_code`
      * if it's end of the array (no olmec found) jump to return_addr
      * the place for return_addr was kind of choosen by feel, as the code is complicated
      * the whole point of the patched code is to find olmec and check it's faze, maybe for the music? no idea, it's a big function
@@ -297,7 +297,7 @@ void set_skip_tiamat_cutscene(bool skip)
 
 void patch_ushabti_error()
 {
-    // nops MessageBoxA("Number of generated Ushabti statues isn't 100!")
+    // nop's MessageBoxA("Number of generated Ushabti statues isn't 100!")
     static bool once = false;
     if (once)
         return;

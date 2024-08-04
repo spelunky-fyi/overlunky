@@ -75,7 +75,7 @@ class PushBlock : public Movable
 class BoneBlock : public Movable
 {
   public:
-    float unknown1; // 1.0 when hited from left and -1.0 when hited from right
+    float unknown1; // 1.0 when whipped from left and -1.0 when whipped from right
 };
 
 class ChainedPushBlock : public PushBlock

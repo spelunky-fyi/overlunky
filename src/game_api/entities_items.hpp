@@ -79,7 +79,7 @@ class Cape : public Backpack
     uint32_t floating_count; // it's per level, not per cape
 
     // clear particle? called when using backpack.trigger_explosion when the cape is about to disappear
-    // it's a common funciton
+    // it's a common function
     virtual void v100(size_t unknown) = 0;
 };
 
@@ -106,7 +106,7 @@ class Mattock : public Purchasable
 };
 
 class Gun : public Purchasable
-{ // BIG NOTE: scepter is not a Purchasable, but that's the only Gun that isn't so i din't bother to make new type for it
+{ // BIG NOTE: scepter is not a Purchasable, but that's the only Gun that isn't so i didn't bother to make new type for it
   public:
     uint8_t cooldown;
     /// used only for webgun
@@ -269,7 +269,7 @@ class ScepterShot : public LightEmitter
     float speed;
     /// short timer before it goes after target
     uint16_t idle_timer;
-    int16_t unknown; // setting it low or high can make it last forever, won't matter if you change it back afterwards, anubis is 300 and player 400 by default
+    int16_t unknown; // setting it low or high can make it last forever, won't matter if you change it back afterwards, Anubis is 300 and player 400 by default
 };
 
 class SpecialShot : public LightEmitter
@@ -630,7 +630,7 @@ class SkullDropTrap : public Movable
 class FrozenLiquid : public Movable
 {
   public:
-    int32_t unknown1; // have problem cheeking those, looks like unused memory, but then, it's always zeros on spawn, changing it can crash the game
+    int32_t unknown1; // have problem checking those, looks like unused memory, but then, it's always zeros on spawn, changing it can crash the game
     int32_t unknown2;
 };
 

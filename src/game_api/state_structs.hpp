@@ -729,7 +729,7 @@ struct LiquidPhysicsEngine
     uint32_t allocated_size;
     uint32_t unk23;         // padding probably
     std::list<size_t> unk1; // seams to be empty, or have one element 0?
-    uint32_t resize_value;  // used to resive the arrays?
+    uint32_t resize_value;  // used to resize the arrays?
     uint32_t unk3b;         // padding probably
 
     // this is actually a pre C++11 version of std::list, which is different from current one!
@@ -749,7 +749,7 @@ struct LiquidPhysicsEngine
     Vec2* entity_velocities;                             // array
     int32_t unknown51a;                                  // size related for the array above
     int32_t unknown51b;                                  // padding
-    std::pair<float, float>* unknown52;                  // not sure about the type, it's defenetly a 64bit
+    std::pair<float, float>* unknown52;                  // not sure about the type, it's definitely a 64bit
     std::pair<float, float>* unknown53;
     size_t unknown54;
     std::pair<float, float>* unknown55;
@@ -1038,7 +1038,7 @@ struct RoomOwnersInfo
 struct MultiLineTextRendering
 {
     size_t* timer;                         // some struct? game increments this value and one at +0x40, seam to be related to rendering, touching just the first one freezes the game
-    std::vector<TextRenderingInfo*> lines; // each line is separete TextRenderingInfo
+    std::vector<TextRenderingInfo*> lines; // each line is separate TextRenderingInfo
     float x;                               // center of the text box?
     float y;                               // center of the text box?
 };

@@ -2118,7 +2118,7 @@ void force_co_subtheme(COSUBTHEME subtheme)
     }
 }
 
-void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
+void grow_vines(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 {
     area.abs();
 
@@ -2148,7 +2148,7 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
     if (end_y == 0)
         end_y = g_level_max_y - (state->h * 8 + 6);
 
-    if (end_y >= g_level_max_y) // in case of overflow when someone puts wierd state->h value
+    if (end_y >= g_level_max_y) // in case of overflow when someone puts weird state->h value
         end_y = 0;
 
     for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
@@ -2174,7 +2174,7 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
                 }
                 --i_y;
                 int32_t last_uid = -1;
-                const int max = (i_y - (int)max_lengh) < 0 ? 0 : i_y - max_lengh;
+                const int max = (i_y - (int)max_length) < 0 ? 0 : i_y - max_length;
                 for (; i_y > max && (i_y - 1) >= 0; --i_y)
                 {
                     if (state->layers[actual_layer]->grid_entities[i_y - 1][i_x] != nullptr)
@@ -2192,11 +2192,11 @@ void grow_vines(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
     }
     if (l == LAYER::BOTH)
     {
-        grow_vines(LAYER::BACK, max_lengh, area, destroy_broken);
+        grow_vines(LAYER::BACK, max_length, area, destroy_broken);
     }
 }
 
-void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
+void grow_poles(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 {
     area.abs();
 
@@ -2225,7 +2225,7 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
     if (start_y == 0)
         start_y = g_level_max_y - (state->h * 8 + 6);
 
-    if (start_y >= g_level_max_y) // in case of overflow when someone puts wierd state->h value
+    if (start_y >= g_level_max_y) // in case of overflow when someone puts weird state->h value
         start_y = 0;
 
     for (uint32_t i_x = start_x; i_x <= end_x; ++i_x)
@@ -2254,7 +2254,7 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
 
                 ++i_y;
                 int32_t last_uid = -1;
-                for (uint32_t max = i_y + max_lengh; i_y < max && (i_y + 1) < g_level_max_y; ++i_y)
+                for (uint32_t max = i_y + max_length; i_y < max && (i_y + 1) < g_level_max_y; ++i_y)
                 {
                     if (state->layers[actual_layer]->grid_entities[i_y + 1][i_x] != nullptr)
                     {
@@ -2271,7 +2271,7 @@ void grow_poles(LAYER l, uint32_t max_lengh, AABB area, bool destroy_broken)
     }
     if (l == LAYER::BOTH)
     {
-        grow_poles(LAYER::BACK, max_lengh, area, destroy_broken);
+        grow_poles(LAYER::BACK, max_length, area, destroy_broken);
     }
 }
 

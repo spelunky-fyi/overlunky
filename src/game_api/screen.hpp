@@ -154,7 +154,7 @@ struct MenuOption
     STRINGID option_name;
     float y_position;
     float brigthness; // 1.0 for selected item, 0 for non selected
-    bool enabled;     // only visual thing, locks brigthness at 0
+    bool enabled;     // only visual thing, locks brightness at 0
     // uint8_t padding_probably[3]
 
     OptionSelect* select; // called as soon as you hit enter on the selected option
@@ -350,7 +350,7 @@ class ScreenOptions : public Screen // ID: 5
     /// Shows the red background behind the option, the scarab on the left and left/right arrows
     bool show_highlight;
     // uint8_t padding_probably8[5];
-    custom_vector<size_t> unknown50; // holds one 8 byte value, related to choosen opion menu
+    custom_vector<size_t> unknown50; // holds one 8 byte value, related to choosen option menu
     uint8_t unknown51;               // probably bool
     // padding_probably10[7];
     custom_vector<STRINGID> tooltip_text;
@@ -520,7 +520,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     float blackout_transparency;
     bool start_pressed;
     bool transition_to_game_started;
-    bool disable_buttons; /* unsure */ // hides the buttons on the enrances and disables control (without setting the bool below)
+    bool disable_buttons; /* unsure */ // hides the buttons on the entrances and disables control (without setting the bool below)
     bool disable_controls;
     uint32_t unknown72;
 
@@ -757,7 +757,7 @@ class ScreenOnlineLoading : public Screen // ID: 28
 struct OnlineLobbyScreenPlayer
 {
     /// 16 = PC, 17 = Discord, 18 = Steam, 19 = Xbox, 32 = switch, 48 = PS, 49 = PS again?
-    uint8_t platform_icon; // werid numbers, anything else results in the startd PC icon, maybe it's some actual id
+    uint8_t platform_icon; // weird numbers, anything else results in the standard PC icon, maybe it's some actual id
     /// 0 - Ana Spelunky, 1 - Margaret Tunnel, 2 - Colin Northward, 3 - Roffy D. Sloth.. and so on. Same order as in ENT_TYPE
     uint8_t character;
     bool ready;
@@ -816,7 +816,7 @@ class ScreenOnlineLobby : public Screen // ID: 29
     uint32_t unknown53;
 
     // can't put ScreenEnterOnlineCode here as it's abstract class
-    // no idea how the game code apperently allows this, unless this is some compiler opimaization bullshit
+    // no idea how the game code apparently allows this, unless this is some compiler optimization bullshit
 
     size_t screen_code_input;
 };
@@ -833,7 +833,7 @@ struct MenuInsert
     float unknown8;
     uint32_t unknown9;
     float unknown10;
-    std::vector<size_t*> unknown11; // menu options, probably just a bunch of floats, suprisingly it's not TextRenderingInfo
+    std::vector<size_t*> unknown11; // menu options, probably just a bunch of floats, surprisingly it's not TextRenderingInfo
     size_t* unknown12;
     size_t* unknown13; // function
     uint32_t selected_menu_index;
@@ -1065,10 +1065,10 @@ struct JournalUI
 
     // uint8_t padding_probably1[3];
 
-    /// Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
-    /// Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
+    /// Stores pages loaded into memory. It's not cleared after the journal is closed or when you go back to the main (menu) page.
+    /// Use `:get_type()` to check page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
     custom_vector<JournalPage*> pages;
-    custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transfered to the pages vector
+    custom_vector<JournalPage*> pages_tmp; // pages are constructed in the show_journal function and put here, later transferred to the pages vector
     uint32_t current_page;
     uint32_t flipping_to_page;
     uint32_t unknown10;

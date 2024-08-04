@@ -138,7 +138,7 @@ struct PauseAPI
         set_pause(pause);
     }
     bool event(PAUSE_TYPE event);
-    bool check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen);
+    bool check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen) const;
     void pre_loop()
     {
         blocked = false;

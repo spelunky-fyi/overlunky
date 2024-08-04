@@ -34,7 +34,7 @@ void PauseAPI::set_pause(PAUSE_TYPE flags)
     state->pause = (uint8_t)(((uint32_t)flags) & 0x3f);
 }
 
-bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen)
+bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen) const
 {
     bool match = false;
     auto state = State::get().ptr();

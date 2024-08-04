@@ -861,7 +861,7 @@ void refresh_script_files()
         }
     }
 
-    for (auto file : g_script_files)
+    for (auto& file : g_script_files)
     {
         load_script(file.wstring(), false);
     }
@@ -990,7 +990,7 @@ void save_config(std::string file)
 
     std::vector<std::string> ini_tabs_open;
     std::vector<std::string> ini_tabs_detached;
-    for (auto [name, window] : windows)
+    for (auto& [name, window] : windows)
     {
         if (window->open)
             ini_tabs_open.push_back(name);
@@ -1084,7 +1084,7 @@ void load_config(std::string file)
     kits.clear();
     saved_entities.clear();
     saved_entities = toml::find_or<std::vector<std::string>>(opts, "kits", {});
-    for (auto saved : saved_entities)
+    for (auto& saved : saved_entities)
     {
         kits.push_back(new Kit({saved, false}));
     }
@@ -1186,7 +1186,7 @@ bool toggle(std::string tool)
     }
     else if (options["menu_ui"])
     {
-        for (auto [name, window] : windows)
+        for (auto& [name, window] : windows)
             window->popup = false;
         windows[tool]->popup = true;
         return true;
@@ -1196,7 +1196,7 @@ bool toggle(std::string tool)
         ImGuiWindow* win = ImGui::FindWindowByName("Overlunky");
         if (win)
             win->Collapsed = false;
-        for (auto window : windows)
+        for (auto& window : windows)
         {
             if (window.first == tool)
             {
@@ -1350,7 +1350,7 @@ void smart_delete(Entity* ent, bool unsafe = false)
 
 void reset_windows()
 {
-    for (auto [name, window] : windows)
+    for (auto& [name, window] : windows)
     {
         window->detached = false;
         window->open = true;
@@ -1628,7 +1628,7 @@ void spawn_entity_over()
     auto to_spawn = get_spawn_item();
     if (to_spawn.has_value())
     {
-        auto item = to_spawn.value();
+        const auto& item = to_spawn.value();
         if (item.name.find("ENT_TYPE_LIQUID") != std::string::npos)
         {
             auto cpos = UI::click_position(g_x, g_y);
@@ -4979,7 +4979,7 @@ void render_messages()
     {
         g_ConsoleMessages.push_back(std::move(message));
     }
-    for (auto message : g_ConsoleMessages)
+    for (auto& message : g_ConsoleMessages)
     {
         std::istringstream messages(message.message);
         while (!messages.eof())
@@ -5019,7 +5019,7 @@ void render_messages()
     }
 
     ImGui::SetWindowPos({base->Pos.x + 30.0f + 0.128f * base->Size.x * io.FontGlobalScale, base->Pos.y + base->Size.y - queue.size() * font_size - 40});
-    for (auto message : queue)
+    for (const auto& message : queue)
     {
         float alpha = 1.0f - std::chrono::duration_cast<std::chrono::milliseconds>(now - std::get<2>(message)).count() / 12000.0f;
         if (!options["fade_script_messages"])
@@ -6117,9 +6117,9 @@ void render_options()
         tooltip("Draw hitboxes for all movable and hovered entities. Also mouse tooltips.", "toggle_hitboxes");
         ImGui::SameLine();
         ImGui::Checkbox("interpolated##DrawRealBox", &options["draw_hitboxes_interpolated"]);
-        tooltip("Use interpolated render position for smoother hitboxes on hifps.\nActual game logic is not interpolated like this though.");
+        tooltip("Use interpolated render position for smoother hitboxes on high fps.\nActual game logic is not interpolated like this though.");
         ImGui::Checkbox("Draw hovered entity tooltip##DrawEntityTooltip", &options["draw_entity_tooltip"]);
-        tooltip("Draw entity names, uids and some random stuff for hovered entitites.", "toggle_entity_tooltip");
+        tooltip("Draw entity names, uids and some random stuff for hovered entities.", "toggle_entity_tooltip");
         ImGui::Checkbox("Draw all entity info##DrawEntityInfo", &options["draw_entity_info"]);
         tooltip("Draw entity names, uids and some random stuff next to all entities.", "toggle_entity_info");
         ImGui::Checkbox("Draw gridlines##DrawTileGrid", &options["draw_grid"]);
@@ -6490,7 +6490,7 @@ void render_script_files()
 {
     ImGui::PushID("files");
     int num = 0;
-    for (auto file : g_script_files)
+    for (auto& file : g_script_files)
     {
         auto id = file.string();
         std::replace(id.begin(), id.end(), '\\', '/');
@@ -6701,7 +6701,7 @@ void render_scripts()
         ImGui::PopID();
         ImGui::PopID();
     }
-    for (auto id : unload_scripts)
+    for (auto& id : unload_scripts)
     {
         auto it = g_scripts.find(id);
         if (it != g_scripts.end())
@@ -7002,7 +7002,7 @@ void render_savegame()
     ImGui::PushID("Feats");
     if (submenu("Steam Achievements"))
     {
-        ImGui::Checkbox("I know what I'm doing, unlock editing!##EditAchiecements", &edit_achievements);
+        ImGui::Checkbox("I know what I'm doing, unlock editing!##EditAchievements", &edit_achievements);
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.3f, 0.3f, 1.0f));
         ImGui::TextWrapped("Warning: Touching anything in here will edit your real Steam Achievements directly. If you're using the Steam emulator, this only affects the achievements saved in the emulator.");
         if (options["disable_achievements"])
@@ -8065,7 +8065,7 @@ void render_hotbar()
             else
                 ImGui::PushStyleColor(ImGuiCol_Border, {0, 0, 0, 0.8f});
             ImGui::PushID(i);
-            auto name = entity_names[hotbar[i]];
+            std::string name = entity_names[hotbar[i]];
             // std::replace(name.begin(), name.end(), '_', '\n');
             name = name.substr(name.find_last_of('_') + 1);
             if (ImGui::Button(fmt::format("{}          \n\n\n{}", i + 1, name).c_str(), {iconsize, iconsize}))
@@ -8282,7 +8282,7 @@ void render_texture_viewer()
     if (draw_animations && ent && ent->get_texture() == texture_viewer.id)
     {
         std::map<std::tuple<uint32_t, uint32_t, bool>, int> overlap;
-        for (auto [id, anim] : ent->type->animations)
+        for (const auto& [id, anim] : ent->type->animations)
         {
             uint32_t x = def.sub_image_offset_x + def.tile_width * (anim.texture % (def.sub_image_width / def.tile_width));
             uint32_t y = def.sub_image_offset_y + def.tile_height * (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
@@ -8697,7 +8697,7 @@ void render_game_props()
             ImGui::RadioButton("Spawned in Castle##QuestHorsingVlad", &horsing_state, 3);
             ImGui::RadioButton("Shot Vlad##QuestHorsingVladShot", &horsing_state, 4);
             ImGui::RadioButton("Spawned in Temple##QuestHorsingTemple", &horsing_state, 5);
-            ImGui::RadioButton("Got alien compass##QuestHorsingComplass", &horsing_state, 6);
+            ImGui::RadioButton("Got alien compass##QuestHorsingCompass", &horsing_state, 6);
             ImGui::RadioButton("Palace basement ending##QuestHorsingTusk", &horsing_state, 7);
             g_state->quests->van_horsing_state = static_cast<int8_t>(horsing_state);
             endmenu();
@@ -8830,7 +8830,7 @@ void render_game_props()
         render_players();
         ImGui::SeparatorText("Player inputs");
         ImGui::PushID("PlayerInputIndex");
-        for (unsigned int i = 0; i < 5; ++i)
+        for (uint8_t i = 0; i < 5; ++i)
         {
             ImGui::PushID(i);
             auto label = i < 4 ? fmt::format("Player {}##PlayerInput{}", i + 1, i) : "Menu?";
@@ -8908,7 +8908,7 @@ void render_game_props()
     {
         static auto hide_zero = true;
         ImGui::Checkbox("Hide 0% chances", &hide_zero);
-        static auto render_procedural_chance = [](uint32_t id, LevelChanceDef& def)
+        static auto render_procedural_chance = [](uint32_t id, const LevelChanceDef& def)
         {
             int inverse_chance = g_state->level_gen->get_procedural_spawn_chance(id);
             std::string name = std::string(g_state->level_gen->get_procedural_spawn_chance_name(id).value_or(fmt::format("{}", id)));
@@ -8938,11 +8938,11 @@ void render_game_props()
         };
 
         ImGui::SeparatorText("Monster chances");
-        for (auto [id, def] : g_state->level_gen->data->level_monster_chances)
+        for (auto& [id, def] : g_state->level_gen->data->level_monster_chances)
             render_procedural_chance(id, def);
 
         ImGui::SeparatorText("Trap chances");
-        for (auto [id, def] : g_state->level_gen->data->level_trap_chances)
+        for (auto& [id, def] : g_state->level_gen->data->level_trap_chances)
             render_procedural_chance(id, def);
 
         ImGui::SeparatorText("Level chances");
@@ -9379,7 +9379,7 @@ void render_prohud()
     }
     g_speedhack_ui_multiplier = UI::get_speedhack();
 
-    auto io = ImGui::GetIO();
+    const auto& io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
     ImDrawList* dl = ImGui::GetBackgroundDrawList(base);
     auto topmargin = 0.0f;
@@ -9660,7 +9660,7 @@ void imgui_draw()
                 ImGui::PopStyleVar();
                 for (size_t i = 0; i < tab_order_main.size(); ++i)
                 {
-                    auto tab = tab_order_main[i];
+                    const auto& tab = tab_order_main[i];
                     if (windows[tab]->detached)
                         continue;
                     ImGui::SetNextWindowSizeConstraints({300.0f, 100.0f}, {500.0f, base->Size.y - 50.0f});
@@ -9686,7 +9686,7 @@ void imgui_draw()
                 {
                     for (size_t i = 0; i < tab_order_extra.size(); ++i)
                     {
-                        auto tab = tab_order_extra[i];
+                        const auto& tab = tab_order_extra[i];
                         if (ImGui::MenuItem(windows[tab]->name.c_str()))
                             detach(tab);
                     }
@@ -9706,7 +9706,7 @@ void imgui_draw()
                 {
                     for (size_t i = 0; i < tab_order.size() - 5; ++i)
                     {
-                        auto tab = tab_order[i];
+                        const auto& tab = tab_order[i];
                         if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
@@ -9714,7 +9714,7 @@ void imgui_draw()
                     }
                     for (size_t i = 0; i < tab_order_extra.size(); ++i)
                     {
-                        auto tab = tab_order_extra[i];
+                        const auto& tab = tab_order_extra[i];
                         if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
@@ -9734,7 +9734,7 @@ void imgui_draw()
                     ImGui::Separator();
                     for (size_t i = tab_order.size() - 4; i < tab_order.size(); ++i)
                     {
-                        auto tab = tab_order[i];
+                        const auto& tab = tab_order[i];
                         if (ImGui::MenuItem(windows[tab]->name.c_str(), key_string(keys[tab]).c_str()))
                         {
                             toggle(tab);
@@ -9773,7 +9773,7 @@ void imgui_draw()
             if (ImGui::BeginTabBar("##TabBar"))
             {
                 ImGuiTabItemFlags flags = 0;
-                for (auto tab : tab_order)
+                for (const auto& tab : tab_order)
                 {
                     flags = 0;
                     if (activate_tab == tab)
@@ -9799,7 +9799,7 @@ void imgui_draw()
                 ImGui::EndTabBar();
             }
             int tabnum = 0;
-            for (auto window : windows)
+            for (auto& window : windows)
             {
                 if (window.second->open && !window.second->detached)
                     ++tabnum;
@@ -9809,7 +9809,7 @@ void imgui_draw()
                 ImGui::TextWrapped("Looks like you closed all your tabs. Good thing we have a menubar now!");
                 if (ImGui::Button("Restore all tabs"))
                 {
-                    for (auto window : windows)
+                    for (auto& window : windows)
                     {
                         window.second->open = true;
                     }
@@ -9817,7 +9817,7 @@ void imgui_draw()
             }
             ImGui::End();
         }
-        for (auto tab : windows)
+        for (const auto& tab : windows)
         {
             if (!tab.second->detached)
                 continue;
@@ -9909,7 +9909,7 @@ void update_bucket()
     g_bucket->overlunky->selected_uids = g_selected_ids;
     g_bucket->overlunky->keys = keys;
 
-    for (auto [k, v] : g_bucket->overlunky->set_options)
+    for (const auto& [k, v] : g_bucket->overlunky->set_options)
     {
         if (!legal_options.contains(k))
             continue;
@@ -9973,7 +9973,7 @@ void update_bucket()
     }
     g_bucket->overlunky->set_options.clear();
 
-    for (auto [k, v] : options)
+    for (auto& [k, v] : options)
     {
         g_bucket->overlunky->options[k] = options[k];
     }

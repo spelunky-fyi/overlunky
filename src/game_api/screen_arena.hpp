@@ -308,5 +308,5 @@ class ScreenArenaScore : public Screen // ID: 27
     // uint32_t padding_probably;
     std::array<ParticleEmitterInfo*, 13> particles;
     std::array<ScreenArenaScoreLavaBubble, 15> lava_bubbles_positions;
-    std::array<ScreenArenaScoreUnknown, 160> unknown45; // only used if one of the players win, probably the flying down confetti/featers
+    std::array<ScreenArenaScoreUnknown, 160> unknown45; // only used if one of the players win, probably the flying down confetti/feathers
 };
