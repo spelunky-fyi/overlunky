@@ -91,6 +91,10 @@ void register_usertypes(sol::state& lua)
         &RenderInfo::x,
         "y",
         &RenderInfo::y,
+        "offset_x",
+        &RenderInfo::offset_x,
+        "offset_y",
+        &RenderInfo::offset_y,
         "shader",
         &RenderInfo::shader,
         "source",
@@ -114,8 +118,14 @@ void register_usertypes(sol::state& lua)
         &RenderInfo::tileh,
         "facing_left",
         &RenderInfo::flip_horizontal,
+        "angle",
+        &RenderInfo::angle1,
+        "animation_frame",
+        &RenderInfo::animation_frame,
         "render_inactive",
         &RenderInfo::render_inactive,
+        "brightness",
+        &RenderInfo::brightness,
         "texture_num",
         sol::readonly(&RenderInfo::texture_num),
         "get_entity",
@@ -125,20 +135,20 @@ void register_usertypes(sol::state& lua)
         "get_second_texture",
         [](const RenderInfo& ri) -> std::optional<TEXTURE>
         {
-            if (!ri.second_texture_name || ri.texture_num < 2)
+            if (!ri.texture_names[1] || ri.texture_num < 2)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.second_texture_name)) /**/;
+            return ::get_texture(std::string_view(*ri.texture_names[1])) /**/;
         },
         "get_third_texture",
         [](const RenderInfo& ri) -> std::optional<TEXTURE>
         {
-            if (!ri.third_texture_name || ri.texture_num < 3)
+            if (!ri.texture_names[2] || ri.texture_num < 3)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.third_texture_name)) /**/;
+            return ::get_texture(std::string_view(*ri.texture_names[2])) /**/;
         },
         "set_second_texture",
         &RenderInfo::set_second_texture,
