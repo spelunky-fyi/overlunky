@@ -20,12 +20,12 @@ class OnHeapPointer
     {
     }
 
-    T* decode()
+    T* decode() const
     {
         return reinterpret_cast<T*>(ptr_ + heap_base());
     }
 
-    T* decode_local()
+    T* decode_local() const
     {
         auto lhb = local_heap_base();
         if (lhb == 0)
@@ -34,7 +34,7 @@ class OnHeapPointer
         return reinterpret_cast<T*>(ptr_ + lhb);
     }
 
-    T* operator->()
+    T* operator->() const
     {
         return decode();
     }
