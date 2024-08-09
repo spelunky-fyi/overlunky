@@ -138,7 +138,7 @@ auto g_angle_style = CORNER_FINISH::ADAPTIVE;
 
 void VanillaRenderContext::set_corner_finish(CORNER_FINISH c)
 {
-    g_angle_style = c; // can i make this per lua environment instead of global? 
+    g_angle_style = c; // can i make this per lua environment instead of global?
 }
 
 // get a Quad to fill out the corner between two lines and fix their overlap
