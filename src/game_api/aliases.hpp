@@ -209,6 +209,6 @@ enum class ENTITY_MASK
     WATER = 0x2000,
     LAVA = 0x4000,
     LIQUID = 0x6000,
-    NONE = 0x0,
+    ANY = 0x0,
 };
 ENUM_CLASS_FLAGS(ENTITY_MASK)

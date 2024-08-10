@@ -1366,16 +1366,16 @@ uint8_t get_liquids_at(ENTITY_MASK liquid_mask, float x, float y, LAYER layer)
     uint32_t ix = static_cast<int>((x + 0.5) / 0.3333333);
     uint32_t iy = static_cast<int>((y + 0.5) / 0.3333333);
     auto& liquids_at = (*liquid_physics->liquids_by_third_of_tile)[iy][ix];
-    if (liquid_mask == ENTITY_MASK::NONE)
+    if (liquid_mask == ENTITY_MASK::ANY)
     {
         return liquids_at.water + liquids_at.lava;
     }
     else
     {
         uint8_t liquids_num = 0;
-        if ((liquid_mask & ENTITY_MASK::WATER) != ENTITY_MASK::NONE)
+        if ((liquid_mask & ENTITY_MASK::WATER) == ENTITY_MASK::WATER)
             liquids_num += liquids_at.water;
-        if ((liquid_mask & ENTITY_MASK::LAVA) != ENTITY_MASK::NONE)
+        if ((liquid_mask & ENTITY_MASK::LAVA) == ENTITY_MASK::LAVA)
             liquids_num += liquids_at.lava;
         return liquids_num;
     }
