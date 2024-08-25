@@ -27,7 +27,7 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"can_be_pushed", 0xa, bool()>,
         VTableEntry<"is_in_liquid", 0xc, bool()>,
         VTableEntry<"set_invisible", 0xf, void(bool)>,
-        VTableEntry<"friction", 0x11, float()>,
+        VTableEntry<"friction", 0x13, float()>,
         VTableEntry<"get_held_entity", 0x16, Entity*()>,
         VTableEntry<"trigger_action", 0x18, void(Entity*)>,
         VTableEntry<"activate", 0x19, void(Entity*)>,

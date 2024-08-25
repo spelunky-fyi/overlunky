@@ -260,6 +260,9 @@ struct SoundInfo
     std::string sound_name; // not 100% sure if it's standard
 };
 
+// there is actually base class that consists of up to the left/right channel, used for the sfx
+// then normal sounds that you can find in entities, screens itp. have up to the paddings
+// finally music in GameManages has the extra bool in BackgroundSound
 struct SoundMeta
 {
     float x;

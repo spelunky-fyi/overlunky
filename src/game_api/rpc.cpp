@@ -69,7 +69,7 @@ void attach_entity(Entity* overlay, Entity* attachee)
 {
     if (attachee->overlay)
     {
-        overlay->remove_item_ptr(attachee);
+        attachee->overlay->remove_item_ptr(attachee, false);
     }
 
     auto [x, y] = overlay->position();
@@ -131,10 +131,6 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)
     {
         if (Entity* top = get_entity_ptr(top_uid))
         {
-            if (top->overlay)
-            {
-                top->overlay->remove_item_ptr(top);
-            }
             attach_entity(bottom, top);
             top->x = offset[0];
             top->y = offset[1];
@@ -342,12 +338,12 @@ void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
     container->as<Container>()->inside = item_entity_type;
 }
 
-void entity_remove_item(uint32_t uid, uint32_t item_uid)
+void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> check_autokill)
 {
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return;
-    entity->remove_item(item_uid);
+    entity->remove_item(item_uid, check_autokill.value_or(true));
 }
 
 void lock_door_at(float x, float y)
@@ -577,14 +573,25 @@ void pick_up(uint32_t who_uid, uint32_t what_uid)
     }
 }
 
-void drop(uint32_t who_uid, uint32_t what_uid)
+void drop(uint32_t who_uid, std::optional<uint32_t> what_uid)
 {
-    Movable* ent = (Movable*)get_entity_ptr(who_uid);
-    Movable* item = (Movable*)get_entity_ptr(what_uid);
-    if (ent != nullptr && item != nullptr)
+    auto ent = get_entity_ptr(who_uid);
+    if (ent == nullptr)
+        return;
+
+    if (!ent->is_movable()) // game would probably use the is_player_or_monster function here, since they are the only ones who should be able to hold something
+        return;
+
+    auto mov = ent->as<Movable>();
+    if (what_uid.has_value()) // should we handle what_uid = -1 the same way?
     {
-        ent->drop(item);
+        auto item = get_entity_ptr(what_uid.value());
+        if (item == nullptr)
+            return;
+        if (item->overlay != mov && mov->holding_uid == what_uid)
+            return;
     }
+    mov->drop();
 }
 
 void unequip_backitem(uint32_t who_uid)

@@ -30,6 +30,7 @@ class Movable;
 struct EntityHooksInfo;
 using ENT_FLAG = uint32_t;
 using ENT_MORE_FLAG = uint32_t;
+using DAMAGE_TYPE = uint16_t;
 
 enum class RECURSIVE_MODE
 {
@@ -192,7 +193,7 @@ class Entity
     {
         return Vec2{x, y};
     }
-    void remove_item(uint32_t item_uid);
+    void remove_item(uint32_t item_uid, bool check_autokill);
 
     TEXTURE get_texture() const;
     /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
@@ -261,42 +262,44 @@ class Entity
     inline static std::function<void(Entity*, std::uint32_t)> clear_dtor_impl{};
 
     virtual ~Entity() = 0;                    // vritual 0
-    virtual void create_rendering_info() = 0; // 1
+    virtual void create_rendering_info() = 0; // 1, potentially also returns the pointer
     virtual void handle_state_machine() = 0;  // 2
 
     /// Kills the entity, you can set responsible to `nil` to ignore it
     virtual void kill(bool destroy_corpse, Entity* responsible) = 0; // 3
 
-    virtual void on_collision1(Entity* other_entity) = 0; // 4, triggers on collision between whip and hit object
+    /// Collisions with stuff that blocks you, like walls, floors, etc. Triggers for entities in it's EntityDB.collision_mask
+    virtual void on_collision1(Entity* other_entity) = 0; // 4
 
     /// Completely removes the entity from existence
     virtual void destroy() = 0; // 5
 
-    virtual void apply_texture(Texture*) = 0;                         // 6
-    virtual void format_shopitem_name(char16_t*) = 0;                 // 7
-    virtual void generate_stomp_damage_particles(Entity* victim) = 0; // 8, particles when jumping on top of enemy
-    virtual float get_type_field_a8() = 0;                            // 9
-    virtual bool can_be_pushed() = 0;                                 // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
-    virtual bool v11() = 0;                                           // 11, for arrows: returns true if it's moving (for y possibily checks for some speed as well?)
+    virtual void apply_texture(Texture*) = 0;                                                   // 6
+    virtual void format_shopitem_name(char16_t*) = 0;                                           // 7
+    virtual void generate_stomp_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool) = 0; // 8, particles when jumping on top of enemy
+    virtual float get_type_field_a8() = 0;                                                      // 9
+    virtual bool can_be_pushed() = 0;                                                           // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
+    virtual bool v11() = 0;                                                                     // 11, for arrows: returns true if it's moving (for y possibly checks for some speed as well?)
     /// Returns true if entity is in water/lava
     virtual bool is_in_liquid() = 0;                                         // 12
     virtual bool check_type_properties_flags_19() = 0;                       // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
-    virtual uint32_t get_type_field_60() = 0;                                // 14
+    virtual uint8_t get_type_field_60() = 0;                                 // 14
     virtual void set_invisible(bool value) = 0;                              // 15
     virtual void handle_turning_left(bool apply) = 0;                        // 16, if disabled, monsters don't turn left and keep walking in the wall (and other right-left issues)
-    virtual void set_draw_depth(uint8_t draw_depth) = 0;                     // 17
-    virtual void resume_ai() = 0;                                            // 18, works on entities with ai_func != 0; runs when companions are let go from being held. AI resumes anyway in 1.23.3
+    virtual void set_draw_depth(uint8_t draw_depth, uint8_t b3f) = 0;        // 17
+    virtual void resume_ai() = 0;                                            // 18, works on entities with ai_func != 0; runs when companions are let go from being held. AI resumes anyway in 1.23.3, only calls `set_draw_depth`
     virtual float friction() = 0;                                            // 19
     virtual void set_as_sound_source(SoundMeta*) = 0;                        // 20, update sound position to entity position?
-    virtual void remove_item_ptr(Entity*) = 0;                               // 21
+    virtual void remove_item_ptr(Entity* entity, bool autokill_check) = 0;   // 21, if autokill_check is true, it will check if the entity has the "kill if overlay lost" flag and kill it if it's set
     virtual Entity* get_held_entity() = 0;                                   // 22
-    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", tiggers use self as the first parameter
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", tiggers use self as the first parameter. Called when there is entity overlapping trigger entity, even if they don't move
     /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     virtual bool trigger_action(Entity* user) = 0; // 24
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0; // 25
 
-    virtual void on_collision2(Entity* other_entity) = 0; // 26, needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical tiggers
+    /// More like on_overlap, triggers when entities touch/overlap each other. Triggers for entities in it's EntityDB.collision2_mask
+    virtual void on_collision2(Entity* other_entity) = 0; // 26
 
     /// e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual uint16_t get_metadata() = 0;                // 27
@@ -307,7 +310,8 @@ class Entity
     virtual void on_stood_on_by(Entity* entity) = 0;    // 32, e.g. pots, skulls, pushblocks, ... standing on floors
     virtual void toggle_backlayer_illumination() = 0;   // 33, only for CHAR_*: when going to the backlayer, turns on player emitted light
     virtual void v34() = 0;                             // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
-    virtual void liberate_from_shop() = 0;              // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
+    /// `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1
+    virtual void liberate_from_shop(bool clear_parrent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
 
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0; // 36, This is actually just an initialize call that is happening once after  the entity is created

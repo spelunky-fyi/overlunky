@@ -239,9 +239,17 @@ void register_usertypes(sol::state& lua)
     entity_type["overlaps_with"] = overlaps_with;
     entity_type["get_texture"] = &Entity::get_texture;
     entity_type["set_texture"] = &Entity::set_texture;
-    entity_type["set_draw_depth"] = &Entity::set_draw_depth;
+
+    auto set_draw_depth = sol::overload(&Entity::set_draw_depth, [](Entity& ent, uint8_t depth) // for backward compatibility
+                                        { ent.set_draw_depth(depth, 0); });
+
+    entity_type["set_draw_depth"] = set_draw_depth;
     entity_type["set_enable_turning"] = &Entity::set_enable_turning;
-    entity_type["liberate_from_shop"] = &Entity::liberate_from_shop;
+
+    auto liberate_from_shop = sol::overload(&Entity::liberate_from_shop, [](Entity& ent) // for backward compatibility)
+                                            { ent.liberate_from_shop(true); });
+
+    entity_type["liberate_from_shop"] = liberate_from_shop;
     entity_type["get_held_entity"] = &Entity::get_held_entity;
     entity_type["set_layer"] = &Entity::set_layer;
     entity_type["apply_layer"] = &Entity::apply_layer;
@@ -274,7 +282,7 @@ void register_usertypes(sol::state& lua)
         static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
     auto add_money = sol::overload(
         static_cast<void (Movable::*)(int32_t)>(&Movable::add_money_broken),
-        static_cast<void (Movable::*)(int32_t, uint32_t)>(&Movable::collect_treasure));
+        static_cast<bool (Movable::*)(int32_t, uint32_t)>(&Movable::collect_treasure));
     auto movable_type = lua.new_usertype<Movable>("Movable", sol::base_classes, sol::bases<Entity>());
     movable_type["move"] = &Movable::move;
     movable_type["movex"] = &Movable::movex;
@@ -304,19 +312,23 @@ void register_usertypes(sol::state& lua)
     /// NoDoc
     movable_type["airtime"] = &Movable::falling_timer;
     movable_type["falling_timer"] = &Movable::falling_timer;
-    movable_type["is_poisoned"] = &Movable::is_poisoned;
-    movable_type["poison"] = &Movable::poison;
     movable_type["dark_shadow_timer"] = &Movable::onfire_effect_timer;
     movable_type["onfire_effect_timer"] = &Movable::onfire_effect_timer;
     movable_type["exit_invincibility_timer"] = &Movable::exit_invincibility_timer;
     movable_type["invincibility_frames_timer"] = &Movable::invincibility_frames_timer;
     movable_type["frozen_timer"] = &Movable::frozen_timer;
+    movable_type["price"] = &Movable::price;
+    movable_type["is_poisoned"] = &Movable::is_poisoned;
+    movable_type["poison"] = &Movable::poison;
     movable_type["is_button_pressed"] = &Movable::is_button_pressed;
     movable_type["is_button_held"] = &Movable::is_button_held;
     movable_type["is_button_released"] = &Movable::is_button_released;
-    movable_type["price"] = &Movable::price;
     movable_type["stun"] = &Movable::stun;
-    movable_type["freeze"] = &Movable::freeze;
+
+    auto freeze = sol::overload(&Movable::freeze, [](Movable& ent, uint8_t frame_count) // for backward compatibility
+                                { ent.freeze(frame_count, false); });
+
+    movable_type["freeze"] = freeze;
     movable_type["light_on_fire"] = light_on_fire;
     movable_type["set_cursed"] = &Movable::set_cursed_fix;
     movable_type["drop"] = &Movable::drop;

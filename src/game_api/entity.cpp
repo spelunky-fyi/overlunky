@@ -33,9 +33,9 @@ using namespace std::chrono_literals;
 void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
 {
     if (overlay)
-        overlay->remove_item(uid);
-    overlay = NULL;
-    auto topmost = topmost_mount();
+        overlay->remove_item(uid, false);
+
+    auto topmost = topmost_mount(); // we just detached from overlay, why do we check this?
     if (!s)
     {
         auto [x_pos, y_pos] = topmost->position();
@@ -78,8 +78,8 @@ void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
 void Entity::teleport_abs(float dx, float dy, float vx, float vy)
 {
     if (overlay)
-        overlay->remove_item(uid);
-    overlay = NULL;
+        overlay->remove_item(uid, false);
+
     x = dx;
     y = dy;
     if (is_movable())
@@ -178,11 +178,11 @@ Vec2 Entity::position() const
     return {x_pos, y_pos};
 }
 
-void Entity::remove_item(uint32_t item_uid)
+void Entity::remove_item(uint32_t item_uid, bool check_autokill)
 {
     auto entity = get_entity_ptr(item_uid);
     if (entity)
-        remove_item_ptr(entity);
+        remove_item_ptr(entity, check_autokill);
 }
 
 void Movable::poison(int16_t frames)

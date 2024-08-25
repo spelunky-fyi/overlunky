@@ -1654,7 +1654,7 @@ void spawn_entity_over()
             auto ent = get_entity_ptr(spawned);
             if (g_dx == 0 && g_dy == 0)
             {
-                ent->set_draw_depth(9);
+                ent->set_draw_depth(9, 0);
                 ent->flags = set_flag(ent->flags, 4);  // pass thru objects
                 ent->flags = set_flag(ent->flags, 10); // no gravity
                 ent->flags = clr_flag(ent->flags, 13); // collides walls
@@ -1875,8 +1875,7 @@ void toggle_noclip()
         if (options["noclip"])
         {
             if (player->overlay)
-                player->overlay->remove_item(player->uid);
-            player->overlay = NULL;
+                player->overlay->remove_item(player->uid, false);
             player->type->max_speed = 0.3f;
         }
         else
@@ -1916,9 +1915,8 @@ void force_cheats()
                     player->teleport_abs(x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
                 }
                 else
-                    player->overlay->remove_item(player->uid);
+                    player->overlay->remove_item(player->uid, false);
             }
-            player->overlay = NULL;
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
             player->flags &= ~(1U << 10);
@@ -7518,12 +7516,16 @@ void render_entity_props(int uid, bool detached = false)
     ImGui::SameLine();
     if (ImGui::Button("Void##VoidEntity"))
     {
-        if (entity->overlay && entity->overlay->is_movable())
+        if (entity->overlay)
         {
-            auto mount = entity->overlay->as<Movable>();
-            if (mount->holding_uid == entity->uid)
+            auto mount = entity->overlay->as<Movable>(); // pre casting to movable before checking
+            if (entity->overlay->is_movable() && mount->holding_uid == entity->uid)
             {
-                mount->holding_uid = -1;
+                mount->drop();
+            }
+            else
+            {
+                mount->remove_item_ptr(entity, false);
             }
         }
         entity->overlay = nullptr;
@@ -7575,11 +7577,11 @@ void render_entity_props(int uid, bool detached = false)
                     }
                     else if (overlay->is_movable() && overlay->as<Movable>()->holding_uid == entity->uid)
                     {
-                        overlay->as<Movable>()->drop(entity);
+                        overlay->as<Movable>()->drop();
                     }
                     else
                     {
-                        overlay->remove_item_ptr(entity);
+                        overlay->remove_item_ptr(entity, true);
                     }
                 }
                 render_uid(overlay->uid, "StateAttached");
@@ -7639,7 +7641,7 @@ void render_entity_props(int uid, bool detached = false)
                 {
                     auto holding = get_entity_ptr(movable->holding_uid);
                     if (holding)
-                        movable->drop(holding);
+                        movable->drop();
                     else
                         movable->holding_uid = -1;
                 }
@@ -7741,7 +7743,7 @@ void render_entity_props(int uid, bool detached = false)
                         removed_uid = ent->uid;
             }
             if (removed_uid)
-                entity_pow->remove_item(removed_uid);
+                entity_pow->remove_item(removed_uid, true);
             ImGui::SeparatorText("Powerups");
             int removed_powerup = 0;
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
@@ -7822,7 +7824,7 @@ void render_entity_props(int uid, bool detached = false)
                         removed_uid = ent->uid;
             }
             if (removed_uid)
-                entity->remove_item(removed_uid);
+                entity->remove_item(removed_uid, true);
         }
         endmenu();
     }
@@ -7961,7 +7963,7 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragFloat("Offset Y##EntityOffsetY", &entity->offsety, 0.5f, -10.0, 10.0, "%.3f");
         uint8_t draw_depth = entity->draw_depth;
         if (ImGui::DragScalar("Draw depth##EntityDrawDepth", ImGuiDataType_U8, &draw_depth, 0.2f, &u8_zero, &u8_draw_depth_max))
-            entity->set_draw_depth(draw_depth);
+            entity->set_draw_depth(draw_depth, 0);
         if (entity->rendering_info)
             ImGui::DragScalar("Shader##EntityShader", ImGuiDataType_U8, &entity->rendering_info->shader, 0.2f, &u8_zero, &u8_shader_max);
         ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &entity->animation_frame, 0.2f, &u16_zero, &u16_max);

@@ -8,7 +8,6 @@
 #include <functional>
 
 struct MovableBehavior;
-using DAMAGE_TYPE = uint16_t;
 
 class CutsceneBehavior
 {
@@ -159,17 +158,17 @@ class Movable : public Entity
 
     /// Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
     virtual bool can_jump() = 0;                                             // 37
-    virtual void get_collision_info(CollisionInfo* dest) = 0;                // 38
-    virtual float sprint_factor() = 0;                                       // 39
-    virtual void calculate_jump_height() = 0;                                // 40, when disabled, jump height is very high
+    virtual void get_collision_info(CollisionInfo& dest) = 0;                // 38, from entityDB
+    virtual float sprint_factor() = 0;                                       // 39, from entityDB
+    virtual float calculate_jump_velocity() = 0;                             // 40
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0; // 41
-    virtual void apply_velocity(Vec2* velocities, bool) = 0;                 // 42, param is pointer to an array of two floats: velocity x and y, could be returninig something
+    virtual void apply_velocity(Vec2& velocities, bool ignore_weight) = 0;   // 42
     /// Returns stomp damage based on shoes and fall time
     virtual int8_t stomp_damage() = 0;            // 43, calculates the amount of stomp damage applied (checks spike shoes, movable.state and stand_counter resulting in different damage values)
     virtual int8_t stomp_damage_trampoline() = 0; // 44, simply jumps to the 43rd virtual function, aka stomp_damage...
     virtual bool is_on_fire() = 0;                // 45
-    virtual void v46() = 0;                       // 46
-    virtual void v47() = 0;                       // 47
+    virtual bool v46(Entity*) = 0;                // 46, on_melee_attack? called on monsters when you touch them
+    virtual bool v47(Entity*) = 0;                // 47, actual on_thrown_by ?
 
     /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.
     /// Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
@@ -177,34 +176,36 @@ class Movable : public Entity
 
     /// Hit by broken arrows etc that don't deal damage, calls on_damage with 0 damage.
     virtual void on_hit(Entity* damage_dealer) = 0; // 49
-    virtual void v50() = 0;                         // 50
-    virtual void stun(uint16_t framecount) = 0;     // 51
-    virtual void freeze(uint8_t framecount) = 0;    // 52
+    /// returns sound id for the damage taken, return 0 to make it silence
+    virtual uint32_t get_damage_sound(DAMAGE_TYPE damage) = 0; // 50
+    virtual void stun(uint16_t framecount) = 0;                // 51
+    /// Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check, if in lava the game will set `frozen_timer` to 0 immediately most of the time
+    virtual void freeze(uint8_t framecount, bool ignore_lava) = 0; // 52
 
     /// Does not damage entity
     virtual void light_on_fire(uint8_t time) = 0;            // 53
     virtual void set_cursed(bool b, bool effect) = 0;        // 54
-    virtual void on_spiderweb_collision() = 0;               // 55
+    virtual void on_spiderweb_collision(bool) = 0;           // 55, the bool sets pause statemachine flag? needs testing
     virtual void set_last_owner_uid_b127(Entity* owner) = 0; // 56, assigns player as last_owner_uid and also manipulates movable.b127
     virtual uint32_t get_last_owner_uid() = 0;               // 57, for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
     /// Disable to not get killed outside level bounds.
-    virtual void check_out_of_bounds() = 0;                      // 58, kills with the 'still falling' death cause, is called for any item/fx/mount/monster/player but not for liquid :(
-    virtual void v59() = 0;                                      // 59
-    virtual Entity* standing_on() = 0;                           // 60, looks up movable.standing_on_uid in state.instance_id_to_pointer
-    virtual void on_stomped_on_by(Entity* stomper) = 0;          // 61
-    virtual void on_thrown_by(Entity* thrower) = 0;              // 62, implemented for special cases like hired hand (player with ai_func), horned lizard...
-    virtual void on_clonegunshot_hit(Entity* clone) = 0;         // 63, implemented for player/hired hand: copies health to clone etc
-    virtual uint32_t get_type_id() = 0;                          // 64
-    virtual bool doesnt_have_spikeshoes() = 0;                   // 65
-    virtual bool is_player_mount_or_monster() = 0;               // 66
-    virtual void pick_up(Entity* entity_to_pick_up) = 0;         // 67
-    virtual void on_picked_up_by(Entity* entity_picking_up) = 0; // 68
+    virtual void check_out_of_bounds() = 0;                                       // 58, kills with the 'still falling' death cause, is called for any item/fx/mount/monster/player
+    virtual void set_standing_on(int32_t entity_uid) = 0;                         // 59
+    virtual Entity* standing_on() = 0;                                            // 60, looks up movable.standing_on_uid in state.instance_id_to_pointer
+    virtual bool on_stomped_on_by(Entity* stomper) = 0;                           // 61
+    virtual void on_thrown_by(Entity* thrower) = 0;                               // 62, implemented for special cases like hired hand (player with ai_func), horned lizard...
+    virtual void on_clonegunshot_hit(Entity* clone, int32_t some_entity_uid) = 0; // 63, implemented for player/hired hand: copies health to clone etc
+    virtual uint32_t get_type_id() = 0;                                           // 64
+    virtual bool doesnt_have_spikeshoes() = 0;                                    // 65
+    virtual bool is_player_mount_or_monster() = 0;                                // 66
+    virtual void pick_up(Entity* entity_to_pick_up) = 0;                          // 67
+    virtual void on_picked_up_by(Entity* entity_picking_up, bool) = 0;            // 68
     /// Called when dropping or throwing
-    virtual void drop(Entity* entity_to_drop) = 0; // 69, also used when throwing
+    virtual void drop() = 0; // 69
 
     /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
-    virtual void collect_treasure(int32_t value, ENT_TYPE treasure) = 0; // 70
-    virtual void apply_movement() = 0;                                   // 71, disable this function and things can't move, some spin in place
+    virtual bool collect_treasure(int32_t value, ENT_TYPE treasure) = 0; // 70
+    virtual void apply_movement(uint8_t, uint8_t, uint8_t) = 0;          // 71, disable this function and things can't move, some spin in place (might have more parameters, the first three probably all bool)
     virtual void damage_entity(Entity* victim) = 0;                      // 72, can't trigger, maybe extra params are needed
     virtual void v73() = 0;                                              // 73
     virtual bool is_monster_or_player() = 0;                             // 74
@@ -217,14 +218,14 @@ class Movable : public Entity
     virtual void hired_hand_related() = 0;                               // 81, checks ai_func, gets triggered just after throwing hired hand
     virtual void generate_fall_poof_particles() = 0;                     // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
     /// Applies gravity to entity. Disable to float like on hoverpack.
-    virtual void handle_fall_logic() = 0;                                    // 83, adjusts entity.velocityy when falling
-    virtual void apply_friction() = 0;                                       // 84, applies entity.type.friction to entity.velocityx
-    virtual void boss_related() = 0;                                         // 85, when disabled, quillback keeps stomping through the level, including border tiles
-    virtual void v86() = 0;                                                  // 86, triggers when tusk is angered, calls get_last_owner_uid
-    virtual void gravity_related() = 0;                                      // 87
-    virtual void v88() = 0;                                                  // 88
-    virtual void stack_plus_28_is_0() = 0;                                   // 89, unknown; triggers on item_rubble
-    virtual void on_crushed_by(Entity*) = 0;                                 // 90, e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
-    virtual void on_fall_onto(uint32_t unknown, Entity* fell_on_entity) = 0; // 91
-    virtual void on_instakill_death() = 0;                                   // 92, seems to only trigger for enemies that die in one hit
+    virtual void handle_fall_logic(float) = 0;                                           // 83, adjusts entity.velocityy when falling
+    virtual void apply_friction(float, bool vertical, float) = 0;                        // 84, applies entity.type.friction to entity.velocityx, the two floats for characters just multiply the friction, could also be returning the value
+    virtual bool boss_related(bool) = 0;                                                 // 85, when disabled, quillback keeps stomping through the level, including border tiles
+    virtual void v86(void*, Entity*) = 0;                                                // 86, triggers when tusk is angered, calls get_last_owner_uid
+    virtual void gravity_related(Entity*, float, Entity*) = 0;                           // 87
+    virtual void v88(Entity*, float) = 0;                                                // 88, calls on_fall_onto, then virtual 14 on the entity in parameter, edits special offset
+    virtual uint8_t stack_plus_28_is_0() = 0;                                            // 89, unknown; triggers on item_rubble
+    virtual void on_crushed_by(Entity*) = 0;                                             // 90, e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
+    virtual SoundMeta* on_fall_onto(uint32_t play_sound_id, Entity* fell_on_entity) = 0; // 91
+    virtual void on_instakill_death() = 0;                                               // 92, seems to only trigger for enemies that die in one hit
 };

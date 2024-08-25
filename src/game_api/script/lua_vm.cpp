@@ -1147,7 +1147,7 @@ end
     lua["get_render_position"] = get_render_position;
     /// Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
     lua["get_velocity"] = get_velocity;
-    /// Remove item by uid from entity
+    /// Remove item by uid from entity. `check_autokill` defaults to true, checks if entity should be killed when missing overlay and kills it if so (can help with avoiding crashes)
     lua["entity_remove_item"] = entity_remove_item;
     /// Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
     lua["attach_ball_and_chain"] = attach_ball_and_chain;
@@ -1173,7 +1173,7 @@ end
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
     lua["pick_up"] = pick_up;
-    /// Drop an entity by uid
+    /// Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
     lua["drop"] = drop;
     /// Unequips the currently worn backitem
     lua["unequip_backitem"] = unequip_backitem;
