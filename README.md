@@ -142,7 +142,7 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + See previous section.
     + Some entities just crash the game, try to avoid them next time.
     + Some script mods just crash the game too. Complain to the author of the mod.
-  - If you have proglems with **Modlunky2 or Playlunky**:
+  - If you have problems with **Modlunky2 or Playlunky**:
     + While we try to keep all the modding tools compatible, some things may break sometimes.
     + Because PL and OL are using the same scripting API, one might inadvertently undo the change you did in the other. Don't expect perfection when using both.
   - If you're **missing** some overlay **windows** or tabs:
@@ -166,7 +166,7 @@ Lua scripting is still buggy and unfinished and the **API might change**, althou
     + Make sure Windows is not using the keys for [something stupid](https://superuser.com/questions/1367843/how-to-disable-ctrlshift-keyboard-layout-switch-for-the-same-input-language-i).
   - If it still doesn't work
     + Stop by #s2-modding-help on the [community Discord](https://discord.gg/spelunky-community) or [submit an issue](https://github.com/spelunky-fyi/overlunky/issues)
-    + We want to know your OS version, are you using the game on Steam, what you have tried, what tools you are using, how you are using them and all the versions. These can be found in the terminal output or ingame overlays. ("Latest" or WHIP is not a version, but 7f0bc94 or 0.6.1 is.)
+    + We want to know your OS version, are you using the game on Steam, what you have tried, what tools you are using, how you are using them and all the versions. These can be found in the terminal output or in-game overlays. ("Latest" or WHIP is not a version, but 7f0bc94 or 0.6.1 is.)
 
 
 ## Development

@@ -2,8 +2,8 @@
 
 bool Triangle::is_point_inside(const Vec2 p, float epsilon) const noexcept
 {
-    // you can compare it eather by area or by angle
-    // not sure if one if faster thne the order, so i left code for both
+    // you can compare it either by area or by angle
+    // not sure if one if faster then the order, so i left code for both
 
     // float area1 = Triangle(A, B, p).area();
     // float area2 = Triangle(A, C, p).area();
