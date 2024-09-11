@@ -228,7 +228,7 @@ class Entity
 
     /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
-    /// destroy_corpse and responsible are the standard parameters for the kill funciton
+    /// destroy_corpse and responsible are the standard parameters for the kill function
     void kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
     /// Short for using RECURSIVE_MODE.NONE
     void kill_recursive(bool destroy_corpse, Entity* responsible)
@@ -260,7 +260,7 @@ class Entity
     inline static std::function<std::uint32_t(Entity*, std::function<void(Entity*)>)> hook_dtor_impl{};
     inline static std::function<void(Entity*, std::uint32_t)> clear_dtor_impl{};
 
-    virtual ~Entity() = 0;                    // vritual 0
+    virtual ~Entity() = 0;                    // virtual 0
     virtual void create_rendering_info() = 0; // 1
     virtual void handle_state_machine() = 0;  // 2
 
@@ -290,13 +290,13 @@ class Entity
     virtual void set_as_sound_source(SoundMeta*) = 0;                        // 20, update sound position to entity position?
     virtual void remove_item_ptr(Entity*) = 0;                               // 21
     virtual Entity* get_held_entity() = 0;                                   // 22
-    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", tiggers use self as the first parameter
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", triggers use self as the first parameter
     /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     virtual bool trigger_action(Entity* user) = 0; // 24
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0; // 25
 
-    virtual void on_collision2(Entity* other_entity) = 0; // 26, needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical tiggers
+    virtual void on_collision2(Entity* other_entity) = 0; // 26, needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical triggers
 
     /// e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual uint16_t get_metadata() = 0;                // 27

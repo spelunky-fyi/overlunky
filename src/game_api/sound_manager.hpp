@@ -285,7 +285,7 @@ struct SoundMeta
     virtual void get_name(char16_t* buffor, uint32_t size) = 0;
     virtual ~SoundMeta() = 0;
     virtual void update() = 0; // disabling this function does not progresses the track, does not stop it at the end level etc.
-                               // like if you start a level you have one loop and then after you move, it porgresses to another one
+                               // like if you start a level you have one loop and then after you move, it progresses to another one
     virtual bool unknown() = 0;
 };
 

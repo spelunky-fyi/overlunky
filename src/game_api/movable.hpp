@@ -130,9 +130,9 @@ class Movable : public Entity
     // don't use this, it's only to not break backwards compatibility
     void light_on_fire_broken()
     {
-        this->light_on_fire(0x64); // kind of stanrad value that the game uses
+        this->light_on_fire(0x64); // kind of standard value that the game uses
     }
-    /// Get all avaible behavior ids
+    /// Get all available behavior ids
     std::vector<uint32_t> get_all_behaviors();
     /// Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity
     /// Returns false if entity doesn't have this behavior id
@@ -163,7 +163,7 @@ class Movable : public Entity
     virtual float sprint_factor() = 0;                                       // 39
     virtual void calculate_jump_height() = 0;                                // 40, when disabled, jump height is very high
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0; // 41
-    virtual void apply_velocity(Vec2* velocities, bool) = 0;                 // 42, param is pointer to an array of two floats: velocity x and y, could be returninig something
+    virtual void apply_velocity(Vec2* velocities, bool) = 0;                 // 42, param is pointer to an array of two floats: velocity x and y, could be returning something
     /// Returns stomp damage based on shoes and fall time
     virtual int8_t stomp_damage() = 0;            // 43, calculates the amount of stomp damage applied (checks spike shoes, movable.state and stand_counter resulting in different damage values)
     virtual int8_t stomp_damage_trampoline() = 0; // 44, simply jumps to the 43rd virtual function, aka stomp_damage...

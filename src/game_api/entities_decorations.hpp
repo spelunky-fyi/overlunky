@@ -27,14 +27,14 @@ class DecoRegeneratingBlock : public Entity
   public:
     int8_t unknown1;
     uint8_t unknown2;   // timer after self_destruct is triggered, modifies the size depending of the unknown1
-    bool self_destruct; // UNSURE have reverse effect of spawning in after the broke is blocken, unsued in the game?
+    bool self_destruct; // UNSURE have reverse effect of spawning in after the block is broken, unused in the game?
 };
 
 class DestructibleBG : public Entity
 {
   public:
-    int32_t attached_to_1; // wierd, unsure
-    int32_t attached_to_2; // wierd, unsure
+    int32_t attached_to_1; // weird, unsure
+    int32_t attached_to_2; // weird, unsure
     bool unknown1;
     bool unknown2;
 };
