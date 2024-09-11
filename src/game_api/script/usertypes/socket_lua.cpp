@@ -18,6 +18,7 @@ void register_usertypes(sol::state& lua)
     /// Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
     /// The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
     /// <br/>The callback signature is optional<string> on_message(string msg, string src)
+    // lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> UdpServer*
     lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb)
     {
         return std::unique_ptr<UdpServer>{new UdpServer(std::move(host), std::move(port), make_safe_cb<UdpServer::SocketCb>(std::move(cb)))};
