@@ -19,7 +19,7 @@ class UdpServer
     /// Closes the server.
     void close();
 
-    /// Returns true if the port was opened successfully and hasn't been closed yet.
+    /// Returns true if the port was opened successfully and the server hasn't been closed yet.
     bool open();
 
     /// Returns a string explaining the last error, at least if open() returned false.

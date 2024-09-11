@@ -13,10 +13,10 @@ namespace NSocket
 void register_usertypes(sol::state& lua)
 {
     lua.new_usertype<UdpServer>(
-        "UdpServer", sol::no_constructor, "close", &UdpServer::close, "open", &UdpServer::open, "error", &UdpServer::error);
+        "UdpServer", sol::no_constructor, "close", &UdpServer::close, "open", &UdpServer::open, "error", &UdpServer::error, "host", sol::readonly(&UdpServer::host), "port", sol::readonly(&UdpServer::port));
 
-    /// Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
-    /// The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close().
+    /// Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
+    /// The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
     lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb)
     {
         return std::unique_ptr<UdpServer>{new UdpServer(std::move(host), std::move(port), make_safe_cb<UdpServer::SocketCb>(std::move(cb)))};

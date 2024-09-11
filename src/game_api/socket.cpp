@@ -78,6 +78,8 @@ UdpServer::UdpServer(std::string host_, in_port_t port_, std::function<SocketCb>
 {
     if (sock.bind(sockpp::inet_address(host, port)))
     {
+        const auto addr = (sockpp::inet_address)sock.address();
+        port = addr.port();
         is_opened = true;
         sock.set_non_blocking();
         kill_thr.test_and_set();
