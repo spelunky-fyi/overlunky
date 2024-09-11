@@ -11,7 +11,7 @@
 class UdpServer
 {
   public:
-    using SocketCb = std::optional<std::string>(std::string);
+    using SocketCb = std::optional<std::string>(std::string, std::string);
 
     UdpServer(std::string host, in_port_t port, std::function<SocketCb> cb);
     ~UdpServer();

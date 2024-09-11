@@ -18,9 +18,9 @@ function init()
         queue = {},
 
         -- Open server on an ephemeral random port, push messages to queue and echo back to sender
-        socket = udp_listen(options.host, options.port, function(msg)
+        socket = udp_listen(options.host, options.port, function(msg, src)
             msg = msg:gsub("%s*$", "")
-            table.insert(server.queue, msg)
+            table.insert(server.queue, { msg = msg, src = src })
             if msg == "gg" then
                 return "bye!\n"
             else
@@ -34,8 +34,8 @@ function init()
         print(F "Listening on {server.socket.port}, please send some UDP datagrams or 'gg' to close")
         server.inter = set_global_interval(function()
             for _, msg in pairs(server.queue) do
-                print(F "Received: {msg}")
-                if msg == "gg" then
+                print(F "Received: '{msg.msg}' from {msg.src}")
+                if msg.msg == "gg" then
                     server.socket:close()
                     clear_callback()
                     print("Server is now closed, have a nice day")

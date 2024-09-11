@@ -57,13 +57,13 @@ void dump_network()
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {
     ssize_t n;
-    char buf[1024];
+    static char buf[32768];
     sockpp::inet_address src;
     while (server->kill_thr.test(std::memory_order_acquire) && socket.is_open())
     {
         while ((n = socket.recv_from(buf, sizeof(buf), &src)) > 0)
         {
-            std::optional<std::string> ret = server->cb(std::string(buf, n));
+            std::optional<std::string> ret = server->cb(std::string(buf, n), src.to_string());
             if (ret)
             {
                 socket.send_to(ret.value(), src);
