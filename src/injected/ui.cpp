@@ -1875,7 +1875,7 @@ void toggle_noclip()
         if (options["noclip"])
         {
             if (player->overlay)
-                player->overlay->remove_item_uid(player->uid, false);
+                player->overlay->remove_item(player, false);
             player->type->max_speed = 0.3f;
         }
         else
@@ -1915,7 +1915,7 @@ void force_cheats()
                     player->teleport_abs(x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
                 }
                 else
-                    player->overlay->remove_item_uid(player->uid, false);
+                    player->overlay->remove_item(player, false);
             }
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
@@ -7735,7 +7735,7 @@ void render_entity_props(int uid, bool detached = false)
         if (entity->type->search_flags & 0x7)
         {
             auto entity_pow = entity->as<PowerupCapable>();
-            int removed_uid = 0;
+            int removed_uid = -1;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0) && !entity_pow->has_powerup(ent->type->id))
@@ -7816,7 +7816,7 @@ void render_entity_props(int uid, bool detached = false)
         }
         else
         {
-            int removed_uid = 0;
+            int removed_uid = -1;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0))

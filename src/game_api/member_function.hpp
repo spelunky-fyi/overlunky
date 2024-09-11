@@ -77,6 +77,7 @@ struct MemberFun
   private:
     using FunT = decltype(fun);
     static_assert(std::is_member_function_pointer_v<FunT>);
+
   public:
     using Pointer = MemberFun_t<FunT>::Pointer;
     using BaseLessType = MemberFun_t<FunT>::BaseLessType;

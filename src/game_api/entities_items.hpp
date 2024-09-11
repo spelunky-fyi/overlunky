@@ -96,11 +96,13 @@ class VladsCape : public Cape
 
 class Purchasable : public Movable
 {
+  public:
     virtual void buy(Entity* who) = 0;
 };
 
 class DummyPurchasableEntity : public Purchasable
 {
+  public:
     Entity* replace_entity;
     bool exploding;
 

@@ -15,14 +15,14 @@ class Monster : public PowerupCapable
     int32_t chased_target_uid;
     uint32_t target_selection_timer;
 
-    virtual void increase_killcount() = 0; // 95, increases state.kills_npc, is not called for normal monsters but they all have the same function
+    virtual void increase_killcount() = 0;    // 95, increases state.kills_npc, is not called for normal monsters but they all have the same function
     virtual void on_aggro(uint8_t, bool) = 0; // 96, updates state.quests in case of npc
-    virtual void unknown_v97() = 0; // 97, can't trigger it
-    virtual void on_shop_entered() = 0; // 98
+    virtual void unknown_v97() = 0;           // 97, can't trigger it
+    virtual void on_shop_entered() = 0;       // 98
     // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
     // if disabled some monster will stop moving (like bats, jiangshi) some wont attack (crabman), shopkeeper can still kick you but won't fire his weapon
     virtual void attack_logic_related(uint8_t, float) = 0; // 99
-    virtual bool update_target(Entity* ent, float&) = 0; // 100, float from the function above, also works as an output?
+    virtual bool update_target(Entity* ent, float&) = 0;   // 100, float from the function above, also works as an output?
 };
 
 // RoomOwner and NPC may have common subclass for the first two virtuals, but they later dirvarge, wepon type is the same spot, but they probably just made one first then copied over the virtuals
