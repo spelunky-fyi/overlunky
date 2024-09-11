@@ -1,12 +1,18 @@
 #include "vtables_lua.hpp"
 
 #include "entity.hpp"                              // for Entity
+#include "entity_structs.hpp"                      // for CollisionInfo
 #include "hookable_vtable.hpp"                     // for HookableVTable
+#include "member_function.hpp"                     // for MemberFun
 #include "movable.hpp"                             // for Movable
 #include "render_api.hpp"                          // for RenderInfo
 #include "script/usertypes/theme_vtable_lua.hpp"   // for NThemeVTables
 #include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
+#include "sound_manager.hpp"                       // for SoundMeta
 #include "state.hpp"                               // for State
+
+template <auto fun>
+using MemFun = MemberFun<fun>::BaseLessType;
 
 namespace NVTables
 {
@@ -18,42 +24,60 @@ void register_usertypes(sol::state& lua)
     using EntityVTable = HookableVTable<
         Entity,
         CallbackType::Entity,
-        VTableEntry<"dtor", 0x0, void()>,
-        VTableEntry<"create_rendering_info", 0x1, void()>,
-        VTableEntry<"update_state_machine", 0x2, void()>,
-        VTableEntry<"kill", 0x3, void(bool, Entity*)>,
-        VTableEntry<"on_collision1", 0x4, void(Entity*)>,
-        VTableEntry<"destroy", 0x5, void()>,
-        VTableEntry<"can_be_pushed", 0xa, bool()>,
-        VTableEntry<"is_in_liquid", 0xc, bool()>,
-        VTableEntry<"set_invisible", 0xf, void(bool)>,
-        VTableEntry<"friction", 0x13, float()>,
-        VTableEntry<"get_held_entity", 0x16, Entity*()>,
-        VTableEntry<"trigger_action", 0x18, void(Entity*)>,
-        VTableEntry<"activate", 0x19, void(Entity*)>,
-        VTableEntry<"on_collision2", 0x1a, void(Entity*)>,
-        VTableEntry<"walked_on", 0x1d, void(Entity*)>,
-        VTableEntry<"walked_off", 0x1e, void(Entity*)>,
-        VTableEntry<"ledge_grab", 0x1f, void(Entity*)>,
-        VTableEntry<"stood_on", 0x20, void(Entity*)>,
-        VTableEntry<"init", 0x24, void()>>;
+        VTableEntry<"dtor", 0, void()>,
+        VTableEntry<"create_rendering_info", 1, MemFun<&Entity::create_rendering_info>>,
+        VTableEntry<"update_state_machine", 2, MemFun<&Entity::update_state_machine>>,
+        VTableEntry<"kill", 3, MemFun<&Entity::kill>>,
+        VTableEntry<"on_collision1", 4, MemFun<&Entity::on_collision1>>,
+        VTableEntry<"destroy", 5, MemFun<&Entity::destroy>>,
+        VTableEntry<"generate_stomp_damage_particles", 8, MemFun<&Entity::generate_stomp_damage_particles>>,
+        VTableEntry<"can_be_pushed", 10, MemFun<&Entity::can_be_pushed>>,
+        VTableEntry<"is_in_liquid", 12, MemFun<&Entity::is_in_liquid>>,
+        VTableEntry<"set_invisible", 15, MemFun<&Entity::set_invisible>>,
+        VTableEntry<"flip", 16, MemFun<&Entity::flip>>,
+        VTableEntry<"set_draw_depth", 17, MemFun<&Entity::set_draw_depth>>,
+        VTableEntry<"reset_draw_depth", 18, MemFun<&Entity::reset_draw_depth>>,
+        VTableEntry<"friction", 19, MemFun<&Entity::friction>>,
+        VTableEntry<"set_as_sound_source", 20, MemFun<&Entity::set_as_sound_source>>,
+        VTableEntry<"remove_item", 21, MemFun<&Entity::remove_item>>,
+        VTableEntry<"get_held_entity", 22, MemFun<&Entity::get_held_entity>>,
+        VTableEntry<"trigger_action", 24, MemFun<&Entity::trigger_action>>,
+        VTableEntry<"activate", 25, MemFun<&Entity::activate>>,
+        VTableEntry<"on_collision2", 26, MemFun<&Entity::on_collision2>>,
+        VTableEntry<"get_metadata", 27, MemFun<&Entity::get_metadata>>,
+        VTableEntry<"apply_metadata", 28, MemFun<&Entity::apply_metadata>>,
+        VTableEntry<"walked_on", 29, MemFun<&Entity::on_walked_on_by>>,
+        VTableEntry<"walked_off", 30, MemFun<&Entity::on_walked_off_by>>,
+        VTableEntry<"ledge_grab", 31, MemFun<&Entity::on_ledge_grab>>,
+        VTableEntry<"stood_on", 32, MemFun<&Entity::on_stood_on_by>>,
+        VTableEntry<"liberate_from_shop", 35, MemFun<&Entity::liberate_from_shop>>,
+        VTableEntry<"init", 36, MemFun<&Entity::apply_db>>>;
     static EntityVTable entity_vtable(lua, lua["Entity"], "ENTITY_OVERRIDE");
 
     using MovableVTable = HookableVTable<
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"can_jump", 37, bool()>,
-        VTableEntry<"stomp_damage", 43, int8_t()>,
+        VTableEntry<"can_jump", 37, MemFun<&Movable::can_jump>>,
+        VTableEntry<"get_collision_info", 38, MemFun<&Movable::get_collision_info>>,
+        VTableEntry<"sprint_factor", 39, MemFun<&Movable::sprint_factor>>,
+        VTableEntry<"calculate_jump_velocity", 40, MemFun<&Movable::calculate_jump_velocity>>,
+        // VTableEntry<"get_animation_map", 41, MemFun<&Movable::get_animation_map>>,
+        VTableEntry<"apply_velocity", 42, MemFun<&Movable::apply_velocity>>,
+        /// NoDoc
+        VTableEntry<"stomp_damage", 43, MemFun<&Movable::get_damage>>,
+        VTableEntry<"get_damage", 43, MemFun<&Movable::get_damage>>,
         VTableEntry<"is_on_fire", 45, bool()>,
         VTableEntry<"damage", 48, bool(Entity*, int8_t, uint16_t, Vec2*, uint8_t, uint16_t, uint8_t, bool)>,
         VTableEntry<"on_hit", 49, void(Entity*)>,
+        VTableEntry<"get_damage_sound", 50, uint32_t(DAMAGE_TYPE)>,
         VTableEntry<"stun", 51, void(uint16_t)>,
         VTableEntry<"freeze", 52, void(uint8_t)>,
         VTableEntry<"light_on_fire", 53, void(uint8_t)>,
         VTableEntry<"set_cursed", 54, void(bool)>,
         VTableEntry<"web_collision", 55, void()>,
         VTableEntry<"check_out_of_bounds", 58, void()>,
+        VTableEntry<"set_standing_on", 59, void(int32_t)>,
         VTableEntry<"standing_on", 60, Entity*()>,
         VTableEntry<"stomped_by", 61, void(Entity*)>,
         VTableEntry<"thrown_by", 62, void(Entity*)>,

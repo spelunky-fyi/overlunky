@@ -7,6 +7,8 @@
 #include <stdexcept>
 #include <tuple>
 
+#include "member_function.hpp"
+
 template <class T>
 struct ZeroIndexArray
 {
@@ -95,19 +97,6 @@ struct usertype_container<ZeroIndexArray<T>>
 };
 } // namespace sol
 
-namespace detail
-{
-template <typename M>
-struct extract;
-template <typename R, class C, typename... Args>
-struct extract<R (C::*)(Args...)>
-{
-    using BaseType = C;
-    using ReturnType = R;
-    using Params = std::tuple<Args...>;
-};
-} // namespace detail
-
 namespace
 {
 template <typename, typename, auto>
@@ -127,9 +116,10 @@ struct proFunc<C<Ts...>, T, fun>
 template <auto fun>
 auto self_return()
 {
-    static_assert(std::is_member_function_pointer_v<decltype(fun)>);
-    using T = typename detail::extract<decltype(fun)>::BaseType;
-    using _tuple = typename detail::extract<decltype(fun)>::Params;
+    using FunT = decltype(fun);
+    static_assert(std::is_member_function_pointer_v<FunT>);
+    using T = typename MemberFun_t<FunT>::BaseType;
+    using _tuple = typename MemberFun_t<FunT>::Parameters_Tuple;
 
     return proFunc<_tuple, T, fun>::func;
 }

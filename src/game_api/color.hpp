@@ -159,7 +159,7 @@ struct Color
         return *this;
     }
 
-    /// Comparison using RGB to avoid non-precise float value
+    // Comparison using RGB to avoid non-precise float value
     bool operator==(const Color& col) const noexcept
     {
         const auto current = get_rgba();

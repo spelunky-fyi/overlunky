@@ -163,9 +163,7 @@ struct Players
         it_t last;
 
         lua_iterator_state(Players& mt)
-            : begin(mt.begin()), it(mt.begin()), last(mt.end())
-        {
-        }
+            : begin(mt.begin()), it(mt.begin()), last(mt.end()){};
     };
     static std::tuple<sol::object, sol::object> my_next(sol::user<lua_iterator_state&> user_it_state, sol::this_state l)
     {

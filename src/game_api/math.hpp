@@ -410,7 +410,7 @@ struct Triangle
     bool is_point_inside_triangle(float x, float y, std::optional<float> epsilon);
     */
 
-    /// Returns the corners
+    // Returns the corners
     operator std::tuple<Vec2, Vec2, Vec2>() const noexcept
     {
         return {A, B, C};
@@ -559,7 +559,7 @@ struct Quad
     Quad& offset_quad(float off_x, float off_y);
     */
 
-    /// Returns the corners in order: bottom_left, bottom_right, top_right, top_left
+    // Returns the corners in order: bottom_left, bottom_right, top_right, top_left
     operator std::tuple<Vec2, Vec2, Vec2, Vec2>() const noexcept
     {
         return {{bottom_left_x, bottom_left_y}, {bottom_right_x, bottom_right_y}, {top_right_x, top_right_y}, {top_left_x, top_left_y}};

@@ -69,7 +69,7 @@ void attach_entity(Entity* overlay, Entity* attachee)
 {
     if (attachee->overlay)
     {
-        attachee->overlay->remove_item_ptr(attachee, false);
+        attachee->overlay->remove_item(attachee, false);
     }
 
     auto [x, y] = overlay->position();
@@ -343,7 +343,7 @@ void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> che
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return;
-    entity->remove_item(item_uid, check_autokill.value_or(true));
+    entity->remove_item_uid(item_uid, check_autokill.value_or(true));
 }
 
 void lock_door_at(float x, float y)

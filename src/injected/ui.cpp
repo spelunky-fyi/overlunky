@@ -1875,7 +1875,7 @@ void toggle_noclip()
         if (options["noclip"])
         {
             if (player->overlay)
-                player->overlay->remove_item(player->uid, false);
+                player->overlay->remove_item_uid(player->uid, false);
             player->type->max_speed = 0.3f;
         }
         else
@@ -1915,7 +1915,7 @@ void force_cheats()
                     player->teleport_abs(x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
                 }
                 else
-                    player->overlay->remove_item(player->uid, false);
+                    player->overlay->remove_item_uid(player->uid, false);
             }
             player->standing_on_uid = -1;
             player->flags |= 1U << 9;
@@ -7525,7 +7525,7 @@ void render_entity_props(int uid, bool detached = false)
             }
             else
             {
-                mount->remove_item_ptr(entity, false);
+                mount->remove_item(entity, false);
             }
         }
         entity->overlay = nullptr;
@@ -7581,7 +7581,7 @@ void render_entity_props(int uid, bool detached = false)
                     }
                     else
                     {
-                        overlay->remove_item_ptr(entity, true);
+                        overlay->remove_item(entity, true);
                     }
                 }
                 render_uid(overlay->uid, "StateAttached");
@@ -7743,7 +7743,7 @@ void render_entity_props(int uid, bool detached = false)
                         removed_uid = ent->uid;
             }
             if (removed_uid)
-                entity_pow->remove_item(removed_uid, true);
+                entity_pow->remove_item_uid(removed_uid, true);
             ImGui::SeparatorText("Powerups");
             int removed_powerup = 0;
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
@@ -7824,7 +7824,7 @@ void render_entity_props(int uid, bool detached = false)
                         removed_uid = ent->uid;
             }
             if (removed_uid)
-                entity->remove_item(removed_uid, true);
+                entity->remove_item_uid(removed_uid, true);
         }
         endmenu();
     }

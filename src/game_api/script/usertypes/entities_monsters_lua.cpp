@@ -523,6 +523,8 @@ void register_usertypes(sol::state& lua)
         &Leprechaun::gold,
         "timer_after_humping",
         &Leprechaun::timer_after_humping,
+        "collected_treasure",
+        &Leprechaun::collected_treasure,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 

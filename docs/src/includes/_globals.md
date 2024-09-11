@@ -523,9 +523,9 @@ Use empty table as argument to reset to the game default
 
 > Search script examples for [drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop)
 
-#### nil drop(int who_uid, int what_uid)
+#### nil drop(int who_uid, optional<int> what_uid)
 
-Drop an entity by uid
+Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
 
 ### enter_door
 
@@ -572,9 +572,9 @@ Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 
 > Search script examples for [entity_remove_item](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 
-#### nil entity_remove_item(int uid, int item_uid)
+#### nil entity_remove_item(int uid, int item_uid, optional<bool> check_autokill)
 
-Remove item by uid from entity
+Remove item by uid from entity. `check_autokill` defaults to true, checks if entity should be killed when missing overlay and kills it if so (can help with avoiding crashes)
 
 ### filter_entities
 

@@ -33,18 +33,18 @@ class Mount : public PowerupCapable
         flags = flags | 0x20000;
     }
 
-    virtual Vec2& get_special_offset(Vec2& offset) = 0; // gets special offset for the raider when jumping on mount
-    virtual Vec2& v96(Vec2& value) = 0;                 // gets something for when crouching on mount
-    virtual bool used_double_jump() = 0;                // checks can_doublejump and unknown9b
-    virtual uint32_t v98(bool) = 0;                     // returns some constant value
-    virtual uint32_t v99() = 0;                         // returns some constant value
-    virtual void play_jump_on_sound() = 0;              // checks if it has rider
-    virtual void remove_rider() = 0;
-    virtual float v102() = 0;                // get offset? mech returns 0.9, the rest 0.5
-    virtual uint32_t v103() = 0;             // returns some constant value
-    virtual uint32_t v104() = 0;             // returns some constant value
-    virtual uint32_t v105() = 0;             // returns some constant value
-    virtual bool can_play_mount_sound() = 0; // called every frame, if returns true mount will make a sound
+    virtual Vec2& get_special_offset(Vec2& offset) = 0;    // 95, gets special offset for the raider when jumping on mount
+    virtual Vec2& v96(Vec2& value) = 0;                    // 96, gets something for when crouching on mount
+    virtual bool used_double_jump() = 0;                   // 97, checks can_doublejump and unknown9b
+    virtual uint32_t get_jump_sound(bool double_jump) = 0; // 98
+    virtual uint32_t get_attack_sound() = 0;               // 99
+    virtual void play_jump_on_sound() = 0;                 // 100, checks if it has rider etc. get's sound from 103 virtual
+    virtual void remove_rider() = 0;                       // 101
+    virtual float v102() = 0;                              // 102, get offset? mech returns 0.9, the rest 0.5
+    virtual uint32_t get_mount_sound() = 0;                // 103, all return the VANILLA_SOUND.MOUNTS_MOUNT sound id
+    virtual uint32_t get_walking_sound() = 0;              // 104
+    virtual uint32_t get_untamed_loop_sound() = 0;         // 105
+    virtual bool can_play_mount_sound() = 0;               // 106, called every frame, if returns true mount will make a sound
 };
 
 class Rockdog : public Mount

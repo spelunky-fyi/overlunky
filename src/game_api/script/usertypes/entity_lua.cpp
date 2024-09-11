@@ -268,7 +268,9 @@ void register_usertypes(sol::state& lua)
     entity_type["is_cursed"] = &Entity::is_cursed;
     entity_type["kill_recursive"] = kill_recursive;
     entity_type["destroy_recursive"] = destroy_recursive;
-    entity_type["update"] = &Entity::handle_state_machine;
+    entity_type["update"] = &Entity::update_state_machine;
+    entity_type["flip"] = &Entity::flip;
+    entity_type["can_be_pushed"] = &Entity::can_be_pushed;
     /* Entity
     // user_data
     // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.
@@ -333,12 +335,13 @@ void register_usertypes(sol::state& lua)
     movable_type["set_cursed"] = &Movable::set_cursed_fix;
     movable_type["drop"] = &Movable::drop;
     movable_type["pick_up"] = &Movable::pick_up;
-    movable_type["can_jump"] = &Movable::can_jump;
     movable_type["standing_on"] = &Movable::standing_on;
     /// NoDoc
     movable_type["add_money"] = add_money;
     movable_type["collect_treasure"] = &Movable::collect_treasure;
+    movable_type["can_jump"] = &Movable::can_jump;
     movable_type["is_on_fire"] = &Movable::is_on_fire;
+    movable_type["is_powerup_capable"] = &Movable::is_powerup_capable;
     movable_type["damage"] = damage;
     movable_type["get_all_behaviors"] = &Movable::get_all_behaviors;
     movable_type["set_behavior"] = &Movable::set_behavior;
