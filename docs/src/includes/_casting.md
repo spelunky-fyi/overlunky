@@ -285,6 +285,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_roomowner
 - as_rubble
 - as_scarab
+- as_scepter
 - as_sceptershot
 - as_scorpion
 - as_shield

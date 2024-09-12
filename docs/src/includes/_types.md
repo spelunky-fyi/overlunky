@@ -7220,6 +7220,15 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 Type | Name | Description
 ---- | ---- | -----------
 
+### Scepter
+
+Derived from [Entity](#Entity) [Movable](#Movable)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [cooldown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cooldown) | 
+
 ### ScepterShot
 
 Derived from [Entity](#Entity) [Movable](#Movable) [LightEmitter](#LightEmitter)
