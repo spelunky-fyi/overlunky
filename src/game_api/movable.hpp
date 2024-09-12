@@ -127,11 +127,6 @@ class Movable : public Entity
     /// Remove the gravity hook and reset to defaults
     void reset_gravity();
 
-    // don't use this, it's only to not break backwards compatibility
-    void light_on_fire_broken()
-    {
-        this->light_on_fire(0x64); // kind of standard value that the game uses
-    }
     /// Get all available behavior ids
     std::vector<uint32_t> get_all_behaviors();
     /// Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity
@@ -142,20 +137,6 @@ class Movable : public Entity
 
     /// Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
     void set_position(float to_x, float to_y);
-
-    // for backwards compatibility
-    // adds a coin to the table cause the collected_money_count is expected to increase
-    void add_money_broken(int amount)
-    {
-        static const auto coin = to_id("ENT_TYPE_ITEM_GOLDCOIN");
-        this->collect_treasure(amount, coin);
-    }
-
-    /// effect = true - plays the sound and spawn particle above entity
-    void set_cursed_fix(bool b, std::optional<bool> effect)
-    {
-        set_cursed(b, effect.value_or(true));
-    }
 
     /// Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
     virtual bool can_jump() = 0;                                             // 37
@@ -194,7 +175,7 @@ class Movable : public Entity
     /// Disable to not get killed outside level bounds.
     virtual void check_out_of_bounds() = 0;               // 58, kills with the 'still falling' death cause, is called for any item/fx/mount/monster/player
     virtual void set_standing_on(int32_t entity_uid) = 0; // 59
-    virtual Entity* standing_on() = 0;                    // 60, looks up movable.standing_on_uid in state.instance_id_to_pointer
+    virtual Entity* standing_on() = 0;                    // 60
     virtual bool on_stomped_on_by(Entity* stomper) = 0;   // 61
     virtual void on_thrown_by(Entity* thrower) = 0;       // 62, implemented for special cases like hired hand (player with ai_func), horned lizard...
     /// Entities must be of the same type!

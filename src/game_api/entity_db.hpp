@@ -40,7 +40,7 @@ struct EntityDB
     float width;
     float height;
     uint8_t draw_depth;
-    uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
+    uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc
     int16_t field_26;
     union
     {
@@ -148,7 +148,6 @@ struct EntityFactory
     bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map; // game_unorderedmap probably
     EntityMap entity_map;                                                             // game_unorderedmap probably
-    void* _ptr_7;
 };
 
 EntityDB* get_type(uint32_t id);

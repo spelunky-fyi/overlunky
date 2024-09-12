@@ -456,13 +456,18 @@ Type | Name | Description
 int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | [MASK](#MASK)
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
+int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
 float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
 float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | 
 float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
-int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
+[SHAPE](#SHAPE) | [default_shape](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_shape) | 
+bool | [default_hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_hitbox_enabled) | 
 int | [collision2_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision2_mask) | [MASK](#MASK), will only call collision2 when colliding with entities that match this mask.
 int | [collision_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision_mask) | [MASK](#MASK) used for collision with floors, walls etc.
+int | [default_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_flags) | 
+int | [default_more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_more_flags) | 
+int | [properties_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=properties_flags) | 
 float | [friction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) | 
 float | [elasticity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elasticity) | 
 float | [weight](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=weight) | 
@@ -471,21 +476,20 @@ float | [max_speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=max
 float | [sprint_factor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sprint_factor) | 
 float | [jump](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump) | 
 [Color](#Color) | [default_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_color) | 
+[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
+int | [tilex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilex) | 
+int | [tiley](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) | 
 int | [damage](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | 
 int | [life](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=life) | 
 int | [sacrifice_value](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sacrifice_value) | Favor for sacrificing alive. Halved when dead (health == 0).
 int | [blood_content](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=blood_content) | 
-[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
-map&lt;int, [Animation](#Animation)&gt; | [animations](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) | 
-int | [properties_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=properties_flags) | 
-int | [default_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_flags) | 
-int | [default_more_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_more_flags) | 
 bool | [leaves_corpse_behind](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leaves_corpse_behind) | 
+[STRINGID](#Aliases) | [description](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) | 
 int | [sound_killed_by_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_player) | 
 int | [sound_killed_by_other](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_other) | 
-[STRINGID](#Aliases) | [description](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) | 
-int | [tilex](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tilex) | 
-int | [tiley](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tiley) | 
+map&lt;int, [Animation](#Animation)&gt; | [animations](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) | 
+float | [default_special_offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_special_offsetx) | 
+float | [default_special_offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_special_offsetx) | 
 
 ### HudInventory
 
@@ -4233,7 +4237,7 @@ bool | [overlaps_with(Entity other)](https://github.com/spelunky-fyi/overlunky/s
 [TEXTURE](#TEXTURE) | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
 bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) | Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
 nil | [set_draw_depth(int draw_depth, int b3f)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | 
-nil | [set_enable_turning(bool enabled)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_enable_turning) | 
+nil | [reset_draw_depth()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_draw_depth) | 
 nil | [liberate_from_shop(bool clear_parrent)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1
 [Entity](#Entity) | [get_held_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) | 
 nil | [set_layer(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) | Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
@@ -4251,13 +4255,16 @@ nil | [set_invisible(bool value)](https://github.com/spelunky-fyi/overlunky/sear
 vector&lt;int&gt; | [get_items()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_items) | 
 bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_in_liquid) | Returns true if entity is in water/lava
 bool | [is_cursed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_cursed) | 
+bool | [is_movable()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_movable) | 
+bool | [can_be_pushed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_be_pushed) | 
 nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s<br/>destroy_corpse and responsible are the standard parameters for the kill function
 nil | [kill_recursive(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
 nil | [destroy_recursive(optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
 nil | [destroy_recursive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
 nil | [update()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update) | 
 nil | [flip(bool left)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip) | 
-bool | [can_be_pushed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_be_pushed) | 
+nil | [remove_item(Entity entity, bool autokill_check)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_item) | 
+nil | [apply_db()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_db) | Applies changes made in `entity.type`
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -6886,6 +6893,7 @@ float | [movey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=movey) 
 [BUTTON](#BUTTON) | [buttons_previous](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=buttons_previous) | 
 int | [stand_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stand_counter) | 
 float | [jump_height_multiplier](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_height_multiplier) | [EntityDB](#EntityDB).jump gets multiplied by this to get the jump
+int | [price](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) | 
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
 int | [last_owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_owner_uid) | 
 [Animation](#Animation) | [current_animation](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=current_animation) | 
@@ -6909,7 +6917,6 @@ int | [onfire_effect_timer](https://github.com/spelunky-fyi/overlunky/search?l=L
 int | [exit_invincibility_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_invincibility_timer) | 
 int | [invincibility_frames_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invincibility_frames_timer) | 
 int | [frozen_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frozen_timer) | 
-int | [price](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=price) | 
 bool | [is_poisoned()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) | 
 bool | [is_button_pressed(BUTTON button)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_pressed) | 
 bool | [is_button_held(BUTTON button)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_held) | 
@@ -6917,7 +6924,7 @@ bool | [is_button_released(BUTTON button)](https://github.com/spelunky-fyi/overl
 nil | [stun(int framecount)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stun) | 
 nil | [freeze(int framecount, bool ignore_lava)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=freeze) | Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check, if in lava the game will set `frozen_timer` to 0 immediately most of the time
 nil | [light_on_fire(int time)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=light_on_fire) | Does not damage entity
-nil | [set_cursed(bool b, optional<bool> effect)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) | effect = true - plays the sound and spawn particle above entity
+nil | [set_cursed(bool b, bool effect)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_cursed) | 
 nil | [drop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) | Called when dropping or throwing
 nil | [pick_up(Entity entity_to_pick_up)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pick_up) | 
 [Entity](#Entity) | [standing_on()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=standing_on) | 
@@ -6925,6 +6932,9 @@ bool | [collect_treasure(int value, ENT_TYPE treasure)](https://github.com/spelu
 bool | [can_jump()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_jump) | Return true if the entity is allowed to jump, even midair. Return false and can't jump, except from ladders apparently.
 bool | [is_on_fire()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_on_fire) | 
 bool | [is_powerup_capable()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_powerup_capable) | 
+bool | [can_be_picked_up_by(Entity entity_picking_up, bool)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_be_picked_up_by) | 
+bool | [can_break_block(bool horizontal, Entity block)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_break_block) | 
+nil | [break_block(bool camera_shake, Entity block)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=break_block) | 
 bool | [damage(Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=damage) | Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.<br/>Returns: true if entity was affected (for stuff like pot that should break after hit etc.), false if the event should be ignored by damage_dealer
 vector&lt;int&gt; | [get_all_behaviors()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_all_behaviors) | Get all available behavior ids
 bool | [set_behavior(int behavior_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_behavior) | Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
@@ -6933,6 +6943,13 @@ nil | [set_gravity(float gravity)](https://github.com/spelunky-fyi/overlunky/sea
 nil | [reset_gravity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_gravity) | Remove the gravity hook and reset to defaults
 nil | [set_position(float to_x, float to_y)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_position) | Set the absolute position of an entity and offset all rendering related things accordingly to teleport without any interpolation or graphical glitches. If the camera is focused on the entity, it is also moved.
 nil | [process_input()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=process_input) | 
+float | [calculate_jump_velocity(bool dont_ignore_liquid)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=calculate_jump_velocity) | 
+nil | [apply_velocity(Vec2 velocities, bool ignore_weight)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_velocity) | 
+int | [get_damage()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_damage) | Returns the damage that the entity deals
+bool | [attack(Entity victim)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack) | Runs on contact damage, returns false if there wasn't any interaction (called from on_collision2, will be called as long as the hitboxes overlap)
+bool | [thrown_into(Entity victim)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=thrown_into) | Same as above, but for being thrown into something and potentially dealing damage that way
+int | [get_damage_sound(DAMAGE_TYPE damage)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_damage_sound) | returns sound id for the damage taken, return 0 to make it silence
+nil | [copy_extra_info(Entity clone, int some_entity_uid)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=copy_extra_info) | Entities must be of the same type!
 [CutsceneBehavior](#CutsceneBehavior) | [cutscene](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cutscene) | 
 nil | [clear_cutscene()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_cutscene) | 
 [VanillaMovableBehavior](#VanillaMovableBehavior) | [get_base_behavior(int state_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_base_behavior) | Gets a vanilla behavior from this movable, needs to be called before `clear_behaviors`<br/>but the returned values are still valid after a call to `clear_behaviors`
@@ -6961,6 +6978,10 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_get_damage(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_get_damage) | Hooks after the virtual function.<br/>The callback signature is `nil get_damage(Movable self)`<br/>Virtual function docs:<br/>Returns the damage that the entity deals
 [CallbackId](#Aliases) | [set_pre_is_on_fire(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_is_on_fire) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> is_on_fire(Movable self)`
 [CallbackId](#Aliases) | [set_post_is_on_fire(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_is_on_fire) | Hooks after the virtual function.<br/>The callback signature is `nil is_on_fire(Movable self)`
+[CallbackId](#Aliases) | [set_pre_attack(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_attack) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> attack(Movable self, Entity victim)`<br/>Virtual function docs:<br/>Runs on contact damage, returns false if there wasn't any interaction (called from on_collision2, will be called as long as the hitboxes overlap)
+[CallbackId](#Aliases) | [set_post_attack(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_attack) | Hooks after the virtual function.<br/>The callback signature is `nil attack(Movable self, Entity victim)`<br/>Virtual function docs:<br/>Runs on contact damage, returns false if there wasn't any interaction (called from on_collision2, will be called as long as the hitboxes overlap)
+[CallbackId](#Aliases) | [set_pre_thrown_into(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_thrown_into) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> thrown_into(Movable self, Entity victim)`<br/>Virtual function docs:<br/>Same as above, but for being thrown into something and potentially dealing damage that way
+[CallbackId](#Aliases) | [set_post_thrown_into(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_thrown_into) | Hooks after the virtual function.<br/>The callback signature is `nil thrown_into(Movable self, Entity victim)`<br/>Virtual function docs:<br/>Same as above, but for being thrown into something and potentially dealing damage that way
 [CallbackId](#Aliases) | [set_pre_damage(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_damage) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> damage(Movable self, Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.<br/>Returns: true if entity was affected (for stuff like pot that should break after hit etc.), false if the event should be ignored by damage_dealer
 [CallbackId](#Aliases) | [set_post_damage(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_damage) | Hooks after the virtual function.<br/>The callback signature is `nil damage(Movable self, Entity damage_dealer, int damage_amount, DAMAGE_TYPE damage_flags, Vec2 velocity, int unknown_damage_phase, int stun_amount, int iframes, bool unknown_is_final)`<br/>Virtual function docs:<br/>Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.<br/>Returns: true if entity was affected (for stuff like pot that should break after hit etc.), false if the event should be ignored by damage_dealer
 [CallbackId](#Aliases) | [set_pre_on_hit(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_on_hit) | Hooks before the virtual function.<br/>The callback signature is `bool on_hit(Movable self, Entity damage_dealer)`<br/>Virtual function docs:<br/>Hit by broken arrows etc that don't deal damage, calls damage with 0 damage.
@@ -6975,40 +6996,54 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_light_on_fire(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_light_on_fire) | Hooks after the virtual function.<br/>The callback signature is `nil light_on_fire(Movable self, int time)`<br/>Virtual function docs:<br/>Does not damage entity
 [CallbackId](#Aliases) | [set_pre_set_cursed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_set_cursed) | Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, bool b, bool effect)`
 [CallbackId](#Aliases) | [set_post_set_cursed(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_set_cursed) | Hooks after the virtual function.<br/>The callback signature is `nil set_cursed(Movable self, bool b, bool effect)`
-[CallbackId](#Aliases) | [set_pre_web_collision(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_web_collision) | Hooks before the virtual function.<br/>The callback signature is `bool web_collision(Movable self)`
-[CallbackId](#Aliases) | [set_post_web_collision(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_web_collision) | Hooks after the virtual function.<br/>The callback signature is `nil web_collision(Movable self)`
+[CallbackId](#Aliases) | [set_pre_web_collision(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_web_collision) | Hooks before the virtual function.<br/>The callback signature is `bool web_collision(Movable self, bool bool)`
+[CallbackId](#Aliases) | [set_post_web_collision(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_web_collision) | Hooks after the virtual function.<br/>The callback signature is `nil web_collision(Movable self, bool bool)`
 [CallbackId](#Aliases) | [set_pre_check_out_of_bounds(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_check_out_of_bounds) | Hooks before the virtual function.<br/>The callback signature is `bool check_out_of_bounds(Movable self)`<br/>Virtual function docs:<br/>Disable to not get killed outside level bounds.
 [CallbackId](#Aliases) | [set_post_check_out_of_bounds(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_check_out_of_bounds) | Hooks after the virtual function.<br/>The callback signature is `nil check_out_of_bounds(Movable self)`<br/>Virtual function docs:<br/>Disable to not get killed outside level bounds.
 [CallbackId](#Aliases) | [set_pre_set_standing_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_set_standing_on) | Hooks before the virtual function.<br/>The callback signature is `bool set_standing_on(Movable self, int entity_uid)`
 [CallbackId](#Aliases) | [set_post_set_standing_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_set_standing_on) | Hooks after the virtual function.<br/>The callback signature is `nil set_standing_on(Movable self, int entity_uid)`
 [CallbackId](#Aliases) | [set_pre_standing_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_standing_on) | Hooks before the virtual function.<br/>The callback signature is `optional<Entity> standing_on(Movable self)`
 [CallbackId](#Aliases) | [set_post_standing_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_standing_on) | Hooks after the virtual function.<br/>The callback signature is `nil standing_on(Movable self)`
-[CallbackId](#Aliases) | [set_pre_stomped_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_stomped_by) | Hooks before the virtual function.<br/>The callback signature is `bool stomped_by(Movable self, Entity)`
-[CallbackId](#Aliases) | [set_post_stomped_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_stomped_by) | Hooks after the virtual function.<br/>The callback signature is `nil stomped_by(Movable self, Entity)`
-[CallbackId](#Aliases) | [set_pre_thrown_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_thrown_by) | Hooks before the virtual function.<br/>The callback signature is `bool thrown_by(Movable self, Entity)`
-[CallbackId](#Aliases) | [set_post_thrown_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_thrown_by) | Hooks after the virtual function.<br/>The callback signature is `nil thrown_by(Movable self, Entity)`
-[CallbackId](#Aliases) | [set_pre_cloned_to(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_cloned_to) | Hooks before the virtual function.<br/>The callback signature is `bool cloned_to(Movable self, Entity)`
-[CallbackId](#Aliases) | [set_post_cloned_to(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_cloned_to) | Hooks after the virtual function.<br/>The callback signature is `nil cloned_to(Movable self, Entity)`
+[CallbackId](#Aliases) | [set_pre_stomped_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_stomped_by) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> stomped_by(Movable self, Entity stomper)`
+[CallbackId](#Aliases) | [set_post_stomped_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_stomped_by) | Hooks after the virtual function.<br/>The callback signature is `nil stomped_by(Movable self, Entity stomper)`
+[CallbackId](#Aliases) | [set_pre_thrown_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_thrown_by) | Hooks before the virtual function.<br/>The callback signature is `bool thrown_by(Movable self, Entity thrower)`
+[CallbackId](#Aliases) | [set_post_thrown_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_thrown_by) | Hooks after the virtual function.<br/>The callback signature is `nil thrown_by(Movable self, Entity thrower)`
+[CallbackId](#Aliases) | [set_pre_cloned_to(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_cloned_to) | Hooks before the virtual function.<br/>The callback signature is `bool cloned_to(Movable self, Entity clone int some_entity_uid)`
+[CallbackId](#Aliases) | [set_post_cloned_to(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_cloned_to) | Hooks after the virtual function.<br/>The callback signature is `nil cloned_to(Movable self, Entity clone int some_entity_uid)`
 [CallbackId](#Aliases) | [set_pre_pick_up(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_pick_up) | Hooks before the virtual function.<br/>The callback signature is `bool pick_up(Movable self, Entity entity_to_pick_up)`
 [CallbackId](#Aliases) | [set_post_pick_up(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_pick_up) | Hooks after the virtual function.<br/>The callback signature is `nil pick_up(Movable self, Entity entity_to_pick_up)`
-[CallbackId](#Aliases) | [set_pre_picked_up_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_picked_up_by) | Hooks before the virtual function.<br/>The callback signature is `bool picked_up_by(Movable self, Entity)`
-[CallbackId](#Aliases) | [set_post_picked_up_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_picked_up_by) | Hooks after the virtual function.<br/>The callback signature is `nil picked_up_by(Movable self, Entity)`
+[CallbackId](#Aliases) | [set_pre_can_be_picked_up_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_can_be_picked_up_by) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> can_be_picked_up_by(Movable self, Entity entity_picking_up, bool)`
+[CallbackId](#Aliases) | [set_post_can_be_picked_up_by(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_can_be_picked_up_by) | Hooks after the virtual function.<br/>The callback signature is `nil can_be_picked_up_by(Movable self, Entity entity_picking_up, bool)`
 [CallbackId](#Aliases) | [set_pre_drop(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_drop) | Hooks before the virtual function.<br/>The callback signature is `bool drop(Movable self)`<br/>Virtual function docs:<br/>Called when dropping or throwing
 [CallbackId](#Aliases) | [set_post_drop(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_drop) | Hooks after the virtual function.<br/>The callback signature is `nil drop(Movable self)`<br/>Virtual function docs:<br/>Called when dropping or throwing
 [CallbackId](#Aliases) | [set_pre_collect_treasure(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_collect_treasure) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> collect_treasure(Movable self, int value, ENT_TYPE treasure)`<br/>Virtual function docs:<br/>Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
 [CallbackId](#Aliases) | [set_post_collect_treasure(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_collect_treasure) | Hooks after the virtual function.<br/>The callback signature is `nil collect_treasure(Movable self, int value, ENT_TYPE treasure)`<br/>Virtual function docs:<br/>Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
+[CallbackId](#Aliases) | [set_pre_apply_movement(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_apply_movement) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> apply_movement(Movable self, int, int, int)`
+[CallbackId](#Aliases) | [set_post_apply_movement(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_apply_movement) | Hooks after the virtual function.<br/>The callback signature is `nil apply_movement(Movable self, int, int, int)`
+[CallbackId](#Aliases) | [set_pre_is_powerup_capable(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_is_powerup_capable) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> is_powerup_capable(Movable self)`
+[CallbackId](#Aliases) | [set_post_is_powerup_capable(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_is_powerup_capable) | Hooks after the virtual function.<br/>The callback signature is `nil is_powerup_capable(Movable self)`
 [CallbackId](#Aliases) | [set_pre_initialize(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_initialize) | Hooks before the virtual function.<br/>The callback signature is `bool initialize(Movable self)`
 [CallbackId](#Aliases) | [set_post_initialize(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_initialize) | Hooks after the virtual function.<br/>The callback signature is `nil initialize(Movable self)`
 [CallbackId](#Aliases) | [set_pre_process_input(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_process_input) | Hooks before the virtual function.<br/>The callback signature is `bool process_input(Movable self)`
 [CallbackId](#Aliases) | [set_post_process_input(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_process_input) | Hooks after the virtual function.<br/>The callback signature is `nil process_input(Movable self)`
 [CallbackId](#Aliases) | [set_pre_picked_up(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_picked_up) | Hooks before the virtual function.<br/>The callback signature is `bool picked_up(Movable self)`
 [CallbackId](#Aliases) | [set_post_picked_up(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_picked_up) | Hooks after the virtual function.<br/>The callback signature is `nil picked_up(Movable self)`
-[CallbackId](#Aliases) | [set_pre_fall(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_fall) | Hooks before the virtual function.<br/>The callback signature is `bool fall(Movable self)`
-[CallbackId](#Aliases) | [set_post_fall(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_fall) | Hooks after the virtual function.<br/>The callback signature is `nil fall(Movable self)`
+[CallbackId](#Aliases) | [set_pre_release(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_release) | Hooks before the virtual function.<br/>The callback signature is `bool release(Movable self)`
+[CallbackId](#Aliases) | [set_post_release(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_release) | Hooks after the virtual function.<br/>The callback signature is `nil release(Movable self)`
+[CallbackId](#Aliases) | [set_pre_generate_fall_poof_particles(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_generate_fall_poof_particles) | Hooks before the virtual function.<br/>The callback signature is `bool generate_fall_poof_particles(Movable self)`
+[CallbackId](#Aliases) | [set_post_generate_fall_poof_particles(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_generate_fall_poof_particles) | Hooks after the virtual function.<br/>The callback signature is `nil generate_fall_poof_particles(Movable self)`
+[CallbackId](#Aliases) | [set_pre_fall(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_fall) | Hooks before the virtual function.<br/>The callback signature is `bool fall(Movable self, float float)`
+[CallbackId](#Aliases) | [set_post_fall(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_fall) | Hooks after the virtual function.<br/>The callback signature is `nil fall(Movable self, float float)`
 [CallbackId](#Aliases) | [set_pre_apply_friction(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_apply_friction) | Hooks before the virtual function.<br/>The callback signature is `bool apply_friction(Movable self, float, bool vertical, float)`
 [CallbackId](#Aliases) | [set_post_apply_friction(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_apply_friction) | Hooks after the virtual function.<br/>The callback signature is `nil apply_friction(Movable self, float, bool vertical, float)`
-[CallbackId](#Aliases) | [set_pre_crush(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_crush) | Hooks before the virtual function.<br/>The callback signature is `bool crush(Movable self, Entity)`
-[CallbackId](#Aliases) | [set_post_crush(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_crush) | Hooks after the virtual function.<br/>The callback signature is `nil crush(Movable self, Entity)`
+[CallbackId](#Aliases) | [set_pre_can_break_block(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_can_break_block) | Hooks before the virtual function.<br/>The callback signature is `optional<bool> can_break_block(Movable self, bool horizontal, Entity block)`
+[CallbackId](#Aliases) | [set_post_can_break_block(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_can_break_block) | Hooks after the virtual function.<br/>The callback signature is `nil can_break_block(Movable self, bool horizontal, Entity block)`
+[CallbackId](#Aliases) | [set_pre_break_block(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_break_block) | Hooks before the virtual function.<br/>The callback signature is `bool break_block(Movable self, bool camera_shake, Entity block)`
+[CallbackId](#Aliases) | [set_post_break_block(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_break_block) | Hooks after the virtual function.<br/>The callback signature is `nil break_block(Movable self, bool camera_shake, Entity block)`
+[CallbackId](#Aliases) | [set_pre_crush(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_crush) | Hooks before the virtual function.<br/>The callback signature is `bool crush(Movable self, Entity entity)`
+[CallbackId](#Aliases) | [set_post_crush(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_crush) | Hooks after the virtual function.<br/>The callback signature is `nil crush(Movable self, Entity entity)`
+[CallbackId](#Aliases) | [set_pre_instakill_death(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_instakill_death) | Hooks before the virtual function.<br/>The callback signature is `bool instakill_death(Movable self)`
+[CallbackId](#Aliases) | [set_post_instakill_death(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_instakill_death) | Hooks after the virtual function.<br/>The callback signature is `nil instakill_death(Movable self)`
 
 ### MovingIcon
 

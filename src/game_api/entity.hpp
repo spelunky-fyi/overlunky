@@ -222,7 +222,7 @@ class Entity
     {
         clear_dtor_impl(this, dtor_cb_id);
     }
-
+    /// NoDoc
     void set_enable_turning(bool enabled);
 
     std::vector<uint32_t> get_items();
