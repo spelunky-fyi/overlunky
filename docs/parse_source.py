@@ -638,6 +638,7 @@ def run_parse():
                                 and item["member_funs"][func_name]
                                 and len(item["member_funs"][func_name]) > 0
                             ):
+                                # choosing the last one since that's the actual virtual signature most of the time
                                 func = item["member_funs"][func_name][-1]
                                 vtable_entries[name] = {
                                     "name": name,
@@ -648,9 +649,7 @@ def run_parse():
                                     "binds": binds,
                                 }
                     else:
-                        signature = re.search(
-                            r"([_a-zA-Z][\w]*.*)\((.*)\)", signature
-                        )
+                        signature = re.search(r"([_a-zA-Z][\w]*.*)\((.*)\)", signature)
                         ret = signature.group(1)
                         args = [t for t in signature.group(2).split(",")]
                         vtable_entries[name] = {
