@@ -283,7 +283,7 @@ class Entity
     /// Returns true if entity is in water/lava
     virtual bool is_in_liquid() = 0;                                         // 12, drill always returns false
     virtual bool check_type_properties_flags_19() = 0;                       // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
-    virtual uint8_t get_type_field_60() = 0;                                 // 14, the value is compared to entity state and used in some bahavior function
+    virtual uint8_t get_type_field_60() = 0;                                 // 14, the value is compared to entity state and used in some behavior function
     virtual void set_invisible(bool value) = 0;                              // 15
     virtual void flip(bool left) = 0;                                        // 16
     virtual void set_draw_depth(uint8_t draw_depth, uint8_t b3f) = 0;        // 17
@@ -293,7 +293,7 @@ class Entity
     virtual void remove_item(Entity* entity, bool autokill_check) = 0;       // 21, if autokill_check is true, it will check if the entity has the "kill if overlay lost" flag and kill it if it's set
     virtual Entity* get_held_entity() = 0;                                   // 22
     virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", triggers use self as the first parameter. Called when there is entity overlapping trigger entity, even if they don't move
-    /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    /// Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
     virtual bool trigger_action(Entity* user) = 0; // 24, also used for throwables, disabling this for bomb make it always spawn an the ground, but you can still pick it up and throw it
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0; // 25

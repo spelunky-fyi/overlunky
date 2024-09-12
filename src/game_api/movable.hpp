@@ -216,7 +216,7 @@ class Movable : public Entity
     virtual void initialize() = 0;                                       // 75, e.g. cobra: set random spit_timer; bat: set random stand_counter; emerald: set price
     virtual void check_is_falling() = 0;                                 // 76, sets more_flags.falling by comparing velocityy to 0, sets i120a to FF, clears owner_uid, can call remove_rider on mounts, for player updates the extra y_pos, for bosses clears lock input timer
     virtual void v77() = 0;                                              // 77
-    virtual void process_input() = 0;                                    // 78, more like: handle_movment
+    virtual void process_input() = 0;                                    // 78, more like: handle_movement
     virtual void post_collision_damage_related() = 0;                    // 79, used for enemies attacks as well? 3 versions for: eggplant minister, players and the rest
     virtual void on_picked_up() = 0;                                     // 80, plays pickup sound depending on the entity mask/type etc. set stun for pets and mounts etc.
     virtual void on_release() = 0;                                       // 81, only for hired hands and lava pots

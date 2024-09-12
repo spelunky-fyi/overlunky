@@ -25,7 +25,7 @@ class Monster : public PowerupCapable
     virtual bool update_target(Entity* ent, float&) = 0;   // 100, float from the function above, also works as an output?
 };
 
-// RoomOwner and NPC may have common subclass for the first two virtuals, but they later dirvarge, wepon type is the same spot, but they probably just made one first then copied over the virtuals
+// RoomOwner and NPC may have common subclass for the first two virtuals, but they later diverge, weapon type is the same spot, but they probably just made one first then copied over the virtuals
 class RoomOwner : public Monster
 {
   public:
@@ -89,7 +89,7 @@ class NPC : public Monster
     virtual ENT_TYPE weapon_type() = 0;
     /// For weapons, checks if the entity should hit the trigger or not
     virtual bool should_attack(std::tuple<Entity*, float, float, float> target) = 0;
-    virtual void on_criminal_act_committed2(void*) = 0; // calls the on_criminal_act_committed except for bodyguard which calls the should_attack_on_sight and turns off any speechbubble
+    virtual void on_criminal_act_committed2(void*) = 0; // calls the on_criminal_act_committed except for bodyguard which calls the should_attack_on_sight and turns off any speech-bubble
 };
 
 class WalkingMonster : public Monster
@@ -378,7 +378,7 @@ class Lavamander : public Monster
     uint16_t jump_pause_timer; // jump pause when cool; runs continuously when hot
     uint8_t lava_detection_timer;
     bool is_hot;
-    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
+    /// 0 - didn't saw player, 1 - saw player, 2 - spited lava; probably used so he won't spit imminently after seeing the player
     uint8_t player_detect_state;
     uint8_t padding2;
 };
