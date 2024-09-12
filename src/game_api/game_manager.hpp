@@ -70,7 +70,7 @@ struct BackgroundMusic
     uint8_t unknown18;
     uint8_t unknown19;
     uint8_t padding_probably;
-    std::array<BGMUnknown, 15> unknown21; // They continously go from 1 to 0 and back as a one big table, from first one to the last one, each change is one tick counted by the unknown22
+    std::array<BGMUnknown, 15> unknown21; // They continuously go from 1 to 0 and back as a one big table, from first one to the last one, each change is one tick counted by the unknown22
     float idle_counter;                   // counts down at the start of a level, then reacts to the player movement controls
     uint32_t unknown22;                   // some timer (counts continuously)
 };
@@ -155,7 +155,7 @@ struct GameProps
 
     // uint32_t padding_probably4;
     size_t* unknown16;
-    size_t unknwon17;
+    size_t unknown17;
     std::array<double, MAX_PLAYERS> unknown18; // counts time or something? only active when the game window is active when there is a player choosen?
     int32_t unknown19;
     int32_t unknown20; // -1
@@ -176,7 +176,7 @@ struct GameManager
     std::array<uint8_t, MAX_PLAYERS> buttons_movement;
     GameProps* game_props;
 
-    // screen pointers below are most likely in an array and indexed through the screen ID, hence the nullptrs for
+    // screen pointers below are most likely in an array and indexed through the screen ID, hence the nullptr for
     // screens that are available in State
     ScreenLogo* screen_logo;
     ScreenIntro* screen_intro;

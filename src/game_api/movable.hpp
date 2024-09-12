@@ -130,9 +130,9 @@ class Movable : public Entity
     // don't use this, it's only to not break backwards compatibility
     void light_on_fire_broken()
     {
-        this->light_on_fire(0x64); // kind of stanrad value that the game uses
+        this->light_on_fire(0x64); // kind of standard value that the game uses
     }
-    /// Get all avaible behavior ids
+    /// Get all available behavior ids
     std::vector<uint32_t> get_all_behaviors();
     /// Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity
     /// Returns false if entity doesn't have this behavior id

@@ -39,9 +39,9 @@ class RoomOwner : public Monster
     uint16_t countdown_timer; // counts down to 0 when a value is forced
     uint8_t unknown1;
     bool is_patrolling; // to set off a shopkeeper, combine this with state.shoppie_aggro_levels > 0
-    /// setting this makes him angry, if it's shopkeeper you get 2 agrro points
+    /// setting this makes him angry, if it's shopkeeper you get 2 aggro points
     bool aggro_trigger;
-    /// also is set true if you set aggro to true, get's trigger even when whiping
+    /// also is set true if you set aggro to true, get's trigger even when whipping
     bool was_hurt;
     uint16_t padding1;
     uint32_t padding2;
@@ -201,10 +201,10 @@ class Spider : public Monster
     uint8_t jump_timer;
     uint8_t padding1;
     uint16_t padding2;
-    /// only in the x coord
+    /// only in the x coordinate
     float trigger_distance;
 
-    virtual void spawn_offset_related() = 0; // disabling this function makes the spider spawn in wierd position
+    virtual void spawn_offset_related() = 0; // disabling this function makes the spider spawn in weird position
     virtual float v_102() = 0;               // for spider returns 0.02, for giant spider 0.025, game does some calculations with this when triggered by player
     virtual bool on_ceiling() = 0;
 };
@@ -446,7 +446,7 @@ class Mummy : public Monster
 class VanHorsing : public NPC
 {
   public:
-    /// if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
+    /// if set to true, he will say "I've been hunting this fiend a long time!" when on screen
     bool show_text;
     /// one way door message has been shown
     bool special_message_shown;
@@ -512,9 +512,9 @@ class Octopus : public WalkingMonster
 class Bodyguard : public NPC
 {
   public:
-    /// 0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace
+    /// 0 - none, 1 - Tusk dice shop, 2 - Entrance to pleasure palace, 3 - Basement entrance to pleasure palace
     uint8_t position_state;
-    bool message_shown; // entrence and basement entrence
+    bool message_shown; // entrance and basement entrance
 };
 
 class Fish : public Monster
@@ -562,7 +562,7 @@ class Kingu : public Monster
     uint16_t climb_pause_timer;
     uint8_t shell_invincibility_timer;
     uint8_t monster_spawn_timer;
-    /// excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
+    /// Excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
     uint8_t initial_shell_health;
     bool player_seen_by_kingu; // unsure if correct
 };
@@ -573,7 +573,7 @@ class Anubis : public Monster
     float spawn_x;
     float spawn_y;
     float unknown1;
-    float attack_proximity_y; // how close you have to be to be attacked; set both to 0 for a pet anubis
+    float attack_proximity_y; // how close you have to be to be attacked; set both to 0 for a pet Anubis
     float attack_proximity_x;
     uint8_t ai_timer;
     uint8_t next_attack_timer;
@@ -938,7 +938,7 @@ class Hundun : public Monster
 class HundunHead : public Monster
 {
   public:
-    /// Posiotion where the head will move on attack
+    /// Position where the head will move on attack
     float attack_position_x;
     float attack_position_y;
     int32_t egg_crack_effect_uid;
@@ -1006,7 +1006,7 @@ class ProtoShopkeeper : public Monster
     uint8_t padding2;
     uint8_t blowup_related;
     uint32_t animation_timer;
-    uint16_t walk_pause_explode_timer; // alternates between walking and pausing; when stunned: crawl timer;  after crawling: head pulse timer (pulse frequency dependend on timer)
+    uint16_t walk_pause_explode_timer; // alternates between walking and pausing; when stunned: crawl timer;  after crawling: head pulse timer (pulse frequency depended on timer)
     /// 0 = slow, 4 = fast
     uint8_t walking_speed;
     uint8_t padding7;
