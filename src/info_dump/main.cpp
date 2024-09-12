@@ -1026,7 +1026,7 @@ void get_vtables()
     }
 }
 
-FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Animation, texture, count, interval, key, repeat);
+FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Animation, first_tile, count, interval, id, repeat);
 FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Rect, offsetx, offsety, hitboxx, hitboxy);
 void to_json(float_json& j, const EntityDB& ent)
 {

@@ -32,9 +32,9 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<Animation>(
         "Animation",
         "id",
-        &Animation::key,
+        &Animation::id,
         "first_tile",
-        &Animation::texture,
+        &Animation::first_tile,
         "num_tiles",
         &Animation::count,
         "interval",

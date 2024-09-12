@@ -117,7 +117,7 @@ class Mattock : public Purchasable
 };
 
 class Gun : public Purchasable
-{ // BIG NOTE: scepter is not a Purchasable, but that's the only Gun that isn't so i didn't bother to make new type for it
+{
   public:
     uint8_t cooldown;
     /// used only for webgun

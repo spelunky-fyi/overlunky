@@ -122,6 +122,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_shield"] = &Entity::as<Shield>;
     lua["Entity"]["as_powerup"] = &Entity::as<Powerup>;
     lua["Entity"]["as_prizedispenser"] = &Entity::as<PrizeDispenser>;
+    lua["Entity"]["as_scepter"] = &Entity::as<Scepter>;
 
     lua.new_usertype<Bomb>(
         "Bomb",
@@ -1025,6 +1026,13 @@ void register_usertypes(sol::state& lua)
         "Web",
         "decay_rate",
         &Web::decay_rate,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Scepter>(
+        "Scepter",
+        "cooldown",
+        &Scepter::cooldown,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 }

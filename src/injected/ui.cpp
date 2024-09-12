@@ -8144,8 +8144,8 @@ void render_hotbar_textures()
                 auto anim = type->animations.begin()->second;
                 if (type->animations.contains(0))
                     anim = type->animations[0];
-                tx = anim.texture % (def.sub_image_width / def.tile_width);
-                ty = (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
+                tx = anim.first_tile % (def.sub_image_width / def.tile_width);
+                ty = (uint32_t)floor(anim.first_tile / (def.sub_image_height / def.tile_height));
             }
             float uv_left = (texture->tile_width_fraction * tx) + texture->offset_x_weird_math;
             float uv_right = uv_left + texture->tile_width_fraction - texture->one_over_width;
@@ -8286,8 +8286,8 @@ void render_texture_viewer()
         std::map<std::tuple<uint32_t, uint32_t, bool>, int> overlap;
         for (const auto& [id, anim] : ent->type->animations)
         {
-            uint32_t x = def.sub_image_offset_x + def.tile_width * (anim.texture % (def.sub_image_width / def.tile_width));
-            uint32_t y = def.sub_image_offset_y + def.tile_height * (uint32_t)floor(anim.texture / (def.sub_image_height / def.tile_height));
+            uint32_t x = def.sub_image_offset_x + def.tile_width * (anim.first_tile % (def.sub_image_width / def.tile_width));
+            uint32_t y = def.sub_image_offset_y + def.tile_height * (uint32_t)floor(anim.first_tile / (def.sub_image_height / def.tile_height));
             bool rev = anim.count < 0;
             auto key = std::make_tuple(x, y, rev);
             float tx = 0;
@@ -8310,7 +8310,7 @@ void render_texture_viewer()
                 dl->AddRect({ax - 3, ay + 3}, {bx + 3, by - 3}, border, 0, 0, thick);
             else
                 dl->AddRect({ax + 3, ay + 3}, {bx - 3, by - 3}, border, 0, 0, thick);
-            dl->AddText({ax + tx, ay + f * def.tile_height - ImGui::GetTextLineHeight() - 4}, 0xffffffff, fmt::format("{}", anim.key).c_str());
+            dl->AddText({ax + tx, ay + f * def.tile_height - ImGui::GetTextLineHeight() - 4}, 0xffffffff, fmt::format("{}", anim.id).c_str());
             overlap[key]++;
         }
     }

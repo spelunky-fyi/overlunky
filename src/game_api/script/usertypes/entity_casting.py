@@ -30,7 +30,7 @@ for f in entities_files:
 
 # Download Spelunky2.json from the x64dbg github repo
 #url = "https://gitcdn.link/repo/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
-url = "https://raw.githubusercontent.com/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2.json"
+url = "https://raw.githubusercontent.com/spelunky-fyi/Spelunky2X64DbgPlugin/master/resources/Spelunky2Entities.json"
 response = urllib.request.urlopen(url)
 spelunky2json = response.read().decode('utf-8')
 j = json.loads(re.sub("//.*", "", spelunky2json, flags=re.MULTILINE))
