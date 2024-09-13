@@ -1582,7 +1582,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "get_entity_name"sv,
         PatternCommandBuffer{}
-            find_after_inst("48 89 F2 66 41 B8 80 00 45 31 C9"_gh)
+            .find_after_inst("48 89 F2 66 41 B8 80 00 45 31 C9"_gh)
             .decode_call()
             .at_exe(),
     },
