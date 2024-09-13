@@ -1582,9 +1582,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "get_entity_name"sv,
         PatternCommandBuffer{}
-            .find_inst("\x44\x21\xe2\x4c\x8b\x91\x78\x02\x00\x00"sv)
-            .at_exe()
-            .function_start(0xff),
+            find_after_inst("48 89 F2 66 41 B8 80 00 45 31 C9"_gh)
+            .decode_call()
+            .at_exe(),
     },
     {
         "construct_soundmeta"sv,
