@@ -1013,7 +1013,7 @@ function change_string(id, str) end
 ---@param str string
 ---@return STRINGID
 function add_string(str) end
----Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+---Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 ---if the entity has no localized name
 ---@param type ENT_TYPE
 ---@param fallback_strategy boolean?

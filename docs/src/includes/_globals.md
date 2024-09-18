@@ -718,7 +718,7 @@ Get the [Entity](#Entity) behind an uid, converted to the correct type. To see w
 
 #### string get_entity_name([ENT_TYPE](#ENT_TYPE) type, optional<bool> fallback_strategy)
 
-Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 if the entity has no localized name
 
 ### get_entity_type
