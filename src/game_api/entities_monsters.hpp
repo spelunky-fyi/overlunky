@@ -237,7 +237,7 @@ class Shopkeeper : public RoomOwner
 class Yang : public RoomOwner
 {
   public:
-    /// Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    /// Table of uids of the turkeys, goes only up to 3, is nil when yang is angry
     custom_set<int32_t> turkeys_in_den;
     uint8_t unknown4;
     uint8_t unknown5;

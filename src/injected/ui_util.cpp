@@ -92,6 +92,64 @@ float UI::get_zoom_level()
     auto game_api = GameAPI::get();
     return game_api->get_current_zoom();
 }
+void teleport_entity(Entity* ent, float dx, float dy, bool s, float vx, float vy, bool snap)
+{
+    if (ent->overlay)
+        ent->overlay->remove_item(ent, false);
+
+    auto topmost = ent->topmost_mount(); // we just detached from overlay, so this is kind of pointelss
+    if (!s)
+    {
+        auto [x_pos, y_pos] = topmost->abs_position();
+        // player relative coordinates
+        x_pos += dx;
+        y_pos += dy;
+        if (snap)
+        {
+            x_pos = round(x_pos);
+            y_pos = round(y_pos);
+        }
+        topmost->x = x_pos;
+        topmost->y = y_pos;
+    }
+    else
+    {
+        // screen coordinates -1..1
+        // log::debug!("Teleporting to screen {}, {}", x, y);
+        auto& state = State::get();
+        auto [x_pos, y_pos] = state.click_position(dx, dy);
+        if (snap && abs(vx) + abs(vy) <= 0.04f)
+        {
+            x_pos = round(x_pos);
+            y_pos = round(y_pos);
+        }
+        // log::debug!("Teleporting to {}, {}", x, y);
+        topmost->x = x_pos;
+        topmost->y = y_pos;
+    }
+    // set velocity
+    if (topmost->is_movable())
+    {
+        auto movable_ent = topmost->as<Movable>();
+        movable_ent->velocityx = vx;
+        movable_ent->velocityy = vy;
+    }
+    return;
+}
+void UI::teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy)
+{
+    if (ent->overlay)
+        ent->overlay->remove_item(ent, false);
+
+    ent->x = dx;
+    ent->y = dy;
+    if (ent->is_movable())
+    {
+        auto movable_ent = ent->as<Movable>();
+        movable_ent->velocityx = vx;
+        movable_ent->velocityy = vy;
+    }
+}
 void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 {
     auto state = State::get().ptr_main();
@@ -99,7 +157,7 @@ void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
     auto player = state->items->player(0);
     if (player == nullptr)
         return;
-    player->teleport(x, y, s, vx, vy, snap);
+    teleport_entity(player, x, y, s, vx, vy, snap);
 }
 std::pair<float, float> UI::screen_position(float x, float y)
 {
@@ -140,7 +198,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     float current_distance = radius;
     auto check_distance = [&current_entity, &current_distance, &x, &y](Entity* test_entity)
     {
-        const auto [ix, iy] = test_entity->position();
+        const auto [ix, iy] = test_entity->abs_position();
         const float distance = (float)std::sqrt(std::pow(x - ix, 2) + std::pow(y - iy, 2));
         if (distance < current_distance)
         {
@@ -180,7 +238,7 @@ void UI::move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy,
 {
     auto ent = get_entity_ptr(uid);
     if (ent)
-        ent->teleport(x, y, s, vx, vy, snap);
+        teleport_entity(ent, x, y, s, vx, vy, snap);
 }
 SaveData* UI::savedata()
 {
@@ -234,7 +292,7 @@ std::pair<float, float> UI::get_position(Entity* ent, bool render)
         return {.0f, .0f};
 
     if (!render)
-        return ent->position();
+        return ent->abs_position();
 
     if (ent->rendering_info && !ent->rendering_info->render_inactive)
         return {ent->rendering_info->x, ent->rendering_info->y};
@@ -246,7 +304,7 @@ std::pair<float, float> UI::get_position(Entity* ent, bool render)
             return {ent_item->rendering_info->x - ent_item->x, ent_item->rendering_info->y - ent_item->y};
         }
     }
-    return ent->position();
+    return ent->abs_position();
 }
 bool UI::has_active_render(Entity* ent)
 {

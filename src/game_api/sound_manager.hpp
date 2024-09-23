@@ -173,6 +173,8 @@ class SoundManager
             fun(parameter_name, static_cast<uint32_t>(i));
         }
     }
+    SOUNDID convert_sound_id(const VANILLA_SOUND& s_name);
+    const VANILLA_SOUND& convert_sound_id(SOUNDID id);
 
   private:
     bool m_IsInit{false};
@@ -255,9 +257,9 @@ class SoundManager
 struct SoundInfo
 {
     int64_t unknown1;
-    uint32_t sound_id;
-    int32_t unknown2;       // padding probably
-    std::string sound_name; // not 100% sure if it's standard
+    SOUNDID sound_id;
+    int32_t unknown2; // padding probably
+    std::string sound_name;
 };
 
 // there is actually base class that consists of up to the left/right channel, used for the sfx
@@ -297,12 +299,15 @@ struct BackgroundSound : public SoundMeta
     bool destroy_sound; // don't use directly, use the kill function
 };
 
-/// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
-/// Returns SoundMeta (read only), beware that after the sound starts, that memory is no longer valid
 SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);
-SoundMeta* play_sound_by_id(uint32_t sound_id, uint32_t source_uid);
+SoundMeta* play_sound(SOUNDID sound_id, uint32_t source_uid);
 
 // could probably be exposed if someone can actually figure out how to properly "register it"?
 // it also needs to make sure the lua owns the returned object and it will properly delete it
 SoundMeta* construct_soundmeta(VANILLA_SOUND sound, bool background_sound);
-SoundMeta* construct_soundmeta(uint32_t sound_id, bool background_sound);
+SoundMeta* construct_soundmeta(SOUNDID sound_id, bool background_sound);
+/*
+VANILLA_SOUND convert_sound_id(SOUNDID id); // for the autodoc
+/// Convert SOUNDID to VANILLA_SOUND and vice versa
+SOUNDID convert_sound_id(VANILLA_SOUND sound);
+*/

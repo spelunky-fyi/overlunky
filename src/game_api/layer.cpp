@@ -207,7 +207,7 @@ void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_la
 {
     if (ent)
     {
-        const auto pos = ent->position();
+        const auto pos = ent->abs_position();
         const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.x));
         const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.y));
         if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
@@ -241,7 +241,7 @@ void Layer::destroy_grid_entity(Entity* ent)
             }
         }
 
-        const auto pos = ent->position();
+        const auto pos = ent->abs_position();
         const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.x));
         const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.y));
         if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)

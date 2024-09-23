@@ -21,13 +21,14 @@ struct SpritePosition;
 class Powerup : public Movable
 {
   public:
-    virtual SpritePosition& get_hud_sprite(SpritePosition&) = 0;
+    virtual SpritePosition& get_hud_sprite(SpritePosition& output) = 0;
     // not sure why the normal powerups use apply/remove effect where backpacks use the put on/put off
     virtual void apply_effect(PowerupCapable* who) = 0;
-    virtual void remove_effect(PowerupCapable* who) = 0;
+    virtual void remove_effect(PowerupCapable* who) = 0; // does not remove powerup from the powerups map
     virtual void on_putting_on(PowerupCapable* who) = 0; // only for backpacks, sets offsets etc.
     virtual void on_putting_off(PowerupCapable* who) = 0;
-    virtual bool in_use() = 0; // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack hoverpack.is_on, teleporter and powerpack and all other powerups return false
+    /// for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack hoverpack.is_on, teleporter and powerpack and all other powerups return false
+    virtual bool in_use() = 0;
 };
 
 class Backpack : public Powerup
@@ -51,7 +52,7 @@ class Jetpack : public Backpack
     uint32_t fly_time; // it's per level, not even per jetpack lol, it also adds at when it explodes
     uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
 
-    virtual float jetpack_acceleration() = 0;
+    virtual float acceleration() = 0;
 };
 
 class TeleporterBackpack : public Backpack
@@ -97,7 +98,9 @@ class VladsCape : public Cape
 class Purchasable : public Movable
 {
   public:
-    virtual void buy(Entity* who) = 0;
+    /// Be aware that for pickable items like weapons, the item will be automatically picked up by the player (unless he already holds something), the ownership transfer is a little bit slow, so it might trigger the shop keeper if you're not inside the shop.
+    /// does not consume money
+    virtual void acquire(Entity* who) = 0;
 };
 
 class DummyPurchasableEntity : public Purchasable
@@ -105,6 +108,8 @@ class DummyPurchasableEntity : public Purchasable
   public:
     Entity* replace_entity;
     bool exploding;
+    /// Explodes when timer reaches 30
+    uint8_t explosion_timer;
 
     /// Transfers ownership etc. for who to blame, sets the exploding bool
     virtual void trigger_explosion(Entity* who) = 0;
@@ -201,7 +206,7 @@ class Idol : public Movable
 class Spear : public Movable
 {
   public:
-    uint32_t sound_id;
+    SOUNDID sound_id;
 };
 
 class JungleSpearCosmetic : public Movable
@@ -220,9 +225,11 @@ struct UnknownPointerGroup
 
 class Projectile : public Movable
 {
-    // called when shooting (entity it still not added to layer) and it's called like normal function, not thru this virtual
+    // depending on the entity can be called directly instead of vtable (example: plasma cannnon)
+
+    // called when shooting (entity it still not added to layer), sets the initial velocities and owner
     virtual void v93(float angle, float speed, Entity* responsible) = 0;
-    // called when shooting (entity it still not added to layer)
+    // called when shooting (entity it still not added to layer), returns false when the responsible doesn't have overlay, checks if the verlay is MASK.ITEM and bunch of other stuff
     virtual bool v94(Entity* responsible, float x) = 0;
 };
 

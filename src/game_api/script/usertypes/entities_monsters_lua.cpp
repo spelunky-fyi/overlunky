@@ -145,6 +145,12 @@ void register_usertypes(sol::state& lua)
         &RoomOwner::aggro_trigger,
         "was_hurt",
         &RoomOwner::was_hurt,
+        "should_attack_on_sight",
+        &RoomOwner::should_attack_on_sight,
+        "is_angry_flag_set",
+        &RoomOwner::is_angry_flag_set,
+        "weapon_type",
+        &RoomOwner::weapon_type,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -169,6 +175,10 @@ void register_usertypes(sol::state& lua)
         &NPC::ai_state,
         "aggro",
         &NPC::aggro,
+        "should_attack_on_sight",
+        &NPC::should_attack_on_sight,
+        "weapon_type",
+        &NPC::weapon_type,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -280,6 +290,8 @@ void register_usertypes(sol::state& lua)
         &Spider::jump_timer,
         "trigger_distance",
         &Spider::trigger_distance,
+        "on_ceiling",
+        &Spider::on_ceiling,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 

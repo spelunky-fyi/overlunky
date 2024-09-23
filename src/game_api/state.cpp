@@ -823,7 +823,7 @@ uint8_t enum_to_layer(const LAYER layer, Vec2& player_position)
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
-            player_position = player->position();
+            player_position = player->abs_position();
             return player->layer;
         }
     }

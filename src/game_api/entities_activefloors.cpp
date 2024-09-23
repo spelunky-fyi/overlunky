@@ -43,5 +43,5 @@ void Drill::trigger(std::optional<bool> play_sound_effect)
     sound2 = construct_soundmeta(0x153, false);
     sound2->start();
     if (play_sound_effect.value_or(false))
-        play_sound_by_id(0xA4, uid);
+        play_sound(0xA4, uid);
 }

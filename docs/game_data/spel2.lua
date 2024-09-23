@@ -535,7 +535,7 @@ function set_contents(uid, item_entity_type) end
 ---@return Entity
 function get_entity(uid) end
 ---Get the [EntityDB](https://spelunky-fyi.github.io/overlunky/#EntityDB) behind an ENT_TYPE...
----@param id integer
+---@param id ENT_TYPE
 ---@return EntityDB
 function get_type(id) end
 ---Gets a grid entity, such as floor or spikes, at the given position and layer.
@@ -670,7 +670,7 @@ function get_position(uid) end
 ---@param uid integer
 ---@return number, number, integer
 function get_render_position(uid) end
----Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
+---Get velocity `vx, vy` of an entity by uid. Use this to get velocity relative to the game world, (the `Entity.velocityx/velocityy` are relative to `Entity.overlay`). Only works for movable or liquid entities
 ---@param uid integer
 ---@return number, number
 function get_velocity(uid) end
@@ -998,12 +998,12 @@ function raise() end
 ---@param hash integer
 ---@return STRINGID
 function hash_to_stringid(hash) end
----Get string behind STRINGID, don't use stringid directly for vanilla string, use [hash_to_stringid](https://spelunky-fyi.github.io/overlunky/#hash_to_stringid) first
+---Get string behind STRINGID, **don't use stringid directly for vanilla string**, use [hash_to_stringid](https://spelunky-fyi.github.io/overlunky/#hash_to_stringid) first
 ---Will return the string of currently choosen language
 ---@param string_id STRINGID
 ---@return string
 function get_string(string_id) end
----Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+---Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](https://spelunky-fyi.github.io/overlunky/#hash_to_stringid) first)
 ---This edits custom string and in game strings but changing the language in settings will reset game strings
 ---@param id STRINGID
 ---@param str string
@@ -1046,7 +1046,7 @@ function change_sunchallenge_spawns(ent_types) end
 ---ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
 ---ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
 ---Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance").
----If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](https://spelunky-fyi.github.io/overlunky/#PrizeDispenser).
+---If you use this function in the level with dice shop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](https://spelunky-fyi.github.io/overlunky/#PrizeDispenser).
 ---Use empty table as argument to reset to the game default
 ---@param ent_types ENT_TYPE[]
 ---@return nil
@@ -1368,7 +1368,7 @@ function set_infinite_loop_detection_enabled(enable) end
 ---@param enable boolean
 ---@return nil
 function set_camera_layer_control_enabled(enable) end
----Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
+---Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see [set_frametime](https://spelunky-fyi.github.io/overlunky/#set_frametime)
 ---@param multiplier number?
 ---@return nil
 function set_speedhack(multiplier) end
@@ -1384,7 +1384,7 @@ function get_performance_frequency() end
 ---Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
 ---@return nil
 function play_adventure() end
----Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
+---Initializes some seeded run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
@@ -1695,10 +1695,25 @@ function set_vanilla_sound_callback(name, types, cb) end
 ---@param id CallbackId
 ---@return nil
 function clear_vanilla_sound_callback(id) end
+---Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
+---Returns SoundMeta, beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
 ---@param sound VANILLA_SOUND
 ---@param source_uid integer
 ---@return SoundMeta
 function play_sound(sound, source_uid) end
+---Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
+---Returns SoundMeta, beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
+---@param sound_id SOUNDID
+---@param source_uid integer
+---@return SoundMeta
+function play_sound(sound_id, source_uid) end
+---@param id SOUNDID
+---@return VANILLA_SOUND
+function convert_sound_id(id) end
+---Convert SOUNDID to VANILLA_SOUND and vice versa
+---@param sound VANILLA_SOUND
+---@return SOUNDID
+function convert_sound_id(sound) end
 ---Calculate the bounding box of text, so you can center it etc. Returns `width`, `height` in screen distance.
 ---@param size number
 ---@param text string
@@ -2427,10 +2442,10 @@ function PRNG:random(min, max) end
     ---@field width number
     ---@field height number
     ---@field draw_depth integer
-    ---@field offsetx number
-    ---@field offsety number
-    ---@field hitboxx number
-    ---@field hitboxy number
+    ---@field offsetx number @Offset of the hitbox in relation to the entity position
+    ---@field offsety number @Offset of the hitbox in relation to the entity position
+    ---@field hitboxx number @Half of the width of the hitbox
+    ---@field hitboxy number @Half of the height of the hitbox
     ---@field default_shape SHAPE
     ---@field default_hitbox_enabled boolean
     ---@field collision2_mask integer @MASK, will only call collision2 when colliding with entities that match this mask.
@@ -2516,15 +2531,14 @@ function PRNG:random(min, max) end
     ---@field offsety number @Offset of the hitbox in relation to the entity position
     ---@field rendering_info RenderInfo
     ---@field user_data any
-    ---@field topmost fun(self): Entity
-    ---@field topmost_mount fun(self): Entity
+    ---@field topmost fun(self): Entity @Returns the top entity in a chain (overlay)
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean @Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     ---@field set_draw_depth fun(self, draw_depth: integer, b3f: integer): nil
     ---@field reset_draw_depth fun(self): nil
     ---@field liberate_from_shop fun(self, clear_parrent: boolean): nil @`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1
     ---@field get_held_entity fun(self): Entity
-    ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+    ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer with all it's items, nothing else happens, so this does not emulate a door transition
     ---@field apply_layer fun(self): nil @Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
     ---@field remove fun(self): nil @Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
     ---@field respawn fun(self, layer_to: LAYER): nil @Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
@@ -2545,6 +2559,8 @@ function PRNG:random(min, max) end
     ---@field flip fun(self, left: boolean): nil
     ---@field remove_item fun(self, entity: Entity, autokill_check: boolean): nil
     ---@field apply_db fun(self): nil @Applies changes made in `entity.type`
+    ---@field get_absolute_velocity fun(self): Vec2 @Get's the velocity relative to the game world, only for movable or liquid entities
+    ---@field get_hitbox fun(self, use_render_pos: boolean?): AABB @`use_render_pos` default is `false`
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -2894,7 +2910,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field get_short_name fun(self): string @Get the short name of the character, this will be the modded name not only the vanilla name.
     ---@field get_heart_color fun(self): Color @Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
     ---@field is_female fun(self): boolean @Check whether the character is female, will be `true` if the character was modded to be female as well.
-    ---@field set_heart_color fun(self, hcolor: Color): nil @Set the heart color the character.
+    ---@field set_heart_color fun(self, hcolor: Color): nil @Set the heart color for the character.
     ---@field let_go fun(self): nil @Drops from ladders, ropes and ledge grabs
 
 ---@class Floor : Entity
@@ -2972,7 +2988,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 
 ---@class TotemTrap : Floor
     ---@field spawn_entity_type ENT_TYPE
-    ---@field first_sound_id integer
+    ---@field first_sound_id SOUNDID
     ---@field trigger fun(self, who_uid: integer, left: boolean): nil @The uid must be movable entity for ownership transfers
 
 ---@class LaserTrap : Floor
@@ -3174,6 +3190,13 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field remove_rider fun(self): nil
     ---@field carry fun(self, rider: Movable): nil
     ---@field tame fun(self, value: boolean): nil
+    ---@field get_rider_offset fun(self, offset: Vec2): Vec2
+    ---@field get_rider_offset_crouching fun(self, value: Vec2): Vec2
+    ---@field get_jump_sound fun(self, double_jump: boolean): SOUNDID
+    ---@field get_attack_sound fun(self): SOUNDID
+    ---@field get_mounting_sound fun(self): SOUNDID
+    ---@field get_walking_sound fun(self): SOUNDID
+    ---@field get_untamed_loop_sound fun(self): SOUNDID
 
 ---@class Rockdog : Mount
     ---@field attack_cooldown integer
@@ -3207,6 +3230,9 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field is_patrolling boolean
     ---@field aggro_trigger boolean @setting this makes him angry, if it's shopkeeper you get 2 aggro points
     ---@field was_hurt boolean @also is set true if you set aggro to true, get's trigger even when whipping
+    ---@field should_attack_on_sight fun(self): boolean
+    ---@field is_angry_flag_set fun(self): boolean
+    ---@field weapon_type fun(self): ENT_TYPE
 
 ---@class WalkingMonster : Monster
     ---@field chatting_to_uid integer
@@ -3218,6 +3244,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field target_in_sight_timer integer
     ---@field ai_state integer
     ---@field aggro boolean @for bodyguard and shopkeeperclone it spawns a weapon as well
+    ---@field should_attack_on_sight fun(self): boolean
+    ---@field weapon_type fun(self): ENT_TYPE
 
 ---@class Ghost : Monster
     ---@field split_timer integer @for SMALL_HAPPY this is also the sequence timer of its various states
@@ -3269,6 +3297,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field ceiling_pos_y number
     ---@field jump_timer integer @For the giant spider, some times he shot web instead of jumping
     ---@field trigger_distance number @only in the x coordinate
+    ---@field on_ceiling fun(self): boolean
 
 ---@class HangSpider : Monster
     ---@field dangle_jump_timer integer
@@ -3283,7 +3312,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field shop_owner boolean
 
 ---@class Yang : RoomOwner
-    ---@field turkeys_in_den integer[] @Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    ---@field turkeys_in_den integer[] @Table of uids of the turkeys, goes only up to 3, is nil when yang is angry
     ---@field first_message_shown boolean @I'm looking for turkeys, wanna help?
     ---@field quest_incomplete boolean @Is set to false when the quest is over (Yang dead or second turkey delivered)
     ---@field special_message_shown boolean @Tusk palace/black market/one way door - message shown
@@ -3787,8 +3816,13 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Projectile : Movable
 
 ---@class Purchasable : Movable
+    ---@field acquire fun(self, who: Entity): nil @Be aware that for pickable items like weapons, the item will be automatically picked up by the player (unless he already holds something), the ownership transfer is a little bit slow, so it might trigger the shop keeper if you're not inside the shop.<br/>does not consume money
 
 ---@class DummyPurchasableEntity : Purchasable
+    ---@field replace_entity Entity
+    ---@field exploding boolean
+    ---@field explosion_timer integer @Explodes when timer reaches 30
+    ---@field trigger_explosion fun(self, who: Entity): nil @Transfers ownership etc. for who to blame, sets the exploding bool
 
 ---@class Bow : Purchasable
     ---@field get_arrow_special_offset fun(self): number @When lying on the ground
@@ -3799,6 +3833,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Jetpack : Backpack
     ---@field flame_on boolean
     ---@field fuel integer
+    ---@field acceleration fun(self): number
 
 ---@class TeleporterBackpack : Backpack
     ---@field teleport_number integer
@@ -3843,7 +3878,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field spawn_y number
 
 ---@class Spear : Movable
-    ---@field sound_id integer
+    ---@field sound_id SOUNDID
 
 ---@class JungleSpearCosmetic : Movable
     ---@field move_x number
@@ -4010,6 +4045,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class OlmecCannon : Movable
     ---@field timer integer
     ---@field bombs_left integer
+    ---@field spawn_projectile fun(self): nil
 
 ---@class Landmine : LightEmitter
     ---@field timer integer @explodes at 57, if you set it to 58 will count to overflow
@@ -5048,12 +5084,18 @@ function CustomSound:play(paused, sound_type) end
 ---@class SoundMeta
     ---@field x number
     ---@field y number
+    ---@field sound_info SoundInfo
     ---@field left_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index, warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
     ---@field right_channel number[] @size: 38 @Use VANILLA_SOUND_PARAM as index warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
     ---@field start_over boolean @when false, current track starts from the beginning, is immediately set back to true
     ---@field playing boolean @set to false to turn off
+    ---@field start fun(self): nil
 
 ---@class BackgroundSound : SoundMeta
+
+---@class SoundInfo
+    ---@field sound_id SOUNDID
+    ---@field sound_name VANILLA_SOUND
 
 ---@class PlayerSlotSettings
     ---@field controller_vibration boolean
@@ -11641,4 +11683,5 @@ local MAX_PLAYERS = 4
 ---@alias uColor integer;
 ---@alias SHORT_TILE_CODE integer;
 ---@alias STRINGID integer;
+---@alias SOUNDID integer;
 ---@alias FEAT integer;

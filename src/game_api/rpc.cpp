@@ -72,7 +72,7 @@ void attach_entity(Entity* overlay, Entity* attachee)
         attachee->overlay->remove_item(attachee, false);
     }
 
-    auto [x, y] = overlay->position();
+    auto [x, y] = overlay->abs_position();
     attachee->x -= x;
     attachee->y -= y;
     attachee->special_offsetx = attachee->x;
@@ -102,17 +102,17 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
         static const auto ball_entity_type = to_id("ENT_TYPE_ITEM_PUNISHBALL");
         static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
 
-        auto [x, y, l] = get_position(uid);
-        auto* layer_ptr = State::get().layer(l);
+        auto pos = entity->abs_position();
+        auto* layer_ptr = State::get().layer(entity->layer);
 
-        PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, x + off_x, y + off_y, false, 0.0f, 0.0f, false);
+        PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, pos.x + off_x, pos.y + off_y, false, 0.0f, 0.0f, false);
 
         ball->attached_to_uid = uid;
 
         const uint8_t chain_length = 15;
         for (uint8_t i = 0; i < chain_length; i++)
         {
-            StretchChain* chain = (StretchChain*)layer_ptr->spawn_entity(chain_entity_type, x, y, false, 0.0f, 0.0f, false);
+            StretchChain* chain = (StretchChain*)layer_ptr->spawn_entity(chain_entity_type, pos.x, pos.y, false, 0.0f, 0.0f, false);
             chain->animation_frame -= (i % 2);
 
             chain->at_end_of_chain_uid = ball->uid;
@@ -144,6 +144,21 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)
     }
 }
 
+void teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy)
+{
+    if (ent->overlay)
+        ent->overlay->remove_item(ent, false);
+
+    ent->x = dx;
+    ent->y = dy;
+    if (ent->is_movable())
+    {
+        auto movable_ent = ent->as<Movable>();
+        movable_ent->velocityx = vx;
+        movable_ent->velocityy = vy;
+    }
+}
+
 void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
     auto ent = get_entity_ptr(uid);
@@ -155,7 +170,7 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
         }
         else
         {
-            ent->teleport_abs(x, y, vx, vy);
+            teleport_entity_abs(ent, x, y, vx, vy);
         }
     }
 }
@@ -173,7 +188,7 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER l
         }
         else
         {
-            ent->teleport_abs(offset.x + x, offset.y + y, vx, vy);
+            teleport_entity_abs(ent, offset.x + x, offset.y + y, vx, vy);
             ent->set_layer(layer);
         }
     }
@@ -343,7 +358,10 @@ void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> che
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return;
-    entity->remove_item_uid(item_uid, check_autokill.value_or(true));
+
+    auto entity_item = get_entity_ptr(item_uid);
+    if (entity_item)
+        entity->remove_item(entity_item, check_autokill.value_or(true));
 }
 
 void lock_door_at(float x, float y)
@@ -1215,7 +1233,11 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
         Vec2 offset;
         const auto actual_layer = enum_to_layer(layer, offset);
         state.layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state.layer(actual_layer));
-        entity->teleport_abs(offset.x + x, offset.y + y, 0, 0);
+
+        if (entity->overlay)
+            entity->overlay->remove_item(entity, false);
+        entity->x = offset.x + x;
+        entity->y = offset.y + y;
         entity->set_layer(layer);
     }
 }

@@ -1334,13 +1334,13 @@ void smart_delete(Entity* ent, bool unsafe = false)
     UI::safe_destroy(ent, unsafe);
     if ((ent->type->id >= first_door && ent->type->id <= first_door + 15) || ent->type->id == logical_door)
     {
-        auto pos = ent->position();
+        auto pos = ent->abs_position();
         auto layer = (LAYER)ent->layer;
         UI::cleanup_at(pos.x, pos.y, layer, ent->type->id);
     }
     if (ent->type->search_flags & 0x180)
     {
-        auto pos = ent->position();
+        auto pos = ent->abs_position();
         auto layer = (LAYER)ent->layer;
         ENT_TYPE type = ent->type->id;
         fix_decorations_at(std::round(pos.x), std::round(pos.y), layer);
@@ -1906,13 +1906,13 @@ void force_cheats()
     {
         for (auto ent : g_players)
         {
-            auto player = (Movable*)(ent->topmost_mount());
+            auto player = ent->topmost_mount()->as<Movable>();
             if (player->overlay)
             {
                 if (player->state == 6 && (player->movex != 0 || player->movey != 0))
                 {
                     auto [x, y] = UI::get_position(player);
-                    player->teleport_abs(x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
+                    UI::teleport_entity_abs(player, x + player->movex * 0.3f, y + player->movey * 0.07f, 0, 0);
                 }
                 else
                     player->overlay->remove_item(player, false);
@@ -1928,7 +1928,7 @@ void force_cheats()
                 auto cpos = UI::get_position(player);
                 if (fix_co_coordinates(cpos))
                 {
-                    player->teleport_abs(cpos.first, cpos.second, player->velocityx, player->velocityy);
+                    UI::teleport_entity_abs(player, cpos.first, cpos.second, player->velocityx, player->velocityy);
                 }
             }
         }
@@ -2104,7 +2104,7 @@ void clear_void()
     for (auto uid : UI::get_entities_by({}, 1422, LAYER::FRONT))
     {
         auto ent = get_entity_ptr(uid);
-        auto [x, y] = ent->position();
+        auto [x, y] = ent->abs_position();
         if (x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
             UI::safe_destroy(ent);
     }
@@ -2118,7 +2118,7 @@ void load_void(std::string data)
     VoidData v;
     sscanf_s(data.c_str(), "V1%02X%02X", &v.x, &v.y);
     g_players = UI::get_players();
-    g_players[0]->teleport_abs((float)v.x, (float)v.y, 0, 0);
+    UI::teleport_entity_abs(g_players[0], (float)v.x, (float)v.y, 0, 0);
 
     std::string ents = data.substr(6);
     if (ents.size() > 0)
@@ -2191,7 +2191,7 @@ void import_void()
 std::string serialize_void()
 {
     const int export_mask = 398;
-    auto [px, py] = g_players[0]->position();
+    auto [px, py] = g_players[0]->abs_position();
     std::string v = fmt::format("V1{:02X}{:02X}", (uint8_t)(px + 0.5f), (uint8_t)(py + 0.5f));
     auto uids = g_selected_ids;
     if (uids.empty())
@@ -2201,7 +2201,7 @@ std::string serialize_void()
         auto ent = get_entity_ptr(uid);
         if (!ent || !(ent->type->search_flags & export_mask))
             continue;
-        auto [x, y] = ent->position();
+        auto [x, y] = ent->abs_position();
         if ((!ent->overlay || (ent->x != 0 || ent->y != 0)) && x > 2.5f && y < 122.5f && x < g_state->w * 10.0f + 2.5f && y > 122.5f - g_state->h * 8.0f)
         {
             char buf[4];
@@ -3393,7 +3393,7 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
             auto layer_to = LAYER::FRONT;
             if (g_players.at(0)->layer == 0)
                 layer_to = LAYER::BACK;
-            g_players.at(0)->set_layer(layer_to);
+            g_players.at(0)->topmost_mount()->set_layer(layer_to);
             if (layer_to == LAYER::BACK || !g_state->illumination)
             {
                 g_players.at(0)->emitted_light->enabled = true;
@@ -5397,7 +5397,7 @@ void render_clickhandler()
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             auto player = (Movable*)g_players.at(0)->topmost_mount();
-            player->teleport_abs(cpos.first, cpos.second, g_vx, g_vy);
+            UI::teleport_entity_abs(player, cpos.first, cpos.second, g_vx, g_vy);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -5411,7 +5411,7 @@ void render_clickhandler()
             if (g_state->theme == 10)
                 fix_co_coordinates(cpos);
             auto player = (Movable*)g_players.at(0)->topmost_mount();
-            player->teleport_abs(cpos.first, cpos.second, g_vx, g_vy);
+            UI::teleport_entity_abs(player, cpos.first, cpos.second, g_vx, g_vy);
             g_x = 0;
             g_y = 0;
             g_vx = 0;
@@ -7670,7 +7670,7 @@ void render_entity_props(int uid, bool detached = false)
             auto layer_to = LAYER::FRONT;
             if (entity->layer == 0)
                 layer_to = LAYER::BACK;
-            entity->set_layer(layer_to);
+            entity->topmost_mount()->set_layer(layer_to);
         }
         ImGui::SameLine();
         switch (entity->layer)
@@ -7742,8 +7742,8 @@ void render_entity_props(int uid, bool detached = false)
                     if (render_uid(ent->uid, "EntityItems", true))
                         removed_uid = ent->uid;
             }
-            if (removed_uid)
-                entity_pow->remove_item_uid(removed_uid, true);
+            if (auto removed = get_entity_ptr(removed_uid))
+                entity_pow->remove_item(removed, true);
             ImGui::SeparatorText("Powerups");
             int removed_powerup = 0;
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
@@ -7823,8 +7823,8 @@ void render_entity_props(int uid, bool detached = false)
                     if (render_uid(ent->uid, "EntityItems", true))
                         removed_uid = ent->uid;
             }
-            if (removed_uid)
-                entity->remove_item_uid(removed_uid, true);
+            if (auto removed = get_entity_ptr(removed_uid))
+                entity->remove_item(removed, true);
         }
         endmenu();
     }

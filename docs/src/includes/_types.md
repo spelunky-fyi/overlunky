@@ -457,10 +457,10 @@ int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=se
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
-float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | 
-float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | 
-float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | 
-float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | 
+float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsetx) | Offset of the hitbox in relation to the entity position
+float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | Offset of the hitbox in relation to the entity position
+float | [hitboxx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxx) | Half of the width of the hitbox
+float | [hitboxy](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hitboxy) | Half of the height of the hitbox
 [SHAPE](#SHAPE) | [default_shape](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_shape) | 
 bool | [default_hitbox_enabled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_hitbox_enabled) | 
 int | [collision2_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collision2_mask) | [MASK](#MASK), will only call collision2 when colliding with entities that match this mask.
@@ -2826,6 +2826,14 @@ map&lt;[VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM), string&gt; | [get_parameters
 optional&lt;float&gt; | [get_parameter(VANILLA_SOUND_PARAM parameter_index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter) | 
 bool | [set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter) | 
 
+### SoundInfo
+
+
+Type | Name | Description
+---- | ---- | -----------
+[SOUNDID](#Aliases) | [sound_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_id) | 
+[VANILLA_SOUND](#VANILLA_SOUND) | [sound_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_name) | 
+
 ### SoundMeta
 
 
@@ -2833,10 +2841,12 @@ Type | Name | Description
 ---- | ---- | -----------
 float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | 
 float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | 
+[SoundInfo](#SoundInfo) | [sound_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_info) | 
 array&lt;float, 38&gt; | [left_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_channel) | Use [VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM) as index, warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
 array&lt;float, 38&gt; | [right_channel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_channel) | Use [VANILLA_SOUND_PARAM](#VANILLA_SOUND_PARAM) as index warning: special case with first index at 0, loop using pairs will get you all results but the key/index will be wrong, ipairs will have correct key/index but will skip the first element
 bool | [start_over](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_over) | when false, current track starts from the beginning, is immediately set back to true
 bool | [playing](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=playing) | set to false to turn off
+nil | [start()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start) | 
 
 ## State types
 
@@ -4089,7 +4099,7 @@ Derived from [Entity](#Entity) [Floor](#Floor)
 Type | Name | Description
 ---- | ---- | -----------
 [ENT_TYPE](#ENT_TYPE) | [spawn_entity_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_entity_type) | 
-int | [first_sound_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) | 
+[SOUNDID](#Aliases) | [first_sound_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_sound_id) | 
 nil | [trigger(int who_uid, bool left)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger) | The uid must be movable entity for ownership transfers
 
 ### TransferFloor
@@ -4229,8 +4239,7 @@ float | [offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offse
 float | [offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offsety) | Offset of the hitbox in relation to the entity position
 [RenderInfo](#RenderInfo) | [rendering_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rendering_info) | 
 any | [user_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=user_data) | You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before [ON](#ON).PRE_LOAD_SCREEN from a level and loaded right before [ON](#ON).POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.<br/> 
-[Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | 
-[Entity](#Entity) | [topmost_mount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost_mount) | 
+[Entity](#Entity) | [topmost()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topmost) | Returns the top entity in a chain (overlay)
 bool | [overlaps_with(AABB hitbox)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
 bool | [overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | Deprecated<br/>Use `overlaps_with(AABB hitbox)` instead
 bool | [overlaps_with(Entity other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
@@ -4240,7 +4249,7 @@ nil | [set_draw_depth(int draw_depth, int b3f)](https://github.com/spelunky-fyi/
 nil | [reset_draw_depth()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_draw_depth) | 
 nil | [liberate_from_shop(bool clear_parrent)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1
 [Entity](#Entity) | [get_held_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) | 
-nil | [set_layer(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) | Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+nil | [set_layer(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) | Moves the entity to specified layer with all it's items, nothing else happens, so this does not emulate a door transition
 nil | [apply_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_layer) | Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
 nil | [remove()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove) | Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
 nil | [respawn(LAYER layer_to)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=respawn) | Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
@@ -4265,6 +4274,8 @@ nil | [update()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update
 nil | [flip(bool left)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip) | 
 nil | [remove_item(Entity entity, bool autokill_check)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_item) | 
 nil | [apply_db()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_db) | Applies changes made in `entity.type`
+[Vec2](#Vec2) | [get_absolute_velocity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_absolute_velocity) | Get's the velocity relative to the game world, only for movable or liquid entities
+[AABB](#AABB) | [get_hitbox(optional<bool> use_render_pos)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox) | `use_render_pos` default is `false`
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -5357,6 +5368,13 @@ bool | [used_double_jump()](https://github.com/spelunky-fyi/overlunky/search?l=L
 nil | [remove_rider()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_rider) | 
 nil | [carry(Movable rider)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=carry) | 
 nil | [tame(bool value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tame) | 
+[Vec2](#Vec2) | [get_rider_offset(Vec2 offset)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rider_offset) | 
+[Vec2](#Vec2) | [get_rider_offset_crouching(Vec2 value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_rider_offset_crouching) | 
+[SOUNDID](#Aliases) | [get_jump_sound(bool double_jump)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_jump_sound) | 
+[SOUNDID](#Aliases) | [get_attack_sound()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_attack_sound) | 
+[SOUNDID](#Aliases) | [get_mounting_sound()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_mounting_sound) | 
+[SOUNDID](#Aliases) | [get_walking_sound()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_walking_sound) | 
+[SOUNDID](#Aliases) | [get_untamed_loop_sound()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_untamed_loop_sound) | 
 
 ### Mummy
 
@@ -5378,6 +5396,8 @@ float | [climb_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua
 int | [target_in_sight_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_in_sight_timer) | 
 int | [ai_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_state) | 
 bool | [aggro](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aggro) | for bodyguard and shopkeeperclone it spawns a weapon as well
+bool | [should_attack_on_sight()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=should_attack_on_sight) | 
+[ENT_TYPE](#ENT_TYPE) | [weapon_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=weapon_type) | 
 
 ### Necromancer
 
@@ -5475,7 +5495,7 @@ string | [get_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=g
 string | [get_short_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_name) | Get the short name of the character, this will be the modded name not only the vanilla name.
 [Color](#Color) | [get_heart_color()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_heart_color) | Get the heart color of the character, this will be the modded heart color not only the vanilla heart color.
 bool | [is_female()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_female) | Check whether the character is female, will be `true` if the character was modded to be female as well.
-nil | [set_heart_color(Color hcolor)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) | Set the heart color the character.
+nil | [set_heart_color(Color hcolor)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_heart_color) | Set the heart color for the character.
 nil | [let_go()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=let_go) | Drops from ladders, ropes and ledge grabs
 
 ### PowerupCapable
@@ -5559,6 +5579,9 @@ int | [countdown_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 bool | [is_patrolling](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_patrolling) | 
 bool | [aggro_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=aggro_trigger) | setting this makes him angry, if it's shopkeeper you get 2 aggro points
 bool | [was_hurt](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=was_hurt) | also is set true if you set aggro to true, get's trigger even when whipping
+bool | [should_attack_on_sight()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=should_attack_on_sight) | 
+bool | [is_angry_flag_set()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_angry_flag_set) | 
+[ENT_TYPE](#ENT_TYPE) | [weapon_type()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=weapon_type) | 
 
 ### Scarab
 
@@ -5628,6 +5651,7 @@ float | [ceiling_pos_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 float | [ceiling_pos_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ceiling_pos_y) | 
 int | [jump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) | For the giant spider, some times he shot web instead of jumping
 float | [trigger_distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_distance) | only in the x coordinate
+bool | [on_ceiling()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=on_ceiling) | 
 
 ### Tadpole
 
@@ -5791,7 +5815,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
-set&lt;int&gt; | [turkeys_in_den](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=turkeys_in_den) | Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+set&lt;int&gt; | [turkeys_in_den](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=turkeys_in_den) | Table of uids of the turkeys, goes only up to 3, is nil when yang is angry
 bool | [first_message_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=first_message_shown) | I'm looking for turkeys, wanna help?
 bool | [quest_incomplete](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=quest_incomplete) | Is set to false when the quest is over ([Yang](#Yang) dead or second turkey delivered)
 bool | [special_message_shown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=special_message_shown) | Tusk palace/black market/one way door - message shown
@@ -6175,6 +6199,10 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Purchasable](#Purchasable)
 
 Type | Name | Description
 ---- | ---- | -----------
+[Entity](#Entity) | [replace_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_entity) | 
+bool | [exploding](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exploding) | 
+int | [explosion_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=explosion_timer) | Explodes when timer reaches 30
+nil | [trigger_explosion(Entity who)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trigger_explosion) | Transfers ownership etc. for who to blame, sets the exploding bool
 
 ### EggSac
 
@@ -6722,6 +6750,7 @@ Type | Name | Description
 ---- | ---- | -----------
 bool | [flame_on](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flame_on) | 
 int | [fuel](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fuel) | 
+float | [acceleration()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=acceleration) | 
 
 ### JungleSpearCosmetic
 
@@ -7081,6 +7110,7 @@ Type | Name | Description
 ---- | ---- | -----------
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [bombs_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bombs_left) | 
+nil | [spawn_projectile()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_projectile) | 
 
 ### OlmecFloater
 
@@ -7217,6 +7247,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
+nil | [acquire(Entity who)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=acquire) | Be aware that for pickable items like weapons, the item will be automatically picked up by the player (unless he already holds something), the ownership transfer is a little bit slow, so it might trigger the shop keeper if you're not inside the shop.<br/>does not consume money
 
 ### PushBlock
 
@@ -7354,7 +7385,7 @@ Derived from [Entity](#Entity) [Movable](#Movable)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [sound_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_id) | 
+[SOUNDID](#Aliases) | [sound_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_id) | 
 
 ### SpecialShot
 

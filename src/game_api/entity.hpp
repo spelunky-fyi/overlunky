@@ -110,18 +110,18 @@ class Entity
     /* for the autodoc
     any user_data;
     */
-
-    size_t pointer()
+    // {x, y}
+    Vec2 position_self() const
     {
-        return (size_t)this;
+        return Vec2{x, y};
     }
-
-    Vec2 position() const;
-
-    void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
-    void teleport_abs(float dx, float dy, float vx, float vy);
-
-    /// Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+    // get the absolute position
+    Vec2 abs_position() const;
+    /// Get's the velocity relative to the game world, only for movable or liquid entities
+    Vec2 get_absolute_velocity() const;
+    /// `use_render_pos` default is `false`
+    AABB get_hitbox(std::optional<bool> use_render_pos) const;
+    /// Moves the entity to specified layer with all it's items, nothing else happens, so this does not emulate a door transition
     void set_layer(LAYER layer);
     /// Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
     void apply_layer();
@@ -134,7 +134,7 @@ class Entity
     }
     /// Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
     void perform_teleport(uint8_t delta_x, uint8_t delta_y);
-
+    /// Returns the top entity in a chain (overlay)
     Entity* topmost()
     {
         auto cur = this;
@@ -144,7 +144,7 @@ class Entity
         }
         return cur;
     }
-
+    /// NoDoc
     Entity* topmost_mount()
     {
         auto topmost = this;
@@ -169,7 +169,7 @@ class Entity
     /// Use `overlaps_with(AABB hitbox)` instead
     bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top) const
     {
-        const auto [posx, posy] = position();
+        const auto [posx, posy] = abs_position();
         const float left = posx - hitboxx + offsetx;
         const float right = posx + hitboxx + offsetx;
         const float bottom = posy - hitboxy + offsety;
@@ -180,7 +180,7 @@ class Entity
 
     bool overlaps_with(Entity* other) const
     {
-        const auto [other_posx, other_posy] = other->position();
+        const auto [other_posx, other_posy] = other->abs_position();
         const float other_left = other_posx - other->hitboxx + other->offsetx;
         const float other_right = other_posx + other->hitboxx + other->offsetx;
         const float other_top = other_posy + other->hitboxy + other->offsety;
@@ -188,12 +188,6 @@ class Entity
 
         return overlaps_with(other_left, other_bottom, other_right, other_top);
     }
-
-    Vec2 position_self() const
-    {
-        return Vec2{x, y};
-    }
-    void remove_item_uid(uint32_t item_uid, bool check_autokill);
 
     TEXTURE get_texture() const;
     /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
@@ -207,25 +201,10 @@ class Entity
         return more_flags & 0x4000;
     };
 
-    // for supporting HookableVTable
-    uint32_t get_aux_id() const
+    std::vector<uint32_t> get_items() const
     {
-        return uid;
+        return std::vector<uint32_t>(items.uids().begin(), items.uids().end());
     }
-
-    // Needed despite HookableVTable for cleanup of arbitrary entity related data
-    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb)
-    {
-        return hook_dtor_impl(this, std::move(cb));
-    }
-    void clean_on_dtor(std::uint32_t dtor_cb_id)
-    {
-        clear_dtor_impl(this, dtor_cb_id);
-    }
-    /// NoDoc
-    void set_enable_turning(bool enabled);
-
-    std::vector<uint32_t> get_items();
 
     /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
@@ -245,12 +224,27 @@ class Entity
         destroy_recursive(std::nullopt, {}, RECURSIVE_MODE::NONE);
     }
 
+    // for supporting HookableVTable
+    uint32_t get_aux_id() const
+    {
+        return uid;
+    }
+    // Needed despite HookableVTable for cleanup of arbitrary entity related data
+    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb)
+    {
+        return hook_dtor_impl(this, std::move(cb));
+    }
+    void clean_on_dtor(std::uint32_t dtor_cb_id)
+    {
+        clear_dtor_impl(this, dtor_cb_id);
+    }
+    /// NoDoc
+    void set_enable_turning(bool enabled);
     template <typename T>
     T* as()
     {
         return static_cast<T*>(this);
     }
-
     static void set_hook_dtor_impl(
         std::function<std::uint32_t(Entity*, std::function<void(Entity*)>)> hook_fun,
         std::function<void(Entity*, std::uint32_t)> clear_fun)
@@ -318,12 +312,4 @@ class Entity
     virtual void apply_db() = 0; // 36, This is actually just an initialize call that is happening once after  the entity is created
 };
 
-std::tuple<float, float, uint8_t> get_position(uint32_t uid);
-std::tuple<float, float, uint8_t> get_render_position(uint32_t uid);
-
-std::tuple<float, float> get_velocity(uint32_t uid);
-
-AABB get_hitbox(uint32_t uid, bool use_render_pos);
-
-struct EntityFactory* entity_factory();
 Entity* get_entity_ptr(uint32_t uid);

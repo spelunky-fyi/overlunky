@@ -37,7 +37,7 @@ void Floor::fix_border_tile_animation()
     }
     else
     {
-        auto [x_pos, y_pos] = position();
+        auto [x_pos, y_pos] = abs_position();
         auto base_x = static_cast<uint32_t>(std::floor(x_pos / 2.0f));
         auto base_y = static_cast<uint32_t>(std::floor(y_pos / 2.0f));
         auto sub_index_x = static_cast<uint32_t>(std::floor(x_pos - base_x * 2));

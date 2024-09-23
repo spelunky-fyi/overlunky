@@ -12,18 +12,16 @@ struct SoundMeta;
 class Mount : public PowerupCapable
 {
   public:
-    // size_t unknown1;
-    // uint64_t unknown2;
     int32_t rider_uid; // who rides it
-    uint32_t unknown4;
+    uint32_t padding1;
     SoundMeta* sound;
     bool can_doublejump; // whether the doublejump has already occurred or not
     bool tamed;
     uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     uint8_t unknown9a;
-    uint8_t unknown9b;
+    bool double_jumping;  // used to play different animation for the double jump then the standard jump, is true for less then a frame
     uint8_t taming_timer; // when 0 it's tame
-    uint8_t unknown9d;
+    uint8_t padding2;
 
     void carry(Movable* rider);
 
@@ -33,18 +31,18 @@ class Mount : public PowerupCapable
         flags = flags | 0x20000;
     }
 
-    virtual Vec2& get_special_offset(Vec2& offset) = 0;    // 95, gets special offset for the raider when jumping on mount
-    virtual Vec2& v96(Vec2& value) = 0;                    // 96, gets something for when crouching on mount
-    virtual bool used_double_jump() = 0;                   // 97, checks can_doublejump and unknown9b
-    virtual uint32_t get_jump_sound(bool double_jump) = 0; // 98
-    virtual uint32_t get_attack_sound() = 0;               // 99
-    virtual void play_jump_on_sound() = 0;                 // 100, checks if it has rider etc. get's sound from 103 virtual
-    virtual void remove_rider() = 0;                       // 101
-    virtual float v102() = 0;                              // 102, get offset? mech returns 0.9, the rest 0.5
-    virtual uint32_t get_mount_sound() = 0;                // 103, all return the VANILLA_SOUND.MOUNTS_MOUNT sound id
-    virtual uint32_t get_walking_sound() = 0;              // 104
-    virtual uint32_t get_untamed_loop_sound() = 0;         // 105
-    virtual bool can_play_mount_sound() = 0;               // 106, called every frame, if returns true mount will make a sound
+    virtual Vec2& get_rider_offset(Vec2& offset) = 0;          // 95
+    virtual Vec2& get_rider_offset_crouching(Vec2& value) = 0; // 96
+    virtual bool used_double_jump() = 0;                       // 97,  (can_doublejump | double_jumping)
+    virtual SOUNDID get_jump_sound(bool double_jump) = 0;      // 98
+    virtual SOUNDID get_attack_sound() = 0;                    // 99
+    virtual void play_jump_on_sound() = 0;                     // 100, checks if it has rider etc. get's sound from 103 virtual
+    virtual void remove_rider() = 0;                           // 101
+    virtual float v102() = 0;                                  // 102, mech returns 0.9, the rest 0.5, related to distance at which the player can mount
+    virtual SOUNDID get_mounting_sound() = 0;                  // 103
+    virtual SOUNDID get_walking_sound() = 0;                   // 104
+    virtual SOUNDID get_untamed_loop_sound() = 0;              // 105
+    virtual bool can_play_mount_sound() = 0;                   // 106, called every frame, if returns true mount will make a sound
 };
 
 class Rockdog : public Mount

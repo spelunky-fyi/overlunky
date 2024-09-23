@@ -146,7 +146,7 @@ class Player : public PowerupCapable
     /// Check whether the character is female, will be `true` if the character was modded to be female as well.
     bool is_female();
 
-    /// Set the heart color the character.
+    /// Set the heart color for the character.
     void set_heart_color(Color hcolor);
     /// Drops from ladders, ropes and ledge grabs
     void let_go();

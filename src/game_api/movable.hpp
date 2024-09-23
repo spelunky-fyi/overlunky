@@ -211,6 +211,6 @@ class Movable : public Entity
     virtual void v88(Entity* entity, float vecloty) = 0;                                 // 88, on_ragdoll? - for player, triggers only when you throw him into wall/ground/celling
     virtual bool v89(void*, void*, bool, bool default_return_flipped) = 0;               // 89, triggers on item_rubble?, first parameter only tested if it's 0 for punishball, ignored in the rest, second parameter never used (leftover?)
     virtual void on_crushed_by(Entity*) = 0;                                             // 90, e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
-    virtual SoundMeta* on_fall_onto(uint32_t play_sound_id, Entity* fell_on_entity) = 0; // 91, plays the sfx at the entity and sets sound parameters
+    virtual SoundMeta* on_fall_onto(SOUNDID play_sound_id, Entity* fell_on_entity) = 0;  // 91, plays the sfx at the entity and sets sound parameters
     virtual void on_instakill_death() = 0;                                               // 92, seems to only trigger for enemies that die in one hit, creates some big struct on stack, feeds it to some unknown function
 };

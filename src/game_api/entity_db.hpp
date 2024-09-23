@@ -46,9 +46,13 @@ struct EntityDB
     {
         struct
         {
+            /// Offset of the hitbox in relation to the entity position
             float default_offsetx;
+            /// Offset of the hitbox in relation to the entity position
             float default_offsety;
+            /// Half of the width of the hitbox
             float default_hitboxx;
+            /// Half of the height of the hitbox
             float default_hitboxy;
             SHAPE default_shape;
             bool default_hitbox_enabled;
@@ -115,17 +119,13 @@ struct EntityDB
     EntityDB(const ENT_TYPE other);
 };
 
-using EntityMap = std::unordered_map<std::string, uint16_t>;
-
 struct EntityItem
 {
     std::string name;
     uint32_t id;
 
     EntityItem(const std::string& name_, uint32_t id_)
-        : name(name_), id(id_)
-    {
-    }
+        : name(name_), id(id_){};
     bool operator<(const EntityItem& item) const
     {
         return id < item.id;
@@ -147,10 +147,10 @@ struct EntityFactory
     EntityDB types[0x395];
     bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map; // game_unorderedmap probably
-    EntityMap entity_map;                                                             // game_unorderedmap probably
+    std::unordered_map<std::string, uint16_t> entity_map;                             // game_unorderedmap probably
 };
 
-EntityDB* get_type(uint32_t id);
+EntityDB* get_type(ENT_TYPE id);
 
 ENT_TYPE to_id(std::string_view id);
 
@@ -158,4 +158,4 @@ std::string_view to_name(ENT_TYPE id);
 
 std::vector<EntityItem> list_entities();
 
-struct EntityFactory* entity_factory();
+EntityFactory* entity_factory();
