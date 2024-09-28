@@ -51,7 +51,7 @@ void register_usertypes(sol::state& lua)
     lua["prng"] = &PRNG::get_main();
 
     /// Get the thread-local version of prng
-    lua["get_local_prng"] = []()
+    lua["get_local_prng"] = []() -> PRNG*
     {
         return &PRNG::get_local();
     };

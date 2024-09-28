@@ -517,3 +517,13 @@ void post_event(ON event)
             return true;
         });
 }
+
+void pre_copy_state_event(StateMemory* from, StateMemory* to)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->pre_copy_state(from, to);
+            return true;
+        });
+}
