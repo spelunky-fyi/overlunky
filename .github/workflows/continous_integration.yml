@@ -31,6 +31,10 @@ jobs:
     steps:
       - uses: llvm/actions/install-ninja@main
 
+      - name: Install llvm 17
+        if: matrix.toolset_name == 'Ninja'
+        run: choco install llvm --version 17.0.6 --allow-downgrade -y
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1

@@ -165,17 +165,17 @@ any | set:at(int order) | Returns elements in order, it's not an index as sets d
 any | map:at(int order) | Returns elements in order, it's not an index as maps don't have one
 int | vector:find(any value) | Searches for the value in vector, returns index of the item in vector or nil if not found, only available for simple values that are comparable
 int | span:find(any value) | Searches for the value in span, returns index of the item in span or nil if not found, only available for simple values that are comparable
-any | set:find(any value) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable
+any | set:find(any key) | Searches for the value in set, returns the value itself or nil if not found, only available for simple values that are comparable
 any | map:find(any key) | Searches for the key in map, returns the value itself or nil if not found, only available for simple keys that are comparable
 nil | vector:erase(int index) | Removes element at given index, the rest of elements shift down so that the vector stays contiguous
-nil | set:erase(any value) | Removes element from set
-nil | map:erase(any key) | Removes element from map by key
+nil | set:erase(any key) | Removes element from set
+nil | map:erase(any key) | Removes element from map
 nil | vector:clear() | Removes all elements from vector
 nil | set:clear() | Removes all elements from set
 nil | map:clear() | Removes all elements from map
 nil | vector:insert(int index, any element) | Inserts element at given index, the rest of elements shift up in index
-nil | set:insert(int order, any element) | The order param doesn't acutally matter and can be set to nil
-nil | map:insert(any key, any value) | unsure, probably easier to just use `map[key] = value`
+nil | set:insert(int order, any key) | The order param doesn't acutally matter and can be set to nil
+nil | map:insert(any key, any value)? | unsure, probably easier to just use `map[key] = value`
 # Functions
 The game functions like `spawn` use [level coordinates](#get_position). Draw functions use normalized [screen coordinates](#screen_position) from `-1.0 .. 1.0` where `0.0, 0.0` is the center of the screen.
 
@@ -389,6 +389,15 @@ Dump the object (table, container, class) as a recursive table, for pretty print
 
 Hook the sendto and recvfrom functions and start dumping network data to terminal
 
+### get_address
+
+
+> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
+
+#### nil get_address(any o)
+
+Get memory address from a lua object
+
 ### get_rva
 
 
@@ -447,6 +456,18 @@ end, SPAWN_TYPE.ANY, 0, ENT_TYPE.ITEM_SPARK)
 Activate custom variables for speed and distance in the `ITEM_SPARK`
 note: because those the variables are custom and game does not initiate them, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
 default game values are: speed = -0.015, distance = 3.0
+
+### add_entity_to_liquid_collision
+
+
+> Search script examples for [add_entity_to_liquid_collision](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_entity_to_liquid_collision)
+
+#### nil add_entity_to_liquid_collision(int uid, bool add)
+
+Attach liquid collision to entity by uid (this is what the push blocks use)
+Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
+Use only for entities that can move around, (for static prefer [update_liquid_collision_at](#update_liquid_collision_at) )
+If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
 
 ### apply_entity_db
 
@@ -631,9 +652,9 @@ Recommended to always set the mask, even if you look for one entity type
 
 > Search script examples for [get_entities_by_draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_draw_depth)
 
-#### vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
-
 #### vector&lt;int&gt; get_entities_by_draw_depth(array<int> draw_depths, [LAYER](#LAYER) l)
+
+#### vector&lt;int&gt; get_entities_by_draw_depth(int draw_depth, [LAYER](#LAYER) l)
 
 Get uids of entities by draw_depth. Can also use table of draw_depths.
 You can later use [filter_entities](#filter_entities) if you want specific entity
@@ -660,6 +681,15 @@ end, ON.LEVEL)
 Get uids of entities matching id. This function is variadic, meaning it accepts any number of id's.
 You can even pass a table!
 This function can be slower than the [get_entities_by](#get_entities_by) with the mask parameter filled
+
+### get_entities_overlapping_grid
+
+
+> Search script examples for [get_entities_overlapping_grid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_grid)
+
+#### vector&lt;int&gt; get_entities_overlapping_grid(float x, float y, [LAYER](#LAYER) layer)
+
+Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
 
 ### get_entities_overlapping_hitbox
 
@@ -1102,12 +1132,30 @@ Set the visibility of a feat
 
 Clears the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
+### clr_mask
+
+
+> Search script examples for [clr_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_mask)
+
+#### [Flags](#Aliases) clr_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
 ### flip_flag
 
 
 > Search script examples for [flip_flag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_flag)
 
 #### [Flags](#Aliases) flip_flag([Flags](#Aliases) flags, int bit)
+
+Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
+### flip_mask
+
+
+> Search script examples for [flip_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_mask)
+
+#### [Flags](#Aliases) flip_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
 
 Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
 
@@ -1174,6 +1222,15 @@ Set the nth bit in a number. This doesn't actually change the variable you pass,
 
 Set `state.level_flags`
 
+### set_mask
+
+
+> Search script examples for [set_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_mask)
+
+#### [Flags](#Aliases) set_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+
 ### test_flag
 
 
@@ -1182,6 +1239,15 @@ Set `state.level_flags`
 #### bool test_flag([Flags](#Aliases) flags, int bit)
 
 Returns true if the nth bit is set in the number.
+
+### test_mask
+
+
+> Search script examples for [test_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_mask)
+
+#### bool test_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+
+Returns true if a bitmask is set in the number.
 
 ## Generic functions
 
@@ -1267,15 +1333,6 @@ Clear cache for a file path or the whole directory
 
 Clear save state from slot 1..4.
 
-### clr_mask
-
-
-> Search script examples for [clr_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clr_mask)
-
-#### [Flags](#Aliases) clr_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
-
-Clears a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
-
 ### create_image
 
 
@@ -1353,15 +1410,6 @@ Destroys all layers and all entities in the level. Usually a bad idea, unless yo
 
 Disable all crust item spawns, returns whether they were already disabled before the call
 
-### flip_mask
-
-
-> Search script examples for [flip_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_mask)
-
-#### [Flags](#Aliases) flip_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
-
-Flips the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
-
 ### force_journal
 
 
@@ -1370,15 +1418,6 @@ Flips the nth bit in a number. This doesn't actually change the variable you pas
 #### nil force_journal(int chapter, int entry)
 
 Force the journal to open on a chapter and entry# when pressing the journal button. Only use even entry numbers. Set chapter to `JOURNALUI_PAGE_SHOWN.JOURNAL` to reset. (This forces the journal toggle to always read from `game_manager.save_related.journal_popup_ui.entry_to_show` etc.)
-
-### get_address
-
-
-> Search script examples for [get_address](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_address)
-
-#### nil get_address([[maybe_unused]] any o)
-
-Get memory address from a lua object
 
 ### get_adventure_seed
 
@@ -1406,6 +1445,16 @@ Returns the [Bucket](#Bucket) of data stored in shared memory between [Overlunky
 #### [Color](#Color) get_character_heart_color([ENT_TYPE](#ENT_TYPE) type_id)
 
 Same as `Player.get_heart_color`
+
+### get_color
+
+
+> Search script examples for [get_color](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_color)
+
+#### [uColor](#Aliases) get_color(string color_name, optional<int> alpha = nullopt)
+
+Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too. Default apha value will be 0xFF, unless it's specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
+
 
 ### get_current_money
 
@@ -1478,6 +1527,15 @@ Get your sanitized script id to be used in import.
 #### int get_level_config([LEVEL_CONFIG](#LEVEL_CONFIG) config)
 
 Gets the value for the specified config
+
+### get_liquid_layer
+
+
+> Search script examples for [get_liquid_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquid_layer)
+
+#### int get_liquid_layer()
+
+Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](#set_liquid_layer)
 
 ### get_local_prng
 
@@ -1595,9 +1653,9 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 
 > Search script examples for [grow_poles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_poles)
 
-#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
-
 #### nil grow_poles([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
 
 Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
@@ -1606,9 +1664,9 @@ Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is w
 
 > Search script examples for [grow_vines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_vines)
 
-#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
-
 #### nil grow_vines([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+
+#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
 
 Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
@@ -1922,7 +1980,7 @@ Set engine target frametime when game is unfocused (1/framerate, default 1/33). 
 
 > Search script examples for [set_hotkey](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_hotkey)
 
-#### [CallbackId](#Aliases) set_hotkey([](function cb, [KEY](#KEY) key, [HOTKEY_TYPE](#HOTKEY_TYPE) flags)
+#### [CallbackId](#Aliases) set_hotkey(function cb, [KEY](#KEY) key, [HOTKEY_TYPE](#HOTKEY_TYPE) flags = [HOTKEY_TYPE](#HOTKEY_TYPE).NORMAL)
 
 Returns unique id >= 0 for the callback to be used in [clear_callback](#clear_callback) or -1 if the key could not be registered.
 Add callback function to be called on a hotkey, using Windows hotkey api. These hotkeys will override all game and UI input and can work even when the game is unfocused. They are by design very intrusive and won't let anything else use the same key combo. Can't detect if input is active in another instance, use [ImGuiIO](#ImGuiIO) if you need Playlunky hotkeys to react to [Overlunky](#Overlunky) input state. Key is a [KEY](#KEY) combo (e.g. `KEY.OL_MOD_CTRL | KEY.X`), possibly returned by GuiDrawContext:key_picker. Doesn't work with mouse buttons.
@@ -1964,14 +2022,16 @@ Set the value for the specified config
 
 Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
 
-### set_mask
+### set_liquid_layer
 
 
-> Search script examples for [set_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_mask)
+> Search script examples for [set_liquid_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_liquid_layer)
 
-#### [Flags](#Aliases) set_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
+#### nil set_liquid_layer([LAYER](#LAYER) l)
 
-Set a bitmask in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
+Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+Everything should be working more or less correctly (report on community discord if you find something unusual)
 
 ### set_seed
 
@@ -2096,15 +2156,6 @@ Set layer to search for storage items on
 
 Open the journal on a chapter and page. The main Journal spread is pages 0..1, so most chapters start at 2. Use even page numbers only.
 
-### test_mask
-
-
-> Search script examples for [test_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=test_mask)
-
-#### bool test_mask([Flags](#Aliases) flags, [Flags](#Aliases) mask)
-
-Returns true if a bitmask is set in the number.
-
 ### toggle_journal
 
 
@@ -2133,9 +2184,10 @@ Gets line1_A, intersection point and line2_B and calls the 3 parameter version o
 
 > Search script examples for [update_liquid_collision_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update_liquid_collision_at)
 
-#### nil update_liquid_collision_at(float x, float y, bool add)
+#### nil update_liquid_collision_at(float x, float y, bool add, optional<[LAYER](#LAYER)> layer = nullopt)
 
 Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
 
 ### update_state
 
@@ -2645,7 +2697,9 @@ set_callback(fix_liquid_out_of_bounds, ON.FRAME)
 
 #### nil fix_liquid_out_of_bounds()
 
-Removes all liquid that is about to go out of bounds, which crashes the game.
+Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+The patch however does not destroy the liquids that fall pass the level bounds,
+so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
 
 ### game_position
 
@@ -3094,7 +3148,6 @@ Use empty table as argument to reset to the game default
 
 Change [ENT_TYPE](#ENT_TYPE)'s spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:<br/>
 {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
-Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance").
 Use empty table as argument to reset to the game default
 
 ### default_spawn_is_valid
@@ -3325,9 +3378,9 @@ Don't overuse this, you are still restricted by the liquid pool sizes and thus m
 
 > Search script examples for [spawn_mushroom](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_mushroom)
 
-#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l)
-
 #### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l, int height)
+
+#### int spawn_mushroom(float x, float y, [LAYER](#LAYER) l)
 
 Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
 Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
@@ -3376,9 +3429,9 @@ or change it's `player_inputs` to the `input` of real player so he can control i
 
 > Search script examples for [spawn_tree](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_tree)
 
-#### int spawn_tree(float x, float y, [LAYER](#LAYER) layer)
-
 #### int spawn_tree(float x, float y, [LAYER](#LAYER) layer, int height)
+
+#### int spawn_tree(float x, float y, [LAYER](#LAYER) layer)
 
 Spawns and grows a tree
 
@@ -3505,8 +3558,9 @@ Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main
 
 > Search script examples for [key_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_name)
 
-#### nil key_name()
+#### string key_name()
 
+Returns human readable string from [KEY](#KEY) chord (e.g. "Ctrl+X", "Unknown" or "None")
 
 ### set_level_string
 

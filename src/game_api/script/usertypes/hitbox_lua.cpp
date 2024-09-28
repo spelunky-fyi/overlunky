@@ -9,9 +9,10 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max, get, pair
 
-#include "entity.hpp" // for get_hitbox
-#include "math.hpp"   // for AABB, Vec2, Quad, AABB::bottom, AABB::left
-#include "rpc.hpp"    // for screen_aabb
+#include "entity.hpp"            // for get_hitbox
+#include "math.hpp"              // for AABB, Vec2, Quad, AABB::bottom, AABB::left
+#include "rpc.hpp"               // for screen_aabb
+#include "script/sol_helper.hpp" // for self_return
 
 namespace NHitbox
 {
@@ -45,6 +46,10 @@ void register_usertypes(sol::state& lua)
         return AABB{sx1, sy1, sx2, sy2};
     };
 
+    auto rotate = sol::overload(
+        self_return<static_cast<Vec2& (Vec2::*)(float, float, float)>(&Vec2::rotate)>(),
+        self_return<static_cast<Vec2& (Vec2::*)(float, const Vec2&)>(&Vec2::rotate)>());
+
     /// Simple object to hold pair of coordinates
     lua.new_usertype<Vec2>(
         "Vec2",
@@ -64,19 +69,19 @@ void register_usertypes(sol::state& lua)
         "y",
         &Vec2::y,
         "rotate",
-        &Vec2::rotate,
+        rotate,
         "distance_to",
         &Vec2::distance_to,
         "set",
-        &Vec2::set,
+        self_return<&Vec2::set>(),
         "split",
         // &Vec2::split); // for the autodoc
         &Vec2::operator std::pair<float, float>);
 
-    const auto extrude = sol::overload(
-        static_cast<AABB& (AABB::*)(float)>(&AABB::extrude),
-        static_cast<AABB& (AABB::*)(float, float)>(&AABB::extrude));
-    const auto is_point_inside = sol::overload(
+    auto extrude = sol::overload(
+        self_return<static_cast<AABB& (AABB::*)(float)>(&AABB::extrude)>(),
+        self_return<static_cast<AABB& (AABB::*)(float, float)>(&AABB::extrude)>());
+    auto is_point_inside = sol::overload(
         static_cast<bool (AABB::*)(const Vec2) const>(&AABB::is_point_inside),
         static_cast<bool (AABB::*)(float, float) const>(&AABB::is_point_inside));
 
@@ -95,11 +100,11 @@ void register_usertypes(sol::state& lua)
         "overlaps_with",
         &AABB::overlaps_with,
         "abs",
-        &AABB::abs,
+        self_return<&AABB::abs>(),
         "extrude",
         extrude,
         "offset",
-        &AABB::offset,
+        self_return<&AABB::offset>(),
         "area",
         &AABB::area,
         "center",
@@ -111,14 +116,14 @@ void register_usertypes(sol::state& lua)
         "is_point_inside",
         is_point_inside,
         "set",
-        &AABB::set,
+        self_return<&AABB::set>(),
         "split",
         // &Vec2::split); // for the autodoc
         &AABB::operator std::tuple<float, float, float, float>);
 
     auto offset = sol::overload(
-        static_cast<Triangle& (Triangle::*)(const Vec2&)>(&Triangle::offset),
-        static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset));
+        self_return<static_cast<Triangle& (Triangle::*)(const Vec2&)>(&Triangle::offset)>(),
+        self_return<static_cast<Triangle& (Triangle::*)(float, float)>(&Triangle::offset)>());
     auto is_point_inside_triangle = sol::overload(
         static_cast<bool (Triangle::*)(const Vec2) const>(&Triangle::is_point_inside),
         static_cast<bool (Triangle::*)(const Vec2, float) const>(&Triangle::is_point_inside),
@@ -137,19 +142,19 @@ void register_usertypes(sol::state& lua)
         "offset",
         offset,
         "rotate",
-        &Triangle::rotate,
+        self_return<&Triangle::rotate>(),
         "center",
         &Triangle::center,
         "get_angles",
         &Triangle::get_angles,
         "scale",
-        &Triangle::scale,
+        self_return<&Triangle::scale>(),
         "area",
         &Triangle::area,
         "is_point_inside",
         is_point_inside_triangle,
         "set",
-        &Triangle::set,
+        self_return<&Triangle::set>(),
         "split",
         // &Triangle::split); // for the autodoc
         &Triangle::operator std::tuple<Vec2, Vec2, Vec2>);
@@ -159,6 +164,10 @@ void register_usertypes(sol::state& lua)
         static_cast<bool (Quad::*)(const Vec2, float) const>(&Quad::is_point_inside),
         static_cast<bool (Quad::*)(float, float) const>(&Quad::is_point_inside),
         static_cast<bool (Quad::*)(float, float, float) const>(&Quad::is_point_inside));
+
+    auto offset_quad = sol::overload(
+        self_return<static_cast<Quad& (Quad::*)(const Vec2&)>(&Quad::offset)>(),
+        self_return<static_cast<Quad& (Quad::*)(float, float)>(&Quad::offset)>());
 
     lua.new_usertype<Quad>(
         "Quad",
@@ -182,17 +191,17 @@ void register_usertypes(sol::state& lua)
         "get_AABB",
         &Quad::get_AABB,
         "offset",
-        &Quad::offset,
+        offset_quad,
         "rotate",
-        &Quad::rotate,
+        self_return<&Quad::rotate>(),
         "flip_horizontally",
-        &Quad::flip_horizontally,
+        self_return<&Quad::flip_horizontally>(),
         "flip_vertically",
-        &Quad::flip_vertically,
+        self_return<&Quad::flip_vertically>(),
         "is_point_inside",
         is_point_inside_quad,
         "set",
-        &Quad::set,
+        self_return<&Quad::set>(),
         "split",
         // &Quad::split); // for the autodoc
         &Quad::operator std::tuple<Vec2, Vec2, Vec2, Vec2>);

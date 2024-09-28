@@ -9,6 +9,7 @@
 #include <tuple>       // for get
 #include <type_traits> // for move, declval
 
+#include "particles.hpp"  // for ParticleEmitterInfo
 #include "render_api.hpp" // for TextureRenderingInfo, WorldShader, TextRen...
 #include "state.hpp"      // for enum_to_layer
 #include "texture.hpp"    // for Texture, get_texture
@@ -903,11 +904,13 @@ void register_usertypes(sol::state& lua)
     hudinventory_type["ankh"] = &HudInventory::ankh;
     hudinventory_type["kapala"] = &HudInventory::kapala;
     hudinventory_type["kapala_blood"] = &HudInventory::kapala_blood;
+    hudinventory_type["kapala_sprite"] = &HudInventory::kapala_sprite;
     hudinventory_type["poison"] = &HudInventory::poison;
     hudinventory_type["curse"] = &HudInventory::curse;
     hudinventory_type["elixir"] = &HudInventory::elixir;
     hudinventory_type["crown"] = &HudInventory::crown;
-    hudinventory_type["item_count"] = &HudInventory::item_count;
+    hudinventory_type["powerup_sprites"] = &HudInventory::powerup_sprites;
+    hudinventory_type["item_count"] = &HudInventory::powerup_count;
 
     auto hudelement_type = lua.new_usertype<HudElement>("HudElement");
     hudelement_type["dim"] = &HudElement::dim;
@@ -933,12 +936,35 @@ void register_usertypes(sol::state& lua)
     huddata_type["time_level"] = &HudData::time_level;
     huddata_type["world_num"] = &HudData::world_num;
     huddata_type["level_num"] = &HudData::level_num;
+    huddata_type["angry_shopkeeper"] = &HudData::angry_shopkeeper;
+    huddata_type["seed_shown"] = &HudData::seed_shown;
     huddata_type["seed"] = &HudData::seed;
     huddata_type["opacity"] = &HudData::opacity;
+    huddata_type["roll_in"] = &HudData::roll_in;
     huddata_type["players"] = &HudData::players;
     huddata_type["money"] = &HudData::money;
+    huddata_type["money_increase_sparkles"] = &HudData::money_increase_sparkles;
     huddata_type["timer"] = &HudData::timer;
     huddata_type["level"] = &HudData::level;
+    huddata_type["clover_falling_apart_timer"] = &HudData::clover_falling_apart_timer;
+    huddata_type["player_cursed_particles"] = &HudData::player_cursed_particles;
+    huddata_type["player_poisoned_particles"] = &HudData::player_poisoned_particles;
+
+    huddata_type["player_highlight"] = &HudData::player_highlight;
+    huddata_type["player_heart"] = &HudData::player_heart;
+    huddata_type["player_ankh"] = &HudData::player_ankh;
+    huddata_type["kapala_icon"] = &HudData::kapala_icon;
+    huddata_type["player_crown"] = &HudData::player_crown;
+    huddata_type["player_bomb"] = &HudData::player_bomb;
+    huddata_type["player_rope"] = &HudData::player_rope;
+    huddata_type["udjat_icon"] = &HudData::udjat_icon;
+    huddata_type["money_and_time_highlight"] = &HudData::money_and_time_highlight;
+    huddata_type["dollar_icon"] = &HudData::dollar_icon;
+    huddata_type["hourglass_icon"] = &HudData::hourglass_icon;
+    huddata_type["clover_icon"] = &HudData::clover_icon;
+    huddata_type["level_highlight"] = &HudData::level_highlight;
+    huddata_type["level_icon"] = &HudData::level_icon;
+    huddata_type["seed_background"] = &HudData::seed_background;
 
     auto hud_type = lua.new_usertype<Hud>("Hud");
     hud_type["y"] = &Hud::y;

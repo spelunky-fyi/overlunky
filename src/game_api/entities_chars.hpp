@@ -55,7 +55,18 @@ class Ai
     int8_t unknown24;
     int8_t unknown25;
     int32_t unknown26;
-    // Map unknown27;
+    std::map<size_t, size_t> unknown27;
+
+    size_t unknown28; // probably vector?
+    size_t unknown29;
+    size_t unknown30;
+
+    std::vector<uintptr_t> unknown31;      // pointers to the Ai targets in state
+    std::map<uint32_t, uint8_t> unknown32; // dunno what any of this is, keeps changing rapidly
+
+    size_t unknown33;
+    uintptr_t unknown34; // pointer to map/set ?
+    std::map<size_t, size_t> unknown35;
 };
 
 class PowerupCapable : public Movable
@@ -70,7 +81,10 @@ class PowerupCapable : public Movable
     void give_powerup(ENT_TYPE powerup_type);
 
     /// Checks whether the player/monster has a certain powerup
-    bool has_powerup(ENT_TYPE powerup_type);
+    bool has_powerup(ENT_TYPE powerup_type)
+    {
+        return powerups.find(powerup_type) != powerups.end();
+    }
 
     /// Return all powerups that the entity has
     std::vector<ENT_TYPE> get_powerups();

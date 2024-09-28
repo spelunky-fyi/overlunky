@@ -48,7 +48,7 @@
 #include "thread_utils.hpp"             // for OnHeapPointer
 #include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
 
-uint32_t setflag(uint32_t flags, int bit) // shouldn't we change those to #define ?
+uint32_t setflag(uint32_t flags, int bit)
 {
     return flags | (1U << (bit - 1));
 }
@@ -169,15 +169,15 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER l
     auto ent = get_entity_ptr(uid);
     if (ent)
     {
-        std::pair<float, float> offset;
+        Vec2 offset;
         enum_to_layer(layer, offset);
         if (ent->is_liquid())
         {
-            move_liquid_abs(uid, offset.first + x, offset.second + y, vx, vy);
+            move_liquid_abs(uid, offset.x + x, offset.y + y, vx, vy);
         }
         else
         {
-            ent->teleport_abs(offset.first + x, offset.second + y, vx, vy);
+            ent->teleport_abs(offset.x + x, offset.y + y, vx, vy);
             ent->set_layer(layer);
         }
     }
@@ -283,7 +283,7 @@ float screen_distance(float x)
 {
     auto a = State::screen_position(0, 0);
     auto b = State::screen_position(x, 0);
-    return b.first - a.first;
+    return b.x - a.x;
 }
 
 std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate)
@@ -712,7 +712,7 @@ void set_time_ghost_enabled(bool b)
     static size_t offset_toast_trigger = 0;
     if (offset_trigger == 0)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         offset_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
         offset_toast_trigger = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_GHOST_TOAST_TRIGGER, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
     }
@@ -729,7 +729,7 @@ void set_time_ghost_enabled(bool b)
 
 void set_time_jelly_enabled(bool b)
 {
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
     static const size_t offset = memory.at_exe(get_virtual_function_address(VTABLE_OFFSET::LOGIC_COSMIC_OCEAN, static_cast<uint32_t>(VIRT_FUNC::LOGIC_PERFORM)));
     if (b)
         recover_mem("set_time_jelly_enabled");
@@ -920,63 +920,57 @@ void enter_door(int32_t player_uid, int32_t door_uid)
 
 void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
 {
-    static bool modified = false;
-
-    uint32_t ent_types_size = static_cast<uint32_t>(ent_types.size());
-    static const auto offset = get_address("sun_chalenge_generator_ent_types");
-    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(offset) + offset + 4);
-
-    if (ent_types_size == 0)
+    // [Known_Issue]: as all the functions that base some functionality on static, this can break if used in PL and OV simultaneously
+    static uintptr_t offset;
+    static uintptr_t new_code_address;
+    if (offset == 0)
     {
-        if (modified)
+        offset = get_address("sun_chalenge_generator_ent_types");
+
+        // just so we can recover the oryginal later
+        save_mem_recoverable("sunchallenge_spawn", offset, 14, true);
+    }
+    const size_t table_offset = offset + 10; // offset to the offset of ent_type table
+    ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(table_offset) + table_offset + 4);
+    bool was_edited_before = mem_written("sunchallenge_spawn");
+    if (ent_types.size() == 0)
+    {
+        recover_mem("sunchallenge_spawn");
+        if (was_edited_before)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
 
-        recover_mem("sunchallenge_spawn");
-        modified = false;
-        return;
-    }
-
-    const uint8_t old_size = ((memory_read<uint8_t>(offset - 4)) >> 2) + 1;
-
-    if (ent_types_size >= 32)
-        ent_types_size = 32;
-    else if ((ent_types_size & (ent_types_size - 1))) // if the size is not power of 2
-    {
-        auto get_previous_power_of_two = [](uint32_t x)
+        // just free it since it's just easier to put the code again
+        if (new_code_address != 0)
         {
-            x = x | (x >> 1);
-            x = x | (x >> 2);
-            x = x | (x >> 4);
-            x = x | (x >> 8);
-            x = x | (x >> 16);
-            return x ^ (x >> 1);
-        };
-        ent_types_size = get_previous_power_of_two(ent_types_size);
-    }
-
-    if (old_size == ent_types_size)
-    {
-        for (uint32_t i = 0; i < ent_types_size; ++i)
-            write_mem_recoverable("sunchallenge_spawn", (size_t)&old_types_array[i], ent_types[i], true);
-
+            VirtualFree(reinterpret_cast<LPVOID>(new_code_address), 0, MEM_RELEASE);
+            new_code_address = 0;
+        }
         return;
     }
-
-    const auto data_size = ent_types_size * sizeof(ENT_TYPE);
-    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(offset + 4, data_size);
+    const auto data_size = ent_types.size() * sizeof(ENT_TYPE);
+    ENT_TYPE* new_array = (ENT_TYPE*)alloc_mem_rel32(table_offset + 4, data_size);
     if (new_array)
     {
-        if (modified)
+        std::memcpy(new_array, ent_types.data(), data_size);
+        int32_t rel = static_cast<int32_t>((size_t)new_array - (table_offset + 4));
+        write_mem_prot(table_offset, rel, true);
+
+        if (new_code_address == 0)
+        {
+            std::string new_code = fmt::format("\x31\xD2\xB9{}\xF7\xF1\x67\x8D\x04\x95\x00\x00\x00\x00"sv, to_le_bytes(static_cast<uint32_t>(ent_types.size())));
+            // xor edx, edx                 ; dividend high half = 0.
+            // mov ecx, ent_types.size()    ; dividend low half
+            // div ecx                      ; division, (divisor already in rax)
+            //                              ; edx - remainder
+            // lea eax,[edx * 4 + 0]        ; multiply by 4 (sizeof ENT_TYPE) and put result in rax
+
+            new_code_address = patch_and_redirect(offset, 7, new_code, true);
+        }
+        else // update the size since the code is in place
+            write_mem_prot(new_code_address + 3, to_le_bytes(static_cast<uint32_t>(ent_types.size())), true);
+
+        if (was_edited_before)
             VirtualFree(old_types_array, 0, MEM_RELEASE);
-
-        memcpy(new_array, ent_types.data(), data_size);
-        int32_t rel = static_cast<int32_t>((size_t)new_array - (offset + 4));
-        write_mem_recoverable("sunchallenge_spawn", offset, rel, true);
-
-        // the game does bitwise "and" with value 12 (0xC), so it would get 0, 4, 8 or 12 (4 positions in table)
-        int8_t new_value = static_cast<int8_t>((ent_types_size - 1) << 2);
-        write_mem_recoverable("sunchallenge_spawn", offset - 4, new_value, true);
-        modified = true;
     }
 }
 
@@ -1165,8 +1159,8 @@ void modify_ankh_health_gain(uint8_t health, uint8_t beat_add_health)
     {
         if (!offsets[0])
         {
-            auto memory = Memory::get();
-            size_t offset = size_minus_one - memory.exe_ptr;
+            auto& memory = Memory::get();
+            size_t offset = size_minus_one - memory.exe_address();
             const auto limit_size = offset + 0x200;
 
             offsets[0] = find_inst(memory.exe(), "\x41\x80\xBF\x17\x01\x00\x00"sv, offset, limit_size, "ankh_health_gain_1");
@@ -1211,10 +1205,10 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
     if (auto entity = get_entity_ptr(uid))
     {
         auto& state = State::get();
-        std::pair<float, float> offset;
+        Vec2 offset;
         const auto actual_layer = enum_to_layer(layer, offset);
-        state.layer(entity->layer)->move_grid_entity(entity, offset.first + x, offset.first + y, state.layer(actual_layer));
-        entity->teleport_abs(offset.first + x, offset.first + y, 0, 0);
+        state.layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state.layer(actual_layer));
+        entity->teleport_abs(offset.x + x, offset.y + y, 0, 0);
         entity->set_layer(layer);
     }
 }
@@ -1317,17 +1311,47 @@ std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start)
     }
 }
 
-void update_liquid_collision_at(float x, float y, bool add)
+void update_liquid_collision_at(float x, float y, bool add, std::optional<LAYER> layer)
 {
-    using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, bool); // setting last parameter to true just skips the whole function
+    using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, uint8_t);
     static UpdateLiquidCollision* RemoveLiquidCollision_fun = (UpdateLiquidCollision*)get_address("remove_from_liquid_collision_map");
-    static UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_from_liquid_collision_map");
+    static UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_to_liquid_collision_map");
     auto state = get_state_ptr();
+    uint8_t actual_layer = enum_to_layer(layer.value_or(LAYER::FRONT));
 
     if (add)
-        AddLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+        AddLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), actual_layer);
     else
-        RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), false);
+        RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), actual_layer);
+}
+
+void add_entity_to_liquid_collision(uint32_t uid, bool add)
+{
+    using AddEntityLiquidCollision = void(LiquidPhysics*, Entity*, uint8_t);
+    static AddEntityLiquidCollision* add_entity_liquid_collision = (AddEntityLiquidCollision*)get_address("add_movable_to_liquid_collision_map");
+    auto state = get_state_ptr();
+    auto entity = get_entity_ptr(uid);
+    if (!entity)
+        return;
+
+    auto map = state->liquid_physics->push_blocks;
+    if (!map)
+        return;
+
+    auto it = map->find(uid);
+
+    // if it already exists we can't add it again, since it will create the collision struct anyway and just overwrite the pointer to it in the map
+    // the actual collision struct is held somewhere else, unrelated to this map
+    if (add && it == map->end())
+        add_entity_liquid_collision(state->liquid_physics, entity, entity->layer);
+    else if (!add && it != map->end())
+    {
+        // very illegal, don't do this, we can because we're professionals xd
+        // game loops thru the map and checks if uid still exists, if not, it removes the collision
+        // which is some bigger struct held in some weird container, and the function is doing other stuff, so this is the easiest way besides killing the entity
+        auto key = const_cast<uint32_t*>(&it->first);
+        *key = ~0u;
+    }
 }
 
 bool disable_floor_embeds(bool disable)
@@ -1459,7 +1483,7 @@ void activate_tiamat_position_hack(bool activate)
 
 void activate_crush_elevator_hack(bool activate)
 {
-    auto memory = Memory::get();
+    auto& memory = Memory::get();
     static size_t offsets[3];
     if (offsets[0] == 0)
     {
@@ -1503,7 +1527,7 @@ void activate_hundun_hack(bool activate)
 
     if (offsets[0] == 0)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         auto func_offset = get_virtual_function_address(VTABLE_OFFSET::MONS_HUNDUN, 78);
         offsets[0] = find_inst(memory.exe(), "\x41\xF6\x85\x61\x01\x00\x00\x08"sv, func_offset, func_offset + 0x1420, "activate_hundun_hack");
         if (offsets[0] == 0)
@@ -1603,12 +1627,12 @@ void set_boss_door_control_enabled(bool enable)
     static size_t offsets[2];
     if (offsets[0] == 0)
     {
-        auto memory = Memory::get();
+        auto& memory = Memory::get();
         offsets[0] = get_address("hundun_door_control");
         if (offsets[0] == 0)
             return;
         // find tiamat door control (the same pattern)
-        offsets[1] = find_inst(memory.exe(), "\x4A\x8B\xB4\xC8\x80\xF4\x00\x00"sv, offsets[0] - memory.exe_ptr + 0x777, std::nullopt, "set_boss_door_control_enabled");
+        offsets[1] = find_inst(memory.exe(), "\x4A\x8B\xB4\xC8\x80\xF4\x00\x00"sv, offsets[0] - memory.exe_address() + 0x777, std::nullopt, "set_boss_door_control_enabled");
         if (offsets[1] == 0)
         {
             offsets[0] = 0;
@@ -1903,4 +1927,133 @@ void init_seeded(std::optional<uint32_t> seed)
     static init_func* isf = (init_func*)(offset);
     auto* state = State::get().ptr();
     isf(state, seed.value_or(state->seed));
+}
+
+void set_liquid_layer(LAYER l)
+{
+    static std::array<uintptr_t, 7> jumps;          // jne (0F85) -> je (0F84)
+    static std::array<uintptr_t, 20> layer_offsets; // 0x1300 -> 0x1308
+    static std::array<uintptr_t, 6> layer_byte;
+    static uintptr_t jump2;
+    static uintptr_t jump3;
+    if (jumps[0] == 0)
+    {
+        layer_byte[0] = get_address("check_if_collides_with_liquid_layer");
+        layer_byte[1] = get_address("check_if_collides_with_liquid_layer2");
+        layer_byte[2] = get_address("lavamander_spewing_lava");
+        layer_byte[3] = get_address("movement_calculations_layer_check");
+        layer_byte[4] = get_address("jump_calculations_layer_check");
+        // i don't actually know what this bit does, probably bool param, it's not just liquid relates as it's for all the entities with collision mask
+        // and it's not layer as well since other collision occur in back layer even with this set to 0 and vice versa
+        layer_byte[5] = get_address("collision_mask_check_param");
+
+        for (auto addr : layer_byte)
+            if (addr == 0)
+                return;
+
+        auto& mem = Memory::get();
+        layer_offsets[0] = get_address("spawn_liquid_layer");
+
+        {
+            auto sound_stuff = get_address("liquid_stream_spawner");
+            if (sound_stuff == 0)
+                return;
+
+            auto last_offset = sound_stuff - mem.exe_address();
+            bool skip = true;
+            for (uint8_t idx = 0; idx < 6; ++idx)
+            {
+                last_offset = find_inst(mem.exe(), "\x48\x8B\x8A"sv, last_offset, last_offset + 0x170, "set_liquid_layer-sound stuff");
+                if (idx == 5 && skip) // skip one, same instruction but not layer related
+                {
+                    idx = 4;
+                    skip = false;
+                    last_offset += 7;
+                    continue;
+                }
+                layer_offsets[idx + 1] = mem.at_exe(last_offset);
+                last_offset += 7;
+            }
+        }
+        layer_offsets[7] = get_address("tidepool_impostor_spawn");
+        layer_offsets[8] = get_address("tiamat_impostor_spawn");
+        layer_offsets[9] = get_address("olmec_impostor_spawn");
+        layer_offsets[10] = get_address("abzu_impostor_spawn");
+
+        {
+            auto logic_magman_spawn = get_virtual_function_address(VTABLE_OFFSET::LOGIC_VOLCANA_RELATED, 1);
+            if (logic_magman_spawn == 0)
+                return;
+
+            auto lookup_patterns = {
+                // in order
+                "\x48\x8B\x8D*\x13\x00\x00"sv,
+                "\x48\x03\xB7*\x13\x00\x00"sv,
+                "\x48\x8B\x89*\x13\x00\x00"sv,
+                "\x48\x03\x95*\x13\x00\x00"sv,
+                "\x48\x03\x95*\x13\x00\x00"sv,
+                "\x48\x03\x8D*\x13\x00\x00"sv,
+                "\x48\x8B\x8A*\x13\x00\x00"sv,
+            };
+            auto current_offset = logic_magman_spawn;
+            uint8_t idx = 11; // next free index
+            for (auto& pattern : lookup_patterns)
+            {
+                current_offset = find_inst(mem.exe(), pattern, current_offset + 7, logic_magman_spawn + 0x764, "set_liquid_layer-volcana");
+                if (current_offset == 0)
+                    return;
+
+                layer_offsets[idx++] = mem.at_exe(current_offset);
+            }
+        }
+        layer_offsets[18] = get_address("logic_volcana_gather_magman_spawn_locations");
+        layer_offsets[19] = get_address("logic_volcana_gather_magman_spawn_locations2");
+
+        for (auto addr : layer_offsets)
+            if (addr == 0)
+                return;
+
+        jump2 = get_address("robot_layer_check");
+        jump3 = get_address("logic_underwater_bubbles_loop_check");
+        if (jump2 == 0 || jump3 == 0)
+            return;
+
+        jumps[0] = get_address("layer_check_in_add_liquid_collision");
+        jumps[1] = get_address("layer_check_in_remove_liquid_collision");
+        jumps[2] = get_address("is_entity_in_liquid_check"); // TODO there is also layer offset nerby, test if it's related
+        jumps[3] = get_address("liquid_render_layer");
+        jumps[4] = get_address("entity_in_liquid_detection1");
+        jumps[5] = get_address("entity_in_liquid_detection2");
+        jumps[6] = get_address("layer_check_in_add_movable_liquid_collision");
+
+        for (auto addr : jumps)
+            if (addr == 0)
+            {
+                jumps[0] = 0;
+                return;
+            }
+    }
+    auto actual_layer = enum_to_layer(l);
+    uint8_t offset_ending = actual_layer == 0 ? 0 : 8;
+    uint8_t jump_oppcode = actual_layer == 0 ? 0x85 : 0x84;
+    uint8_t jump_oppcode2 = actual_layer == 0 ? 0x75 : 0x74;
+    uint8_t jump_oppcode2_inverse = actual_layer == 0 ? 0x74 : 0x75;
+
+    for (auto addr : jumps)
+        write_mem_prot(addr + 1, jump_oppcode, true);
+
+    for (auto addr : layer_offsets)
+        write_mem_prot(addr + 3, offset_ending, true);
+
+    for (auto addr : layer_byte)
+        write_mem_prot(addr, actual_layer, true);
+
+    write_mem_prot(jump2, jump_oppcode2, true);
+    write_mem_prot(jump3, jump_oppcode2_inverse, true);
+}
+
+uint8_t get_liquid_layer()
+{
+    static auto addr = get_address("check_if_collides_with_liquid_layer");
+    return memory_read<uint8_t>(addr);
 }

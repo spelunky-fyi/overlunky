@@ -34,7 +34,7 @@ void register_usertypes(sol::state& lua)
     playerslot_type["input_mapping_controller"] = sol::readonly(&PlayerSlot::input_mapping_controller);
     /// NoDoc
     playerslot_type["player_id"] = sol::readonly(&PlayerSlot::player_slot);
-    playerslot_type["player_slot"] = sol::property([](PlayerSlot& p)
+    playerslot_type["player_slot"] = sol::property([](PlayerSlot& p) -> uint8_t
                                                    { return p.player_slot < 0 ? p.player_slot : p.player_slot + 1; });
     playerslot_type["is_participating"] = sol::readonly(&PlayerSlot::is_participating);
 

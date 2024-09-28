@@ -18,7 +18,7 @@
 #include "entity_db.hpp"      // for EntityDB
 #include "entity_structs.hpp" // for CollisionInfo
 #include "layer.hpp"          // for EntityList
-#include "math.hpp"           // for AABB
+#include "math.hpp"           // for AABB, Vec2
 
 struct RenderInfo;
 struct Texture;
@@ -115,7 +115,7 @@ class Entity
         return (size_t)this;
     }
 
-    std::pair<float, float> position();
+    Vec2 position() const;
 
     void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
     void teleport_abs(float dx, float dy, float vx, float vy);
@@ -127,7 +127,10 @@ class Entity
     /// Moves the entity to the limbo-layer where it can later be retrieved from again via `respawn`
     void remove();
     /// Moves the entity from the limbo-layer (where it was previously put by `remove`) to `layer`
-    void respawn(LAYER layer);
+    void respawn(LAYER layer_to)
+    {
+        set_layer(layer_to);
+    }
     /// Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
     void perform_teleport(uint8_t delta_x, uint8_t delta_y);
 
@@ -156,14 +159,14 @@ class Entity
         return topmost;
     }
 
-    bool overlaps_with(AABB hitbox)
+    bool overlaps_with(AABB hitbox) const
     {
         return overlaps_with(hitbox.left, hitbox.bottom, hitbox.right, hitbox.top);
     }
 
     /// Deprecated
     /// Use `overlaps_with(AABB hitbox)` instead
-    bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top)
+    bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top) const
     {
         const auto [posx, posy] = position();
         const float left = posx - hitboxx + offsetx;
@@ -174,7 +177,7 @@ class Entity
         return left < rect_right && rect_left < right && bottom < rect_top && rect_bottom < top;
     }
 
-    bool overlaps_with(Entity* other)
+    bool overlaps_with(Entity* other) const
     {
         const auto [other_posx, other_posy] = other->position();
         const float other_left = other_posx - other->hitboxx + other->offsetx;
@@ -185,17 +188,20 @@ class Entity
         return overlaps_with(other_left, other_bottom, other_right, other_top);
     }
 
-    std::pair<float, float> position_self() const;
+    Vec2 position_self() const
+    {
+        return Vec2{x, y};
+    }
     void remove_item(uint32_t item_uid);
 
-    TEXTURE get_texture();
+    TEXTURE get_texture() const;
     /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
     bool set_texture(TEXTURE texture_id);
 
-    bool is_player();
-    bool is_movable();
-    bool is_liquid();
-    bool is_cursed()
+    bool is_player() const;
+    bool is_movable() const;
+    bool is_liquid() const;
+    bool is_cursed() const
     {
         return more_flags & 0x4000;
     };
@@ -218,7 +224,7 @@ class Entity
 
     void set_enable_turning(bool enabled);
 
-    std::span<uint32_t> get_items();
+    std::vector<uint32_t> get_items();
 
     /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's

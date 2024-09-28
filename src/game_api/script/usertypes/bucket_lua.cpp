@@ -23,6 +23,7 @@ void register_usertypes(sol::state& lua)
     /// Control the pause API
     auto pauseapi_type = lua.new_usertype<PauseAPI>("PauseAPI", sol::no_constructor);
     // pauseapi_type["pause"] = &PauseAPI::pause;
+    /// NoDoc
     pauseapi_type["pause"] = sol::property(&PauseAPI::get_pause, &PauseAPI::set_pause);
     pauseapi_type["pause_type"] = &PauseAPI::pause_type;
     pauseapi_type["pause_trigger"] = &PauseAPI::pause_trigger;

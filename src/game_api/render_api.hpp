@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>         // for array
 #include <cstddef>       // for size_t
 #include <cstdint>       // for uint32_t, uint8_t, uint16_t, int32_t
 #include <functional>    // for equal_to
@@ -10,15 +11,18 @@
 #include <unordered_map> // for _Umap_traits<>::allocator_type, unordered_map
 #include <utility>       // for pair
 
-#include "aliases.hpp" // for TEXTURE
-#include "color.hpp"   // for Color
-#include "math.hpp"    // for Quad, AABB (ptr only)
-#include "texture.hpp" // for Texture
+#include "aliases.hpp"                       // for TEXTURE
+#include "color.hpp"                         // for Color
+#include "containers/game_unordered_map.hpp" // for game_unordered_map
+#include "containers/game_vector.hpp"        // for game_vector
+#include "math.hpp"                          // for Quad, AABB (ptr only)
+#include "texture.hpp"                       // for Texture
 
 struct JournalUI;
 struct Layer;
 class Entity;
 struct Renderer;
+struct ParticleEmitterInfo;
 
 using VANILLA_TEXT_ALIGNMENT = uint32_t;
 using VANILLA_FONT_STYLE = uint32_t;
@@ -174,7 +178,7 @@ struct TextRenderingInfo
 
     Letter* dest{nullptr};
     Letter* source{nullptr};
-    // 6 * wcslen(input_text), just numbers in order 0, 1, 2 ... have some strage effect if you change them
+    // 6 * text_length, just numbers in order 0, 1, 2 ... have some strage effect if you change them
     uint16_t* unknown6{nullptr};
 
     uint16_t nof_special_character; // number of special characters, still not sure how the game knows which ones are the special ones?
@@ -182,7 +186,7 @@ struct TextRenderingInfo
     uint16_t unknown8;              // padding probably
 
     /// Used to draw buttons and stuff, default is -1 wich uses the buttons texture
-    int32_t special_texture_id;
+    TEXTURE special_texture_id;
 
     uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
     uint8_t padding1[3];
@@ -356,7 +360,7 @@ struct RenderInfo
     bool set_second_texture(TEXTURE texture_id);
     bool set_third_texture(TEXTURE texture_id);
     /// Set the number of textures that may be used, need to have them set before for it to work
-    bool set_texture_num(uint32_t texture_id);
+    bool set_texture_num(uint32_t num);
     /// Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
     bool set_normal_map_texture(TEXTURE texture_id);
 };
@@ -366,6 +370,12 @@ bool& get_journal_enabled();
 void on_open_journal_chapter(JournalUI* journal_ui, uint8_t chapter, bool instant, bool play_sound);
 void render_draw_depth(Layer* layer, uint8_t draw_depth, float bbox_left, float bbox_bottom, float bbox_right, float bbox_top);
 float get_layer_transition_zoom_offset(uint8_t layer);
+
+struct SpritePosition
+{
+    uint32_t column;
+    uint32_t row;
+};
 
 struct HudInventory
 {
@@ -378,36 +388,35 @@ struct HudInventory
     bool ankh;
     bool kapala;
     uint8_t b03;
+    float kapala_scale;
 
-    uint32_t u03;
-
-    uint32_t kapala_blood;
-
-    uint32_t u0c;
-
+    union
+    {
+        /// NoDoc
+        uint32_t kapala_blood;
+        SpritePosition kapala_sprite;
+    };
     bool poison;
     bool curse;
     bool elixir;
     uint8_t b13;
-
     /// Powerup type or 0
     ENT_TYPE crown;
-
-    uint8_t skip[176 - 7 * 4 - 4]; // TODO: individual item icons
+    std::array<SpritePosition, 18> powerup_sprites;
 
     /// Amount of generic pickup items at the bottom. Set to 0 to not draw them.
-    uint32_t item_count;
+    uint32_t powerup_count;
 };
 static_assert(sizeof(HudInventory) == 176);
 
 struct HudElement
 {
     /// Hide background and dim if using the auto adjust setting.
-    bool dim;
+    bool dim; // it acutally  3 states: 0 - bright, 1 - dim, anything above - hide completely
     /// Background will be drawn if this is not 0.5
     float opacity;
     /// Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
-    int32_t time_dim;
+    int32_t time_dim; // it's set to INT_MAX after it was dimmed
 };
 
 struct HudPlayer : HudElement
@@ -415,6 +424,7 @@ struct HudPlayer : HudElement
     int16_t health;
     int16_t bombs;
     int16_t ropes;
+    // int16_t padding;
     int32_t idunno;
 };
 static_assert(sizeof(HudPlayer) == 24);
@@ -424,28 +434,103 @@ struct HudMoney : HudElement
     int32_t total;
     int32_t counter;
     uint8_t timer;
-    // padding?
+    // uint8_t padding[3];
 };
 
 struct HudData
 {
     std::array<HudInventory, MAX_PLAYERS> inventory;
     bool udjat;
+    // uint8_t padding[3];
     int32_t money_total;
     int32_t money_counter;
-    uint32_t time_total;
+    /// in ms
     uint32_t time_level;
+    /// in ms
+    uint32_t time_total;
     uint8_t world_num;
     uint8_t level_num;
+    bool angry_shopkeeper;
+    bool seed_shown;
     uint32_t seed;
     float opacity;
-    uint8_t skip[1640]; // TODO: probably rendering coordinates all the way down
+
+    /// For player related icons, they use the same TextureRendering, just offset while drawing
+    TextureRenderingInfo player_highlight;
+    TextureRenderingInfo player_heart;
+    TextureRenderingInfo player_ankh;
+    TextureRenderingInfo kapala_icon;
+    TextureRenderingInfo player_crown;
+    TextureRenderingInfo unknown_texture5;
+    TextureRenderingInfo player_bomb;
+    TextureRenderingInfo player_rope;
+    TextureRenderingInfo unknown_texture8;
+    TextureRenderingInfo unknown_texture9;
+    TextureRenderingInfo unknown_texture10;
+    TextureRenderingInfo unknown_texture11;
+    TextureRenderingInfo unknown_texture12;
+    TextureRenderingInfo udjat_icon;
+    TextureRenderingInfo unknown_texture14;
+    /// Money and time use the same TextureRendering, just offset while drawing
+    TextureRenderingInfo money_and_time_highlight;
+    TextureRenderingInfo dollar_icon;
+    TextureRenderingInfo hourglass_icon;
+    TextureRenderingInfo clover_icon;
+    TextureRenderingInfo level_highlight;
+    TextureRenderingInfo level_icon;
+    TextureRenderingInfo seed_background;
+    float roll_in;
+    float unknown6;
+    float unknown7;
+    float unknown8;
+    float unknown9;
+    float unknown10;
+    std::array<float, MAX_PLAYERS> player_zoom; // ?
+    float unknown15;
+    float unknown16;
+    float unknown17;
+    float unknown18;
+
     std::array<HudPlayer, MAX_PLAYERS> players;
     HudMoney money;
-    size_t p9c0;
+    ParticleEmitterInfo* money_increase_sparkles;
     HudElement timer;
     HudElement level;
-    // there's a few pointers and some timer missing, doesn't seem important
+    game_vector<HudElement*> elements; // not sure what's for, just lists all the elements above, even for the unactive players
+
+    uint32_t unknown20;
+    uint8_t unknown21;
+    uint8_t unknown22;
+    uint16_t unknown23;
+    float clover_falling_apart_timer;
+    float unknown25;
+    ParticleEmitterInfo* unknown26;
+    TextureRenderingInfo unknown27;
+    TextureRenderingInfo unknown28;
+    TextureRenderingInfo unknown29;
+    float unknown30;
+    // uint32_t unknown31; // probably padding
+    game_unordered_map<uint32_t, uint32_t> unknown32;
+    float unknown33;
+    float unknown34;
+    float unknown35;
+    float unknown36;
+    float unknown37;
+    float unknown38;
+    float unknown39;
+    TextureRenderingInfo loading_dragon;
+    float loading_dragon_visibility;
+    float unknown42;
+    float unknown43;
+    TextureRenderingInfo loading_cog;
+    float unknown45;
+    uint32_t loading_cog_timer;
+    uint32_t unknown47;
+    bool unknown48;
+    // uint8_t unknown49[3]; //probably padding
+    float unknown51;
+    std::array<ParticleEmitterInfo*, MAX_PLAYERS> player_cursed_particles;
+    std::array<ParticleEmitterInfo*, MAX_PLAYERS> player_poisoned_particles;
 };
 // static_assert(sizeof(HudData) <= 0xa00);
 

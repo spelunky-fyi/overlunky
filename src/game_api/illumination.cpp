@@ -41,12 +41,14 @@ Illumination* create_illumination(Color color, float size, int32_t uid)
 
 void refresh_illumination(Illumination* illumination)
 {
-    static uint32_t* offset = 0;
-    if (offset == 0)
-    {
-        size_t** heap_offset = (size_t**)get_address("refresh_illumination_heap_offset");
-        auto illumination_counter = OnHeapPointer<uint32_t>(**heap_offset);
+    static size_t** heap_offset = (size_t**)get_address("refresh_illumination_heap_offset");
+    if (heap_offset == nullptr)
+        return;
+
+    auto illumination_counter = OnHeapPointer<uint32_t>(**heap_offset);
+    uint32_t* offset = illumination_counter.decode_local();
+    if (offset == nullptr)
         offset = illumination_counter.decode();
-    }
+
     illumination->timer = *offset;
 }

@@ -11,6 +11,7 @@
 struct Texture
 {
     TEXTURE id;
+    uint32_t padding{0};
     const char** name;
     std::uint32_t width;
     std::uint32_t height;

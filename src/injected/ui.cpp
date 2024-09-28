@@ -518,7 +518,7 @@ void version_check(bool force = false)
 
     version_check_status.state = VERSION_CHECK::CHECKING;
     DEBUG("UpdateCheck: {}", version_check_messages[(int)version_check_status.state].message);
-    new HttpRequest(std::move(version_check_url), get_version_info);
+    new HttpRequest(version_check_url, get_version_info);
 }
 
 void hook_savegame()
@@ -825,7 +825,7 @@ void refresh_script_files()
                 unload_scripts.push_back(script.second->get_file());
             }
         }
-        for (auto id : unload_scripts)
+        for (auto& id : unload_scripts)
         {
             auto it = g_scripts.find(id);
             if (it != g_scripts.end())
@@ -853,7 +853,7 @@ void refresh_script_files()
                 unload_scripts.push_back(script.second->get_file());
             }
         }
-        for (auto id : unload_scripts)
+        for (auto& id : unload_scripts)
         {
             auto it = g_scripts.find(id);
             if (it != g_scripts.end())
@@ -869,7 +869,7 @@ void refresh_script_files()
 
 void autorun_scripts()
 {
-    for (auto file : g_script_autorun)
+    for (auto& file : g_script_autorun)
     {
         std::string script = scriptpath + "/" + file;
         if (std::filesystem::exists(script) && std::filesystem::is_regular_file(script))
@@ -1336,15 +1336,15 @@ void smart_delete(Entity* ent, bool unsafe = false)
     {
         auto pos = ent->position();
         auto layer = (LAYER)ent->layer;
-        UI::cleanup_at(pos.first, pos.second, layer, ent->type->id);
+        UI::cleanup_at(pos.x, pos.y, layer, ent->type->id);
     }
     if (ent->type->search_flags & 0x180)
     {
         auto pos = ent->position();
         auto layer = (LAYER)ent->layer;
         ENT_TYPE type = ent->type->id;
-        fix_decorations_at(std::round(pos.first), std::round(pos.second), layer);
-        UI::cleanup_at(std::round(pos.first), std::round(pos.second), layer, type);
+        fix_decorations_at(std::round(pos.x), std::round(pos.y), layer);
+        UI::cleanup_at(std::round(pos.x), std::round(pos.y), layer, type);
     }
 }
 
@@ -1947,7 +1947,7 @@ void force_cheats()
             ent->onfire_effect_timer = 0;
             ent->wet_effect_timer = 0;
             ent->lock_input_timer = 0;
-            ent->set_cursed(false);
+            ent->set_cursed(false, false);
             ent->more_flags &= ~(1U << 16);
             UI::destroy_entity_item_type(ent, ink);
         }
@@ -3678,16 +3678,16 @@ bool render_uid(int uid, const char* section, bool rembtn = false)
     ImGui::Text("%s", typec.c_str());
     ImGui::SameLine();
     ImGui::Text("%s", pname.c_str());
+    auto remove = false;
     if (rembtn)
     {
         ImGui::SameLine();
         ImGui::PushID(uid);
-        if (ImGui::Button("Remove"))
-            g_entity->remove_item(uid);
+        remove = ImGui::Button("Remove##RemoveItem");
         ImGui::PopID();
     }
     ImGui::PopID();
-    return true;
+    return remove;
 }
 
 void render_light(const char* name, LightParams* light)
@@ -4196,8 +4196,9 @@ void render_camera()
 {
     if (submenu("Focus and bounds"))
     {
-        if (render_uid(g_state->camera->focused_entity_uid, "FocusedEntity"))
+        if (g_state->camera->focused_entity_uid != 0 && g_state->camera->focused_entity_uid != UINT32_MAX)
         {
+            render_uid(g_state->camera->focused_entity_uid, "FocusedEntity");
             ImGui::SameLine(0, 4.0f);
             if (ImGui::Button("Unfocus"))
                 g_state->camera->focused_entity_uid = -1;
@@ -4937,16 +4938,17 @@ void render_messages()
         auto in_time_t = std::chrono::system_clock::to_time_t(now);
         std::tm time_buf;
         localtime_s(&time_buf, &in_time_t);
-        std::vector<ScriptMessage> messages;
+
         for (auto& [name, script] : g_scripts)
         {
+            std::vector<ScriptMessage> messages;
             for (auto&& message : script->consume_messages())
                 messages.push_back(message);
             if (messages.size() > 0)
                 g_Console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", script->get_name(), time_buf), std::move(messages));
         }
-        messages.clear();
         {
+            std::vector<ScriptMessage> messages;
             for (auto&& message : g_Console->consume_messages())
                 messages.push_back(message);
             if (messages.size() > 0)
@@ -7072,12 +7074,12 @@ void render_savegame()
     ImGui::PopID();
 }
 
-void render_powerup(PowerupCapable* ent, int uid, const char* section)
+bool render_powerup(int uid, const char* section)
 {
     std::string uidc = std::to_string(uid);
     int ptype = UI::get_entity_type(uid);
     if (ptype == 0)
-        return;
+        return false;
     std::string typec = std::to_string(ptype);
     const char* pname = entity_names[ptype].c_str();
     ImGui::PushID(section);
@@ -7092,12 +7094,10 @@ void render_powerup(PowerupCapable* ent, int uid, const char* section)
     ImGui::Text("%s", pname);
     ImGui::SameLine();
     ImGui::PushID(uid);
-    if (ImGui::Button("Remove##RemovePowerup"))
-    {
-        ent->as<Player>()->remove_powerup(ptype);
-    }
+    auto remove = ImGui::Button("Remove##RemovePowerup");
     ImGui::PopID();
     ImGui::PopID();
+    return remove;
 }
 
 void render_state(const char* label, uint8_t state)
@@ -7733,16 +7733,24 @@ void render_entity_props(int uid, bool detached = false)
         if (entity->type->search_flags & 0x7)
         {
             auto entity_pow = entity->as<PowerupCapable>();
+            int removed_uid = 0;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0) && !entity_pow->has_powerup(ent->type->id))
-                    render_uid(ent->uid, "EntityItems", true);
+                    if (render_uid(ent->uid, "EntityItems", true))
+                        removed_uid = ent->uid;
             }
+            if (removed_uid)
+                entity_pow->remove_item(removed_uid);
             ImGui::SeparatorText("Powerups");
+            int removed_powerup = 0;
             for (const auto& [powerup_id, powerup_entity] : entity_pow->powerups)
             {
-                render_powerup(entity_pow, powerup_entity->uid, "Powerups");
+                if (render_powerup(powerup_entity->uid, "Powerups"))
+                    removed_powerup = powerup_entity->type->id;
             }
+            if (removed_powerup)
+                entity_pow->remove_powerup(removed_powerup);
             ImGui::PushItemWidth(160);
             static const char* chosenPowerup = "";
             static uint8_t chosenPowerupIndex = 0;
@@ -7806,11 +7814,15 @@ void render_entity_props(int uid, bool detached = false)
         }
         else
         {
+            int removed_uid = 0;
             for (auto ent : entity->items.entities())
             {
                 if ((fx || (ent->type->search_flags & 0x40) == 0))
-                    render_uid(ent->uid, "EntityItems", true);
+                    if (render_uid(ent->uid, "EntityItems", true))
+                        removed_uid = ent->uid;
             }
+            if (removed_uid)
+                entity->remove_item(removed_uid);
         }
         endmenu();
     }
@@ -8114,7 +8126,7 @@ void render_hotbar_textures()
             if (type->texture_id < 0)
             {
                 const auto theme = g_state->current_theme ? g_state->current_theme : g_state->level_gen->themes[0];
-                texture = get_texture(theme->get_dynamic_texture(type->texture_id));
+                texture = get_texture(theme->get_dynamic_texture((DYNAMIC_TEXTURE)type->texture_id));
             }
             if (!texture)
                 continue;

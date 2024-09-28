@@ -18,7 +18,7 @@ struct fmt::formatter<ByteStr>
     }
 
     template <typename FormatContext>
-    auto format(ByteStr byte_str, FormatContext& ctx)
+    auto format(const ByteStr& byte_str, FormatContext& ctx) const
     {
         auto out = ctx.out();
 

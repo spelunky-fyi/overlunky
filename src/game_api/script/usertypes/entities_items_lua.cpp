@@ -862,23 +862,15 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
-    lua.new_usertype<CookFire>(
-        "CookFire",
-        /// NoDoc
-        "lit",
-        &Torch::is_lit, // left to not break backwards compatibility
-        "emitted_light",
-        &CookFire::emitted_light,
-        "particles_smoke",
-        &CookFire::particles_smoke,
-        "particles_flames",
-        &CookFire::particles_flames,
-        "particles_warp",
-        &CookFire::particles_warp,
-        "sound",
-        &CookFire::sound,
-        sol::base_classes,
-        sol::bases<Entity, Movable, Torch>());
+    auto cookfire_type = lua.new_usertype<CookFire>("CookFire");
+    /// NoDoc
+    cookfire_type["lit"] = &Torch::is_lit; // left to not break backwards compatibility
+    cookfire_type["emitted_light"] = &CookFire::emitted_light;
+    cookfire_type["particles_smoke"] = &CookFire::particles_smoke;
+    cookfire_type["particles_flames"] = &CookFire::particles_flames;
+    cookfire_type["particles_warp"] = &CookFire::particles_warp;
+    cookfire_type["sound"] = &CookFire::sound;
+    cookfire_type[sol::base_classes] = sol::bases<Entity, Movable, Torch>();
 
     lua.new_usertype<Orb>(
         "Orb",

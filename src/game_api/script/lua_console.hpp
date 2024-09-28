@@ -71,15 +71,39 @@ class LuaConsole : public LockableLuaBackend<LuaConsole>
     using LuaBackend::reset;
     virtual bool pre_draw() override;
 
-    virtual void set_enabled(bool enabled) override;
-    virtual bool get_enabled() const override;
+    virtual void set_enabled(bool enable) override
+    {
+        enabled = enable;
+    }
+    virtual bool get_enabled() const override
+    {
+        return enabled;
+    }
 
-    virtual bool get_unsafe() const override;
-    virtual const char* get_name() const override;
-    virtual const char* get_id() const override;
-    virtual const char* get_version() const override;
-    virtual const char* get_path() const override;
-    virtual const char* get_root() const override;
+    virtual bool get_unsafe() const override
+    {
+        return unsafe;
+    }
+    virtual const char* get_name() const override
+    {
+        return "lua_console";
+    }
+    virtual const char* get_id() const override
+    {
+        return "dev/lua_console";
+    }
+    virtual const char* get_version() const override
+    {
+        return "1.337";
+    }
+    virtual const char* get_path() const override
+    {
+        return "console_proxy.lua";
+    }
+    virtual const char* get_root() const override
+    {
+        return ".";
+    }
     virtual const std::filesystem::path& get_root_path() const override;
 
     void register_command(LuaBackend* provider, std::string command_name, sol::function cmd);
@@ -94,6 +118,13 @@ class LuaConsole : public LockableLuaBackend<LuaConsole>
 
     std::string dump_api();
     unsigned int get_input_lines();
-    void set_geometry(float x, float y, float w, float h);
-    void set_alt_keys(bool enable);
+    void set_geometry(float x, float y, float w, float h)
+    {
+        pos = ImVec2(x, y);
+        size = ImVec2(w, h);
+    }
+    void set_alt_keys(bool enable)
+    {
+        alt_keys = enable;
+    }
 };

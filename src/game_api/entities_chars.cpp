@@ -36,11 +36,6 @@ void PowerupCapable::give_powerup(ENT_TYPE powerup_type)
     }
 }
 
-bool PowerupCapable::has_powerup(ENT_TYPE powerup_type)
-{
-    return powerups.find(powerup_type) != powerups.end();
-}
-
 std::vector<ENT_TYPE> PowerupCapable::get_powerups()
 {
     std::vector<ENT_TYPE> return_powerups;

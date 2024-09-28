@@ -5,19 +5,11 @@
 #include "script/events.hpp" // for pre_load_state
 #include "state.hpp"         // for State, get_state_ptr, enum_to_layer
 
-size_t get_state_offset()
-{
-    auto addr = get_address("state_location");
-    if (addr)
-        return memory_read<size_t>(addr);
-    return 0x4a0;
-}
-
 StateMemory* get_save_state_raw(int slot)
 {
     size_t arr = get_address("save_states");
     size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
-    auto state = reinterpret_cast<StateMemory*>(base + get_state_offset());
+    auto state = reinterpret_cast<StateMemory*>(base + State::get().get_offset());
     return state;
 }
 
@@ -87,28 +79,25 @@ void invalidate_save_slots()
 
 SaveState::SaveState()
 {
-    addr = (size_t)malloc(8 * 0x400000);
+    addr = (size_t)malloc(8ull * 0x400000);
     save();
 }
 
-SaveState::~SaveState()
-{
-    clear();
-}
-
-StateMemory* SaveState::get_state()
+StateMemory* SaveState::get_state() const
 {
     if (!addr)
         return nullptr;
-    return reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    return reinterpret_cast<StateMemory*>(addr + State::get().get_offset());
 }
 
 void SaveState::load()
 {
     if (!addr)
         return;
-    size_t to = (size_t)(State::get().ptr_main()) - get_state_offset();
-    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    State& state_g = State::get();
+    size_t offset = state_g.get_offset();
+    size_t to = (size_t)(state_g.ptr_main()) - offset;
+    auto state = reinterpret_cast<StateMemory*>(addr + offset);
     if (pre_load_state(-1, state))
         return;
     copy_state(addr, to);
@@ -119,8 +108,10 @@ void SaveState::save()
 {
     if (!addr)
         return;
-    size_t from = (size_t)(State::get().ptr_main()) - get_state_offset();
-    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    State& state_g = State::get();
+    size_t offset = state_g.get_offset();
+    size_t from = (size_t)(state_g.ptr_main()) - offset;
+    auto state = reinterpret_cast<StateMemory*>(addr + offset);
     if (pre_save_state(-1, state))
         return;
     copy_state(from, addr);

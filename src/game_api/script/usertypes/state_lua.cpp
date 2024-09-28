@@ -220,6 +220,7 @@ void register_usertypes(sol::state& lua)
         "is_pet_poisoned",
         &Items::is_pet_poisoned,
         "leader",
+        // &Items::leader,
         sol::property([](Items& s) -> uint8_t
                       { return s.leader + 1; },
                       [](Items& s, uint8_t leader)
@@ -435,7 +436,8 @@ void register_usertypes(sol::state& lua)
     statememory_type["user_data"] = std::move(user_data);
     /* StateMemory
     // user_data
-    // You can put any arbitrary lua object here and it will work correctly in online multiplayer, by having a copy on each state and being copied when the game does.
+    // You can store a table (or lua primitive) here and it will store data correctly in online multiplayer, by having a different copy on each state and being copied over when the game does.
+    // Doesn't support recursive tables / cyclic references. Metatables will be transferred by reference instead of being copied
     */
 
     lua.create_named_table("FADE", "NONE", 0, "OUT", 1, "LOAD", 2, "IN", 3);
@@ -517,6 +519,10 @@ void register_usertypes(sol::state& lua)
     camera_type["uniform_shake"] = &Camera::uniform_shake;
     camera_type["focused_entity_uid"] = &Camera::focused_entity_uid;
     camera_type["inertia"] = &Camera::inertia;
+    camera_type["peek_timer"] = &Camera::peek_timer;
+    camera_type["peek_layer"] = &Camera::peek_layer;
+    camera_type["get_bounds"] = &Camera::get_bounds;
+    camera_type["set_bounds"] = &Camera::set_bounds;
 
     /// Can be accessed via global [online](#online)
     lua.new_usertype<Online>(

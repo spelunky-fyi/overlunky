@@ -66,6 +66,7 @@
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
 #include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes
+#include "usertypes/color_lua.hpp"                 // for register_usertypes
 #include "usertypes/drops_lua.hpp"                 // for register_usertypes
 #include "usertypes/entities_activefloors_lua.hpp" // for register_usertypes
 #include "usertypes/entities_backgrounds_lua.hpp"  // for register_usertypes
@@ -299,6 +300,7 @@ end
     NVTables::register_usertypes(lua);
     NLogic::register_usertypes(lua);
     NBucket::register_usertypes(lua);
+    NColor::register_usertypes(lua);
 
     StateMemory* main_state = State::get().ptr_main();
 
@@ -1047,6 +1049,8 @@ end
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
+    /// Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+    lua["get_entities_overlapping_grid"] = get_entities_overlapping_grid;
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
     lua["get_entities"] = get_entities;
@@ -1268,7 +1272,7 @@ end
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
-            return (float)std::sqrt(std::pow(ea->position().first - eb->position().first, 2) + std::pow(ea->position().second - eb->position().second, 2));
+            return (float)std::sqrt(std::pow(ea->position().x - eb->position().x, 2) + std::pow(ea->position().y - eb->position().y, 2));
     };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
     /// inside these boundaries. The order is: left x, top y, right x, bottom y
@@ -1781,7 +1785,6 @@ end
 
     /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:<br/>
     /// {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
-    /// Because of the game logic number of entity types has to be a power of 2: (1, 2, 4, 8, 16, 32), if you want say 30 types, you need to write two entities two times (they will have higher "spawn chance").
     /// Use empty table as argument to reset to the game default
     lua["change_sunchallenge_spawns"] = change_sunchallenge_spawns;
 
@@ -1830,7 +1833,9 @@ end
     /// Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
     lua["refresh_illumination"] = refresh_illumination;
 
-    /// Removes all liquid that is about to go out of bounds, which crashes the game.
+    /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+    /// The patch however does not destroy the liquids that fall pass the level bounds,
+    /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
     lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
 
     /// Return the name of the first matching number in an enum table
@@ -1927,6 +1932,7 @@ end
     /// Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
     lua["set_adventure_seed"] = set_adventure_seed;
     /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+    /// optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
     lua["update_liquid_collision_at"] = update_liquid_collision_at;
 
     /// Disable all crust item spawns, returns whether they were already disabled before the call
@@ -2008,7 +2014,7 @@ end
     {
         std::vector<std::string> files;
         auto backend = LuaBackend::get_calling_backend();
-        auto base = backend->get_root_path();
+        const auto& base = backend->get_root_path();
         auto path = base / std::filesystem::path(dir.value_or("."));
         if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
             return sol::make_object(lua, sol::lua_nil);
@@ -2268,15 +2274,19 @@ end
     /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
 
-    lua.script(R"##(
-        function deepcopy_object(obj)
-            if type(obj) ~= 'table' then return obj end
-            local res = {}
-            for k, v in pairs(obj) do res[deepcopy_object(k)] = deepcopy_object(v) end
-            res = setmetatable(res, getmetatable(obj))
-            return res
-        end
-    )##");
+    /// Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+    /// This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+    /// Everything should be working more or less correctly (report on community discord if you find something unusual)
+    lua["set_liquid_layer"] = set_liquid_layer;
+
+    /// Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](#set_liquid_layer)
+    lua["get_liquid_layer"] = get_liquid_layer;
+
+    /// Attach liquid collision to entity by uid (this is what the push blocks use)
+    /// Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
+    /// Use only for entities that can move around, (for static prefer [update_liquid_collision_at](#update_liquid_collision_at) )
+    /// If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
+    lua["add_entity_to_liquid_collision"] = add_entity_to_liquid_collision;
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
@@ -2510,7 +2520,7 @@ end
     // WIN
     // Runs when entering any winning cutscene, including the constellation.
     // CREDITS
-    // Runs when entering the credits.
+    // Runs when entering the credits screen.
     // SCORES
     // Runs when entering the final score celebration screen of a normal or hard ending.
     // CONSTELLATION

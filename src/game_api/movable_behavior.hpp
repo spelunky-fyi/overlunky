@@ -51,8 +51,14 @@ struct CustomMovableBehavior final : MovableBehavior
 
     ~CustomMovableBehavior();
 
-    virtual uint8_t get_state_id() const override;
-    virtual uint8_t secondary_sort_id() const override;
+    virtual uint8_t get_state_id() const override
+    {
+        return state_id;
+    }
+    virtual uint8_t secondary_sort_id() const override
+    {
+        return 255;
+    }
     virtual bool force_state(Movable* movable) override;
     virtual void on_enter(Movable* movable) override;
     virtual void on_exit(Movable* movable) override;
@@ -76,12 +82,15 @@ void clear_behavior(Movable* movable, MovableBehavior* behavior);
 /// Clears all behaviors of this movable, need to call `add_behavior` to avoid crashing
 void clear_behaviors(Movable* movable);
 
-/// Move a movable according to its velocity, update physics, gravity, etc.
-/// Will also update `movable.animation_frame` and various timers and counters
-void update_movable(Movable* movable);
 /// Move a movable according to its velocity, can disable gravity
 /// Will also update `movable.animation_frame` and various timers and counters
 void update_movable(Movable* movable, bool disable_gravity);
+/// Move a movable according to its velocity, update physics, gravity, etc.
+/// Will also update `movable.animation_frame` and various timers and counters
+inline void update_movable(Movable* movable)
+{
+    update_movable(movable, false);
+}
 /// Move a movable according to its velocity and `move`, if the movables `BUTTON.RUN` is
 /// held apply `sprint_factor` on `move.x`, can disable gravity or lock its horizontal
 /// movement via `on_rope`. Use this for example to update a custom enemy type.

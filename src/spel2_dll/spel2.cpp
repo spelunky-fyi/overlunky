@@ -423,7 +423,7 @@ int64_t SpelunkyEntity_GetTexture(Entity* entity)
 }
 void SpelunkyEntity_SetTexture(Entity* entity, int64_t texture)
 {
-    entity->set_texture(texture);
+    entity->set_texture(static_cast<TEXTURE>(texture));
 }
 uint16_t SpelunkyEntity_GetTextureTile(Entity* entity)
 {

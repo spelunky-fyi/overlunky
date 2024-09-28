@@ -972,38 +972,6 @@ bool LuaConsole::pre_draw()
     return true;
 }
 
-void LuaConsole::set_enabled(bool enable)
-{
-    enabled = enable;
-}
-bool LuaConsole::get_enabled() const
-{
-    return enabled;
-}
-bool LuaConsole::get_unsafe() const
-{
-    return unsafe;
-}
-const char* LuaConsole::get_name() const
-{
-    return "lua_console";
-}
-const char* LuaConsole::get_id() const
-{
-    return "dev/lua_console";
-}
-const char* LuaConsole::get_version() const
-{
-    return "1.337";
-}
-const char* LuaConsole::get_path() const
-{
-    return "console_proxy.lua";
-}
-const char* LuaConsole::get_root() const
-{
-    return ".";
-}
 const std::filesystem::path& LuaConsole::get_root_path() const
 {
     static std::filesystem::path root_path{"."};
@@ -1166,15 +1134,4 @@ unsigned int LuaConsole::get_input_lines()
     for (str = console_input; *str; ++str)
         num += *str == '\n';
     return num;
-}
-
-void LuaConsole::set_geometry(float x, float y, float w, float h)
-{
-    pos = ImVec2(x, y);
-    size = ImVec2(w, h);
-}
-
-void LuaConsole::set_alt_keys(bool enable)
-{
-    alt_keys = enable;
 }

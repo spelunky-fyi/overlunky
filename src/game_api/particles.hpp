@@ -71,8 +71,8 @@ struct ParticleDB
     ParticleDB(const ParticleDB& other) = default;
     ParticleDB(const PARTICLEEMITTER particle_id);
 
-    std::uint64_t get_texture();
-    bool set_texture(std::uint32_t texture_id);
+    TEXTURE get_texture() const;
+    bool set_texture(TEXTURE texture_id);
 };
 
 struct ParticleEmitter
@@ -81,9 +81,7 @@ struct ParticleEmitter
     uint32_t id;
 
     ParticleEmitter(const std::string& name_, uint32_t id_)
-        : name(name_), id(id_)
-    {
-    }
+        : name(name_), id(id_){};
 };
 
 struct Particle
@@ -132,9 +130,7 @@ struct EmittedParticlesInfo
     {
       public:
         IteratorImpl(T* const src, uint32_t i)
-            : source{src}, index{i}
-        {
-        }
+            : source{src}, index{i} {};
 
         Particle dereference() const noexcept
         {
@@ -167,23 +163,77 @@ struct EmittedParticlesInfo
     using iterator = Iterator;
     using const_iterator = ConstIterator;
 
-    Iterator begin();
-    Iterator end();
-    ConstIterator begin() const;
-    ConstIterator end() const;
-    ConstIterator cbegin() const;
-    ConstIterator cend() const;
+    Iterator begin()
+    {
+        return Iterator{this, 0};
+    }
+    Iterator end()
+    {
+        return Iterator{this, particle_count};
+    }
+    ConstIterator begin() const
+    {
+        return cbegin();
+    }
+    ConstIterator end() const
+    {
+        return cend();
+    }
+    ConstIterator cbegin() const
+    {
+        return ConstIterator{this, 0};
+    }
+    ConstIterator cend() const
+    {
+        return ConstIterator{this, particle_count};
+    }
 
-    Particle front();
-    Particle back();
-    const Particle front() const;
-    const Particle back() const;
+    Particle front()
+    {
+        return (*this)[0];
+    }
+    Particle back()
+    {
+        return (*this)[particle_count - 1];
+    }
+    const Particle front() const
+    {
+        return (*this)[0];
+    }
+    const Particle back() const
+    {
+        return (*this)[particle_count - 1];
+    }
 
-    bool empty();
-    size_type size();
+    bool empty() const noexcept
+    {
+        return particle_count == 0;
+    }
+    size_type size() const noexcept
+    {
+        return particle_count;
+    }
 
-    Particle operator[](const size_type idx);
-    const Particle operator[](const size_type idx) const;
+    Particle operator[](const size_type idx)
+    {
+        return static_cast<const EmittedParticlesInfo&>(*this)[idx];
+    }
+    const Particle operator[](const size_type idx) const
+    {
+        return {
+            max_lifetimes + idx,
+            lifetimes + idx,
+            x_positions + idx,
+            y_positions + idx,
+            unknown_x_positions + idx,
+            unknown_y_positions + idx,
+            colors + idx,
+            widths + idx,
+            heights + idx,
+            x_velocities + idx,
+            y_velocities + idx,
+        };
+    }
 };
 
 struct ParticleEmitterInfo

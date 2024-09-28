@@ -100,7 +100,18 @@ Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
     return ent;
 }
 
-Entity* Layer::get_grid_entity_at(float x, float y)
+EntityList* Layer::get_entities_overlapping_grid_at(float x, float y) const
+{
+    const uint32_t ix = static_cast<uint32_t>(std::round(x));
+    const uint32_t iy = static_cast<uint32_t>(std::round(y));
+    if (ix < g_level_max_x && iy < g_level_max_y)
+    {
+        return const_cast<EntityList*>(&entities_overlapping_grid[iy][ix]);
+    }
+    return nullptr;
+}
+
+Entity* Layer::get_grid_entity_at(float x, float y) const
 {
     const uint32_t ix = static_cast<uint32_t>(std::round(x));
     const uint32_t iy = static_cast<uint32_t>(std::round(y));
@@ -197,8 +208,8 @@ void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_la
     if (ent)
     {
         const auto pos = ent->position();
-        const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.first));
-        const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.second));
+        const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.x));
+        const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.y));
         if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
         {
             if (grid_entities[current_grid_y][current_grid_x] == ent)
@@ -231,14 +242,14 @@ void Layer::destroy_grid_entity(Entity* ent)
         }
 
         const auto pos = ent->position();
-        const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.first));
-        const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.second));
+        const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.x));
+        const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.y));
         if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
         {
             if (grid_entities[current_grid_y][current_grid_x] == ent)
             {
                 grid_entities[current_grid_y][current_grid_x] = nullptr;
-                update_liquid_collision_at(pos.first, pos.second, false);
+                update_liquid_collision_at(pos.x, pos.y, false);
             }
         }
 

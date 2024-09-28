@@ -8,6 +8,7 @@
 
 #include "aliases.hpp"                  // for ENT_TYPE, LAYER
 #include "containers/custom_vector.hpp" //
+#include "memory.hpp"                   // for memory_read
 #include "state_structs.hpp"            // for JournalProgressStickerSlot, ...
 
 class Entity;
@@ -318,8 +319,14 @@ struct StateMemory
     void force_current_theme(THEME t);
 
     /// Returns animation_frame of the correct ushabti
-    uint16_t get_correct_ushabti();
-    void set_correct_ushabti(uint16_t animation_frame);
+    uint16_t get_correct_ushabti() const
+    {
+        return (correct_ushabti + (correct_ushabti / 10) * 2);
+    }
+    void set_correct_ushabti(uint16_t animation_frame)
+    {
+        correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
+    }
 };
 #pragma pack(pop)
 
@@ -354,13 +361,13 @@ struct State
 
     void godmode(bool g);
     void godmode_companions(bool g);
-    void darkmode(bool g);
+    static void darkmode(bool g);
 
-    void zoom(float level);
-    void zoom_reset();
+    void zoom(float level) const;
+    static void zoom_reset();
 
-    static std::pair<float, float> click_position(float x, float y);
-    static std::pair<float, float> screen_position(float x, float y);
+    static Vec2 click_position(float x, float y);
+    static Vec2 screen_position(float x, float y);
 
     uint32_t flags() const
     {
@@ -385,15 +392,16 @@ struct State
 
     static Entity* find(StateMemory* state, uint32_t uid);
 
-    static std::pair<float, float> get_camera_position();
+    static Vec2 get_camera_position();
     void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
     SaveData* savedata();
-    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type);
-    size_t get_location()
+    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type) const;
+    // Get the 0x4A0 offset
+    size_t get_offset() const
     {
-        return this->location;
+        return memory_read<size_t>(location);
     }
 
   private:
@@ -409,7 +417,7 @@ void init_process_input_hook();
 void init_game_loop_hook();
 void init_state_clone_hook();
 
-uint8_t enum_to_layer(const LAYER layer, std::pair<float, float>& player_position);
+uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
 uint8_t enum_to_layer(const LAYER layer);
 
 uint32_t lowbias32(uint32_t x);

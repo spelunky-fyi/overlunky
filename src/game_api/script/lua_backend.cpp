@@ -6,9 +6,10 @@
 #include <fmt/format.h> // for format_error
 #include <list>         // for _List_iterator, _List_co...
 #include <sol/sol.hpp>  // for table_proxy, optional
-#include <stack>        // for stack
-#include <tuple>        // for get
-#include <vector>       // for vector
+#include <sol/types.hpp>
+#include <stack>  // for stack
+#include <tuple>  // for get
+#include <vector> // for vector
 
 #include "aliases.hpp"                      // for IMAGE, JournalPageType
 #include "bucket.hpp"                       // for Bucket
@@ -81,7 +82,7 @@ LuaBackend::~LuaBackend()
 
     {
         std::lock_guard lock{global_lua_lock};
-        std::erase_if(g_all_backends, [=](const std::unique_ptr<ProtectedBackend>& protected_backend)
+        std::erase_if(g_all_backends, [this](const std::unique_ptr<ProtectedBackend>& protected_backend)
                       { return protected_backend.get() == self; });
     }
 }
@@ -188,12 +189,6 @@ void LuaBackend::clear_all_callbacks()
     lua["on_death"] = sol::lua_nil;
     lua["on_win"] = sol::lua_nil;
     lua["on_screen"] = sol::lua_nil;
-}
-
-bool LuaBackend::reset()
-{
-    clear();
-    return true;
 }
 
 CustomMovableBehavior* LuaBackend::get_custom_movable_behavior(std::string_view name)
@@ -1687,7 +1682,7 @@ bool LuaBackend::pre_set_feat(FEAT feat)
     return false;
 }
 
-CurrentCallback LuaBackend::get_current_callback()
+CurrentCallback LuaBackend::get_current_callback() const
 {
     return current_cb;
 }
@@ -1899,6 +1894,42 @@ void LuaBackend::on_post(ON event)
     }
 }
 
+sol::table deepcopy_lua_table(sol::state& sol_state, sol::table& from_r)
+{
+    sol::table new_table(sol_state, sol::create);
+    for (auto& [k, v] : from_r.as<sol::table>())
+    {
+        if (v.is<sol::table>())
+        {
+            sol::table v_table = v.as<sol::table>();
+            new_table.raw_set(k, deepcopy_lua_table(sol_state, v_table));
+        }
+        else
+        {
+            new_table.raw_set(k, v);
+        }
+    }
+    auto maybe_metatable = from_r.raw_get<sol::optional<sol::table>>(sol::metatable_key);
+    if (maybe_metatable)
+    {
+        new_table.raw_set(sol::metatable_key, maybe_metatable.value());
+    }
+    return new_table;
+}
+
+inline sol::object deepcopy_lua(sol::state& sol_state, sol::object& from)
+{
+    if (from.is<sol::table>())
+    {
+        auto from_t = from.as<sol::table>();
+        return deepcopy_lua_table(sol_state, from_t);
+    }
+    else
+    {
+        return from;
+    }
+}
+
 void LuaBackend::copy_locals(StateMemory* from, StateMemory* to)
 {
     if (!local_state_datas.contains(from))
@@ -1915,7 +1946,7 @@ void LuaBackend::copy_locals(StateMemory* from, StateMemory* to)
     sol::object from_user_data = from_data.user_data;
     if (from_user_data != sol::lua_nil)
     {
-        to_data.user_data = (*vm)["deepcopy_object"](from_user_data);
+        to_data.user_data = deepcopy_lua(*vm, from_user_data);
     }
 }
 

@@ -143,19 +143,6 @@ bool ScriptImpl::reset()
         return false;
     }
 }
-bool ScriptImpl::pre_update()
-{
-    if (changed)
-    {
-        result = "";
-        changed = false;
-        if (!reset())
-        {
-            return false;
-        }
-    }
-    return true;
-}
 
 void ScriptImpl::set_enabled(bool enbl)
 {
@@ -173,39 +160,6 @@ void ScriptImpl::set_enabled(bool enbl)
         }
     }
     enabled = enbl;
-}
-bool ScriptImpl::get_enabled() const
-{
-    return enabled;
-}
-
-bool ScriptImpl::get_unsafe() const
-{
-    return meta.unsafe;
-}
-const char* ScriptImpl::get_name() const
-{
-    return meta.stem.c_str();
-}
-const char* ScriptImpl::get_path() const
-{
-    return meta.file.c_str();
-}
-const char* ScriptImpl::get_id() const
-{
-    return meta.id.c_str();
-}
-const char* ScriptImpl::get_version() const
-{
-    return meta.version.c_str();
-}
-const char* ScriptImpl::get_root() const
-{
-    return meta.path.c_str();
-}
-const std::filesystem::path& ScriptImpl::get_root_path() const
-{
-    return script_folder;
 }
 
 std::string ScriptImpl::execute(std::string str, bool raw)

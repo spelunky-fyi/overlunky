@@ -51,8 +51,15 @@ replace_table = {
     "sol::": "",
     "void": "",
     "constexpr": "",
-    "const": "",
+    "const ": "",
     "static": "",
+    "[[nodiscard]]": "",
+    "[[maybe_unused]]": "",
+    "inline ": "",
+    "self_return<&": "",
+    ">()": "",
+    "unsigned": "",
+    "sol::no_constructor": "",
     # special
     "variadic_args va": "ENT_TYPE, ENT_TYPE...",
     "EmittedParticlesInfo": "array<Particle>",
@@ -162,6 +169,7 @@ api_files = [
     "../src/game_api/script/usertypes/steam_lua.cpp",
     "../src/game_api/script/usertypes/logic_lua.cpp",
     "../src/game_api/script/usertypes/bucket_lua.cpp",
+    "../src/game_api/script/usertypes/color_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
@@ -207,6 +215,22 @@ def cb_signature_dict(ret, param):
         "param": param,
     }
 
+def custom_split(var):
+    result = []
+    level = 0
+    current = ""
+    for char in var:
+        if char == ',' and level == 0:
+            result.append(current.strip())
+            current = ""
+        else:
+            current += char
+            if char == '[' or char == '(' or char == '<':
+                level += 1
+            elif char == ']' or char == ')' or char == '>':
+                level -= 1
+    result.append(current.strip())
+    return result
 
 def get_cb_signature(text):
     signature_ms = reSignature.findall(text)
@@ -611,11 +635,11 @@ def run_parse():
     for file in api_files:
         data = open(file, "r").read()
         data = data.replace("\n", "")
-        data = re.sub(r" ", "", data)
+        data = fix_spaces(data)
         reParticleHelper = re.compile(r"MakeParticleMemberAccess<(.+?)>\(\)")
         data = reParticleHelper.sub(r"\1", data)
         m = re.findall(
-            r'(auto([a-z]+_type)=)?lua\.new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",?(.*?)\);',
+            r'(auto ([a-z]+_type) =)? lua\.new_usertype\<([^\>]*?)\>\s*\(\s*"([^"]*)",?(.*?)\);',
             data,
         )
         for type in m:
@@ -626,7 +650,7 @@ def run_parse():
             if container:
                 extra = []
                 n = re.findall(
-                    r"(?<!NoDoc)" + container + r'\[("[^"]+")\]=([^;]+);', data
+                    r"(?<! NoDoc )" + container + r'\[([\w":]+)\] = ([^;]+);', data
                 )
                 for var in n:
                     extra.append(",".join(var))
@@ -639,7 +663,7 @@ def run_parse():
             base = ""
             bm = re.search(r"sol::bases<([^\]]*)>", attr)
             if bm:
-                base = bm.group(1)
+                base = bm.group(1).replace(" ", "")
             attr = attr.replace('",', ",")
             attr = attr.split('"')
             vars = []
@@ -669,10 +693,10 @@ def run_parse():
                     continue
                 if not var:
                     continue
-                var = var.split(",")
+                var = custom_split(var)
                 if len(var) < 2:
                     continue
-                if var[0] == "sol::base_classes" or var[0] == "sol::no_constructor":
+                if var[0] == "sol::no_constructor":
                     continue
                 if "NoDoc" in var[0]:
                     skip = True
@@ -687,11 +711,11 @@ def run_parse():
                     var[1] = var[1][:-1]
 
                 var_name = var[0]
-                cpp = var[1]
+                cpp = replace_fun(var[1]) # should probably be done later, so the regex doesn't have to relay on some of the changes, also generate_emmylua.py uses some unique formats replacements
 
                 if var[1].startswith("sol::property"):
                     param_match = re.match(
-                        rf"sol::property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
+                        rf"property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
                         cpp,
                     )
                     if param_match:
@@ -707,8 +731,8 @@ def run_parse():
                         cpp_name = cpp
                 else:
                     cpp_name = cpp[cpp.find("::") + 2 :] if cpp.find("::") >= 0 else cpp
-
-                if var[0].startswith("sol::constructors"):
+                
+                if var_name.startswith("sol::constructors"):
                     for fun in underlying_cpp_type["member_funs"][cpp_type]:
                         param = fun["param"]
 
@@ -721,6 +745,34 @@ def run_parse():
                                 "comment": fun["comment"],
                             }
                         )
+                elif cpp.startswith("[]("):
+                    param_match = re.match(r"\[\]\(([\w &*:,]+)?\) -> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp)
+                    if param_match:
+                        ret = param_match.group(2)
+                        if ret is None:
+                            ret = "nil"
+                            
+                        sig = param_match.group(1)
+                        if sig.startswith(cpp_type): # remove the self parameter if present
+                            first_param_end = sig.find(",") + 1
+                            if first_param_end == 0:
+                                sig = ""
+                            else:
+                                sig = sig[first_param_end:].strip()
+                        vars.append(
+                            {
+                                "name": var_name,
+                                "type": cpp,
+                                "signature": f"{ret} {var_name}({sig})",
+                                "comment": "",
+                                "function": True,
+                                "cb_signature": "",
+                            }
+                        )
+                elif var_name.startswith("sol::base_classes"):
+                    bm = re.search(r"bases<([^\]]*)", cpp)
+                    if bm:
+                        base = bm.group(1).replace(" ", "")
                 elif cpp_name in underlying_cpp_type["member_funs"]:
                     for fun in underlying_cpp_type["member_funs"][cpp_name]:
                         ret = fun["return"] or "nil"
@@ -775,7 +827,7 @@ def run_parse():
                         )
                     else:
                         m_return_type = re.search(
-                            r"->([:<>\w*]+){", var[1]
+                            r"-> ([:<>\w\[\], *]+) {", var[1]
                         )  # Use var[1] instead of cpp because it could be replaced on the sol::property stuff
                         if m_return_type:
                             type = replace_fun(m_return_type[1])

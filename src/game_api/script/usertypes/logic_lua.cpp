@@ -312,6 +312,12 @@ void register_usertypes(sol::state& lua)
     /// Used in LogicList
     lua.new_usertype<LogicUnderwaterBubbles>(
         "LogicUnderwaterBubbles",
+        "gravity_direction",
+        &LogicUnderwaterBubbles::gravity_direction,
+        "droplets_spawn_chance",
+        &LogicUnderwaterBubbles::droplets_spawn_chance,
+        "droplets_enabled",
+        &LogicUnderwaterBubbles::droplets_enabled,
         sol::base_classes,
         sol::bases<Logic>());
     /// Used in LogicList

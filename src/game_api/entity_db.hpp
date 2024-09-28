@@ -14,6 +14,7 @@
 
 #include "aliases.hpp"                       // for ENT_TYPE, LAYER, TEXTURE, STRINGID
 #include "color.hpp"                         // for Color
+#include "containers/custom_vector.hpp"      // for custom_vector
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/identity_hasher.hpp"    // for identity_hasher
 #include "entity_structs.hpp"                // for CollisionInfo
@@ -58,7 +59,7 @@ struct EntityDB
     };
     /// MASK, will only call collision2 when colliding with entities that match this mask.
     int32_t collision2_mask;
-    /// MASK used for collision with floors.
+    /// MASK used for collision with floors, walls etc.
     int32_t collision_mask;
     int32_t field_44;
     int32_t default_flags;
@@ -77,13 +78,17 @@ struct EntityDB
         Color default_color;
         struct
         {
+            /// NoDoc
             float glow_red;
+            /// NoDoc
             float glow_green;
+            /// NoDoc
             float glow_blue;
+            /// NoDoc
             float glow_alpha;
         };
     };
-    int32_t texture_id;
+    TEXTURE texture_id;
     int32_t technique;
     int32_t tile_x;
     int32_t tile_y;
@@ -106,7 +111,7 @@ struct EntityDB
     float default_special_offsety;
     uint8_t init;
 
-    EntityDB(const EntityDB& other);
+    EntityDB(const EntityDB& other) = default;
     EntityDB(const ENT_TYPE other);
 };
 
@@ -127,28 +132,22 @@ struct EntityItem
     }
 };
 
-struct EntityBucket
-{
-    void** begin;
-    void** current; // Note, counts down from end to begin instead of up from begin to end :shrug:
-    void** end;
-};
 struct EntityPool
 {
     std::uint32_t slot_size;
     std::uint32_t initial_slots;
     std::uint32_t slots_growth;
     std::uint32_t current_slots;
-    std::uint64_t _ulong_0;
-    EntityBucket* _some_bucket;
-    EntityBucket* bucket;
+    std::uint64_t unknown;
+    custom_vector<size_t>* pools_begin;   // saved the first entity address that causes the slot size to increase (including the initial)
+    custom_vector<size_t>* empty_buckets; // empty entity slots
 };
 struct EntityFactory
 {
     EntityDB types[0x395];
     bool type_set[0x395];
-    std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map;
-    EntityMap entity_map;
+    std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map; // game_unorderedmap probably
+    EntityMap entity_map;                                                             // game_unorderedmap probably
     void* _ptr_7;
 };
 

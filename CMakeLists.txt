@@ -43,6 +43,10 @@ add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
 add_compile_definitions(NOMINMAX)
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
 
+# Fix MSVC 19.40 crash with mutex due to spelunky using an old redist (mscvp140.dll)
+# Related links: https://github.com/microsoft/STL/releases/tag/vs-2022-17.10 | https://github.com/actions/runner-images/issues/10004
+add_compile_definitions(_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
+
 if(BUILD_OVERLUNKY)
   add_compile_definitions(SPEL2_EDITABLE_SCRIPTS)
   add_compile_definitions(SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS)

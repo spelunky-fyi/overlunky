@@ -6,9 +6,7 @@
 #include <utility>     // for min, find_if
 
 CmdLineParser::CmdLineParser(int argc, char** argv)
-    : m_CmdLine(argv, argv + argc)
-{
-}
+    : m_CmdLine(argv, argv + argc){};
 
 std::vector<std::string_view> CmdLineParser::Get(std::string_view arg, has_args_tag) const
 {

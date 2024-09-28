@@ -519,7 +519,7 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     {
         if (texture_id < -3)
         {
-            texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture(texture_id);
+            texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture((DYNAMIC_TEXTURE)texture_id);
         }
         entity->texture = get_textures()->texture_map[texture_id];
     }

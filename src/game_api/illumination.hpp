@@ -69,7 +69,7 @@ struct Illumination
     };
 };
 
-Illumination* create_illumination(Vec2 pos, Color color, LIGHT_TYPE type, float size, uint8_t flags, int32_t uid, LAYER layer);
-Illumination* create_illumination(Color color, float size, float x, float y);
-Illumination* create_illumination(Color color, float size, int32_t uid);
+[[nodiscard]] Illumination* create_illumination(Vec2 pos, Color color, LIGHT_TYPE type, float size, uint8_t flags, int32_t uid, LAYER layer);
+[[nodiscard]] Illumination* create_illumination(Color color, float size, float x, float y);
+[[nodiscard]] Illumination* create_illumination(Color color, float size, int32_t uid);
 void refresh_illumination(Illumination* illumination);

@@ -12,10 +12,7 @@
 
 bool entity_type_check(const std::vector<ENT_TYPE>& types_array, const ENT_TYPE find)
 {
-    if (types_array.empty() || types_array[0] == 0 || std::find(types_array.begin(), types_array.end(), find) != types_array.end())
-        return true;
-
-    return false;
+    return (types_array.empty() || types_array[0] == 0 || std::find(types_array.begin(), types_array.end(), find) != types_array.end());
 }
 
 std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
@@ -52,28 +49,22 @@ int32_t get_grid_entity_at(float x, float y, LAYER layer)
     return -1;
 }
 
-std::vector<uint32_t> get_entities()
+std::vector<uint32_t> get_entities_overlapping_grid(float x, float y, LAYER layer)
 {
-    return get_entities_by({}, 0, LAYER::BOTH);
-}
-
-std::vector<uint32_t> get_entities_by_layer(LAYER layer)
-{
-    return get_entities_by({}, 0, layer);
-}
-
-std::vector<uint32_t> get_entities_by_type(std::vector<ENT_TYPE> entity_types)
-{
-    return get_entities_by(std::move(entity_types), 0, LAYER::BOTH);
-}
-std::vector<uint32_t> get_entities_by_type(ENT_TYPE entity_type)
-{
-    return get_entities_by(std::vector<ENT_TYPE>{entity_type}, 0, LAYER::BOTH);
-}
-
-std::vector<uint32_t> get_entities_by_mask(uint32_t mask)
-{
-    return get_entities_by({}, mask, LAYER::BOTH);
+    auto& state = State::get();
+    uint8_t actual_layer = enum_to_layer(layer);
+    std::vector<uint32_t> uids;
+    auto entities = state.layer(actual_layer)->get_entities_overlapping_grid_at(x, y);
+    if (entities)
+        uids.insert(uids.end(), entities->uids().begin(), entities->uids().end());
+    if (layer == LAYER::BOTH)
+    {
+        // enum_to_layer returns 0 for LAYER::BOTH, so we only need to add entities from second layer
+        auto entities2 = state.layer(1)->get_entities_overlapping_grid_at(x, y);
+        if (entities2)
+            uids.insert(uids.end(), entities2->uids().begin(), entities2->uids().end());
+    }
+    return uids;
 }
 
 template <class FunT>
@@ -162,11 +153,6 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     return found;
 }
 
-std::vector<uint32_t> get_entities_by(ENT_TYPE entity_type, uint32_t mask, LAYER layer)
-{
-    return get_entities_by(std::vector<ENT_TYPE>{entity_type}, mask, layer);
-}
-
 std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
     // TODO: use entity regions?
@@ -197,11 +183,6 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     return found;
 }
 
-std::vector<uint32_t> get_entities_at(ENT_TYPE entity_type, uint32_t mask, float x, float y, LAYER layer, float radius)
-{
-    return get_entities_at(std::vector<ENT_TYPE>{entity_type}, mask, x, y, layer, radius);
-}
-
 std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
 {
     // TODO: use entity regions?
@@ -222,19 +203,6 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> enti
     }
     return result;
 }
-std::vector<uint32_t> get_entities_overlapping_hitbox(ENT_TYPE entity_type, uint32_t mask, AABB hitbox, LAYER layer)
-{
-    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, hitbox, layer);
-}
-
-std::vector<uint32_t> get_entities_overlapping(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
-{
-    return get_entities_overlapping_hitbox(std::move(entity_types), mask, {sx, sy2, sx2, sy}, layer);
-}
-std::vector<uint32_t> get_entities_overlapping(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, LAYER layer)
-{
-    return get_entities_overlapping_hitbox(std::vector<ENT_TYPE>{entity_type}, mask, {sx, sy2, sx2, sy}, layer);
-}
 
 std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
 {
@@ -250,10 +218,6 @@ std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> 
                      } });
 
     return found;
-}
-std::vector<uint32_t> get_entities_overlapping_by_pointer(ENT_TYPE entity_type, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
-{
-    return get_entities_overlapping_by_pointer(std::vector<ENT_TYPE>{entity_type}, mask, sx, sy, sx2, sy2, layer);
 }
 
 bool entity_has_item_uid(uint32_t uid, uint32_t item_uid)
@@ -280,10 +244,6 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
         }
     }
     return false;
-}
-bool entity_has_item_type(uint32_t uid, ENT_TYPE entity_type)
-{
-    return entity_has_item_type(uid, std::vector<ENT_TYPE>{entity_type});
 }
 
 std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask)
@@ -312,15 +272,6 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
         }
     }
     return found;
-}
-std::vector<uint32_t> entity_get_items_by(uint32_t uid, ENT_TYPE entity_type, uint32_t mask)
-{
-    return entity_get_items_by(uid, std::vector<ENT_TYPE>{entity_type}, mask);
-}
-
-std::vector<uint32_t> get_entities_by_draw_depth(uint8_t draw_depth, LAYER l)
-{
-    return get_entities_by_draw_depth(std::vector<uint8_t>{draw_depth}, l);
 }
 
 std::vector<uint32_t> get_entities_by_draw_depth(std::vector<uint8_t> draw_depths, LAYER l)

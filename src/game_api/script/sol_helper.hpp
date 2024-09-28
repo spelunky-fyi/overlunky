@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <span>
 #include <stdexcept>
+#include <tuple>
 
 template <class T>
 struct ZeroIndexArray
@@ -93,3 +94,42 @@ struct usertype_container<ZeroIndexArray<T>>
     }
 };
 } // namespace sol
+
+namespace detail
+{
+template <typename M>
+struct extract;
+template <typename R, class C, typename... Args>
+struct extract<R (C::*)(Args...)>
+{
+    using BaseType = C;
+    using ReturnType = R;
+    using Params = std::tuple<Args...>;
+};
+} // namespace detail
+
+namespace
+{
+template <typename, typename, auto>
+struct proFunc;
+
+template <template <typename...> class C, typename... Ts, typename T, auto fun>
+struct proFunc<C<Ts...>, T, fun>
+{
+    static auto func(sol::object obj, Ts... args)
+    {
+        (obj.as<T&>().*fun)(std::forward<Ts>(args)...);
+        return obj;
+    };
+};
+} // namespace
+
+template <auto fun>
+auto self_return()
+{
+    static_assert(std::is_member_function_pointer_v<decltype(fun)>);
+    using T = typename detail::extract<decltype(fun)>::BaseType;
+    using _tuple = typename detail::extract<decltype(fun)>::Params;
+
+    return proFunc<_tuple, T, fun>::func;
+}

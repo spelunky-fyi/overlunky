@@ -285,9 +285,9 @@ class Generator : public Floor
     int32_t spawned_uid;
     uint16_t set_timer;
     uint16_t timer;
-    /// works only for star challenge
+    /// Applicable only for ENT_TYPE`.FLOOR_SUNCHALLENGE_GENERATOR`
     uint8_t start_counter;
-    /// works only for star challenge
+    /// Applicable only for ENT_TYPE`.FLOOR_SUNCHALLENGE_GENERATOR`
     bool on_off;
 
     virtual void randomize_timer() = 0; // called after it spawns entity and it's "ready" (have proper flags set etc.)

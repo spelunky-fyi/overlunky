@@ -45,47 +45,49 @@ class ExecutableMemory
 };
 struct Memory
 {
-    size_t exe_ptr;
-    size_t after_bundle;
+    static Memory& get();
 
-    static Memory& get()
-    {
-        static Memory mem{[]()
-                          {
-                              auto exe = (size_t)GetModuleHandleA(NULL);
-
-                              // Skipping bundle for faster memory search
-                              auto after_bundle_ = find_after_bundle(exe);
-
-                              return Memory{
-                                  exe,
-                                  after_bundle_,
-                              };
-                          }()};
-        return mem;
-    }
-
-    size_t at_exe(size_t offset)
+    size_t at_exe(size_t offset) const
     {
         return exe_ptr + offset;
     }
 
     char* exe()
     {
-        return (char*)exe_ptr;
+        return reinterpret_cast<char*>(exe_ptr);
+    }
+    size_t exe_address() const
+    {
+        return exe_ptr;
+    }
+    size_t after_bundle_address() const
+    {
+        return after_bundle;
     }
     static size_t decode_call(size_t off)
     {
-        auto memory = get();
+        auto& memory = get();
         return off + (*(int32_t*)(&memory.exe()[off + 1])) + 5;
     }
+
+  private:
+    size_t exe_ptr;
+    size_t after_bundle;
+    Memory(size_t ptr, size_t ab)
+        : exe_ptr(ptr), after_bundle(ab){};
+
+    Memory(const Memory&) = delete;
+    Memory& operator=(const Memory&) = delete;
+    ~Memory(){};
 };
 
-LPVOID alloc_mem_rel32(size_t addr, size_t size);
+[[nodiscard]] LPVOID alloc_mem_rel32(size_t addr, size_t size);
 void write_mem_prot(size_t addr, std::string_view payload, bool prot);
 void write_mem_prot(size_t addr, std::string payload, bool prot);
 void write_mem(size_t addr, std::string payload);
 size_t function_start(size_t off, uint8_t outside_byte = '\xcc');
+// save copy of the oryginal memory so it can be later recovered via recover_mem
+void save_mem_recoverable(std::string name, size_t addr, size_t size, bool prot);
 void write_mem_recoverable(std::string name, size_t addr, std::string_view payload, bool prot);
 void recover_mem(std::string name, size_t addr = NULL);
 bool mem_written(std::string name);
