@@ -8,6 +8,7 @@
 
 #include "aliases.hpp"                  // for ENT_TYPE, LAYER
 #include "containers/custom_vector.hpp" //
+#include "memory.hpp"                   // for memory_read
 #include "state_structs.hpp"            // for JournalProgressStickerSlot, ...
 
 class Entity;
@@ -310,6 +311,10 @@ struct StateMemory
     uint8_t unknown43;
     uint32_t unknown44; // probably padding
 
+    /* for the autodoc
+    any user_data;
+    */
+
     /// This function should only be used in a very specific circumstance (forcing the exiting theme when manually transitioning). Will crash the game if used inappropriately!
     void force_current_theme(THEME t);
 
@@ -381,6 +386,7 @@ struct State
 
     uint32_t get_frame_count_main() const;
     uint32_t get_frame_count() const;
+    static uint32_t get_frame_count(StateMemory* state);
 
     std::vector<int64_t> read_prng() const;
 
@@ -392,6 +398,11 @@ struct State
     void set_seed(uint32_t seed);
     SaveData* savedata();
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type) const;
+    // Get the 0x4A0 offset
+    size_t get_offset() const
+    {
+        return memory_read<size_t>(location);
+    }
 
   private:
     State(size_t addr)
@@ -404,6 +415,7 @@ struct State
 void init_state_update_hook();
 void init_process_input_hook();
 void init_game_loop_hook();
+void init_state_clone_hook();
 
 uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
 uint8_t enum_to_layer(const LAYER layer);

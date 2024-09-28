@@ -1216,10 +1216,10 @@ function set_level_string(str) end
 ---@return nil
 function set_ending_unlock(type) end
 ---Get the thread-local version of state
----@return nil
+---@return StateMemory
 function get_local_state() end
 ---Get the thread-local version of players
----@return nil
+---@return Player[]
 function get_local_players() end
 ---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 ---@param dir string?
@@ -1436,7 +1436,7 @@ function get_raw_input() end
 ---@return nil
 function seed_prng(seed) end
 ---Get the thread-local version of prng
----@return nil
+---@return PRNG
 function get_local_prng() end
 ---Same as `Player.get_name`
 ---@param type_id ENT_TYPE
@@ -2222,6 +2222,7 @@ do
     ---@field liquid LiquidPhysics
     ---@field next_entity_uid integer @Next entity spawned will have this uid
     ---@field room_owners RoomOwnersInfo @Holds info about owned rooms and items (shops, challenge rooms, vault etc.)
+    ---@field user_data any
 
 ---@class LightParams
     ---@field red number

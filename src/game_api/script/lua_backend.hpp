@@ -28,6 +28,7 @@
 #include "hook_handler.hpp" // for HookHandler
 #include "level_api.hpp"    // IWYU pragma: keep
 #include "logger.h"         // for DEBUG
+#include "online_util.hpp"  // for VectorEditTracked, UMapEditTracked
 #include "script.hpp"       // for ScriptMessage, ScriptImage (ptr only), Scri...
 #include "util.hpp"         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
@@ -139,6 +140,7 @@ enum class ON
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
+    // PRE_COPY_STATE,
 };
 
 struct IntOption
@@ -284,6 +286,17 @@ class SoundManager;
 class LuaConsole;
 struct RenderInfo;
 
+struct LocalStateData
+{
+    sol::object user_data;
+    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
+    UMapEditTracked<int, TimerCallback> level_timers;
+    UMapEditTracked<int, ScreenCallback> callbacks;
+    UMapEditTracked<int, ScreenCallback> save_callbacks;
+    VectorEditTracked<int> clear_callbacks;
+    int cbcount = 0;
+};
+
 class LuaBackend
     : public HookHandler<Entity, CallbackType::Entity>,
       public HookHandler<RenderInfo, CallbackType::Entity>,
@@ -300,18 +313,13 @@ class LuaBackend
     std::unordered_set<std::string> loaded_modules;
 
     std::string result;
-    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
 
-    int cbcount = 0;
     CurrentCallback current_cb = {0, 0, CallbackType::None};
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
-    std::unordered_map<int, TimerCallback> level_timers;
     std::unordered_map<int, TimerCallback> global_timers;
-    std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
-    std::unordered_map<int, ScreenCallback> save_callbacks;
     std::unordered_map<int, HotKeyCallback> hotkey_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_tile_code_callbacks;
@@ -321,7 +329,6 @@ class LuaBackend
     std::vector<EntityInstagibCallback> pre_entity_instagib_callbacks;
     std::vector<std::uint32_t> chance_callbacks;
     std::vector<std::uint32_t> extra_spawn_callbacks;
-    std::vector<int> clear_callbacks;
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
@@ -331,6 +338,7 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
+    std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
     bool manual_save{false};
     uint32_t last_save{0};
 
@@ -349,6 +357,9 @@ class LuaBackend
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
 
+    const LocalStateData* get_locals_const() const;
+    LocalStateData& get_locals();
+    void copy_locals(StateMemory* from, StateMemory* to);
     void clear();
     void clear_all_callbacks();
     bool update();
@@ -462,6 +473,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
+    void pre_copy_state(StateMemory* from, StateMemory* to);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);

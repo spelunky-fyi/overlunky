@@ -26,6 +26,7 @@ bool pre_unload_level();
 bool pre_unload_layer(LAYER layer);
 bool pre_save_state(int slot, StateMemory* saved);
 bool pre_load_state(int slot, StateMemory* loaded);
+void pre_copy_state_event(StateMemory* from, StateMemory* to);
 
 void post_load_screen();
 void post_init_layer(LAYER layer);

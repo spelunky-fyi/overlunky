@@ -1840,6 +1840,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        // Put write bp on state.win_state and enter a multiplayer game
+        "heap_clone"sv,
+        PatternCommandBuffer{}
+            .find_inst("4c 8d 05 f4 ca 27 00"_gh)
+            .find_next_inst("eb 27"_gh)
+            .offset(-0xC)
+            .at_exe(),
+    },
+    {
         // ^ writes to state.pause on state.loading == 3
         "unpause_level"sv,
         PatternCommandBuffer{}
