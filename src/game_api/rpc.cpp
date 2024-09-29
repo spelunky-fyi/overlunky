@@ -69,19 +69,20 @@ void attach_entity(Entity* overlay, Entity* attachee)
 {
     if (attachee->overlay)
     {
-        overlay->remove_item_ptr(attachee);
+        if (attachee->overlay == overlay)
+            return;
+
+        attachee->overlay->remove_item(attachee, false);
     }
 
-    auto [x, y] = overlay->position();
+    auto [x, y] = overlay->abs_position();
     attachee->x -= x;
     attachee->y -= y;
     attachee->special_offsetx = attachee->x;
     attachee->special_offsety = attachee->y;
     attachee->overlay = overlay;
 
-    using AddItemPtr = void(EntityList*, Entity*, bool);
-    static AddItemPtr* add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
-    add_item_ptr(&overlay->items, attachee, false);
+    overlay->items.insert(attachee, false);
 }
 
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
@@ -102,17 +103,17 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
         static const auto ball_entity_type = to_id("ENT_TYPE_ITEM_PUNISHBALL");
         static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
 
-        auto [x, y, l] = get_position(uid);
-        auto* layer_ptr = State::get().layer(l);
+        auto pos = entity->abs_position();
+        auto* layer_ptr = State::get().layer(entity->layer);
 
-        PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, x + off_x, y + off_y, false, 0.0f, 0.0f, false);
+        PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, pos.x + off_x, pos.y + off_y, false, 0.0f, 0.0f, false);
 
         ball->attached_to_uid = uid;
 
         const uint8_t chain_length = 15;
         for (uint8_t i = 0; i < chain_length; i++)
         {
-            StretchChain* chain = (StretchChain*)layer_ptr->spawn_entity(chain_entity_type, x, y, false, 0.0f, 0.0f, false);
+            StretchChain* chain = (StretchChain*)layer_ptr->spawn_entity(chain_entity_type, pos.x, pos.y, false, 0.0f, 0.0f, false);
             chain->animation_frame -= (i % 2);
 
             chain->at_end_of_chain_uid = ball->uid;
@@ -131,10 +132,6 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)
     {
         if (Entity* top = get_entity_ptr(top_uid))
         {
-            if (top->overlay)
-            {
-                top->overlay->remove_item_ptr(top);
-            }
             attach_entity(bottom, top);
             top->x = offset[0];
             top->y = offset[1];
@@ -159,7 +156,15 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
         }
         else
         {
-            ent->teleport_abs(x, y, vx, vy);
+            ent->detach(false);
+            ent->x = x;
+            ent->y = y;
+            if (ent->is_movable())
+            {
+                auto movable_ent = ent->as<Movable>();
+                movable_ent->velocityx = vx;
+                movable_ent->velocityy = vy;
+            }
         }
     }
 }
@@ -177,7 +182,15 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER l
         }
         else
         {
-            ent->teleport_abs(offset.x + x, offset.y + y, vx, vy);
+            ent->detach(false);
+            ent->x = offset.x + x;
+            ent->y = offset.y + y;
+            if (ent->is_movable())
+            {
+                auto movable_ent = ent->as<Movable>();
+                movable_ent->velocityx = vx;
+                movable_ent->velocityy = vy;
+            }
             ent->set_layer(layer);
         }
     }
@@ -342,12 +355,15 @@ void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
     container->as<Container>()->inside = item_entity_type;
 }
 
-void entity_remove_item(uint32_t uid, uint32_t item_uid)
+void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> check_autokill)
 {
     Entity* entity = get_entity_ptr(uid);
     if (entity == nullptr)
         return;
-    entity->remove_item(item_uid);
+
+    auto entity_item = get_entity_ptr(item_uid);
+    if (entity_item)
+        entity->remove_item(entity_item, check_autokill.value_or(true));
 }
 
 void lock_door_at(float x, float y)
@@ -577,14 +593,25 @@ void pick_up(uint32_t who_uid, uint32_t what_uid)
     }
 }
 
-void drop(uint32_t who_uid, uint32_t what_uid)
+void drop(uint32_t who_uid, std::optional<uint32_t> what_uid)
 {
-    Movable* ent = (Movable*)get_entity_ptr(who_uid);
-    Movable* item = (Movable*)get_entity_ptr(what_uid);
-    if (ent != nullptr && item != nullptr)
+    auto ent = get_entity_ptr(who_uid);
+    if (ent == nullptr)
+        return;
+
+    if (!ent->is_movable()) // game would probably use the is_player_or_monster function here, since they are the only ones who should be able to hold something
+        return;
+
+    auto mov = ent->as<Movable>();
+    if (what_uid.has_value()) // should we handle what_uid = -1 the same way?
     {
-        ent->drop(item);
+        auto item = get_entity_ptr(what_uid.value());
+        if (item == nullptr)
+            return;
+        if (item->overlay != mov && mov->holding_uid == what_uid)
+            return;
     }
+    mov->drop();
 }
 
 void unequip_backitem(uint32_t who_uid)
@@ -1208,7 +1235,10 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
         Vec2 offset;
         const auto actual_layer = enum_to_layer(layer, offset);
         state.layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state.layer(actual_layer));
-        entity->teleport_abs(offset.x + x, offset.y + y, 0, 0);
+
+        entity->detach(false);
+        entity->x = offset.x + x;
+        entity->y = offset.y + y;
         entity->set_layer(layer);
     }
 }

@@ -96,7 +96,7 @@ class PowerupCapable : public Movable
     int32_t worn_backitem();
 
     // those could be wrong because of the update
-    virtual void on_blood_collision() = 0; // only triggers when player has kapala
+    virtual bool on_blood_collision() = 0; // only triggers when player has kapala
 
     // called for stunned entities, check bunch of stuff like state, hold entity, standing on entity etc. runs until returned 1
     // this is used to clear the last_owner of stunned entity when it is no longed stunned
@@ -146,7 +146,7 @@ class Player : public PowerupCapable
     /// Check whether the character is female, will be `true` if the character was modded to be female as well.
     bool is_female();
 
-    /// Set the heart color the character.
+    /// Set the heart color for the character.
     void set_heart_color(Color hcolor);
     /// Drops from ladders, ropes and ledge grabs
     void let_go();

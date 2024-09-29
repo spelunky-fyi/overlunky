@@ -330,7 +330,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
-        auto test_pos = current_piece->position();
+        auto test_pos = current_piece->abs_position();
 
         if (static_cast<int>(test_pos.x) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.x + 1, test_pos.y) == nullptr &&
             prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
@@ -543,7 +543,7 @@ void fix_impostor_lake_positions()
     for (auto& lake : state->liquid_physics->impostor_lakes)
     {
         Entity* impostor_lake = lake.impostor_lake;
-        auto [x_pos, y_pos] = impostor_lake->position();
+        auto [x_pos, y_pos] = impostor_lake->abs_position();
         x_pos += impostor_lake->offsetx;
         y_pos += impostor_lake->offsety;
         float hitboxx = impostor_lake->hitboxx;

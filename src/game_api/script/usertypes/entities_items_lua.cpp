@@ -122,6 +122,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_shield"] = &Entity::as<Shield>;
     lua["Entity"]["as_powerup"] = &Entity::as<Powerup>;
     lua["Entity"]["as_prizedispenser"] = &Entity::as<PrizeDispenser>;
+    lua["Entity"]["as_scepter"] = &Entity::as<Scepter>;
 
     lua.new_usertype<Bomb>(
         "Bomb",
@@ -154,11 +155,21 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Purchasable>(
         "Purchasable",
+        "acquire",
+        &Purchasable::acquire,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
     lua.new_usertype<DummyPurchasableEntity>(
         "DummyPurchasableEntity",
+        "replace_entity",
+        &DummyPurchasableEntity::replace_entity,
+        "exploding",
+        &DummyPurchasableEntity::exploding,
+        "explosion_timer",
+        &DummyPurchasableEntity::explosion_timer,
+        "trigger_explosion",
+        &DummyPurchasableEntity::trigger_explosion,
         sol::base_classes,
         sol::bases<Entity, Movable, Purchasable>());
 
@@ -182,6 +193,8 @@ void register_usertypes(sol::state& lua)
         &Jetpack::flame_on,
         "fuel",
         &Jetpack::fuel,
+        "acceleration",
+        &Jetpack::acceleration,
         sol::base_classes,
         sol::bases<Entity, Movable, Backpack>());
 
@@ -634,6 +647,8 @@ void register_usertypes(sol::state& lua)
         &OlmecCannon::timer,
         "bombs_left",
         &OlmecCannon::bombs_left,
+        "spawn_projectile",
+        &OlmecCannon::spawn_projectile,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -1025,6 +1040,13 @@ void register_usertypes(sol::state& lua)
         "Web",
         "decay_rate",
         &Web::decay_rate,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Scepter>(
+        "Scepter",
+        "cooldown",
+        &Scepter::cooldown,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 }
