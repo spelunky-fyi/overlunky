@@ -223,6 +223,25 @@ class Entity
     {
         destroy_recursive(std::nullopt, {}, RECURSIVE_MODE::NONE);
     }
+    /// Detach from overlay
+    void detach(std::optional<bool> check_autokill)
+    {
+        if (overlay)
+            overlay->remove_item(this, check_autokill.value_or(true));
+    }
+    /// Attach to other entity (at the current relative position to it)
+    void attach(Entity* new_overlay)
+    {
+        if (new_overlay == overlay)
+            return;
+
+        detach(false);
+        auto const pos = new_overlay->abs_position();
+        x -= pos.x;
+        y -= pos.y;
+        overlay = new_overlay;
+        overlay->items.insert(this, false);
+    }
 
     // for supporting HookableVTable
     uint32_t get_aux_id() const

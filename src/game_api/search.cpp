@@ -655,8 +655,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        "add_item_ptr"sv,
-        // Used in spawn_entity as `add_item_ptr(overlay + 0x18, spawned_entity, false)`
+        "entitylist_insert"sv,
+        // Used in spawn_entity as `entitylist_insert(overlay + 0x18, spawned_entity, false)`
         PatternCommandBuffer{}
             .find_inst("\xe8****\x44\x88\x76"sv)
             .decode_call()

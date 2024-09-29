@@ -69,6 +69,9 @@ void attach_entity(Entity* overlay, Entity* attachee)
 {
     if (attachee->overlay)
     {
+        if (attachee->overlay == overlay)
+            return;
+
         attachee->overlay->remove_item(attachee, false);
     }
 
@@ -79,9 +82,7 @@ void attach_entity(Entity* overlay, Entity* attachee)
     attachee->special_offsety = attachee->y;
     attachee->overlay = overlay;
 
-    using AddItemPtr = void(EntityList*, Entity*, bool);
-    static AddItemPtr* add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
-    add_item_ptr(&overlay->items, attachee, false);
+    overlay->items.insert(attachee, false);
 }
 
 void attach_entity_by_uid(uint32_t overlay_uid, uint32_t attachee_uid)
@@ -144,21 +145,6 @@ void stack_entities(uint32_t bottom_uid, uint32_t top_uid, const float (&offset)
     }
 }
 
-void teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy)
-{
-    if (ent->overlay)
-        ent->overlay->remove_item(ent, false);
-
-    ent->x = dx;
-    ent->y = dy;
-    if (ent->is_movable())
-    {
-        auto movable_ent = ent->as<Movable>();
-        movable_ent->velocityx = vx;
-        movable_ent->velocityy = vy;
-    }
-}
-
 void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
 {
     auto ent = get_entity_ptr(uid);
@@ -170,7 +156,15 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy)
         }
         else
         {
-            teleport_entity_abs(ent, x, y, vx, vy);
+            ent->detach(false);
+            ent->x = x;
+            ent->y = y;
+            if (ent->is_movable())
+            {
+                auto movable_ent = ent->as<Movable>();
+                movable_ent->velocityx = vx;
+                movable_ent->velocityy = vy;
+            }
         }
     }
 }
@@ -188,7 +182,15 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER l
         }
         else
         {
-            teleport_entity_abs(ent, offset.x + x, offset.y + y, vx, vy);
+            ent->detach(false);
+            ent->x = offset.x + x;
+            ent->y = offset.y + y;
+            if (ent->is_movable())
+            {
+                auto movable_ent = ent->as<Movable>();
+                movable_ent->velocityx = vx;
+                movable_ent->velocityy = vy;
+            }
             ent->set_layer(layer);
         }
     }
@@ -1234,8 +1236,7 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
         const auto actual_layer = enum_to_layer(layer, offset);
         state.layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state.layer(actual_layer));
 
-        if (entity->overlay)
-            entity->overlay->remove_item(entity, false);
+        entity->detach(false);
         entity->x = offset.x + x;
         entity->y = offset.y + y;
         entity->set_layer(layer);

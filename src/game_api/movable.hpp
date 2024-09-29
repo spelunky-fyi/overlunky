@@ -203,14 +203,14 @@ class Movable : public Entity
     virtual void on_release() = 0;                                       // 81, only for hired hands and lava pots
     virtual void generate_fall_poof_particles() = 0;                     // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
     /// Applies gravity to entity. Disable to float like on hoverpack.
-    virtual void handle_fall_logic(float) = 0;                                           // 83, adjusts entity.velocityy when falling
-    virtual void apply_friction(float, bool vertical, float) = 0;                        // 84, applies entity.type.friction to entity.velocityx, the two floats for characters just multiply the friction, could also be returning the value
-    virtual bool can_break_block(bool horizontal, Entity* block) = 0;                    // 85, check on collision if the entity should break the block, used for stuff like drill, hundun etc. surprisingly no mattoc
-    virtual void break_block(bool camera_shake, Entity* block) = 0;                      // 86
-    virtual void v87(Entity* entity, float, Entity* floor, float, bool) = 0;             // 87, on_contact_with_ground ? calls on_stood_on_by, on_fall_onto
-    virtual void v88(Entity* entity, float vecloty) = 0;                                 // 88, on_ragdoll? - for player, triggers only when you throw him into wall/ground/celling
-    virtual bool v89(void*, void*, bool, bool default_return_flipped) = 0;               // 89, triggers on item_rubble?, first parameter only tested if it's 0 for punishball, ignored in the rest, second parameter never used (leftover?)
-    virtual void on_crushed_by(Entity*) = 0;                                             // 90, e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
-    virtual SoundMeta* on_fall_onto(SOUNDID play_sound_id, Entity* fell_on_entity) = 0;  // 91, plays the sfx at the entity and sets sound parameters
-    virtual void on_instakill_death() = 0;                                               // 92, seems to only trigger for enemies that die in one hit, creates some big struct on stack, feeds it to some unknown function
+    virtual void handle_fall_logic(float) = 0;                                          // 83, adjusts entity.velocityy when falling
+    virtual void apply_friction(float, bool vertical, float) = 0;                       // 84, applies entity.type.friction to entity.velocityx, the two floats for characters just multiply the friction, could also be returning the value
+    virtual bool can_break_block(bool horizontal, Entity* block) = 0;                   // 85, check on collision if the entity should break the block, used for stuff like drill, hundun etc. surprisingly no mattoc
+    virtual void break_block(bool camera_shake, Entity* block) = 0;                     // 86
+    virtual void v87(Entity* entity, float, Entity* floor, float, bool) = 0;            // 87, on_contact_with_ground ? calls on_stood_on_by, on_fall_onto
+    virtual void v88(Entity* entity, float vecloty) = 0;                                // 88, on_ragdoll? - for player, triggers only when you throw him into wall/ground/celling
+    virtual bool v89(void*, void*, bool, bool default_return_flipped) = 0;              // 89, triggers on item_rubble?, first parameter only tested if it's 0 for punishball, ignored in the rest, second parameter never used (leftover?)
+    virtual void on_crushed_by(Entity*) = 0;                                            // 90, e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
+    virtual SoundMeta* on_fall_onto(SOUNDID play_sound_id, Entity* fell_on_entity) = 0; // 91, plays the sfx at the entity and sets sound parameters
+    virtual void on_instakill_death() = 0;                                              // 92, seems to only trigger for enemies that die in one hit, creates some big struct on stack, feeds it to some unknown function
 };

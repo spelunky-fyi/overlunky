@@ -78,11 +78,11 @@ ENT_TYPE to_id(std::string_view name)
     {
         const EntityFactory* entity_factory_ptr = entity_factory();
         if (!entity_factory_ptr)
-            return -1;
+            return (ENT_TYPE)~0;
         map = &entity_factory_ptr->entity_map;
     }
     auto it = map->find(std::string(name));
-    return it != map->end() ? it->second : -1;
+    return it != map->end() ? it->second : (ENT_TYPE)~0;
 }
 
 std::string_view to_name(ENT_TYPE id)

@@ -29,12 +29,7 @@ void Drill::trigger(std::optional<bool> play_sound_effect)
     {
         return;
     }
-
-    if (overlay != nullptr)
-    {
-        overlay->remove_item(this, true);
-    }
-
+    detach(true);
     move_state = 6;
     flags = flags & ~(1U << (10 - 1));
 

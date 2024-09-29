@@ -4276,6 +4276,8 @@ nil | [remove_item(Entity entity, bool autokill_check)](https://github.com/spelu
 nil | [apply_db()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_db) | Applies changes made in `entity.type`
 [Vec2](#Vec2) | [get_absolute_velocity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_absolute_velocity) | Get's the velocity relative to the game world, only for movable or liquid entities
 [AABB](#AABB) | [get_hitbox(optional<bool> use_render_pos)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox) | `use_render_pos` default is `false`
+nil | [attach(Entity new_overlay)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach) | Attach to other entity (at the current relative position to it)
+nil | [detach(optional<bool> check_autokill)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=detach) | Detach from overlay
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.

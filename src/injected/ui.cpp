@@ -1874,8 +1874,7 @@ void toggle_noclip()
         auto player = (Movable*)ent->topmost_mount();
         if (options["noclip"])
         {
-            if (player->overlay)
-                player->overlay->remove_item(player, false);
+            player->detach(false);
             player->type->max_speed = 0.3f;
         }
         else
@@ -7516,18 +7515,7 @@ void render_entity_props(int uid, bool detached = false)
     ImGui::SameLine();
     if (ImGui::Button("Void##VoidEntity"))
     {
-        if (entity->overlay)
-        {
-            auto mount = entity->overlay->as<Movable>(); // pre casting to movable before checking
-            if (entity->overlay->is_movable() && mount->holding_uid == entity->uid)
-            {
-                mount->drop();
-            }
-            else
-            {
-                mount->remove_item(entity, false);
-            }
-        }
+        entity->detach(true);
         entity->overlay = nullptr;
         entity->y -= 1000.0;
     }
@@ -7553,7 +7541,7 @@ void render_entity_props(int uid, bool detached = false)
     if (submenu("State"))
     {
         auto overlay = entity->overlay;
-        if (overlay && !IsBadReadPtr(overlay, 0x178))
+        if (overlay)
         {
             if (overlay->type->search_flags & 0x2) // MOUNT
             {
@@ -7563,7 +7551,8 @@ void render_entity_props(int uid, bool detached = false)
                 {
                     overlay->as<Mount>()->remove_rider();
                 }
-                render_uid(overlay->uid, "StateRiding");
+                else
+                    render_uid(overlay->uid, "StateRiding");
             }
             else
             {
@@ -7572,19 +7561,12 @@ void render_entity_props(int uid, bool detached = false)
                 if (ImGui::Button("Detach"))
                 {
                     if (entity->type->search_flags & 0x1) // PLAYER
-                    {
                         entity->as<Player>()->let_go();
-                    }
-                    else if (overlay->is_movable() && overlay->as<Movable>()->holding_uid == entity->uid)
-                    {
-                        overlay->as<Movable>()->drop();
-                    }
                     else
-                    {
-                        overlay->remove_item(entity, true);
-                    }
+                        entity->detach(true);
                 }
-                render_uid(overlay->uid, "StateAttached");
+                else
+                    render_uid(overlay->uid, "StateAttached");
             }
         }
         else

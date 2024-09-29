@@ -2561,6 +2561,8 @@ function PRNG:random(min, max) end
     ---@field apply_db fun(self): nil @Applies changes made in `entity.type`
     ---@field get_absolute_velocity fun(self): Vec2 @Get's the velocity relative to the game world, only for movable or liquid entities
     ---@field get_hitbox fun(self, use_render_pos: boolean?): AABB @`use_render_pos` default is `false`
+    ---@field attach fun(self, new_overlay: Entity): nil @Attach to other entity (at the current relative postion to it)
+    ---@field detach fun(self, check_autokill: boolean?): nil @Detach from overlay
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.

@@ -94,10 +94,9 @@ float UI::get_zoom_level()
 }
 void teleport_entity(Entity* ent, float dx, float dy, bool s, float vx, float vy, bool snap)
 {
-    if (ent->overlay)
-        ent->overlay->remove_item(ent, false);
+    ent->detach(false);
 
-    auto topmost = ent->topmost_mount(); // we just detached from overlay, so this is kind of pointelss
+    auto topmost = ent->topmost_mount(); // we just detached from overlay, so this is kind of pointless
     if (!s)
     {
         auto [x_pos, y_pos] = topmost->abs_position();
@@ -138,8 +137,7 @@ void teleport_entity(Entity* ent, float dx, float dy, bool s, float vx, float vy
 }
 void UI::teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy)
 {
-    if (ent->overlay)
-        ent->overlay->remove_item(ent, false);
+    ent->detach(false);
 
     ent->x = dx;
     ent->y = dy;
