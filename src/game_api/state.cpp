@@ -1063,11 +1063,12 @@ Logic* LogicList::start_logic(LOGIC idx)
 
 void LogicList::stop_logic(LOGIC idx)
 {
-    if ((uint32_t)idx > 27 || logic_indexed[(uint32_t)idx] == nullptr)
+    auto index = static_cast<uint32_t>(idx);
+    if (index > 27 || logic_indexed[index] == nullptr)
         return;
 
-    delete logic_indexed[(uint32_t)idx];
-    logic_indexed[(uint32_t)idx] = nullptr;
+    delete logic_indexed[index];
+    logic_indexed[index] = nullptr;
 }
 
 void LogicList::stop_logic(Logic* log)
@@ -1075,20 +1076,15 @@ void LogicList::stop_logic(Logic* log)
     if (log == nullptr)
         return;
 
-    auto idx = log->logic_index;
+    auto idx = static_cast<uint32_t>(log->logic_index);
     delete log;
-    logic_indexed[(uint32_t)idx] = nullptr;
+    logic_indexed[idx] = nullptr;
 }
 
 void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
 {
-    for (auto it = magmaman_positions.begin(); it < magmaman_positions.end(); ++it)
-    {
-        if (it->x == x && it->y == y)
-        {
-            magmaman_positions.erase(it);
-        }
-    }
+    std::erase_if(magmaman_positions, [x, y](MagmamanSpawnPosition& m_pos)
+                  { return (m_pos.x == x && m_pos.y == y); });
 }
 
 void update_camera_position()
