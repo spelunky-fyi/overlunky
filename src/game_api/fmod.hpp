@@ -327,6 +327,14 @@ struct CREATESOUNDEXINFO
     std::intptr_t fsbguid;
 };
 
+struct FMOD_GUID
+{
+    unsigned int   Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char  Data4[8];
+};
+
 enum class ChannelControlType
 {
     Channel,
@@ -408,6 +416,23 @@ enum EventCallbackType
     Num = 17
 };
 
+enum class LoadBankFlags
+{
+    Normal = 0x00000000,
+    Nonblocking = 0x00000001,
+    DecompressSamples = 0x00000002,
+    Unencrypted = 0x00000004,
+};
+
+enum class LoadingState
+{
+    Unloading,
+    Unloaded,
+    Loading,
+    Loaded,
+    Error
+};
+
 enum class PlaybackState
 {
     Playing,
@@ -463,6 +488,18 @@ using FlushCommands = FMOD_RESULT(System*);
 using GetBus = FMOD_RESULT(System*, const char*, Bus**);
 using LockChannelGroup = FMOD_RESULT(Bus*);
 using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
+
+using SystemLoadBankFile = FMOD_RESULT(System*, const char*, LoadBankFlags, Bank**);
+using SystemGetBank = FMOD_RESULT(System*, const char*, Bank**);
+using SystemGetEventByID = FMOD_RESULT(System*, FMOD_GUID*, EventDescription**);
+
+using BankGetLoadingState = FMOD_RESULT(Bank*, LoadingState*);
+using BankGetSampleLoadingState = FMOD_RESULT(Bank*, LoadingState*);
+using BankLoadSampleData = FMOD_RESULT(Bank*);
+using BankUnload = FMOD_RESULT(Bank*);
+using BankUnloadSampleData = FMOD_RESULT(Bank*);
+
+using ParseID = FMOD_RESULT(const char*, FMOD_GUID*);
 
 using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
 

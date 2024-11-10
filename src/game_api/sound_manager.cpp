@@ -22,6 +22,13 @@ FMOD::FMOD_MODE operator|(FMOD::FMOD_MODE lhs, FMOD::FMOD_MODE rhs)
         static_cast<std::underlying_type<FMOD::FMOD_MODE>::type>(rhs));
 }
 
+FMODStudio::LoadBankFlags operator|(FMODStudio::LoadBankFlags lhs, FMODStudio::LoadBankFlags rhs)
+{
+    return static_cast<FMODStudio::LoadBankFlags>(
+        static_cast<std::underlying_type<FMODStudio::LoadBankFlags>::type>(lhs) |
+        static_cast<std::underlying_type<FMODStudio::LoadBankFlags>::type>(rhs));
+}
+
 struct SoundCallbackData
 {
     FMOD::Channel* handle;
@@ -136,6 +143,78 @@ FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_t
         }
     }
     return FMOD::FMOD_RESULT::OK;
+}
+
+CustomBank::CustomBank(const CustomBank& rhs)
+    : m_FmodHandle{ rhs.m_FmodHandle }, m_SoundManager{ rhs.m_SoundManager }
+{
+    if (m_SoundManager != nullptr)
+    {
+        std::visit(
+            overloaded{
+                [this](FMOD::Bank* bank)
+                { m_SoundManager->acquire_bank(bank); },
+                [](std::monostate) {},
+            },
+            rhs.m_FmodHandle);
+    }
+}
+CustomBank::CustomBank(CustomBank&& rhs) noexcept
+{
+    std::swap(m_FmodHandle, rhs.m_FmodHandle);
+    std::swap(m_SoundManager, rhs.m_SoundManager);
+}
+CustomBank::CustomBank(FMOD::Bank* fmod_bank, SoundManager* sound_manager)
+    : m_FmodHandle{ fmod_bank }, m_SoundManager{ sound_manager }
+{
+}
+
+CustomBank::~CustomBank()
+{
+    if (m_SoundManager != nullptr)
+    {
+        std::visit(
+            overloaded{
+                [this](FMOD::Bank* bank)
+                { m_SoundManager->acquire_bank(bank); },
+                [](std::monostate) {},
+            },
+            m_FmodHandle);
+    }
+}
+
+std::optional <FMODStudio::LoadingState> CustomBank::getLoadingState()
+{
+    return m_SoundManager->get_bank_loading_state(*this);
+}
+
+std::optional <FMODStudio::LoadingState> CustomBank::getSampleLoadingState()
+{
+    return m_SoundManager->get_bank_sample_loading_state(*this);
+}
+
+bool CustomBank::loadSampleData()
+{
+    return m_SoundManager->load_bank_sample_data(*this);
+}
+
+bool CustomBank::unload()
+{
+    return std::visit(
+        overloaded{
+            [=, this](FMOD::Bank* bank)
+            { return m_SoundManager->unload_bank(bank); },
+            [](std::monostate)
+            {
+                return false;
+            },
+        },
+        m_FmodHandle);
+}
+
+bool CustomBank::unloadSampleData()
+{
+    return m_SoundManager->unload_bank_sample_data(*this);
 }
 
 CustomSound::CustomSound(const CustomSound& rhs)
@@ -287,6 +366,13 @@ struct SoundManager::Sound
     FMOD::Sound* fmod_sound{nullptr};
 };
 
+struct SoundManager::Bank
+{
+    std::uint32_t ref_count;
+    std::string path;
+    FMOD::Bank* fmod_bank{nullptr};
+};
+
 SoundManager::SoundManager(DecodeAudioFile* decode_function)
     : m_DecodeFunction{decode_function}
 {
@@ -309,10 +395,10 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
                 m_SoundData.NameToEvent[event.Name] = &event;
             }
 
-            auto fmod_studio_system = *(FMODStudio::System**)get_address("fmod_studio"sv);
+            m_FmodStudioSystem = *(FMODStudio::System**)get_address("fmod_studio"sv);
             auto get_core_system = reinterpret_cast<FMODStudio::GetCoreSystem*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetCoreSystem"));
             {
-                auto err = get_core_system(fmod_studio_system, &m_FmodSystem);
+                auto err = get_core_system(m_FmodStudioSystem, &m_FmodSystem);
                 if (err != FMOD::FMOD_RESULT::OK)
                 {
                     AUDIO_INIT_ERROR("Could not get Fmod System, custom audio won't work...");
@@ -327,7 +413,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
             auto get_channel_group_from_bus_name = [=](const char* bus_name, FMOD::ChannelGroup** channel_group)
             {
                 FMODStudio::Bus* bus{nullptr};
-                auto err = get_bus(fmod_studio_system, bus_name, &bus);
+                auto err = get_bus(m_FmodStudioSystem, bus_name, &bus);
                 if (err != FMOD::FMOD_RESULT::OK)
                 {
                     AUDIO_INIT_ERROR("Could not get bus '{}', custom audio volume won't be synced with game volume properly...", bus_name);
@@ -341,7 +427,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
                     }
                     else
                     {
-                        err = flush_commands(fmod_studio_system);
+                        err = flush_commands(m_FmodStudioSystem);
                         if (err != FMOD::FMOD_RESULT::OK)
                         {
                             AUDIO_INIT_ERROR(
@@ -364,6 +450,27 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
             };
             get_channel_group_from_bus_name("bus:/Master_SUM/Master_SFX", &m_SfxChannelGroup);
             get_channel_group_from_bus_name("bus:/Master_SUM/Master_BGM", &m_MusicChannelGroup);
+
+            m_StudioParseID =
+                reinterpret_cast<FMODStudio::ParseID*>(GetProcAddress(fmod_studio, "FMOD_Studio_ParseID"));
+
+            m_SystemLoadBankFile =
+                reinterpret_cast<FMODStudio::SystemLoadBankFile*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_LoadBankFile"));
+            m_SystemGetBank =
+                reinterpret_cast<FMODStudio::SystemGetBank*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetBank"));
+            m_SystemGetEventByID =
+                reinterpret_cast<FMODStudio::SystemGetEventByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetEventByID"));
+
+            m_BankGetLoadingState =
+                reinterpret_cast<FMODStudio::BankGetLoadingState*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bank_GetLoadingState"));
+            m_BankGetSampleLoadingState =
+                reinterpret_cast<FMODStudio::BankGetSampleLoadingState*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bank_GetSampleLoadingState"));
+            m_BankLoadSampleData =
+                reinterpret_cast<FMODStudio::BankLoadSampleData*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bank_LoadSampleData"));
+            m_BankUnload =
+                reinterpret_cast<FMODStudio::BankUnload*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bank_Unload"));
+            m_BankUnloadSampleData =
+                reinterpret_cast<FMODStudio::BankUnloadSampleData*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bank_UnloadSampleData"));
 
             m_EventCreateInstance =
                 reinterpret_cast<FMODStudio::EventDescriptionCreateInstance*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_CreateInstance"));
@@ -442,6 +549,10 @@ SoundManager::~SoundManager()
     for (Sound& sound : m_SoundStorage)
     {
         m_ReleaseSound(sound.fmod_sound);
+    }
+    for (Bank& bank : m_BankStorage)
+    {
+        m_BankUnload(bank.fmod_bank);
     }
 }
 
@@ -564,6 +675,21 @@ PlayingSound SoundManager::play_sound(FMOD::Sound* fmod_sound, bool paused, bool
     return PlayingSound{channel, this};
 }
 
+/// TODO REMOVE THIS, TEMPORARY KLUDGE FOR TESTING
+CustomSound SoundManager::get_event_guid(std::string guid_string)
+{
+    FMOD::FMOD_GUID guid;
+    if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
+    {
+        FMODStudio::EventDescription* fmod_event;
+        if (FMOD_CHECK_CALL(m_SystemGetEventByID(m_FmodStudioSystem, &guid, &fmod_event)))
+        {
+            return CustomSound{fmod_event, this};
+        }
+    }
+    return CustomSound{nullptr, nullptr};
+}
+
 CustomSound SoundManager::get_event(std::string_view event_name)
 {
     auto it = m_SoundData.NameToEvent.find(event_name);
@@ -582,6 +708,144 @@ PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, 
         m_EventInstanceStart(instance);
     }
     return PlayingSound{instance, this};
+}
+
+CustomBank SoundManager::get_bank(std::string path)
+{
+    DEBUG("Loading bank file from path {}", path);
+    auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [&path](const Bank& bank)
+        { return bank.path == path; });
+    if (it != m_BankStorage.end())
+    {
+        it->ref_count++;
+        return CustomBank{ it->fmod_bank, this };
+    }
+
+    FMODStudio::LoadBankFlags load_bank_flags = (FMODStudio::LoadBankFlags)(FMODStudio::LoadBankFlags::Nonblocking);
+
+    Bank new_bank;
+    new_bank.ref_count = 1;
+    new_bank.path = std::move(path);
+
+    FMOD::FMOD_RESULT err = m_SystemLoadBankFile(m_FmodStudioSystem, new_bank.path.c_str(), load_bank_flags, &new_bank.fmod_bank);
+    if (err != FMOD::FMOD_RESULT::OK)
+    {
+        DEBUG("Failed loading bank file {}\nFMOD result: {}", new_bank.path, FMOD::ErrStr(err));
+        return CustomBank{ nullptr, nullptr };
+    }
+
+    DEBUG("Successfully loaded bank file {}", new_bank.path);
+    m_BankStorage.push_back(std::move(new_bank));
+    return CustomBank{ m_BankStorage.back().fmod_bank, this };
+}
+
+CustomBank SoundManager::get_bank(const char* path)
+{
+    return get_bank(std::string{ path });
+}
+
+CustomBank SoundManager::get_existing_bank(std::string_view path)
+{
+    auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [&path](const Bank& bank)
+        { return bank.path == path; });
+    if (it != m_BankStorage.end())
+    {
+        it->ref_count++;
+        return CustomBank{ it->fmod_bank, this };
+    }
+    return CustomBank{ nullptr, nullptr };
+}
+
+void SoundManager::acquire_bank(FMOD::Bank* fmod_bank)
+{
+    auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [fmod_bank](const Bank& bank)
+        { return bank.fmod_bank == fmod_bank; });
+    if (it == m_BankStorage.end())
+    {
+        DEBUG("Trying to acquire bank that does not exist...");
+        return;
+    }
+
+    it->ref_count++;
+}
+
+bool SoundManager::unload_bank(FMOD::Bank* fmod_bank)
+{
+    auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [fmod_bank](const Bank& bank)
+        { return bank.fmod_bank == fmod_bank; });
+    if (it == m_BankStorage.end())
+    {
+        DEBUG("Trying to release bank that does not exist...");
+        return false;
+    }
+
+    if (it->ref_count == 1)
+    {
+        auto res = FMOD_CHECK_CALL(m_BankUnload(it->fmod_bank));
+        m_BankStorage.erase(it);
+        return res;
+    }
+    else
+    {
+        it->ref_count--;
+        return false;
+    }
+}
+
+std::optional <FMODStudio::LoadingState> SoundManager::get_bank_loading_state(CustomBank custom_bank)
+{
+    return std::visit(
+        overloaded{
+                   [this](FMODStudio::Bank* bank)
+                   {
+                        FMODStudio::LoadingState value;
+                        if (FMOD_CHECK_CALL(m_BankGetLoadingState(bank, &value)))
+                        {
+                            return std::optional<FMODStudio::LoadingState>{value};
+                        }
+                        return std::optional<FMODStudio::LoadingState>{};
+                   },
+                   [](std::monostate)
+                   { return std::optional<FMODStudio::LoadingState>{}; } },
+        custom_bank.m_FmodHandle);
+}
+
+std::optional <FMODStudio::LoadingState> SoundManager::get_bank_sample_loading_state(CustomBank custom_bank)
+{
+    return std::visit(
+        overloaded{
+                   [this](FMODStudio::Bank* bank)
+                   {
+                        FMODStudio::LoadingState value;
+                        if (FMOD_CHECK_CALL(m_BankGetSampleLoadingState(bank, &value)))
+                        {
+                            return std::optional<FMODStudio::LoadingState>{value};
+                        }
+                        return std::optional<FMODStudio::LoadingState>{};
+                   },
+                   [](std::monostate)
+                   { return std::optional<FMODStudio::LoadingState>{}; } },
+        custom_bank.m_FmodHandle);
+}
+
+bool SoundManager::load_bank_sample_data(CustomBank custom_bank)
+{
+    return std::visit(
+        overloaded{ [this](FMODStudio::Bank* bank)
+                   { return FMOD_CHECK_CALL(m_BankLoadSampleData(bank)); },
+                   [](std::monostate)
+                   { return false; } },
+        custom_bank.m_FmodHandle);
+}
+
+bool SoundManager::unload_bank_sample_data(CustomBank custom_bank)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::Bank* bank)
+                   { return FMOD_CHECK_CALL(m_BankUnloadSampleData(bank)); },
+                   [](std::monostate)
+                   { return false; } },
+        custom_bank.m_FmodHandle);
 }
 
 bool SoundManager::is_playing(PlayingSound playing_sound)

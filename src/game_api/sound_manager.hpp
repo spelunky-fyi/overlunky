@@ -39,6 +39,38 @@ enum class SOUND_TYPE
     Music
 };
 
+class CustomBank
+{
+    friend class SoundManager;
+
+public:
+    CustomBank(const CustomBank& rhs);
+    CustomBank(CustomBank&& rhs) noexcept;
+    CustomBank& operator=(const CustomBank& rhs) = delete;
+    CustomBank& operator=(CustomBank&& rhs) = delete;
+    ~CustomBank();
+
+    operator bool()
+    {
+        return m_SoundManager != nullptr;
+    }
+
+    std::optional <FMODStudio::LoadingState> getLoadingState();
+    std::optional <FMODStudio::LoadingState> getSampleLoadingState();
+    bool loadSampleData();
+    bool unload();
+    bool unloadSampleData();
+
+private:
+    CustomBank(std::nullptr_t, std::nullptr_t)
+    {
+    }
+    CustomBank(FMOD::Bank* fmod_bank, SoundManager* sound_manager);
+
+    std::variant<FMOD::Bank*, std::monostate> m_FmodHandle{};
+    SoundManager* m_SoundManager{ nullptr };
+};
+
 class CustomSound
 {
     friend class SoundManager;
@@ -127,6 +159,16 @@ class SoundManager
         return m_IsInit;
     }
 
+    CustomBank get_bank(std::string path);
+    CustomBank get_bank(const char* path);
+    CustomBank get_existing_bank(std::string_view path);
+    void acquire_bank(FMOD::Bank* fmod_bank);
+    std::optional <FMODStudio::LoadingState> get_bank_loading_state(CustomBank custom_bank);
+    std::optional <FMODStudio::LoadingState> get_bank_sample_loading_state(CustomBank custom_bank);
+    bool load_bank_sample_data(CustomBank custom_bank);
+    bool unload_bank(FMOD::Bank* fmod_bank);
+    bool unload_bank_sample_data(CustomBank custom_bank);
+
     CustomSound get_sound(std::string path);
     CustomSound get_sound(const char* path);
     CustomSound get_existing_sound(std::string_view path);
@@ -134,6 +176,7 @@ class SoundManager
     void release_sound(FMOD::Sound* fmod_sound);
     PlayingSound play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music);
 
+    CustomSound get_event_guid(std::string guid_string);
     CustomSound get_event(std::string_view event_name);
     PlayingSound play_event(FMODStudio::EventDescription* fmod_event, bool paused, bool as_music);
 
@@ -197,6 +240,19 @@ class SoundManager
     FMOD::ChannelSetUserData* m_ChannelSetUserData{nullptr};
     FMOD::ChannelGetUserData* m_ChannelGetUserData{nullptr};
 
+    FMODStudio::System* m_FmodStudioSystem{nullptr};
+    FMODStudio::SystemLoadBankFile* m_SystemLoadBankFile{nullptr};
+    FMODStudio::SystemGetBank* m_SystemGetBank{nullptr};
+    FMODStudio::SystemGetEventByID* m_SystemGetEventByID{nullptr};
+
+    FMODStudio::ParseID* m_StudioParseID{nullptr};
+
+    FMODStudio::BankGetLoadingState* m_BankGetLoadingState{nullptr};
+    FMODStudio::BankGetSampleLoadingState* m_BankGetSampleLoadingState{nullptr};
+    FMODStudio::BankLoadSampleData* m_BankLoadSampleData{nullptr};
+    FMODStudio::BankUnload* m_BankUnload{nullptr};
+    FMODStudio::BankUnloadSampleData* m_BankUnloadSampleData{nullptr};
+
     FMODStudio::EventDescriptionCreateInstance* m_EventCreateInstance{nullptr};
     FMODStudio::EventDescriptionGetParameterDescriptionByID* m_EventDescriptionGetParameterDescriptionByID{nullptr};
     FMODStudio::EventDescriptionGetParameterDescriptionByName* m_EventDescriptionGetParameterDescriptionByName{nullptr};
@@ -247,8 +303,10 @@ class SoundManager
     static_assert(sizeof(EventDescription) == 0x1a0);
     SoundData m_SoundData;
 
+    struct Bank;
     struct Sound;
 
+    std::vector<Bank> m_BankStorage;
     std::vector<Sound> m_SoundStorage;
 };
 

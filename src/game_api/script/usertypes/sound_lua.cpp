@@ -47,6 +47,28 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         return;
     }
 
+    /// Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
+    lua["load_bank"] = [](std::string path) -> sol::optional<CustomBank>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (CustomBank bank = backend->sound_manager->get_bank((backend->get_root_path() / path).string()))
+        {
+            return bank;
+        }
+        return sol::nullopt;
+    };
+
+    /// Gets an existing bank if a file at the same path was already loaded
+    lua["get_bank"] = [](std::string path) -> sol::optional<CustomBank>
+        {
+            auto backend = LuaBackend::get_calling_backend();
+        if (CustomBank bank = backend->sound_manager->get_existing_bank((backend->get_root_path() / path).string()))
+            {
+                return bank;
+            }
+            return sol::nullopt;
+        };
+
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
     {
@@ -72,6 +94,42 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         }
         return sol::nullopt;
     };
+
+    /// TODO REMOVE THIS, TEMPORARY KLUDGE FOR TESTING
+    lua["get_sound_guid"] = [](std::string guid_string) -> sol::optional<CustomSound>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (CustomSound event = backend->sound_manager->get_event_guid(guid_string))
+        {
+            return event;
+        }
+        return sol::nullopt;
+    };
+
+    lua.new_enum("FMOD_LOADING_STATE",
+        "UNLOADING",
+        FMODStudio::LoadingState::Unloading,
+        "UNLOADED",
+        FMODStudio::LoadingState::Unloaded,
+        "LOADING",
+        FMODStudio::LoadingState::Loading,
+        "LOADED",
+        FMODStudio::LoadingState::Loaded,
+        "ERROR",
+        FMODStudio::LoadingState::Error);
+
+    lua.new_usertype<CustomBank>(
+        "CustomBank",
+        "getLoadingState",
+        &CustomBank::getLoadingState,
+        "getSampleLoadingState",
+        &CustomBank::getSampleLoadingState,
+        "loadSampleData",
+        &CustomBank::loadSampleData,
+        "unload",
+        &CustomBank::unload,
+        "unloadSampleData",
+        &CustomBank::unloadSampleData);
 
     /// Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
     /// Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
