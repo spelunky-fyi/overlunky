@@ -83,8 +83,6 @@ Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
     static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
     using AddToLayer = void(Layer*, Entity*);
     static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
-    using AddItemPtr = void(Entity*, Entity*, bool);
-    static auto add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
 
     Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, is_back_layer, overlay, true);
 

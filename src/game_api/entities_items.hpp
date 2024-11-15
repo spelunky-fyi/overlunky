@@ -25,9 +25,11 @@ class Powerup : public Movable
     // not sure why the normal powerups use apply/remove effect where backpacks use the put on/put off
     virtual void apply_effect(PowerupCapable* who) = 0;
     virtual void remove_effect(PowerupCapable* who) = 0; // does not remove powerup from the powerups map
+    /// only for backpacks
     virtual void on_putting_on(PowerupCapable* who) = 0; // only for backpacks, sets offsets etc.
+    /// only for backpacks
     virtual void on_putting_off(PowerupCapable* who) = 0;
-    /// for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack hoverpack.is_on, teleporter and powerpack and all other powerups return false
+    /// for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack hoverpack.is_on, teleporter, powerpack and all other powerups return false
     virtual bool in_use() = 0;
 };
 
@@ -40,7 +42,7 @@ class Backpack : public Powerup
     uint16_t unknown1;
     uint32_t unknown2;
 
-    virtual void trigger_explosion() = 0; // Causes the backpack to play its warning sound and triggers the explosion
+    virtual void trigger_explosion() = 0;
 };
 
 class Jetpack : public Backpack

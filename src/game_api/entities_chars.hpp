@@ -88,16 +88,13 @@ class PowerupCapable : public Movable
 
     /// Return all powerups that the entity has
     std::vector<ENT_TYPE> get_powerups();
-
     /// Unequips the currently worn backitem
     void unequip_backitem();
-
     /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
     int32_t worn_backitem();
 
-    // those could be wrong because of the update
-    virtual bool on_blood_collision() = 0; // only triggers when player has kapala
-
+    /// only triggers when it has kapala
+    virtual bool on_blood_collision() = 0;
     // called for stunned entities, check bunch of stuff like state, hold entity, standing on entity etc. runs until returned 1
     // this is used to clear the last_owner of stunned entity when it is no longed stunned
     virtual bool can_clear_last_owner() = 0;

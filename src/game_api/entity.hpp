@@ -287,22 +287,24 @@ class Entity
     /// Completely removes the entity from existence
     virtual void destroy() = 0; // 5
 
-    virtual void apply_texture(Texture*) = 0;                                                   // 6
-    virtual void format_shopitem_name(char16_t*) = 0;                                           // 7
-    virtual void generate_stomp_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool) = 0; // 8, particles when jumping on top of enemy
-    virtual float get_type_field_a8() = 0;                                                      // 9
-    virtual bool can_be_pushed() = 0;                                                           // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
-    virtual bool v11() = 0;                                                                     // 11, is in motion? (only projectiles and some weapons)
+    virtual void apply_texture(Texture*) = 0;                                                     // 6
+    virtual void format_shopitem_name(char16_t* output) = 0;                                      // 7
+    virtual void generate_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool killing) = 0; // 8, contact dmg
+    virtual float get_type_field_a8() = 0;                                                        // 9
+    virtual bool can_be_pushed() = 0;                                                             // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
+    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons)
     /// Returns true if entity is in water/lava
-    virtual bool is_in_liquid() = 0;                                         // 12, drill always returns false
-    virtual bool check_type_properties_flags_19() = 0;                       // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
-    virtual uint8_t get_type_field_60() = 0;                                 // 14, the value is compared to entity state and used in some behavior function
-    virtual void set_invisible(bool value) = 0;                              // 15
-    virtual void flip(bool left) = 0;                                        // 16
-    virtual void set_draw_depth(uint8_t draw_depth, uint8_t b3f) = 0;        // 17
-    virtual void reset_draw_depth() = 0;                                     // 18
-    virtual float friction() = 0;                                            // 19
-    virtual void set_as_sound_source(SoundMeta*) = 0;                        // 20, update sound position to entity position?
+    virtual bool is_in_liquid() = 0;                                  // 12, drill always returns false
+    virtual bool check_type_properties_flags_19() = 0;                // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
+    virtual uint8_t get_type_field_60() = 0;                          // 14, the value is compared to entity state and used in some behavior function
+    virtual void set_invisible(bool value) = 0;                       // 15
+    virtual void flip(bool left) = 0;                                 // 16
+    virtual void set_draw_depth(uint8_t draw_depth, uint8_t b3f) = 0; // 17
+    virtual void reset_draw_depth() = 0;                              // 18
+    /// Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
+    virtual float friction() = 0;                     // 19
+    virtual void set_as_sound_source(SoundMeta*) = 0; // 20, update sound position to entity position?
+    /// Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
     virtual void remove_item(Entity* entity, bool autokill_check) = 0;       // 21, if autokill_check is true, it will check if the entity has the "kill if overlay lost" flag and kill it if it's set
     virtual Entity* get_held_entity() = 0;                                   // 22
     virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", triggers use self as the first parameter. Called when there is entity overlapping trigger entity, even if they don't move
@@ -324,7 +326,7 @@ class Entity
     /// only for CHAR_*: when going to the backlayer, turns on/off player emitted light
     virtual void toggle_backlayer_illumination() = 0; // 33
     virtual void v34() = 0;                           // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
-    /// `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1
+    /// `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
     virtual void liberate_from_shop(bool clear_parrent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
 
     /// Applies changes made in `entity.type`

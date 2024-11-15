@@ -582,7 +582,7 @@ class Anubis : public Monster
 
     virtual void set_next_attack_timer() = 0; // sets next_attack_timer based on the psychic_orbs_counter
     virtual void normal_attack() = 0;
-    virtual void play_attack_sound() = 0; // also calls virtual 20
+    virtual void play_attack_sound() = 0;
 };
 
 class Cobra : public Monster

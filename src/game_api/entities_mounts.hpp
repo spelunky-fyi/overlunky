@@ -42,7 +42,8 @@ class Mount : public PowerupCapable
     virtual SOUNDID get_mounting_sound() = 0;                  // 103
     virtual SOUNDID get_walking_sound() = 0;                   // 104
     virtual SOUNDID get_untamed_loop_sound() = 0;              // 105
-    virtual bool can_play_mount_sound() = 0;                   // 106, called every frame, if returns true mount will make a sound
+    /// called every frame, if returns true mount will make a sound
+    virtual bool can_play_mount_sound() = 0; // 106
 };
 
 class Rockdog : public Mount

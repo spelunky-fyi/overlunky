@@ -146,7 +146,7 @@ void register_usertypes(sol::state& lua)
         "trigger_explosion",
         &Backpack::trigger_explosion,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Powerup>());
 
     lua.new_usertype<Projectile>(
         "Projectile",
@@ -196,14 +196,14 @@ void register_usertypes(sol::state& lua)
         "acceleration",
         &Jetpack::acceleration,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack>());
+        sol::bases<Entity, Movable, Powerup, Backpack>());
 
     lua.new_usertype<TeleporterBackpack>(
         "TeleporterBackpack",
         "teleport_number",
         &TeleporterBackpack::teleport_number,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack>());
+        sol::bases<Entity, Movable, Powerup, Backpack>());
 
     lua.new_usertype<Hoverpack>(
         "Hoverpack",
@@ -212,11 +212,11 @@ void register_usertypes(sol::state& lua)
         "is_on",
         &Hoverpack::is_on,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack>());
+        sol::bases<Entity, Movable, Powerup, Backpack>());
 
-    lua.new_usertype<Cape>("Cape", "floating_down", &Cape::floating_down, sol::base_classes, sol::bases<Entity, Movable, Backpack>());
+    lua.new_usertype<Cape>("Cape", "floating_down", &Cape::floating_down, sol::base_classes, sol::bases<Entity, Movable, Powerup, Backpack>());
 
-    lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Backpack, Cape>());
+    lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Powerup, Backpack, Cape>());
 
     lua.new_usertype<Mattock>(
         "Mattock",

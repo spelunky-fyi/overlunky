@@ -963,10 +963,10 @@ void get_vtables()
 
         const auto base_off = (size_t)Memory::get().exe();
 
-        file << "TypeID,Name,vtable offset,~Entity,create_rendering_info,update_state_machine,kill,on_collision1,destroy,apply_texture,format_shopitem_name,generate_stomp_damage_particles,get_type_field_a8,can_be_pushed,v11,is_in_liquid,check_type_properties_flags_19,get_type_field_60,set_invisible,flip,set_draw_depth,reset_draw_depth,friction,set_as_sound_source,remove_item,"
+        file << "TypeID,Name,vtable offset,~Entity,create_rendering_info,update_state_machine,kill,on_collision1,destroy,apply_texture,format_shopitem_name,generate_damage_particles,get_type_field_a8,can_be_pushed,v11,is_in_liquid,check_type_properties_flags_19,get_type_field_60,set_invisible,flip,set_draw_depth,reset_draw_depth,friction,set_as_sound_source,remove_item,"
                 "get_held_entity,v23,trigger_action,activate,on_collision2,get_metadata,apply_metadata,on_walked_on_by,on_walked_off_by,on_ledge_grab,on_stood_on_by,toggle_backlayer_illumination,v34,liberate_from_shop,apply_db,END OF ENTITY,can_jump,get_collision_info,sprint_factor,calculate_jump_velocity,get_animation_map,apply_velocity,get_damage,get_stomp_damage,is_on_fire,attack,thrown_into,"
                 "damage,on_hit,get_damage_sound,stun,freeze,light_on_fire,set_cursed,on_spiderweb_collision,set_last_owner_uid_b127,get_last_owner_uid,check_out_of_bounds,set_standing_on,standing_on,on_stomped_on_by,on_thrown_by,copy_extra_info,get_type_id,doesnt_have_spikeshoes,is_player_mount_or_monster,pick_up,can_be_picked_up_by,drop,collect_treasure,apply_movement,damage_entity,v73,"
-                "is_powerup_capable,initialize,check_is_falling,v77,process_input,post_collision_damage_related,on_picked_up,on_release,generate_fall_poof_particles,handle_fall_logic,apply_friction,can_break_block,break_block,v87,v88,v89,on_crushed_by,on_fall_onto,on_instakill_death,END OF MOVABLE,v93,v94,v95,v96,v97,v98,v99,v100,v101,v102,v103,v104,v105,v106,v107,v108,v109,";
+                "is_powerup_capable,initialize,check_is_falling,v77,process_input,post_collision_damage_related,on_picked_up,on_release,generate_fall_poof_particles,handle_fall_logic,apply_friction,can_break_block,break_block,v87,v88,v89,on_crushed_by,on_fall_onto,on_body_destruction,END OF MOVABLE,v93,v94,v95,v96,v97,v98,v99,v100,v101,v102,v103,v104,v105,v106,v107,v108,v109,";
         file << std::endl;
 
         int idx = 0;
@@ -985,6 +985,9 @@ void get_vtables()
                 do
                 {
                     if (v_idx && base_functions.find(*(vtable_b + v_idx)) != base_functions.end())
+                        break;
+
+                    if (IsBadReadPtr((void*)(*(vtable_b + v_idx)), 8))
                         break;
 
                     if (*(vtable_b + v_idx) == func_ret)

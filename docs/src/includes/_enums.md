@@ -232,7 +232,7 @@ Name | Data | Description
 [KILL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.KILL) | 3 | 
 [ON_COLLISION1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION1) | 4 | 
 [DESTROY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DESTROY) | 5 | 
-[GENERATE_STOMP_DAMAGE_PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GENERATE_STOMP_DAMAGE_PARTICLES) | 8 | 
+[GENERATE_DAMAGE_PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GENERATE_DAMAGE_PARTICLES) | 8 | 
 [CAN_BE_PUSHED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_BE_PUSHED) | 10 | 
 [IS_IN_LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_IN_LIQUID) | 12 | 
 [SET_INVISIBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_INVISIBLE) | 15 | 
@@ -255,10 +255,8 @@ Name | Data | Description
 [LIBERATE_FROM_SHOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIBERATE_FROM_SHOP) | 35 | 
 [INIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INIT) | 36 | 
 [CAN_JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_JUMP) | 37 | 
-[GET_COLLISION_INFO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_COLLISION_INFO) | 38 | 
 [SPRINT_FACTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SPRINT_FACTOR) | 39 | 
 [CALCULATE_JUMP_VELOCITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CALCULATE_JUMP_VELOCITY) | 40 | 
-[GET_ANIMATION_MAP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_ANIMATION_MAP) | 41 | 
 [APPLY_VELOCITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_VELOCITY) | 42 | 
 [GET_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_DAMAGE) | 43 | 
 [IS_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_ON_FIRE) | 45 | 
@@ -294,7 +292,7 @@ Name | Data | Description
 [CAN_BREAK_BLOCK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_BREAK_BLOCK) | 85 | 
 [BREAK_BLOCK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.BREAK_BLOCK) | 86 | 
 [CRUSH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CRUSH) | 90 | 
-[INSTAKILL_DEATH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INSTAKILL_DEATH) | 92 | 
+[BODY_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.BODY_DESTRUCTION) | 92 | 
 [FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
 [ENTER_ATTEMPT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER_ATTEMPT) | 40 | 
 [HIDE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.HIDE_HUD) | 41 | 
@@ -302,6 +300,14 @@ Name | Data | Description
 [LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_LEVEL) | 44 | 
 [IS_UNLOCKED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_UNLOCKED) | 45 | 
 [CAN_ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_ENTER) | 46 | 
+[BLOOD_COLLISION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.BLOOD_COLLISION) | 93 | 
+[PUTTING_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PUTTING_ON) | 96 | 
+[PUTTING_OFF](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PUTTING_OFF) | 97 | 
+[TRIGGER_EXPLOSION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_EXPLOSION) | 99 | 
+[ACCELERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ACCELERATION) | 100 | 
+[ACQUIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ACQUIRE) | 93 | 
+[TRIGGER_EXPLOSION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_EXPLOSION) | 94 | 
+[SPAWN_PROJECTILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SPAWN_PROJECTILE) | 93 | 
 
 ## ENT_FLAG
 

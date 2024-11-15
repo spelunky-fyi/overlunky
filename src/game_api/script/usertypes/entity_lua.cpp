@@ -243,6 +243,7 @@ void register_usertypes(sol::state& lua)
 
     entity_type["set_draw_depth"] = set_draw_depth;
     entity_type["reset_draw_depth"] = &Entity::reset_draw_depth;
+    entity_type["friction"] = &Entity::friction;
     entity_type["set_enable_turning"] = &Entity::set_enable_turning;
 
     auto liberate_from_shop = sol::overload(&Entity::liberate_from_shop, [](Entity& ent) // for backward compatibility)

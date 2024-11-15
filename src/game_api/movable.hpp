@@ -144,10 +144,11 @@ class Movable : public Entity
     virtual float sprint_factor() = 0;                                       // 39, from entityDB
     virtual float calculate_jump_velocity(bool dont_ignore_liquid) = 0;      // 40
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0; // 41
-    virtual void apply_velocity(Vec2& velocities, bool ignore_weight) = 0;   // 42
+    /// Mostly used for ragdoll by the game
+    virtual void apply_velocity(Vec2& velocities, bool ignore_weight) = 0; // 42
     /// Returns the damage that the entity deals
     virtual int8_t get_damage() = 0;       // 43, for player it calculates stomp damages as that's the only damage that the player entity can deal, the "normal" damage is done by the whip
-    virtual int8_t get_stomp_damage() = 0; // 44, calls get_damage except for mech which always returns 3, runs on stomping enemy
+    virtual int8_t get_stomp_damage() = 0; // 44, calls get_damage except for mech which always returns 3, dunno what's the difference between this and get_damage
     virtual bool is_on_fire() = 0;         // 45
     /// Runs on contact damage, returns false if there wasn't any interaction (called from on_collision2, will be called as long as the hitboxes overlap)
     virtual bool attack(Entity* victim) = 0; // 46
@@ -161,17 +162,17 @@ class Movable : public Entity
     /// Hit by broken arrows etc that don't deal damage, calls damage with 0 damage.
     virtual void on_hit(Entity* damage_dealer) = 0; // 49
     /// returns sound id for the damage taken, return 0 to make it silence
-    virtual uint32_t get_damage_sound(DAMAGE_TYPE damage) = 0; // 50
-    virtual void stun(uint16_t framecount) = 0;                // 51
+    virtual SOUNDID get_damage_sound(DAMAGE_TYPE damage) = 0; // 50
+    virtual void stun(uint16_t framecount) = 0;               // 51
     /// Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check, if in lava the game will set `frozen_timer` to 0 immediately most of the time
     virtual void freeze(uint8_t framecount, bool ignore_lava) = 0; // 52
 
     /// Does not damage entity
-    virtual void light_on_fire(uint8_t time) = 0;            // 53
-    virtual void set_cursed(bool b, bool effect) = 0;        // 54
-    virtual void on_spiderweb_collision(bool) = 0;           // 55, the bool sets pause statemachine flag? needs testing
-    virtual void set_last_owner_uid_b127(Entity* owner) = 0; // 56, assigns player as last_owner_uid and also manipulates movable.b127
-    virtual uint32_t get_last_owner_uid() = 0;               // 57, for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
+    virtual void light_on_fire(uint8_t time) = 0;       // 53
+    virtual void set_cursed(bool b, bool effect) = 0;   // 54
+    virtual void on_spiderweb_collision(bool) = 0;      // 55, the bool sets pause statemachine flag? needs testing
+    virtual void set_last_owner_uid(Entity* owner) = 0; // 56, assigns entity as last_owner_uid and also manipulates movable.b127
+    virtual uint32_t get_last_owner_uid() = 0;          // 57, for players, it checks !stunned && !frozen && !cursed && !has_overlay; for others: just returns last_owner_uid
     /// Disable to not get killed outside level bounds.
     virtual void check_out_of_bounds() = 0;               // 58, kills with the 'still falling' death cause, is called for any item/fx/mount/monster/player
     virtual void set_standing_on(int32_t entity_uid) = 0; // 59
@@ -212,5 +213,5 @@ class Movable : public Entity
     virtual bool v89(void*, void*, bool, bool default_return_flipped) = 0;              // 89, triggers on item_rubble?, first parameter only tested if it's 0 for punishball, ignored in the rest, second parameter never used (leftover?)
     virtual void on_crushed_by(Entity*) = 0;                                            // 90, e.g. crushed by elevator, punishball, pushblock, crushtrap (not quillback or boulder)
     virtual SoundMeta* on_fall_onto(SOUNDID play_sound_id, Entity* fell_on_entity) = 0; // 91, plays the sfx at the entity and sets sound parameters
-    virtual void on_instakill_death() = 0;                                              // 92, seems to only trigger for enemies that die in one hit, creates some big struct on stack, feeds it to some unknown function
+    virtual void on_body_destruction() = 0;                                             // 92, creates some big struct on stack, feeds it to some unknown function
 };

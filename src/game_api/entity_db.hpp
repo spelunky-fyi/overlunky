@@ -106,8 +106,8 @@ struct EntityDB
     uint8_t field_9A;
     uint8_t field_9B;
     STRINGID description;
-    int32_t sound_killed_by_player;
-    int32_t sound_killed_by_other;
+    SOUNDID sound_killed_by_player;
+    SOUNDID sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
     game_unordered_map<uint8_t, Animation, identity_hasher<>> animations;
