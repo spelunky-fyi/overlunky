@@ -870,7 +870,7 @@ class PrizeDispenser : public Movable
 class Bow : public Purchasable
 {
   public:
-    /// When lying on the ground
+    /// When laying on the ground
     virtual float get_arrow_special_offset() = 0;
 };
 

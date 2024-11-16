@@ -3844,7 +3844,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field set_post_trigger_explosion fun(self, fun: fun(self: DummyPurchasableEntity, who: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_explosion(DummyPurchasableEntity self, Entity who)`<br/>Virtual function docs:<br/>Transfers ownership etc. for who to blame, sets the exploding bool
 
 ---@class Bow : Purchasable
-    ---@field get_arrow_special_offset fun(self): number @When lying on the ground
+    ---@field get_arrow_special_offset fun(self): number @When laying on the ground
 
 ---@class Present : Purchasable
     ---@field inside ENT_TYPE
@@ -7232,12 +7232,16 @@ DYNAMIC_TEXTURE = {
 }
 ---@alias DYNAMIC_TEXTURE integer
 ENTITY_OVERRIDE = {
+  ACCELERATION = 100,
+  ACQUIRE = 93,
   ACTIVATE = 25,
   APPLY_FRICTION = 84,
   APPLY_METADATA = 28,
   APPLY_MOVEMENT = 71,
   APPLY_VELOCITY = 42,
   ATTACK = 46,
+  BLOOD_COLLISION = 93,
+  BODY_DESTRUCTION = 92,
   BREAK_BLOCK = 86,
   CALCULATE_JUMP_VELOCITY = 40,
   CAN_BE_PICKED_UP_BY = 68,
@@ -7261,9 +7265,8 @@ ENTITY_OVERRIDE = {
   FLOOR_UPDATE = 38,
   FREEZE = 52,
   FRICTION = 19,
+  GENERATE_DAMAGE_PARTICLES = 8,
   GENERATE_FALL_POOF_PARTICLES = 82,
-  GENERATE_STOMP_DAMAGE_PARTICLES = 8,
-  GET_COLLISION_INFO = 38,
   GET_DAMAGE = 43,
   GET_DAMAGE_SOUND = 50,
   GET_HELD_ENTITY = 22,
@@ -7271,7 +7274,6 @@ ENTITY_OVERRIDE = {
   HIDE_HUD = 41,
   INIT = 36,
   INITIALIZE = 75,
-  INSTAKILL_DEATH = 92,
   IS_IN_LIQUID = 12,
   IS_ON_FIRE = 45,
   IS_POWERUP_CAPABLE = 74,
@@ -7288,6 +7290,8 @@ ENTITY_OVERRIDE = {
   PICKED_UP_BY = 68,
   PICK_UP = 67,
   PROCESS_INPUT = 78,
+  PUTTING_OFF = 97,
+  PUTTING_ON = 96,
   RELEASE = 81,
   REMOVE_ITEM = 21,
   RESET_DRAW_DEPTH = 18,
@@ -7296,6 +7300,7 @@ ENTITY_OVERRIDE = {
   SET_DRAW_DEPTH = 17,
   SET_INVISIBLE = 15,
   SET_STANDING_ON = 59,
+  SPAWN_PROJECTILE = 93,
   SPRINT_FACTOR = 39,
   STANDING_ON = 60,
   STOMPED_BY = 61,
@@ -7305,6 +7310,7 @@ ENTITY_OVERRIDE = {
   THROWN_BY = 62,
   THROWN_INTO = 47,
   TRIGGER_ACTION = 24,
+  TRIGGER_EXPLOSION = 94,
   UPDATE_STATE_MACHINE = 2,
   WALKED_OFF = 30,
   WALKED_ON = 29,

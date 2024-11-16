@@ -5995,7 +5995,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Purchasable](#Purchasable)
 
 Type | Name | Description
 ---- | ---- | -----------
-float | [get_arrow_special_offset()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_arrow_special_offset) | When lying on the ground
+float | [get_arrow_special_offset()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_arrow_special_offset) | When laying on the ground
 
 ### Bullet
 
