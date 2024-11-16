@@ -9,10 +9,11 @@
 #include <tuple>       // for get
 #include <type_traits> // for move, declval
 
-#include "particles.hpp"  // for ParticleEmitterInfo
-#include "render_api.hpp" // for TextureRenderingInfo, WorldShader, TextRen...
-#include "state.hpp"      // for enum_to_layer
-#include "texture.hpp"    // for Texture, get_texture
+#include "particles.hpp"          // for ParticleEmitterInfo
+#include "render_api.hpp"         // for TextureRenderingInfo, WorldShader, TextRen...
+#include "script/lua_backend.hpp" // for get_calling_backend
+#include "state.hpp"              // for enum_to_layer
+#include "texture.hpp"            // for Texture, get_texture
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
 {
@@ -134,18 +135,19 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, TextureRender
     RenderAPI::get().draw_screen_texture(texture, std::move(tri), std::move(color), 0x29);
 }
 
-auto g_angle_style = CORNER_FINISH::ADAPTIVE;
-
 void VanillaRenderContext::set_corner_finish(CORNER_FINISH c)
 {
-    g_angle_style = c; // can i make this per lua environment instead of global?
+    auto backend = LuaBackend::get_calling_backend();
+    backend->vanilla_render_corner_finish = c;
 }
 
 // get a Quad to fill out the corner between two lines and fix their overlap
 Quad get_corner_quad(Quad& line1, Quad& line2)
 {
-    if (g_angle_style == CORNER_FINISH::NONE)
+    auto backend = LuaBackend::get_calling_backend();
+    if (backend->vanilla_render_corner_finish == CORNER_FINISH::NONE)
         return {};
+
     // save the corners as Vec2 for easier calculations
     // and calculate inner and outher corner, we don't know which is which at this point
     Vec2 A{line1.top_left_x, line1.top_left_y};
@@ -191,16 +193,17 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
 
     Vec2 middle_point = *first - (*first - *second) / 2;
 
-    if (g_angle_style == CORNER_FINISH::ADAPTIVE && std::abs(true_angle) > 1.6f)
+    if (backend->vanilla_render_corner_finish == CORNER_FINISH::ADAPTIVE && std::abs(true_angle) > 1.6f)
     {
         Vec2 offset = *outer_corner - middle_point;
         offset = offset * (float)std::pow((std::abs(true_angle) - 1.6f) / 1.54f, 2);
         *outer_corner -= offset;
     }
-    else if (g_angle_style == CORNER_FINISH::CUT)
+    else if (backend->vanilla_render_corner_finish == CORNER_FINISH::CUT)
     {
         *outer_corner = *second;
     }
+    // else CORNER_FINISH::REAL
 
     if (std::abs(true_angle) > 3) // for small corners it's hard to do this right, so we give up on this
     {
