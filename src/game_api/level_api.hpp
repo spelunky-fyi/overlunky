@@ -254,9 +254,7 @@ class ThemeInfo
     uint32_t unknown3;
     uint32_t unknown4;
 
-    virtual ~ThemeInfo()
-    {
-    }
+    virtual ~ThemeInfo(){};
 
     /// Sets the beehive and leprechaun flags
     virtual void reset_theme_flags() = 0;
