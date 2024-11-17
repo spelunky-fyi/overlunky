@@ -55,7 +55,7 @@ struct VTableDetour<RetT(ClassT*, ArgsT...), Index>
                 s_Functions[self](self, args..., s_Originals[vtable]);
                 return;
             }
-            s_Originals[vtable](self, args...);
+            s_Originals[vtable](self, std::move(args)...);
         }
         else
         {

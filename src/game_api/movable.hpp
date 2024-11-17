@@ -145,7 +145,7 @@ class Movable : public Entity
     virtual float calculate_jump_velocity(bool dont_ignore_liquid) = 0;      // 40
     virtual std::unordered_map<uint8_t, Animation>& get_animation_map() = 0; // 41
     /// Mostly used for ragdoll by the game
-    virtual void apply_velocity(Vec2& velocities, bool ignore_weight) = 0; // 42
+    virtual void apply_velocity(Vec2* velocities, bool ignore_weight) = 0; // 42
     /// Returns the damage that the entity deals
     virtual int8_t get_damage() = 0;       // 43, for player it calculates stomp damages as that's the only damage that the player entity can deal, the "normal" damage is done by the whip
     virtual int8_t get_stomp_damage() = 0; // 44, calls get_damage except for mech which always returns 3, dunno what's the difference between this and get_damage
