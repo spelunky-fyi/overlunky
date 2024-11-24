@@ -3,10 +3,11 @@
 #include <cstddef> // for size_t
 #include <cstdint> // for uint32_t, uint8_t, int8_t
 
-#include "aliases.hpp"    // for MAX_PLAYERS
-#include "render_api.hpp" // for TextureRenderingInfo
-#include "sound_manager.hpp"
-#include "thread_utils.hpp" // for OnHeapPointer
+#include "aliases.hpp"                       // for MAX_PLAYERS
+#include "containers/game_unordered_map.hpp" // for game_unordered_map
+#include "render_api.hpp"                    // for TextureRenderingInfo
+#include "sound_manager.hpp"                 // for BackgroundSound
+#include "thread_utils.hpp"                  // for OnHeapPointer
 
 struct SaveData;
 class ScreenCamp;
@@ -35,12 +36,68 @@ struct JournalPopupUI
     uint32_t timer;
     float slide_position;
     uint8_t unknown;
+    // uint8_t padding[3]; // probably?
+};
+
+class JournalData
+{
+    uint32_t page_nr;
+    uint32_t sprite_id;
+    STRINGID name;
+    STRINGID description;
+    float scale;
+    float offset_x;
+    float offset_y;
+};
+
+class JournalBestiaryData : public JournalData
+{
+    TEXTURE texture;
+    uint32_t background_sprite_id;
+    bool killed_by_NA;
+    bool defeated_NA;
+};
+
+class JournalPeopleData : public JournalData
+{
+    TEXTURE texture;
+    uint32_t background_sprite_id;
+    bool killed_by_NA;
+    bool defeated_NA;
+    // uint16_t padding;
+    TEXTURE portret_texture;
+};
+
+class JournalTrapData : public JournalData
+{
+    TEXTURE texture;
+    uint32_t background_sprite_id;
+};
+
+struct StickersData
+{
+    uint32_t sprite_id;
+    TEXTURE texture;
 };
 
 struct SaveRelated
 {
     OnHeapPointer<SaveData> savedata;
     JournalPopupUI journal_popup_ui;
+
+    ENT_TYPE player_entity;                  // for the journal stuff, probably the leader?
+    ENT_TYPE progress_stickers_powerups[29]; // pre-journal progress setup, maybe gathering from all players or something?
+
+    /// Scale and offset not used
+    game_unordered_map<uint8_t, JournalData> places_data;
+    game_unordered_map<ENT_TYPE, JournalBestiaryData> bestiary_data;
+    game_unordered_map<ENT_TYPE, ENT_TYPE> monster_part_to_main; // used to map stuff like Osiris_Hand -> Osiris_Head, Hundun limbs -> Hundun etc.
+    game_unordered_map<ENT_TYPE, JournalPeopleData> people_info;
+    game_unordered_map<ENT_TYPE, ENT_TYPE> people_part_to_main; // used to map shopkeeper clone to shopkeeper only
+    game_unordered_map<ENT_TYPE, JournalData> item_info;
+    game_unordered_map<ENT_TYPE, JournalData> trap_info;
+    game_unordered_map<ENT_TYPE, ENT_TYPE> trap_part_to_main; // used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
+    game_unordered_map<ENT_TYPE, StickersData> stickers_data;
 };
 
 struct BGMUnknown
