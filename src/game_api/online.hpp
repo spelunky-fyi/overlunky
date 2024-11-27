@@ -4,7 +4,7 @@
 #include <cstdint> // for uint32_t, uint8_t, int8_t, int32_t
 #include <string>  // for string
 
-enum class GAME_MODE : uint8_t
+enum class GAME_MODE : uint32_t
 {
     COOP = 1,
     ARENA = 2
@@ -30,10 +30,11 @@ enum class PLATFORM : uint8_t
 struct OnlinePlayer
 {
     uint8_t player_name_length;
-    uint8_t padding1[7];
+    uint8_t padding[3];
+    uint32_t unknown1;
     uint64_t id;
     GAME_MODE game_mode;
-    uint8_t padding2[4];
+    uint8_t unknown2;
     READY_STATE ready_state : 2;
     PLATFORM platform : 6;
     uint8_t character;
