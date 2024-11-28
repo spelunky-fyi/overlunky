@@ -6,6 +6,7 @@
 #include <exception> // for exception
 #include <memory>    // for remove_if, unique_ptr
 #include <mutex>     // for lock_guard, mutex
+#include <regex>     // for regex, regex_replace, regex_search
 
 #include "entity.hpp"             //
 #include "logger.h"               // for DEBUG
@@ -205,10 +206,7 @@ bool CustomBank::unload()
             [=, this](FMOD::Bank* bank)
             { return m_SoundManager->unload_bank(bank); },
             [](std::monostate)
-            {
-                return false;
-            },
-        },
+            { return false; }},
         m_FmodHandle);
 }
 
@@ -227,7 +225,7 @@ CustomSound::CustomSound(const CustomSound& rhs)
                 [this](FMOD::Sound* sound)
                 { m_SoundManager->acquire_sound(sound); },
                 [](FMODStudio::EventDescription*) {},
-                [](std::monostate) {},
+                [](std::monostate) {}
             },
             rhs.m_FmodHandle);
     }
@@ -356,6 +354,27 @@ std::optional<float> PlayingSound::get_parameter(VANILLA_SOUND_PARAM parameter_i
 bool PlayingSound::set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)
 {
     return m_SoundManager->set_parameter(*this, parameter_index, value);
+}
+
+CustomGUIDstringMap::CustomGUIDstringMap(const CustomGUIDstringMap& rhs)
+    : m_PathGUIDmap{rhs.m_PathGUIDmap}, m_SoundManager{rhs.m_SoundManager}
+{
+}
+CustomGUIDstringMap::CustomGUIDstringMap(CustomGUIDstringMap&& rhs) noexcept
+{
+    std::swap(m_PathGUIDmap, rhs.m_PathGUIDmap);
+    std::swap(m_SoundManager, rhs.m_SoundManager);
+}
+CustomGUIDstringMap::CustomGUIDstringMap(std::unordered_map<std::string, FMOD::FMOD_GUID> m_PathGUIDmap, SoundManager* sound_manager)
+    : m_PathGUIDmap{m_PathGUIDmap}, m_SoundManager{sound_manager}
+{
+}
+
+CustomGUIDstringMap::~CustomGUIDstringMap() = default;
+
+CustomSound CustomGUIDstringMap::get_sound_fmod_path(std::string path)
+{
+    return m_SoundManager->get_event_guid_map(*this, path);
 }
 
 struct SoundManager::Sound
@@ -675,18 +694,39 @@ PlayingSound SoundManager::play_sound(FMOD::Sound* fmod_sound, bool paused, bool
     return PlayingSound{channel, this};
 }
 
-/// TODO REMOVE THIS, TEMPORARY KLUDGE FOR TESTING
-CustomSound SoundManager::get_event_guid(std::string guid_string)
+CustomSound SoundManager::get_event_guid_map(CustomGUIDstringMap map, std::string path)
+{
+    auto it = map.m_PathGUIDmap.find(path);
+    if (it != map.m_PathGUIDmap.end())
+    {
+        DEBUG("Found guid {}", path);
+        return get_event_guid(&it->second);
+    }
+    DEBUG("Guid not found for path {}", path);
+    return CustomSound{nullptr, nullptr};
+}
+
+CustomSound SoundManager::get_event_guid_string(std::string guid_string)
 {
     FMOD::FMOD_GUID guid;
     if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
     {
-        FMODStudio::EventDescription* fmod_event;
-        if (FMOD_CHECK_CALL(m_SystemGetEventByID(m_FmodStudioSystem, &guid, &fmod_event)))
-        {
-            return CustomSound{fmod_event, this};
-        }
+        return get_event_guid(&guid);
     }
+    return CustomSound{nullptr, nullptr};
+}
+
+CustomSound SoundManager::get_event_guid(FMODStudio::FMOD_GUID* guid)
+{
+    DEBUG("{{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}",
+        guid->Data1, guid->Data2, guid->Data3, guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3], guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
+    FMODStudio::EventDescription* fmod_event;
+    if (FMOD_CHECK_CALL(m_SystemGetEventByID(m_FmodStudioSystem, guid, &fmod_event)))
+    {
+        DEBUG("Created CustomSound");
+        return CustomSound{fmod_event, this};
+    }
+    DEBUG("Could not get event by ID, is the bank loaded?");
     return CustomSound{nullptr, nullptr};
 }
 
@@ -846,6 +886,54 @@ bool SoundManager::unload_bank_sample_data(CustomBank custom_bank)
                    [](std::monostate)
                    { return false; } },
         custom_bank.m_FmodHandle);
+}
+
+CustomGUIDstringMap SoundManager::load_guid_string_map(std::string_view path)
+{
+    if (std::ifstream guid_file = std::ifstream(std::string{path}))
+    {
+        std::regex re("(\\{.*\\}) (event:.*)", std::regex_constants::icase);
+        std::string line;
+        std::smatch matches;
+        std::unordered_map<std::string, FMOD::FMOD_GUID> FMOD_GUID_Path_Map;
+
+        while (std::getline(guid_file, line))
+        {
+            if (std::regex_search(line, matches, re))
+            {
+                std::string FMOD_path = matches[2].str();
+                const char* FMOD_guid = matches[1].str().c_str();
+
+                FMOD::FMOD_GUID guid;
+                if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid, &guid)))
+                {
+                    DEBUG("Parsed GUID string {} as {{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}",
+                        FMOD_guid,
+                        guid.Data1, guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+                    auto it = FMOD_GUID_Path_Map.find(FMOD_path);
+                    if (it != FMOD_GUID_Path_Map.end())
+                    {
+                        it->second = guid;
+                    }
+                    else
+                    {
+                        FMOD_GUID_Path_Map[FMOD_path] = std::move(guid);
+                    }
+                }
+                else
+                {
+                    DEBUG("Failed to parse FMOD GUID string {}", FMOD_guid);
+                }
+            }
+        }
+        if (!FMOD_GUID_Path_Map.empty())
+        {
+            DEBUG("Successfully created GUID string map.");
+            return CustomGUIDstringMap{FMOD_GUID_Path_Map, this};
+        }
+    }
+    DEBUG("Failed to create GUID string map.");
+    return CustomGUIDstringMap{nullptr, nullptr};
 }
 
 bool SoundManager::is_playing(PlayingSound playing_sound)

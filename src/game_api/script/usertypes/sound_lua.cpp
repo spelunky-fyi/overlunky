@@ -95,11 +95,10 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         return sol::nullopt;
     };
 
-    /// TODO REMOVE THIS, TEMPORARY KLUDGE FOR TESTING
     lua["get_sound_guid"] = [](std::string guid_string) -> sol::optional<CustomSound>
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (CustomSound event = backend->sound_manager->get_event_guid(guid_string))
+        if (CustomSound event = backend->sound_manager->get_event_guid_string(guid_string))
         {
             return event;
         }
@@ -130,6 +129,47 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         &CustomBank::unload,
         "unloadSampleData",
         &CustomBank::unloadSampleData);
+
+    //auto get_sound_fmod_path = [](CustomGUIDstringMap& self, std::string path)
+    //{
+    //    return self.get_sound_fmod_path(self, path);
+    //};
+
+    lua.new_usertype<CustomGUIDstringMap>(
+        "CustomGUIDstringMap",
+        "get_sound_fmod_path",
+        [](CustomGUIDstringMap& sm, std::string path) -> std::optional<CustomSound>
+        {
+            auto backend = LuaBackend::get_calling_backend();
+            if (CustomSound event = sm.get_sound_fmod_path(path))
+            {
+                return event;
+            }
+            DEBUG("Failed to get CustomSound from StringMap");
+            return sol::nullopt;
+        }
+    );
+    
+    /// Loads an FMOD GUID to event map from disk relative to this script.
+    lua["register_event_map"] = [](std::string path) -> sol::optional<CustomGUIDstringMap>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (CustomGUIDstringMap map = backend->sound_manager->load_guid_string_map((backend->get_root_path() / path).string()))
+        {
+            return map;
+        }
+        return sol::nullopt;
+    };
+
+    lua["get_sound_fmod_path"] = [](std::string guid_string) -> sol::optional<CustomSound>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (CustomSound event = backend->sound_manager->get_event_guid_string(guid_string))
+        {
+            return event;
+        }
+        return sol::nullopt;
+    };
 
     /// Returns unique id for the callback to be used in [clear_vanilla_sound_callback](#clear_vanilla_sound_callback).
     /// Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound

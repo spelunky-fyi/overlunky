@@ -143,6 +143,34 @@ class PlayingSound
     SoundManager* m_SoundManager{nullptr};
 };
 
+class CustomGUIDstringMap
+{
+    friend class SoundManager;
+
+  public:
+    CustomGUIDstringMap(const CustomGUIDstringMap& rhs);
+    CustomGUIDstringMap(CustomGUIDstringMap&& rhs) noexcept;
+    CustomGUIDstringMap& operator=(const CustomGUIDstringMap& rhs) = delete;
+    CustomGUIDstringMap& operator=(CustomGUIDstringMap&& rhs) = delete;
+    ~CustomGUIDstringMap();
+
+    operator bool()
+    {
+        return m_SoundManager != nullptr;
+    }
+
+    CustomSound get_sound_fmod_path(std::string path);
+
+  private:
+    CustomGUIDstringMap(std::nullptr_t, std::nullptr_t)
+    {
+    }
+    CustomGUIDstringMap(std::unordered_map<std::string, FMOD::FMOD_GUID> m_PathGUIDmap, SoundManager* sound_manager);
+
+    std::unordered_map<std::string, FMOD::FMOD_GUID> m_PathGUIDmap;
+    SoundManager* m_SoundManager{nullptr};
+};
+
 class SoundManager
 {
   public:
@@ -168,6 +196,7 @@ class SoundManager
     bool load_bank_sample_data(CustomBank custom_bank);
     bool unload_bank(FMOD::Bank* fmod_bank);
     bool unload_bank_sample_data(CustomBank custom_bank);
+    CustomGUIDstringMap load_guid_string_map(std::string_view path);
 
     CustomSound get_sound(std::string path);
     CustomSound get_sound(const char* path);
@@ -176,7 +205,9 @@ class SoundManager
     void release_sound(FMOD::Sound* fmod_sound);
     PlayingSound play_sound(FMOD::Sound* fmod_sound, bool paused, bool as_music);
 
-    CustomSound get_event_guid(std::string guid_string);
+    CustomSound get_event_guid_map(CustomGUIDstringMap map, std::string path);
+    CustomSound get_event_guid_string(std::string guid_string);
+    CustomSound get_event_guid(FMOD::FMOD_GUID* guid);
     CustomSound get_event(std::string_view event_name);
     PlayingSound play_event(FMODStudio::EventDescription* fmod_event, bool paused, bool as_music);
 
