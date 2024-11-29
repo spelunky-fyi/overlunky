@@ -95,6 +95,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         return sol::nullopt;
     };
 
+    /// Gets an existing sound using a human readable FMOD GUID string
     lua["get_sound_guid"] = [](std::string guid_string) -> sol::optional<CustomSound>
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -130,43 +131,27 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "unloadSampleData",
         &CustomBank::unloadSampleData);
 
-    //auto get_sound_fmod_path = [](CustomGUIDstringMap& self, std::string path)
-    //{
-    //    return self.get_sound_fmod_path(self, path);
-    //};
-
-    lua.new_usertype<CustomGUIDstringMap>(
+    lua.new_usertype<FMODpathGUIDmap>(
         "CustomGUIDstringMap",
         "get_sound_fmod_path",
-        [](CustomGUIDstringMap& sm, std::string path) -> std::optional<CustomSound>
+        [](FMODpathGUIDmap& pgm, std::string path) -> std::optional<CustomSound>
         {
-            auto backend = LuaBackend::get_calling_backend();
-            if (CustomSound event = sm.get_sound_fmod_path(path))
+            if (CustomSound event = pgm.get_sound_fmod_event_path(path))
             {
                 return event;
             }
-            DEBUG("Failed to get CustomSound from StringMap");
+            DEBUG("Failed to get CustomSound from FMODpathGUIDmap");
             return sol::nullopt;
         }
     );
     
-    /// Loads an FMOD GUID to event map from disk relative to this script.
-    lua["register_event_map"] = [](std::string path) -> sol::optional<CustomGUIDstringMap>
+    /// Creates an FMOD event path to GUID map from disk relative to this script.
+    lua["create_fmod_path_guid_map"] = [](std::string path) -> sol::optional<FMODpathGUIDmap>
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (CustomGUIDstringMap map = backend->sound_manager->load_guid_string_map((backend->get_root_path() / path).string()))
+        if (FMODpathGUIDmap map = backend->sound_manager->create_fmod_path_guid_map((backend->get_root_path() / path).string()))
         {
             return map;
-        }
-        return sol::nullopt;
-    };
-
-    lua["get_sound_fmod_path"] = [](std::string guid_string) -> sol::optional<CustomSound>
-    {
-        auto backend = LuaBackend::get_calling_backend();
-        if (CustomSound event = backend->sound_manager->get_event_guid_string(guid_string))
-        {
-            return event;
         }
         return sol::nullopt;
     };
