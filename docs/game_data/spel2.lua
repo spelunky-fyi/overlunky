@@ -2356,6 +2356,46 @@ do
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
+    ---@field places_data table<integer, JournalPageData> @Scale and offset not used in those pages. Can't add more
+    ---@field bestiary_data table<ENT_TYPE, JournalBestiaryData>
+    ---@field monster_part_to_main table<ENT_TYPE, ENT_TYPE> @used to map stuff like Osiris_Hand -> Osiris_Head, Hundun limbs -> Hundun etc.
+    ---@field people_info table<ENT_TYPE, JournalPeopleData>
+    ---@field people_part_to_main table<ENT_TYPE, ENT_TYPE> @used to map shopkeeper clone to shopkeeper only
+    ---@field item_info table<ENT_TYPE, JournalPageData>
+    ---@field trap_info table<ENT_TYPE, JournalPageData>
+    ---@field trap_part_to_main table<ENT_TYPE, ENT_TYPE> @used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
+    ---@field stickers_data table<ENT_TYPE, StickersData>
+    ---@field get_SaveData fun(self): SaveData @Gets local version of the SaveData
+
+---@class JournalPageData
+    ---@field page_nr integer
+    ---@field sprite_id integer
+    ---@field name STRINGID
+    ---@field description STRINGID
+    ---@field scale number
+    ---@field offset_x number
+    ---@field offset_y number
+
+---@class JournalBestiaryData : JournalPageData
+    ---@field texture TEXTURE
+    ---@field background_sprite_id integer
+    ---@field killed_by_NA boolean
+    ---@field defeated_NA boolean
+
+---@class JournalPeopleData : JournalPageData
+    ---@field texture TEXTURE
+    ---@field background_sprite_id integer
+    ---@field killed_by_NA boolean
+    ---@field defeated_NA boolean
+    ---@field portret_texture TEXTURE
+
+---@class JournalTrapData : JournalPageData
+    ---@field texture TEXTURE
+    ---@field background_sprite_id integer
+
+---@class StickersData
+    ---@field sprite_id integer
+    ---@field texture TEXTURE
 
 ---@class JournalPopupUI
     ---@field wiggling_page_icon TextureRenderingInfo

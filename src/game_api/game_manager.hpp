@@ -39,8 +39,9 @@ struct JournalPopupUI
     // uint8_t padding[3]; // probably?
 };
 
-class JournalData
+class JournalPageData
 {
+  public:
     uint32_t page_nr;
     uint32_t sprite_id;
     STRINGID name;
@@ -50,16 +51,18 @@ class JournalData
     float offset_y;
 };
 
-class JournalBestiaryData : public JournalData
+class JournalBestiaryData : public JournalPageData
 {
+  public:
     TEXTURE texture;
     uint32_t background_sprite_id;
     bool killed_by_NA;
     bool defeated_NA;
 };
 
-class JournalPeopleData : public JournalData
+class JournalPeopleData : public JournalPageData
 {
+  public:
     TEXTURE texture;
     uint32_t background_sprite_id;
     bool killed_by_NA;
@@ -68,8 +71,9 @@ class JournalPeopleData : public JournalData
     TEXTURE portret_texture;
 };
 
-class JournalTrapData : public JournalData
+class JournalTrapData : public JournalPageData
 {
+  public:
     TEXTURE texture;
     uint32_t background_sprite_id;
 };
@@ -88,16 +92,25 @@ struct SaveRelated
     ENT_TYPE player_entity;                  // for the journal stuff, probably the leader?
     ENT_TYPE progress_stickers_powerups[29]; // pre-journal progress setup, maybe gathering from all players or something?
 
-    /// Scale and offset not used
-    game_unordered_map<uint8_t, JournalData> places_data;
+    /// Scale and offset not used in those pages. Can't add more
+    game_unordered_map<uint8_t, JournalPageData> places_data;
     game_unordered_map<ENT_TYPE, JournalBestiaryData> bestiary_data;
-    game_unordered_map<ENT_TYPE, ENT_TYPE> monster_part_to_main; // used to map stuff like Osiris_Hand -> Osiris_Head, Hundun limbs -> Hundun etc.
+    /// used to map stuff like Osiris_Hand -> Osiris_Head, Hundun limbs -> Hundun etc.
+    game_unordered_map<ENT_TYPE, ENT_TYPE> monster_part_to_main;
     game_unordered_map<ENT_TYPE, JournalPeopleData> people_info;
-    game_unordered_map<ENT_TYPE, ENT_TYPE> people_part_to_main; // used to map shopkeeper clone to shopkeeper only
-    game_unordered_map<ENT_TYPE, JournalData> item_info;
-    game_unordered_map<ENT_TYPE, JournalData> trap_info;
-    game_unordered_map<ENT_TYPE, ENT_TYPE> trap_part_to_main; // used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
+    /// used to map shopkeeper clone to shopkeeper only
+    game_unordered_map<ENT_TYPE, ENT_TYPE> people_part_to_main;
+    game_unordered_map<ENT_TYPE, JournalPageData> item_info;
+    game_unordered_map<ENT_TYPE, JournalPageData> trap_info;
+    /// used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
+    game_unordered_map<ENT_TYPE, ENT_TYPE> trap_part_to_main;
     game_unordered_map<ENT_TYPE, StickersData> stickers_data;
+
+    /// Gets local version of the SaveData
+    SaveData* get_SaveData()
+    {
+        return savedata.decode_local();
+    }
 };
 
 struct BGMUnknown

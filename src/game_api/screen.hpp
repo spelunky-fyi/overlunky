@@ -506,7 +506,7 @@ class ScreenCharacterSelect : public Screen // ID: 9
     float start_panel_slidein;
     float action_buttons_keycap_size;
     bool screen_loading; // locks the inputs?
-    bool unknown64b; // sets the state.ingame
+    bool unknown64b;     // sets the state.ingame
     bool seeded_run;
     bool daily_challenge;
     uint32_t next_screen_to_load;

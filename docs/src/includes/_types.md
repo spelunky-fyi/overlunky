@@ -779,6 +779,20 @@ Type | Name | Description
 [ENT_TYPE](#ENT_TYPE) | [owner_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_type) | 
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
 
+### JournalPageData
+
+Used in [SaveRelated](#SaveRelated)
+
+Type | Name | Description
+---- | ---- | -----------
+int | [page_nr](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=page_nr) | 
+int | [sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sprite_id) | 
+[STRINGID](#Aliases) | [name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=name) | 
+[STRINGID](#Aliases) | [description](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=description) | 
+float | [scale](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=scale) | 
+float | [offset_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_x) | 
+float | [offset_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=offset_y) | 
+
 ### KeyboardKey
 
 
@@ -1028,6 +1042,15 @@ Type | Name | Description
 int | [column](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=column) | 
 int | [row](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=row) | 
 
+### StickersData
+
+Used in [SaveRelated](#SaveRelated)
+
+Type | Name | Description
+---- | ---- | -----------
+int | [sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sprite_id) | 
+[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
+
 ### Triangle
 
 
@@ -1187,6 +1210,19 @@ array&lt;[ControllerInput](#ControllerInput), 12&gt; | [controller](https://gith
 
 ## Journal types
 
+
+### JournalBestiaryData
+
+Used in [SaveRelated](#SaveRelated)
+Derived from [JournalPageData](#JournalPageData)
+
+
+Type | Name | Description
+---- | ---- | -----------
+[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
+int | [background_sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background_sprite_id) | 
+bool | [killed_by_NA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_by_NA) | 
+bool | [defeated_NA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_NA) | 
 
 ### JournalPage
 
@@ -1367,6 +1403,31 @@ Type | Name | Description
 ---- | ---- | -----------
 [TextureRenderingInfo](#TextureRenderingInfo) | [trap_icon](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_icon) | 
 [TextureRenderingInfo](#TextureRenderingInfo) | [trap_background](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_background) | 
+
+### JournalPeopleData
+
+Used in [SaveRelated](#SaveRelated)
+Derived from [JournalPageData](#JournalPageData)
+
+
+Type | Name | Description
+---- | ---- | -----------
+[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
+int | [background_sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background_sprite_id) | 
+bool | [killed_by_NA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_by_NA) | 
+bool | [defeated_NA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_NA) | 
+[TEXTURE](#TEXTURE) | [portret_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=portret_texture) | 
+
+### JournalTrapData
+
+Used in [SaveRelated](#SaveRelated)
+Derived from [JournalPageData](#JournalPageData)
+
+
+Type | Name | Description
+---- | ---- | -----------
+[TEXTURE](#TEXTURE) | [texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=texture) | 
+int | [background_sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background_sprite_id) | 
 
 ## Levelgen types
 
@@ -1966,6 +2027,7 @@ float | [sinewave_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 
 ### JournalPopupUI
 
+Used in [SaveRelated](#SaveRelated)
 
 Type | Name | Description
 ---- | ---- | -----------
@@ -2052,10 +2114,21 @@ int | [visibility](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=visi
 
 ### SaveRelated
 
+Used in [GameManager](#GameManager)
 
 Type | Name | Description
 ---- | ---- | -----------
 [JournalPopupUI](#JournalPopupUI) | [journal_popup_ui](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=journal_popup_ui) | 
+map&lt;int, [JournalPageData](#JournalPageData)&gt; | [places_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=places_data) | Scale and offset not used in those pages. Can't add more
+map&lt;[ENT_TYPE](#ENT_TYPE), [JournalBestiaryData](#JournalBestiaryData)&gt; | [bestiary_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=bestiary_data) | 
+map&lt;[ENT_TYPE](#ENT_TYPE), [ENT_TYPE](#ENT_TYPE)&gt; | [monster_part_to_main](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=monster_part_to_main) | used to map stuff like Osiris_Hand -> Osiris_Head, [Hundun](#Hundun) limbs -> [Hundun](#Hundun) etc.
+map&lt;[ENT_TYPE](#ENT_TYPE), [JournalPeopleData](#JournalPeopleData)&gt; | [people_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_info) | 
+map&lt;[ENT_TYPE](#ENT_TYPE), [ENT_TYPE](#ENT_TYPE)&gt; | [people_part_to_main](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=people_part_to_main) | used to map shopkeeper clone to shopkeeper only
+map&lt;[ENT_TYPE](#ENT_TYPE), [JournalPageData](#JournalPageData)&gt; | [item_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=item_info) | 
+map&lt;[ENT_TYPE](#ENT_TYPE), [JournalPageData](#JournalPageData)&gt; | [trap_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_info) | 
+map&lt;[ENT_TYPE](#ENT_TYPE), [ENT_TYPE](#ENT_TYPE)&gt; | [trap_part_to_main](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_part_to_main) | used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
+map&lt;[ENT_TYPE](#ENT_TYPE), [StickersData](#StickersData)&gt; | [stickers_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers_data) | 
+[SaveData](#SaveData) | [get_SaveData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_SaveData) | Gets local version of the [SaveData](#SaveData)
 
 ### Screen
 
