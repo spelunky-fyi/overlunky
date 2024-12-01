@@ -51,15 +51,6 @@ class JournalPageData
     float offset_y;
 };
 
-class JournalBestiaryData : public JournalPageData
-{
-  public:
-    TEXTURE texture;
-    uint32_t background_sprite_id;
-    bool killed_by_NA;
-    bool defeated_NA;
-};
-
 class JournalPeopleData : public JournalPageData
 {
   public:
@@ -71,6 +62,17 @@ class JournalPeopleData : public JournalPageData
     TEXTURE portret_texture;
 };
 
+// probably same as JournalPeopleData, just not using portret_texture
+class JournalBestiaryData : public JournalPageData
+{
+  public:
+    TEXTURE texture;
+    uint32_t background_sprite_id;
+    bool killed_by_NA;
+    bool defeated_NA;
+};
+
+// this is probably part of JournalPageData, just only used for bestiary, people and trap
 class JournalTrapData : public JournalPageData
 {
   public:
