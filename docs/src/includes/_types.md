@@ -2379,6 +2379,10 @@ array&lt;float, MAX_PLAYERS&gt; | [player_quickselect_wiggle_angle](https://gith
 float | [topleft_woodpanel_esc_slidein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=topleft_woodpanel_esc_slidein) | 
 float | [start_panel_slidein](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start_panel_slidein) | 
 float | [action_buttons_keycap_size](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=action_buttons_keycap_size) | 
+bool | [screen_loading](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_loading) | 
+bool | [seeded_run](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seeded_run) | 
+bool | [daily_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=daily_challenge) | 
+bool | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge` 
 int | [next_screen_to_load](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_screen_to_load) | 
 bool | [not_ready_to_start_yet](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=not_ready_to_start_yet) | 
 int | [available_mine_entrances](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=available_mine_entrances) | 

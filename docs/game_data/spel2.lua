@@ -5919,6 +5919,10 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field topleft_woodpanel_esc_slidein number
     ---@field start_panel_slidein number
     ---@field action_buttons_keycap_size number
+    ---@field screen_loading boolean
+    ---@field seeded_run boolean
+    ---@field daily_challenge boolean
+    ---@field arena boolean @Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge` 
     ---@field next_screen_to_load integer
     ---@field not_ready_to_start_yet boolean
     ---@field available_mine_entrances integer
