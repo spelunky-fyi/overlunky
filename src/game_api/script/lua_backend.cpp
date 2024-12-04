@@ -92,6 +92,17 @@ LocalStateData& LuaBackend::get_locals()
     return local_state_datas[State::get().ptr()];
 }
 
+// Can return `nullptr`
+const LocalStateData* LuaBackend::get_locals_const() const
+{
+    StateMemory* state = State::get().ptr();
+    if (auto search = local_state_datas.find(state); search != local_state_datas.end())
+    {
+        return &search->second;
+    }
+    return nullptr;
+}
+
 void LuaBackend::clear()
 {
     clear_all_callbacks();
@@ -104,15 +115,16 @@ void LuaBackend::clear_all_callbacks()
 {
     // Clear all callbacks on script reload to avoid running them
     // multiple times.
-    level_timers.clear();
+    auto& locals = get_locals();
+    locals.level_timers.clear();
     global_timers.clear();
-    callbacks.clear();
+    locals.callbacks.clear();
     for (auto id : vanilla_sound_callbacks)
     {
         sound_manager->clear_callback(id);
     }
     load_callbacks.clear();
-    save_callbacks.clear();
+    locals.save_callbacks.clear();
     vanilla_sound_callbacks.clear();
     pre_tile_code_callbacks.clear();
     post_tile_code_callbacks.clear();
@@ -284,8 +296,9 @@ bool LuaBackend::update()
             script_input.clear();
             clear_custom_shopitem_names();
         }*/
-        ScriptState& script_state = get_locals().state;
         StateMemory* state = State::get().ptr();
+        auto& locals = local_state_datas[state];
+        ScriptState& script_state = locals.state;
         if (state->screen != script_state.screen)
         {
             if (on_screen)
@@ -326,13 +339,13 @@ bool LuaBackend::update()
                 on_win.value()();
         }
 
-        for (auto id : clear_callbacks)
+        for (auto id : locals.clear_callbacks)
         {
-            level_timers.erase(id);
+            locals.level_timers.erase(id);
             global_timers.erase(id);
-            callbacks.erase(id);
+            locals.callbacks.erase(id);
             load_callbacks.erase(id);
-            save_callbacks.erase(id);
+            locals.save_callbacks.erase(id);
             if (hotkey_callbacks.contains(id))
             {
                 if (g_hotkeys.contains(hotkey_callbacks[id].hotkeyid))
@@ -355,7 +368,7 @@ bool LuaBackend::update()
             std::erase_if(pre_entity_instagib_callbacks, [id](auto& cb)
                           { return cb.id == id; });
         }
-        clear_callbacks.clear();
+        locals.clear_callbacks.clear();
 
         HookHandler<Entity, CallbackType::Entity>::clear_pending();
         HookHandler<RenderInfo, CallbackType::Entity>::clear_pending();
@@ -427,7 +440,7 @@ bool LuaBackend::update()
             }
         }
 
-        for (auto& [id, callback] : callbacks)
+        for (auto& [id, callback] : locals.callbacks)
         {
             if (is_callback_cleared(id))
                 continue;
@@ -514,7 +527,7 @@ bool LuaBackend::update()
             clear_current_callback();
         }
         const int now_l = state->time_level;
-        for (auto it = level_timers.begin(); it != level_timers.end();)
+        for (auto it = locals.level_timers.begin(); it != locals.level_timers.end();)
         {
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
@@ -526,8 +539,12 @@ bool LuaBackend::update()
                     cb->lastRan = now_l;
                     if (!keep_going.value_or(true))
                     {
-                        it = level_timers.erase(it);
+                        it = locals.level_timers.erase(it);
                         continue;
+                    }
+                    else
+                    {
+                        locals.level_timers.increase_edit_num();
                     }
                 }
                 ++it;
@@ -539,7 +556,7 @@ bool LuaBackend::update()
                     set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function<void>(this, cbt->func);
                     clear_current_callback();
-                    it = level_timers.erase(it);
+                    it = locals.level_timers.erase(it);
                 }
                 else
                 {
@@ -554,7 +571,7 @@ bool LuaBackend::update()
 
         // Save callbacks have to run after all other callbacks or manual saves that happen after
         // will be skipped.
-        for (auto& [id, callback] : save_callbacks)
+        for (auto& [id, callback] : locals.save_callbacks)
         {
             set_current_callback(-1, id, CallbackType::Normal);
             if ((state->loading != script_state.loading && state->loading == 1) || manual_save)
@@ -609,7 +626,7 @@ void LuaBackend::draw(ImDrawList* dl)
             on_guiframe.value()(draw_ctx);
         }
 
-        for (auto& [id, callback] : callbacks)
+        for (auto& [id, callback] : get_locals().callbacks)
         {
             if (is_callback_cleared(id))
                 continue;
@@ -735,6 +752,11 @@ void LuaBackend::render_options()
 
 bool LuaBackend::is_callback_cleared(int32_t callback_id) const
 {
+    const LocalStateData* locals = get_locals_const();
+    if (locals == nullptr)
+        return false;
+
+    auto& clear_callbacks = locals->clear_callbacks;
     return std::find(clear_callbacks.begin(), clear_callbacks.end(), callback_id) != clear_callbacks.end();
 }
 bool LuaBackend::is_screen_callback_cleared(std::pair<int32_t, uint32_t> callback_id) const
@@ -788,7 +810,7 @@ void LuaBackend::pre_load_level_files()
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -809,7 +831,7 @@ bool LuaBackend::pre_init_level()
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -833,7 +855,7 @@ bool LuaBackend::pre_init_layer(LAYER layer)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -864,7 +886,7 @@ bool LuaBackend::pre_load_screen()
         set_level_string(u"%d-%d"sv);
     }
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -943,7 +965,7 @@ bool LuaBackend::pre_load_screen()
 
     if ((ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
     {
-        level_timers.clear();
+        get_locals().level_timers.clear();
         script_input.clear();
         clear_custom_shopitem_names();
     }
@@ -958,7 +980,7 @@ bool LuaBackend::pre_unload_level()
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -983,7 +1005,7 @@ bool LuaBackend::pre_unload_layer(LAYER layer)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1009,7 +1031,7 @@ void LuaBackend::post_room_generation()
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1086,7 +1108,7 @@ void LuaBackend::post_level_generation()
         saved_user_datas.clear();
     }
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1107,7 +1129,7 @@ void LuaBackend::post_init_layer(LAYER layer)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1134,7 +1156,7 @@ void LuaBackend::post_load_screen()
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1155,7 +1177,7 @@ void LuaBackend::post_unload_layer(LAYER layer)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1177,7 +1199,7 @@ void LuaBackend::on_death_message(STRINGID stringid)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1199,7 +1221,7 @@ std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1227,7 +1249,7 @@ LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenR
 
     PreHandleRoomTilesContext ctx{room_data};
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1334,7 +1356,7 @@ bool LuaBackend::process_vanilla_render_callbacks(ON event)
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1359,7 +1381,7 @@ bool LuaBackend::process_vanilla_render_blur_callbacks(ON event, float blur_amou
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1384,7 +1406,7 @@ bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1409,7 +1431,7 @@ bool LuaBackend::process_vanilla_render_layer_callbacks(ON event, uint8_t layer)
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1435,7 +1457,7 @@ bool LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
     render_ctx.bounding_box = bbox;
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1460,7 +1482,7 @@ bool LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
 
     auto now = get_frame_count();
     VanillaRenderContext render_ctx;
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1486,7 +1508,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
 
     std::optional<std::u16string> return_value = std::nullopt;
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1517,7 +1539,7 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
 
     std::optional<std::u16string> return_value = std::nullopt;
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1545,7 +1567,7 @@ bool LuaBackend::pre_load_journal_chapter(uint8_t chapter)
         return false;
 
     auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1574,7 +1596,7 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
 
     auto now = get_frame_count();
     std::vector<uint32_t> new_pages;
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1610,7 +1632,7 @@ std::optional<bool> LuaBackend::pre_get_feat(FEAT feat)
         return std::nullopt;
 
     auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1638,7 +1660,7 @@ bool LuaBackend::pre_set_feat(FEAT feat)
         return false;
 
     auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1812,7 +1834,7 @@ void LuaBackend::on_set_user_data(Entity* ent)
         return;
 
     auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1834,7 +1856,7 @@ bool LuaBackend::on_pre(ON event)
         return skip;
 
     auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1857,7 +1879,7 @@ void LuaBackend::on_post(ON event)
         return;
 
     auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1916,6 +1938,11 @@ void LuaBackend::copy_locals(StateMemory* from, StateMemory* to)
     auto& to_data = local_state_datas[to];
     auto& from_data = local_state_datas[from];
     to_data.state = from_data.state;
+    to_data.level_timers = from_data.level_timers;
+    to_data.callbacks = from_data.callbacks;
+    to_data.save_callbacks = from_data.save_callbacks;
+    to_data.clear_callbacks = from_data.clear_callbacks;
+    to_data.cbcount = from_data.cbcount;
     sol::object from_user_data = from_data.user_data;
     if (from_user_data != sol::lua_nil)
     {
@@ -1951,7 +1978,7 @@ bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -1977,7 +2004,7 @@ bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -2003,7 +2030,7 @@ void LuaBackend::post_save_state(int slot, StateMemory* saved)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -2025,7 +2052,7 @@ void LuaBackend::post_load_state(int slot, StateMemory* loaded)
 
     auto now = get_frame_count();
 
-    for (auto& [id, callback] : callbacks)
+    for (auto& [id, callback] : get_locals().callbacks)
     {
         if (is_callback_cleared(id))
             continue;
@@ -2059,6 +2086,7 @@ int LuaBackend::register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags)
 
     if (RegisterHotKey(get_window(), id, mod, vk))
     {
+        auto& cbcount = get_locals().cbcount;
         cb.hotkeyid = id;
         auto hotkey = HotKey{mod, vk, this, cbcount, true, flags, HOTKEY_TYPE::NORMAL};
         g_hotkeys[id] = hotkey;

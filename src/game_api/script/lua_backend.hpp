@@ -28,6 +28,7 @@
 #include "hook_handler.hpp" // for HookHandler
 #include "level_api.hpp"    // IWYU pragma: keep
 #include "logger.h"         // for DEBUG
+#include "online_util.hpp"  // for VectorEditTracked, UMapEditTracked
 #include "script.hpp"       // for ScriptMessage, ScriptImage (ptr only), Scri...
 #include "util.hpp"         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
@@ -289,6 +290,11 @@ struct LocalStateData
 {
     sol::object user_data;
     ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
+    UMapEditTracked<int, TimerCallback> level_timers;
+    UMapEditTracked<int, ScreenCallback> callbacks;
+    UMapEditTracked<int, ScreenCallback> save_callbacks;
+    VectorEditTracked<int> clear_callbacks;
+    int cbcount = 0;
 };
 
 class LuaBackend
@@ -308,16 +314,12 @@ class LuaBackend
 
     std::string result;
 
-    int cbcount = 0;
     CurrentCallback current_cb = {0, 0, CallbackType::None};
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
-    std::unordered_map<int, TimerCallback> level_timers;
     std::unordered_map<int, TimerCallback> global_timers;
-    std::unordered_map<int, ScreenCallback> callbacks;
     std::unordered_map<int, ScreenCallback> load_callbacks;
-    std::unordered_map<int, ScreenCallback> save_callbacks;
     std::unordered_map<int, HotKeyCallback> hotkey_callbacks;
     std::vector<std::uint32_t> vanilla_sound_callbacks;
     std::vector<LevelGenCallback> pre_tile_code_callbacks;
@@ -327,7 +329,6 @@ class LuaBackend
     std::vector<EntityInstagibCallback> pre_entity_instagib_callbacks;
     std::vector<std::uint32_t> chance_callbacks;
     std::vector<std::uint32_t> extra_spawn_callbacks;
-    std::vector<int> clear_callbacks;
     std::vector<std::pair<int, std::uint32_t>> screen_hooks;
     std::vector<std::pair<int, std::uint32_t>> clear_screen_hooks;
     std::vector<CustomMovableBehaviorStorage> custom_movable_behaviors;
@@ -356,6 +357,7 @@ class LuaBackend
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
 
+    const LocalStateData* get_locals_const() const;
     LocalStateData& get_locals();
     void copy_locals(StateMemory* from, StateMemory* to);
     void clear();

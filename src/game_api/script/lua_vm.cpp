@@ -467,20 +467,22 @@ end
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto state = State::get().ptr_main();
+        auto state = State::get().ptr();
         auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
-        backend->level_timers[backend->cbcount] = luaCb;
-        return backend->cbcount++;
+        auto& locals = backend->get_locals();
+        locals.level_timers[locals.cbcount] = luaCb;
+        return locals.cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add per level callback function to be called after `frames` engine frames. Timer is paused on pause and cleared on level transition.
     lua["set_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        int now = backend->g_state->time_level;
+        int now = State::get().ptr()->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
-        backend->level_timers[backend->cbcount] = luaCb;
-        return backend->cbcount++;
+        auto& locals = backend->get_locals();
+        locals.level_timers[locals.cbcount] = luaCb;
+        return locals.cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback). You can also return `false` from your function to clear the callback.
     /// Add global callback function to be called every `frames` engine frames. This timer is never paused or cleared.
@@ -488,8 +490,9 @@ end
     {
         auto backend = LuaBackend::get_calling_backend();
         auto luaCb = IntervalCallback{cb, frames, -1};
-        backend->global_timers[backend->cbcount] = luaCb;
-        return backend->cbcount++;
+        int& cbcount = backend->get_locals().cbcount;
+        backend->global_timers[cbcount] = luaCb;
+        return cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called after `frames` engine frames. This timer is never paused or cleared.
@@ -498,8 +501,9 @@ end
         auto backend = LuaBackend::get_calling_backend();
         int now = get_frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
-        backend->global_timers[backend->cbcount] = luaCb;
-        return backend->cbcount++;
+        int& cbcount = backend->get_locals().cbcount;
+        backend->global_timers[cbcount] = luaCb;
+        return cbcount++;
     };
     /// Returns unique id for the callback to be used in [clear_callback](#clear_callback).
     /// Add global callback function to be called on an [event](#Events).
@@ -507,13 +511,14 @@ end
     {
         auto backend = LuaBackend::get_calling_backend();
         auto luaCb = ScreenCallback{cb, event, -1};
+        auto& locals = backend->get_locals();
         if (luaCb.screen == ON::LOAD)
-            backend->load_callbacks[backend->cbcount] = luaCb; // Make sure load always runs before other callbacks
+            backend->load_callbacks[locals.cbcount] = luaCb; // Make sure load always runs before other callbacks
         else if (luaCb.screen == ON::SAVE)
-            backend->save_callbacks[backend->cbcount] = luaCb; // Make sure save always runs after other callbacks
+            locals.save_callbacks[locals.cbcount] = luaCb; // Make sure save always runs after other callbacks
         else
-            backend->callbacks[backend->cbcount] = luaCb;
-        return backend->cbcount++;
+            locals.callbacks[locals.cbcount] = luaCb;
+        return locals.cbcount++;
     };
     /// Clear previously added callback `id` or call without arguments inside any callback to clear that callback after it returns.
     // lua["clear_callback"] = [](sol::optional<CallbackId> id) -> void {};
@@ -521,7 +526,7 @@ end
         [](CallbackId id)
         {
             auto backend = LuaBackend::get_calling_backend();
-            backend->clear_callbacks.push_back(id);
+            backend->get_locals().clear_callbacks.push_back(id);
         },
         []()
         {
@@ -531,7 +536,7 @@ end
             {
             case CallbackType::Normal:
             case CallbackType::HotKey:
-                backend->clear_callbacks.push_back(caller.id);
+                backend->get_locals().clear_callbacks.push_back(caller.id);
                 break;
             case CallbackType::Entity:
                 backend->HookHandler<Entity, CallbackType::Entity>::clear_hook(caller.id, caller.aux_id);
@@ -940,8 +945,9 @@ end
         std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
         auto backend = LuaBackend::get_calling_backend();
-        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
-        return backend->cbcount++;
+        int& cbcount = backend->get_locals().cbcount;
+        backend->pre_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(proper_types), flags, std::move(cb)});
+        return cbcount++;
     };
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
@@ -961,8 +967,9 @@ end
         std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(types));
 
         auto backend = LuaBackend::get_calling_backend();
-        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{backend->cbcount, mask, std::move(proper_types), flags, std::move(cb)});
-        return backend->cbcount++;
+        int& cbcount = backend->get_locals().cbcount;
+        backend->post_entity_spawn_callbacks.push_back(EntitySpawnCallback{cbcount, mask, std::move(proper_types), flags, std::move(cb)});
+        return cbcount++;
     };
 
     /// Warp to a level immediately.
@@ -1580,8 +1587,9 @@ end
         if (Entity* ent = get_entity_ptr(uid))
         {
             auto backend = LuaBackend::get_calling_backend();
-            backend->pre_entity_instagib_callbacks.push_back(EntityInstagibCallback{backend->cbcount, uid, std::move(fun)});
-            return backend->cbcount++;
+            int& cbcount = backend->get_locals().cbcount;
+            backend->pre_entity_instagib_callbacks.push_back(EntityInstagibCallback{cbcount, uid, std::move(fun)});
+            return cbcount++;
         }
         return sol::nullopt;
     };
