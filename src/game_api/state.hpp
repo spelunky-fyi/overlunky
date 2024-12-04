@@ -222,7 +222,7 @@ struct StateMemory
     int32_t speechbubble_owner;
     Dialogue basecamp_dialogue;
 
-    // screen pointers below are most likely in an array and indexed through the screen ID (-10), hence the nullptrs for
+    // screen pointers below are most likely in an array and indexed through the screen ID (-10), hence the nullptr for
     // screens that are available in GameManager
     ScreenCharacterSelect* screen_character_select;
     /// For the arena

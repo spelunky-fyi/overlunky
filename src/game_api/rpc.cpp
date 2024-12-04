@@ -925,7 +925,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
     static uintptr_t new_code_address;
     if (offset == 0)
     {
-        offset = get_address("sun_chalenge_generator_ent_types");
+        offset = get_address("sun_challenge_generator_ent_types");
 
         // just so we can recover the oryginal later
         save_mem_recoverable("sunchallenge_spawn", offset, 14, true);
@@ -1254,7 +1254,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
             {
                 auto state = State::get().ptr();
                 item->flags = setflag(item->flags, 23); // shop item
-                item->flags = setflag(item->flags, 20); // Enable button prompt (flag is problably: show dialogs and other fx)
+                item->flags = setflag(item->flags, 20); // Enable button prompt (flag is probably: show dialogs and other fx)
                 state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
                 state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
 
@@ -1572,7 +1572,7 @@ void activate_hundun_hack(bool activate)
             offsets[0] = 0;
             return;
         }
-        offsets[5] += 9; // instruction size (din't include the whole thing in pattern, very short distance from previous pattern)
+        offsets[5] += 9; // instruction size (didn't include the whole thing in pattern, very short distance from previous pattern)
 
         offsets[0] = memory.at_exe(offsets[0]);
         offsets[1] = memory.at_exe(offsets[1]);
@@ -1783,7 +1783,7 @@ void set_level_logic_enabled(bool enable)
 
 void set_camera_layer_control_enabled(bool enable)
 {
-    static const size_t offset = get_address("camera_layer_controll");
+    static const size_t offset = get_address("camera_layer_control");
     static const size_t offset2 = get_address("player_behavior_layer_switch");
 
     if (enable)
@@ -2020,7 +2020,7 @@ void set_liquid_layer(LAYER l)
 
         jumps[0] = get_address("layer_check_in_add_liquid_collision");
         jumps[1] = get_address("layer_check_in_remove_liquid_collision");
-        jumps[2] = get_address("is_entity_in_liquid_check"); // TODO there is also layer offset nerby, test if it's related
+        jumps[2] = get_address("is_entity_in_liquid_check"); // TODO there is also layer offset nearby, test if it's related
         jumps[3] = get_address("liquid_render_layer");
         jumps[4] = get_address("entity_in_liquid_detection1");
         jumps[5] = get_address("entity_in_liquid_detection2");

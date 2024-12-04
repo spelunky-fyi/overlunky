@@ -40,14 +40,14 @@ struct Inventory
     uint8_t saved_pets_count;
 
     int8_t player_slot;
-    /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+    /// Used to transfer information to transition/next level (player riding a mount). Is not updated during a level
     /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ENT_TYPE mount_type;
     /// Metadata of the mount (health, is cursed etc.)
-    /// Used to transfer information to transition/next level (player rading a mout). Is not updated during a level
+    /// Used to transfer information to transition/next level (player riding a mount). Is not updated during a level
     /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     int16_t mount_metadata;
-    int16_t unknown_mount_ralated; // unsure, can be padding as well
+    int16_t unknown_mount_related; // unsure, can be padding as well
 
     /// Types of gold/gems collected during this level, used later to display during the transition
     std::array<ENT_TYPE, 512> collected_money;
@@ -76,7 +76,7 @@ struct Inventory
     /// (0..3) Used to transfer information to transition/next level. Is not updated during a level
     /// You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     std::array<uint8_t, 8> companion_trust;
-    /// Number of companions, it will determinate how many companions will be transfered to next level
+    /// Number of companions, it will determinate how many companions will be transferred to next level
     /// Increments when player acquires new companion, decrements when one of them dies
     uint8_t companion_count;
     /// Used to transfer information to transition/next level. Is not updated during a level

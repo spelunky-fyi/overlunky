@@ -19,7 +19,7 @@ void register_usertypes(sol::state& lua)
     /// The server will be closed once the handle is released.
     lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> UdpServer*
     {
-        // TODO: change the return to std::unique_ptr after fixing the dead lock with the destroctor
+        // TODO: change the return to std::unique_ptr after fixing the dead lock with the destructor
         UdpServer* server = new UdpServer(std::move(host), std::move(port), make_safe_cb<UdpServer::SocketCb>(std::move(cb)));
         return server;
     };

@@ -147,7 +147,7 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
     if (g_angle_style == CORNER_FINISH::NONE)
         return {};
     // save the corners as Vec2 for easier calculations
-    // and calculate inner and outher corner, we don't know which is which at this point
+    // and calculate inner and outer corner, we don't know which is which at this point
     Vec2 A{line1.top_left_x, line1.top_left_y};
     Vec2 B{line1.top_right_x, line1.top_right_y};
 
@@ -238,7 +238,7 @@ Quad get_line_quad(const Vec2 A, const Vec2 B, float thickness, bool world = fal
     float axis_AB_angle = std::atan2((B.y - A.y), (B.x) - (A.x));
     float hypotenuse = (float)std::sqrt(std::pow(B.x - A.x, 2) + std::pow(B.y - A.y, 2));
 
-    // make ractangle and then rotate it because i'm stupid
+    // make rectangle and then rotate it because i'm stupid
     Quad dest{AABB{A.x, A.y + thickness / 2, (A.x + hypotenuse), A.y - thickness / 2}};
     dest.rotate(axis_AB_angle, A.x, A.y);
     return dest;
@@ -726,7 +726,7 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("CORNER_FINISH", "NONE", CORNER_FINISH::NONE, "REAL", CORNER_FINISH::REAL, "CUT", CORNER_FINISH::CUT, "ADAPTIVE", CORNER_FINISH::ADAPTIVE);
     /* CORNER_FINISH
     // NONE
-    // Don't draw corner at all, will draw lines as separate pieces, overlaping etc.
+    // Don't draw corner at all, will draw lines as separate pieces, overlapping etc.
     // REAL
     // Draws a real corner, no matter how far away the "peak" of the corner may end up being
     // CUT
@@ -861,7 +861,7 @@ void register_usertypes(sol::state& lua)
     // TEXTURE_ALPHA_COLOR
     // Renders a texture by interpreting its red channel as alpha and applying the given color
     // TEXTURE_COLOR
-    // The default shader to be used, just renders a texture with transparancy and the given color
+    // The default shader to be used, just renders a texture with transparency and the given color
     // TEXTURE_COLORS_WARP
     // Renders the texture, with "gamma correction" of the color channels and multiplying everything by the input color alpha only
     // DEFERRED_COLOR_TRANSPARENT

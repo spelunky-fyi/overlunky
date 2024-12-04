@@ -141,7 +141,7 @@ struct Layer
 
     std::map<uint32_t, EntityList> entities_by_mask; // key is the mask
 
-    // 4x4 block areas (the edge ones extend to infinity?), each probably contains diffrent mask entities
+    // 4x4 block areas (the edge ones extend to infinity?), each probably contains different mask entities
     EntityList entities_by_region1[31][21];
     EntityList entities_by_region2[31][21]; // Active floors ?
     EntityList entities_by_region3[31][21];
@@ -171,13 +171,9 @@ struct Layer
     // uint32_t unknown17;
 
     Entity* spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx, float vy, bool snap);
-
     Entity* spawn_entity_snap_to_floor(ENT_TYPE id, float x, float y);
-
     Entity* spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y);
-
     Entity* spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t);
-
     Entity* spawn_apep(float x, float y, bool right);
 
     Entity* get_grid_entity_at(float x, float y) const;

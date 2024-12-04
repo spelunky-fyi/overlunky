@@ -101,7 +101,7 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
 
     size_t test_addr = addr + 0x10000; // dunno why, without this it can get address that is more than 32bit away
 
-    if (test_addr <= INT32_MAX) // redunded check as you probably won't get address that is less than INT32_MAX from "zero"
+    if (test_addr <= INT32_MAX) // redundant check as you probably won't get address that is less than INT32_MAX from "zero"
         test_addr = 0x1000;     // but i did it just in case so you can't get overflow
     else
         test_addr -= INT32_MAX;
@@ -180,7 +180,7 @@ void recover_mem(std::string name, size_t addr)
         }
     }
     // else
-    //     DEBUG("Warning: (recover_mem) tried to recover non existing memeory named: {}", name);
+    //     DEBUG("Warning: (recover_mem) tried to recover non existing memory named: {}", name);
 }
 
 bool mem_written(std::string name)

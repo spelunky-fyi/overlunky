@@ -462,7 +462,7 @@ void register_usertypes(sol::state& lua)
         "as_color",
         &LightParams::as_color);
 
-    /// Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
+    /// Generic object for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
     /// Used in StateMemory, Player, PlayerGhost, BurningRopeEffect ...
     auto illumination_type = lua.new_usertype<Illumination>("Illumination");
     illumination_type["lights"] = &Illumination::lights;

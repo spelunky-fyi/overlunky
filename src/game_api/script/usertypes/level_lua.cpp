@@ -992,7 +992,7 @@ void register_usertypes(sol::state& lua)
     /// Default function in spawn definitions to check whether a spawn is valid or not
     lua["default_spawn_is_valid"] = default_spawn_is_valid;
 
-    /// Check if position satifies the given POS_TYPE flags, to be used in a custom is_valid function procedural for spawns.
+    /// Check if position satisfies the given POS_TYPE flags, to be used in a custom is_valid function procedural for spawns.
     lua["position_is_valid"] = position_is_valid;
 
     /// Add a callback for a specific tile code that is called before the game handles the tile code.
@@ -1064,7 +1064,7 @@ void register_usertypes(sol::state& lua)
     /// Use for example when you can spawn only on the ceiling, under water or inside a shop.
     /// Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
     /// To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
-    /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+    /// No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new unique id.
     lua["define_extra_spawn"] = [](sol::function do_spawn, sol::function is_valid, std::uint32_t num_spawns_frontlayer, std::uint32_t num_spawns_backlayer) -> std::uint32_t
     {
         std::function<bool(float, float, int)> is_valid_call{nullptr};

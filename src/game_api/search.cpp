@@ -1240,7 +1240,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "insta_gib"sv,
-        // This should be just called/jumped to at the end of kill virtual fror the CHAR_* entity
+        // This should be just called/jumped to at the end of kill virtual for the CHAR_* entity
         // Put a write bp on player's Entity::flags, conditionally exclude the couple bp's it hits for just being in the level,
         // Or write bp on Movable::health, the next function after setting it to 0 should be this one
         // then die to a ghost
@@ -1468,7 +1468,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "sparktrap_angle_increment"sv,
-        // Put a read bp on Spark:rotatnio_angle, the next instruction adds a hardcoded float from constant, we want address of that constant (not the whole instruction)
+        // Put a read bp on Spark:rotation_angle, the next instruction adds a hardcoded float from constant, we want address of that constant (not the whole instruction)
         PatternCommandBuffer{}
             .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00"sv)
             .at_exe(),
@@ -1582,9 +1582,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "get_entity_name"sv,
         PatternCommandBuffer{}
-            .find_inst("\x44\x21\xe2\x4c\x8b\x91\x78\x02\x00\x00"sv)
-            .at_exe()
-            .function_start(0xff),
+            .find_after_inst("48 89 F2 66 41 B8 80 00 45 31 C9"_gh)
+            .decode_call()
+            .at_exe(),
     },
     {
         "construct_soundmeta"sv,
@@ -1596,7 +1596,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // Open the journal on any page and find references to its vftable pointer (look at page in game_manager.journal_ui.pages)
-        // scroll up to the top, find refrence to this address (each page is referenced two times, but the top of vtable is like 10 times)
+        // scroll up to the top, find reference to this address (each page is referenced two times, but the top of vtable is like 10 times)
         "vftable_JournalPages"sv,
         PatternCommandBuffer{}
             .find_inst("48 89 01 85 D2 74 08"_gh)
@@ -1656,7 +1656,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // execute to the return two times, you should see this array right above the call
         // It's pointer to array[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
         // we want the address to the `shift right` instruction since we gonna replace it all, but not mess with PRNG stuff
-        "sun_chalenge_generator_ent_types"sv,
+        "sun_challenge_generator_ent_types"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x89\x4A\x38\x48\xC1\xE8\x1C\x83\xE0"sv)
             .offset(0x4)
@@ -1706,7 +1706,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // Set conditional bp on load_item for KEY, execute til return, scroll up untill you find instruction writing const into r14
+        // Set conditional bp on load_item for KEY, execute til return, scroll up until you find instruction writing const into r14
         "waddler_drop_array"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x45\x0F\x57\xDB\x4C\x8D\x35"sv)
@@ -1903,7 +1903,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // find string "%d-%d" go to it's address, look for refrences to that address, one will be inside the render hud funciton
+        // find string "%d-%d" go to it's address, look for references to that address, one will be inside the render hud function
         // we want the address of the offset (not whole instruction)
         "hud_level_text"sv,
         PatternCommandBuffer{}
@@ -2044,7 +2044,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "hud"sv,
-        // you can get the address from the render_hud (first parameter), it's global/static, so just find good refrence to it
+        // you can get the address from the render_hud (first parameter), it's global/static, so just find good reference to it
         PatternCommandBuffer{}
             .find_after_inst("41 C6 47 6B 01"_gh)
             .find_inst("48 8D 0D"_gh)
@@ -2077,7 +2077,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         //.from_exe_base(0x228b58f0),
     },
     {
-        "camera_layer_controll"sv,
+        "camera_layer_control"sv,
         // overwrites state.camera_layer every frame
         PatternCommandBuffer{}
             .get_address("state_refresh"sv)
@@ -2138,7 +2138,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .from_exe_base(0x22e0d1d0) // TODO
     },
     {
-        // look into spawn entity function when spawninig activefloor
+        // look into spawn entity function when spawning activefloor
         // or set break point on write to the activefloors map in state.liquid_physics.activefloors
         "add_movable_to_liquid_collision_map"sv, // jump
         PatternCommandBuffer{}
@@ -2237,7 +2237,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         // when he spews lava, go to hes current behavior, and to function `get_next_state_id`
         // then find a few writes to stack and then a function call
-        // one of those writes is byte [+0x50] with value 0 (presumbly layer? or bool that means check both layers?)
+        // one of those writes is byte [+0x50] with value 0 (presumably layer? or bool that means check both layers?)
         "lavamander_spewing_lava"sv, // layer byte or bool
         PatternCommandBuffer{}
             .from_exe_base(0x22A45F94), // code too generic to find anything unique
@@ -2290,7 +2290,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         // set bp on on_collision2 for plasma cannon (probably any entity works)
         // execute till return, when in state update function, above the call to the collision virtual should entity lookup
-        // with the useal stack set, one of the params is byte 0 which we want to edit
+        // with the usual stack set, one of the params is byte 0 which we want to edit
         "collision_mask_check_param"sv, // layer byte or bool
         PatternCommandBuffer{}
             .get_address("state_refresh")

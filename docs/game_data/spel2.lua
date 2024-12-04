@@ -78,11 +78,11 @@ function lua_print() end
 ---@param message string
 ---@return nil
 function print(message) end
----Print a log message to ingame console with a comment identifying the script that sent it.
+---Print a log message to in-game console with a comment identifying the script that sent it.
 ---@param message string
 ---@return nil
 function console_print(message) end
----Prinspect to ingame console.
+---Prinspect to in-game console.
 ---@vararg any
 ---@return nil
 function console_prinspect(...) end
@@ -418,7 +418,7 @@ function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
 ---@param layer LAYER?
 ---@return integer
 function spawn_player(player_slot, x, y, layer) end
----Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input) and send_input to controll it
+---Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input) and send_input to control it
 ---or change it's `player_inputs` to the `input` of real player so he can control it directly
 ---@param char_type ENT_TYPE
 ---@param x number
@@ -428,7 +428,7 @@ function spawn_player(player_slot, x, y, layer) end
 function spawn_playerghost(char_type, x, y, layer) end
 ---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 ---This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
----In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+---In many cases replacing the intended entity won't have the intended effect or will even break the game, so use only if you really know what you're doing.
 ---The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
 ---@param cb fun(entity_type: ENT_TYPE, x: number, y: number, layer: integer, overlay_entity: Entity, spawn_flags: SPAWN_TYPE): integer?
 ---@param flags SPAWN_TYPE
@@ -544,7 +544,7 @@ function get_type(id) end
 ---@param layer LAYER
 ---@return integer
 function get_grid_entity_at(x, y, layer) end
----Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+---Get uids of static entities overlapping this grid position (decorations, backgrounds etc.)
 ---@param x number
 ---@param y number
 ---@param layer LAYER
@@ -997,7 +997,7 @@ function raise() end
 ---@param hash integer
 ---@return STRINGID
 function hash_to_stringid(hash) end
----Get string behind STRINGID, don't use stringid diretcly for vanilla string, use [hash_to_stringid](https://spelunky-fyi.github.io/overlunky/#hash_to_stringid) first
+---Get string behind STRINGID, don't use stringid directly for vanilla string, use [hash_to_stringid](https://spelunky-fyi.github.io/overlunky/#hash_to_stringid) first
 ---Will return the string of currently choosen language
 ---@param string_id STRINGID
 ---@return string
@@ -1008,12 +1008,12 @@ function get_string(string_id) end
 ---@param str string
 ---@return nil
 function change_string(id, str) end
----Add custom string, currently can only be used for names of shop items (Entitydb->description)
+---Add custom string, currently can only be used for names of shop items (EntityDB->description)
 ---Returns STRINGID of the new string
 ---@param str string
 ---@return STRINGID
 function add_string(str) end
----Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+---Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 ---if the entity has no localized name
 ---@param type ENT_TYPE
 ---@param fallback_strategy boolean?
@@ -1285,12 +1285,12 @@ function set_frametime_unfocused(frametime) end
 ---@return double
 function get_frametime_unfocused() end
 ---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
----Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+---Use empty array or no parameter to get new unique ENT_TYPE that can be used for custom EntityDB
 ---@param types ENT_TYPE[]
 ---@return ENT_TYPE
 function add_custom_type(types) end
 ---Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
----Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+---Use empty array or no parameter to get new unique ENT_TYPE that can be used for custom EntityDB
 ---@return ENT_TYPE
 function add_custom_type() end
 ---Get uids of entities by draw_depth. Can also use table of draw_depths.
@@ -1388,7 +1388,7 @@ function play_adventure() end
 ---@return nil
 function play_seeded(seed) end
 ---Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
----This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+---This sadly also makes lavamanders extinct, since the logic for their spawn is hardcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
 ---Everything should be working more or less correctly (report on community discord if you find something unusual)
 ---@param l LAYER
 ---@return nil
@@ -1500,7 +1500,7 @@ function extinguish_particles(particle_emitter) end
 ---@param layer LAYER
 ---@return boolean
 function default_spawn_is_valid(x, y, layer) end
----Check if position satifies the given POS_TYPE flags, to be used in a custom is_valid function procedural for spawns.
+---Check if position satisfies the given POS_TYPE flags, to be used in a custom is_valid function procedural for spawns.
 ---@param x number
 ---@param y number
 ---@param layer LAYER
@@ -1552,7 +1552,7 @@ function define_procedural_spawn(procedural_spawn, do_spawn, is_valid) end
 ---Use for example when you can spawn only on the ceiling, under water or inside a shop.
 ---Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 ---To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
----No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+---No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new unique id.
 ---@param do_spawn fun(x: number, y: number, layer: LAYER): nil
 ---@param is_valid fun(x: number, y: number, layer: LAYER): boolean
 ---@param num_spawns_frontlayer integer
@@ -1629,28 +1629,28 @@ function get_level_config(config) end
 function set_level_config(config, value) end
 ---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
----@param max_lengh integer
+---@param max_length integer
 ---@param area AABB
 ---@param destroy_broken boolean
 ---@return nil
-function grow_vines(l, max_lengh, area, destroy_broken) end
+function grow_vines(l, max_length, area, destroy_broken) end
 ---Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
----@param max_lengh integer
+---@param max_length integer
 ---@return nil
-function grow_vines(l, max_lengh) end
+function grow_vines(l, max_length) end
 ---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
----@param max_lengh integer
+---@param max_length integer
 ---@param area AABB
 ---@param destroy_broken boolean
 ---@return nil
-function grow_poles(l, max_lengh, area, destroy_broken) end
+function grow_poles(l, max_length, area, destroy_broken) end
 ---Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
 ---@param l LAYER
----@param max_lengh integer
+---@param max_length integer
 ---@return nil
-function grow_poles(l, max_lengh) end
+function grow_poles(l, max_length) end
 ---Grow chains from `ENT_TYPE_FLOOR_CHAIN_CEILING` and chain with blocks on it from `ENT_TYPE_FLOOR_CHAINANDBLOCKS_CEILING`, it starts looking for the ceilings from the top left corner of a level.
 ---To limit it use the parameters, so x = 10 will only grow chains from ceilings with x < 10, with y = 10 it's ceilings that have y > (level bound top - 10)
 ---@return boolean
@@ -1822,7 +1822,7 @@ function screen_aabb(box) end
 ---@param D Vec2
 ---@return Vec2
 function intersection(A, B, C, D) end
----Mesures angle between two lines with one common point
+---Measures angle between two lines with one common point
 ---@param A Vec2
 ---@param common Vec2
 ---@param B Vec2
@@ -1909,7 +1909,7 @@ function get_bucket() end
 function rgba(r, g, b, a) end
 ---Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol
 ---You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too.
----Default apha value will be 0xFF, unless it's specified
+---Default alpha value will be 0xFF, unless it's specified
 ---Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
 ---@param color_name string
 ---@param alpha integer?
@@ -2567,6 +2567,10 @@ function PRNG:random(min, max) end
     ---@field set_post_activate fun(self, fun: fun(self: Entity, activator: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`
     ---@field set_post_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil on_collision2(Entity self, Entity other_entity)`
+    ---@field set_pre_get_metadata fun(self, fun: fun(self: Entity): integer?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<integer> get_metadata(Entity self)`<br/>Virtual function docs:<br/>e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    ---@field set_post_get_metadata fun(self, fun: fun(self: Entity): integer?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil get_metadata(Entity self)`<br/>Virtual function docs:<br/>e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
+    ---@field set_pre_apply_metadata fun(self, fun: fun(self: Entity, metadata: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool apply_metadata(Entity self, integer metadata)`
+    ---@field set_post_apply_metadata fun(self, fun: fun(self: Entity, metadata: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil apply_metadata(Entity self, integer metadata)`
     ---@field set_pre_walked_on fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_on(Entity self, Entity)`
     ---@field set_post_walked_on fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil walked_on(Entity self, Entity)`
     ---@field set_pre_walked_off fun(self, fun: fun(self: Entity, Entity: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool walked_off(Entity self, Entity)`
@@ -2594,7 +2598,7 @@ function Entity:overlaps_with(rect_left, rect_bottom, rect_right, rect_top) end
 function Entity:overlaps_with(other) end
 ---Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
 ---To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
----destroy_corpse and responsible are the standard parameters for the kill funciton
+---destroy_corpse and responsible are the standard parameters for the kill function
 ---@param destroy_corpse boolean
 ---@param responsible Entity
 ---@param mask integer?
@@ -2665,7 +2669,7 @@ function Entity:destroy_recursive() end
     ---@field collect_treasure fun(self, value: integer, treasure: ENT_TYPE): nil @Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
     ---@field is_on_fire fun(self): boolean
     ---@field damage fun(self, damage_dealer: Entity, damage_amount: integer, damage_flags: DAMAGE_TYPE, velocity: Vec2, unknown_damage_phase: integer, stun_amount: integer, iframes: integer, unknown_is_final: boolean): boolean @Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.<br/>Returns: true if entity was affected, damage_dealer should break etc. false if the event should be ignored by damage_dealer?
-    ---@field get_all_behaviors fun(self): integer[] @Get all avaible behavior ids
+    ---@field get_all_behaviors fun(self): integer[] @Get all available behavior ids
     ---@field set_behavior fun(self, behavior_id: integer): boolean @Set behavior, this is more than just state as it's an active function, for example climbing ladder is a behavior and it doesn't actually need ladder/rope entity<br/>Returns false if entity doesn't have this behavior id
     ---@field get_behavior fun(self): integer @Get the current behavior id
     ---@field set_gravity fun(self, gravity: number): nil @Force the gravity for this entity. Will override anything set by special states like swimming too, unless you reset it. Default 1.0
@@ -2776,8 +2780,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field held_item ENT_TYPE @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field held_item_metadata integer @Metadata of the held item (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field saved_pets_count integer
-    ---@field mount_type ENT_TYPE @Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
-    ---@field mount_metadata integer @Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field mount_type ENT_TYPE @Used to transfer information to transition/next level (player riding a mount). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
+    ---@field mount_metadata integer @Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player riding a mount). Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field kills_level integer
     ---@field kills_total integer
     ---@field collected_money_total integer @Total money collected during previous levels (so excluding the current one)
@@ -2785,7 +2789,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field collected_money ENT_TYPE[] @size: 512 @Types of gold/gems collected during this level, used later to display during the transition
     ---@field collected_money_values integer[] @size: 512 @Values of gold/gems collected during this level, used later to display during the transition
     ---@field killed_enemies ENT_TYPE[] @size: 256 @Types of enemies killed during this level, used later to display during the transition
-    ---@field companion_count integer @Number of companions, it will determinate how many companions will be transfered to next level<br/>Increments when player acquires new companion, decrements when one of them dies
+    ---@field companion_count integer @Number of companions, it will determinate how many companions will be transferred to next level<br/>Increments when player acquires new companion, decrements when one of them dies
     ---@field companions ENT_TYPE[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field companion_held_items ENT_TYPE[] @size: 8 @Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
     ---@field companion_held_item_metadatas integer[] @size: 8 @Metadata of items held by companions (health, is cursed etc.)<br/>Used to transfer information to transition/next level. Is not updated during a level<br/>You can use `ON.PRE_LEVEL_GENERATION` to access/edit this
@@ -2803,7 +2807,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field last_state integer
     ---@field trust integer @Levels completed with, 0..3
     ---@field whipped integer @Number of times whipped by player
-    ---@field walk_pause_timer integer @positive: walking, negative: wating/idle
+    ---@field walk_pause_timer integer @positive: walking, negative: waiting/idle
 
 ---@class Player : PowerupCapable
     ---@field inventory Inventory
@@ -2833,7 +2837,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field deco_left integer
     ---@field deco_right integer
     ---@field fix_border_tile_animation fun(self): nil @Sets `animation_frame` of the floor for types `FLOOR_BORDERTILE`, `FLOOR_BORDERTILE_METAL` and `FLOOR_BORDERTILE_OCTOPUS`.
-    ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil @Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_*` entities, those usually only have decorations when broken.
+    ---@field fix_decorations fun(self, fix_also_neighbors: boolean, fix_styled_floor: boolean): nil @Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set `fix_also_neighbors` to `true` to fix the neighboring floor tile decorations on the border of the two tiles.<br/>Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_*` entities, those usually only have decorations when broken.
     ---@field add_decoration fun(self, side: FLOOR_SIDE): nil @Explicitly add a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
     ---@field remove_decoration fun(self, side: FLOOR_SIDE): nil @Explicitly remove a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
     ---@field decorate_internal fun(self): nil
@@ -3135,8 +3139,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field lose_interest_timer integer
     ---@field countdown_timer integer @can't shot when the timer is running
     ---@field is_patrolling boolean
-    ---@field aggro_trigger boolean @setting this makes him angry, if it's shopkeeper you get 2 agrro points
-    ---@field was_hurt boolean @also is set true if you set aggro to true, get's trigger even when whiping
+    ---@field aggro_trigger boolean @setting this makes him angry, if it's shopkeeper you get 2 aggro points
+    ---@field was_hurt boolean @also is set true if you set aggro to true, get's trigger even when whipping
 
 ---@class WalkingMonster : Monster
     ---@field chatting_to_uid integer
@@ -3198,7 +3202,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field ceiling_pos_x number
     ---@field ceiling_pos_y number
     ---@field jump_timer integer @For the giant spider, some times he shot web instead of jumping
-    ---@field trigger_distance number @only in the x coord
+    ---@field trigger_distance number @only in the x coordinate
 
 ---@class HangSpider : Monster
     ---@field dangle_jump_timer integer
@@ -3319,7 +3323,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field walk_pause_timer integer
 
 ---@class VanHorsing : NPC
-    ---@field show_text boolean @if set to true, he will say 'i've been hunting this fiend a long time!' when on screen
+    ---@field show_text boolean @if set to true, he will say "I've been hunting this fiend a long time!" when on screen
     ---@field special_message_shown boolean @one way door message has been shown
 
 ---@class WitchDoctor : WalkingMonster
@@ -3354,7 +3358,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Octopus : WalkingMonster
 
 ---@class Bodyguard : NPC
-    ---@field position_state integer @0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace
+    ---@field position_state integer @0 - none, 1 - Tusk dice shop, 2 - Entrance to pleasure palace, 3 - Basement entrance to pleasure palace
     ---@field message_shown boolean
 
 ---@class Fish : Monster
@@ -3380,7 +3384,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field climb_pause_timer integer
     ---@field shell_invincibility_timer integer
     ---@field monster_spawn_timer integer
-    ---@field initial_shell_health integer @excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
+    ---@field initial_shell_health integer @Excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip
     ---@field player_seen_by_kingu boolean
 
 ---@class Anubis : Monster
@@ -3586,7 +3590,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field snake_head_spawn_y number @This is custom variable, you need [activate_hundun_hack](#activate_hundun_hack) to use it
 
 ---@class HundunHead : Monster
-    ---@field attack_position_x number @Posiotion where the head will move on attack
+    ---@field attack_position_x number @Position where the head will move on attack
     ---@field attack_position_y number
     ---@field egg_crack_effect_uid integer
     ---@field targeted_player_uid integer
@@ -4329,7 +4333,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field max_timer integer
     ---@field size number @Gets smaller as the timer gets close to the max_timer
 
----@class BGShopEntrence : Entity
+---@class BGShopEntrance : Entity
     ---@field on_entering boolean
 
 ---@class BGFloatingDebris : BGSurfaceLayer
@@ -4477,7 +4481,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class EggplantThrower : Entity
 
 ---@class LogicalMiniGame : Entity
-    ---@field timer integer @Delay between spwning ufo
+    ---@field timer integer @Delay between spawning ufo
 
 ---@class DMSpawning : Entity
     ---@field spawn_x number
@@ -4627,7 +4631,7 @@ function MovableBehavior:get_state_id() end
     ---@field spawn_decoration fun(self): nil @Spawns some specific decoration, e.g. Vlad's big banner
     ---@field spawn_decoration2 fun(self): nil @Spawns some other specific decorations, e.g. grass, flowers, udjat room decal
     ---@field spawn_extra fun(self): nil @Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil @Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
+    ---@field do_procedural_spawn fun(self, info: SpawnInfo): nil @Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)
     ---@field set_pre_virtual fun(self, entry: THEME_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: THEME_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -4731,8 +4735,8 @@ function MovableBehavior:get_state_id() end
     ---@field set_post_spawn_decoration2 fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_decoration2(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns some other specific decorations, e.g. grass, flowers, udjat room decal
     ---@field set_pre_spawn_extra fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
     ---@field set_post_spawn_extra fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_extra(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-    ---@field set_pre_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
-    ---@field set_post_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)
+    ---@field set_pre_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)
+    ---@field set_post_do_procedural_spawn fun(self, fun: fun(self: ThemeInfo, info: SpawnInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)`<br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)
 
 ---@class CustomTheme : ThemeInfo
     ---@field level_file string @Level file to load. Probably doesn't do much in custom themes, especially if you're forcing them in PRE_LOAD_LEVEL_FILES.
@@ -5180,15 +5184,15 @@ function GuiDrawContext:win_pushid(id) end
 
 ---@class VanillaRenderContext
     ---@field draw_text_size fun(self, text: string, scale_x: number, scale_y: number, fontstyle: integer): number, number @Measure the provided text using the built-in renderer<br/>If you can, consider creating your own TextRenderingInfo instead<br/>You can then use `:text_size()` and `draw_text` with that one object<br/>`draw_text_size` works by creating new TextRenderingInfo just to call `:text_size()`, which is not very optimal
-    ---@field set_corner_finish fun(self, c: CORNER_FINISH): nil @Set the prefered way of drawing corners for the non filled shapes
+    ---@field set_corner_finish fun(self, c: CORNER_FINISH): nil @Set the preferred way of drawing corners for the non filled shapes
     ---@field draw_screen_line fun(self, A: Vec2, B: Vec2, thickness: number, color: Color): nil @Draws a line on screen using the built-in renderer from point `A` to point `B`.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    ---@field draw_screen_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
-    ---@field draw_screen_rect_filled fun(self, rect: AABB, color: Color, angle: number?, px: number?, py: number?): nil @Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_screen_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotation where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
+    ---@field draw_screen_rect_filled fun(self, rect: AABB, color: Color, angle: number?, px: number?, py: number?): nil @Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     ---@field draw_screen_triangle fun(self, triangle: Triangle, thickness: number, color: Color): nil @Draw triangle in screen coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     ---@field draw_screen_triangle_filled fun(self, triangle: Triangle, color: Color): nil @Draw filled triangle in screen coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
     ---@field draw_world_line fun(self, A: Vec2, B: Vec2, thickness: number, color: Color): nil @Draws a line in world coordinates using the built-in renderer from point `A` to point `B`.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
-    ---@field draw_world_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
-    ---@field draw_world_rect_filled fun(self, rect: AABB, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    ---@field draw_world_rect fun(self, rect: AABB, thickness: number, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotation where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the `thickness`)<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
+    ---@field draw_world_rect_filled fun(self, rect: AABB, color: Color, angle: number?, px: number?, py: number?): nil @Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional `angle`.<br/>`px`/`py` is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     ---@field draw_world_triangle fun(self, triangle: Triangle, thickness: number, color: Color): nil @Draw triangle in world coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     ---@field draw_world_triangle_filled fun(self, triangle: Triangle, color: Color): nil @Draw filled triangle in world coordinates using the built-in renderer.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
     ---@field bounding_box AABB
@@ -5231,7 +5235,7 @@ function VanillaRenderContext:draw_screen_texture(texture_id, row, column, left,
 ---@param color Color
 ---@return nil
 function VanillaRenderContext:draw_screen_texture(texture_id, row, column, rect, color) end
----Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+---Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.
 ---Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events
 ---@param texture_id TEXTURE
 ---@param row integer
@@ -5320,7 +5324,7 @@ function VanillaRenderContext:draw_world_texture(texture_id, row, column, left, 
 ---@param color Color
 ---@return nil
 function VanillaRenderContext:draw_world_texture(texture_id, row, column, dest, color) end
----Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.
+---Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.
 ---Use in combination with ON.RENDER_PRE_DRAW_DEPTH event
 ---For more control use the version taking a Quad instead
 ---@param texture_id TEXTURE
@@ -5406,7 +5410,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field new any @constructors<TextureRenderingInfo(), TextureRenderingInfo(TextureRenderingInfo)>{}
     ---@field x number
     ---@field y number
-    ---@field destination_bottom_left_x number @destination is relative to the x,y centerpoint
+    ---@field destination_bottom_left_x number @destination is relative to the x,y center point
     ---@field destination_bottom_left_y number
     ---@field destination_bottom_right_x number
     ---@field destination_bottom_right_y number
@@ -5439,12 +5443,12 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
     ---@field new any @initializers(TextRenderingInfo_ctor, TextRenderingInfo_ctor2)
     ---@field x number
     ---@field y number
-    ---@field text_length integer @You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
+    ---@field text_length integer @You can also just use `#` operator on the whole TextRenderingInfo to get the text length
     ---@field width number
     ---@field height number
-    ---@field special_texture_id TEXTURE @Used to draw buttons and stuff, default is -1 wich uses the buttons texture
-    ---@field get_dest fun(self): Letter[] @Returns refrence to the letter coordinates relative to the x,y position
-    ---@field get_source fun(self): Letter[] @Returns refrence to the letter coordinates in the texture
+    ---@field special_texture_id TEXTURE @Used to draw buttons and stuff, default is -1 which uses the buttons texture
+    ---@field get_dest fun(self): Letter[] @Returns reference to the letter coordinates relative to the x,y position
+    ---@field get_source fun(self): Letter[] @Returns reference to the letter coordinates in the texture
     ---@field text_size fun(self): number, number @{width, height}, is only updated when you set/change the text. This is equivalent to draw_text_size
     ---@field rotate fun(self, angle: number, px: number?, py: number?): nil @Rotates the text around the pivot point (default 0), pivot is relative to the text position (x, y), use px and py to offset it
     ---@field set_text fun(self, text: string, scale_x: number, scale_y: number, alignment: VANILLA_TEXT_ALIGNMENT, fontstyle: VANILLA_FONT_STYLE): nil @Changes the text, only position stays the same, everything else (like rotation) is reset or set according to the parameters
@@ -5469,7 +5473,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 ---@class HudElement
     ---@field dim boolean @Hide background and dim if using the auto adjust setting.
     ---@field opacity number @Background will be drawn if this is not 0.5
-    ---@field time_dim integer @Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+    ---@field time_dim integer @Level time when element should dim again after highlighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
 
 ---@class HudPlayer : HudElement
     ---@field health integer
@@ -5538,7 +5542,7 @@ function VanillaRenderContext:draw_world_poly_filled(points, color) end
 ---@class Vec2
     ---@field x number
     ---@field y number
-    ---@field distance_to fun(self, other: Vec2): number @Just simple pythagoras theorem
+    ---@field distance_to fun(self, other: Vec2): number @Just simple Pythagoras theorem
     ---@field set fun(self, other: Vec2): Vec2
     ---@field split fun(self): number, number
 local Vec2 = nil
@@ -5628,7 +5632,7 @@ function Triangle:is_point_inside(x, y, epsilon) end
     ---@field top_left_x number
     ---@field top_left_y number
     ---@field get_AABB fun(self): AABB @Returns the max/min values of the Quad
-    ---@field rotate fun(self, angle: number, px: number, py: number): Quad @Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for simetrical quadrangle
+    ---@field rotate fun(self, angle: number, px: number, py: number): Quad @Rotates a Quad by an angle, px/py are not offsets, use `:get_AABB():center()` to get approximated center for symmetrical quadrangle
     ---@field flip_horizontally fun(self): Quad
     ---@field flip_vertically fun(self): Quad
     ---@field set fun(self, other: Quad): Quad
@@ -6080,7 +6084,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field fade_timer integer
     ---@field page_timer integer
     ---@field opacity number
-    ---@field pages JournalPage[] @Stores pages loaded into memeory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to chcek page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
+    ---@field pages JournalPage[] @Stores pages loaded into memory. It's not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use `:get_type()` to check page type and cast it correctly (see ON.[RENDER_PRE_JOURNAL_PAGE](#ON-RENDER_PRE_JOURNAL_PAGE))
 
 ---@class JournalPage
     ---@field background TextureRenderingInfo

@@ -66,7 +66,7 @@ enum class ON
     CONSTELLATION = 19,
     RECAP = 20,
     ARENA_MENU = 21,
-    ARENA_STAGES = 22, // selecting avaible stages for arena from the menu
+    ARENA_STAGES = 22, // selecting available stages for arena from the menu
     ARENA_ITEMS = 23,
     ARENA_SELECT = 24, // select arena before fight
     ARENA_INTRO = 25,

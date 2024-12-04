@@ -31,7 +31,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_bgmovingstar
 - as_bgrelativeelement
 - as_bgshootingstar
-- as_bgshopentrence
+- as_bgshopentrance
 - as_bgshopkeeperprime
 - as_bgsurfacelayer
 - as_bgsurfacestar
