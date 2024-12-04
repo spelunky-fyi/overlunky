@@ -139,6 +139,7 @@ enum class ON
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
+    // PRE_COPY_STATE,
 };
 
 struct IntOption
@@ -284,6 +285,12 @@ class SoundManager;
 class LuaConsole;
 struct RenderInfo;
 
+struct LocalStateData
+{
+    sol::object user_data;
+    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
+};
+
 class LuaBackend
     : public HookHandler<Entity, CallbackType::Entity>,
       public HookHandler<RenderInfo, CallbackType::Entity>,
@@ -300,7 +307,6 @@ class LuaBackend
     std::unordered_set<std::string> loaded_modules;
 
     std::string result;
-    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
     CurrentCallback current_cb = {0, 0, CallbackType::None};
@@ -331,6 +337,7 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
+    std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
     bool manual_save{false};
     uint32_t last_save{0};
 
@@ -349,6 +356,8 @@ class LuaBackend
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
 
+    LocalStateData& get_locals();
+    void copy_locals(StateMemory* from, StateMemory* to);
     void clear();
     void clear_all_callbacks();
     bool update();
@@ -462,6 +471,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
+    void pre_copy_state(StateMemory* from, StateMemory* to);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);

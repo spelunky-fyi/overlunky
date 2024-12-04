@@ -744,7 +744,7 @@ Gets a grid entity, such as floor or spikes, at the given position and layer.
 
 > Search script examples for [get_local_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_players)
 
-#### nil get_local_players()
+#### vector&lt;[Player](#Player)&gt; get_local_players()
 
 Get the thread-local version of players
 
@@ -1542,7 +1542,7 @@ Get the current layer that the liquid is spawn in. Related function [set_liquid_
 
 > Search script examples for [get_local_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_prng)
 
-#### nil get_local_prng()
+#### [PRNG](#PRNG) get_local_prng()
 
 Get the thread-local version of prng
 
@@ -1551,7 +1551,7 @@ Get the thread-local version of prng
 
 > Search script examples for [get_local_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_state)
 
-#### nil get_local_state()
+#### [StateMemory](#StateMemory) get_local_state()
 
 Get the thread-local version of state
 
