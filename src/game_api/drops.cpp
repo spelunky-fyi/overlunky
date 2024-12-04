@@ -294,6 +294,8 @@ std::vector<DropEntry> drop_entries{
     /// Special:
     ///
 
+    /// Change item used to open the door (still requires hedjet, crown or eggplant crown)
+    {"DOOR_COG_SCEPTER", "\x81\x78\x14\x4C\x02\x00\x00"sv, VTABLE_OFFSET::FLOOR_DOOR_COG, 25, 3, 2}, // is not the exact virtual, but function that the virtual uses
     /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2
     {"MOTHERSTATUE_HEALTH", "\xBD\x04\x00\x00\x00\xD3"sv, VTABLE_OFFSET::FLOOR_MOTHER_STATUE, 2, 1},
     /// It's not ENT_TYPE but amount of health, with elixir it will be this value * 2

@@ -91,14 +91,37 @@ struct PlayerInputs
     };
 };
 
+struct QuestLogic
+{
+    // used to access flags in QuestsInfo
+    uint32_t id;
+
+    // called during layer loading by the state update, sets the level generation flags etc.
+    virtual void pre_level_gen() = 0;
+
+    // Gets called on every non-CO level by 18 virtual in current theme. Function checks whether the quest needs to be initialized.
+    // Yang: checks whether his quest status = 1 -> makes his pen work
+    // Sisters: make them appear on Olmec
+    // Horsing: makes him appear in Vlad's castle
+    // Sparrow: nop
+    // Tusk: populates pleasure palace with other characters depending on their quest state
+    // Beg: nop
+    virtual void post_level_gen() = 0;
+
+    // Only implemented for Beg quest, called by the 24 virtual in current theme
+    virtual void post_level_gen2() = 0;
+
+    virtual ~QuestLogic() = delete;
+};
+
 struct QuestsInfo
 {
-    size_t unknown1; // the first six are pointers to small similar objects
-    size_t unknown2; // that don't appear to change at all
-    size_t unknown3;
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
+    QuestLogic* yang;
+    QuestLogic* jungle_sisters;
+    QuestLogic* van_horsing;
+    QuestLogic* sparrow;
+    QuestLogic* madame_tusk;
+    QuestLogic* beg;
     int8_t yang_state;
     int8_t jungle_sisters_flags; // flags! not state ; -1 = sisters angry
     int8_t van_horsing_state;

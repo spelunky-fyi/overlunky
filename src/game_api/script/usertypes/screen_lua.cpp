@@ -348,6 +348,12 @@ void register_usertypes(sol::state& lua)
     screencharacterselect_type["topleft_woodpanel_esc_slidein"] = &ScreenCharacterSelect::topleft_woodpanel_esc_slidein;
     screencharacterselect_type["start_panel_slidein"] = &ScreenCharacterSelect::start_panel_slidein;
     screencharacterselect_type["action_buttons_keycap_size"] = &ScreenCharacterSelect::action_buttons_keycap_size;
+    screencharacterselect_type["screen_loading"] = &ScreenCharacterSelect::screen_loading;
+    screencharacterselect_type["seeded_run"] = &ScreenCharacterSelect::seeded_run;
+    screencharacterselect_type["daily_challenge"] = sol::readonly(&ScreenCharacterSelect::daily_challenge);
+    /// Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge`
+    screencharacterselect_type["arena"] = sol::property([](ScreenCharacterSelect* screen) -> bool
+                                                        { return screen->next_screen_to_load == 10 && !screen->seeded_run && !screen->daily_challenge; });
     screencharacterselect_type["next_screen_to_load"] = &ScreenCharacterSelect::next_screen_to_load;
     screencharacterselect_type["not_ready_to_start_yet"] = &ScreenCharacterSelect::not_ready_to_start_yet;
     screencharacterselect_type["available_mine_entrances"] = &ScreenCharacterSelect::available_mine_entrances;
