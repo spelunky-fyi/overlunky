@@ -989,7 +989,7 @@ void register_usertypes(sol::state& lua)
         "sound",
         &YellowCape::sound,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack, Cape>());
+        sol::bases<Entity, Movable, Powerup, Backpack, Cape>());
 
     lua.new_usertype<Teleporter>(
         "Teleporter",

@@ -19,7 +19,7 @@ class Mount : public PowerupCapable
     bool tamed;
     uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     uint8_t unknown9a;
-    bool double_jumping;  // used to play different animation for the double jump then the standard jump, is true for less then a frame
+    bool double_jumping;  // used to play different animation for the double jump then the standard jump, is true for less than a frame
     uint8_t taming_timer; // when 0 it's tame
     uint8_t padding2;
 
