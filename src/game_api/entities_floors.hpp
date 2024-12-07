@@ -189,7 +189,7 @@ class TotemTrap : public Floor
     float unknown2; // might be sound delay related, cannot reproduce anymore
     float unknown3;
     ENT_TYPE spawn_entity_type;
-    uint32_t first_sound_id;
+    SOUNDID first_sound_id;
     int32_t counter;  // adds some value depending on trap and with side is triggered, setting to low value pauses it?
     uint8_t unknown4; // forced to 1
     uint8_t unused1;

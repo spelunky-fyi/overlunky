@@ -655,8 +655,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        "add_item_ptr"sv,
-        // Used in spawn_entity as `add_item_ptr(overlay + 0x18, spawned_entity, false)`
+        "entitylist_insert"sv,
+        // Used in spawn_entity as `entitylist_insert(overlay + 0x18, spawned_entity, false)`
         PatternCommandBuffer{}
             .find_inst("\xe8****\x44\x88\x76"sv)
             .decode_call()
@@ -713,8 +713,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_event_map"sv, // probably wrong
-                            // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+        "fmod_event_map"sv, // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
                             // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
                             // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
         PatternCommandBuffer{}
@@ -1932,7 +1931,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // Go into jetpack 99 virtual function (play_warning_sound), there are two calls for virtuls and one call to static function, that's the one
-        "play_sound"sv,
+        "play_sfx"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x83\xC1\x18\x41\xB8\x38\x01\x00\x00"sv)
             .at_exe()
