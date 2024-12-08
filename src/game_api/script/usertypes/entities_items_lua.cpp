@@ -919,6 +919,8 @@ void register_usertypes(sol::state& lua)
         "RollingItem",
         "roll_speed",
         &RollingItem::roll_speed,
+        "give_powerup",
+        &RollingItem::give_powerup,
         sol::base_classes,
         sol::bases<Entity, Movable, Purchasable>());
 

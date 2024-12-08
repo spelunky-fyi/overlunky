@@ -210,11 +210,17 @@ void register_usertypes(sol::state& lua)
         VTableEntry<"spawn_projectile", 93, MemFun<&OlmecCannon::spawn_projectile>>>;
     static OlmecCannonVTable olmec_cannon_vtable(lua, lua["OlmecCannon"], "ENTITY_OVERRIDE");
 
+    using RollingItemVTable = HookableVTable<
+        Entity,
+        CallbackType::Entity,
+        EntityVTable,
+        VTableEntry<"give_powerup", 93, MemFun<&RollingItem::give_powerup>>>;
+    static RollingItemVTable rolling_item_vtable(lua, lua["RollingItem"], "ENTITY_OVERRIDE");
+
     // Arrow // poison_arrow // light_up ?
     // Torch // light_up // get_flame_offset // get_flame_type
     // Bow // get_arrow_special_offset
     // Generator // randomize_timer ?
-    // RollingItem // pickup
     // SoundMeta // start // kill //update maybe?
     // CritterSlime + CritterSnail // get_speed
     // Ghist // on_body_destroyed

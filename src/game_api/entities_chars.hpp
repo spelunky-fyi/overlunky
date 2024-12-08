@@ -93,7 +93,7 @@ class PowerupCapable : public Movable
     /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
     int32_t worn_backitem();
 
-    /// only triggers when it has kapala
+    /// only triggers when entity has kapala
     virtual bool on_blood_collision() = 0;
     // called for stunned entities, check bunch of stuff like state, hold entity, standing on entity etc. runs until returned 1
     // this is used to clear the last_owner of stunned entity when it is no longed stunned

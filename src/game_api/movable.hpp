@@ -156,7 +156,7 @@ class Movable : public Entity
     virtual bool thrown_into(Entity* victim) = 0; // 47
 
     /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.
-    /// Returns: true if entity was affected (for stuff like pot that should break after hit etc.), false if the event should be ignored by damage_dealer
+    /// Returns: true if entity was affected (for stuff like: if pot was thrown into entity, should that pot break after hit), false if the event should be ignored by damage_dealer
     virtual bool damage(Entity* damage_dealer, int8_t damage_amount, DAMAGE_TYPE damage_flags, Vec2* velocity, uint8_t unknown_damage_phase, uint16_t stun_amount, uint8_t iframes, bool unknown_is_final) = 0; // 48
 
     /// Hit by broken arrows etc that don't deal damage, calls damage with 0 damage.
@@ -200,9 +200,11 @@ class Movable : public Entity
     virtual void v77() = 0;                                              // 77
     virtual void process_input() = 0;                                    // 78, more like: handle_movement
     virtual void post_collision_damage_related() = 0;                    // 79, used for enemies attacks as well? 3 versions for: eggplant minister, players and the rest
-    virtual void on_picked_up() = 0;                                     // 80, plays pickup sound depending on the entity mask/type etc. set stun for pets and mounts etc.
-    virtual void on_release() = 0;                                       // 81, only for hired hands and lava pots
-    virtual void generate_fall_poof_particles() = 0;                     // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
+    /// Called for entity that just has been picked up
+    virtual void on_picked_up() = 0; // 80, plays pickup sound depending on the entity mask/type etc. set stun for pets and mounts etc.
+    /// Called for entity that just has been thrown/dropped
+    virtual void on_release() = 0;                   // 81, only for hired hands and lava pots, the rest just returns
+    virtual void generate_fall_poof_particles() = 0; // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
     /// Applies gravity to entity. Disable to float like on hoverpack.
     virtual void handle_fall_logic(float) = 0;                                          // 83, adjusts entity.velocityy when falling
     virtual void apply_friction(float, bool vertical, float) = 0;                       // 84, applies entity.type.friction to entity.velocityx, the two floats for characters just multiply the friction, could also be returning the value

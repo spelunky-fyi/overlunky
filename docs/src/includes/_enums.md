@@ -308,6 +308,7 @@ Name | Data | Description
 [ACQUIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ACQUIRE) | 93 | 
 [TRIGGER_EXPLOSION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_EXPLOSION) | 94 | 
 [SPAWN_PROJECTILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SPAWN_PROJECTILE) | 93 | 
+[GIVE_POWERUP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GIVE_POWERUP) | 93 | 
 
 ## ENT_FLAG
 

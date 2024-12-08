@@ -630,7 +630,6 @@ def run_parse():
                         for item in classes:
                             if item["name"] != func_ref.group(1):
                                 continue
-                            # TODO: pretty sure if the actual virtual function name is different then the one in VTableEntry there won't be comment in callback signature
                             func_name = func_ref.group(2)
                             # if it throws error at `item["member_funs"][func_name]` then the virtual defined using MemFun was not found in the parsed class/struct code
                             if (
@@ -645,8 +644,8 @@ def run_parse():
                                     "index": index,
                                     "ret": func["return"],
                                     "args": [t for t in func["param"].split(",")],
-                                    # "ref": func_name.group(2),
                                     "binds": binds,
+                                    "ref": func_name,
                                 }
                     else:
                         signature = re.search(r"([_a-zA-Z][\w]*.*)\((.*)\)", signature)
@@ -920,11 +919,12 @@ def run_parse():
                 for entry in vtable["entries"].values():
                     entry_name = entry["name"]
 
+                    func_name = entry["ref"] if "ref" in entry else entry["name"]
                     pre_signature = None
                     post_signature = None
                     cpp_comment = []
-                    if entry_name in underlying_cpp_type["member_funs"]:
-                        for fun in underlying_cpp_type["member_funs"][entry_name]:
+                    if func_name in underlying_cpp_type["member_funs"]:
+                        for fun in underlying_cpp_type["member_funs"][func_name]:
                             ret = replace_fun(fun["return"])
                             ret = f"optional<{ret}>" if ret else "bool"
                             ret = ret if entry_name != "dtor" else "nil"
