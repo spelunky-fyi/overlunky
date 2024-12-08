@@ -83,7 +83,7 @@ struct EntityList
     using UidRange = Range<uint32_t>;
     using ConstUidRange = Range<const uint32_t>;
 
-    bool empty()
+    bool empty() const
     {
         return size == 0;
     }
@@ -113,6 +113,8 @@ struct EntityList
     {
         return uids().contains(uid);
     }
+
+    void insert(Entity*, bool);
 
     std::pair<Entity*&, uint32_t&> operator[](const uint32_t idx) const
     {
@@ -155,13 +157,11 @@ struct Layer
     EntityList unknown_entities2;
     std::array<EntityList, 53> entities_by_draw_depth;
     EntityList unknown_entities2a;
-    EntityList unknown_entities3;        // debris, explosions, laserbeams etc. ?
+    EntityList unknown_entities3;        // debris, explosions, laserbeams etc. expired_entities ?
     EntityList unknown_entities4;        // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
     std::vector<Entity*> unknown_vector; // add_to_layer uses this
     std::set<float>* unknown6;           // triggered by floor entity destruction? needs more testing
-    // List of items that were destroyed and are waiting to have the dtor called
-    // and then be returned to the entity pool
-    EntityList expired_entities;
+    EntityList unknown_entities5;
     bool is_layer_loading;
     bool unknown14;
 

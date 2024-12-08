@@ -48,7 +48,7 @@ std::vector<EntityItem> list_entities()
     if (!entity_factory_ptr)
         return {};
 
-    const EntityMap& map = entity_factory_ptr->entity_map;
+    const auto& map = entity_factory_ptr->entity_map;
 
     std::vector<EntityItem> result;
     for (const auto& [name, id] : map)
@@ -58,7 +58,7 @@ std::vector<EntityItem> list_entities()
     return result;
 }
 
-EntityDB* get_type(uint32_t id)
+EntityDB* get_type(ENT_TYPE id)
 {
     EntityFactory* entity_factory_ptr = entity_factory();
 
@@ -73,12 +73,16 @@ EntityDB* get_type(uint32_t id)
 
 ENT_TYPE to_id(std::string_view name)
 {
-    const EntityFactory* entity_factory_ptr = entity_factory();
-    if (!entity_factory_ptr)
-        return {};
-    const EntityMap& map = entity_factory_ptr->entity_map;
-    auto it = map.find(std::string(name));
-    return it != map.end() ? it->second : -1;
+    static const std::unordered_map<std::string, uint16_t>* map;
+    if (map == nullptr)
+    {
+        const EntityFactory* entity_factory_ptr = entity_factory();
+        if (!entity_factory_ptr)
+            return (ENT_TYPE)~0;
+        map = &entity_factory_ptr->entity_map;
+    }
+    auto it = map->find(std::string(name));
+    return it != map->end() ? it->second : (ENT_TYPE)~0;
 }
 
 std::string_view to_name(ENT_TYPE id)
@@ -89,11 +93,8 @@ std::string_view to_name(ENT_TYPE id)
         for (const auto& [name, type_id] : entity_factory_ptr->entity_map)
         {
             if (type_id == id)
-            {
                 return name;
-            }
         }
     }
-
     return {};
 }

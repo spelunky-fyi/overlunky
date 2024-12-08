@@ -30,14 +30,20 @@ void register_usertypes(sol::state& lua)
     /// Gets the hitbox of an entity, use `extrude` to make the hitbox bigger/smaller in all directions and `offset` to offset the hitbox in a given direction
     lua["get_hitbox"] = [](uint32_t uid, sol::optional<float> extrude, sol::optional<float> offsetx, sol::optional<float> offsety) -> AABB
     {
-        auto [sx1, sy1, sx2, sy2] = get_hitbox(uid, false);
-        return fixup_hitbox(AABB{sx1, sy1, sx2, sy2}, extrude, offsetx, offsety);
+        AABB hitbox;
+        if (auto ent = get_entity_ptr(uid))
+            hitbox = ent->get_hitbox(false);
+
+        return fixup_hitbox(hitbox, extrude, offsetx, offsety);
     };
     /// Same as `get_hitbox` but based on `get_render_position`
     lua["get_render_hitbox"] = [](uint32_t uid, sol::optional<float> extrude, sol::optional<float> offsetx, sol::optional<float> offsety) -> AABB
     {
-        auto [sx1, sy1, sx2, sy2] = get_hitbox(uid, true);
-        return fixup_hitbox(AABB{sx1, sy1, sx2, sy2}, extrude, offsetx, offsety);
+        AABB hitbox;
+        if (auto ent = get_entity_ptr(uid))
+            hitbox = ent->get_hitbox(true);
+
+        return fixup_hitbox(hitbox, extrude, offsetx, offsety);
     };
     /// Convert an `AABB` to a screen `AABB` that can be directly passed to draw functions
     lua["screen_aabb"] = [](AABB box) -> AABB
