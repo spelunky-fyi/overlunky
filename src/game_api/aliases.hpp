@@ -191,7 +191,7 @@ enum class PAUSE_SCREEN : int64_t
 };
 ENUM_CLASS_FLAGS(PAUSE_SCREEN);
 
-enum class ENTITY_MASK
+enum class ENTITY_MASK : uint32_t
 {
     PLAYER = 0x1,
     MOUNT = 0x2,
@@ -212,3 +212,11 @@ enum class ENTITY_MASK
     ANY = 0x0,
 };
 ENUM_CLASS_FLAGS(ENTITY_MASK)
+
+// Returns true if any of the set bits in `mask` are in `flags`
+template <class T>
+requires std::is_enum_v<T>
+bool test_mask(T flags, T mask)
+{
+    return static_cast<std::underlying_type_t<T>>(flags & mask) != 0;
+}

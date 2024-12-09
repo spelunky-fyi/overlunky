@@ -20,6 +20,7 @@
 #include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
 #include <utility>          // for min, max, pair, find
 
+#include "aliases.hpp"
 #include "bucket.hpp"
 #include "containers/custom_vector.hpp" //
 #include "custom_types.hpp"             // for get_custom_entity_types, CUSTOM_TYPE
@@ -1360,7 +1361,7 @@ uint8_t get_liquids_at(ENTITY_MASK liquid_mask, float x, float y, LAYER layer)
     LiquidPhysics* liquid_physics = State::get().ptr()->liquid_physics;
     if (actual_layer != get_liquid_layer())
         return 0;
-    if (y > 125.5 || y < 0 || x > 85.5 || x < 0)
+    if (y >= 125.5 || y < 0 || x >= 85.5 || x < 0) // Game uses `>` instead of `>=`, resulting in it being able to read out of bounds of the array, but it never happens without OL because of the border blocks
         return 0;
 
     uint32_t ix = static_cast<int>((x + 0.5) / 0.3333333);
@@ -1373,9 +1374,9 @@ uint8_t get_liquids_at(ENTITY_MASK liquid_mask, float x, float y, LAYER layer)
     else
     {
         uint8_t liquids_num = 0;
-        if ((liquid_mask & ENTITY_MASK::WATER) == ENTITY_MASK::WATER)
+        if (test_mask(liquid_mask, ENTITY_MASK::WATER))
             liquids_num += liquids_at.water;
-        if ((liquid_mask & ENTITY_MASK::LAVA) == ENTITY_MASK::LAVA)
+        if (test_mask(liquid_mask, ENTITY_MASK::LAVA))
             liquids_num += liquids_at.lava;
         return liquids_num;
     }
