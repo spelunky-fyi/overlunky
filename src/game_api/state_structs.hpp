@@ -875,13 +875,14 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    custom_map<std::pair<uint8_t, uint8_t>, size_t*>* floors;   // key is a grid position, the struct seams to be the same as in push_blocks
-    custom_map<uint32_t, size_t*>* push_blocks;                 // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
-    custom_vector<LiquidLake> impostor_lakes;                   //
-    uint32_t total_liquid_spawned;                              // Total number of spawned liquid entities, all types.
-    uint32_t unknown8;                                          // padding probably
-    LiquidAmounts (*liquids_by_third_of_tile)[126 * 3][86 * 3]; // array byte* game allocates 0x2F9E8 bytes for it ((126 * 3) * (86 * 3) * 2 : y, x, liquid_type).
-                                                                // always allocates after the LiquidPhysics
+    custom_map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seams to be the same as in push_blocks
+    custom_map<uint32_t, size_t*>* push_blocks;               // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
+    custom_vector<LiquidLake> impostor_lakes;                 //
+    uint32_t total_liquid_spawned;                            // Total number of spawned liquid entities, all types.
+    uint32_t unknown8;                                        // padding probably
+
+    LiquidAmounts (*liquids_by_third_of_tile)[g_level_max_y * 3][g_level_max_x * 3]; // array byte* game allocates 0x2F9E8 bytes for it ((126 * 3) * (86 * 3) * 2 : y, x, liquid_type).
+                                                                                     // always allocates after the LiquidPhysics
 
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
     bool unknown12;                 // if false, I think the game should check for liquids by looking for liquid entities rather than using the previous liquids array. Is set to true by the game actively

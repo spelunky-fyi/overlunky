@@ -1361,11 +1361,16 @@ uint8_t get_liquids_at(ENTITY_MASK liquid_mask, float x, float y, LAYER layer)
     LiquidPhysics* liquid_physics = State::get().ptr()->liquid_physics;
     if (actual_layer != get_liquid_layer())
         return 0;
-    if (y >= 125.5 || y < 0 || x >= 85.5 || x < 0) // Game uses `>` instead of `>=`, resulting in it being able to read out of bounds of the array, but it never happens without OL because of the border blocks
+    // if (y > 125.5 || y < 0 || x > 85.5 || x < 0) // Original check by the game, can result is accesing the array out of bounds
+    //     return 0;
+    if (y < 0 || x < 0)
         return 0;
 
     uint32_t ix = static_cast<int>((x + 0.5) / 0.3333333);
     uint32_t iy = static_cast<int>((y + 0.5) / 0.3333333);
+    if (iy >= (g_level_max_y * 3) || ix >= (g_level_max_x * 3))
+        return 0;
+
     auto& liquids_at = (*liquid_physics->liquids_by_third_of_tile)[iy][ix];
     if (liquid_mask == ENTITY_MASK::ANY)
     {
