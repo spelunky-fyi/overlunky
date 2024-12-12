@@ -147,26 +147,24 @@ class Movable : public Entity
     /// Mostly used for ragdoll by the game
     virtual void apply_velocity(Vec2* velocities, bool ignore_weight) = 0; // 42
     /// Returns the damage that the entity deals
-    virtual int8_t get_damage() = 0;       // 43, for player it calculates stomp damages as that's the only damage that the player entity can deal, the "normal" damage is done by the whip
-    virtual int8_t get_stomp_damage() = 0; // 44, calls get_damage except for mech which always returns 3, dunno what's the difference between this and get_damage
-    virtual bool is_on_fire() = 0;         // 45
+    virtual int8_t get_damage() = 0;       //                                // 43, for player it calculates stomp damages as that's the only damage that the player entity can deal, the "normal" damage is done by the whip
+    virtual int8_t get_stomp_damage() = 0; //                                // 44, calls get_damage except for mech which always returns 3, dunno what's the difference between this and get_damage
+    virtual bool is_on_fire() = 0;         //                                // 45
     /// Runs on contact damage, returns false if there wasn't any interaction (called from on_collision2, will be called as long as the hitboxes overlap)
-    virtual bool attack(Entity* victim) = 0; // 46
+    virtual bool attack(Entity* victim) = 0; //                              // 46
     /// Same as above, but for being thrown into something and potentially dealing damage that way
-    virtual bool thrown_into(Entity* victim) = 0; // 47
-
+    virtual bool thrown_into(Entity* victim) = 0; //                         // 47
     /// Damage the movable by the specified amount, stuns and gives it invincibility for the specified amount of frames and applies the velocities. `damage_dealer` can be set to nil.
     /// Returns: true if entity was affected (for stuff like: if pot was thrown into entity, should that pot break after hit), false if the event should be ignored by damage_dealer
     virtual bool damage(Entity* damage_dealer, int8_t damage_amount, DAMAGE_TYPE damage_flags, Vec2* velocity, uint8_t unknown_damage_phase, uint16_t stun_amount, uint8_t iframes, bool unknown_is_final) = 0; // 48
-
     /// Hit by broken arrows etc that don't deal damage, calls damage with 0 damage.
     virtual void on_hit(Entity* damage_dealer) = 0; // 49
     /// returns sound id for the damage taken, return 0 to make it silence
     virtual SOUNDID get_damage_sound(DAMAGE_TYPE damage) = 0; // 50
     virtual void stun(uint16_t framecount) = 0;               // 51
-    /// Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check, if in lava the game will set `frozen_timer` to 0 immediately most of the time
+    /// Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check,
+    /// if in lava the game will set `frozen_timer` to 0 immediately most of the time
     virtual void freeze(uint8_t framecount, bool ignore_lava) = 0; // 52
-
     /// Does not damage entity
     virtual void light_on_fire(uint8_t time) = 0;       // 53
     virtual void set_cursed(bool b, bool effect) = 0;   // 54
@@ -187,8 +185,7 @@ class Movable : public Entity
     virtual void pick_up(Entity* entity_to_pick_up) = 0;                      // 67
     virtual bool can_be_picked_up_by(Entity* entity_picking_up, bool) = 0;    // 68, the bool has something to do with the entity being attached to some entity already
     /// Called when dropping or throwing
-    virtual void drop() = 0; // 69
-
+    virtual void drop() = 0; //                                               // 69
     /// Adds or subtracts the specified amount of money to the movable's (player's) inventory. Shows the calculation animation in the HUD. Adds treasure to the inventory list shown on transition. Use the global add_money to add money without adding specific treasure.
     virtual bool collect_treasure(int32_t value, ENT_TYPE treasure) = 0; // 70
     virtual bool apply_movement(uint8_t, uint8_t, uint8_t) = 0;          // 71, disable this function and things can't move, some spin in place
@@ -201,10 +198,10 @@ class Movable : public Entity
     virtual void process_input() = 0;                                    // 78, more like: handle_movement
     virtual void post_collision_damage_related() = 0;                    // 79, used for enemies attacks as well? 3 versions for: eggplant minister, players and the rest
     /// Called for entity that just has been picked up
-    virtual void on_picked_up() = 0; // 80, plays pickup sound depending on the entity mask/type etc. set stun for pets and mounts etc.
+    virtual void on_picked_up() = 0; //                                                 // 80, plays pickup sound depending on the entity mask/type etc. set stun for pets and mounts etc.
     /// Called for entity that just has been thrown/dropped
-    virtual void on_release() = 0;                   // 81, only for hired hands and lava pots, the rest just returns
-    virtual void generate_fall_poof_particles() = 0; // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
+    virtual void on_release() = 0;                   //                                 // 81, only for hired hands and lava pots, the rest just returns
+    virtual void generate_fall_poof_particles() = 0; //                                 // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
     /// Applies gravity to entity. Disable to float like on hoverpack.
     virtual void handle_fall_logic(float) = 0;                                          // 83, adjusts entity.velocityy when falling
     virtual void apply_friction(float, bool vertical, float) = 0;                       // 84, applies entity.type.friction to entity.velocityx, the two floats for characters just multiply the friction, could also be returning the value

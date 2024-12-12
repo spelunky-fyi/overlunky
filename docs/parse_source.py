@@ -787,7 +787,7 @@ def run_parse():
                         )
                 elif cpp.startswith("[]("):
                     param_match = re.match(
-                        r"\[\]\(([\w &*:,]+)?\) -> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp
+                        r"\[\]\(([\w &<>\?*:,]+)?\) -> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp
                     )
                     if param_match:
                         ret = param_match.group(2)

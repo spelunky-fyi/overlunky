@@ -2534,7 +2534,7 @@ function PRNG:random(min, max) end
     ---@field topmost fun(self): Entity @Returns the top entity in a chain (overlay)
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean @Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
-    ---@field set_draw_depth fun(self, draw_depth: integer, b3f: integer): nil
+    ---@field set_draw_depth fun(self, draw_depth: integer, unknown: integer?): nil
     ---@field reset_draw_depth fun(self): nil
     ---@field friction fun(self): number @Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
     ---@field liberate_from_shop fun(self, clear_parrent: boolean): nil @`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
@@ -2701,7 +2701,7 @@ function Entity:destroy_recursive() end
     ---@field is_button_held fun(self, button: BUTTON): boolean
     ---@field is_button_released fun(self, button: BUTTON): boolean
     ---@field stun fun(self, framecount: integer): nil
-    ---@field freeze fun(self, framecount: integer, ignore_lava: boolean): nil @Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check, if in lava the game will set `frozen_timer` to 0 immediately most of the time
+    ---@field freeze fun(self, framecount: integer, ignore_lava: boolean): nil @Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check,<br/>if in lava the game will set `frozen_timer` to 0 immediately most of the time
     ---@field light_on_fire fun(self, time: integer): nil @Does not damage entity
     ---@field set_cursed fun(self, b: boolean, effect: boolean): nil
     ---@field drop fun(self): nil @Called when dropping or throwing
@@ -2762,8 +2762,8 @@ function Entity:destroy_recursive() end
     ---@field set_post_get_damage_sound fun(self, fun: fun(self: Movable, damage: DAMAGE_TYPE): SOUNDID?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil get_damage_sound(Movable self, DAMAGE_TYPE damage)`<br/>Virtual function docs:<br/>returns sound id for the damage taken, return 0 to make it silence
     ---@field set_pre_stun fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stun(Movable self, integer framecount)`
     ---@field set_post_stun fun(self, fun: fun(self: Movable, framecount: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stun(Movable self, integer framecount)`
-    ---@field set_pre_freeze fun(self, fun: fun(self: Movable, framecount: integer, ignore_lava: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool freeze(Movable self, integer framecount, boolean ignore_lava)`<br/>Virtual function docs:<br/>Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check, if in lava the game will set `frozen_timer` to 0 immediately most of the time
-    ---@field set_post_freeze fun(self, fun: fun(self: Movable, framecount: integer, ignore_lava: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil freeze(Movable self, integer framecount, boolean ignore_lava)`<br/>Virtual function docs:<br/>Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check, if in lava the game will set `frozen_timer` to 0 immediately most of the time
+    ---@field set_pre_freeze fun(self, fun: fun(self: Movable, framecount: integer, ignore_lava: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool freeze(Movable self, integer framecount, boolean ignore_lava)`<br/>Virtual function docs:<br/>Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check,<br/>if in lava the game will set `frozen_timer` to 0 immediately most of the time
+    ---@field set_post_freeze fun(self, fun: fun(self: Movable, framecount: integer, ignore_lava: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil freeze(Movable self, integer framecount, boolean ignore_lava)`<br/>Virtual function docs:<br/>Sets the `frozen_timer`, the param `ignore_lava` doesn't do much, just skips the liquid check,<br/>if in lava the game will set `frozen_timer` to 0 immediately most of the time
     ---@field set_pre_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
     ---@field set_post_light_on_fire fun(self, fun: fun(self: Movable, time: integer): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil light_on_fire(Movable self, integer time)`<br/>Virtual function docs:<br/>Does not damage entity
     ---@field set_pre_set_cursed fun(self, fun: fun(self: Movable, b: boolean, effect: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool set_cursed(Movable self, boolean b, boolean effect)`

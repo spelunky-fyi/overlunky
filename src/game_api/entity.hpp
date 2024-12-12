@@ -277,16 +277,12 @@ class Entity
     virtual ~Entity() = 0;                    // virtual 0
     virtual void create_rendering_info() = 0; // 1
     virtual void update_state_machine() = 0;  // 2
-
     /// Kills the entity, you can set responsible to `nil` to ignore it
     virtual void kill(bool destroy_corpse, Entity* responsible) = 0; // 3
-
     /// Collisions with stuff that blocks you, like walls, floors, etc. Triggers for entities in it's EntityDB.collision_mask
     virtual void on_collision1(Entity* other_entity) = 0; // 4
-
     /// Completely removes the entity from existence
-    virtual void destroy() = 0; // 5
-
+    virtual void destroy() = 0;                                                                   // 5
     virtual void apply_texture(Texture*) = 0;                                                     // 6
     virtual void format_shopitem_name(char16_t* output) = 0;                                      // 7
     virtual void generate_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool killing) = 0; // 8, contact dmg
@@ -302,20 +298,18 @@ class Entity
     virtual void set_draw_depth(uint8_t draw_depth, uint8_t b3f) = 0; // 17
     virtual void reset_draw_depth() = 0;                              // 18
     /// Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
-    virtual float friction() = 0;                     // 19
-    virtual void set_as_sound_source(SoundMeta*) = 0; // 20, update sound position to entity position?
+    virtual float friction() = 0;                     //              // 19
+    virtual void set_as_sound_source(SoundMeta*) = 0; //              // 20, update sound position to entity position?
     /// Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
     virtual void remove_item(Entity* entity, bool autokill_check) = 0;       // 21, if autokill_check is true, it will check if the entity has the "kill if overlay lost" flag and kill it if it's set
     virtual Entity* get_held_entity() = 0;                                   // 22
     virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", triggers use self as the first parameter. Called when there is entity overlapping trigger entity, even if they don't move
     /// Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
-    virtual bool trigger_action(Entity* user) = 0; // 24, also used for throwables, disabling this for bomb make it always spawn an the ground, but you can still pick it up and throw it
+    virtual bool trigger_action(Entity* user) = 0; //                        // 24, also used for throwables, disabling this for bomb make it always spawn an the ground, but you can still pick it up and throw it
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
-    virtual void activate(Entity* activator) = 0; // 25
-
+    virtual void activate(Entity* activator) = 0; //                         // 25
     /// More like on_overlap, triggers when entities touch/overlap each other. Triggers for entities in it's EntityDB.collision2_mask
     virtual void on_collision2(Entity* other_entity) = 0; // 26
-
     /// e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     virtual uint16_t get_metadata() = 0;                    // 27
     virtual void apply_metadata(uint16_t metadata) = 0;     // 28
@@ -324,11 +318,10 @@ class Entity
     virtual void on_ledge_grab(Entity* who) = 0;            // 31, only ACTIVEFLOOR_FALLING_PLATFORM, does something with game menager
     virtual void on_stood_on_by(Entity* entity, Vec2*) = 0; // 32, e.g. pots, skulls, pushblocks, ... standing on floors. The Vec2 is just a guess, it only compares Y with 0.1f
     /// only for CHAR_*: when going to the backlayer, turns on/off player emitted light
-    virtual void toggle_backlayer_illumination() = 0; // 33
-    virtual void v34() = 0;                           // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
+    virtual void toggle_backlayer_illumination() = 0; //    // 33
+    virtual void v34() = 0;                           //    // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
     /// `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
     virtual void liberate_from_shop(bool clear_parrent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
-
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0; // 36, This is actually just an initialize call that is happening once after  the entity is created
 };
