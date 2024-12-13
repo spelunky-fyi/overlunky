@@ -2033,6 +2033,17 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
     return false;
 }
 
+void LevelGenSystem::set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TEMPLATE room_template)
+{
+    using SetBacklayerRoomTemplate = void(LevelGenSystem*, uint32_t, uint32_t, uint32_t);
+    static auto set_backlayer_room_template = (SetBacklayerRoomTemplate*)get_address("set_backlayer_room_template");
+    // Backlayer_room_exists doesn't detect to-be generated rooms, like udjat or vault, at POST_ROOM_GEN. While checking for template == 9 (invalid) makes machinerooms invalid, when they aren't always invalid
+    if (!this->backlayer_room_exists->rooms[x + y * 8])
+    {
+        set_backlayer_room_template(this, x, y, room_template);
+    }
+}
+
 bool default_spawn_is_valid(float x, float y, LAYER layer)
 {
     uint8_t correct_layer = enum_to_layer(layer);

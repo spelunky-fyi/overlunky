@@ -74,6 +74,11 @@ bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE ch
     return State::get().ptr_local()->level_gen->set_procedural_spawn_chance(chance_id, inverse_chance);
 }
 
+void PostRoomGenerationContext::set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TEMPLATE room_template)
+{
+    return State::get().ptr_local()->level_gen->set_backlayer_room_template(x, y, room_template);
+}
+
 void PostRoomGenerationContext::set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer)
 {
     State::get().ptr_local()->level_gen->data->set_num_extra_spawns(extra_spawn_id, num_spawns_front_layer, num_spawns_back_layer);
@@ -1410,6 +1415,8 @@ void register_usertypes(sol::state& lua)
         "PostRoomGenerationContext",
         "set_room_template",
         &PostRoomGenerationContext::set_room_template,
+        "set_backlayer_room_template",
+        &PostRoomGenerationContext::set_backlayer_room_template,
         "mark_as_machine_room_origin",
         &PostRoomGenerationContext::mark_as_machine_room_origin,
         "mark_as_set_room",
