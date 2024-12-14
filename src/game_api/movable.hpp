@@ -200,8 +200,9 @@ class Movable : public Entity
     /// Called for entity that just has been picked up
     virtual void on_picked_up() = 0; //                                                 // 80, plays pickup sound depending on the entity mask/type etc. set stun for pets and mounts etc.
     /// Called for entity that just has been thrown/dropped
-    virtual void on_release() = 0;                   //                                 // 81, only for hired hands and lava pots, the rest just returns
-    virtual void generate_fall_poof_particles() = 0; //                                 // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
+    virtual void on_release() = 0; //                                                   // 81, only for hired hands and lava pots, the rest just returns
+    /// Only for landing on the floor or activefloor, generates "poof" particle and plays sfx (note: when stunned, sfx is played by the damage function)
+    virtual void generate_landing_effects() = 0; //                                     // 82, entity.velocityy must be < -0.12 to generate a poof, might do other stuff regarding falling/landing
     /// Applies gravity to entity. Disable to float like on hoverpack.
     virtual void handle_fall_logic(float) = 0;                                          // 83, adjusts entity.velocityy when falling
     virtual void apply_friction(float, bool vertical, float) = 0;                       // 84, applies entity.type.friction to entity.velocityx, the two floats for characters just multiply the friction, could also be returning the value
