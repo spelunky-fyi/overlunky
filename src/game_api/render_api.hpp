@@ -336,7 +336,7 @@ struct RenderInfo
     float brightness; // 0.0 = completely black ; 1.0 = normal (used for dark effect like when on fire)
 
     virtual ~RenderInfo() = 0;
-    /// Called when entity enters view of the camera
+    /// Called when the entity enters the camera view, using its hitbox with an extra threshold. Handles low-level graphics tasks related to the GPU
     virtual void draw() = 0;   // initializes positions
     virtual void update() = 0; // math, basically always runs before render
     virtual void render(Vec2* offset) = 0;
