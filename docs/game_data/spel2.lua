@@ -2365,7 +2365,7 @@ do
     ---@field trap_info table<ENT_TYPE, JournalPageData>
     ---@field trap_part_to_main table<ENT_TYPE, ENT_TYPE> @used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
     ---@field stickers_data table<ENT_TYPE, StickersData>
-    ---@field get_SaveData fun(self): SaveData @Gets local version of the SaveData
+    ---@field get_savegame fun(self): SaveData @Gets local version of the SaveData
 
 ---@class JournalPageData
     ---@field page_nr integer
@@ -2387,7 +2387,7 @@ do
     ---@field background_sprite_id integer
     ---@field killed_by_NA boolean
     ---@field defeated_NA boolean
-    ---@field portret_texture TEXTURE
+    ---@field portrait_texture TEXTURE
 
 ---@class JournalTrapData : JournalPageData
     ---@field texture TEXTURE

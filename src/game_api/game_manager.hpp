@@ -5,6 +5,7 @@
 
 #include "aliases.hpp"                       // for MAX_PLAYERS
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
+#include "containers/identity_hasher.hpp"    // for identity_hasher
 #include "render_api.hpp"                    // for TextureRenderingInfo
 #include "sound_manager.hpp"                 // for BackgroundSound
 #include "thread_utils.hpp"                  // for OnHeapPointer
@@ -95,18 +96,18 @@ struct SaveRelated
     ENT_TYPE progress_stickers_powerups[29]; // pre-journal progress setup, maybe gathering from all players or something?
 
     /// Scale and offset not used in those pages. Can't add more
-    game_unordered_map<uint8_t, JournalPageData> places_data;
-    game_unordered_map<ENT_TYPE, JournalBestiaryData> bestiary_data;
+    game_unordered_map<uint8_t, JournalPageData, identity_hasher<>> places_data;
+    game_unordered_map<ENT_TYPE, JournalBestiaryData, identity_hasher<>> bestiary_data;
     /// used to map stuff like Osiris_Hand -> Osiris_Head, Hundun limbs -> Hundun etc.
-    game_unordered_map<ENT_TYPE, ENT_TYPE> monster_part_to_main;
-    game_unordered_map<ENT_TYPE, JournalPeopleData> people_info;
+    game_unordered_map<ENT_TYPE, ENT_TYPE, identity_hasher<>> monster_part_to_main;
+    game_unordered_map<ENT_TYPE, JournalPeopleData, identity_hasher<>> people_info;
     /// used to map shopkeeper clone to shopkeeper only
-    game_unordered_map<ENT_TYPE, ENT_TYPE> people_part_to_main;
-    game_unordered_map<ENT_TYPE, JournalPageData> item_info;
-    game_unordered_map<ENT_TYPE, JournalPageData> trap_info;
+    game_unordered_map<ENT_TYPE, ENT_TYPE, identity_hasher<>> people_part_to_main;
+    game_unordered_map<ENT_TYPE, JournalPageData, identity_hasher<>> item_info;
+    game_unordered_map<ENT_TYPE, JournalPageData, identity_hasher<>> trap_info;
     /// used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
-    game_unordered_map<ENT_TYPE, ENT_TYPE> trap_part_to_main;
-    game_unordered_map<ENT_TYPE, StickersData> stickers_data;
+    game_unordered_map<ENT_TYPE, ENT_TYPE, identity_hasher<>> trap_part_to_main;
+    game_unordered_map<ENT_TYPE, StickersData, identity_hasher<>> stickers_data;
 
     /// Gets local version of the SaveData
     SaveData* get_savegame()

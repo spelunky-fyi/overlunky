@@ -1416,7 +1416,7 @@ Type | Name | Description
 int | [background_sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=background_sprite_id) | 
 bool | [killed_by_NA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=killed_by_NA) | 
 bool | [defeated_NA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defeated_NA) | 
-[TEXTURE](#TEXTURE) | [portret_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=portret_texture) | 
+[TEXTURE](#TEXTURE) | [portrait_texture](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=portrait_texture) | 
 
 ### JournalTrapData
 
@@ -2128,7 +2128,7 @@ map&lt;[ENT_TYPE](#ENT_TYPE), [JournalPageData](#JournalPageData)&gt; | [item_in
 map&lt;[ENT_TYPE](#ENT_TYPE), [JournalPageData](#JournalPageData)&gt; | [trap_info](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_info) | 
 map&lt;[ENT_TYPE](#ENT_TYPE), [ENT_TYPE](#ENT_TYPE)&gt; | [trap_part_to_main](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=trap_part_to_main) | used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
 map&lt;[ENT_TYPE](#ENT_TYPE), [StickersData](#StickersData)&gt; | [stickers_data](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stickers_data) | 
-[SaveData](#SaveData) | [get_SaveData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_SaveData) | Gets local version of the [SaveData](#SaveData)
+[SaveData](#SaveData) | [get_savegame()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_savegame) | Gets local version of the [SaveData](#SaveData)
 
 ### Screen
 
