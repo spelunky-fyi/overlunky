@@ -12,18 +12,19 @@
 #include <type_traits>            // for move, declval, decay_t, reference_...
 #include <utility>                // for min, max
 
-#include "entities_chars.hpp" // IWYU pragma: keep
-#include "entity.hpp"         // IWYU pragma: keep
-#include "illumination.hpp"   // IWYU pragma: keep
-#include "items.hpp"          // for Items, SelectPlayerSlot, Items::is...
-#include "level_api.hpp"      // IWYU pragma: keep
-#include "online.hpp"         // for OnlinePlayer, OnlineLobby, Online
-#include "savestate.hpp"      // for SaveState
-#include "screen.hpp"         // IWYU pragma: keep
-#include "screen_arena.hpp"   // IWYU pragma: keep
-#include "script/events.hpp"  // for pre_load_state
-#include "state.hpp"          // for StateMemory, State, StateMemory::a...
-#include "state_structs.hpp"  // for ArenaConfigArenas, ArenaConfigItems
+#include "entities_chars.hpp"     // IWYU pragma: keep
+#include "entity.hpp"             // IWYU pragma: keep
+#include "illumination.hpp"       // IWYU pragma: keep
+#include "items.hpp"              // for Items, SelectPlayerSlot, Items::is...
+#include "level_api.hpp"          // IWYU pragma: keep
+#include "online.hpp"             // for OnlinePlayer, OnlineLobby, Online
+#include "savestate.hpp"          // for SaveState
+#include "screen.hpp"             // IWYU pragma: keep
+#include "screen_arena.hpp"       // IWYU pragma: keep
+#include "script/events.hpp"      // for pre_load_state
+#include "script/lua_backend.hpp" // for LuaBackend
+#include "state.hpp"              // for StateMemory, State, StateMemory::a...
+#include "state_structs.hpp"      // for ArenaConfigArenas, ArenaConfigItems
 
 namespace NState
 {
@@ -414,6 +415,31 @@ void register_usertypes(sol::state& lua)
     statememory_type["next_entity_uid"] = &StateMemory::next_entity_uid;
     statememory_type["room_owners"] = &StateMemory::room_owners;
 
+    auto state_get_user_data = [](StateMemory& state) -> sol::object
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        auto local_datas = backend->local_state_datas;
+        if (local_datas.contains(&state))
+        {
+            return local_datas[&state].user_data;
+        }
+        return sol::nil;
+    };
+
+    auto state_set_user_data = [](StateMemory& state, sol::object user_data) -> void
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        backend->local_state_datas[&state].user_data = user_data;
+    };
+    auto user_data = sol::property(state_get_user_data, state_set_user_data);
+
+    statememory_type["user_data"] = std::move(user_data);
+    /* StateMemory
+    // user_data
+    // You can store a table (or lua primitive) here and it will store data correctly in online multiplayer, by having a different copy on each state and being copied over when the game does.
+    // Doesn't support recursive tables / cyclic references. Metatables will be transferred by reference instead of being copied
+    */
+
     lua.create_named_table("FADE", "NONE", 0, "OUT", 1, "LOAD", 2, "IN", 3);
 
     lua.create_named_table("QUEST_FLAG", "RESET", 1, "DARK_LEVEL_SPAWNED", 2, "VAULT_SPAWNED", 3, "SPAWN_OUTPOST", 4, "SHOP_SPAWNED", 5, "SHORTCUT_USED", 6, "SEEDED", 7, "DAILY", 8, "CAVEMAN_SHOPPIE_AGGROED", 9, "WADDLER_AGGROED", 10, "SHOP_BOUGHT_OUT", 11, "EGGPLANT_CROWN_PICKED_UP", 12, "UDJAT_EYE_SPAWNED", 17, "BLACK_MARKET_SPAWNED", 18, "DRILL_SPAWNED", 19, "MOON_CHALLENGE_SPAWNED", 25, "STAR_CHALLENGE_SPAWNED", 26, "SUN_CHALLENGE_SPAWNED", 27);
@@ -436,7 +462,7 @@ void register_usertypes(sol::state& lua)
         "as_color",
         &LightParams::as_color);
 
-    /// Generic obcject for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
+    /// Generic object for lights in the game, you can make your own with [create_illumination](#create_illumination)<br/>
     /// Used in StateMemory, Player, PlayerGhost, BurningRopeEffect ...
     auto illumination_type = lua.new_usertype<Illumination>("Illumination");
     illumination_type["lights"] = &Illumination::lights;

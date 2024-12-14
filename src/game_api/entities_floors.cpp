@@ -735,7 +735,7 @@ void ForceField::activate_laserbeam(bool turn_on)
 void Door::unlock(bool unlock)
 {
     // TODO: DOOR_EGGSHIP, DOOR_EGGSHIP_ATREZZO, DOOR_EGGSHIP_ROOM, HUNDUN ?
-    static const ENT_TYPE entrence_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
+    static const ENT_TYPE entrance_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static const ENT_TYPE locked_door = to_id("ENT_TYPE_FLOOR_DOOR_LOCKED");
     static const ENT_TYPE COG_door = to_id("ENT_TYPE_FLOOR_DOOR_COG");
     static const ENT_TYPE eggchild_room_door = to_id("ENT_TYPE_FLOOR_DOOR_MOAI_STATUE");
@@ -757,7 +757,7 @@ void Door::unlock(bool unlock)
             door_ent->set_invisible(false);
         }
     }
-    else if (ent_type == EW_door || (ent_type >= entrence_door && ent_type < locked_door))
+    else if (ent_type == EW_door || (ent_type >= entrance_door && ent_type < locked_door))
     {
         if (unlock)
         {
@@ -768,8 +768,8 @@ void Door::unlock(bool unlock)
             this->flags &= ~0x80000; // clr flag 20 (Enable button prompt)
         }
 
-        // entrence, exit, starting exit
-        if (ent_type == entrence_door || ent_type == entrence_door + 1 || ent_type == entrence_door + 3)
+        // entrance, exit, starting exit
+        if (ent_type == entrance_door || ent_type == entrance_door + 1 || ent_type == entrance_door + 3)
         {
             static const ENT_TYPE door_bg = to_id("ENT_TYPE_BG_DOOR");
             const auto entities = state.layer(this->layer)->get_entities_overlapping_grid_at(x, y);
@@ -792,7 +792,7 @@ void Door::unlock(bool unlock)
                 }
             }
         }
-        else if (ent_type == entrence_door + 2) // main exit
+        else if (ent_type == entrance_door + 2) // main exit
         {
             static const ENT_TYPE fx_maindoor = to_id("ENT_TYPE_FX_MAIN_EXIT_DOOR");
             static const ENT_TYPE door_bg_large = to_id("ENT_TYPE_BG_DOOR_LARGE");
@@ -804,7 +804,7 @@ void Door::unlock(bool unlock)
                     if (main_door->door_blocker->type->id == fx_maindoor)
                     {
                         main_door->door_blocker->as<Movable>()->move_state = 5; // this will kill it
-                        main_door->door_blocker = nullptr;                      // unlock the door, but the backgound still stays
+                        main_door->door_blocker = nullptr;                      // unlock the door, but the background still stays
                     }
                     else
                     {

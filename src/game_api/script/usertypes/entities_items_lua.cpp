@@ -226,7 +226,7 @@ void register_usertypes(sol::state& lua)
         sol::bases<Entity, Movable, Purchasable>());
 
     /// NoDoc
-    lua.new_usertype<WebGun>( // left to not break compability
+    lua.new_usertype<WebGun>( // left to not break combability
         "WebGun",
         sol::base_classes,
         sol::bases<Entity, Movable, Purchasable, Gun>());

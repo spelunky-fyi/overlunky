@@ -41,7 +41,7 @@ std::array themes_short{
 
 std::array entity_flags{
     "Invisible",
-    "Indestructable/special floor",
+    "Indestructible/special floor",
     "Solid (wall)",
     "Passes through objects",
     "Passes through everything",

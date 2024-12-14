@@ -1127,7 +1127,7 @@ std::string LuaConsole::dump_api()
     return api;
 }
 
-unsigned int LuaConsole::get_input_lines()
+unsigned int LuaConsole::get_input_lines() const
 {
     int num = 1;
     const char* str;

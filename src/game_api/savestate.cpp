@@ -5,12 +5,12 @@
 #include "script/events.hpp" // for pre_load_state
 #include "state.hpp"         // for State, get_state_ptr, enum_to_layer
 
-size_t get_state_offset()
+StateMemory* get_save_state_raw(int slot)
 {
-    auto addr = get_address("state_location");
-    if (addr)
-        return memory_read<size_t>(addr);
-    return 0x4a0;
+    size_t arr = get_address("save_states");
+    size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
+    auto state = reinterpret_cast<StateMemory*>(base + State::get().get_offset());
+    return state;
 }
 
 void copy_save_slot(int from, int to)
@@ -18,6 +18,7 @@ void copy_save_slot(int from, int to)
     if ((from == 5 && pre_save_state(to, get_save_state(to))) ||
         (to == 5 && pre_load_state(from, get_save_state(from))))
         return;
+    pre_copy_state_event(get_save_state_raw(from), get_save_state_raw(to));
     size_t arr = get_address("save_states");
     size_t fromBaseState = memory_read<size_t>(arr + (from - 1) * 8);
     size_t toBaseState = memory_read<size_t>(arr + (to - 1) * 8);
@@ -57,9 +58,7 @@ void copy_state(size_t fromBaseState, size_t toBaseState)
 
 StateMemory* get_save_state(int slot)
 {
-    size_t arr = get_address("save_states");
-    size_t base = memory_read<size_t>(arr + (slot - 1) * 8);
-    auto state = reinterpret_cast<StateMemory*>(base + get_state_offset());
+    auto state = get_save_state_raw(slot);
     if (state->screen)
         return state;
     return nullptr;
@@ -88,15 +87,17 @@ StateMemory* SaveState::get_state() const
 {
     if (!addr)
         return nullptr;
-    return reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    return reinterpret_cast<StateMemory*>(addr + State::get().get_offset());
 }
 
 void SaveState::load()
 {
     if (!addr)
         return;
-    size_t to = (size_t)(State::get().ptr_main()) - get_state_offset();
-    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    State& state_g = State::get();
+    size_t offset = state_g.get_offset();
+    size_t to = (size_t)(state_g.ptr_main()) - offset;
+    auto state = reinterpret_cast<StateMemory*>(addr + offset);
     if (pre_load_state(-1, state))
         return;
     copy_state(addr, to);
@@ -107,8 +108,10 @@ void SaveState::save()
 {
     if (!addr)
         return;
-    size_t from = (size_t)(State::get().ptr_main()) - get_state_offset();
-    auto state = reinterpret_cast<StateMemory*>(addr + get_state_offset());
+    State& state_g = State::get();
+    size_t offset = state_g.get_offset();
+    size_t from = (size_t)(state_g.ptr_main()) - offset;
+    auto state = reinterpret_cast<StateMemory*>(addr + offset);
     if (pre_save_state(-1, state))
         return;
     copy_state(from, addr);

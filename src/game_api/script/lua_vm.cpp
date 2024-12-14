@@ -382,7 +382,7 @@ end
         backend->lua["lua_print"](message);
     };
 
-    /// Print a log message to ingame console with a comment identifying the script that sent it.
+    /// Print a log message to in-game console with a comment identifying the script that sent it.
     lua["console_print"] = [&lua](std::string message) -> void
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -399,7 +399,7 @@ end
         backend->console->push_history(fmt::format("--- [{}] at {:%Y-%m-%d %X}", backend->get_id(), time_buf), std::move(messages));
     };
 
-    /// Prinspect to ingame console.
+    /// Prinspect to in-game console.
     lua["console_prinspect"] = [&lua](sol::variadic_args objects) -> void
     {
         if (objects.size() > 0)
@@ -918,12 +918,12 @@ end
     /// Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
     /// If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
     lua["spawn_player"] = spawn_player;
-    /// Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](#steal_input) and send_input to controll it
+    /// Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](#steal_input) and send_input to control it
     /// or change it's `player_inputs` to the `input` of real player so he can control it directly
     lua["spawn_playerghost"] = spawn_playerghost;
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
-    /// In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+    /// In many cases replacing the intended entity won't have the intended effect or will even break the game, so use only if you really know what you're doing.
     /// <br/>The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
     lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
     {
@@ -1042,7 +1042,7 @@ end
     lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
-    /// Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+    /// Get uids of static entities overlapping this grid position (decorations, backgrounds etc.)
     lua["get_entities_overlapping_grid"] = get_entities_overlapping_grid;
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
@@ -1743,7 +1743,7 @@ end
     /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
 
-    /// Get string behind STRINGID, don't use stringid diretcly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
+    /// Get string behind STRINGID, don't use stringid directly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
     /// Will return the string of currently choosen language
     lua["get_string"] = get_string;
 
@@ -1754,11 +1754,11 @@ end
         return change_string(id, str);
     };
 
-    /// Add custom string, currently can only be used for names of shop items (Entitydb->description)
+    /// Add custom string, currently can only be used for names of shop items (EntityDB->description)
     /// Returns STRINGID of the new string
     lua["add_string"] = add_string;
 
-    /// Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+    /// Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
     /// if the entity has no localized name
     lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy) -> std::u16string
     {
@@ -1990,13 +1990,13 @@ end
     lua["set_ending_unlock"] = set_ending_unlock;
 
     /// Get the thread-local version of state
-    lua["get_local_state"] = []()
+    lua["get_local_state"] = []() -> StateMemory*
     {
         return State::get().ptr_local();
     };
 
     /// Get the thread-local version of players
-    lua["get_local_players"] = []()
+    lua["get_local_players"] = []() -> std::vector<Player*>
     {
         return get_players(State::get().ptr_local());
     };
@@ -2148,7 +2148,7 @@ end
         static_cast<ENT_TYPE (*)()>(::add_custom_type));
 
     /// Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
-    /// Use empty array or no parameter to get new uniqe ENT_TYPE that can be used for custom EntityDB
+    /// Use empty array or no parameter to get new unique ENT_TYPE that can be used for custom EntityDB
     lua["add_custom_type"] = add_custom_type;
 
     auto get_entities_by_draw_depth = sol::overload(
@@ -2267,7 +2267,7 @@ end
     lua["play_seeded"] = init_seeded;
 
     /// Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
-    /// This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+    /// This sadly also makes lavamanders extinct, since the logic for their spawn is hardcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
     /// Everything should be working more or less correctly (report on community discord if you find something unusual)
     lua["set_liquid_layer"] = set_liquid_layer;
 
@@ -2665,7 +2665,7 @@ end
     // Params: JOURNALUI_PAGE_SHOWN chapter, array:int pages
     // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
     // All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
-    // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page
+    // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page
     // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
     // PRE_GET_FEAT
     // Runs before getting performed status for a FEAT when rendering the Feats page in journal.
@@ -2675,7 +2675,7 @@ end
     // Return: true to block the default behaviour of calling Steam SetAchievement.
     // PRE_UPDATE
     // Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
-    // Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
+    // Return behavior: return true to stop further PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
     // POST_UPDATE
     // Runs right after the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
     // SCRIPT_ENABLE
@@ -2696,15 +2696,15 @@ end
     // Params: LAYER layer
     // Runs right after a layer has been created and you can start spawning entities in it. Runs in all screens that usually have entities, or when creating a layer manually.
     // PRE_LEVEL_DESTRUCTION
-    // Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.
     // POST_LEVEL_DESTRUCTION
-    // Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.
     // PRE_LAYER_DESTRUCTION
     // Params: LAYER layer
-    // Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.
     // POST_LAYER_DESTRUCTION
     // Params: LAYER layer
-    // Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.
+    // Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.
     // PRE_PROCESS_INPUT
     // Runs right before the game gets input from various devices and writes to a bunch of buttons-variables. Return true to disable all game input completely.
     // POST_PROCESS_INPUT

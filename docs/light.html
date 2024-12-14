@@ -2341,7 +2341,7 @@
                             <a href="#BGShootingStar" class="toc-h3 toc-link" data-title="BGShootingStar">BGShootingStar</a>
                           </li>
                           <li>
-                            <a href="#BGShopEntrence" class="toc-h3 toc-link" data-title="BGShopEntrence">BGShopEntrence</a>
+                            <a href="#BGShopEntrance" class="toc-h3 toc-link" data-title="BGShopEntrance">BGShopEntrance</a>
                           </li>
                           <li>
                             <a href="#BGShopKeeperPrime" class="toc-h3 toc-link" data-title="BGShopKeeperPrime">BGShopKeeperPrime</a>
@@ -4425,7 +4425,7 @@ Sets a callback that is called right after the screen is drawn.
 <h4 id='CallbackId-set_pre_entity_spawn-function-cb-SPAWN_TYPE-flags-int-mask-variadic_args-entity_types'><a href="#Aliases">CallbackId</a> set_pre_entity_spawn(function cb, <a href="#SPAWN_TYPE">SPAWN_TYPE</a> flags, int mask, variadic_args entity_types)</h4>
 <p>Add a callback for a spawn of specific entity types or mask. Set <code>mask</code> to <code>MASK.ANY</code> to ignore that.
 This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
-In many cases replacing the intended entity won&#39;t have the indended effect or will even break the game, so use only if you really know what you&#39;re doing.
+In many cases replacing the intended entity won&#39;t have the intended effect or will even break the game, so use only if you really know what you&#39;re doing.
 <br/>The callback signature is optional<int> pre_entity_spawn(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, float x, float y, int layer, <a href="#Entity">Entity</a> overlay_entity, <a href="#SPAWN_TYPE">SPAWN_TYPE</a> spawn_flags)</p>
 <h3 id='set_pre_render_screen'>set_pre_render_screen</h3>
 <blockquote>
@@ -4662,7 +4662,7 @@ This function can be slower than the <a href="#get_entities_by">get_entities_by<
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_overlapping_grid">get_entities_overlapping_grid</a></p>
 </blockquote>
 <h4 id='vector-lt-int-gt-get_entities_overlapping_grid-float-x-float-y-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping_grid(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
-<p>Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)</p>
+<p>Get uids of static entities overlapping this grid position (decorations, backgrounds etc.)</p>
 <h3 id='get_entities_overlapping_hitbox'>get_entities_overlapping_hitbox</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_overlapping_hitbox">get_entities_overlapping_hitbox</a></p>
@@ -4680,7 +4680,7 @@ This function can be slower than the <a href="#get_entities_by">get_entities_by<
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_name">get_entity_name</a></p>
 </blockquote>
 <h4 id='string-get_entity_name-ENT_TYPE-type-optional-fallback_strategy'>string get_entity_name(<a href="#ENT_TYPE">ENT_TYPE</a> type, optional<bool> fallback_strategy)</h4>
-<p>Get localized name of an entity, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.*</code> enum name
+<p>Get localized name of an entity from the journal, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.*</code> enum name
 if the entity has no localized name</p>
 <h3 id='get_entity_type'>get_entity_type</h3>
 <blockquote>
@@ -4698,7 +4698,7 @@ if the entity has no localized name</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_players">get_local_players</a></p>
 </blockquote>
-<h4 id='nil-get_local_players'>nil get_local_players()</h4>
+<h4 id='vector-lt-Player-gt-get_local_players'>vector&lt;<a href="#Player">Player</a>&gt; get_local_players()</h4>
 <p>Get the thread-local version of players</p>
 <h3 id='get_player'>get_player</h3>
 <blockquote>
@@ -5052,7 +5052,7 @@ default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0
 </blockquote>
 <h4 id='ENT_TYPE-add_custom_type-array-lt-ENT_TYPE-gt-types'><a href="#ENT_TYPE">ENT_TYPE</a> add_custom_type(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; types)</h4><h4 id='ENT_TYPE-add_custom_type'><a href="#ENT_TYPE">ENT_TYPE</a> add_custom_type()</h4>
 <p>Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
-Use empty array or no parameter to get new uniqe <a href="#ENT_TYPE">ENT_TYPE</a> that can be used for custom <a href="#EntityDB">EntityDB</a></p>
+Use empty array or no parameter to get new unique <a href="#ENT_TYPE">ENT_TYPE</a> that can be used for custom <a href="#EntityDB">EntityDB</a></p>
 <h3 id='add_money'>add_money</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_money">add_money</a></p>
@@ -5165,7 +5165,7 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_color">get_color</a></p>
 </blockquote>
 <h4 id='uColor-get_color-string-color_name-optional-alpha-nullopt'><a href="#Aliases">uColor</a> get_color(string color_name, optional<int> alpha = nullopt)</h4>
-<p>Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with &#39;#&#39; symbol You can also convert hex string into a color, prefix it with &#39;0x&#39;, but use it only if you need to since lua allows for hex values directly too. Default apha value will be 0xFF, unless it&#39;s specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR</p>
+<p>Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with &#39;#&#39; symbol You can also convert hex string into a color, prefix it with &#39;0x&#39;, but use it only if you need to since lua allows for hex values directly too. Default alpha value will be 0xFF, unless it&#39;s specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR</p>
 <h3 id='get_current_money'>get_current_money</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_current_money">get_current_money</a></p>
@@ -5223,13 +5223,13 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_prng">get_local_prng</a></p>
 </blockquote>
-<h4 id='nil-get_local_prng'>nil get_local_prng()</h4>
+<h4 id='PRNG-get_local_prng'><a href="#PRNG">PRNG</a> get_local_prng()</h4>
 <p>Get the thread-local version of prng</p>
 <h3 id='get_local_state'>get_local_state</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_state">get_local_state</a></p>
 </blockquote>
-<h4 id='nil-get_local_state'>nil get_local_state()</h4>
+<h4 id='StateMemory-get_local_state'><a href="#StateMemory">StateMemory</a> get_local_state()</h4>
 <p>Get the thread-local version of state</p>
 <h3 id='get_ms'>get_ms</h3>
 <blockquote>
@@ -5296,13 +5296,13 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grow_poles">grow_poles</a></p>
 </blockquote>
-<h4 id='nil-grow_poles-LAYER-l-int-max_lengh-AABB-area-bool-destroy_broken'>nil grow_poles(<a href="#LAYER">LAYER</a> l, int max_lengh, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4><h4 id='nil-grow_poles-LAYER-l-int-max_lengh'>nil grow_poles(<a href="#LAYER">LAYER</a> l, int max_lengh)</h4>
+<h4 id='nil-grow_poles-LAYER-l-int-max_length-AABB-area-bool-destroy_broken'>nil grow_poles(<a href="#LAYER">LAYER</a> l, int max_length, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4><h4 id='nil-grow_poles-LAYER-l-int-max_length'>nil grow_poles(<a href="#LAYER">LAYER</a> l, int max_length)</h4>
 <p>Grow pole from <code>GROWABLE_CLIMBING_POLE</code> entities in a level, <code>area</code> default is whole level, <code>destroy_broken</code> default is false</p>
 <h3 id='grow_vines'>grow_vines</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=grow_vines">grow_vines</a></p>
 </blockquote>
-<h4 id='nil-grow_vines-LAYER-l-int-max_lengh-AABB-area-bool-destroy_broken'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4><h4 id='nil-grow_vines-LAYER-l-int-max_lengh'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_lengh)</h4>
+<h4 id='nil-grow_vines-LAYER-l-int-max_length-AABB-area-bool-destroy_broken'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_length, <a href="#AABB">AABB</a> area, bool destroy_broken)</h4><h4 id='nil-grow_vines-LAYER-l-int-max_length'>nil grow_vines(<a href="#LAYER">LAYER</a> l, int max_length)</h4>
 <p>Grow vines from <code>GROWABLE_VINE</code> and <code>VINE_TREE_TOP</code> entities in a level, <code>area</code> default is whole level, <code>destroy_broken</code> default is false</p>
 <h3 id='import'>import</h3>
 <blockquote>
@@ -5556,7 +5556,7 @@ Add callback function to be called on a hotkey, using Windows hotkey api. These 
 </blockquote>
 <h4 id='nil-set_liquid_layer-LAYER-l'>nil set_liquid_layer(<a href="#LAYER">LAYER</a> l)</h4>
 <p>Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
-This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+This sadly also makes lavamanders extinct, since the logic for their spawn is hardcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
 Everything should be working more or less correctly (report on community discord if you find something unusual)</p>
 <h3 id='set_seed'>set_seed</h3>
 <blockquote>
@@ -5663,7 +5663,7 @@ Everything should be working more or less correctly (report on community discord
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=two_lines_angle">two_lines_angle</a></p>
 </blockquote>
 <h4 id='float-two_lines_angle-Vec2-A-Vec2-common-Vec2-B'>float two_lines_angle(<a href="#Vec2">Vec2</a> A, <a href="#Vec2">Vec2</a> common, <a href="#Vec2">Vec2</a> B)</h4>
-<p>Mesures angle between two lines with one common point</p>
+<p>Measures angle between two lines with one common point</p>
 <h4 id='float-two_lines_angle-Vec2-line1_A-Vec2-line1_B-Vec2-line2_A-Vec2-line2_B'>float two_lines_angle(<a href="#Vec2">Vec2</a> line1_A, <a href="#Vec2">Vec2</a> line1_B, <a href="#Vec2">Vec2</a> line2_A, <a href="#Vec2">Vec2</a> line2_B)</h4>
 <p>Gets line1_A, intersection point and line2_B and calls the 3 parameter version of this function</p>
 <h3 id='update_liquid_collision_at'>update_liquid_collision_at</h3>
@@ -5734,13 +5734,13 @@ optional <code>layer</code> parameter to be used when liquid was moved to back l
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=console_prinspect">console_prinspect</a></p>
 </blockquote>
 <h4 id='nil-console_prinspect-variadic_args-objects'>nil console_prinspect(variadic_args objects)</h4>
-<p>Prinspect to ingame console.</p>
+<p>Prinspect to in-game console.</p>
 <h3 id='console_print'>console_print</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=console_print">console_print</a></p>
 </blockquote>
 <h4 id='nil-console_print-string-message'>nil console_print(string message)</h4>
-<p>Print a log message to ingame console with a comment identifying the script that sent it.</p>
+<p>Print a log message to in-game console with a comment identifying the script that sent it.</p>
 <h3 id='log_print'>log_print</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=log_print">log_print</a></p>
@@ -6088,7 +6088,7 @@ you&#39;re standing on, not real level coordinates.</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=position_is_valid">position_is_valid</a></p>
 </blockquote>
 <h4 id='bool-position_is_valid-float-x-float-y-LAYER-layer-POS_TYPE-flags'>bool position_is_valid(float x, float y, <a href="#LAYER">LAYER</a> layer, <a href="#POS_TYPE">POS_TYPE</a> flags)</h4>
-<p>Check if position satifies the given <a href="#POS_TYPE">POS_TYPE</a> flags, to be used in a custom is_valid function procedural for spawns.</p>
+<p>Check if position satisfies the given <a href="#POS_TYPE">POS_TYPE</a> flags, to be used in a custom is_valid function procedural for spawns.</p>
 <h3 id='screen_aabb'>screen_aabb</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_aabb">screen_aabb</a></p>
@@ -6313,7 +6313,7 @@ The function <code>bool is_valid(float x, float y, LAYER layer)</code> determine
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set <code>is_valid</code> to <code>nil</code> in order to use the default rule (aka. on top of floor and not obstructed).
 To change the number of spawns use <code>PostRoomGenerationContext:set_num_extra_spawns</code> during <code>ON.POST_ROOM_GENERATION</code>
-No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.</p>
+No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new unique id.</p>
 <h3 id='define_procedural_spawn'>define_procedural_spawn</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=define_procedural_spawn">define_procedural_spawn</a></p>
@@ -6481,7 +6481,7 @@ If you want to respawn a player that is a ghost, set in his <a href="#Inventory"
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_playerghost">spawn_playerghost</a></p>
 </blockquote>
 <h4 id='int-spawn_playerghost-ENT_TYPE-char_type-float-x-float-y-LAYER-layer'>int spawn_playerghost(<a href="#ENT_TYPE">ENT_TYPE</a> char_type, float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
-<p>Spawn the <a href="#PlayerGhost">PlayerGhost</a> entity, it will not move and not be connected to any player, you can then use <a href="#steal_input">steal_input</a> and send_input to controll it
+<p>Spawn the <a href="#PlayerGhost">PlayerGhost</a> entity, it will not move and not be connected to any player, you can then use <a href="#steal_input">steal_input</a> and send_input to control it
 or change it&#39;s <code>player_inputs</code> to the <code>input</code> of real player so he can control it directly</p>
 <h3 id='spawn_tree'>spawn_tree</h3>
 <blockquote>
@@ -6507,7 +6507,7 @@ This is better alternative to <code>add_string</code> but instead of changing th
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_string">add_string</a></p>
 </blockquote>
 <h4 id='STRINGID-add_string-string-str'><a href="#Aliases">STRINGID</a> add_string(string str)</h4>
-<p>Add custom string, currently can only be used for names of shop items (Entitydb-&gt;description)
+<p>Add custom string, currently can only be used for names of shop items (<a href="#EntityDB">EntityDB</a>-&gt;description)
 Returns <a href="#Aliases">STRINGID</a> of the new string</p>
 <h3 id='change_string'>change_string</h3>
 <blockquote>
@@ -6557,7 +6557,7 @@ This edits custom string and in game strings but changing the language in settin
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_string">get_string</a></p>
 </blockquote>
 <h4 id='string-get_string-STRINGID-string_id'>string get_string(<a href="#Aliases">STRINGID</a> string_id)</h4>
-<p>Get string behind <a href="#Aliases">STRINGID</a>, don&#39;t use stringid diretcly for vanilla string, use <a href="#hash_to_stringid">hash_to_stringid</a> first
+<p>Get string behind <a href="#Aliases">STRINGID</a>, don&#39;t use stringid directly for vanilla string, use <a href="#hash_to_stringid">hash_to_stringid</a> first
 Will return the string of currently choosen language</p>
 <h3 id='hash_to_stringid'>hash_to_stringid</h3>
 <blockquote>
@@ -8351,7 +8351,7 @@ Future calls to this will override the save</p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_texture">draw_screen_texture(TEXTURE texture_id, int row, int column, AABB rect, Color color, float angle, float px, float py)</a></td>
-<td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+<td>Draw a texture in screen coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -8371,7 +8371,7 @@ Future calls to this will override the save</p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_corner_finish">set_corner_finish(CORNER_FINISH c)</a></td>
-<td>Set the prefered way of drawing corners for the non filled shapes</td>
+<td>Set the preferred way of drawing corners for the non filled shapes</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -8381,12 +8381,12 @@ Future calls to this will override the save</p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect">draw_screen_rect(AABB rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
-<td>Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+<td>Draw rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotation where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_screen_rect_filled">draw_screen_rect_filled(AABB rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
-<td>Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
+<td>Draw filled rectangle in screen coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_✱_HUD/PAUSE_MENU/JOURNAL_PAGE events</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -8431,7 +8431,7 @@ Future calls to this will override the save</p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_texture">draw_world_texture(TEXTURE texture_id, int row, int column, AABB dest, Color color, float angle, float px, float py)</a></td>
-<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
+<td>Draw a texture in world coordinates from top-left to bottom-right using the built-in renderer with angle, px/py is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with <a href="#ON">ON</a>.RENDER_PRE_DRAW_DEPTH event<br/>For more control use the version taking a <a href="#Quad">Quad</a> instead</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -8461,12 +8461,12 @@ Future calls to this will override the save</p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect">draw_world_rect(AABB rect, float thickness, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
-<td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+<td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotation where 0,0 is center 1,1 is top right corner etc. (corner from the AABB, not the visible one from adding the <code>thickness</code>)<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_world_rect_filled">draw_world_rect_filled(AABB rect, Color color, optional<float> angle, optional<float> px, optional<float> py)</a></td>
-<td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotatnion where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
+<td>Draw rectangle in world coordinates from top-left to bottom-right using the built-in renderer with optional <code>angle</code>.<br/><code>px</code>/<code>py</code> is pivot for the rotation where 0,0 is center 1,1 is top right corner etc.<br/>Use in combination with ON.RENDER_PRE_DRAW_DEPTH event</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -8557,7 +8557,7 @@ Future calls to this will override the save</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=walk_pause_timer">walk_pause_timer</a></td>
-<td>positive: walking, negative: wating/idle</td>
+<td>positive: walking, negative: waiting/idle</td>
 </tr>
 </tbody></table>
 <h3 id='Animation'>Animation</h3>
@@ -8995,12 +8995,12 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mount_type">mount_type</a></td>
-<td>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
+<td>Used to transfer information to transition/next level (player riding a mount). Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=mount_metadata">mount_metadata</a></td>
-<td>Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player rading a mout). Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
+<td>Metadata of the mount (health, is cursed etc.)<br/>Used to transfer information to transition/next level (player riding a mount). Is not updated during a level<br/>You can use <code>ON.PRE_LEVEL_GENERATION</code> to access/edit this</td>
 </tr>
 <tr>
 <td>int</td>
@@ -9040,7 +9040,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=companion_count">companion_count</a></td>
-<td>Number of companions, it will determinate how many companions will be transfered to next level<br/>Increments when player acquires new companion, decrements when one of them dies</td>
+<td>Number of companions, it will determinate how many companions will be transferred to next level<br/>Increments when player acquires new companion, decrements when one of them dies</td>
 </tr>
 <tr>
 <td>array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, 8&gt;</td>
@@ -9763,7 +9763,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=time_dim">time_dim</a></td>
-<td>Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.</td>
+<td>Level time when element should dim again after highlighted, INT_MAX if dimmed on auto adjust. 0 on opaque.</td>
 </tr>
 </tbody></table>
 <h3 id='HudMoney'>HudMoney</h3>
@@ -10301,7 +10301,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td><a href="#Quad">Quad</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotate">rotate(float angle, float px, float py)</a></td>
-<td>Rotates a <a href="#Quad">Quad</a> by an angle, px/py are not offsets, use <code>:get_AABB():center()</code> to get approximated center for simetrical quadrangle</td>
+<td>Rotates a <a href="#Quad">Quad</a> by an angle, px/py are not offsets, use <code>:get_AABB():center()</code> to get approximated center for symmetrical quadrangle</td>
 </tr>
 <tr>
 <td><a href="#Quad">Quad</a></td>
@@ -10808,7 +10808,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=distance_to">distance_to(Vec2 other)</a></td>
-<td>Just simple pythagoras theorem</td>
+<td>Just simple Pythagoras theorem</td>
 </tr>
 <tr>
 <td><a href="#Vec2">Vec2</a></td>
@@ -11789,7 +11789,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 </tbody></table>
 <h2 id='Lighting-types'>Lighting types</h2><h3 id='Illumination'>Illumination</h3>
-<p>Generic obcject for lights in the game, you can make your own with <a href="#create_illumination">create_illumination</a><br/>
+<p>Generic object for lights in the game, you can make your own with <a href="#create_illumination">create_illumination</a><br/>
 Used in <a href="#StateMemory">StateMemory</a>, <a href="#Player">Player</a>, <a href="#PlayerGhost">PlayerGhost</a>, <a href="#BurningRopeEffect">BurningRopeEffect</a> ...</p>
 
 <table><thead>
@@ -13589,7 +13589,7 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <tr>
 <td>vector&lt;<a href="#JournalPage">JournalPage</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=pages">pages</a></td>
-<td>Stores pages loaded into memeory. It&#39;s not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use <code>:get_type()</code> to chcek page type and cast it correctly (see ON.<a href="#ON-RENDER_PRE_JOURNAL_PAGE">RENDER_PRE_JOURNAL_PAGE</a>)</td>
+<td>Stores pages loaded into memory. It&#39;s not cleared after the journal is closed or when you go back to the main (menu) page.<br/>Use <code>:get_type()</code> to check page type and cast it correctly (see ON.<a href="#ON-RENDER_PRE_JOURNAL_PAGE">RENDER_PRE_JOURNAL_PAGE</a>)</td>
 </tr>
 </tbody></table>
 <h3 id='MenuScreenPanels'>MenuScreenPanels</h3>
@@ -17709,6 +17709,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=room_owners">room_owners</a></td>
 <td>Holds info about owned rooms and items (shops, challenge rooms, vault etc.)</td>
 </tr>
+<tr>
+<td>any</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=user_data">user_data</a></td>
+<td>You can store a table (or lua primitive) here and it will store data correctly in online multiplayer, by having a different copy on each state and being copied over when the game does.<br/>Doesn&#39;t support recursive tables / cyclic references. Metatables will be transferred by reference instead of being copied<br/></td>
+</tr>
 </tbody></table>
 <h2 id='Texture-types'>Texture types</h2><h3 id='TextRenderingInfo'>TextRenderingInfo</h3>
 <table><thead>
@@ -17736,7 +17741,7 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=text_length">text_length</a></td>
-<td>You can also just use <code>#</code> operator on the whole TextRenderingInfo to get the text lenght</td>
+<td>You can also just use <code>#</code> operator on the whole TextRenderingInfo to get the text length</td>
 </tr>
 <tr>
 <td>float</td>
@@ -17751,17 +17756,17 @@ You can just discard this handle if you do not need extended control anymore</p>
 <tr>
 <td><a href="#TEXTURE">TEXTURE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=special_texture_id">special_texture_id</a></td>
-<td>Used to draw buttons and stuff, default is -1 wich uses the buttons texture</td>
+<td>Used to draw buttons and stuff, default is -1 which uses the buttons texture</td>
 </tr>
 <tr>
 <td>span&lt;<a href="#Letter">Letter</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_dest">get_dest()</a></td>
-<td>Returns refrence to the letter coordinates relative to the x,y position</td>
+<td>Returns reference to the letter coordinates relative to the x,y position</td>
 </tr>
 <tr>
 <td>span&lt;<a href="#Letter">Letter</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_source">get_source()</a></td>
-<td>Returns refrence to the letter coordinates in the texture</td>
+<td>Returns reference to the letter coordinates in the texture</td>
 </tr>
 <tr>
 <td>tuple&lt;float, float&gt;</td>
@@ -17875,7 +17880,7 @@ Tiles are labeled in sequence starting at the top left, going right and down at 
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=destination_bottom_left_x">destination_bottom_left_x</a></td>
-<td>destination is relative to the x,y centerpoint</td>
+<td>destination is relative to the x,y center point</td>
 </tr>
 <tr>
 <td>float</td>
@@ -18659,7 +18664,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=do_procedural_spawn">do_procedural_spawn(SpawnInfo info)</a></td>
-<td>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)</td>
+<td>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -19179,12 +19184,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_do_procedural_spawn">set_pre_do_procedural_spawn(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_do_procedural_spawn">set_post_do_procedural_spawn(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarb in dark levels etc.)</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil do_procedural_spawn(ThemeInfo self, SpawnInfo info)</code><br/>Virtual function docs:<br/>Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)</td>
 </tr>
 </tbody></table>
 <h1 id='Entity-types'>Entity types</h1><h2 id='Background-entities'>Background entities</h2><h3 id='BGBackLayerDoor'>BGBackLayerDoor</h3>
@@ -19353,7 +19358,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Gets smaller as the timer gets close to the max_timer</td>
 </tr>
 </tbody></table>
-<h3 id='BGShopEntrence'>BGShopEntrence</h3>
+<h3 id='BGShopEntrance'>BGShopEntrance</h3>
 <p>Derived from <a href="#Entity">Entity</a></p>
 
 <table><thead>
@@ -19972,7 +19977,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=fix_decorations">fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)</a></td>
-<td>Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set <code>fix_also_neighbours</code> to <code>true</code> to fix the neighbouring floor tile decorations on the border of the two tiles.<br/>Set <code>fix_styled_floor</code> to <code>true</code> to fix decorations on <code>FLOORSTYLED_*</code> entities, those usually only have decorations when broken.</td>
+<td>Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.<br/>Set <code>fix_also_neighbors</code> to <code>true</code> to fix the neighboring floor tile decorations on the border of the two tiles.<br/>Set <code>fix_styled_floor</code> to <code>true</code> to fix decorations on <code>FLOORSTYLED_*</code> entities, those usually only have decorations when broken.</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -21075,7 +21080,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kill_recursive">kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)</a></td>
-<td>Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s<br/>destroy_corpse and responsible are the standard parameters for the kill funciton</td>
+<td>Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain <a href="#MASK">MASK</a> and <a href="#ENT_TYPE">ENT_TYPE</a>. Note: the function will first check mask, if the entity doesn&#39;t match, it will look in the provided <a href="#ENT_TYPE">ENT_TYPE</a>&#39;s<br/>destroy_corpse and responsible are the standard parameters for the kill function</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -21251,6 +21256,26 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_on_collision2">set_post_on_collision2(function fun)</a></td>
 <td>Hooks after the virtual function.<br/>The callback signature is <code>nil on_collision2(Entity self, Entity other_entity)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_get_metadata">set_pre_get_metadata(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;int&gt; get_metadata(Entity self)</code><br/>Virtual function docs:<br/>e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_get_metadata">set_post_get_metadata(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil get_metadata(Entity self)</code><br/>Virtual function docs:<br/>e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_apply_metadata">set_pre_apply_metadata(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool apply_metadata(Entity self, int metadata)</code></td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_apply_metadata">set_post_apply_metadata(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil apply_metadata(Entity self, int metadata)</code></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -21711,7 +21736,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
-<td>Delay between spwning ufo</td>
+<td>Delay between spawning ufo</td>
 </tr>
 </tbody></table>
 <h3 id='LogicalRegeneratingBlock'>LogicalRegeneratingBlock</h3>
@@ -22065,7 +22090,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=position_state">position_state</a></td>
-<td>0 - none, 1 - Tusk dice shop, 2 - Entrence to pleasure palace, 3 - Basement entrance to pleasure palace</td>
+<td>0 - none, 1 - Tusk dice shop, 2 - Entrance to pleasure palace, 3 - Basement entrance to pleasure palace</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -23216,7 +23241,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_position_x">attack_position_x</a></td>
-<td>Posiotion where the head will move on attack</td>
+<td>Position where the head will move on attack</td>
 </tr>
 <tr>
 <td>float</td>
@@ -23360,7 +23385,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=initial_shell_health">initial_shell_health</a></td>
-<td>excalibur wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip</td>
+<td><a href="#Excalibur">Excalibur</a> wipes out immediately, bombs take off 11 points, when 0 vulnerable to whip</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -24419,12 +24444,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=aggro_trigger">aggro_trigger</a></td>
-<td>setting this makes him angry, if it&#39;s shopkeeper you get 2 agrro points</td>
+<td>setting this makes him angry, if it&#39;s shopkeeper you get 2 aggro points</td>
 </tr>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=was_hurt">was_hurt</a></td>
-<td>also is set true if you set aggro to true, get&#39;s trigger even when whiping</td>
+<td>also is set true if you set aggro to true, get&#39;s trigger even when whipping</td>
 </tr>
 </tbody></table>
 <h3 id='Scarab'>Scarab</h3>
@@ -24595,7 +24620,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger_distance">trigger_distance</a></td>
-<td>only in the x coord</td>
+<td>only in the x coordinate</td>
 </tr>
 </tbody></table>
 <h3 id='Tadpole'>Tadpole</h3>
@@ -24847,7 +24872,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=show_text">show_text</a></td>
-<td>if set to true, he will say &#39;i&#39;ve been hunting this fiend a long time!&#39; when on screen</td>
+<td>if set to true, he will say &quot;I&#39;ve been hunting this fiend a long time!&quot; when on screen</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -27592,7 +27617,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td>vector&lt;int&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_all_behaviors">get_all_behaviors()</a></td>
-<td>Get all avaible behavior ids</td>
+<td>Get all available behavior ids</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -29611,7 +29636,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_JOURNAL_CHAPTER">ON.POST_LOAD_JOURNAL_CHAPTER</a></p>
 </blockquote>
 
-<p>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></p>
+<p>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></p>
 <h2 id='ON-PRE_GET_FEAT'>ON.PRE_GET_FEAT</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GET_FEAT">ON.PRE_GET_FEAT</a></p>
@@ -29629,7 +29654,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_UPDATE">ON.PRE_UPDATE</a></p>
 </blockquote>
 
-<p>Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don&#39;t update the state (this will essentially freeze the game engine)<br/></p>
+<p>Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>Return behavior: return true to stop further PRE_UPDATE callbacks from executing and don&#39;t update the state (this will essentially freeze the game engine)<br/></p>
 <h2 id='ON-POST_UPDATE'>ON.POST_UPDATE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_UPDATE">ON.POST_UPDATE</a></p>
@@ -29671,25 +29696,25 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_DESTRUCTION">ON.PRE_LEVEL_DESTRUCTION</a></p>
 </blockquote>
 
-<p>Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<p>Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></p>
 <h2 id='ON-POST_LEVEL_DESTRUCTION'>ON.POST_LEVEL_DESTRUCTION</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_DESTRUCTION">ON.POST_LEVEL_DESTRUCTION</a></p>
 </blockquote>
 
-<p>Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<p>Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></p>
 <h2 id='ON-PRE_LAYER_DESTRUCTION'>ON.PRE_LAYER_DESTRUCTION</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LAYER_DESTRUCTION">ON.PRE_LAYER_DESTRUCTION</a></p>
 </blockquote>
 
-<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></p>
 <h2 id='ON-POST_LAYER_DESTRUCTION'>ON.POST_LAYER_DESTRUCTION</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_DESTRUCTION">ON.POST_LAYER_DESTRUCTION</a></p>
 </blockquote>
 
-<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></p>
+<p>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></p>
 <h2 id='ON-PRE_PROCESS_INPUT'>ON.PRE_PROCESS_INPUT</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_PROCESS_INPUT">ON.PRE_PROCESS_INPUT</a></p>
@@ -30058,7 +30083,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CORNER_FINISH.NONE">NONE</a></td>
 <td>CORNER_FINISH::NONE</td>
-<td>Don&#39;t draw corner at all, will draw lines as separate pieces, overlaping etc.<br/></td>
+<td>Don&#39;t draw corner at all, will draw lines as separate pieces, overlapping etc.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=CORNER_FINISH.REAL">REAL</a></td>
@@ -30448,6 +30473,16 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ENTITY_OVERRIDE.ON_COLLISION2">ON_COLLISION2</a></td>
 <td>26</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ENTITY_OVERRIDE.GET_METADATA">GET_METADATA</a></td>
+<td>27</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ENTITY_OVERRIDE.APPLY_METADATA">APPLY_METADATA</a></td>
+<td>28</td>
 <td></td>
 </tr>
 <tr>
@@ -32721,7 +32756,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_JOURNAL_CHAPTER">POST_LOAD_JOURNAL_CHAPTER</a></td>
 <td>ON::POST_LOAD_JOURNAL_CHAPTER</td>
-<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was aready loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></td>
+<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GET_FEAT">PRE_GET_FEAT</a></td>
@@ -32736,7 +32771,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_UPDATE">PRE_UPDATE</a></td>
 <td>ON::PRE_UPDATE</td>
-<td>Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>Return behavior: return true to stop futher PRE_UPDATE callbacks from executing and don&#39;t update the state (this will essentially freeze the game engine)<br/></td>
+<td>Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS<br/>Return behavior: return true to stop further PRE_UPDATE callbacks from executing and don&#39;t update the state (this will essentially freeze the game engine)<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_UPDATE">POST_UPDATE</a></td>
@@ -32771,22 +32806,22 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LEVEL_DESTRUCTION">PRE_LEVEL_DESTRUCTION</a></td>
 <td>ON::PRE_LEVEL_DESTRUCTION</td>
-<td>Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+<td>Runs right before the current level is unloaded and any entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LEVEL_DESTRUCTION">POST_LEVEL_DESTRUCTION</a></td>
 <td>ON::POST_LEVEL_DESTRUCTION</td>
-<td>Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+<td>Runs right after the current level has been unloaded and all entities destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_LAYER_DESTRUCTION">PRE_LAYER_DESTRUCTION</a></td>
 <td>ON::PRE_LAYER_DESTRUCTION</td>
-<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right before a layer is unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LAYER_DESTRUCTION">POST_LAYER_DESTRUCTION</a></td>
 <td>ON::POST_LAYER_DESTRUCTION</td>
-<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destoyed is in state.screen_last.<br/></td>
+<td>Params: <a href="#LAYER">LAYER</a> layer<br/>Runs right after a layer has been unloaded and any entities there destroyed. Runs in pretty much all screens, even ones without entities. The screen has already changed at this point, meaning the screen being destroyed is in state.screen_last.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_PROCESS_INPUT">PRE_PROCESS_INPUT</a></td>
@@ -35225,7 +35260,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.TEXTURE_COLOR">TEXTURE_COLOR</a></td>
 <td>WorldShader::TextureColor</td>
-<td>The default shader to be used, just renders a texture with transparancy and the given color<br/></td>
+<td>The default shader to be used, just renders a texture with transparency and the given color<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=WORLD_SHADER.TEXTURE_COLORS_WARP">TEXTURE_COLORS_WARP</a></td>
@@ -35390,7 +35425,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <li>as_bgmovingstar</li>
 <li>as_bgrelativeelement</li>
 <li>as_bgshootingstar</li>
-<li>as_bgshopentrence</li>
+<li>as_bgshopentrance</li>
 <li>as_bgshopkeeperprime</li>
 <li>as_bgsurfacelayer</li>
 <li>as_bgsurfacestar</li>

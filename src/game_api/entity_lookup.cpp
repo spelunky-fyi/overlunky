@@ -121,7 +121,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
         {
             if (mask == 0) // all entities
             {
-                // this exception for small improvments with calling reserve once
+                // this exception for small improvements with calling reserve once
                 found.reserve(found.size() + (size_t)layer_front->all_entities.size + (size_t)layer_back->all_entities.size);
                 found.insert(found.end(), layer_front->all_entities.uids().begin(), layer_front->all_entities.uids().end());
                 found.insert(found.end(), layer_back->all_entities.uids().begin(), layer_back->all_entities.uids().end());

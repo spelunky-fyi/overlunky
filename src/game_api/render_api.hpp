@@ -31,7 +31,7 @@ using VANILLA_FONT_STYLE = uint32_t;
 enum JOURNAL_VFTABLE
 {
     // to get those offsets, find "vftable_JournalPages" then go to each page in journal, then to it's first vtable function address
-    // and calculate offset diference
+    // and calculate offset difference
     PROGRESS = 496,         // open journal: page 0 or die, journal: page 2
     MENU = 448,             // open journal: page 1
     PLACES = 672,           // open journal > Places: any page > 1
@@ -130,12 +130,12 @@ struct TextRenderingInfo
     void set_text(const std::u16string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
     void set_text(const std::string text, float x, float y, float scale_x, float scale_y, uint32_t alignment, uint32_t fontstyle);
 
-    /// Returns refrence to the letter coordinates relative to the x,y position
+    /// Returns reference to the letter coordinates relative to the x,y position
     std::span<Letter> get_dest()
     {
         return {dest, (dest + text_length)};
     }
-    /// Returns refrence to the letter coordinates in the texture
+    /// Returns reference to the letter coordinates in the texture
     std::span<Letter> get_source()
     {
         return {source, (source + text_length)};
@@ -171,7 +171,7 @@ struct TextRenderingInfo
 
     float x;
     float y;
-    /// You can also just use `#` operator on the whole TextRenderingInfo to get the text lenght
+    /// You can also just use `#` operator on the whole TextRenderingInfo to get the text length
     uint32_t text_length;
     float width;
     float height;
@@ -179,14 +179,14 @@ struct TextRenderingInfo
 
     Letter* dest{nullptr};
     Letter* source{nullptr};
-    // 6 * text_length, just numbers in order 0, 1, 2 ... have some strage effect if you change them
+    // 6 * text_length, just numbers in order 0, 1, 2 ... have some strange effect if you change them
     uint16_t* unknown6{nullptr};
 
     uint16_t nof_special_character; // number of special characters, still not sure how the game knows which ones are the special ones?
                                     // setting higher value than the `text_length` will crash
     uint16_t unknown8;              // padding probably
 
-    /// Used to draw buttons and stuff, default is -1 wich uses the buttons texture
+    /// Used to draw buttons and stuff, default is -1 which uses the buttons texture
     TEXTURE special_texture_id;
 
     uint8_t shader; // ? changing it can change the text color, or make the text all rectangles?
@@ -202,7 +202,7 @@ struct TextureRenderingInfo
     float x{0};
     float y{0};
 
-    /// destination is relative to the x,y centerpoint
+    /// destination is relative to the x,y center point
     float destination_bottom_left_x{0};
     float destination_bottom_left_y{0};
     float destination_bottom_right_x{0};
@@ -315,8 +315,8 @@ struct RenderInfo
     float tileh;
     float x_dupe3;
     float y_dupe3;
-    float x_dupe4; // this will be writen into x next refresh
-    float y_dupe4; // this will be writen into y next refresh
+    float x_dupe4; // this will be written into x next refresh
+    float y_dupe4; // this will be written into y next refresh
     float angle1;
     float angle2;
     float angle_related;
@@ -403,10 +403,10 @@ static_assert(sizeof(HudInventory) == 176);
 struct HudElement
 {
     /// Hide background and dim if using the auto adjust setting.
-    bool dim; // it acutally  3 states: 0 - bright, 1 - dim, anything above - hide completely
+    bool dim; // it's actually  3 states: 0 - bright, 1 - dim, anything above - hide completely
     /// Background will be drawn if this is not 0.5
     float opacity;
-    /// Level time when element should dim again after hilighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
+    /// Level time when element should dim again after highlighted, INT_MAX if dimmed on auto adjust. 0 on opaque.
     int32_t time_dim; // it's set to INT_MAX after it was dimmed
 };
 

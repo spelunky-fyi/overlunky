@@ -48,7 +48,7 @@ class Floor : public Entity
     void fix_border_tile_animation();
 
     /// Used to add decoration to a floor entity after it was spawned outside of level gen, is not necessary when spawning during level gen.
-    /// Set `fix_also_neighbours` to `true` to fix the neighbouring floor tile decorations on the border of the two tiles.
+    /// Set `fix_also_neighbors` to `true` to fix the neighboring floor tile decorations on the border of the two tiles.
     /// Set `fix_styled_floor` to `true` to fix decorations on `FLOORSTYLED_*` entities, those usually only have decorations when broken.
     void fix_decorations(bool fix_also_neighbors, bool fix_styled_floor);
     /// Explicitly add a decoration on the given side. Corner decorations only exist for `FLOOR_BORDERTILE` and `FLOOR_BORDERTILE_OCTOPUS`.
@@ -84,7 +84,7 @@ class Door : public Floor
     /// Lock/Unlock doors
     void unlock(bool unlock);
 
-    // this function doesnt do much, checks if it's CHAR_*, checks if hes holding anything (if yes calls some function), then checks if Player.can_use is equal to 4 calls some other function
+    // this function doesn't do much, checks if it's CHAR_*, checks if hes holding anything (if yes calls some function), then checks if Player.can_use is equal to 4 calls some other function
     // can't be bother to look into the functions
     virtual void on_enter_attempt(Entity* who) = 0;
 

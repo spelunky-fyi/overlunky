@@ -9,7 +9,7 @@
 
 /// Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol
 /// You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too.
-/// Default apha value will be 0xFF, unless it's specified
+/// Default alpha value will be 0xFF, unless it's specified
 /// Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
 uColor get_color(const std::string& color_name, std::optional<uint8_t> alpha = std::nullopt);
 

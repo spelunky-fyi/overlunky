@@ -24,7 +24,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_bgeggshiproom"] = &Entity::as<BGEggshipRoom>;
     lua["Entity"]["as_bgbacklayerdoor"] = &Entity::as<BGBackLayerDoor>;
     lua["Entity"]["as_bgtutorialsign"] = &Entity::as<BGTutorialSign>;
-    lua["Entity"]["as_bgshopentrence"] = &Entity::as<BGShopEntrence>;
+    lua["Entity"]["as_bgshopentrance"] = &Entity::as<BGShopEntrance>;
     lua["Entity"]["as_bgfloatingdebris"] = &Entity::as<BGFloatingDebris>;
     lua["Entity"]["as_bgshopkeeperprime"] = &Entity::as<BGShopKeeperPrime>;
 
@@ -114,10 +114,10 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, BGRelativeElement>());
 
-    lua.new_usertype<BGShopEntrence>(
-        "BGShopEntrence",
+    lua.new_usertype<BGShopEntrance>(
+        "BGShopEntrance",
         "on_entering",
-        &BGShopEntrence::on_entering,
+        &BGShopEntrance::on_entering,
         sol::base_classes,
         sol::bases<Entity>());
 

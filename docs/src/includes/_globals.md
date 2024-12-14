@@ -331,7 +331,7 @@ Sets a callback that is called right after the screen is drawn.
 
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
-In many cases replacing the intended entity won't have the indended effect or will even break the game, so use only if you really know what you're doing.
+In many cases replacing the intended entity won't have the intended effect or will even break the game, so use only if you really know what you're doing.
 <br/>The callback signature is optional<int> pre_entity_spawn([ENT_TYPE](#ENT_TYPE) entity_type, float x, float y, int layer, [Entity](#Entity) overlay_entity, [SPAWN_TYPE](#SPAWN_TYPE) spawn_flags)
 
 ### set_pre_render_screen
@@ -689,7 +689,7 @@ This function can be slower than the [get_entities_by](#get_entities_by) with th
 
 #### vector&lt;int&gt; get_entities_overlapping_grid(float x, float y, [LAYER](#LAYER) layer)
 
-Get uids of static entities overlaping this grid position (decorations, backgrounds etc.)
+Get uids of static entities overlapping this grid position (decorations, backgrounds etc.)
 
 ### get_entities_overlapping_hitbox
 
@@ -718,7 +718,7 @@ Get the [Entity](#Entity) behind an uid, converted to the correct type. To see w
 
 #### string get_entity_name([ENT_TYPE](#ENT_TYPE) type, optional<bool> fallback_strategy)
 
-Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 if the entity has no localized name
 
 ### get_entity_type
@@ -744,7 +744,7 @@ Gets a grid entity, such as floor or spikes, at the given position and layer.
 
 > Search script examples for [get_local_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_players)
 
-#### nil get_local_players()
+#### vector&lt;[Player](#Player)&gt; get_local_players()
 
 Get the thread-local version of players
 
@@ -1284,7 +1284,7 @@ default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0
 #### [ENT_TYPE](#ENT_TYPE) add_custom_type()
 
 Adds new custom type (group of ENT_TYPE) that can be later used in functions like get_entities_by or set_(pre/post)_entity_spawn
-Use empty array or no parameter to get new uniqe [ENT_TYPE](#ENT_TYPE) that can be used for custom [EntityDB](#EntityDB)
+Use empty array or no parameter to get new unique [ENT_TYPE](#ENT_TYPE) that can be used for custom [EntityDB](#EntityDB)
 
 ### add_money
 
@@ -1453,7 +1453,7 @@ Same as `Player.get_heart_color`
 
 #### [uColor](#Aliases) get_color(string color_name, optional<int> alpha = nullopt)
 
-Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too. Default apha value will be 0xFF, unless it's specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
+Convert a string to a color, you can use the HTML color names, or even HTML color codes, just prefix them with '#' symbol You can also convert hex string into a color, prefix it with '0x', but use it only if you need to since lua allows for hex values directly too. Default alpha value will be 0xFF, unless it's specified Format: [name], #RRGGBB, #RRGGBBAA, 0xBBGGRR, 0xAABBGGRR
 
 
 ### get_current_money
@@ -1542,7 +1542,7 @@ Get the current layer that the liquid is spawn in. Related function [set_liquid_
 
 > Search script examples for [get_local_prng](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_prng)
 
-#### nil get_local_prng()
+#### [PRNG](#PRNG) get_local_prng()
 
 Get the thread-local version of prng
 
@@ -1551,7 +1551,7 @@ Get the thread-local version of prng
 
 > Search script examples for [get_local_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_local_state)
 
-#### nil get_local_state()
+#### [StateMemory](#StateMemory) get_local_state()
 
 Get the thread-local version of state
 
@@ -1653,9 +1653,9 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 
 > Search script examples for [grow_poles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_poles)
 
-#### nil grow_poles([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+#### nil grow_poles([LAYER](#LAYER) l, int max_length, [AABB](#AABB) area, bool destroy_broken)
 
-#### nil grow_poles([LAYER](#LAYER) l, int max_lengh)
+#### nil grow_poles([LAYER](#LAYER) l, int max_length)
 
 Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
@@ -1664,9 +1664,9 @@ Grow pole from `GROWABLE_CLIMBING_POLE` entities in a level, `area` default is w
 
 > Search script examples for [grow_vines](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=grow_vines)
 
-#### nil grow_vines([LAYER](#LAYER) l, int max_lengh, [AABB](#AABB) area, bool destroy_broken)
+#### nil grow_vines([LAYER](#LAYER) l, int max_length, [AABB](#AABB) area, bool destroy_broken)
 
-#### nil grow_vines([LAYER](#LAYER) l, int max_lengh)
+#### nil grow_vines([LAYER](#LAYER) l, int max_length)
 
 Grow vines from `GROWABLE_VINE` and `VINE_TREE_TOP` entities in a level, `area` default is whole level, `destroy_broken` default is false
 
@@ -2030,7 +2030,7 @@ Setting to false disables all player logic in [SCREEN](#SCREEN).LEVEL, mainly th
 #### nil set_liquid_layer([LAYER](#LAYER) l)
 
 Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
-This sadly also makes lavamanders extinct, since the logic for their spawn is harcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+This sadly also makes lavamanders extinct, since the logic for their spawn is hardcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
 Everything should be working more or less correctly (report on community discord if you find something unusual)
 
 ### set_seed
@@ -2172,7 +2172,7 @@ Open or close the journal as if pressing the journal button. Will respect visibl
 
 #### float two_lines_angle([Vec2](#Vec2) A, [Vec2](#Vec2) common, [Vec2](#Vec2) B)
 
-Mesures angle between two lines with one common point
+Measures angle between two lines with one common point
 
 #### float two_lines_angle([Vec2](#Vec2) line1_A, [Vec2](#Vec2) line1_B, [Vec2](#Vec2) line2_A, [Vec2](#Vec2) line2_B)
 
@@ -2297,7 +2297,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out (updates th
 
 #### nil console_prinspect(variadic_args objects)
 
-Prinspect to ingame console.
+Prinspect to in-game console.
 
 ### console_print
 
@@ -2306,7 +2306,7 @@ Prinspect to ingame console.
 
 #### nil console_print(string message)
 
-Print a log message to ingame console with a comment identifying the script that sent it.
+Print a log message to in-game console with a comment identifying the script that sent it.
 
 ### log_print
 
@@ -2839,7 +2839,7 @@ Get the current set zoom level
 
 #### bool position_is_valid(float x, float y, [LAYER](#LAYER) layer, [POS_TYPE](#POS_TYPE) flags)
 
-Check if position satifies the given [POS_TYPE](#POS_TYPE) flags, to be used in a custom is_valid function procedural for spawns.
+Check if position satisfies the given [POS_TYPE](#POS_TYPE) flags, to be used in a custom is_valid function procedural for spawns.
 
 ### screen_aabb
 
@@ -3172,7 +3172,7 @@ The function `bool is_valid(float x, float y, LAYER layer)` determines whether t
 Use for example when you can spawn only on the ceiling, under water or inside a shop.
 Set `is_valid` to `nil` in order to use the default rule (aka. on top of floor and not obstructed).
 To change the number of spawns use `PostRoomGenerationContext:set_num_extra_spawns` during `ON.POST_ROOM_GENERATION`
-No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new uniqe id.
+No name is attached to the extra spawn since it is not modified from level files, instead every call to this function will return a new unique id.
 
 ### define_procedural_spawn
 
@@ -3421,7 +3421,7 @@ If you want to respawn a player that is a ghost, set in his [Inventory](#Invento
 
 #### int spawn_playerghost([ENT_TYPE](#ENT_TYPE) char_type, float x, float y, [LAYER](#LAYER) layer)
 
-Spawn the [PlayerGhost](#PlayerGhost) entity, it will not move and not be connected to any player, you can then use [steal_input](#steal_input) and send_input to controll it
+Spawn the [PlayerGhost](#PlayerGhost) entity, it will not move and not be connected to any player, you can then use [steal_input](#steal_input) and send_input to control it
 or change it's `player_inputs` to the `input` of real player so he can control it directly
 
 ### spawn_tree
@@ -3466,7 +3466,7 @@ This is better alternative to `add_string` but instead of changing the name for 
 
 #### [STRINGID](#Aliases) add_string(string str)
 
-Add custom string, currently can only be used for names of shop items (Entitydb->description)
+Add custom string, currently can only be used for names of shop items ([EntityDB](#EntityDB)->description)
 Returns [STRINGID](#Aliases) of the new string
 
 ### change_string
@@ -3540,7 +3540,7 @@ Same as `Player.get_short_name`
 
 #### string get_string([STRINGID](#Aliases) string_id)
 
-Get string behind [STRINGID](#Aliases), don't use stringid diretcly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
+Get string behind [STRINGID](#Aliases), don't use stringid directly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
 Will return the string of currently choosen language
 
 ### hash_to_stringid
