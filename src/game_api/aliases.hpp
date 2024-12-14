@@ -66,6 +66,7 @@ using IMAGE = int64_t;                        // NoAlias
 using WORLD_SHADER = uint8_t;                 // NoAlias
 using SHORT_TILE_CODE = uint8_t;
 using STRINGID = uint32_t;
+using SOUNDID = int32_t;
 using FEAT = uint8_t;
 using KEY = int64_t;    // NoAlias
 using RAW_KEY = int8_t; // NoAlias

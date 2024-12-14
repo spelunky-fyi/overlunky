@@ -27,10 +27,10 @@ enum class SHAPE : uint8_t
 
 struct Animation
 {
-    int32_t texture;
-    int32_t count;
+    int32_t first_tile;
+    int32_t count; // num_tiles
     int32_t interval;
-    uint8_t key;
+    uint8_t id;
     REPEAT_TYPE repeat;
 };
 
