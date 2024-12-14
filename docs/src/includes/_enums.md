@@ -1233,6 +1233,7 @@ Name | Data | Description
 Name | Data | Description
 ---- | ---- | -----------
 [DTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.DTOR) | 0 | 
+[DRAW](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.DRAW) | 1 | 
 [RENDER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RENDER_INFO_OVERRIDE.RENDER) | 3 | 
 
 ## REPEAT_TYPE
