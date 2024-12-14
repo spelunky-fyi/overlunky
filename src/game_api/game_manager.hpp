@@ -59,10 +59,10 @@ class JournalPeopleData : public JournalPageData
     bool killed_by_NA;
     bool defeated_NA;
     // uint16_t padding;
-    TEXTURE portret_texture;
+    TEXTURE portrait_texture;
 };
 
-// probably same as JournalPeopleData, just not using portret_texture
+// probably same as JournalPeopleData, just not using portrait_texture
 class JournalBestiaryData : public JournalPageData
 {
   public:
@@ -109,7 +109,7 @@ struct SaveRelated
     game_unordered_map<ENT_TYPE, StickersData> stickers_data;
 
     /// Gets local version of the SaveData
-    SaveData* get_SaveData()
+    SaveData* get_savegame()
     {
         return savedata.decode_local();
     }

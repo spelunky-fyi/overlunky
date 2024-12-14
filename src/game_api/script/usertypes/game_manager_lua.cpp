@@ -8,11 +8,12 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
-#include "game_manager.hpp"      // for GameManager, JournalPopupUI, GameProps
-#include "memory.hpp"            // for memory_read TODO:temp
-#include "savedata.hpp"          // for SaveData
-#include "screen.hpp"            // IWYU pragma: keep
-#include "script/sol_helper.hpp" // for ZeroIndexArray
+#include "containers/game_allocator.hpp" // for game_allocator
+#include "game_manager.hpp"              // for GameManager, JournalPopupUI, GameProps
+#include "memory.hpp"                    // for memory_read TODO:temp
+#include "savedata.hpp"                  // for SaveData
+#include "screen.hpp"                    // IWYU pragma: keep
+#include "script/sol_helper.hpp"         // for ZeroIndexArray
 
 namespace NGM
 {
@@ -102,8 +103,8 @@ void register_usertypes(sol::state& lua)
         &SaveRelated::trap_part_to_main,
         "stickers_data",
         &SaveRelated::stickers_data,
-        "get_SaveData",
-        &SaveRelated::get_SaveData);
+        "get_savegame",
+        &SaveRelated::get_savegame);
 
     /// Used in SaveRelated
     lua.new_usertype<JournalPageData>(
@@ -148,8 +149,8 @@ void register_usertypes(sol::state& lua)
         &JournalPeopleData::killed_by_NA,
         "defeated_NA",
         &JournalPeopleData::defeated_NA,
-        "portret_texture",
-        &JournalPeopleData::portret_texture,
+        "portrait_texture",
+        &JournalPeopleData::portrait_texture,
         sol::base_classes,
         sol::bases<JournalPageData>());
 
