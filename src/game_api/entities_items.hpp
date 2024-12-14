@@ -100,9 +100,9 @@ class VladsCape : public Cape
 class Purchasable : public Movable
 {
   public:
-    /// Be aware that for pickable items like weapons, the item will be automatically picked up by the player (unless he already holds something), the ownership transfer is a little bit slow, so it might trigger the shop keeper if you're not inside the shop.
-    /// does not consume money
-    virtual void acquire(Entity* who) = 0;
+    /// Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.
+    /// Nothing else happens, by itself it does not remove item from shop etc.
+    virtual void equip(Entity* who) = 0;
 };
 
 class DummyPurchasableEntity : public Purchasable

@@ -286,7 +286,7 @@ Name | Data | Description
 [PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PROCESS_INPUT) | 78 | 
 [PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP) | 80 | 
 [RELEASE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.RELEASE) | 81 | 
-[GENERATE_FALL_POOF_PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GENERATE_FALL_POOF_PARTICLES) | 82 | 
+[GENERATE_LANDING_EFFECTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GENERATE_LANDING_EFFECTS) | 82 | 
 [FALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FALL) | 83 | 
 [APPLY_FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_FRICTION) | 84 | 
 [CAN_BREAK_BLOCK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_BREAK_BLOCK) | 85 | 

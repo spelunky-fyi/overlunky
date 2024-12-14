@@ -194,7 +194,7 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"acquire", 93, MemFun<&Purchasable::acquire>>>;
+        VTableEntry<"acquire", 93, MemFun<&Purchasable::equip>>>;
     static PurchasableVTable purchasable_vtable(lua, lua["Purchasable"], "ENTITY_OVERRIDE");
 
     using DummyPurchasableEntityVTable = HookableVTable<

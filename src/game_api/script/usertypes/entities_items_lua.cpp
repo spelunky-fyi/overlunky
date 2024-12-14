@@ -155,8 +155,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Purchasable>(
         "Purchasable",
-        "acquire",
-        &Purchasable::acquire,
+        "equip",
+        &Purchasable::equip,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
