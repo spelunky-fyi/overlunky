@@ -1270,6 +1270,24 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
     }
 }
 
+using SetRandomBacklayerRooms = void(LevelGenSystem*);
+SetRandomBacklayerRooms* g_set_random_backlayer_rooms_trampoline{nullptr};
+void set_random_backlayer_rooms(LevelGenSystem* level_gen)
+{
+    if (!pre_event(ON::PRE_SET_RANDOM_BACKLAYER_ROOMS))
+        g_set_random_backlayer_rooms_trampoline(level_gen);
+    post_event(ON::POST_SET_RANDOM_BACKLAYER_ROOMS);
+}
+
+using SpawnBacklayerRooms = void(LevelGenSystem*, uint32_t, uint32_t, uint32_t, uint32_t);
+SpawnBacklayerRooms* g_spawn_backlayer_rooms_trampoline{nullptr};
+void spawn_backlayer_rooms(LevelGenSystem* level_gen, uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height)
+{
+    if (!pre_spawn_backlayer_rooms(start_x, start_y, limit_width, limit_height))
+        g_spawn_backlayer_rooms_trampoline(level_gen, start_x, start_y, limit_width, limit_height);
+    post_spawn_backlayer_rooms(start_x, start_y, limit_width, limit_height);
+}
+
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
 TestChance* g_test_chance{nullptr};
 
@@ -1498,6 +1516,8 @@ void LevelGenData::init()
         g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data"sv);
         g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data"sv);
         g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
+        g_set_random_backlayer_rooms_trampoline = (SetRandomBacklayerRooms*)get_address("set_random_backlayer_rooms"sv);
+        g_spawn_backlayer_rooms_trampoline = (SpawnBacklayerRooms*)get_address("spawn_backlayer_rooms"sv);
 
         g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_func"sv);
         g_unload_layer_trampoline = (UnloadLayerFun*)get_address("unload_layer"sv);
@@ -1515,6 +1535,8 @@ void LevelGenData::init()
         DetourAttach((void**)&g_gather_room_data_trampoline, gather_room_data);
         DetourAttach((void**)&g_get_random_room_data_trampoline, get_random_room_data);
         DetourAttach((void**)&g_spawn_room_from_tile_codes_trampoline, spawn_room_from_tile_codes);
+        DetourAttach((void**)&g_set_random_backlayer_rooms_trampoline, set_random_backlayer_rooms);
+        DetourAttach((void**)&g_spawn_backlayer_rooms_trampoline, spawn_backlayer_rooms);
 
         DetourAttach((void**)&g_load_screen_trampoline, load_screen);
         DetourAttach((void**)&g_unload_layer_trampoline, unload_layer);
@@ -2037,11 +2059,7 @@ void LevelGenSystem::set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TE
 {
     using SetBacklayerRoomTemplate = void(LevelGenSystem*, uint32_t, uint32_t, uint32_t);
     static auto set_backlayer_room_template = (SetBacklayerRoomTemplate*)get_address("set_backlayer_room_template");
-    // Backlayer_room_exists doesn't detect to-be generated rooms, like udjat or vault, at POST_ROOM_GEN. While checking for template == 9 (invalid) makes machinerooms invalid, when they aren't always invalid
-    if (!this->backlayer_room_exists->rooms[x + y * 8])
-    {
-        set_backlayer_room_template(this, x, y, room_template);
-    }
+    set_backlayer_room_template(this, x, y, room_template);
 }
 
 bool default_spawn_is_valid(float x, float y, LAYER layer)

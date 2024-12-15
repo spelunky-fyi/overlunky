@@ -90,6 +90,10 @@ enum class ON
     POST_LEVEL_GENERATION,
     PRE_GET_RANDOM_ROOM,
     PRE_HANDLE_ROOM_TILES,
+    PRE_SET_RANDOM_BACKLAYER_ROOMS,
+    POST_SET_RANDOM_BACKLAYER_ROOMS,
+    PRE_SPAWN_BACKLAYER_ROOMS,
+    POST_SPAWN_BACKLAYER_ROOMS,
     SCRIPT_ENABLE,
     SCRIPT_DISABLE,
     RENDER_PRE_HUD,
@@ -472,6 +476,8 @@ class LuaBackend
     bool on_pre(ON event);
     void on_post(ON event);
     void pre_copy_state(StateMemory* from, StateMemory* to);
+    bool pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
+    void post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);

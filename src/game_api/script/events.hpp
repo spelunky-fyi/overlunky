@@ -27,6 +27,8 @@ bool pre_unload_layer(LAYER layer);
 bool pre_save_state(int slot, StateMemory* saved);
 bool pre_load_state(int slot, StateMemory* loaded);
 void pre_copy_state_event(StateMemory* from, StateMemory* to);
+bool pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
+void post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
 
 void post_load_screen();
 void post_init_layer(LAYER layer);

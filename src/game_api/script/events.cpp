@@ -527,3 +527,30 @@ void pre_copy_state_event(StateMemory* from, StateMemory* to)
             return true;
         });
 }
+
+bool pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height)
+{
+    bool return_val = false;
+    LuaBackend::for_each_backend(
+        [=, &return_val](LuaBackend::LockedBackend backend)
+        {
+            if (backend->pre_spawn_backlayer_rooms(start_x, start_y, limit_width, limit_height))
+            {
+                return_val = true;
+                return false;
+            }
+            return true;
+        },
+        false);
+    return return_val;
+}
+
+void post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend->post_spawn_backlayer_rooms(start_x, start_y, limit_width, limit_height);
+            return true;
+        });
+}
