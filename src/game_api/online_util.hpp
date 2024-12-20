@@ -1,3 +1,4 @@
+#pragma once
 // Classes with only the functions that were currently used, more can be added if needed
 
 template <class T, class Allocator = std::allocator<T>>
