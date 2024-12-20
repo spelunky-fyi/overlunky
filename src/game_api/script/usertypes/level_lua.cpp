@@ -1002,8 +1002,9 @@ void register_usertypes(sol::state& lua)
     lua["set_pre_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->pre_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
-        return backend->cbcount++;
+        int& cbcount = backend->get_locals().cbcount;
+        backend->pre_tile_code_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
+        return cbcount++;
     };
     /// Add a callback for a specific tile code that is called after the game handles the tile code.
     /// Use this to affect what the game or other scripts spawned in this position.
@@ -1012,8 +1013,9 @@ void register_usertypes(sol::state& lua)
     lua["set_post_tile_code_callback"] = [](sol::function cb, std::string tile_code) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        backend->post_tile_code_callbacks.push_back(LevelGenCallback{backend->cbcount, std::move(tile_code), std::move(cb)});
-        return backend->cbcount++;
+        int& cbcount = backend->get_locals().cbcount;
+        backend->post_tile_code_callbacks.push_back(LevelGenCallback{cbcount, std::move(tile_code), std::move(cb)});
+        return cbcount++;
     };
     /// Define a new tile code, to make this tile code do anything you have to use either [set_pre_tile_code_callback](#set_pre_tile_code_callback) or [set_post_tile_code_callback](#set_post_tile_code_callback).
     /// If a user disables your script but still uses your level mod nothing will be spawned in place of your tile code.
