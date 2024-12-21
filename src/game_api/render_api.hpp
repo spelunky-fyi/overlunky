@@ -17,6 +17,7 @@
 #include "containers/game_vector.hpp"        // for game_vector
 #include "math.hpp"                          // for Quad, AABB (ptr only)
 #include "texture.hpp"                       // for Texture
+#include "thread_utils.hpp"                  // for OnHeapPointer
 
 struct JournalUI;
 struct Layer;
@@ -261,12 +262,13 @@ struct RenderInfo
     float x;
     float y;
     uint32_t unknown3;
-    float unknown4;
-    uint32_t unknown5;
+    float offset_x;
+    float offset_y;
     uint32_t unknown6;
     uint32_t unknown7;
-    uint32_t unknown8;
-    uint32_t unknown9;
+    float unknown8; // used for parallax?
+    float unknown9; // automatically goes to 0, while it's non 0 game does (unknown9/unknown8) or something like that and influences position
+
     float x_dupe1; // position last refresh
     float y_dupe1; // position last refresh
     uint32_t unknown10;
@@ -274,7 +276,7 @@ struct RenderInfo
     float y_dupe2;
     uint32_t unknown11;
     uint8_t unknown_timer1; // can someone test this at higher refresh rate if it's tided to the fps or Hz?
-    uint8_t unknown_timer2; // for some entities this stops when the entity is not on screen but the above one don't
+    uint8_t unknown_timer2; // for some entities this stops when the entity is not on screen but the above one doesn't
     bool unknown12c;
     bool unknown12d;
     bool render_inactive; // stops all the rendering stuff, the value is forced thou
@@ -287,7 +289,7 @@ struct RenderInfo
     bool unknown17;
     bool unknown18;
     uint32_t unknown19;
-    WORLD_SHADER shader; // 0 - 36, game crash at around 55
+    WORLD_SHADER shader;
     uint8_t unknown20a;
     uint8_t unknown20b;
     uint8_t unknown20c;
@@ -319,37 +321,27 @@ struct RenderInfo
     float angle2;
     float angle_related;
     uint32_t animation_frame;
-    uint32_t unknown38;
-    Texture* texture;
-    const char** texture_name;
+    uint32_t unknown38; // padding
+    Texture* texture;   // probably just used for definition
+    const char** texture_names[7];
+    // second_texture_name Normal map texture on COG entities (shader 30), shine texture on ice entities. May not have a correct value on entities that don't use it
+    // third_texture_name Shine texture on COG entities (shader 30). May not have a correct value on entities that don't use it
 
-    const char** second_texture_name; // Normal map texture on COG entities (shader 30), shine texture on ice entities. May not have a correct value on entities that don't use it
-    const char** third_texture_name;  // Shine texture on COG entities (shader 30). May not have a correct value on entities that don't use it
-    size_t unknown41;                 // fourth texture?? seems to be somehow used if changing the texture_num to 4
-    size_t unknown42;
-    size_t unknown43;
-    size_t unknown44;
     uint32_t texture_num; // liquids use 0, most sprite entities use 1, ice uses 2, COG entities use 3
-    uint32_t unknown50;
-    size_t entity_offset; // the offset of the associated entity in memory, starting from the memory segment that State resides in
+    uint32_t padding1;
+    OnHeapPointer<Entity> entity_offset;
     bool flip_horizontal; // facing left
-    uint8_t unknown52;
-    uint8_t unknown53;
-    uint8_t unknown54;
+    uint8_t padding2[3];
     uint32_t unknown55;
-    float darkness; // 0.0 = completely black ; 1.0 = normal (dark effect like when on fire)
-    uint32_t unknown56;
-    uint32_t unknown57;
-    uint32_t unknown58;
-    float* unknown59;
-    uint32_t unknown60;
-    uint32_t unknown61; // end, next RenderInfo below
+    float brightness; // 0.0 = completely black ; 1.0 = normal (used for dark effect like when on fire)
 
     virtual ~RenderInfo() = 0;
-    virtual void unknown_v2() = 0;
-    virtual void update() = 0;
-    virtual void render(float*) = 0;
-    virtual bool unknown_3() = 0; // init? sets darkness to 1.0 at the start, then does some other stuff
+    /// Called when the entity enters the camera view, using its hitbox with an extra threshold. Handles low-level graphics tasks related to the GPU
+    virtual void draw() = 0;   // initializes positions
+    virtual void update() = 0; // math, basically always runs before render
+    /// Offset used in CO to draw the fake image of the entity on the other side of a level
+    virtual void render(Vec2* offset) = 0;
+    virtual bool set_entity(Texture* texture, Entity* entity) = 0;
 
     // gets the entity owning this RenderInfo
     Entity* get_entity() const;
