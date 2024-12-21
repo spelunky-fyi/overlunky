@@ -1838,6 +1838,9 @@
                             <a href="#ItemOwnerDetails" class="toc-h3 toc-link" data-title="ItemOwnerDetails">ItemOwnerDetails</a>
                           </li>
                           <li>
+                            <a href="#JournalPageData" class="toc-h3 toc-link" data-title="JournalPageData">JournalPageData</a>
+                          </li>
+                          <li>
                             <a href="#KeyboardKey" class="toc-h3 toc-link" data-title="KeyboardKey">KeyboardKey</a>
                           </li>
                           <li>
@@ -1886,6 +1889,9 @@
                             <a href="#SpritePosition" class="toc-h3 toc-link" data-title="SpritePosition">SpritePosition</a>
                           </li>
                           <li>
+                            <a href="#StickersData" class="toc-h3 toc-link" data-title="StickersData">StickersData</a>
+                          </li>
+                          <li>
                             <a href="#Triangle" class="toc-h3 toc-link" data-title="Triangle">Triangle</a>
                           </li>
                           <li>
@@ -1922,6 +1928,9 @@
                   <li>
                     <a href="#Journal-types" class="toc-h2 toc-link" data-title="Journal types">Journal types</a>
                       <ul class="toc-list-h3">
+                          <li>
+                            <a href="#JournalBestiaryData" class="toc-h3 toc-link" data-title="JournalBestiaryData">JournalBestiaryData</a>
+                          </li>
                           <li>
                             <a href="#JournalPage" class="toc-h3 toc-link" data-title="JournalPage">JournalPage</a>
                           </li>
@@ -1963,6 +1972,12 @@
                           </li>
                           <li>
                             <a href="#JournalPageTraps" class="toc-h3 toc-link" data-title="JournalPageTraps">JournalPageTraps</a>
+                          </li>
+                          <li>
+                            <a href="#JournalPeopleData" class="toc-h3 toc-link" data-title="JournalPeopleData">JournalPeopleData</a>
+                          </li>
+                          <li>
+                            <a href="#JournalTrapData" class="toc-h3 toc-link" data-title="JournalTrapData">JournalTrapData</a>
                           </li>
                       </ul>
                   </li>
@@ -3745,6 +3760,9 @@
                     <a href="#GAMEPAD_FLAG" class="toc-h2 toc-link" data-title="GAMEPAD_FLAG">GAMEPAD_FLAG</a>
                   </li>
                   <li>
+                    <a href="#GAME_MODE" class="toc-h2 toc-link" data-title="GAME_MODE">GAME_MODE</a>
+                  </li>
+                  <li>
                     <a href="#GAME_SETTING" class="toc-h2 toc-link" data-title="GAME_SETTING">GAME_SETTING</a>
                   </li>
                   <li>
@@ -3826,6 +3844,9 @@
                     <a href="#PAUSE_TYPE" class="toc-h2 toc-link" data-title="PAUSE_TYPE">PAUSE_TYPE</a>
                   </li>
                   <li>
+                    <a href="#PLATFORM" class="toc-h2 toc-link" data-title="PLATFORM">PLATFORM</a>
+                  </li>
+                  <li>
                     <a href="#POS_TYPE" class="toc-h2 toc-link" data-title="POS_TYPE">POS_TYPE</a>
                   </li>
                   <li>
@@ -3848,6 +3869,9 @@
                   </li>
                   <li>
                     <a href="#RAW_KEY" class="toc-h2 toc-link" data-title="RAW_KEY">RAW_KEY</a>
+                  </li>
+                  <li>
+                    <a href="#READY_STATE" class="toc-h2 toc-link" data-title="READY_STATE">READY_STATE</a>
                   </li>
                   <li>
                     <a href="#RECURSIVE_MODE" class="toc-h2 toc-link" data-title="RECURSIVE_MODE">RECURSIVE_MODE</a>
@@ -9839,6 +9863,52 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td></td>
 </tr>
 </tbody></table>
+<h3 id='JournalPageData'>JournalPageData</h3>
+<p>Used in <a href="#SaveRelated">SaveRelated</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=page_nr">page_nr</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sprite_id">sprite_id</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Aliases">STRINGID</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=name">name</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#Aliases">STRINGID</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=description">description</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=scale">scale</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset_x">offset_x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset_y">offset_y</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='KeyboardKey'>KeyboardKey</h3>
 <table><thead>
 <tr>
@@ -10368,6 +10438,16 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset_x">offset_x</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=offset_y">offset_y</a></td>
+<td></td>
+</tr>
+<tr>
 <td><a href="#WORLD_SHADER">WORLD_SHADER</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shader">shader</a></td>
 <td></td>
@@ -10398,8 +10478,23 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td></td>
 </tr>
 <tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=angle">angle</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=animation_frame">animation_frame</a></td>
+<td></td>
+</tr>
+<tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=render_inactive">render_inactive</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=brightness">brightness</a></td>
 <td></td>
 </tr>
 <tr>
@@ -10469,13 +10564,23 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_draw">set_pre_draw(function fun)</a></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool draw(RenderInfo self)</code><br/>Virtual function docs:<br/>Called when the entity enters the camera view, using its hitbox with an extra threshold. Handles low-level graphics tasks related to the GPU</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_draw">set_post_draw(function fun)</a></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil draw(RenderInfo self)</code><br/>Virtual function docs:<br/>Called when the entity enters the camera view, using its hitbox with an extra threshold. Handles low-level graphics tasks related to the GPU</td>
+</tr>
+<tr>
+<td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_render">set_pre_render(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool render(RenderInfo self, float float, VanillaRenderContext vanilla_render_context)</code></td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool render(RenderInfo self, Vec2 offset, VanillaRenderContext vanilla_render_context)</code><br/>Virtual function docs:<br/>Offset used in CO to draw the fake image of the entity on the other side of a level</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_render">set_post_render(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil render(RenderInfo self, float float, VanillaRenderContext vanilla_render_context)</code></td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil render(RenderInfo self, Vec2 offset, VanillaRenderContext vanilla_render_context)</code><br/>Virtual function docs:<br/>Offset used in CO to draw the fake image of the entity on the other side of a level</td>
 </tr>
 </tbody></table>
 <h3 id='RoomOwnerDetails'>RoomOwnerDetails</h3>
@@ -10649,6 +10754,27 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=row">row</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='StickersData'>StickersData</h3>
+<p>Used in <a href="#SaveRelated">SaveRelated</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sprite_id">sprite_id</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -11176,7 +11302,39 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td>State of controller buttons per controller. Zero-based indexing, i.e. use <a href="#GameProps">GameProps</a>.input_index directly to index this.</td>
 </tr>
 </tbody></table>
-<h2 id='Journal-types'>Journal types</h2><h3 id='JournalPage'>JournalPage</h3>
+<h2 id='Journal-types'>Journal types</h2><h3 id='JournalBestiaryData'>JournalBestiaryData</h3>
+<p>Used in <a href="#SaveRelated">SaveRelated</a>
+Derived from <a href="#JournalPageData">JournalPageData</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=background_sprite_id">background_sprite_id</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=killed_by_NA">killed_by_NA</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=defeated_NA">defeated_NA</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='JournalPage'>JournalPage</h3>
 <p>Used in <a href="#set_callback">set_callback</a> with <a href="#ON">ON</a>.RENDER_POST_JOURNAL_PAGE</p>
 
 <table><thead>
@@ -11672,6 +11830,65 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td><a href="#TextureRenderingInfo">TextureRenderingInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trap_background">trap_background</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='JournalPeopleData'>JournalPeopleData</h3>
+<p>Used in <a href="#SaveRelated">SaveRelated</a>
+Derived from <a href="#JournalPageData">JournalPageData</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=background_sprite_id">background_sprite_id</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=killed_by_NA">killed_by_NA</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=defeated_NA">defeated_NA</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=portrait_texture">portrait_texture</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='JournalTrapData'>JournalTrapData</h3>
+<p>Used in <a href="#SaveRelated">SaveRelated</a>
+Derived from <a href="#JournalPageData">JournalPageData</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="#TEXTURE">TEXTURE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=texture">texture</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=background_sprite_id">background_sprite_id</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -12750,7 +12967,17 @@ Derived from <a href="#Logic">Logic</a></p>
 </tr>
 </thead><tbody>
 <tr>
-<td>int</td>
+<td><a href="#GAME_MODE">GAME_MODE</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=game_mode">game_mode</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#PLATFORM">PLATFORM</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=platform">platform</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#READY_STATE">READY_STATE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ready_state">ready_state</a></td>
 <td></td>
 </tr>
@@ -13470,6 +13697,8 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 </tr>
 </tbody></table>
 <h3 id='JournalPopupUI'>JournalPopupUI</h3>
+<p>Used in <a href="#SaveRelated">SaveRelated</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -13795,6 +14024,8 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 </tr>
 </tbody></table>
 <h3 id='SaveRelated'>SaveRelated</h3>
+<p>Used in <a href="#GameManager">GameManager</a></p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -13806,6 +14037,56 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td><a href="#JournalPopupUI">JournalPopupUI</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=journal_popup_ui">journal_popup_ui</a></td>
 <td></td>
+</tr>
+<tr>
+<td>map&lt;int, <a href="#JournalPageData">JournalPageData</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=places_data">places_data</a></td>
+<td>Scale and offset not used in those pages. Can&#39;t add more</td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#JournalBestiaryData">JournalBestiaryData</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=bestiary_data">bestiary_data</a></td>
+<td></td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#ENT_TYPE">ENT_TYPE</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=monster_part_to_main">monster_part_to_main</a></td>
+<td>used to map stuff like Osiris_Hand -&gt; Osiris_Head, <a href="#Hundun">Hundun</a> limbs -&gt; <a href="#Hundun">Hundun</a> etc.</td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#JournalPeopleData">JournalPeopleData</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=people_info">people_info</a></td>
+<td></td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#ENT_TYPE">ENT_TYPE</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=people_part_to_main">people_part_to_main</a></td>
+<td>used to map shopkeeper clone to shopkeeper only</td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#JournalPageData">JournalPageData</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=item_info">item_info</a></td>
+<td></td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#JournalPageData">JournalPageData</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trap_info">trap_info</a></td>
+<td></td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#ENT_TYPE">ENT_TYPE</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trap_part_to_main">trap_part_to_main</a></td>
+<td>used for stuff like upsidedown_spikes -&gt; spikes, skulldrop skulls -&gt; skulldrop trap etc.</td>
+</tr>
+<tr>
+<td>map&lt;<a href="#ENT_TYPE">ENT_TYPE</a>, <a href="#StickersData">StickersData</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=stickers_data">stickers_data</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#SaveData">SaveData</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_savegame">get_savegame()</a></td>
+<td>Gets local version of the <a href="#SaveData">SaveData</a></td>
 </tr>
 </tbody></table>
 <h3 id='Screen'>Screen</h3>
@@ -14782,6 +15063,26 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=action_buttons_keycap_size">action_buttons_keycap_size</a></td>
 <td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=screen_loading">screen_loading</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=seeded_run">seeded_run</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=daily_challenge">daily_challenge</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=arena">arena</a></td>
+<td>Short for <code>screen-&gt;next_screen_to_load == SCREEN.TEAM_SELECT and not screen-&gt;seeded_run and not screen-&gt;daily_challenge</code></td>
 </tr>
 <tr>
 <td>int</td>
@@ -31157,6 +31458,31 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 </tbody></table>
+<h2 id='GAME_MODE'>GAME_MODE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAME_MODE">GAME_MODE</a></p>
+</blockquote>
+
+<p>Can be accessed via global <a href="#online">online</a><br/>Used in <a href="#Online">Online</a></p>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAME_MODE.COOP">COOP</a></td>
+<td>GAME_MODE::COOP</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAME_MODE.ARENA">ARENA</a></td>
+<td>GAME_MODE::ARENA</td>
+<td></td>
+</tr>
+</tbody></table>
 <h2 id='GAME_SETTING'>GAME_SETTING</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=GAME_SETTING">GAME_SETTING</a></p>
@@ -33280,6 +33606,49 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 </tbody></table>
+<h2 id='PLATFORM'>PLATFORM</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PLATFORM">PLATFORM</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PLATFORM.NONE">NONE</a></td>
+<td>PLATFORM::NONE</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PLATFORM.DISCORD">DISCORD</a></td>
+<td>PLATFORM::DISCORD</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PLATFORM.STEAM">STEAM</a></td>
+<td>PLATFORM::STEAM</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PLATFORM.XBOX">XBOX</a></td>
+<td>PLATFORM::XBOX</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PLATFORM.SWITCH">SWITCH</a></td>
+<td>PLATFORM::SWITCH</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=PLATFORM.PLAYSTATION">PLAYSTATION</a></td>
+<td>PLATFORM::PLAYSTATION</td>
+<td></td>
+</tr>
+</tbody></table>
 <h2 id='POS_TYPE'>POS_TYPE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=POS_TYPE">POS_TYPE</a></p>
@@ -33816,6 +34185,34 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 </tbody></table>
+<h2 id='READY_STATE'>READY_STATE</h2>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=READY_STATE">READY_STATE</a></p>
+</blockquote>
+
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Data</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=READY_STATE.NOT_READY">NOT_READY</a></td>
+<td>READY_STATE::NOT_READY</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=READY_STATE.READY">READY</a></td>
+<td>READY_STATE::READY</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=READY_STATE.SEARCHING">SEARCHING</a></td>
+<td>READY_STATE::SEARCHING</td>
+<td></td>
+</tr>
+</tbody></table>
 <h2 id='RECURSIVE_MODE'>RECURSIVE_MODE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RECURSIVE_MODE">RECURSIVE_MODE</a></p>
@@ -33859,6 +34256,11 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RENDER_INFO_OVERRIDE.DTOR">DTOR</a></td>
 <td>0</td>
+<td></td>
+</tr>
+<tr>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=RENDER_INFO_OVERRIDE.DRAW">DRAW</a></td>
+<td>1</td>
 <td></td>
 </tr>
 <tr>

@@ -428,6 +428,18 @@ Name | Data | Description
 [X](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.X) | 15 | 
 [Y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAMEPAD_FLAG.Y) | 16 | 
 
+## GAME_MODE
+
+
+> Search script examples for [GAME_MODE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_MODE)
+
+Can be accessed via global [online](#online)<br/>Used in [Online](#Online)
+
+Name | Data | Description
+---- | ---- | -----------
+[COOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_MODE.COOP) | GAME_MODE::COOP | 
+[ARENA](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=GAME_MODE.ARENA) | GAME_MODE::ARENA | 
+
 ## GAME_SETTING
 
 
@@ -1047,6 +1059,22 @@ Name | Data | Description
 [PRE_PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.PRE_PROCESS_INPUT) | PAUSE_TYPE::PRE_PROCESS_INPUT | 
 [FORCE_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PAUSE_TYPE.FORCE_STATE) | PAUSE_TYPE::FORCE_STATE | 
 
+## PLATFORM
+
+
+> Search script examples for [PLATFORM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PLATFORM)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NONE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PLATFORM.NONE) | PLATFORM::NONE | 
+[DISCORD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PLATFORM.DISCORD) | PLATFORM::DISCORD | 
+[STEAM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PLATFORM.STEAM) | PLATFORM::STEAM | 
+[XBOX](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PLATFORM.XBOX) | PLATFORM::XBOX | 
+[SWITCH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PLATFORM.SWITCH) | PLATFORM::SWITCH | 
+[PLAYSTATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=PLATFORM.PLAYSTATION) | PLATFORM::PLAYSTATION | 
+
 ## POS_TYPE
 
 
@@ -1210,6 +1238,19 @@ Name | Data | Description
 ---- | ---- | -----------
 [UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=RAW_KEY.UP) | 1 | 
 ...check [lua_enums.txt](game_data/lua_enums.txt)... |  | 
+
+## READY_STATE
+
+
+> Search script examples for [READY_STATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=READY_STATE)
+
+
+
+Name | Data | Description
+---- | ---- | -----------
+[NOT_READY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=READY_STATE.NOT_READY) | READY_STATE::NOT_READY | 
+[READY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=READY_STATE.READY) | READY_STATE::READY | 
+[SEARCHING](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=READY_STATE.SEARCHING) | READY_STATE::SEARCHING | 
 
 ## RECURSIVE_MODE
 

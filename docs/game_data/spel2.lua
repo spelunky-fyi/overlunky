@@ -2284,7 +2284,9 @@ do
     ---@field lobby OnlineLobby
 
 ---@class OnlinePlayer
-    ---@field ready_state integer
+    ---@field game_mode GAME_MODE
+    ---@field platform PLATFORM
+    ---@field ready_state READY_STATE
     ---@field character integer
     ---@field player_name string
 

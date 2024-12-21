@@ -1842,7 +1842,9 @@ Used in [Online](#Online)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [ready_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) | 
+[GAME_MODE](#GAME_MODE) | [game_mode](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_mode) | 
+[PLATFORM](#PLATFORM) | [platform](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform) | 
+[READY_STATE](#READY_STATE) | [ready_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) | 
 int | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 
 string | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) | 
 
