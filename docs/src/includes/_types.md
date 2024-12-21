@@ -1847,7 +1847,9 @@ Used in [Online](#Online)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [ready_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) | 
+[GAME_MODE](#GAME_MODE) | [game_mode](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=game_mode) | 
+[PLATFORM](#PLATFORM) | [platform](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=platform) | 
+[READY_STATE](#READY_STATE) | [ready_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ready_state) | 
 int | [character](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=character) | 
 string | [player_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player_name) | 
 
@@ -4330,7 +4332,7 @@ bool | [overlaps_with(float rect_left, float rect_bottom, float rect_right, floa
 bool | [overlaps_with(Entity other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
 [TEXTURE](#TEXTURE) | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
 bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) | Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
-nil | [set_draw_depth(int draw_depth, optional<int> unknown)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | 
+nil | [set_draw_depth(int draw_depth, optional<int> unknown)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering) 
 nil | [reset_draw_depth()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_draw_depth) | 
 float | [friction()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) | Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
 nil | [liberate_from_shop(bool clear_parrent)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
@@ -7367,8 +7369,8 @@ nil | [equip(Entity who)](https://github.com/spelunky-fyi/overlunky/search?l=Lua
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
-[CallbackId](#Aliases) | [set_pre_acquire(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_acquire) | Hooks before the virtual function.<br/>The callback signature is `bool acquire(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
-[CallbackId](#Aliases) | [set_post_acquire(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_acquire) | Hooks after the virtual function.<br/>The callback signature is `nil acquire(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
+[CallbackId](#Aliases) | [set_pre_equip(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_equip) | Hooks before the virtual function.<br/>The callback signature is `bool equip(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
+[CallbackId](#Aliases) | [set_post_equip(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_equip) | Hooks after the virtual function.<br/>The callback signature is `nil equip(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
 
 ### PushBlock
 

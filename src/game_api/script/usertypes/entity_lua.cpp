@@ -247,7 +247,7 @@ void register_usertypes(sol::state& lua)
     entity_type["overlaps_with"] = overlaps_with;
     entity_type["get_texture"] = &Entity::get_texture;
     entity_type["set_texture"] = &Entity::set_texture;
-    /// optional unknown game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering)
+    /// optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering)
     entity_type["set_draw_depth"] = [](Entity& ent, uint8_t draw_depth, sol::optional<uint8_t> unknown) -> void
     { ent.set_draw_depth(draw_depth, unknown.value_or(0)); }; // for backward compatibility
 

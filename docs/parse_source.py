@@ -689,7 +689,7 @@ def run_parse():
             if container:
                 extra = []
                 n = re.findall(
-                    r'(/// [\w _\-+<>.,`"\'=]*?)?' + container + r'\[([\w":]+)\] = ([^;]+);', data
+                    r'(/// [\w _\-+()<>.,`"\'=]*?)?' + container + r'\[([\w":]+)\] = ([^;]+);', data
                 )
                 for var in n:
                     if var[0].startswith("/// NoDoc"):

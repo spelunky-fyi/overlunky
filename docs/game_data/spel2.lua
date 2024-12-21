@@ -2300,7 +2300,9 @@ do
     ---@field lobby OnlineLobby
 
 ---@class OnlinePlayer
-    ---@field ready_state integer
+    ---@field game_mode GAME_MODE
+    ---@field platform PLATFORM
+    ---@field ready_state READY_STATE
     ---@field character integer
     ---@field player_name string
 
@@ -2582,7 +2584,7 @@ function PRNG:random(min, max) end
     ---@field topmost fun(self): Entity @Returns the top entity in a chain (overlay)
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean @Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
-    ---@field set_draw_depth fun(self, draw_depth: integer, unknown: integer?): nil
+    ---@field set_draw_depth fun(self, draw_depth: integer, unknown: integer?): nil @optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering) 
     ---@field reset_draw_depth fun(self): nil
     ---@field friction fun(self): number @Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
     ---@field liberate_from_shop fun(self, clear_parrent: boolean): nil @`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
@@ -3877,8 +3879,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
-    ---@field set_pre_acquire fun(self, fun: fun(self: Purchasable, who: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool acquire(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
-    ---@field set_post_acquire fun(self, fun: fun(self: Purchasable, who: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil acquire(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
+    ---@field set_pre_equip fun(self, fun: fun(self: Purchasable, who: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool equip(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
+    ---@field set_post_equip fun(self, fun: fun(self: Purchasable, who: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil equip(Purchasable self, Entity who)`<br/>Virtual function docs:<br/>Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.<br/>Nothing else happens, by itself it does not remove item from shop etc.
 
 ---@class DummyPurchasableEntity : Purchasable
     ---@field replace_entity Entity
