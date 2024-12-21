@@ -35,10 +35,10 @@
 
 struct Items;
 
-std::uint32_t g_SpawnNonReplacable;
-SpawnType g_SpawnTypeFlags;
-std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
-std::function<void(Entity*)> g_temp_entity_spawn_hook;
+thread_local std::uint32_t g_SpawnNonReplacable;
+thread_local SpawnType g_SpawnTypeFlags{SPAWN_TYPE_SYSTEMIC};
+thread_local std::array<std::uint32_t, SPAWN_TYPE_NUM_FLAGS> g_SpawnTypes{};
+thread_local std::function<void(Entity*)> g_temp_entity_spawn_hook;
 
 void spawn_liquid(ENT_TYPE entity_type, float x, float y)
 {

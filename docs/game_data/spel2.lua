@@ -1014,7 +1014,7 @@ function change_string(id, str) end
 ---@param str string
 ---@return STRINGID
 function add_string(str) end
----Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+---Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
 ---if the entity has no localized name
 ---@param type ENT_TYPE
 ---@param fallback_strategy boolean?
@@ -1217,10 +1217,10 @@ function set_level_string(str) end
 ---@return nil
 function set_ending_unlock(type) end
 ---Get the thread-local version of state
----@return nil
+---@return StateMemory
 function get_local_state() end
 ---Get the thread-local version of players
----@return nil
+---@return Player[]
 function get_local_players() end
 ---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 ---@param dir string?
@@ -1437,7 +1437,7 @@ function get_raw_input() end
 ---@return nil
 function seed_prng(seed) end
 ---Get the thread-local version of prng
----@return nil
+---@return PRNG
 function get_local_prng() end
 ---Same as `Player.get_name`
 ---@param type_id ENT_TYPE
@@ -2238,6 +2238,7 @@ do
     ---@field liquid LiquidPhysics
     ---@field next_entity_uid integer @Next entity spawned will have this uid
     ---@field room_owners RoomOwnersInfo @Holds info about owned rooms and items (shops, challenge rooms, vault etc.)
+    ---@field user_data any
 
 ---@class LightParams
     ---@field red number
@@ -2372,6 +2373,46 @@ do
 
 ---@class SaveRelated
     ---@field journal_popup_ui JournalPopupUI
+    ---@field places_data table<integer, JournalPageData> @Scale and offset not used in those pages. Can't add more
+    ---@field bestiary_data table<ENT_TYPE, JournalBestiaryData>
+    ---@field monster_part_to_main table<ENT_TYPE, ENT_TYPE> @used to map stuff like Osiris_Hand -> Osiris_Head, Hundun limbs -> Hundun etc.
+    ---@field people_info table<ENT_TYPE, JournalPeopleData>
+    ---@field people_part_to_main table<ENT_TYPE, ENT_TYPE> @used to map shopkeeper clone to shopkeeper only
+    ---@field item_info table<ENT_TYPE, JournalPageData>
+    ---@field trap_info table<ENT_TYPE, JournalPageData>
+    ---@field trap_part_to_main table<ENT_TYPE, ENT_TYPE> @used for stuff like upsidedown_spikes -> spikes, skulldrop skulls -> skulldrop trap etc.
+    ---@field stickers_data table<ENT_TYPE, StickersData>
+    ---@field get_savegame fun(self): SaveData @Gets local version of the SaveData
+
+---@class JournalPageData
+    ---@field page_nr integer
+    ---@field sprite_id integer
+    ---@field name STRINGID
+    ---@field description STRINGID
+    ---@field scale number
+    ---@field offset_x number
+    ---@field offset_y number
+
+---@class JournalBestiaryData : JournalPageData
+    ---@field texture TEXTURE
+    ---@field background_sprite_id integer
+    ---@field killed_by_NA boolean
+    ---@field defeated_NA boolean
+
+---@class JournalPeopleData : JournalPageData
+    ---@field texture TEXTURE
+    ---@field background_sprite_id integer
+    ---@field killed_by_NA boolean
+    ---@field defeated_NA boolean
+    ---@field portrait_texture TEXTURE
+
+---@class JournalTrapData : JournalPageData
+    ---@field texture TEXTURE
+    ---@field background_sprite_id integer
+
+---@class StickersData
+    ---@field sprite_id integer
+    ---@field texture TEXTURE
 
 ---@class JournalPopupUI
     ---@field wiggling_page_icon TextureRenderingInfo
@@ -2479,13 +2520,18 @@ function PRNG:random(min, max) end
 ---@class RenderInfo
     ---@field x number
     ---@field y number
+    ---@field offset_x number
+    ---@field offset_y number
     ---@field shader WORLD_SHADER
     ---@field source Quad
     ---@field destination Quad
     ---@field tilew number
     ---@field tileh number
     ---@field facing_left boolean
+    ---@field angle number
+    ---@field animation_frame integer
     ---@field render_inactive boolean
+    ---@field brightness number
     ---@field texture_num integer
     ---@field get_entity fun(self): Entity
     ---@field set_normal_map_texture fun(self, texture_id: TEXTURE): boolean @Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
@@ -2499,8 +2545,10 @@ function PRNG:random(min, max) end
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
     ---@field set_pre_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId @Hooks before the virtual function.<br/>The callback signature is `nil dtor(RenderInfo self)`
     ---@field set_post_dtor fun(self, fun: fun(self: RenderInfo): nil): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil dtor(RenderInfo self)`
-    ---@field set_pre_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
-    ---@field set_post_render fun(self, fun: fun(self: RenderInfo, number: number, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil render(RenderInfo self, number number, VanillaRenderContext vanilla_render_context)`
+    ---@field set_pre_draw fun(self, fun: fun(self: RenderInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool draw(RenderInfo self)`<br/>Virtual function docs:<br/>Called when the entity enters the camera view, using its hitbox with an extra threshold. Handles low-level graphics tasks related to the GPU
+    ---@field set_post_draw fun(self, fun: fun(self: RenderInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil draw(RenderInfo self)`<br/>Virtual function docs:<br/>Called when the entity enters the camera view, using its hitbox with an extra threshold. Handles low-level graphics tasks related to the GPU
+    ---@field set_pre_render fun(self, fun: fun(self: RenderInfo, offset: Vec2, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool render(RenderInfo self, Vec2 offset, VanillaRenderContext vanilla_render_context)`<br/>Virtual function docs:<br/>Offset used in CO to draw the fake image of the entity on the other side of a level
+    ---@field set_post_render fun(self, fun: fun(self: RenderInfo, offset: Vec2, vanilla_render_context: VanillaRenderContext): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil render(RenderInfo self, Vec2 offset, VanillaRenderContext vanilla_render_context)`<br/>Virtual function docs:<br/>Offset used in CO to draw the fake image of the entity on the other side of a level
 
 ---@class Entity
     ---@field type EntityDB @Type of the entity, contains special properties etc. If you want to edit them just for this entity look at the EntityDB
@@ -6034,6 +6082,10 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field topleft_woodpanel_esc_slidein number
     ---@field start_panel_slidein number
     ---@field action_buttons_keycap_size number
+    ---@field screen_loading boolean
+    ---@field seeded_run boolean
+    ---@field daily_challenge boolean
+    ---@field arena boolean @Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge` 
     ---@field next_screen_to_load integer
     ---@field not_ready_to_start_yet boolean
     ---@field available_mine_entrances integer

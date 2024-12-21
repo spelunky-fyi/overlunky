@@ -330,7 +330,7 @@ change_string(hash_to_stringid(0xcd07f25b), CUSTOM_SKIN_TEXT)
 set_pre_render_screen(SCREEN.CHARACTER_SELECT, function(self, ctx)
     if state.items.player_select[1].activated then
         if state.screen_character_select.player_y[1] == 0 then
-            state.screen_character_select.right_button_text_id = hash_to_stringid(0xcd07f25b)
+            state.screen_character_select.screen_panels.bottom_right_text = hash_to_stringid(0xcd07f25b)
         end
     end
     if state.screen_character_select.player_quickselect_shown[1] then

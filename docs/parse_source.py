@@ -685,13 +685,18 @@ def run_parse():
             cpp_type = type[2]
             name = type[3]
             attr = type[4]
+            extra_comments = {}
             if container:
                 extra = []
                 n = re.findall(
-                    r"(?<! NoDoc )" + container + r'\[([\w":]+)\] = ([^;]+);', data
+                    r'(/// [\w _\-+<>.,`"\'=]*?)?' + container + r'\[([\w":]+)\] = ([^;]+);', data
                 )
                 for var in n:
-                    extra.append(",".join(var))
+                    if var[0].startswith("/// NoDoc"):
+                        continue
+                    if var[0]:
+                        extra_comments[var[1].replace('"', '')] = var[0][4:]
+                    extra.append(",".join(var[1:3]))
                 extra = ",".join(extra)
                 if attr:
                     attr = attr + "," + extra
@@ -749,11 +754,9 @@ def run_parse():
                     var[1] = var[1][:-1]
 
                 var_name = var[0]
-                cpp = replace_fun(
-                    var[1]
-                )  # should probably be done later, so the regex doesn't have to relay on some of the changes, also generate_emmylua.py uses some unique formats replacements
+                cpp = replace_fun(var[1]) #TODO: should probably be done later, so the regex doesn't have to relay on some of the changes, also generate_emmylua.py uses some unique formats replacements
 
-                if var[1].startswith("sol::property"):
+                if var[1].startswith("sol::property"): # fix for sol::property
                     param_match = re.match(
                         rf"property\(\[\]\({underlying_cpp_type['name']}&(\w+)\)",
                         cpp,
@@ -785,10 +788,8 @@ def run_parse():
                                 "comment": fun["comment"],
                             }
                         )
-                elif cpp.startswith("[]("):
-                    param_match = re.match(
-                        r"\[\]\(([\w &<>\?*:,]+)?\) -> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp
-                    )
+                elif cpp.startswith("[]("): # lambdas
+                    param_match = re.match(r"\[\]\(([\w <>\?&*:,]+)?\) -> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp)
                     if param_match:
                         ret = param_match.group(2)
                         if ret is None:
@@ -808,7 +809,7 @@ def run_parse():
                                 "name": var_name,
                                 "type": cpp,
                                 "signature": f"{ret} {var_name}({sig})",
-                                "comment": "",
+                                "comment": [extra_comments[var_name]] if var_name in extra_comments else [],
                                 "function": True,
                                 "cb_signature": "",
                             }
@@ -827,6 +828,8 @@ def run_parse():
                             if fun["comment"]
                             else None
                         )
+                        if var_name in extra_comments:
+                            fun["comment"].append(extra_comments[var_name])
 
                         vars.append(
                             {
@@ -861,6 +864,8 @@ def run_parse():
                                 sig += underlying_cpp_var["name"][
                                     underlying_cpp_var["name"].find("[") :
                                 ]
+                        if var_name in extra_comments:
+                            underlying_cpp_var["comment"].append(extra_comments[var_name])
                         vars.append(
                             {
                                 "name": var_name,
@@ -877,10 +882,10 @@ def run_parse():
                             type = replace_fun(m_return_type[1])
                             sig = f"{type} {var_name}"
                             vars.append(
-                                {"name": var_name, "type": cpp, "signature": sig}
+                                {"name": var_name, "type": cpp, "signature": sig, "comment": [extra_comments[var_name]] if var_name in extra_comments else []}
                             )
                         else:
-                            vars.append({"name": var_name, "type": cpp})
+                            vars.append({"name": var_name, "type": cpp, "comment": [extra_comments[var_name]] if var_name in extra_comments else []})
 
             if name in vtables_by_usertype:
                 vtable = vtables_by_usertype[name]

@@ -24,12 +24,13 @@
 #include <variant>       // for variant
 #include <vector>        // for vector
 
-#include "aliases.hpp"      // for IMAGE, JournalPageType, SPAWN_TYPE
-#include "hook_handler.hpp" // for HookHandler
-#include "level_api.hpp"    // IWYU pragma: keep
-#include "logger.h"         // for DEBUG
-#include "script.hpp"       // for ScriptMessage, ScriptImage (ptr only), Scri...
-#include "util.hpp"         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
+#include "aliases.hpp"                      // for IMAGE, JournalPageType, SPAWN_TYPE
+#include "hook_handler.hpp"                 // for HookHandler
+#include "level_api.hpp"                    // IWYU pragma: keep
+#include "logger.h"                         // for DEBUG
+#include "script.hpp"                       // for ScriptMessage, ScriptImage (ptr only), Scri...
+#include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext, CORNER_FINISH
+#include "util.hpp"                         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
 extern std::recursive_mutex global_lua_lock;
 
@@ -139,6 +140,7 @@ enum class ON
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
+    // PRE_COPY_STATE,
 };
 
 struct IntOption
@@ -284,6 +286,12 @@ class SoundManager;
 class LuaConsole;
 struct RenderInfo;
 
+struct LocalStateData
+{
+    sol::object user_data;
+    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
+};
+
 class LuaBackend
     : public HookHandler<Entity, CallbackType::Entity>,
       public HookHandler<RenderInfo, CallbackType::Entity>,
@@ -300,7 +308,6 @@ class LuaBackend
     std::unordered_set<std::string> loaded_modules;
 
     std::string result;
-    ScriptState state = {0, 0, 0, 0, 0, 0, 0, 0};
 
     int cbcount = 0;
     CurrentCallback current_cb = {0, 0, CallbackType::None};
@@ -331,6 +338,7 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
+    std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
     bool manual_save{false};
     uint32_t last_save{0};
 
@@ -345,10 +353,13 @@ class LuaBackend
 
     size_t frame_counter{0};
     bool infinite_loop_detection{true};
+    CORNER_FINISH vanilla_render_corner_finish = CORNER_FINISH::ADAPTIVE;
 
     LuaBackend(SoundManager* sound_manager, LuaConsole* console);
     virtual ~LuaBackend();
 
+    LocalStateData& get_locals();
+    void copy_locals(StateMemory* from, StateMemory* to);
     void clear();
     void clear_all_callbacks();
     bool update();
@@ -462,6 +473,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
+    void pre_copy_state(StateMemory* from, StateMemory* to);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);

@@ -4680,7 +4680,7 @@ This function can be slower than the <a href="#get_entities_by">get_entities_by<
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_name">get_entity_name</a></p>
 </blockquote>
 <h4 id='string-get_entity_name-ENT_TYPE-type-optional-fallback_strategy'>string get_entity_name(<a href="#ENT_TYPE">ENT_TYPE</a> type, optional<bool> fallback_strategy)</h4>
-<p>Get localized name of an entity, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.*</code> enum name
+<p>Get localized name of an entity from the journal, pass <code>fallback_strategy</code> as <code>true</code> to fall back to the <code>ENT_TYPE.*</code> enum name
 if the entity has no localized name</p>
 <h3 id='get_entity_type'>get_entity_type</h3>
 <blockquote>
@@ -4698,7 +4698,7 @@ if the entity has no localized name</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_players">get_local_players</a></p>
 </blockquote>
-<h4 id='nil-get_local_players'>nil get_local_players()</h4>
+<h4 id='vector-lt-Player-gt-get_local_players'>vector&lt;<a href="#Player">Player</a>&gt; get_local_players()</h4>
 <p>Get the thread-local version of players</p>
 <h3 id='get_player'>get_player</h3>
 <blockquote>
@@ -5223,13 +5223,13 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_prng">get_local_prng</a></p>
 </blockquote>
-<h4 id='nil-get_local_prng'>nil get_local_prng()</h4>
+<h4 id='PRNG-get_local_prng'><a href="#PRNG">PRNG</a> get_local_prng()</h4>
 <p>Get the thread-local version of prng</p>
 <h3 id='get_local_state'>get_local_state</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_state">get_local_state</a></p>
 </blockquote>
-<h4 id='nil-get_local_state'>nil get_local_state()</h4>
+<h4 id='StateMemory-get_local_state'><a href="#StateMemory">StateMemory</a> get_local_state()</h4>
 <p>Get the thread-local version of state</p>
 <h3 id='get_ms'>get_ms</h3>
 <blockquote>
@@ -17708,6 +17708,11 @@ You can just discard this handle if you do not need extended control anymore</p>
 <td><a href="#RoomOwnersInfo">RoomOwnersInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=room_owners">room_owners</a></td>
 <td>Holds info about owned rooms and items (shops, challenge rooms, vault etc.)</td>
+</tr>
+<tr>
+<td>any</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=user_data">user_data</a></td>
+<td>You can store a table (or lua primitive) here and it will store data correctly in online multiplayer, by having a different copy on each state and being copied over when the game does.<br/>Doesn&#39;t support recursive tables / cyclic references. Metatables will be transferred by reference instead of being copied<br/></td>
 </tr>
 </tbody></table>
 <h2 id='Texture-types'>Texture types</h2><h3 id='TextRenderingInfo'>TextRenderingInfo</h3>

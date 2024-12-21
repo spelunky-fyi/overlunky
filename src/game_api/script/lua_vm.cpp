@@ -1786,7 +1786,7 @@ end
     /// Returns STRINGID of the new string
     lua["add_string"] = add_string;
 
-    /// Get localized name of an entity, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+    /// Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
     /// if the entity has no localized name
     lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy) -> std::u16string
     {
@@ -2018,13 +2018,13 @@ end
     lua["set_ending_unlock"] = set_ending_unlock;
 
     /// Get the thread-local version of state
-    lua["get_local_state"] = []()
+    lua["get_local_state"] = []() -> StateMemory*
     {
         return State::get().ptr_local();
     };
 
     /// Get the thread-local version of players
-    lua["get_local_players"] = []()
+    lua["get_local_players"] = []() -> std::vector<Player*>
     {
         return get_players(State::get().ptr_local());
     };

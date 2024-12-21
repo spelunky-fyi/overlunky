@@ -1246,7 +1246,7 @@ void register_usertypes(sol::state& lua)
     auto customtheme_type = lua.new_usertype<CustomTheme>("CustomTheme", sol::constructors<CustomTheme(), CustomTheme(uint8_t, uint8_t), CustomTheme(uint8_t, uint8_t, bool)>(), sol::base_classes, sol::bases<ThemeInfo>());
     customtheme_type["level_file"] = &CustomTheme::level_file;
     customtheme_type["theme"] = &CustomTheme::theme;
-    // NoDoc
+    /// NoDoc
     customtheme_type["base_theme"] = sol::property([](CustomTheme& ct) -> uint8_t
                                                    {
                                                        if (ct.base_theme < UINT8_MAX)

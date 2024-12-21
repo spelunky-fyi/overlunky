@@ -156,7 +156,8 @@ void register_usertypes(sol::state& lua)
         RenderInfo,
         CallbackType::Entity,
         VTableEntry<"dtor", 0x0, void()>,
-        VTableEntry<"render", 0x3, void(float*), BackBinder<VanillaRenderContext>>>;
+        VTableEntry<"draw", 0x1, void()>,
+        VTableEntry<"render", 0x3, void(Vec2*), BackBinder<VanillaRenderContext>>>;
     static RenderInfoVTable render_info_vtable(lua, lua["RenderInfo"], "RENDER_INFO_OVERRIDE");
 
     using PowerupCapableVTable = HookableVTable<

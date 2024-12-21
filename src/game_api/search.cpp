@@ -1581,9 +1581,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "get_entity_name"sv,
         PatternCommandBuffer{}
-            .find_inst("\x44\x21\xe2\x4c\x8b\x91\x78\x02\x00\x00"sv)
-            .at_exe()
-            .function_start(0xff),
+            .find_after_inst("48 89 F2 66 41 B8 80 00 45 31 C9"_gh)
+            .decode_call()
+            .at_exe(),
     },
     {
         "construct_soundmeta"sv,
@@ -1837,6 +1837,15 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .find_inst("\x44\x0F\x29\xBD\x20\x02\x00\x00"sv)
             .at_exe()
             .function_start(),
+    },
+    {
+        // Put write bp on state.win_state and enter a multiplayer game
+        "heap_clone"sv,
+        PatternCommandBuffer{}
+            .find_inst("4c 8d 05 f4 ca 27 00"_gh)
+            .find_next_inst("eb 27"_gh)
+            .offset(-0xC)
+            .at_exe(),
     },
     {
         // ^ writes to state.pause on state.loading == 3
