@@ -697,7 +697,7 @@ Type | Name | Description
                 [] if type_name not in ps.constructors else ps.constructors[type_name]
             )
             for var in ctors + type["vars"]:
-                if "comment" in var and "NoDoc" in var["comment"]:
+                if "comment" in var and var["comment"] and "NoDoc" in var["comment"]:
                     continue
                 var_name = var["name"]
                 search_link = (
