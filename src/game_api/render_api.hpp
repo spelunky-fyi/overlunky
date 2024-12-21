@@ -339,6 +339,7 @@ struct RenderInfo
     /// Called when the entity enters the camera view, using its hitbox with an extra threshold. Handles low-level graphics tasks related to the GPU
     virtual void draw() = 0;   // initializes positions
     virtual void update() = 0; // math, basically always runs before render
+    /// Offset used in CO to draw the fake image of the entity on the other side of a level
     virtual void render(Vec2* offset) = 0;
     virtual bool set_entity(Texture* texture, Entity* entity) = 0;
 
