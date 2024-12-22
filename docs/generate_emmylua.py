@@ -52,6 +52,7 @@ replace_table = {
     "object": "any",
     "ImVec2": "Vec2",
     "BucketItem": "any",
+    "ENTITY_MASK": "MASK",
 }
 
 reFloat = re.compile(r"\bfloat\b")

@@ -20,6 +20,7 @@
 #include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
 #include <utility>          // for min, max, pair, find
 
+#include "aliases.hpp"
 #include "bucket.hpp"
 #include "containers/custom_vector.hpp" //
 #include "custom_types.hpp"             // for get_custom_entity_types, CUSTOM_TYPE
@@ -1351,6 +1352,38 @@ void add_entity_to_liquid_collision(uint32_t uid, bool add)
         // which is some bigger struct held in some weird container, and the function is doing other stuff, so this is the easiest way besides killing the entity
         auto key = const_cast<uint32_t*>(&it->first);
         *key = ~0u;
+    }
+}
+
+uint8_t get_liquids_at(ENTITY_MASK liquid_mask, float x, float y, LAYER layer)
+{
+    uint8_t actual_layer = enum_to_layer(layer);
+    LiquidPhysics* liquid_physics = State::get().ptr()->liquid_physics;
+    if (actual_layer != get_liquid_layer())
+        return 0;
+    // if (y > 125.5 || y < 0 || x > 85.5 || x < 0) // Original check by the game, can result is accesing the array out of bounds
+    //     return 0;
+    if (y < 0 || x < 0)
+        return 0;
+
+    uint32_t ix = static_cast<int>((x + 0.5) / 0.3333333);
+    uint32_t iy = static_cast<int>((y + 0.5) / 0.3333333);
+    if (iy >= (g_level_max_y * 3) || ix >= (g_level_max_x * 3))
+        return 0;
+
+    auto& liquids_at = (*liquid_physics->liquids_by_third_of_tile)[iy][ix];
+    if (liquid_mask == ENTITY_MASK::ANY)
+    {
+        return liquids_at.water + liquids_at.lava;
+    }
+    else
+    {
+        uint8_t liquids_num = 0;
+        if (test_mask(liquid_mask, ENTITY_MASK::WATER))
+            liquids_num += liquids_at.water;
+        if (test_mask(liquid_mask, ENTITY_MASK::LAVA))
+            liquids_num += liquids_at.lava;
+        return liquids_num;
     }
 }
 
