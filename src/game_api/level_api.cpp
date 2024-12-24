@@ -81,11 +81,16 @@ struct CommunityTileCode;
 
 using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, Layer* layer);
 
-bool is_room_flipped(float x, float y)
+bool is_room_flipped(float x, float y, std::uint8_t layer)
 {
     thread_local StateMemory* state_ptr = State::get().ptr_local();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
-    return state_ptr->level_gen->flipped_rooms->rooms[ix + iy * 8ull];
+    return state_ptr->level_gen->flipped_rooms[layer]->rooms[ix + iy * 8ull];
+}
+
+inline std::uint8_t get_layer_num(Layer* layer)
+{
+    return layer->is_back_layer ? 1 : 0;
 }
 
 struct CommunityTileCode
@@ -114,7 +119,7 @@ void g_spawn_eggsac(const CommunityTileCode& self, float x, float y, Layer* laye
 {
     if constexpr (!ignore_flip)
     {
-        if (is_room_flipped(x, y))
+        if (is_room_flipped(x, y, get_layer_num(layer)))
         {
             constexpr int new_angle = []()
             {
@@ -163,7 +168,7 @@ void g_spawn_punishball_attach(const CommunityTileCode& self, float x, float y, 
 {
     if constexpr (!ignore_flip)
     {
-        if (is_room_flipped(x, y))
+        if (is_room_flipped(x, y, get_layer_num(layer)))
         {
             g_spawn_punishball_attach<-offset_x, offset_y, true>(self, x, y, layer);
             return;
@@ -441,11 +446,11 @@ std::array g_community_tile_codes{
     CommunityTileCode{"apep", "ENT_TYPE_MONS_APEP_HEAD"},
     CommunityTileCode{"apep_left", "ENT_TYPE_MONS_APEP_HEAD", []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
                       {
-                          layer->spawn_apep(x, y, is_room_flipped(x, y));
+                          layer->spawn_apep(x, y, is_room_flipped(x, y, get_layer_num(layer)));
                       }},
     CommunityTileCode{"apep_right", "ENT_TYPE_MONS_APEP_HEAD", []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
                       {
-                          layer->spawn_apep(x, y, !is_room_flipped(x, y));
+                          layer->spawn_apep(x, y, !is_room_flipped(x, y, get_layer_num(layer)));
                       }},
     CommunityTileCode{"olmite_naked", "ENT_TYPE_MONS_OLMITE_NAKED"},
     CommunityTileCode{"olmite_helmet", "ENT_TYPE_MONS_OLMITE_HELMET"},
@@ -1879,6 +1884,27 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t r
     return true;
 }
 
+bool LevelGenSystem::get_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y)
+{
+    auto* state_ptr = State::get().ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h || static_cast<size_t>(meta_type) >= rooms_meta.size())
+        return false;
+
+    return rooms_meta[static_cast<uint32_t>(meta_type)]->rooms[x + y * 8];
+}
+
+bool LevelGenSystem::set_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y, bool value)
+{
+    auto* state_ptr = State::get().ptr_local();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h || static_cast<size_t>(meta_type) >= rooms_meta.size())
+        return false;
+
+    rooms_meta[static_cast<uint32_t>(meta_type)]->rooms[x + y * 8] = value;
+    return true;
+}
+
 bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
 {
     auto* state_ptr = State::get().ptr_local();
@@ -1886,7 +1912,7 @@ bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
-    return flipped_rooms->rooms[x + y * 8];
+    return flipped_rooms_front_layer->rooms[x + y * 8];
 }
 bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y) const
 {

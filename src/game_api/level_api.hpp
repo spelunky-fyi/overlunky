@@ -91,6 +91,17 @@ enum class POS_TYPE
     WALL_RIGHT = 0x4000,
 };
 
+enum class ROOM_META
+{
+    FLIPPED_ROOM_FRONT_LAYER = 0,
+    FLIPPED_ROOM_BACK_LAYER,
+    SET_ROOM_FRONT_LAYER,
+    SET_ROOM_BACK_LAYER,
+    BACKLAYER_ROOM_EXISTS,
+    MACHINE_ROOM_ORIGIN,
+    DUAL_ROOM,
+};
+
 struct LevelGenData
 {
     void init();
@@ -442,6 +453,16 @@ struct LevelGenRoomsMeta
     std::array<bool, 8 * 16> rooms;
 };
 
+struct RoomTileCodes
+{
+    std::array<TileCodeDef, 10 * 8> tile_codes;
+};
+
+struct LevelGenBackLayerRoomsTileCodes
+{
+    std::array<RoomTileCodes*, 8 * 15> rooms;
+};
+
 class SpecialLevelGeneration
 {
   public:
@@ -540,14 +561,35 @@ struct LevelGenSystem
             LevelGenRooms* rooms_backlayer;
         };
     };
-    LevelGenRoomsMeta* flipped_rooms;
-    LevelGenRoomsMeta* rooms_meta_27;
-    LevelGenRoomsMeta* set_room_front_layer;
-    LevelGenRoomsMeta* set_room_back_layer;
-    LevelGenRoomsMeta* backlayer_room_exists;
-    LevelGenRoomsMeta* machine_room_origin;
-    LevelGenRoomsMeta* dual_room;
-    LevelGenRoomsMeta* rooms_meta_33;
+    union
+    {
+        std::array<LevelGenRoomsMeta*, 7> rooms_meta;
+        struct
+        {
+            union
+            {
+                LevelGenRoomsMeta* flipped_rooms[2];
+                struct
+                {
+                    LevelGenRoomsMeta* flipped_rooms_front_layer;
+                    LevelGenRoomsMeta* flipped_rooms_back_layer;
+                };
+            };
+            union
+            {
+                LevelGenRoomsMeta* set_room[2];
+                struct
+                {
+                    LevelGenRoomsMeta* set_room_front_layer;
+                    LevelGenRoomsMeta* set_room_back_layer;
+                };
+            };
+            LevelGenRoomsMeta* backlayer_room_exists;
+            LevelGenRoomsMeta* machine_room_origin;
+            LevelGenRoomsMeta* dual_room;
+        };
+    };
+    LevelGenBackLayerRoomsTileCodes* backlayer_rooms_tilecodes;
     LevelGenRoomsMeta* rooms_meta_34;
     std::uint32_t spawn_room_x;
     std::uint32_t spawn_room_y;
@@ -592,6 +634,8 @@ struct LevelGenSystem
     std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l) const;
     bool set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template);
 
+    bool get_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y);
+    bool set_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y, bool value);
     bool is_room_flipped(uint32_t x, uint32_t y) const;
     bool is_machine_room_origin(uint32_t x, uint32_t y) const;
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
