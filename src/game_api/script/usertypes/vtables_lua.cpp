@@ -216,7 +216,7 @@ void register_usertypes(sol::state& lua)
         Entity,
         CallbackType::Entity,
         EntityVTable,
-        VTableEntry<"give_powerup", 93, MemFun<&RollingItem::give_powerup>>>;
+        VTableEntry<"give_powerup", 94, MemFun<&RollingItem::give_powerup>>>;
     static RollingItemVTable rolling_item_vtable(lua, lua["RollingItem"], "ENTITY_OVERRIDE");
 
     // Arrow // poison_arrow // light_up ?
