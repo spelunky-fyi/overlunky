@@ -83,15 +83,12 @@ Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
     static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
     using AddToLayer = void(Layer*, Entity*);
     static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
-    using AddItemPtr = void(Entity*, Entity*, bool);
-    static auto add_item_ptr = (AddItemPtr*)get_address("add_item_ptr");
 
     Entity* ent = spawn_entity_raw(entity_factory(), id, x, y, is_back_layer, overlay, true);
 
-    const auto param_5 = true;
-    if (((bool*)this)[0x64490] == false && param_5 == false)
+    if (is_layer_loading == false)
     {
-        add_item_ptr(((Entity**)this)[0x64440 / 0x8], ent, false);
+        unknown_entities4.insert(ent, false);
     }
     else
     {
@@ -207,7 +204,7 @@ void Layer::move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_la
 {
     if (ent)
     {
-        const auto pos = ent->position();
+        const auto pos = ent->abs_position();
         const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.x));
         const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.y));
         if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
@@ -241,7 +238,7 @@ void Layer::destroy_grid_entity(Entity* ent)
             }
         }
 
-        const auto pos = ent->position();
+        const auto pos = ent->abs_position();
         const uint32_t current_grid_x = static_cast<uint32_t>(std::round(pos.x));
         const uint32_t current_grid_y = static_cast<uint32_t>(std::round(pos.y));
         if (current_grid_x < g_level_max_x && current_grid_y < g_level_max_y)
@@ -256,4 +253,11 @@ void Layer::destroy_grid_entity(Entity* ent)
         ent->flags |= 1U << (29 - 1); // set DEAD flag to prevent certain stuff like gold nuggets drop or particles from entities such as spikes
         ent->destroy();
     }
+}
+
+void EntityList::insert(Entity* ent, bool b)
+{
+    using EntityListInsert = void(EntityList*, Entity*, bool);
+    static EntityListInsert* list_insert = (EntityListInsert*)get_address("entitylist_insert");
+    list_insert(this, ent, b);
 }

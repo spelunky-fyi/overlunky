@@ -125,6 +125,7 @@ class Online
     // some more stuff
 
     virtual ~Online() = 0;
+    // 27 virtuals, destructor probably at index 7
 };
 
 Online* get_online();

@@ -140,7 +140,7 @@ void Player::let_go()
 {
     if (overlay)
     {
-        overlay->remove_item_ptr(this);
+        overlay->remove_item(this, true);
         // coyote_timer = 0xFF;
         // last_state = state;
         // state = 1, 9, 0xA; ?
