@@ -766,7 +766,7 @@ class RollingItem : public Purchasable
     float roll_speed; // only positive numbers
 
     /// Skip this function for item to be unpickable
-    virtual void give_powerup(Entity* who, bool) = 0;
+    virtual void give_powerup(Entity* who, bool play_sfx) = 0;
 };
 
 class PlayerBag : public Movable

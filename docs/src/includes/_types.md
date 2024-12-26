@@ -7400,12 +7400,12 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Purchasable](#Purchasable)
 Type | Name | Description
 ---- | ---- | -----------
 float | [roll_speed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=roll_speed) | 
-nil | [give_powerup(Entity who, bool)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=give_powerup) | Skip this function for item to be unpickable
+nil | [give_powerup(Entity who, bool play_sfx)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=give_powerup) | Skip this function for item to be unpickable
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
-[CallbackId](#Aliases) | [set_pre_give_powerup(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_give_powerup) | Hooks before the virtual function.<br/>The callback signature is `bool give_powerup(RollingItem self, Entity who, bool)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
-[CallbackId](#Aliases) | [set_post_give_powerup(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_give_powerup) | Hooks after the virtual function.<br/>The callback signature is `nil give_powerup(RollingItem self, Entity who, bool)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
+[CallbackId](#Aliases) | [set_pre_give_powerup(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_give_powerup) | Hooks before the virtual function.<br/>The callback signature is `bool give_powerup(RollingItem self, Entity who, bool play_sfx)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
+[CallbackId](#Aliases) | [set_post_give_powerup(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_give_powerup) | Hooks after the virtual function.<br/>The callback signature is `nil give_powerup(RollingItem self, Entity who, bool play_sfx)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
 
 ### Rubble
 

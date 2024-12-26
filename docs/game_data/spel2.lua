@@ -4248,12 +4248,12 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 
 ---@class RollingItem : Purchasable
     ---@field roll_speed number
-    ---@field give_powerup fun(self, who: Entity, boolean: ): nil @Skip this function for item to be unpickable
+    ---@field give_powerup fun(self, who: Entity, play_sfx: boolean): nil @Skip this function for item to be unpickable
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
-    ---@field set_pre_give_powerup fun(self, fun: fun(self: RollingItem, who: Entity, boolean: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool give_powerup(RollingItem self, Entity who, boolean)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
-    ---@field set_post_give_powerup fun(self, fun: fun(self: RollingItem, who: Entity, boolean: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil give_powerup(RollingItem self, Entity who, boolean)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
+    ---@field set_pre_give_powerup fun(self, fun: fun(self: RollingItem, who: Entity, play_sfx: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool give_powerup(RollingItem self, Entity who, boolean play_sfx)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
+    ---@field set_post_give_powerup fun(self, fun: fun(self: RollingItem, who: Entity, play_sfx: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil give_powerup(RollingItem self, Entity who, boolean play_sfx)`<br/>Virtual function docs:<br/>Skip this function for item to be unpickable
 
 ---@class PlayerBag : Movable
     ---@field bombs integer
