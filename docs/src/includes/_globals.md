@@ -1542,11 +1542,12 @@ Get the current layer that the liquid is spawn in. Related function [set_liquid_
 
 > Search script examples for [get_liquids_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquids_at)
 
-#### int get_liquids_at([MASK](#MASK) liquid_mask, float x, float y, [LAYER](#LAYER) layer)
+#### tuple&lt;int, int&gt; get_liquids_at(float x, float y, [LAYER](#LAYER) layer)
 
 Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
-Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6
-Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6
+Returns a pair of water and lava, in that order.
+Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
+Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
 
 ### get_local_prng
 

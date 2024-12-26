@@ -1,3 +1,7 @@
+meta.name = "Liquids by grid"
+meta.version = "1.0"
+meta.description = "Shows the amounts of liquids by grid, using the `get_liquids_at` function"
+
 register_option_bool("only_draw_at_mouse", "Testing: Draw only liquid num at mouse position", "", false)
 register_option_bool("draw_grid_lines", "Draw grid lines", "", true)
 register_option_bool("draw_text_shadow", "Draw text shadow", "", true)
@@ -39,8 +43,7 @@ end
 ---@param x number
 ---@param y number
 local function draw_liquids_at(ctx, x, y)
-	local water = get_liquids_at(MASK.WATER, x, y, LAYER.PLAYER)
-	local lava = get_liquids_at(MASK.LAVA, x, y, LAYER.PLAYER)
+	local water, lava = get_liquids_at(x, y, LAYER.PLAYER)
 	if water == 0 and lava == 0 then return end
 
 	local spacing <const> = 0.0135 / last_zoom

@@ -1177,14 +1177,14 @@ function set_adventure_seed(first, second) end
 ---@return nil
 function update_liquid_collision_at(x, y, add, layer) end
 ---Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
----Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6
----Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6
----@param liquid_mask MASK
+---Returns a pair of water and lava, in that order.
+---Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
+---Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
 ---@param x number
 ---@param y number
 ---@param layer LAYER
----@return integer
-function get_liquids_at(liquid_mask, x, y, layer) end
+---@return integer, integer
+function get_liquids_at(x, y, layer) end
 ---Disable all crust item spawns, returns whether they were already disabled before the call
 ---@param disable boolean
 ---@return boolean
