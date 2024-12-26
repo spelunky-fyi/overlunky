@@ -1828,12 +1828,8 @@ void register_usertypes(sol::state& lua)
         ROOM_META::SET_ROOM_FRONT_LAYER,
         "SET_ROOM_BACK_LAYER",
         ROOM_META::SET_ROOM_BACK_LAYER,
-        "BACKLAYER_ROOM_EXISTS",
-        ROOM_META::BACKLAYER_ROOM_EXISTS,
         "MACHINE_ROOM_ORIGIN",
-        ROOM_META::MACHINE_ROOM_ORIGIN,
-        "DUAL_ROOM",
-        ROOM_META::DUAL_ROOM);
+        ROOM_META::MACHINE_ROOM_ORIGIN);
 
     /* ROOM_META
     // FLIPPED_ROOM_FRONT_LAYER
@@ -1844,12 +1840,8 @@ void register_usertypes(sol::state& lua)
     // If the room is a set_room
     // SET_ROOM_BACK_LAYER
     // If the room is a set_room
-    // BACKLAYER_ROOM_EXISTS
-    // If there's a backlayer room already chosen on that position. There's no chosen rooms `ON.POST_ROOM_GENERATION`, use other callbacks like `ON.PRE_SET_RANDOM_BACKLAYER_ROOMS`
     // MACHINE_ROOM_ORIGIN
     // If the room is the origin of a machine room
-    // DUAL_ROOM
-    // If the front layer room is a !dual room. There shouldn't be any `ON.POST_ROOM_GENERATION`, but should be on other callbacks like `ON.PRE_SET_RANDOM_BACKLAYER_ROOMS` (TODO)
     */
 
     lua.new_usertype<SpawnInfo>(

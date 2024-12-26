@@ -94,12 +94,12 @@ enum class POS_TYPE
 enum class ROOM_META
 {
     FLIPPED_ROOM_FRONT_LAYER = 0,
-    FLIPPED_ROOM_BACK_LAYER,
-    SET_ROOM_FRONT_LAYER,
-    SET_ROOM_BACK_LAYER,
-    BACKLAYER_ROOM_EXISTS,
-    MACHINE_ROOM_ORIGIN,
-    DUAL_ROOM,
+    FLIPPED_ROOM_BACK_LAYER = 1,
+    SET_ROOM_FRONT_LAYER = 2,
+    SET_ROOM_BACK_LAYER = 3,
+    // BACKLAYER_ROOM_EXISTS = 4,
+    MACHINE_ROOM_ORIGIN = 5,
+    // DUAL_ROOM = 6,
 };
 
 struct LevelGenData
@@ -584,9 +584,9 @@ struct LevelGenSystem
                     LevelGenRoomsMeta* set_room_back_layer;
                 };
             };
-            LevelGenRoomsMeta* backlayer_room_exists;
+            LevelGenRoomsMeta* backlayer_room_exists; // isn't very consistent, some passage rooms, BM rooms, challenge rooms, etc. aren't marked with this.
             LevelGenRoomsMeta* machine_room_origin;
-            LevelGenRoomsMeta* dual_room;
+            LevelGenRoomsMeta* dual_room; // is wrong, seems to be related to liquid rooms
         };
     };
     LevelGenBackLayerRoomsTileCodes* backlayer_rooms_tilecodes;

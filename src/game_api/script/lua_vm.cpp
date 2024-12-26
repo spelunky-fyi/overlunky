@@ -2739,6 +2739,14 @@ end
     // Runs instead of POST_GAME_LOOP when anything blocks a PRE_GAME_LOOP. Even runs in Playlunky when Overlunky blocks a PRE_GAME_LOOP.
     // BLOCKED_PROCESS_INPUT
     // Runs instead of POST_PROCESS_INPUT when anything blocks a PRE_PROCESS_INPUT. Even runs in Playlunky when Overlunky blocks a PRE_PROCESS_INPUT.
+    // PRE_SET_RANDOM_BACKLAYER_ROOMS
+    // Runs right before the random backlayer rooms (like room2) are set and hidden backlayer rooms are spawned, also is right after the front layer room entities have spawned.
+    // POST_SET_RANDOM_BACKLAYER_ROOMS
+    // Runs right after the random backlayer rooms (like room2) are set and hidden backlayer rooms are spawned, but the room entities (like generic_floor) aren't spawned yet.
+    // PRE_SPAWN_BACKLAYER_ROOMS
+    // Runs right before the backlayer room entities are spawned. Front layer entities are already spawned at this point.
+    // POST_SPAWN_BACKLAYER_ROOMS
+    // Runs right after the backlayer room entities are spawned. Front layer room entities are also already spawned at this point.
     */
 
     lua.create_named_table(
