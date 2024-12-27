@@ -786,7 +786,7 @@ void register_usertypes(sol::state& lua)
     // lua["TYPE_MAP"][801] = lua["Entity"]["as_entity"];  // BG_BASECAMP_DININGTABLE_DISHES (plain entity)
     // lua["TYPE_MAP"][802] = lua["Entity"]["as_entity"];  // BG_BASECAMP_SHORTCUTSTATIONBANNER (plain entity)
     // lua["TYPE_MAP"][803] = lua["Entity"]["as_entity"];  // BG_SHOP (plain entity)
-    lua["TYPE_MAP"][804] = lua["Entity"]["as_bgshopentrence"]; // BG_SHOP_ENTRANCEDOOR
+    lua["TYPE_MAP"][804] = lua["Entity"]["as_bgshopentrance"]; // BG_SHOP_ENTRANCEDOOR
     // lua["TYPE_MAP"][805] = lua["Entity"]["as_entity"];  // BG_SHOP_BACKDOOR (plain entity)
     // lua["TYPE_MAP"][806] = lua["Entity"]["as_entity"];  // BG_SHOPWANTEDPOSTER (plain entity)
     // lua["TYPE_MAP"][807] = lua["Entity"]["as_entity"];  // BG_SHOPWANTEDPORTRAIT (plain entity)
