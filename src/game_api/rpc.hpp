@@ -41,7 +41,7 @@ std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::funct
 void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t);
 std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid);
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type);
-void entity_remove_item(uint32_t uid, uint32_t item_uid);
+void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> check_autokill);
 void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
 uint32_t get_frame_count_main();
@@ -64,7 +64,7 @@ void set_kapala_hud_icon(int8_t icon_index);
 void set_blood_multiplication(uint32_t default_multiplier, uint32_t vladscape_multiplier);
 std::vector<int64_t> read_prng();
 void pick_up(uint32_t who_uid, uint32_t what_uid);
-void drop(uint32_t who_uid, uint32_t what_uid);
+void drop(uint32_t who_uid, std::optional<uint32_t> what_uid);
 void unequip_backitem(uint32_t who_uid);
 int32_t worn_backitem(uint32_t who_uid);
 void set_olmec_phase_y_level(uint8_t phase, float y);

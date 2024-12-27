@@ -16,8 +16,24 @@ struct Inventory;
 struct ParticleEmitterInfo;
 struct PlayerSlot;
 struct SoundMeta;
+struct SpritePosition;
 
-class Backpack : public Movable
+class Powerup : public Movable
+{
+  public:
+    virtual SpritePosition& get_hud_sprite(SpritePosition& output) = 0;
+    // not sure why the normal powerups use apply/remove effect where backpacks use the put on/put off
+    virtual void apply_effect(PowerupCapable* who) = 0;
+    virtual void remove_effect(PowerupCapable* who) = 0; // does not remove powerup from the powerups map
+    /// only for backpacks
+    virtual void on_putting_on(PowerupCapable* who) = 0; // only for backpacks, sets offsets etc.
+    /// only for backpacks
+    virtual void on_putting_off(PowerupCapable* who) = 0;
+    /// for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack hoverpack.is_on, teleporter, powerpack and all other powerups return false
+    virtual bool in_use() = 0;
+};
+
+class Backpack : public Powerup
 {
   public:
     /// More like on fire trigger, the explosion happens when the timer reaches > 29
@@ -26,13 +42,7 @@ class Backpack : public Movable
     uint16_t unknown1;
     uint32_t unknown2;
 
-    virtual void v93() = 0; // always returns 0x100000007 (maybe two 32bit values, 1 and 7 ?)
-    virtual void v94() = 0; // just return
-    virtual void v95() = 0; // just return
-    virtual void on_putting_on(Entity* who) = 0;
-    virtual void on_putting_off(Entity* who) = 0;
-    virtual bool is_active() = 0;         // for jetpack returns jetpack.flame_on, for capes Cape.floating_down, for hoverpack, hoverpack.is_on, teleporter and powerpack return false
-    virtual void trigger_explosion() = 0; // Causes the backpack to play its warning sound and triggers the explosion
+    virtual void trigger_explosion() = 0;
 };
 
 class Jetpack : public Backpack
@@ -43,6 +53,8 @@ class Jetpack : public Backpack
     uint16_t unknown21;
     uint32_t fly_time; // it's per level, not even per jetpack lol, it also adds at when it explodes
     uint16_t fuel;     // only set the fuel for an equipped jetpack (player->items)!
+
+    virtual float acceleration() = 0;
 };
 
 class TeleporterBackpack : public Backpack
@@ -77,10 +89,6 @@ class Cape : public Backpack
     uint8_t padding2;
     uint8_t padding3;
     uint32_t floating_count; // it's per level, not per cape
-
-    // clear particle? called when using backpack.trigger_explosion when the cape is about to disappear
-    // it's a common function
-    virtual void v100(size_t unknown) = 0;
 };
 
 class VladsCape : public Cape
@@ -91,12 +99,22 @@ class VladsCape : public Cape
 
 class Purchasable : public Movable
 {
-    virtual void buy(Entity* who) = 0;
+  public:
+    /// Is called after purchase, changes the DummyPurchasableEntity into the real entity plus tries to equip it, or pick it up (for stuff like weapons), or give the powerup.
+    /// Nothing else happens, by itself it does not remove item from shop etc.
+    virtual void equip(Entity* who) = 0;
 };
 
 class DummyPurchasableEntity : public Purchasable
 {
-    virtual Entity* switch_entities(void*) = 0; // switches the purchasable cape with normal one
+  public:
+    Entity* replace_entity;
+    bool exploding;
+    /// Explodes when timer reaches 30
+    uint8_t explosion_timer;
+
+    /// Transfers ownership etc. for who to blame, sets the exploding bool
+    virtual void trigger_explosion(Entity* who) = 0;
 };
 
 class Mattock : public Purchasable
@@ -106,7 +124,7 @@ class Mattock : public Purchasable
 };
 
 class Gun : public Purchasable
-{ // BIG NOTE: scepter is not a Purchasable, but that's the only Gun that isn't so i didn't bother to make new type for it
+{
   public:
     uint8_t cooldown;
     /// used only for webgun
@@ -116,6 +134,12 @@ class Gun : public Purchasable
     uint8_t b12b;
     /// Only for webgun, uid of the webshot entity
     int32_t in_chamber;
+};
+
+class Scepter : public Movable
+{
+  public:
+    uint8_t cooldown;
 };
 
 class WebGun : public Gun
@@ -184,7 +208,7 @@ class Idol : public Movable
 class Spear : public Movable
 {
   public:
-    uint32_t sound_id;
+    SOUNDID sound_id;
 };
 
 class JungleSpearCosmetic : public Movable
@@ -203,9 +227,11 @@ struct UnknownPointerGroup
 
 class Projectile : public Movable
 {
-    // called when shooting (entity it still not added to layer) and it's called like normal function, not thru this virtual
+    // depending on the entity can be called directly instead of vtable (example: plasma cannnon)
+
+    // called when shooting (entity it still not added to layer), sets the initial velocities and owner
     virtual void v93(float angle, float speed, Entity* responsible) = 0;
-    // called when shooting (entity it still not added to layer)
+    // called when shooting (entity it still not added to layer), returns false when the responsible doesn't have overlay, checks if the verlay is MASK.ITEM and bunch of other stuff
     virtual bool v94(Entity* responsible, float x) = 0;
 };
 
@@ -425,7 +451,7 @@ class Torch : public Movable
     int16_t unknown2;
 
     virtual void light_up(bool lit) = 0;
-    virtual std::pair<float, float>& v_94(std::pair<float, float>& value) = 0; // sets the value to some constant, runs on spawn
+    virtual Vec2& get_flame_offset(Vec2& output) = 0;
     virtual ENT_TYPE get_flame_type() = 0;
 };
 
@@ -739,7 +765,8 @@ class RollingItem : public Purchasable
   public:
     float roll_speed; // only positive numbers
 
-    virtual void on_purchase(Entity* who, int32_t unknown) = 0; // give you the powerup if you buy it
+    /// Skip this function for item to be unpickable
+    virtual void give_powerup(Entity* who, bool play_sfx) = 0;
 };
 
 class PlayerBag : public Movable
@@ -747,15 +774,6 @@ class PlayerBag : public Movable
   public:
     int8_t bombs;
     int8_t ropes;
-};
-
-class Powerup : public Movable
-{
-  public:
-    virtual size_t& v93(size_t&) = 0;                      // get powerup id/type?
-    virtual void apply_effect(PowerupCapable* player) = 0; // runs when getting the powerup
-    virtual void remove_effect(PowerupCapable* player) = 0;
-    // 3 more here, but they just return instantly
 };
 
 class KapalaPowerup : public Powerup
@@ -852,7 +870,7 @@ class PrizeDispenser : public Movable
 class Bow : public Purchasable
 {
   public:
-    // When lain on the ground
+    /// When laying on the ground
     virtual float get_arrow_special_offset() = 0;
 };
 

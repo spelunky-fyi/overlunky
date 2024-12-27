@@ -232,10 +232,16 @@ Name | Data | Description
 [KILL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.KILL) | 3 | 
 [ON_COLLISION1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_COLLISION1) | 4 | 
 [DESTROY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DESTROY) | 5 | 
+[GENERATE_DAMAGE_PARTICLES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GENERATE_DAMAGE_PARTICLES) | 8 | 
 [CAN_BE_PUSHED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_BE_PUSHED) | 10 | 
 [IS_IN_LIQUID](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_IN_LIQUID) | 12 | 
 [SET_INVISIBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_INVISIBLE) | 15 | 
-[FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FRICTION) | 17 | 
+[FLIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLIP) | 16 | 
+[SET_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_DRAW_DEPTH) | 17 | 
+[RESET_DRAW_DEPTH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.RESET_DRAW_DEPTH) | 18 | 
+[FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FRICTION) | 19 | 
+[SET_AS_SOUND_SOURCE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_AS_SOUND_SOURCE) | 20 | 
+[REMOVE_ITEM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.REMOVE_ITEM) | 21 | 
 [GET_HELD_ENTITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_HELD_ENTITY) | 22 | 
 [TRIGGER_ACTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_ACTION) | 24 | 
 [ACTIVATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ACTIVATE) | 25 | 
@@ -246,32 +252,47 @@ Name | Data | Description
 [WALKED_OFF](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.WALKED_OFF) | 30 | 
 [LEDGE_GRAB](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LEDGE_GRAB) | 31 | 
 [STOOD_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOOD_ON) | 32 | 
+[LIBERATE_FROM_SHOP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIBERATE_FROM_SHOP) | 35 | 
 [INIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INIT) | 36 | 
 [CAN_JUMP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_JUMP) | 37 | 
-[STOMP_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMP_DAMAGE) | 43 | 
+[SPRINT_FACTOR](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SPRINT_FACTOR) | 39 | 
+[CALCULATE_JUMP_VELOCITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CALCULATE_JUMP_VELOCITY) | 40 | 
+[APPLY_VELOCITY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_VELOCITY) | 42 | 
+[GET_DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_DAMAGE) | 43 | 
 [IS_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_ON_FIRE) | 45 | 
+[ATTACK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ATTACK) | 46 | 
+[THROWN_INTO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.THROWN_INTO) | 47 | 
 [DAMAGE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DAMAGE) | 48 | 
 [ON_HIT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ON_HIT) | 49 | 
+[GET_DAMAGE_SOUND](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GET_DAMAGE_SOUND) | 50 | 
 [STUN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STUN) | 51 | 
 [FREEZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FREEZE) | 52 | 
 [LIGHT_ON_FIRE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_ON_FIRE) | 53 | 
 [SET_CURSED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_CURSED) | 54 | 
 [WEB_COLLISION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.WEB_COLLISION) | 55 | 
 [CHECK_OUT_OF_BOUNDS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CHECK_OUT_OF_BOUNDS) | 58 | 
+[SET_STANDING_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SET_STANDING_ON) | 59 | 
 [STANDING_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STANDING_ON) | 60 | 
 [STOMPED_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.STOMPED_BY) | 61 | 
 [THROWN_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.THROWN_BY) | 62 | 
 [CLONED_TO](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CLONED_TO) | 63 | 
 [PICK_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICK_UP) | 67 | 
-[PICKED_UP_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP_BY) | 68 | 
+[CAN_BE_PICKED_UP_BY](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_BE_PICKED_UP_BY) | 68 | 
 [DROP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.DROP) | 69 | 
 [COLLECT_TREASURE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.COLLECT_TREASURE) | 70 | 
+[APPLY_MOVEMENT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_MOVEMENT) | 71 | 
+[IS_POWERUP_CAPABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_POWERUP_CAPABLE) | 74 | 
 [INITIALIZE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.INITIALIZE) | 75 | 
 [PROCESS_INPUT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PROCESS_INPUT) | 78 | 
 [PICKED_UP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PICKED_UP) | 80 | 
+[RELEASE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.RELEASE) | 81 | 
+[GENERATE_LANDING_EFFECTS](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GENERATE_LANDING_EFFECTS) | 82 | 
 [FALL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FALL) | 83 | 
 [APPLY_FRICTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.APPLY_FRICTION) | 84 | 
+[CAN_BREAK_BLOCK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_BREAK_BLOCK) | 85 | 
+[BREAK_BLOCK](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.BREAK_BLOCK) | 86 | 
 [CRUSH](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CRUSH) | 90 | 
+[BODY_DESTRUCTION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.BODY_DESTRUCTION) | 92 | 
 [FLOOR_UPDATE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.FLOOR_UPDATE) | 38 | 
 [ENTER_ATTEMPT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ENTER_ATTEMPT) | 40 | 
 [HIDE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.HIDE_HUD) | 41 | 
@@ -279,6 +300,15 @@ Name | Data | Description
 [LIGHT_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.LIGHT_LEVEL) | 44 | 
 [IS_UNLOCKED](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.IS_UNLOCKED) | 45 | 
 [CAN_ENTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.CAN_ENTER) | 46 | 
+[BLOOD_COLLISION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.BLOOD_COLLISION) | 93 | 
+[PUTTING_ON](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PUTTING_ON) | 96 | 
+[PUTTING_OFF](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.PUTTING_OFF) | 97 | 
+[TRIGGER_EXPLOSION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_EXPLOSION) | 99 | 
+[ACCELERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.ACCELERATION) | 100 | 
+[EQUIP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.EQUIP) | 93 | 
+[TRIGGER_EXPLOSION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.TRIGGER_EXPLOSION) | 94 | 
+[SPAWN_PROJECTILE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.SPAWN_PROJECTILE) | 93 | 
+[GIVE_POWERUP](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ENTITY_OVERRIDE.GIVE_POWERUP) | 94 | 
 
 ## ENT_FLAG
 
@@ -888,7 +918,7 @@ Name | Data | Description
 [POST_LEVEL_GENERATION](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LEVEL_GENERATION) | ON::POST_LEVEL_GENERATION | Runs right after level generation is done, i.e. after all level gen entities are spawned, before any entities are updated. You can spawn your own entities here, like extra enemies, give items to players etc.<br/>
 [POST_LOAD_SCREEN](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_SCREEN) | ON::POST_LOAD_SCREEN | Runs right after a screen is loaded, before rendering anything<br/>
 [PRE_GET_RANDOM_ROOM](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_GET_RANDOM_ROOM) | ON::PRE_GET_RANDOM_ROOM | Params: int x, int y, [LAYER](#LAYER) layer, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template<br/>Return: `string room_data`<br/>Called when the game wants to get a random room for a given template. Return a string that represents a room template to make the game use that.<br/>If the size of the string returned does not match with the room templates expected size the room is discarded.<br/>White spaces at the beginning and end of the string are stripped, not at the beginning and end of each line.<br/>
-[PRE_HANDLE_ROOM_TILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) | ON::PRE_HANDLE_ROOM_TILES | Params: int x, int y, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template, [PreHandleRoomTilesContext](#PreHandleRoomTilesContext) room_ctx<br/>Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this<br/>Runs after a random room was selected and right before it would spawn entities for each tile code<br/>Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant<br/>
+[PRE_HANDLE_ROOM_TILES](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_HANDLE_ROOM_TILES) | ON::PRE_HANDLE_ROOM_TILES | Params: int x, int y, [ROOM_TEMPLATE](#ROOM_TEMPLATE) room_template, [PreHandleRoomTilesContext](#PreHandleRoomTilesContext) room_ctx<br/>Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this<br/>Runs after a random room was selected and right before it would spawn entities for each tile code<br/>Allows you to modify the rooms content in the front and back layer as well as add a back layer if not yet existant<br/>
 [SCRIPT_ENABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_ENABLE) | ON::SCRIPT_ENABLE | Runs when the script is enabled from the UI or when imported by another script while disabled, but not on load.<br/>
 [SCRIPT_DISABLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SCRIPT_DISABLE) | ON::SCRIPT_DISABLE | Runs when the script is disabled from the UI and also right before unloading/reloading.<br/>
 [RENDER_PRE_HUD](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_HUD) | ON::RENDER_PRE_HUD | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, [Hud](#Hud) hud<br/>Runs before the HUD is drawn on screen. In this event, you can draw textures with the `draw_screen_texture` function of the render_ctx or edit the Hud values. Return `true` to skip rendering.<br/>
@@ -905,7 +935,7 @@ Name | Data | Description
 [RENDER_POST_LAYER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LAYER) | ON::RENDER_POST_LAYER | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int rendered_layer<br/>Runs after a layer is rendered, runs for both layers during layer door transitions. Things drawn here will be part of the layer transition animation<br/>
 [RENDER_PRE_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_LEVEL) | ON::RENDER_PRE_LEVEL | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs before the level is rendered. Return `true` to skip rendering.<br/>
 [RENDER_POST_LEVEL](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_LEVEL) | ON::RENDER_POST_LEVEL | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx, int camera_layer<br/>Runs after the level is rendered, before hud<br/>
-[RENDER_PRE_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_GAME) | ON::RENDER_PRE_GAME | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the ingame part of the game is rendered. Return `true` to skip rendering.<br/>
+[RENDER_PRE_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_PRE_GAME) | ON::RENDER_PRE_GAME | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs before the in-game part of the game is rendered. Return `true` to skip rendering.<br/>
 [RENDER_POST_GAME](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.RENDER_POST_GAME) | ON::RENDER_POST_GAME | Params: [VanillaRenderContext](#VanillaRenderContext) render_ctx<br/>Runs after the level and HUD are rendered, before pause menus and blur effects<br/>
 [SPEECH_BUBBLE](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.SPEECH_BUBBLE) | ON::SPEECH_BUBBLE | Params: [Entity](#Entity) speaking_entity, string text<br/>Runs before any speech bubble is created, even the one using [say](#say) function<br/>Return: if you don't return anything it will execute the speech bubble function normally with default message<br/>if you return empty string, it will not create the speech bubble at all, if you return string, it will use that instead of the original<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
 [TOAST](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.TOAST) | ON::TOAST | Params: string text<br/>Runs before any toast is created, even the one using [toast](#toast) function<br/>Return: if you don't return anything it will execute the toast function normally with default message<br/>if you return empty string, it will not create the toast at all, if you return string, it will use that instead of the original message<br/>The first script to return string (empty or not) will take priority, the rest will receive callback call but the return behavior won't matter<br/>
