@@ -473,8 +473,6 @@ class LuaBackend
     static void pop_calling_backend(LuaBackend*);
     void on_set_user_data(Entity* ent);
     void load_user_data();
-    bool on_pre(ON event);
-    void on_post(ON event);
     void pre_copy_state(StateMemory* from, StateMemory* to);
     bool pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
     void post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);

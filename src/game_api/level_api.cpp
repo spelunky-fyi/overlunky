@@ -30,6 +30,7 @@
 #include "movable.hpp"               // for Movable
 #include "prng.hpp"                  // for PRNG, PRNG::EXTRA_SPAWNS
 #include "rpc.hpp"                   // for attach_entity, get_entities_overlap...
+#include "script/events.cpp"         //
 #include "script/events.hpp"         // for post_load_screen, pre_load_screen
 #include "search.hpp"                // for get_address
 #include "spawn_api.hpp"             // for pop_spawn_type_flags, push_spawn_ty...
@@ -1288,9 +1289,9 @@ using SpawnBacklayerRooms = void(LevelGenSystem*, uint32_t, uint32_t, uint32_t, 
 SpawnBacklayerRooms* g_spawn_backlayer_rooms_trampoline{nullptr};
 void spawn_backlayer_rooms(LevelGenSystem* level_gen, uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height)
 {
-    if (!pre_spawn_backlayer_rooms(start_x, start_y, limit_width, limit_height))
+    if (!pre_event(ON::PRE_SPAWN_BACKLAYER_ROOMS, start_x, start_y, limit_width, limit_height))
         g_spawn_backlayer_rooms_trampoline(level_gen, start_x, start_y, limit_width, limit_height);
-    post_spawn_backlayer_rooms(start_x, start_y, limit_width, limit_height);
+    post_event(ON::POST_SPAWN_BACKLAYER_ROOMS, start_x, start_y, limit_width, limit_height);
 }
 
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);

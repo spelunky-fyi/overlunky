@@ -1827,30 +1827,6 @@ void LuaBackend::on_set_user_data(Entity* ent)
     }
 }
 
-bool LuaBackend::on_pre(ON event)
-{
-    bool skip{false};
-    if (!get_enabled())
-        return skip;
-
-    auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == event)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            skip |= handle_function<bool>(this, callback.func).value_or(false);
-            clear_current_callback();
-            callback.lastRan = now;
-        }
-    }
-
-    return skip;
-}
-
 bool LuaBackend::pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height)
 {
     bool skip{false};
@@ -1890,27 +1866,6 @@ void LuaBackend::post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, 
         {
             set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, start_x, start_y, limit_width, limit_height);
-            clear_current_callback();
-            callback.lastRan = now;
-        }
-    }
-}
-
-void LuaBackend::on_post(ON event)
-{
-    if (!get_enabled())
-        return;
-
-    auto now = get_frame_count();
-    for (auto& [id, callback] : callbacks)
-    {
-        if (is_callback_cleared(id))
-            continue;
-
-        if (callback.screen == event)
-        {
-            set_current_callback(-1, id, CallbackType::Normal);
-            handle_function<void>(this, callback.func);
             clear_current_callback();
             callback.lastRan = now;
         }
