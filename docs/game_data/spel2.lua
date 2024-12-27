@@ -2517,7 +2517,7 @@ function PRNG:random(min, max) end
     ---@field sound_killed_by_other SOUNDID
     ---@field animations table<integer, Animation>
     ---@field default_special_offsetx number
-    ---@field default_special_offsetx number
+    ---@field default_special_offsety number
 
 ---@class RenderInfo
     ---@field x number

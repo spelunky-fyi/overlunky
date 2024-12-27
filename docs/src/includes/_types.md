@@ -489,7 +489,7 @@ bool | [leaves_corpse_behind](https://github.com/spelunky-fyi/overlunky/search?l
 [SOUNDID](#Aliases) | [sound_killed_by_other](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound_killed_by_other) | 
 map&lt;int, [Animation](#Animation)&gt; | [animations](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animations) | 
 float | [default_special_offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_special_offsetx) | 
-float | [default_special_offsetx](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_special_offsetx) | 
+float | [default_special_offsety](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=default_special_offsety) | 
 
 ### HudInventory
 

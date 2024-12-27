@@ -86,7 +86,7 @@ void register_usertypes(sol::state& lua)
     entitydb_type["sound_killed_by_other"] = &EntityDB::sound_killed_by_other;
     entitydb_type["animations"] = &EntityDB::animations;
     entitydb_type["default_special_offsetx"] = &EntityDB::default_special_offsetx;
-    entitydb_type["default_special_offsetx"] = &EntityDB::default_special_offsety;
+    entitydb_type["default_special_offsety"] = &EntityDB::default_special_offsety;
 
     /// Some information used to render the entity, can not be changed, used in Entity
     lua.new_usertype<RenderInfo>(
