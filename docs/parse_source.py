@@ -1013,7 +1013,7 @@ def run_parse():
             if c:
                 comment.append(c.group(1))
 
-    print_collecting_info("enums")
+    print_collecting_info("enums") # TODO: should probably improve how this handles comments
     for file in api_files:
         data = open(file, "r").read()
         data = data.replace("\n", "")
@@ -1022,7 +1022,7 @@ def run_parse():
         for type in m:
             name = type[0]
             attr = type[1]
-            attr = attr.replace("//", "")
+            attr = attr.replace("//,", ",")
             attr = attr.replace('",', ",")
             attr = attr.split('"')
             vars = []

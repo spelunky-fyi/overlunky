@@ -1774,6 +1774,7 @@ function get_hud() end
 function set_drop_chance(dropchance_id, new_drop_chance) end
 ---Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
 ---Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
+---Check all the available drops [here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp)
 ---@param drop_id integer
 ---@param new_drop_entity_type ENT_TYPE
 ---@return nil
