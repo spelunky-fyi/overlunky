@@ -30,7 +30,6 @@
 #include "movable.hpp"               // for Movable
 #include "prng.hpp"                  // for PRNG, PRNG::EXTRA_SPAWNS
 #include "rpc.hpp"                   // for attach_entity, get_entities_overlap...
-#include "script/events.cpp"         //
 #include "script/events.hpp"         // for post_load_screen, pre_load_screen
 #include "search.hpp"                // for get_address
 #include "spawn_api.hpp"             // for pop_spawn_type_flags, push_spawn_ty...
