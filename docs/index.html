@@ -825,6 +825,9 @@
                             <a href="#get_liquid_layer" class="toc-h3 toc-link" data-title="get_liquid_layer">get_liquid_layer</a>
                           </li>
                           <li>
+                            <a href="#get_liquids_at" class="toc-h3 toc-link" data-title="get_liquids_at">get_liquids_at</a>
+                          </li>
+                          <li>
                             <a href="#get_local_prng" class="toc-h3 toc-link" data-title="get_local_prng">get_local_prng</a>
                           </li>
                           <li>
@@ -5256,6 +5259,15 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 </blockquote>
 <h4 id='int-get_liquid_layer'>int get_liquid_layer()</h4>
 <p>Get the current layer that the liquid is spawn in. Related function <a href="#set_liquid_layer">set_liquid_layer</a></p>
+<h3 id='get_liquids_at'>get_liquids_at</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_liquids_at">get_liquids_at</a></p>
+</blockquote>
+<h4 id='tuple-lt-int-int-gt-get_liquids_at-float-x-float-y-LAYER-layer'>tuple&lt;int, int&gt; get_liquids_at(float x, float y, <a href="#LAYER">LAYER</a> layer)</h4>
+<p>Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the <code>liquids.lua</code> example to know better how it works.
+Returns a pair of water and lava, in that order.
+Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
+Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.</p>
 <h3 id='get_local_prng'>get_local_prng</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_local_prng">get_local_prng</a></p>
