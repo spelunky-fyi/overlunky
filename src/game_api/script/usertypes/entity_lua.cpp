@@ -32,9 +32,9 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<Animation>(
         "Animation",
         "id",
-        &Animation::key,
+        &Animation::id,
         "first_tile",
-        &Animation::texture,
+        &Animation::first_tile,
         "num_tiles",
         &Animation::count,
         "interval",
@@ -49,13 +49,18 @@ void register_usertypes(sol::state& lua)
     entitydb_type["search_flags"] = &EntityDB::search_flags;
     entitydb_type["width"] = &EntityDB::width;
     entitydb_type["height"] = &EntityDB::height;
+    entitydb_type["draw_depth"] = &EntityDB::draw_depth;
     entitydb_type["offsetx"] = &EntityDB::default_offsetx;
     entitydb_type["offsety"] = &EntityDB::default_offsety;
     entitydb_type["hitboxx"] = &EntityDB::default_hitboxx;
     entitydb_type["hitboxy"] = &EntityDB::default_hitboxy;
-    entitydb_type["draw_depth"] = &EntityDB::draw_depth;
+    entitydb_type["default_shape"] = &EntityDB::default_shape;
+    entitydb_type["default_hitbox_enabled"] = &EntityDB::default_hitbox_enabled;
     entitydb_type["collision2_mask"] = &EntityDB::collision2_mask;
     entitydb_type["collision_mask"] = &EntityDB::collision_mask;
+    entitydb_type["default_flags"] = &EntityDB::default_flags;
+    entitydb_type["default_more_flags"] = &EntityDB::default_more_flags;
+    entitydb_type["properties_flags"] = &EntityDB::properties_flags;
     entitydb_type["friction"] = &EntityDB::friction;
     entitydb_type["elasticity"] = &EntityDB::elasticity;
     entitydb_type["weight"] = &EntityDB::weight;
@@ -68,21 +73,20 @@ void register_usertypes(sol::state& lua)
     entitydb_type["glow_green"] = &EntityDB::glow_green;
     entitydb_type["glow_blue"] = &EntityDB::glow_blue;
     entitydb_type["glow_alpha"] = &EntityDB::glow_alpha;
+    entitydb_type["texture"] = &EntityDB::texture_id;
+    entitydb_type["tilex"] = &EntityDB::tile_x;
+    entitydb_type["tiley"] = &EntityDB::tile_y;
     entitydb_type["damage"] = &EntityDB::damage;
     entitydb_type["life"] = &EntityDB::life;
     entitydb_type["sacrifice_value"] = &EntityDB::sacrifice_value;
     entitydb_type["blood_content"] = &EntityDB::blood_content;
-    entitydb_type["texture"] = &EntityDB::texture_id;
-    entitydb_type["animations"] = &EntityDB::animations;
-    entitydb_type["properties_flags"] = &EntityDB::properties_flags;
-    entitydb_type["default_flags"] = &EntityDB::default_flags;
-    entitydb_type["default_more_flags"] = &EntityDB::default_more_flags;
     entitydb_type["leaves_corpse_behind"] = &EntityDB::leaves_corpse_behind;
+    entitydb_type["description"] = &EntityDB::description;
     entitydb_type["sound_killed_by_player"] = &EntityDB::sound_killed_by_player;
     entitydb_type["sound_killed_by_other"] = &EntityDB::sound_killed_by_other;
-    entitydb_type["description"] = &EntityDB::description;
-    entitydb_type["tilex"] = &EntityDB::tile_x;
-    entitydb_type["tiley"] = &EntityDB::tile_y;
+    entitydb_type["animations"] = &EntityDB::animations;
+    entitydb_type["default_special_offsetx"] = &EntityDB::default_special_offsetx;
+    entitydb_type["default_special_offsety"] = &EntityDB::default_special_offsety;
 
     /// Some information used to render the entity, can not be changed, used in Entity
     lua.new_usertype<RenderInfo>(
@@ -91,6 +95,10 @@ void register_usertypes(sol::state& lua)
         &RenderInfo::x,
         "y",
         &RenderInfo::y,
+        "offset_x",
+        &RenderInfo::offset_x,
+        "offset_y",
+        &RenderInfo::offset_y,
         "shader",
         &RenderInfo::shader,
         "source",
@@ -114,8 +122,14 @@ void register_usertypes(sol::state& lua)
         &RenderInfo::tileh,
         "facing_left",
         &RenderInfo::flip_horizontal,
+        "angle",
+        &RenderInfo::angle1,
+        "animation_frame",
+        &RenderInfo::animation_frame,
         "render_inactive",
         &RenderInfo::render_inactive,
+        "brightness",
+        &RenderInfo::brightness,
         "texture_num",
         sol::readonly(&RenderInfo::texture_num),
         "get_entity",
@@ -125,20 +139,20 @@ void register_usertypes(sol::state& lua)
         "get_second_texture",
         [](const RenderInfo& ri) -> std::optional<TEXTURE>
         {
-            if (!ri.second_texture_name || ri.texture_num < 2)
+            if (!ri.texture_names[1] || ri.texture_num < 2)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.second_texture_name)) /**/;
+            return ::get_texture(std::string_view(*ri.texture_names[1])) /**/;
         },
         "get_third_texture",
         [](const RenderInfo& ri) -> std::optional<TEXTURE>
         {
-            if (!ri.third_texture_name || ri.texture_num < 3)
+            if (!ri.texture_names[2] || ri.texture_num < 3)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.third_texture_name)) /**/;
+            return ::get_texture(std::string_view(*ri.texture_names[2])) /**/;
         },
         "set_second_texture",
         &RenderInfo::set_second_texture,
@@ -206,17 +220,11 @@ void register_usertypes(sol::state& lua)
     // entity_type["abs_x"] = &Entity::abs_x;
     /// NoDoc
     entity_type["abs_x"] = sol::property([](Entity& e) -> float
-                                         {
-        if (e.abs_x == -FLT_MAX)
-            return e.position().x;
-        return e.abs_x; });
+                                         { return e.abs_position().x; });
     // entity_type["abs_y"] = &Entity::abs_y;
     /// NoDoc
     entity_type["abs_y"] = sol::property([](Entity& e) -> float
-                                         {
-        if (e.abs_y == -FLT_MAX)
-            return e.position().y;
-        return e.abs_y; });
+                                         { return e.abs_position().y; });
     entity_type["layer"] = &Entity::layer;
     entity_type["width"] = &Entity::w;
     entity_type["height"] = &Entity::h;
@@ -239,9 +247,18 @@ void register_usertypes(sol::state& lua)
     entity_type["overlaps_with"] = overlaps_with;
     entity_type["get_texture"] = &Entity::get_texture;
     entity_type["set_texture"] = &Entity::set_texture;
-    entity_type["set_draw_depth"] = &Entity::set_draw_depth;
+    /// optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering)
+    entity_type["set_draw_depth"] = [](Entity& ent, uint8_t draw_depth, sol::optional<uint8_t> unknown) -> void
+    { ent.set_draw_depth(draw_depth, unknown.value_or(0)); }; // for backward compatibility
+
+    entity_type["reset_draw_depth"] = &Entity::reset_draw_depth;
+    entity_type["friction"] = &Entity::friction;
     entity_type["set_enable_turning"] = &Entity::set_enable_turning;
-    entity_type["liberate_from_shop"] = &Entity::liberate_from_shop;
+
+    auto liberate_from_shop = sol::overload(&Entity::liberate_from_shop, [](Entity& ent) // for backward compatibility)
+                                            { ent.liberate_from_shop(true); });
+
+    entity_type["liberate_from_shop"] = liberate_from_shop;
     entity_type["get_held_entity"] = &Entity::get_held_entity;
     entity_type["set_layer"] = &Entity::set_layer;
     entity_type["apply_layer"] = &Entity::apply_layer;
@@ -258,9 +275,19 @@ void register_usertypes(sol::state& lua)
     entity_type["get_items"] = &Entity::get_items;
     entity_type["is_in_liquid"] = &Entity::is_in_liquid;
     entity_type["is_cursed"] = &Entity::is_cursed;
+    entity_type["is_movable"] = &Entity::is_movable;
+    entity_type["can_be_pushed"] = &Entity::can_be_pushed;
     entity_type["kill_recursive"] = kill_recursive;
     entity_type["destroy_recursive"] = destroy_recursive;
-    entity_type["update"] = &Entity::handle_state_machine;
+    entity_type["update"] = &Entity::update_state_machine;
+    entity_type["flip"] = &Entity::flip;
+    entity_type["remove_item"] = &Entity::remove_item;
+    entity_type["apply_db"] = &Entity::apply_db;
+    entity_type["get_absolute_velocity"] = &Entity::get_absolute_velocity;
+    entity_type["get_hitbox"] = &Entity::get_hitbox;
+    entity_type["attach"] = &Entity::attach;
+    entity_type["detach"] = &Entity::detach;
+
     /* Entity
     // user_data
     // You can put any arbitrary lua object here for custom entities or player stats, which is then saved across level transitions for players and carried items, mounts etc... This field is local to the script and multiple scripts can write different things in the same entity. The data is saved right before ON.PRE_LOAD_SCREEN from a level and loaded right before ON.POST_LOAD_SCREEN to a level or transition. It is not available yet in post_entity_spawn, but that is a good place to initialize it for new custom entities. See example for more.
@@ -270,11 +297,15 @@ void register_usertypes(sol::state& lua)
         &Movable::broken_damage,
         &Movable::damage);
     auto light_on_fire = sol::overload(
-        static_cast<void (Movable::*)()>(&Movable::light_on_fire_broken),
-        static_cast<void (Movable::*)(uint8_t)>(&Movable::light_on_fire));
+        [](Movable& ent)              // for backwards compatibility
+        { ent.light_on_fire(0x64); }, // kind of standard value that the game uses
+        &Movable::light_on_fire);
     auto add_money = sol::overload(
-        static_cast<void (Movable::*)(int32_t)>(&Movable::add_money_broken),
-        static_cast<void (Movable::*)(int32_t, uint32_t)>(&Movable::collect_treasure));
+        [](Movable& ent, int amount) // for backwards compatibility
+        {static const auto coin = to_id("ENT_TYPE_ITEM_GOLDCOIN"); 
+        ent.collect_treasure(amount, coin); },                         // adds a coin to the table cause the collected_money_count is expected to increase
+        &Movable::collect_treasure);
+
     auto movable_type = lua.new_usertype<Movable>("Movable", sol::base_classes, sol::bases<Entity>());
     movable_type["move"] = &Movable::move;
     movable_type["movex"] = &Movable::movex;
@@ -283,6 +314,7 @@ void register_usertypes(sol::state& lua)
     movable_type["buttons_previous"] = &Movable::buttons_previous;
     movable_type["stand_counter"] = &Movable::stand_counter;
     movable_type["jump_height_multiplier"] = &Movable::jump_height_multiplier;
+    movable_type["price"] = &Movable::price;
     movable_type["owner_uid"] = &Movable::owner_uid;
     movable_type["last_owner_uid"] = &Movable::last_owner_uid;
     movable_type["current_animation"] = &Movable::current_animation;
@@ -304,29 +336,39 @@ void register_usertypes(sol::state& lua)
     /// NoDoc
     movable_type["airtime"] = &Movable::falling_timer;
     movable_type["falling_timer"] = &Movable::falling_timer;
-    movable_type["is_poisoned"] = &Movable::is_poisoned;
-    movable_type["poison"] = &Movable::poison;
     movable_type["dark_shadow_timer"] = &Movable::onfire_effect_timer;
     movable_type["onfire_effect_timer"] = &Movable::onfire_effect_timer;
     movable_type["exit_invincibility_timer"] = &Movable::exit_invincibility_timer;
     movable_type["invincibility_frames_timer"] = &Movable::invincibility_frames_timer;
     movable_type["frozen_timer"] = &Movable::frozen_timer;
+    movable_type["is_poisoned"] = &Movable::is_poisoned;
+    movable_type["poison"] = &Movable::poison;
     movable_type["is_button_pressed"] = &Movable::is_button_pressed;
     movable_type["is_button_held"] = &Movable::is_button_held;
     movable_type["is_button_released"] = &Movable::is_button_released;
-    movable_type["price"] = &Movable::price;
     movable_type["stun"] = &Movable::stun;
-    movable_type["freeze"] = &Movable::freeze;
+
+    auto freeze = sol::overload(&Movable::freeze, [](Movable& ent, uint8_t frame_count) // for backwards compatibility
+                                { ent.freeze(frame_count, false); });
+
+    auto set_cursed = sol::overload(&Movable::set_cursed, [](Movable& ent, bool b) // for backwards compatibility
+                                    { ent.set_cursed(b, true); });
+
+    movable_type["freeze"] = freeze;
     movable_type["light_on_fire"] = light_on_fire;
-    movable_type["set_cursed"] = &Movable::set_cursed_fix;
+    movable_type["set_cursed"] = set_cursed;
     movable_type["drop"] = &Movable::drop;
     movable_type["pick_up"] = &Movable::pick_up;
-    movable_type["can_jump"] = &Movable::can_jump;
     movable_type["standing_on"] = &Movable::standing_on;
     /// NoDoc
     movable_type["add_money"] = add_money;
     movable_type["collect_treasure"] = &Movable::collect_treasure;
+    movable_type["can_jump"] = &Movable::can_jump;
     movable_type["is_on_fire"] = &Movable::is_on_fire;
+    movable_type["is_powerup_capable"] = &Movable::is_powerup_capable;
+    movable_type["can_be_picked_up_by"] = &Movable::can_be_picked_up_by;
+    movable_type["can_break_block"] = &Movable::can_break_block;
+    movable_type["break_block"] = &Movable::break_block;
     movable_type["damage"] = damage;
     movable_type["get_all_behaviors"] = &Movable::get_all_behaviors;
     movable_type["set_behavior"] = &Movable::set_behavior;
@@ -335,6 +377,13 @@ void register_usertypes(sol::state& lua)
     movable_type["reset_gravity"] = &Movable::reset_gravity;
     movable_type["set_position"] = &Movable::set_position;
     movable_type["process_input"] = &Movable::process_input;
+    movable_type["calculate_jump_velocity"] = &Movable::calculate_jump_velocity;
+    movable_type["apply_velocity"] = &Movable::apply_velocity;
+    movable_type["get_damage"] = &Movable::get_damage;
+    movable_type["attack"] = &Movable::attack;
+    movable_type["thrown_into"] = &Movable::thrown_into;
+    movable_type["get_damage_sound"] = &Movable::get_damage_sound;
+    movable_type["copy_extra_info"] = &Movable::copy_extra_info;
     movable_type["cutscene"] = sol::readonly(&Movable::cutscene_behavior);
     movable_type["clear_cutscene"] = [](Movable& movable) -> void
     {

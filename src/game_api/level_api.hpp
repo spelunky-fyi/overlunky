@@ -265,9 +265,7 @@ class ThemeInfo
     uint32_t unknown3;
     uint32_t unknown4;
 
-    virtual ~ThemeInfo()
-    {
-    }
+    virtual ~ThemeInfo(){};
 
     /// Sets the beehive and leprechaun flags
     virtual void reset_theme_flags() = 0;
@@ -326,7 +324,7 @@ class ThemeInfo
     /// Fixes textures on pleasure palace ladders, adds some decorations
     virtual void post_process_entities() = 0;
 
-    /// Adds legs under platforms, random pots, goldbars, monsters, compass indicator, random shadows...
+    /// Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...
     virtual void spawn_procedural() = 0;
 
     /// Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes
@@ -344,7 +342,7 @@ class ThemeInfo
     /// Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     virtual void spawn_players() = 0;
 
-    /// Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
+    /// Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects. Spawns beg and handles it's quest flags
     virtual void spawn_effects() = 0;
 
     /// Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))

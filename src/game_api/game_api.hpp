@@ -8,13 +8,15 @@
 
 struct Renderer
 {
+    // check x64dbg plugin for up to date structure
+
     uint32_t render_width; // same as window size unless resolution scale is set
     uint32_t render_height;
 
     uint32_t fps; // changing it doesn't seam to do anything
     uint32_t fps_denominator;
 
-    uint32_t render_width2; // repeat?
+    uint32_t render_width2; // used by the liquids to know what part(?) of screen to draw on top of the liquid (for all the transformation effects)
     uint32_t render_height2;
 
     uint8_t flags1;
@@ -27,14 +29,13 @@ struct Renderer
 
     size_t unknown38; // bool?
     float unknown39;  // not sure if actually float
-    float unknown40;
-    float unknown41;
+    float unknown40;  // some float counter
+    float brightness; // whole game brightness, can be set above 1
     uint8_t unknown42[4];
-    const char** unknown43a; // font/floor it's changing
-    const char** unknown43b; // noise0.dds
-    const char** unknown43c; // noise1.dds
-    size_t unknown44[4];     // null?
-    size_t unknown45;        // bool?
+    const char** textures_to_load[7]; // textures to load for entity
+    uint32_t texture_num;             // number of textures in use
+
+    uint32_t unknown45; // padding?
 
     // feels like two standard containers or something
     size_t* unknown46;
@@ -88,8 +89,8 @@ struct Renderer
 
     uint8_t skip3[0xAD8]; // probably some static arrays of ... stuff
 
-    size_t swap_chain;
-    // 3 more pointers, some bit fields, then 5 more pointers
+    size_t swap_chain; // unsure?
+    // a lot of stuff more, total size is 0x81138 bytes
 
     // somewhere there should be shaders stored
 

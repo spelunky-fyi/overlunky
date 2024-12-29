@@ -66,6 +66,7 @@ using IMAGE = int64_t;                        // NoAlias
 using WORLD_SHADER = uint8_t;                 // NoAlias
 using SHORT_TILE_CODE = uint8_t;
 using STRINGID = uint32_t;
+using SOUNDID = int32_t;
 using FEAT = uint8_t;
 using KEY = int64_t;    // NoAlias
 using RAW_KEY = int8_t; // NoAlias
@@ -190,3 +191,33 @@ enum class PAUSE_SCREEN : int64_t
     EXIT = 1 << 31,
 };
 ENUM_CLASS_FLAGS(PAUSE_SCREEN);
+
+enum class ENTITY_MASK : uint32_t
+{
+    PLAYER = 0x1,
+    MOUNT = 0x2,
+    MONSTER = 0x4,
+    ITEM = 0x8,
+    EXPLOSION = 0x10,
+    ROPE = 0x20,
+    FX = 0x40,
+    ACTIVEFLOOR = 0x80,
+    FLOOR = 0x100,
+    DECORATION = 0x200,
+    BG = 0x400,
+    SHADOW = 0x800,
+    LOGICAL = 0x1000,
+    WATER = 0x2000,
+    LAVA = 0x4000,
+    LIQUID = 0x6000,
+    ANY = 0x0,
+};
+ENUM_CLASS_FLAGS(ENTITY_MASK)
+
+// Returns true if any of the set bits in `mask` are in `flags`
+template <class T>
+requires std::is_enum_v<T>
+bool test_mask(T flags, T mask)
+{
+    return static_cast<std::underlying_type_t<T>>(flags & mask) != 0;
+}

@@ -7,11 +7,11 @@
 #include <memory>    // for remove_if, unique_ptr
 #include <mutex>     // for lock_guard, mutex
 
-#include "entity.hpp"             //
-#include "logger.h"               // for DEBUG
-#include "overloaded.hpp"         // for overloaded
-#include "script/lua_backend.hpp" //
-#include "search.hpp"             // for get_address
+#include "aliases.hpp"    //
+#include "entity.hpp"     //
+#include "logger.h"       // for DEBUG
+#include "overloaded.hpp" // for overloaded
+#include "search.hpp"     // for get_address
 
 #define SOL_ALL_SAFETIES_ON 1
 
@@ -871,61 +871,73 @@ bool SoundManager::set_parameter(PlayingSound playing_sound, VANILLA_SOUND_PARAM
         playing_sound.m_FmodHandle);
 }
 
-int32_t sound_name_to_id(const VANILLA_SOUND s_name)
+SOUNDID SoundManager::convert_sound_id(const VANILLA_SOUND& s_name)
 {
-    static std::vector<std::string> sound_names;
-    if (sound_names.empty())
-    {
-        auto sound_mgr = LuaBackend::get_calling_backend()->sound_manager;
-        sound_mgr->for_each_event_name(
-            [](std::string event_name)
-            {
-                sound_names.push_back(std::move(event_name));
-            });
-    }
+    for (auto& [id, event_descr] : *m_SoundData.Events)
+        if (event_descr.Name == s_name)
+            return id;
 
-    for (auto& sound : sound_names)
-    {
-        if (sound == s_name)
-        {
-            return int32_t(&sound - &sound_names[0]) + 1;
-        }
-    }
     return -1;
 }
 
-SoundMeta* play_sound_by_id(uint32_t sound_id, uint32_t source_uid)
+const VANILLA_SOUND& SoundManager::convert_sound_id(SOUNDID sound_id)
+{
+    static const VANILLA_SOUND empty{};
+    // auto event = m_SoundData.Events->find(id); // didn't work for some reason
+    // if (event == m_SoundData.Events->end())
+    //    return empty;
+    // return event->second.Name;
+    if (sound_id < 0)
+        return empty;
+
+    for (auto& [id, event_descr] : *m_SoundData.Events)
+        if (id == (uint32_t)sound_id)
+            return event_descr.Name;
+
+    return empty;
+}
+
+SoundMeta* play_sound(SOUNDID sound_id, uint32_t source_uid)
 {
     if (sound_id == -1)
         return nullptr;
 
     using play_sound = SoundMeta*(int32_t);
-    static auto play_sound_func = (play_sound*)get_address("play_sound");
+    static auto play_sound_func = (play_sound*)get_address("play_sfx");
 
     Entity* source = get_entity_ptr(source_uid);
     SoundMeta* sound_info{nullptr};
 
-    if (source_uid == ~0 || source != nullptr) // don't play the sound if the entity is not valid
+    if (source_uid == ~0 || source) // don't play the sound if the entity is not valid but allow -1
     {
         sound_info = play_sound_func(sound_id);
-        if (source != nullptr)
+        if (source && sound_info)
             source->set_as_sound_source(sound_info);
     }
     return sound_info;
 }
 
+SoundManager* g_sound_manager{nullptr};
+
 SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid)
 {
-    auto sound_id = sound_name_to_id(sound);
-    return play_sound_by_id(sound_id, source_uid);
+    if (g_sound_manager == nullptr)
+        g_sound_manager = new SoundManager(nullptr);
+
+    auto sound_id = g_sound_manager->convert_sound_id(sound);
+    return play_sound(sound_id, source_uid);
 }
 
 SoundMeta* construct_soundmeta(VANILLA_SOUND sound, bool background_sound)
 {
-    return construct_soundmeta(sound_name_to_id(sound), background_sound);
+    if (g_sound_manager == nullptr)
+        g_sound_manager = new SoundManager(nullptr);
+
+    auto sound_id = g_sound_manager->convert_sound_id(sound);
+    return construct_soundmeta(sound_id, background_sound);
 }
 
-SoundMeta* construct_soundmeta(uint32_t sound_id, bool background_sound)
+SoundMeta* construct_soundmeta(SOUNDID sound_id, bool background_sound)
 {
     using construct_soundposition_ptr_fun_t = SoundMeta*(uint32_t id, bool background_sound);
     static const auto construct_soundposition_ptr_call = (construct_soundposition_ptr_fun_t*)get_address("construct_soundmeta");

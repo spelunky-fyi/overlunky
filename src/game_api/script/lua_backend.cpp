@@ -11,31 +11,30 @@
 #include <tuple>  // for get
 #include <vector> // for vector
 
-#include "aliases.hpp"                      // for IMAGE, JournalPageType
-#include "bucket.hpp"                       // for Bucket
-#include "constants.hpp"                    // for no_return_str
-#include "entities_chars.hpp"               // for Player
-#include "entity.hpp"                       // for Entity, get_entity_ptr
-#include "handle_lua_function.hpp"          // for handle_function
-#include "items.hpp"                        // for Inventory
-#include "level_api.hpp"                    // for LevelGenData, LevelGenSy...
-#include "level_api_types.hpp"              // for LevelGenRoomData
-#include "lua_console.hpp"                  // for LuaConsole
-#include "lua_vm.hpp"                       // for acquire_lua_vm, get_lua_vm
-#include "math.hpp"                         // for AABB
-#include "movable_behavior.hpp"             // for CustomMovableBehavior
-#include "overloaded.hpp"                   // for overloaded
-#include "rpc.hpp"                          // for get_frame_count, get_pla...
-#include "screen.hpp"                       // for get_screen_ptr, Screen
-#include "script_util.hpp"                  // for InputString
-#include "sound_manager.hpp"                // for SoundManager
-#include "state.hpp"                        // for StateMemory, State, get_...
-#include "strings.hpp"                      // for clear_custom_shopitem_names
-#include "usertypes/gui_lua.hpp"            // for GuiDrawContext
-#include "usertypes/level_lua.hpp"          // for PreHandleRoomTilesContext
-#include "usertypes/save_context.hpp"       // for LoadContext, SaveContext
-#include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
-#include "window_api.hpp"                   // for get_window
+#include "aliases.hpp"                // for IMAGE, JournalPageType
+#include "bucket.hpp"                 // for Bucket
+#include "constants.hpp"              // for no_return_str
+#include "entities_chars.hpp"         // for Player
+#include "entity.hpp"                 // for Entity, get_entity_ptr
+#include "handle_lua_function.hpp"    // for handle_function
+#include "items.hpp"                  // for Inventory
+#include "level_api.hpp"              // for LevelGenData, LevelGenSy...
+#include "level_api_types.hpp"        // for LevelGenRoomData
+#include "lua_console.hpp"            // for LuaConsole
+#include "lua_vm.hpp"                 // for acquire_lua_vm, get_lua_vm
+#include "math.hpp"                   // for AABB
+#include "movable_behavior.hpp"       // for CustomMovableBehavior
+#include "overloaded.hpp"             // for overloaded
+#include "rpc.hpp"                    // for get_frame_count, get_pla...
+#include "screen.hpp"                 // for get_screen_ptr, Screen
+#include "script_util.hpp"            // for InputString
+#include "sound_manager.hpp"          // for SoundManager
+#include "state.hpp"                  // for StateMemory, State, get_...
+#include "strings.hpp"                // for clear_custom_shopitem_names
+#include "usertypes/gui_lua.hpp"      // for GuiDrawContext
+#include "usertypes/level_lua.hpp"    // for PreHandleRoomTilesContext
+#include "usertypes/save_context.hpp" // for LoadContext, SaveContext
+#include "window_api.hpp"             // for get_window
 
 std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>> g_all_backends;
 std::unordered_map<int, HotKey> g_hotkeys;

@@ -12,7 +12,7 @@ struct Illumination;
 struct ParticleEmitterInfo;
 struct SoundMeta;
 
-// Seams like all activefloors have one virtual function, but it just `return` so no reason to add it
+// Seams like all activefloors have one virtual function, but it just `return` so no reason to add it, maybe "purchasable" ?
 
 class Crushtrap : public Movable
 {

@@ -11,7 +11,7 @@ jobs:
     name: Build Docs
     runs-on: ubuntu-latest
     env:
-      ruby-version: 3.0
+      ruby-version: '3.0'
 
     steps:
     - uses: actions/checkout@v2

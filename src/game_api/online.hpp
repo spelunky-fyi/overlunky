@@ -4,16 +4,39 @@
 #include <cstdint> // for uint32_t, uint8_t, int8_t, int32_t
 #include <string>  // for string
 
+enum class GAME_MODE : uint32_t
+{
+    COOP = 1,
+    ARENA = 2
+};
+
+enum class READY_STATE : uint8_t
+{
+    NOT_READY = 0,
+    READY = 1,
+    SEARCHING = 2
+};
+
+enum class PLATFORM : uint8_t
+{
+    NONE = 16,
+    DISCORD = 17,
+    STEAM = 18,
+    XBOX = 19,
+    SWITCH = 32,
+    PLAYSTATION = 48
+};
+
 struct OnlinePlayer
 {
-    uint8_t unknown39;
+    uint8_t player_name_length;
     uint8_t padding[3];
     uint32_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
-    uint32_t unknown4;
-    uint8_t unknown5;
-    uint8_t ready_state;
+    uint64_t id;
+    GAME_MODE game_mode;
+    uint8_t unknown2;
+    READY_STATE ready_state : 2;
+    PLATFORM platform : 6;
     uint8_t character;
     char player_name[33]; // could be 32 actually?
 };
@@ -102,6 +125,7 @@ class Online
     // some more stuff
 
     virtual ~Online() = 0;
+    // 27 virtuals, destructor probably at index 7
 };
 
 Online* get_online();

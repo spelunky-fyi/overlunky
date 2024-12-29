@@ -536,12 +536,21 @@ void register_usertypes(sol::state& lua)
     /// Used in Online
     lua.new_usertype<OnlinePlayer>(
         "OnlinePlayer",
+        "game_mode",
+        sol::readonly(&OnlinePlayer::game_mode),
+        "platform",
+        sol::property([](OnlinePlayer& op) -> PLATFORM
+                      { return op.platform; }),
         "ready_state",
-        sol::readonly(&OnlinePlayer::ready_state),
+        sol::property([](OnlinePlayer& op) -> READY_STATE
+                      { return op.ready_state; }),
         "character",
         &OnlinePlayer::character,
         "player_name",
         sol::readonly(&OnlinePlayer::player_name));
+    lua.create_named_table("GAME_MODE", "COOP", GAME_MODE::COOP, "ARENA", GAME_MODE::ARENA);
+    lua.create_named_table("PLATFORM", "NONE", PLATFORM::NONE, "DISCORD", PLATFORM::DISCORD, "STEAM", PLATFORM::STEAM, "XBOX", PLATFORM::XBOX, "SWITCH", PLATFORM::SWITCH, "PLAYSTATION", PLATFORM::PLAYSTATION);
+    lua.create_named_table("READY_STATE", "NOT_READY", READY_STATE::NOT_READY, "READY", READY_STATE::READY, "SEARCHING", READY_STATE::SEARCHING);
     /// Used in Online
     lua.new_usertype<OnlineLobby>(
         "OnlineLobby",

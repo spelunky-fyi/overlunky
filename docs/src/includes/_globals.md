@@ -523,9 +523,9 @@ Use empty table as argument to reset to the game default
 
 > Search script examples for [drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop)
 
-#### nil drop(int who_uid, int what_uid)
+#### nil drop(int who_uid, optional<int> what_uid)
 
-Drop an entity by uid
+Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
 
 ### enter_door
 
@@ -572,9 +572,9 @@ Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 
 > Search script examples for [entity_remove_item](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_remove_item)
 
-#### nil entity_remove_item(int uid, int item_uid)
+#### nil entity_remove_item(int uid, int item_uid, optional<bool> check_autokill)
 
-Remove item by uid from entity
+Remove item by uid from entity. `check_autokill` defaults to true, checks if entity should be killed when missing overlay and kills it if so (can help with avoiding crashes)
 
 ### filter_entities
 
@@ -771,7 +771,7 @@ Returns [PlayerGhost](#PlayerGhost) with this player slot 1..4
 
 > Search script examples for [get_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_type)
 
-#### [EntityDB](#EntityDB) get_type(int id)
+#### [EntityDB](#EntityDB) get_type([ENT_TYPE](#ENT_TYPE) id)
 
 Get the [EntityDB](#EntityDB) behind an [ENT_TYPE](#ENT_TYPE)...
 
@@ -1537,6 +1537,18 @@ Gets the value for the specified config
 
 Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](#set_liquid_layer)
 
+### get_liquids_at
+
+
+> Search script examples for [get_liquids_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_liquids_at)
+
+#### tuple&lt;int, int&gt; get_liquids_at(float x, float y, [LAYER](#LAYER) layer)
+
+Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
+Returns a pair of water and lava, in that order.
+Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
+Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
+
 ### get_local_prng
 
 
@@ -1809,7 +1821,7 @@ Initializes some adventure run related values and loads the character select scr
 
 #### nil play_seeded(optional<int> seed)
 
-Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
+Initializes some seeded run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
 
 ### register_console_command
 
@@ -2074,7 +2086,7 @@ Sets the specified setting temporarily. These values are not saved and might res
 
 #### nil set_speedhack(optional<float> multiplier)
 
-Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
+Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see [set_frametime](#set_frametime)
 
 ### set_start_level_paused
 
@@ -2812,7 +2824,7 @@ Get interpolated render position `x, y, layer` of entity by uid. This gives smoo
 
 #### tuple&lt;float, float&gt; get_velocity(int uid)
 
-Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
+Get velocity `vx, vy` of an entity by uid. Use this to get velocity relative to the game world, (the `Entity.velocityx/velocityy` are relative to `Entity.overlay`). Only works for movable or liquid entities
 
 ### get_window_size
 
@@ -3045,7 +3057,7 @@ Change [ENT_TYPE](#ENT_TYPE)'s spawned in dice shops (Madame Tusk as well), by d
 ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
 ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}<br/>
 Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance").
-If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser).
+If you use this function in the level with dice shop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser).
 Use empty table as argument to reset to the game default
 
 ### is_inside_active_shop_room
@@ -3098,6 +3110,18 @@ Spawn a [Shopkeeper](#Shopkeeper) in the coordinates and make the room their sho
 ## Sound functions
 
 
+### convert_sound_id
+
+
+> Search script examples for [convert_sound_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=convert_sound_id)
+
+#### [VANILLA_SOUND](#VANILLA_SOUND) convert_sound_id([SOUNDID](#Aliases) id)
+
+#### [SOUNDID](#Aliases) convert_sound_id([VANILLA_SOUND](#VANILLA_SOUND) sound)
+
+Convert [SOUNDID](#Aliases) to [VANILLA_SOUND](#VANILLA_SOUND) and vice versa
+
+
 ### create_sound
 
 
@@ -3123,6 +3147,10 @@ Gets an existing sound, either if a file at the same path was already loaded or 
 
 #### [SoundMeta](#SoundMeta) play_sound([VANILLA_SOUND](#VANILLA_SOUND) sound, int source_uid)
 
+#### [SoundMeta](#SoundMeta) play_sound([SOUNDID](#Aliases) sound_id, int source_uid)
+
+Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
+Returns [SoundMeta](#SoundMeta), beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
 
 ## Spawn functions
 
@@ -3476,7 +3504,7 @@ Returns [STRINGID](#Aliases) of the new string
 
 #### nil change_string([STRINGID](#Aliases) id, string str)
 
-Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first)
 This edits custom string and in game strings but changing the language in settings will reset game strings
 
 ### clear_custom_name
@@ -3540,7 +3568,7 @@ Same as `Player.get_short_name`
 
 #### string get_string([STRINGID](#Aliases) string_id)
 
-Get string behind [STRINGID](#Aliases), don't use stringid directly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
+Get string behind [STRINGID](#Aliases), **don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first
 Will return the string of currently choosen language
 
 ### hash_to_stringid
