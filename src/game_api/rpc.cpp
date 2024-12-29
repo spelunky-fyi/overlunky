@@ -20,6 +20,7 @@
 #include <unordered_set>    // for _Uset_traits<>::allocator_type, _Use...
 #include <utility>          // for min, max, pair, find
 
+#include "aliases.hpp"
 #include "bucket.hpp"
 #include "containers/custom_vector.hpp" //
 #include "custom_types.hpp"             // for get_custom_entity_types, CUSTOM_TYPE
@@ -1382,6 +1383,24 @@ void add_entity_to_liquid_collision(uint32_t uid, bool add)
         auto key = const_cast<uint32_t*>(&it->first);
         *key = ~0u;
     }
+}
+
+std::pair<uint8_t, uint8_t> get_liquids_at(float x, float y, LAYER layer)
+{
+    uint8_t actual_layer = enum_to_layer(layer);
+    LiquidPhysics* liquid_physics = State::get().ptr()->liquid_physics;
+    // if (y > 125.5f || y < .0f || x > 85.5f || x < .0f) // Original check by the game, can result is accesing the array out of bounds
+    //     return 0;
+    if (actual_layer != get_liquid_layer() || y < .0f || x < .0f)
+        return {0, 0};
+
+    uint32_t ix = static_cast<int>((x + 0.5f) / 0.3333333f);
+    uint32_t iy = static_cast<int>((y + 0.5f) / 0.3333333f);
+    if (iy >= (g_level_max_y * 3) || ix >= (g_level_max_x * 3))
+        return {0, 0};
+
+    auto& liquids_at = (*liquid_physics->liquids_by_third_of_tile)[iy][ix];
+    return {liquids_at.water, liquids_at.lava};
 }
 
 bool disable_floor_embeds(bool disable)
