@@ -66,8 +66,7 @@ StateMemory* get_save_state(int slot)
 
 void invalidate_save_slots()
 {
-    auto online = get_online();
-    if (online->lobby.code != 0)
+    if (get_online()->is_active())
         return;
     for (int i = 1; i <= 4; ++i)
     {

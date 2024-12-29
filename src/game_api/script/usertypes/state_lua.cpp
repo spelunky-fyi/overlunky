@@ -532,7 +532,9 @@ void register_usertypes(sol::state& lua)
         "local_player",
         &Online::local_player,
         "lobby",
-        &Online::lobby);
+        &Online::lobby,
+        "is_active",
+        &Online::is_active);
     /// Used in Online
     lua.new_usertype<OnlinePlayer>(
         "OnlinePlayer",
