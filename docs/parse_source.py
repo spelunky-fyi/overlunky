@@ -1066,7 +1066,8 @@ def run_parse():
             enum_to_mod = next((item for item in enums if item["name"] == enum), dict())
             current_var_to_mod = dict()
             if enum_to_mod:
-                sub_matches = extended_enum_info.strip().split("//")
+                sub_matches = extended_enum_info.strip()
+                sub_matches = re.split('(?<!:)\s*//\s*', sub_matches)
                 collected_docs = ""
                 for sub_match in sub_matches:
                     var_name = sub_match.strip()
@@ -1093,7 +1094,8 @@ def run_parse():
             type_to_mod = next((item for item in types if item["name"] == type), dict())
             current_var_to_mod = dict()
             if type_to_mod:
-                sub_matches = extended_type_info.strip().split("//")
+                sub_matches = extended_type_info.strip()
+                sub_matches = re.split('(?<!:)\s*//\s*', sub_matches)
                 collected_docs = ""
                 for sub_match in sub_matches:
                     var_name = sub_match.strip()
