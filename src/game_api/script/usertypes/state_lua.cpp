@@ -603,16 +603,14 @@ void register_usertypes(sol::state& lua)
     lua["save_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4)
-        {
-            copy_save_slot(5, slot);
-        }
+            save_main_heap(slot);
     };
 
     /// Load level state from slot 1..4, if a save_state was made in this level.
     lua["load_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4 && get_save_state(slot))
-            copy_save_slot(slot, 5);
+            load_main_heap(slot);
     };
 
     /// Clear save state from slot 1..4.

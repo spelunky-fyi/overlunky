@@ -63,18 +63,25 @@ size_t* get_thread_heap_base(HANDLE thread)
     return (size_t*)(memory_read<uint64_t>(((uint64_t*)tib.TebBaseAddress)[11]) + 0x120);
 }
 
-size_t heap_base()
+HeapBase HeapBase::get_main()
 {
     static const auto main_thread = get_main_thread();
-    static const size_t* this_thread_heap_base_addr = get_thread_heap_base(main_thread);
+    static const uintptr_t* this_thread_heap_base_addr = get_thread_heap_base(main_thread);
     return *this_thread_heap_base_addr;
 }
 
-size_t local_heap_base()
+HeapBase HeapBase::get_local()
 {
-    thread_local const size_t* this_thread_heap_base_addr = get_thread_heap_base(GetCurrentThread());
+    thread_local const uintptr_t* this_thread_heap_base_addr = get_thread_heap_base(GetCurrentThread());
     if (this_thread_heap_base_addr == nullptr)
         return NULL;
-
     return *this_thread_heap_base_addr;
+}
+
+HeapBase HeapBase::get(uint8_t slot)
+{
+    if (slot >= MAX_SAVE_SLOTS)
+        return NULL;
+    static HeapBase* save_slots = reinterpret_cast<HeapBase*>(get_address("save_states"));
+    return *(save_slots + slot);
 }

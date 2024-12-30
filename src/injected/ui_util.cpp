@@ -886,9 +886,14 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
     ::set_adventure_seed(first, second);
 }
 
-void UI::copy_state(int from, int to)
+void UI::load_state_as_main(int from)
 {
-    ::copy_save_slot(from, to);
+    load_main_heap(from);
+}
+
+void UI::save_main_state(int to)
+{
+    save_main_heap(to);
 }
 
 StateMemory* UI::get_save_state(int slot)

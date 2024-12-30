@@ -341,9 +341,9 @@ void force_journal(uint32_t chapter, uint32_t entry)
 void toggle_journal()
 {
     auto gm = get_game_manager();
-    typedef void show_journal_func(JournalUI*, size_t);
+    typedef void show_journal_func(JournalUI*, HeapBase);
     static show_journal_func* show = (show_journal_func*)(get_address("toggle_journal"sv));
-    show(gm->journal_ui, heap_base());
+    show(gm->journal_ui, HeapBase::get_local_safe());
 }
 
 void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page)
