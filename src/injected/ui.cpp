@@ -10011,7 +10011,7 @@ std::string make_save_path(std::string_view script_path, std::string_view script
     return save_path;
 }
 
-void init_ui()
+void init_ui(ImGuiContext* ctx)
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
@@ -10029,7 +10029,7 @@ void init_ui()
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
-    register_imgui_pre_init(&imgui_pre_init);
+    imgui_pre_init(ctx);
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);

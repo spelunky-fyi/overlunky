@@ -134,7 +134,7 @@ void run()
     }
 
     auto& api = RenderAPI::get();
-    init_ui();
+    register_imgui_pre_init(&init_ui);
     init_hooks((void*)api.swap_chain());
 }
 
