@@ -146,7 +146,7 @@ Vec2 Entity::get_absolute_velocity() const
     }
     else if (is_liquid())
     {
-        auto liquid_engine = State::get().get_correct_liquid_engine(type->id);
+        auto liquid_engine = HeapBase::get().liquid_physics()->get_correct_liquid_engine(type->id);
         velocity.x = liquid_engine->entity_velocities->x;
         velocity.y = liquid_engine->entity_velocities->y;
     }

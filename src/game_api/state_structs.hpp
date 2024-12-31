@@ -927,6 +927,8 @@ struct LiquidPhysics
     uint8_t padding12b;
     uint8_t padding12c;
     uint32_t unknown13;
+
+    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE ent);
 };
 
 struct AITarget

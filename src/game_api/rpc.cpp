@@ -203,7 +203,7 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
     auto entity = get_entity_ptr(uid)->as<Liquid>();
     if (entity)
     {
-        auto liquid_engine = State::get().get_correct_liquid_engine(entity->type->id);
+        auto liquid_engine = HeapBase::get().liquid_physics()->get_correct_liquid_engine(entity->type->id);
         if (liquid_engine)
         {
             liquid_engine->entity_coordinates[*entity->liquid_id] = {x, y};
