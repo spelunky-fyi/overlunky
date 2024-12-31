@@ -343,7 +343,7 @@ void toggle_journal()
     auto gm = get_game_manager();
     typedef void show_journal_func(JournalUI*, HeapBase);
     static show_journal_func* show = (show_journal_func*)(get_address("toggle_journal"sv));
-    show(gm->journal_ui, HeapBase::get_local_safe());
+    show(gm->journal_ui, HeapBase::get());
 }
 
 void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page)
@@ -366,7 +366,7 @@ void show_journal(JOURNALUI_PAGE_SHOWN chapter, uint32_t page)
     }
 }
 
-std::optional<uint32_t> ScreenCodeInput::get_seed()
+std::optional<uint32_t> ScreenCodeInput::get_seed() const
 {
     if (code_length == 0)
         return std::nullopt;

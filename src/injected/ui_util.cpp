@@ -57,7 +57,7 @@ void UI::zoom_reset()
 }
 uint32_t UI::get_frame_count()
 {
-    return State::get().get_frame_count();
+    return HeapBase::get().frame_count();
 }
 void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 {

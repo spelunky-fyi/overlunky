@@ -397,7 +397,7 @@ class ScreenCodeInput : public Screen // ID: 8
     /// Set the seed entered in the seed dialog. Call without arguments to clear entered seed. Optionally enter a length to set partial seed.
     void set_seed(std::optional<uint32_t> seed, std::optional<uint8_t> length);
     /// Get the seed currently entered in the seed dialog or nil if nothing is entered. Will also return incomplete seeds, check seed_length to verify it's ready.
-    std::optional<uint32_t> get_seed();
+    std::optional<uint32_t> get_seed() const;
 
     virtual void unknown() = 0; // set seed? sets the game variables in state, for ScreenEnterOnlineCode it just sets the unknown10
 };

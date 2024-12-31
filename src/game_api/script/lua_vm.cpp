@@ -62,7 +62,7 @@
 #include "spawn_api.hpp"                           // for spawn_roomowner
 #include "state.hpp"                               // for State, StateMemory
 #include "strings.hpp"                             // for change_string
-#include "thread_utils.hpp"                        // for OnHeapPointer
+#include "thread_utils.hpp"                        // for OnHeapPointer, HeapBase
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
 #include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes
@@ -494,7 +494,7 @@ end
     lua["set_global_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        int now = get_frame_count();
+        int now = HeapBase::get().frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->global_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -1214,7 +1214,8 @@ end
     /// Try to unlock the exit at coordinates
     lua["unlock_door_at"] = unlock_door_at;
     /// Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
-    lua["get_frame"] = get_frame_count;
+    lua["get_frame"] = []()
+    { return HeapBase::get().frame_count(); };
     /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
     lua["get_global_frame"] = get_global_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.
@@ -2005,7 +2006,7 @@ end
     lua["save_script"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= get_frame_count() - 120)
+        if (backend->last_save <= HeapBase::get().frame_count() - 120)
         {
             backend->manual_save = true;
             return true;

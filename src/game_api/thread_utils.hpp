@@ -11,16 +11,12 @@ struct LiquidPhysics;
 
 struct HeapBase
 {
+    // get HeapBase from save slots
     static HeapBase get(uint8_t slot);
+    // get local, fallback to main if can't get local
+    static HeapBase get();
+    // use only if you know what you're doing
     static HeapBase get_main();
-    // can be NULL
-    static HeapBase get_local();
-    // fallback to main if can't get local
-    static HeapBase get_local_safe()
-    {
-        auto local = get_local();
-        return local.is_null() ? get_main() : local;
-    }
 
     bool is_null() const noexcept
     {
@@ -37,12 +33,12 @@ struct HeapBase
 
         return reinterpret_cast<StateMemory*>(ptr + GAME_OFFSET::STATE);
     }
-    size_t frame() const noexcept
+    uint32_t frame_count() const noexcept
     {
         if (is_null())
             return NULL;
 
-        return *reinterpret_cast<size_t*>(ptr + GAME_OFFSET::FRAME_COUNTER);
+        return *reinterpret_cast<uint32_t*>(ptr + GAME_OFFSET::FRAME_COUNTER);
     }
     PRNG* prng() const noexcept
     {
@@ -101,32 +97,20 @@ template <typename T>
 class OnHeapPointer
 {
   public:
-    explicit OnHeapPointer(uint64_t ptr)
+    explicit OnHeapPointer(size_t ptr)
         : ptr_(ptr){};
 
-    T* decode() const
+    T* decode() const // TODO: change to decode_main and decode
     {
         return reinterpret_cast<T*>(ptr_ + HeapBase::get_main().address());
     }
 
     T* decode_local() const
     {
-        auto lhb = HeapBase::get_local();
-        if (lhb.is_null())
-            return nullptr;
-
-        return reinterpret_cast<T*>(ptr_ + lhb.address());
-    }
-
-    T* decode_local_safe() const
-    {
-        auto lhb = HeapBase::get_local();
-        if (lhb.is_null())
-            lhb = HeapBase::get_main();
-
+        auto lhb = HeapBase::get();
         return reinterpret_cast<T*>(ptr_ + lhb.address());
     }
 
   private:
-    uint64_t ptr_;
+    size_t ptr_;
 };

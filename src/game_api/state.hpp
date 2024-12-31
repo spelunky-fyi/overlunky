@@ -384,11 +384,7 @@ struct State
         ptr()->pause = p;
     }
 
-    uint32_t get_frame_count_main() const;
-    uint32_t get_frame_count() const;
     static uint32_t get_frame_count(StateMemory* state);
-
-    std::vector<int64_t> read_prng() const;
 
     static Entity* find(StateMemory* state, uint32_t uid);
 
