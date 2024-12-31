@@ -25,7 +25,7 @@
 #include "math.hpp"                   // for AABB
 #include "movable_behavior.hpp"       // for CustomMovableBehavior
 #include "overloaded.hpp"             // for overloaded
-#include "rpc.hpp"                    // for get_frame_count, get_pla...
+#include "rpc.hpp"                    // for set_level_string
 #include "screen.hpp"                 // for get_screen_ptr, Screen
 #include "script_util.hpp"            // for InputString
 #include "sound_manager.hpp"          // for SoundManager
@@ -43,16 +43,13 @@ int g_hotkey_count = 0;
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
 {
-    g_state = State::get().ptr_local();
-    if (g_state == nullptr)
-    {
-        g_state = State::get().ptr_main();
-    }
+    auto heap = HeapBase::get();
+    g_state = heap.state();
     ScriptState& state = local_state_datas[g_state].state;
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
-    state.time_global = State::get_frame_count(g_state);
+    state.time_global = heap.frame_count();
     state.frame = state.frame;
     state.loading = g_state->loading;
     state.reset = (g_state->quest_flags & 1);
@@ -564,11 +561,12 @@ bool LuaBackend::update()
             clear_current_callback();
         }
 
+        auto local_frame = HeapBase::get().frame_count();
         script_state.screen = state->screen;
         script_state.time_level = state->time_level;
         script_state.time_total = state->time_total;
-        script_state.time_global = get_frame_count();
-        script_state.frame = get_frame_count();
+        script_state.time_global = local_frame;
+        script_state.frame = local_frame;
         script_state.loading = state->loading;
         script_state.reset = (state->quest_flags & 1);
         script_state.quest_flags = state->quest_flags;
@@ -576,7 +574,7 @@ bool LuaBackend::update()
         if (manual_save)
         {
             manual_save = false;
-            last_save = get_frame_count();
+            last_save = local_frame;
         }
     }
     catch (const sol::error& e)
@@ -613,7 +611,7 @@ void LuaBackend::draw(ImDrawList* dl)
             if (is_callback_cleared(id))
                 continue;
 
-            auto now = get_frame_count();
+            auto now = HeapBase::get().frame_count();
             if (callback.screen == ON::GUIFRAME)
             {
                 set_current_callback(-1, id, CallbackType::Normal);
@@ -637,7 +635,7 @@ void LuaBackend::draw(ImDrawList* dl)
                 g_hotkeys[callback.hotkeyid].active = !(ImGui::GetIO().WantCaptureKeyboard || bucket->io->WantCaptureKeyboard.value_or(false));
             }
 
-            auto now = get_frame_count();
+            auto now = HeapBase::get().frame_count();
             while (callback.queue > 0)
             {
                 set_current_callback(-1, id, CallbackType::HotKey);
@@ -785,7 +783,7 @@ void LuaBackend::pre_load_level_files()
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -806,7 +804,7 @@ bool LuaBackend::pre_init_level()
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -830,7 +828,7 @@ bool LuaBackend::pre_init_layer(LAYER layer)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -854,7 +852,7 @@ bool LuaBackend::pre_load_screen()
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen_next <= ON::LEVEL && (ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
@@ -955,7 +953,7 @@ bool LuaBackend::pre_unload_level()
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -980,7 +978,7 @@ bool LuaBackend::pre_unload_layer(LAYER layer)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1006,7 +1004,7 @@ void LuaBackend::post_room_generation()
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1076,7 +1074,7 @@ void LuaBackend::post_level_generation()
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     auto state_ptr = State::get().ptr();
     if ((ON)state_ptr->screen == ON::LEVEL)
@@ -1104,7 +1102,7 @@ void LuaBackend::post_init_layer(LAYER layer)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1131,7 +1129,7 @@ void LuaBackend::post_load_screen()
         load_user_data();
     }
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1152,7 +1150,7 @@ void LuaBackend::post_unload_layer(LAYER layer)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1174,7 +1172,7 @@ void LuaBackend::on_death_message(STRINGID stringid)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1196,7 +1194,7 @@ std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_
     if (!get_enabled())
         return std::string{};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1222,7 +1220,7 @@ LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenR
     if (!get_enabled())
         return {false, std::nullopt};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     PreHandleRoomTilesContext ctx{room_data};
 
@@ -1331,7 +1329,7 @@ bool LuaBackend::process_vanilla_render_callbacks(ON event)
     // used in infinite loop detection to see if game is hanging because a script is hanging
     frame_counter++;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1356,7 +1354,7 @@ bool LuaBackend::process_vanilla_render_blur_callbacks(ON event, float blur_amou
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1381,7 +1379,7 @@ bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1406,7 +1404,7 @@ bool LuaBackend::process_vanilla_render_layer_callbacks(ON event, uint8_t layer)
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1431,7 +1429,7 @@ bool LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     render_ctx.bounding_box = bbox;
     for (auto& [id, callback] : callbacks)
@@ -1457,7 +1455,7 @@ bool LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1481,7 +1479,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
     if (!get_enabled())
         return std::u16string{no_return_str};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     std::optional<std::u16string> return_value = std::nullopt;
 
@@ -1512,7 +1510,7 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
     if (!get_enabled())
         return std::u16string{no_return_str};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     std::optional<std::u16string> return_value = std::nullopt;
 
@@ -1543,7 +1541,7 @@ bool LuaBackend::pre_load_journal_chapter(uint8_t chapter)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1571,7 +1569,7 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
     if (!get_enabled())
         return {};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     std::vector<uint32_t> new_pages;
     for (auto& [id, callback] : callbacks)
     {
@@ -1608,7 +1606,7 @@ std::optional<bool> LuaBackend::pre_get_feat(FEAT feat)
     if (!get_enabled())
         return std::nullopt;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1636,7 +1634,7 @@ bool LuaBackend::pre_set_feat(FEAT feat)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1810,7 +1808,7 @@ void LuaBackend::on_set_user_data(Entity* ent)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1832,7 +1830,7 @@ bool LuaBackend::on_pre(ON event)
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1855,7 +1853,7 @@ void LuaBackend::on_post(ON event)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1928,7 +1926,7 @@ void LuaBackend::pre_copy_state(StateMemory* from, StateMemory* to)
         return;
 
     copy_locals(from, to);
-    // auto now = get_frame_count();
+    // auto now = HeapBase::get().frame_count();
     // for (auto& [id, callback] : callbacks)
     // {
     //     if (is_callback_cleared(id))
@@ -1948,7 +1946,7 @@ bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1974,7 +1972,7 @@ bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -2000,7 +1998,7 @@ void LuaBackend::post_save_state(int slot, StateMemory* saved)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -2022,7 +2020,7 @@ void LuaBackend::post_load_state(int slot, StateMemory* loaded)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {

@@ -200,7 +200,7 @@ struct ScreenCallback
 {
     sol::function func;
     ON screen;
-    int lastRan;
+    int lastRan; // TODO should probably be uint32_t ?
 };
 
 struct LevelGenCallback
@@ -338,7 +338,7 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
-    std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
+    std::unordered_map<StateMemory*, LocalStateData> local_state_datas; // TODO: change key from StateMemory* to HeapBase
     bool manual_save{false};
     uint32_t last_save{0};
 

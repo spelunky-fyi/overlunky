@@ -1,5 +1,7 @@
 #pragma once
 
+#include "thread_utils.hpp"
+
 struct StateMemory;
 
 class SaveState
@@ -22,13 +24,16 @@ class SaveState
     void save();
 
     /// Delete the SaveState and free the memory. The SaveState can't be used after this.
-    void clear();
+    void clear()
+    {
+        base.free();
+    }
 
   private:
-    size_t addr;
+    HeapBase base;
 };
 
-void copy_save_slot(int from, int to);
-void copy_state(size_t fromBaseState, size_t toBaseState);
+void save_main_heap(int slot_to);
+void load_main_heap(int slot_from);
 StateMemory* get_save_state(int slot);
 void invalidate_save_slots();

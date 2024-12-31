@@ -49,32 +49,32 @@ bool get_forward_events()
 
 StateMemory* get_state_ptr()
 {
-    return State::get().ptr();
+    return HeapBase::get().state();
 }
 void fix_liquid_out_of_bounds()
 {
-    auto state = State::get().ptr();
-    if (!state || !state->liquid_physics)
+    auto state = HeapBase::get().state();
+    if (!state->liquid_physics)
         return;
 
     for (const auto& it : state->liquid_physics->pools)
     {
-        if (it.physics_engine && !it.physics_engine->pause_physics)
-        {
-            for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
-            {
-                auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
-                if (liquid_coordinates->y < 0                      // y < 0
-                    || liquid_coordinates->x < 0                   // x < 0
-                    || liquid_coordinates->x > g_level_max_x       // x > g_level_max_x
-                    || liquid_coordinates->y > g_level_max_y + 16) // y > g_level_max_y
-                {
-                    if (!*(it.physics_engine->unknown61 + i)) // just some bs
-                        continue;
+        if (it.physics_engine == nullptr || it.physics_engine->pause_physics)
+            continue;
 
-                    const auto ent = **(it.physics_engine->unknown61 + i);
-                    ent->kill(true, nullptr);
-                }
+        for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
+        {
+            auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
+            if (liquid_coordinates->y < 0                      // y < 0
+                || liquid_coordinates->x < 0                   // x < 0
+                || liquid_coordinates->x > g_level_max_x       // x > g_level_max_x
+                || liquid_coordinates->y > g_level_max_y + 16) // y > g_level_max_y
+            {
+                if (!*(it.physics_engine->unknown61 + i)) // just some bs
+                    continue;
+
+                const auto ent = **(it.physics_engine->unknown61 + i);
+                ent->kill(true, nullptr);
             }
         }
     }
@@ -618,14 +618,6 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type) cons
     return nullptr;
 }
 
-uint32_t State::get_frame_count_main() const
-{
-    return memory_read<uint32_t>((size_t)ptr_main() - 0xd0);
-}
-uint32_t State::get_frame_count() const
-{
-    return memory_read<uint32_t>((size_t)ptr() - 0xd0);
-}
 uint32_t State::get_frame_count(StateMemory* state)
 {
     return memory_read<uint32_t>((size_t)state - 0xd0);
@@ -638,16 +630,6 @@ int64_t get_global_update_count()
 {
     return global_update_count;
 };
-
-std::vector<int64_t> State::read_prng() const
-{
-    std::vector<int64_t> prng;
-    for (int i = 0; i < 20; ++i)
-    {
-        prng.push_back(memory_read<int64_t>((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
-    }
-    return prng;
-}
 
 using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
@@ -792,10 +774,10 @@ void GameLoop(void* a, float b, void* c)
 {
     static const auto bucket = Bucket::get();
     static const auto pa = bucket->pause_api;
-    auto& state = State::get();
+    auto frame_main = HeapBase::get_main().frame_count();
 
-    if (global_frame_count < state.get_frame_count_main())
-        global_frame_count = state.get_frame_count_main();
+    if (global_frame_count < frame_main)
+        global_frame_count = frame_main;
     else
         global_frame_count++;
 
@@ -860,7 +842,7 @@ uint8_t enum_to_layer(const LAYER layer, Vec2& player_position)
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
@@ -881,7 +863,7 @@ uint8_t enum_to_layer(const LAYER layer)
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {

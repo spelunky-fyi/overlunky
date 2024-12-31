@@ -57,7 +57,7 @@ void UI::zoom_reset()
 }
 uint32_t UI::get_frame_count()
 {
-    return State::get().get_frame_count();
+    return HeapBase::get().frame_count();
 }
 void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 {
@@ -886,9 +886,14 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
     ::set_adventure_seed(first, second);
 }
 
-void UI::copy_state(int from, int to)
+void UI::load_state_as_main(int from)
 {
-    ::copy_save_slot(from, to);
+    load_main_heap(from);
+}
+
+void UI::save_main_state(int to)
+{
+    save_main_heap(to);
 }
 
 StateMemory* UI::get_save_state(int slot)

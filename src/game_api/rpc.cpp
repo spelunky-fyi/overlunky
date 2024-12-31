@@ -42,6 +42,7 @@
 #include "movable.hpp"                  // for Movable
 #include "online.hpp"                   // for Online
 #include "particles.hpp"                // for ParticleEmitterInfo
+#include "prng.hpp"                     // for PRNG
 #include "screen.hpp"                   //
 #include "search.hpp"                   // for get_address, find_inst
 #include "state.hpp"                    // for State, get_state_ptr, enum_to_layer
@@ -407,17 +408,6 @@ void unlock_door_at(float x, float y)
     }
 }
 
-uint32_t get_frame_count_main()
-{
-    auto& state = State::get();
-    return state.get_frame_count_main();
-}
-uint32_t get_frame_count()
-{
-    auto& state = State::get();
-    return state.get_frame_count();
-}
-
 void carry(uint32_t mount_uid, uint32_t rider_uid)
 {
     auto mount = get_entity_ptr(mount_uid)->as<Mount>();
@@ -580,8 +570,11 @@ void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscap
 
 std::vector<int64_t> read_prng()
 {
-    auto& state = State::get();
-    return state.read_prng();
+    std::vector<int64_t> prng_raw;
+    prng_raw.resize(20);
+    auto prng = reinterpret_cast<int64_t*>(HeapBase::get().prng());
+    std::memcpy(prng_raw.data(), prng, sizeof(int64_t) * 20);
+    return prng_raw;
 }
 
 void pick_up(uint32_t who_uid, uint32_t what_uid)

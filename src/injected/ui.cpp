@@ -2821,7 +2821,7 @@ void load_state(int slot)
         g_state->camera->focus_offset_y = 0;
         set_camera_bounds(true);
     }
-    UI::copy_state(slot, 5);
+    UI::load_state_as_main(slot);
 }
 
 void clear_script_messages()
@@ -3556,19 +3556,19 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("save_state_1", wParam))
     {
-        UI::copy_state(5, 1);
+        UI::save_main_state(1);
     }
     else if (pressed("save_state_2", wParam))
     {
-        UI::copy_state(5, 2);
+        UI::save_main_state(2);
     }
     else if (pressed("save_state_3", wParam))
     {
-        UI::copy_state(5, 3);
+        UI::save_main_state(3);
     }
     else if (pressed("save_state_4", wParam))
     {
-        UI::copy_state(5, 4);
+        UI::save_main_state(4);
     }
     else if (pressed("load_state_1", wParam))
     {
@@ -8520,7 +8520,7 @@ void render_game_props()
         for (int i = 1; i <= 4; ++i)
         {
             if (ImGui::Button(fmt::format(" {} ##SaveState{}", i, i).c_str()))
-                UI::copy_state(5, i);
+                UI::save_main_state(i);
             tooltip("Save current level state", fmt::format("save_state_{}", i).c_str());
             ImGui::SameLine();
         }
@@ -10011,7 +10011,7 @@ std::string make_save_path(std::string_view script_path, std::string_view script
     return save_path;
 }
 
-void init_ui()
+void init_ui(ImGuiContext* ctx)
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
@@ -10029,7 +10029,7 @@ void init_ui()
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
-    register_imgui_pre_init(&imgui_pre_init);
+    imgui_pre_init(ctx);
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);

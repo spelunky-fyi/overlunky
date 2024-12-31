@@ -8,6 +8,8 @@
 #include "logger.h"   // for DEBUG
 #include "memory.hpp" // for memory_read
 
+constexpr size_t TEB_OFFSET = 0x120;
+
 HANDLE get_main_thread()
 {
     static const auto main_thread = []
@@ -60,21 +62,28 @@ size_t* get_thread_heap_base(HANDLE thread)
         OUT PULONG ReturnLength OPTIONAL);
     static const auto NtQueryInformationThread_ptr = reinterpret_cast<FuncPtr>(GetProcAddress(GetModuleHandle("ntdll.dll"), "NtQueryInformationThread"));
     NtQueryInformationThread_ptr(thread, (_THREADINFOCLASS)0, (&tib), sizeof(THREAD_BASIC_INFORMATION), nullptr);
-    return (size_t*)(memory_read<uint64_t>(((uint64_t*)tib.TebBaseAddress)[11]) + 0x120);
+    return (size_t*)(memory_read<uint64_t>(((uint64_t*)tib.TebBaseAddress)[11]) + TEB_OFFSET);
 }
 
-size_t heap_base()
+HeapBase HeapBase::get_main()
 {
     static const auto main_thread = get_main_thread();
-    static const size_t* this_thread_heap_base_addr = get_thread_heap_base(main_thread);
+    static const uintptr_t* this_thread_heap_base_addr = get_thread_heap_base(main_thread);
     return *this_thread_heap_base_addr;
 }
 
-size_t local_heap_base()
+HeapBase HeapBase::get()
 {
-    thread_local const size_t* this_thread_heap_base_addr = get_thread_heap_base(GetCurrentThread());
-    if (this_thread_heap_base_addr == nullptr)
-        return NULL;
-
+    thread_local const uintptr_t* this_thread_heap_base_addr = get_thread_heap_base(GetCurrentThread());
+    if (this_thread_heap_base_addr == nullptr || *this_thread_heap_base_addr == NULL) // keeping for now just to be sure
+        return get_main();
     return *this_thread_heap_base_addr;
+}
+
+HeapBase HeapBase::get(uint8_t slot)
+{
+    if (slot >= MAX_SAVE_SLOTS)
+        return NULL;
+    static HeapBase* save_slots = reinterpret_cast<HeapBase*>(get_address("save_states"));
+    return *(save_slots + slot);
 }
