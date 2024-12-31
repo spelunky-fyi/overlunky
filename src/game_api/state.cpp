@@ -91,7 +91,7 @@ inline bool& get_do_hooks()
     static bool do_hooks{true};
     return do_hooks;
 }
-void State::set_do_hooks(bool do_hooks)
+void API::set_do_hooks(bool do_hooks)
 {
     if (get_is_init())
     {
@@ -112,7 +112,7 @@ bool& get_write_load_opt()
     static bool allowed{true};
     return allowed;
 }
-void State::set_write_load_opt(bool write_load_opt)
+void API::set_write_load_opt(bool write_load_opt)
 {
     if (get_is_init())
     {
@@ -258,38 +258,19 @@ struct ThemeHookImpl
     }
 };
 
-void State::init(class SoundManager* sound_manager)
+void API::init(SoundManager* sound_manager)
 {
-    State::get();
-    if (sound_manager)
-        get_lua_vm(sound_manager);
-}
-void State::post_init()
-{
-    if (get_is_init())
-    {
-        StateMemory& state{*State::get().ptr_main()};
-        state.level_gen->hook_themes(ThemeHookImpl{});
-    }
-}
-
-State& State::get()
-{
-    static State STATE{0x4A0};
     if (!get_is_init())
     {
+        get_is_init() = true;
         if (get_write_load_opt())
         {
             do_write_load_opt();
         }
-        if (auto addr_location = get_address("state_location"); addr_location != 0)
-            STATE.location = addr_location;
-
-        get_is_init() = true;
 
         if (get_do_hooks())
         {
-            STATE.ptr_main()->level_gen->init();
+            HeapBase::get_main().level_gen()->init();
             init_spawn_hooks();
             init_behavior_hooks();
             init_render_api_hooks();
@@ -305,6 +286,8 @@ State& State::get()
             bucket->count++;
             if (!bucket->patches_applied)
             {
+                bucket->patches_applied = true;
+                bucket->forward_blocked_events = true;
                 DEBUG("Applying patches");
                 patch_tiamat_kill_crash();
                 patch_orbs_limit();
@@ -312,8 +295,6 @@ State& State::get()
                 patch_liquid_OOB();
                 patch_ushabti_error();
                 patch_entering_closed_door_crash();
-                bucket->patches_applied = true;
-                bucket->forward_blocked_events = true;
             }
             else
             {
@@ -323,12 +304,28 @@ State& State::get()
             }
         }
     }
-    return STATE;
+
+    if (sound_manager)
+        get_lua_vm(sound_manager);
+}
+void API::post_init()
+{
+    if (get_is_init())
+    {
+        StateMemory& state{*State::get().ptr_main()};
+        state.level_gen->hook_themes(ThemeHookImpl{});
+    }
+}
+
+State& State::get()
+{
+    static State s{0x4A0};
+    return s;
 }
 
 StateMemory* State::ptr_main() const
 {
-    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
+    OnHeapPointer<StateMemory> p(location);
     return p.decode();
 }
 
@@ -339,7 +336,7 @@ StateMemory* State::ptr() const
 
 StateMemory* State::ptr_local() const
 {
-    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
+    OnHeapPointer<StateMemory> p(location);
     return p.decode_local();
 }
 

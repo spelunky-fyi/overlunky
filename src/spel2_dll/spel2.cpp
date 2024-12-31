@@ -22,19 +22,19 @@ SpelunkyConsole* g_Console{nullptr};
 
 void Spelunky_SetDoHooks(bool do_hooks)
 {
-    State::set_do_hooks(do_hooks);
+    API::set_do_hooks(do_hooks);
 }
 void Spelunky_SetWriteLoadOptimization(bool write_load_opt)
 {
-    State::set_write_load_opt(write_load_opt);
+    API::set_write_load_opt(write_load_opt);
 }
 void Spelunky_InitState()
 {
-    State::init();
+    API::init();
 }
 void Spelunky_PostInitState()
 {
-    State::post_init();
+    API::post_init();
 }
 
 void Spelunky_RegisterApplicationVersion(const char* version)
@@ -453,11 +453,6 @@ void Spelunky_DrawText(const char* text, float x, float y, float scale_x, float 
 void Spelunky_EnabledAdvancedHud()
 {
     RenderAPI::get().set_advanced_hud();
-}
-
-void Spelunky_UpdateLiquidOutOfBoundsBugfix()
-{
-    fix_liquid_out_of_bounds();
 }
 
 void Spelunky_ReloadShaders()

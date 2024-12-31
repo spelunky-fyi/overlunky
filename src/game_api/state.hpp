@@ -29,6 +29,7 @@ class ScreenScores;
 class ScreenTeamSelect;
 class ScreenTransition;
 class ScreenWin;
+class SoundManager;
 struct ParticleEmitterInfo;
 
 const float ZF = 0.737f;
@@ -334,13 +335,6 @@ StateMemory* get_state_ptr();
 
 struct State
 {
-    static void set_do_hooks(bool do_hooks);
-
-    static void set_write_load_opt(bool allow);
-
-    static void init(class SoundManager* sound_manager = nullptr);
-    static void post_init();
-
     static State& get();
 
     // Returns the main-thread version of StateMemory*
@@ -397,7 +391,7 @@ struct State
     // Get the 0x4A0 offset
     size_t get_offset() const
     {
-        return memory_read<size_t>(location);
+        return location;
     }
 
   private:
@@ -408,6 +402,15 @@ struct State
     State(const State&) = delete;
     State& operator=(const State&) = delete;
 };
+
+namespace API
+{
+void init(SoundManager* sound_manager = nullptr);
+void post_init();
+void set_do_hooks(bool do_hooks);
+void set_write_load_opt(bool allow);
+} // namespace API
+
 void init_state_update_hook();
 void init_process_input_hook();
 void init_game_loop_hook();

@@ -10015,8 +10015,8 @@ void init_ui(ImGuiContext* ctx)
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    State::init(g_SoundManager.get());
-    State::post_init();
+    API::init(g_SoundManager.get());
+    API::post_init();
 
     g_state = State::get().ptr_main();
     g_save = UI::savedata();

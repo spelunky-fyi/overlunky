@@ -541,17 +541,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    {
-        "state_location"sv,
-        // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
-        PatternCommandBuffer{}
-            .find_inst("\x49\x0F\x44\xC0"sv)
-            .find_next_inst("\x49\x0F\x44\xC0"sv)
-            .offset(-0x19)
-            .find_inst("\x48\x8B"sv)
-            .decode_pc()
-            .at_exe(),
-    },
+    //{
+    //    "state_location"sv,
+    //    // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x49\x0F\x44\xC0"sv)
+    //        .find_next_inst("\x49\x0F\x44\xC0"sv)
+    //        .offset(-0x19)
+    //        .find_inst("\x48\x8B"sv)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
     {
         "game_manager"sv,
         PatternCommandBuffer{}
