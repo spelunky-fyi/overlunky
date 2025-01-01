@@ -1087,6 +1087,7 @@ function add_item_to_shop(item_uid, shop_owner_uid) end
 ---@return nil
 function change_poison_timer(frames) end
 ---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---Warning: this is only valid for current level!
 ---@param pos Vec2
 ---@param color Color
 ---@param type LIGHT_TYPE
@@ -1097,6 +1098,7 @@ function change_poison_timer(frames) end
 ---@return Illumination
 function create_illumination(pos, color, type, size, flags, uid, layer) end
 ---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---Warning: this is only valid for current level!
 ---@param color Color
 ---@param size number
 ---@param x number
@@ -1104,6 +1106,7 @@ function create_illumination(pos, color, type, size, flags, uid, layer) end
 ---@return Illumination
 function create_illumination(color, size, x, y) end
 ---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---Warning: this is only valid for current level!
 ---@param color Color
 ---@param size number
 ---@param uid integer
