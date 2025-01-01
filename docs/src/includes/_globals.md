@@ -2281,7 +2281,7 @@ Creates a new [Illumination](#Illumination). Don't forget to continuously call [
 
 #### nil refresh_illumination([Illumination](#Illumination) illumination)
 
-Refreshes an [Illumination](#Illumination), keeps it from fading out (updates the timer, keeping it in sync with the game render)
+Refreshes an [Illumination](#Illumination), keeps it from fading out, short for `illumination.timer = get_frame()`
 
 ## Message functions
 

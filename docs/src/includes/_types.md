@@ -1830,6 +1830,7 @@ Type | Name | Description
 array&lt;[OnlinePlayer](#OnlinePlayer), 4&gt; | [online_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) | 
 [OnlinePlayer](#OnlinePlayer) | [local_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=local_player) | 
 [OnlineLobby](#OnlineLobby) | [lobby](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lobby) | 
+bool | [is_active()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_active) | 
 
 ### OnlineLobby
 

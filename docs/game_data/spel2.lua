@@ -1109,7 +1109,7 @@ function create_illumination(color, size, x, y) end
 ---@param uid integer
 ---@return Illumination
 function create_illumination(color, size, uid) end
----Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
+---Refreshes an Illumination, keeps it from fading out, short for `illumination.timer = get_frame()`
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
@@ -2307,6 +2307,7 @@ do
     ---@field online_players OnlinePlayer[] @size: 4
     ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
+    ---@field is_active fun(self): boolean
 
 ---@class OnlinePlayer
     ---@field game_mode GAME_MODE

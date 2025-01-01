@@ -1214,7 +1214,7 @@ end
     /// Try to unlock the exit at coordinates
     lua["unlock_door_at"] = unlock_door_at;
     /// Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
-    lua["get_frame"] = []()
+    lua["get_frame"] = []() -> uint32_t
     { return HeapBase::get().frame_count(); };
     /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
     lua["get_global_frame"] = get_global_frame_count;
@@ -1851,7 +1851,7 @@ end
         static_cast<Illumination* (*)(Vec2, Color, LIGHT_TYPE, float, uint8_t, int32_t, LAYER)>(::create_illumination));
     /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
     lua["create_illumination"] = create_illumination;
-    /// Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
+    /// Refreshes an Illumination, keeps it from fading out, short for `illumination.timer = get_frame()`
     lua["refresh_illumination"] = refresh_illumination;
 
     /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.

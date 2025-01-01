@@ -1346,14 +1346,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    {
-        "refresh_illumination_heap_offset"sv,
-        // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
+    //{
+    //    "refresh_illumination_heap_offset"sv,
+    //    // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
     {
         "ghost_spawn_time"sv,
         // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
