@@ -2569,10 +2569,10 @@ function PRNG:random(min, max) end
     ---@field uid integer @Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     ---@field animation_frame integer @Number (id) of the sprite in the texture
     ---@field draw_depth integer @Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
-    ---@field x number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-    ---@field y number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-    ---@field abs_x number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
-    ---@field abs_y number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    ---@field x number @Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+    ---@field y number @Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+    ---@field abs_x number @Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
+    ---@field abs_y number @Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
     ---@field layer integer @Use `set_layer` to change
     ---@field width number @Width of the sprite
     ---@field height number @Height of the sprite
@@ -2620,6 +2620,7 @@ function PRNG:random(min, max) end
     ---@field remove_item fun(self, entity: Entity, autokill_check: boolean): nil @Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
     ---@field apply_db fun(self): nil @Applies changes made in `entity.type`
     ---@field get_absolute_velocity fun(self): Vec2 @Get's the velocity relative to the game world, only for movable or liquid entities
+    ---@field get_absolute_position fun(self): Vec2 @Get the absolute position of an entity in the game world
     ---@field get_hitbox fun(self, use_render_pos: boolean?): AABB @`use_render_pos` default is `false`
     ---@field attach fun(self, new_overlay: Entity): nil @Attach to other entity (at the current relative position to it)
     ---@field detach fun(self, check_autokill: boolean?): nil @Detach from overlay

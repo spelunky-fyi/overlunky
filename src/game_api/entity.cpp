@@ -105,8 +105,8 @@ void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
 
 Vec2 Entity::abs_position() const
 {
-    if (abs_x != -FLT_MAX && abs_y != -FLT_MAX) // shortcut, if available
-        return {abs_x, abs_y};
+    // if (abs_x != -FLT_MAX && abs_y != -FLT_MAX) // shortcut, if available
+    //     return {abs_x, abs_y}; // using abs_x/y may have some issues https://github.com/spelunky-fyi/overlunky/issues/408
 
     auto [x_pos, y_pos] = position_self();
 
