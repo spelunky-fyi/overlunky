@@ -495,7 +495,7 @@ void register_usertypes(sol::state& lua)
     // Various types, all `Entity`
     // BG
     // All MIDBG* entities and most of the BG_* entities
-    // does not include: a lot .. check [default_flags_more_flags.txt](internal/entity.type.default_flags_more_flags.txt) for full list
+    // does not include: a lot .. check `1024` in [search_flags](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/search_flags.json) for full list of included entities
     // Also includes: DECORATION_PALACE_PORTRAIT
     // Various types, all `Entity`
     // SHADOW

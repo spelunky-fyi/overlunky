@@ -1014,7 +1014,7 @@ def run_parse():
             if c:
                 comment.append(c.group(1))
 
-    print_collecting_info("enums")
+    print_collecting_info("enums") # TODO: should probably improve how this handles comments
     for file in api_files:
         data = open(file, "r").read()
         data = data.replace("\n", "")
@@ -1023,7 +1023,7 @@ def run_parse():
         for type in m:
             name = type[0]
             attr = type[1]
-            attr = attr.replace("//", "")
+            attr = attr.replace("//,", ",")
             attr = attr.replace('",', ",")
             attr = attr.split('"')
             vars = []
@@ -1067,7 +1067,8 @@ def run_parse():
             enum_to_mod = next((item for item in enums if item["name"] == enum), dict())
             current_var_to_mod = dict()
             if enum_to_mod:
-                sub_matches = extended_enum_info.strip().split("//")
+                sub_matches = extended_enum_info.strip()
+                sub_matches = re.split('(?<!:)\s*//\s*', sub_matches)
                 collected_docs = ""
                 for sub_match in sub_matches:
                     var_name = sub_match.strip()
@@ -1094,7 +1095,8 @@ def run_parse():
             type_to_mod = next((item for item in types if item["name"] == type), dict())
             current_var_to_mod = dict()
             if type_to_mod:
-                sub_matches = extended_type_info.strip().split("//")
+                sub_matches = extended_type_info.strip()
+                sub_matches = re.split('(?<!:)\s*//\s*', sub_matches)
                 collected_docs = ""
                 for sub_match in sub_matches:
                     var_name = sub_match.strip()

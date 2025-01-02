@@ -869,6 +869,7 @@ Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
 
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop([DROP](#DROP).VAN_HORSING_DIAMOND, [ENT_TYPE](#ENT_TYPE).ITEM_PLASMACANNON))
 Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
+Check all the available drops [here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp)
 
 ### set_boss_door_control_enabled
 
