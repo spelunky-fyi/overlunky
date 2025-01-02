@@ -4819,7 +4819,8 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 </blockquote>
 <h4 id='nil-replace_drop-int-drop_id-ENT_TYPE-new_drop_entity_type'>nil replace_drop(int drop_id, <a href="#ENT_TYPE">ENT_TYPE</a> new_drop_entity_type)</h4>
 <p>Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(<a href="#DROP">DROP</a>.VAN_HORSING_DIAMOND, <a href="#ENT_TYPE">ENT_TYPE</a>.ITEM_PLASMACANNON))
-Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as drop_id to reset all to default</p>
+Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as drop_id to reset all to default
+Check all the available drops <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">here</a></p>
 <h3 id='set_boss_door_control_enabled'>set_boss_door_control_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_boss_door_control_enabled">set_boss_door_control_enabled</a></p>
@@ -21234,22 +21235,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
-<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <code>get_absolute_position</code> to get real position of anything in the game world.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
-<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <code>get_absolute_position</code> to get real position of anything in the game world.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_x">abs_x</a></td>
-<td>Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.</td>
+<td>Absolute position in the world, even if overlaid. Might be a frame off since it&#39;s updated with <code>apply_movement</code> function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use <code>get_absolute_position</code> for precise. Read only.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_y">abs_y</a></td>
-<td>Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.</td>
+<td>Absolute position in the world, even if overlaid. Might be a frame off since it&#39;s updated with <code>apply_movement</code> function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use <code>get_absolute_position</code> for precise. Read only.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -21520,6 +21521,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td><a href="#Vec2">Vec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_absolute_velocity">get_absolute_velocity()</a></td>
 <td>Get&#39;s the velocity relative to the game world, only for movable or liquid entities</td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_absolute_position">get_absolute_position()</a></td>
+<td>Get the absolute position of an entity in the game world</td>
 </tr>
 <tr>
 <td><a href="#AABB">AABB</a></td>
@@ -31337,7 +31343,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td>...see <a href="https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible drops...</td>
+<td>...see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible drops...</td>
 <td></td>
 <td></td>
 </tr>
@@ -31365,7 +31371,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td>...see <a href="https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible dropchances...</td>
+<td>...see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible dropchances...</td>
 <td></td>
 <td></td>
 </tr>
@@ -33510,7 +33516,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.BG">BG</a></td>
 <td>0x400</td>
-<td>All MIDBG* entities and most of the BG_* entities<br/>does not include: a lot .. check <a href="internal/entity.type.default_flags_more_flags.txt">default_flags_more_flags.txt</a> for full list<br/>Also includes: DECORATION_PALACE_PORTRAIT<br/>Various types, all <code>Entity</code><br/></td>
+<td>All MIDBG* entities and most of the BG_* entities<br/>does not include: a lot .. check <code>1024</code> in <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/search_flags.json">search_flags</a> for full list of included entities<br/>Also includes: DECORATION_PALACE_PORTRAIT<br/>Various types, all <code>Entity</code><br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.SHADOW">SHADOW</a></td>
