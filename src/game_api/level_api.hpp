@@ -432,7 +432,7 @@ class ThemeInfo
     virtual void spawn_decoration2() = 0;
 
     /// Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-    virtual void spawn_extra() = 0;
+    virtual void spawn_extra(int32_t start_x, int32_t start_y, int32_t end_x, int32_t end_y, uint8_t layer) = 0;
 
     /// Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)
     virtual void do_procedural_spawn(SpawnInfo* info) = 0;

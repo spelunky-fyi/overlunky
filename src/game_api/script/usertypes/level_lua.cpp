@@ -968,14 +968,14 @@ class CustomTheme : public ThemeInfo
             State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_decoration2();
         run_post_func<std::monostate>(index);
     }
-    void spawn_extra()
+    void spawn_extra(int32_t start_x, int32_t start_y, int32_t end_x, int32_t end_y, uint8_t layer)
     {
         auto index = THEME_OVERRIDE::SPAWN_EXTRA;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_extra();
+            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_extra(start_x, start_y, end_x, end_y, layer);
         run_post_func<std::monostate>(index);
     }
     void do_procedural_spawn(SpawnInfo* info)
