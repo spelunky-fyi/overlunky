@@ -4305,10 +4305,10 @@ Type | Name | Description
 int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | Unique id of the entity, save it to variable to check this entity later (don't use the whole [Entity](#Entity) type as it will be replaced with a different one when this is destroyed)
 int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | Number (id) of the sprite in the texture
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
-float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-float | [abs_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_x) | Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
-float | [abs_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_y) | Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+float | [abs_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_x) | Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
+float | [abs_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_y) | Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | Use `set_layer` to change
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Width of the sprite
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Height of the sprite
@@ -4363,6 +4363,7 @@ nil | [flip(bool left)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 nil | [remove_item(Entity entity, bool autokill_check)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_item) | Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
 nil | [apply_db()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_db) | Applies changes made in `entity.type`
 [Vec2](#Vec2) | [get_absolute_velocity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_absolute_velocity) | Get's the velocity relative to the game world, only for movable or liquid entities
+[Vec2](#Vec2) | [get_absolute_position()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_absolute_position) | Get the absolute position of an entity in the game world
 [AABB](#AABB) | [get_hitbox(optional<bool> use_render_pos)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox) | `use_render_pos` default is `false`
 nil | [attach(Entity new_overlay)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach) | Attach to other entity (at the current relative position to it)
 nil | [detach(optional<bool> check_autokill)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=detach) | Detach from overlay

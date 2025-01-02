@@ -284,6 +284,7 @@ void register_usertypes(sol::state& lua)
     entity_type["remove_item"] = &Entity::remove_item;
     entity_type["apply_db"] = &Entity::apply_db;
     entity_type["get_absolute_velocity"] = &Entity::get_absolute_velocity;
+    entity_type["get_absolute_position"] = &Entity::abs_position;
     entity_type["get_hitbox"] = &Entity::get_hitbox;
     entity_type["attach"] = &Entity::attach;
     entity_type["detach"] = &Entity::detach;
