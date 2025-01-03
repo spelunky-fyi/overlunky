@@ -184,12 +184,12 @@ CustomBank::~CustomBank()
     }
 }
 
-std::optional <FMODStudio::LoadingState> CustomBank::getLoadingState()
+std::optional<FMODStudio::LoadingState> CustomBank::getLoadingState()
 {
     return m_SoundManager->get_bank_loading_state(*this);
 }
 
-std::optional <FMODStudio::LoadingState> CustomBank::getSampleLoadingState()
+std::optional<FMODStudio::LoadingState> CustomBank::getSampleLoadingState()
 {
     return m_SoundManager->get_bank_sample_loading_state(*this);
 }
@@ -356,6 +356,191 @@ bool PlayingSound::set_parameter(VANILLA_SOUND_PARAM parameter_index, float valu
     return m_SoundManager->set_parameter(*this, parameter_index, value);
 }
 
+CustomEventDescription::CustomEventDescription(const CustomEventDescription& rhs)
+    : m_FmodHandle{rhs.m_FmodHandle}, m_SoundManager{rhs.m_SoundManager}
+{
+    if (m_SoundManager != nullptr)
+    {
+        std::visit(
+            overloaded{
+                [](FMODStudio::EventDescription*) {},
+                [](std::monostate) {}},
+            rhs.m_FmodHandle);
+    }
+}
+CustomEventDescription::CustomEventDescription(CustomEventDescription&& rhs) noexcept
+{
+    std::swap(m_FmodHandle, rhs.m_FmodHandle);
+    std::swap(m_SoundManager, rhs.m_SoundManager);
+}
+CustomEventDescription::CustomEventDescription(FMODStudio::EventDescription* fmod_event, SoundManager* sound_manager)
+    : m_FmodHandle{fmod_event}, m_SoundManager{sound_manager}
+{
+}
+CustomEventDescription::~CustomEventDescription()
+{
+    if (m_SoundManager != nullptr)
+    {
+        std::visit(
+            overloaded{
+                [](FMODStudio::EventDescription*) {},
+                [](std::monostate) {},
+            },
+            m_FmodHandle);
+    }
+}
+CustomEventInstance CustomEventDescription::createInstance()
+{
+    return std::visit(
+        overloaded{
+            [=, this](FMODStudio::EventDescription* event)
+            { return m_SoundManager->create_event_instance(event); },
+            [](std::monostate)
+            {
+                return CustomEventInstance{nullptr, nullptr};
+            },
+        },
+        m_FmodHandle);
+}
+bool CustomEventDescription::releaseAllInstances()
+{
+    return std::visit(
+        overloaded{
+            [=, this](FMODStudio::EventDescription* event)
+            { return m_SoundManager->release_all_event_instances(event); },
+            [](std::monostate)
+            {
+                return false;
+            },
+        },
+        m_FmodHandle);
+}
+bool CustomEventDescription::loadSampleData()
+{
+    return m_SoundManager->load_event_sample_data(*this);
+}
+bool CustomEventDescription::unloadSampleData()
+{
+    return m_SoundManager->unload_event_sample_data(*this);
+}
+std::optional<FMODStudio::LoadingState> CustomEventDescription::getSampleLoadingState()
+{
+    return m_SoundManager->get_event_sample_loading_state(*this);
+}
+std::optional<FMODStudio::ParameterDescription> CustomEventDescription::getParameterDescriptionByName(std::string name)
+{
+    return m_SoundManager->event_get_parameter_description_by_name(*this, name);
+}
+bool CustomEventDescription::isValid()
+{
+    return m_SoundManager->event_description_is_valid(*this);
+}
+
+CustomEventInstance::CustomEventInstance(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager)
+    : m_FmodHandle{fmod_event}, m_SoundManager{sound_manager}
+{
+}
+bool CustomEventInstance::start()
+{
+    return m_SoundManager->start(*this);
+}
+bool CustomEventInstance::stop()
+{
+    return m_SoundManager->stop(*this, FMODStudio::StopMode::AllowFadeOut);
+}
+bool CustomEventInstance::stop(FMODStudio::StopMode mode)
+{
+    return m_SoundManager->stop(*this, mode);
+}
+std::optional<FMODStudio::PlaybackState> CustomEventInstance::get_playback_state()
+{
+    return m_SoundManager->get_playback_state(*this);
+}
+bool CustomEventInstance::set_pause(bool pause)
+{
+    return m_SoundManager->set_pause(*this, pause);
+}
+std::optional<bool> CustomEventInstance::get_pause()
+{
+    return m_SoundManager->get_pause(*this);
+}
+bool CustomEventInstance::key_off()
+{
+    return m_SoundManager->key_off(*this);
+}
+bool CustomEventInstance::set_pitch(float pitch)
+{
+    return m_SoundManager->set_pitch(*this, pitch);
+}
+std::optional<std::vector<float>> CustomEventInstance::get_pitch()
+{
+    return m_SoundManager->get_pitch(*this);
+}
+bool CustomEventInstance::set_timeline_position(int position)
+{
+    return m_SoundManager->set_timeline_position(*this, position);
+}
+std::optional<int> CustomEventInstance::get_timeline_position()
+{
+    return m_SoundManager->get_timeline_position(*this);
+}
+bool CustomEventInstance::set_volume(float volume)
+{
+    return m_SoundManager->set_volume(*this, volume);
+}
+std::optional<std::vector<float>> CustomEventInstance::get_volume()
+{
+    return m_SoundManager->get_volume(*this);
+}
+std::optional<std::vector<float>> CustomEventInstance::get_parameter_by_name(std::string name)
+{
+    return m_SoundManager->get_parameter_by_name(*this, name);
+}
+bool CustomEventInstance::set_parameter_by_name(std::string name, float value)
+{
+    return m_SoundManager->set_parameter_by_name(*this, name, value, false);
+}
+bool CustomEventInstance::set_parameter_by_name(std::string name, float value, bool ignoreseekspeed)
+{
+    return m_SoundManager->set_parameter_by_name(*this, name, value, ignoreseekspeed);
+}
+bool CustomEventInstance::set_parameter_by_name_with_label(std::string name, std::string label)
+{
+    return m_SoundManager->set_parameter_by_name_with_label(*this, name, label, false);
+}
+bool CustomEventInstance::set_parameter_by_name_with_label(std::string name, std::string label, bool ignoreseekspeed)
+{
+    return m_SoundManager->set_parameter_by_name_with_label(*this, name, label, ignoreseekspeed);
+}
+std::optional<std::vector<float>> CustomEventInstance::get_parameter_by_id(FMODStudio::ParameterId id)
+{
+    return m_SoundManager->get_parameter_by_id(*this, id);
+}
+bool CustomEventInstance::set_parameter_by_id(FMODStudio::ParameterId id, float value)
+{
+    return m_SoundManager->set_parameter_by_id(*this, id, value, false);
+}
+bool CustomEventInstance::set_parameter_by_id(FMODStudio::ParameterId id, float value, bool ignoreseekspeed)
+{
+    return m_SoundManager->set_parameter_by_id(*this, id, value, ignoreseekspeed);
+}
+bool CustomEventInstance::set_parameter_by_id_with_label(FMODStudio::ParameterId id, std::string label)
+{
+    return m_SoundManager->set_parameter_by_id_with_label(*this, id, label, false);
+}
+bool CustomEventInstance::set_parameter_by_id_with_label(FMODStudio::ParameterId id, std::string label, bool ignoreseekspeed)
+{
+    return m_SoundManager->set_parameter_by_id_with_label(*this, id, label, ignoreseekspeed);
+}
+bool CustomEventInstance::release()
+{
+    return m_SoundManager->release(*this);
+}
+bool CustomEventInstance::is_valid()
+{
+    return m_SoundManager->event_instance_is_valid(*this);
+}
+
 FMODpathGUIDmap::FMODpathGUIDmap(const FMODpathGUIDmap& rhs)
     : m_PathGUIDmap{rhs.m_PathGUIDmap}, m_SoundManager{rhs.m_SoundManager}
 {
@@ -372,9 +557,9 @@ FMODpathGUIDmap::FMODpathGUIDmap(std::unordered_map<std::string, FMOD::FMOD_GUID
 
 FMODpathGUIDmap::~FMODpathGUIDmap() = default;
 
-CustomSound FMODpathGUIDmap::get_sound_fmod_event_path(std::string path)
+CustomEventDescription FMODpathGUIDmap::get_event_desc_from_path(std::string path)
 {
-    return m_SoundManager->pathguidmap_get_event_path_guid(*this, path);
+    return m_SoundManager->pathguidmap_lookup_event_id_by_path(*this, path);
 }
 
 struct SoundManager::Sound
@@ -493,12 +678,22 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 
             m_EventCreateInstance =
                 reinterpret_cast<FMODStudio::EventDescriptionCreateInstance*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_CreateInstance"));
+            m_EventDescriptionReleaseAllInstances = reinterpret_cast<FMODStudio::EventDescriptionReleaseAllInstances*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_ReleaseAllInstances"));
+            m_EventDescriptionLoadSampleData = reinterpret_cast<FMODStudio::EventDescriptionLoadSampleData*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_LoadSampleData"));
+            m_EventDescriptionUnloadSampleData = reinterpret_cast<FMODStudio::EventDescriptionUnloadSampleData*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_UnloadSampleData"));
+            m_EventDescriptionGetSampleLoadingState = reinterpret_cast<FMODStudio::EventDescriptionGetSampleLoadingState*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetSampleLoadingState"));
             m_EventDescriptionGetParameterDescriptionByName = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByName*>(
                 GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByName"));
             m_EventDescriptionGetParameterDescriptionByID = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByID*>(
                 GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByID"));
             m_EventDescriptionSetCallback =
                 reinterpret_cast<FMODStudio::EventDescriptionSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_SetCallback"));
+            m_EventDescriptionIsValid =
+                reinterpret_cast<FMODStudio::EventDescriptionIsValid*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_IsValid"));
 
             m_EventInstanceStart = reinterpret_cast<FMODStudio::EventInstanceStart*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Start"));
             m_EventInstanceStop = reinterpret_cast<FMODStudio::EventInstanceStop*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Stop"));
@@ -508,10 +703,20 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
                 reinterpret_cast<FMODStudio::EventInstanceSetPaused*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetPaused"));
             m_EventInstanceGetPaused =
                 reinterpret_cast<FMODStudio::EventInstanceGetPaused*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetPaused"));
+            m_EventInstanceKeyOff =
+                reinterpret_cast<FMODStudio::EventInstanceKeyOff*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_KeyOff"));
             m_EventInstanceSetPitch =
                 reinterpret_cast<FMODStudio::EventInstanceSetPitch*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetPitch"));
+            m_EventInstanceGetPitch =
+                reinterpret_cast<FMODStudio::EventInstanceGetPitch*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetPitch"));
+            m_EventInstanceSetTimelinePosition =
+                reinterpret_cast<FMODStudio::EventInstanceSetTimelinePosition*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetTimelinePosition"));
+            m_EventInstanceGetTimelinePosition =
+                reinterpret_cast<FMODStudio::EventInstanceGetTimelinePosition*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetTimelinePosition"));
             m_EventInstanceSetVolume =
                 reinterpret_cast<FMODStudio::EventInstanceSetVolume*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetVolume"));
+            m_EventInstanceGetVolume =
+                reinterpret_cast<FMODStudio::EventInstanceGetVolume*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetVolume"));
             m_EventInstanceSetCallback =
                 reinterpret_cast<FMODStudio::EventInstanceSetCallback*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetCallback"));
             m_EventInstanceSetUserData =
@@ -520,10 +725,22 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
                 reinterpret_cast<FMODStudio::EventInstanceGetUserData*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetUserData"));
             m_EventInstanceGetDescription =
                 reinterpret_cast<FMODStudio::EventInstanceGetDescription*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetDescription"));
+            m_EventInstanceSetParameterByName =
+                reinterpret_cast<FMODStudio::EventInstanceSetParameterByName*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByName"));
+            m_EventInstanceGetParameterByName =
+                reinterpret_cast<FMODStudio::EventInstanceGetParameterByName*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetParameterByName"));
+            m_EventInstanceSetParameterByNameWithLabel =
+                reinterpret_cast<FMODStudio::EventInstanceSetParameterByNameWithLabel*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByNameWithLabel"));
             m_EventInstanceGetParameterByID =
                 reinterpret_cast<FMODStudio::EventInstanceGetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_GetParameterByID"));
             m_EventInstanceSetParameterByID =
                 reinterpret_cast<FMODStudio::EventInstanceSetParameterByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByID"));
+            m_EventInstanceSetParameterByIDWithLabel =
+                reinterpret_cast<FMODStudio::EventInstanceSetParameterByIDWithLabel*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_SetParameterByIDWithLabel"));
+            m_EventInstanceRelease =
+                reinterpret_cast<FMODStudio::EventInstanceRelease*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_Release"));
+            m_EventInstanceIsValid =
+                reinterpret_cast<FMODStudio::EventInstanceIsValid*>(GetProcAddress(fmod_studio, "FMOD_Studio_EventInstance_IsValid"));
 
             EventCallbackData::EventInstanceGetDescription = m_EventInstanceGetDescription;
         }
@@ -694,37 +911,37 @@ PlayingSound SoundManager::play_sound(FMOD::Sound* fmod_sound, bool paused, bool
     return PlayingSound{channel, this};
 }
 
-CustomSound SoundManager::pathguidmap_get_event_path_guid(FMODpathGUIDmap map, std::string path)
+CustomEventDescription SoundManager::pathguidmap_lookup_event_id_by_path(FMODpathGUIDmap map, std::string path)
 {
     auto it = map.m_PathGUIDmap.find(path);
     if (it != map.m_PathGUIDmap.end())
     {
-        return get_event_guid(&it->second);
+        return get_event_description_by_id(&it->second);
     }
     DEBUG("Could not find event path {} in FMODpathGUIDmap", path);
-    return CustomSound{nullptr, nullptr};
+    return CustomEventDescription{nullptr, nullptr};
 }
 
-CustomSound SoundManager::get_event_guid_string(std::string guid_string)
+CustomEventDescription SoundManager::get_event_description_by_id_string(std::string guid_string)
 {
     FMOD::FMOD_GUID guid;
     if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
     {
-        return get_event_guid(&guid);
+        return get_event_description_by_id(&guid);
     }
-    return CustomSound{nullptr, nullptr};
+    return CustomEventDescription{nullptr, nullptr};
 }
 
-CustomSound SoundManager::get_event_guid(FMODStudio::FMOD_GUID* guid)
+CustomEventDescription SoundManager::get_event_description_by_id(FMODStudio::FMOD_GUID* guid)
 {
     FMODStudio::EventDescription* fmod_event;
     if (FMOD_CHECK_CALL(m_SystemGetEventByID(m_FmodStudioSystem, guid, &fmod_event)))
     {
-        return CustomSound{fmod_event, this};
+        return CustomEventDescription{fmod_event, this};
     }
     DEBUG("Could not get event for GUID {{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}",
         guid->Data1, guid->Data2, guid->Data3, guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3], guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
-    return CustomSound{nullptr, nullptr};
+    return CustomEventDescription{nullptr, nullptr};
 }
 
 CustomSound SoundManager::get_event(std::string_view event_name)
@@ -775,12 +992,10 @@ CustomBank SoundManager::get_bank(std::string path)
     m_BankStorage.push_back(std::move(new_bank));
     return CustomBank{ m_BankStorage.back().fmod_bank, this };
 }
-
 CustomBank SoundManager::get_bank(const char* path)
 {
     return get_bank(std::string{ path });
 }
-
 CustomBank SoundManager::get_existing_bank(std::string_view path)
 {
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [&path](const Bank& bank)
@@ -792,7 +1007,6 @@ CustomBank SoundManager::get_existing_bank(std::string_view path)
     }
     return CustomBank{ nullptr, nullptr };
 }
-
 void SoundManager::acquire_bank(FMOD::Bank* fmod_bank)
 {
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [fmod_bank](const Bank& bank)
@@ -805,7 +1019,6 @@ void SoundManager::acquire_bank(FMOD::Bank* fmod_bank)
 
     it->ref_count++;
 }
-
 bool SoundManager::unload_bank(FMOD::Bank* fmod_bank)
 {
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [fmod_bank](const Bank& bank)
@@ -828,8 +1041,7 @@ bool SoundManager::unload_bank(FMOD::Bank* fmod_bank)
         return false;
     }
 }
-
-std::optional <FMODStudio::LoadingState> SoundManager::get_bank_loading_state(CustomBank custom_bank)
+std::optional<FMODStudio::LoadingState> SoundManager::get_bank_loading_state(CustomBank custom_bank)
 {
     return std::visit(
         overloaded{
@@ -846,8 +1058,7 @@ std::optional <FMODStudio::LoadingState> SoundManager::get_bank_loading_state(Cu
                    { return std::optional<FMODStudio::LoadingState>{}; } },
         custom_bank.m_FmodHandle);
 }
-
-std::optional <FMODStudio::LoadingState> SoundManager::get_bank_sample_loading_state(CustomBank custom_bank)
+std::optional<FMODStudio::LoadingState> SoundManager::get_bank_sample_loading_state(CustomBank custom_bank)
 {
     return std::visit(
         overloaded{
@@ -864,7 +1075,6 @@ std::optional <FMODStudio::LoadingState> SoundManager::get_bank_sample_loading_s
                    { return std::optional<FMODStudio::LoadingState>{}; } },
         custom_bank.m_FmodHandle);
 }
-
 bool SoundManager::load_bank_sample_data(CustomBank custom_bank)
 {
     return std::visit(
@@ -874,7 +1084,6 @@ bool SoundManager::load_bank_sample_data(CustomBank custom_bank)
                    { return false; } },
         custom_bank.m_FmodHandle);
 }
-
 bool SoundManager::unload_bank_sample_data(CustomBank custom_bank)
 {
     return std::visit(
@@ -883,6 +1092,320 @@ bool SoundManager::unload_bank_sample_data(CustomBank custom_bank)
                    [](std::monostate)
                    { return false; } },
         custom_bank.m_FmodHandle);
+}
+
+CustomEventInstance SoundManager::create_event_instance(FMODStudio::EventDescription* fmod_event)
+{
+    FMODStudio::EventInstance* instance{nullptr};
+    m_EventCreateInstance(fmod_event, &instance);
+    return CustomEventInstance{instance, this};
+}
+bool SoundManager::release_all_event_instances(FMODStudio::EventDescription* fmod_event)
+{
+    return FMOD_CHECK_CALL(m_EventDescriptionReleaseAllInstances(fmod_event));
+}
+bool SoundManager::load_event_sample_data(CustomEventDescription fmod_event)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::EventDescription* event_desc)
+                   { return FMOD_CHECK_CALL(m_EventDescriptionLoadSampleData(event_desc)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event.m_FmodHandle);
+}
+bool SoundManager::unload_event_sample_data(CustomEventDescription fmod_event)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::EventDescription* event_desc)
+                   { return FMOD_CHECK_CALL(m_EventDescriptionUnloadSampleData(event_desc)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event.m_FmodHandle);
+}
+std::optional<FMODStudio::LoadingState> SoundManager::get_event_sample_loading_state(CustomEventDescription fmod_event)
+{
+    return std::visit(
+        overloaded{
+            [this](FMODStudio::EventDescription* event_desc)
+            {
+                FMODStudio::LoadingState value;
+                if (FMOD_CHECK_CALL(m_EventDescriptionGetSampleLoadingState(event_desc, &value)))
+                {
+                    return std::optional<FMODStudio::LoadingState>{value};
+                }
+                return std::optional<FMODStudio::LoadingState>{};
+            },
+            [](std::monostate)
+            { return std::optional<FMODStudio::LoadingState>{}; }},
+        fmod_event.m_FmodHandle);
+}
+std::optional<FMODStudio::ParameterDescription> SoundManager::event_get_parameter_description_by_name(CustomEventDescription fmod_event, std::string name)
+{
+    return std::visit(
+        overloaded{
+            [this, name](FMODStudio::EventDescription* event_desc)
+            {
+                FMODStudio::ParameterDescription param_desc;
+                if (FMOD_CHECK_CALL(m_EventDescriptionGetParameterDescriptionByName(event_desc, name.c_str(), &param_desc)))
+                {
+                    return std::optional<FMODStudio::ParameterDescription>{param_desc};
+                }
+                return std::optional<FMODStudio::ParameterDescription>{};
+            },
+            [](std::monostate)
+            { return std::optional<FMODStudio::ParameterDescription>{}; }},
+        fmod_event.m_FmodHandle);
+}
+bool SoundManager::event_description_is_valid(CustomEventDescription fmod_event)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::EventDescription* event_desc)
+                   { return m_EventDescriptionIsValid(event_desc); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event.m_FmodHandle);
+}
+
+bool SoundManager::start(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceStart(event_instance)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::stop(CustomEventInstance fmod_event_instance, FMODStudio::StopMode mode)
+{
+    return std::visit(
+        overloaded{[this, mode](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceStop(event_instance, mode)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+std::optional<FMODStudio::PlaybackState> SoundManager::get_playback_state(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{
+            [this](FMODStudio::EventInstance* event_instance)
+            {
+                FMODStudio::PlaybackState playback_state;
+                if (FMOD_CHECK_CALL(m_EventInstanceGetPlaybackState(event_instance, &playback_state)))
+                {
+                    return std::optional<FMODStudio::PlaybackState>{playback_state};
+                }
+                return std::optional<FMODStudio::PlaybackState>{};
+            },
+            [](std::monostate)
+            { return std::optional<FMODStudio::PlaybackState>{}; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_pause(CustomEventInstance fmod_event_instance, bool pause)
+{
+    return std::visit(
+        overloaded{[this, pause](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetPaused(event_instance, pause)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+std::optional<bool> SoundManager::get_pause(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{
+            [this](FMODStudio::EventInstance* event_instance)
+            {
+                BOOL paused;
+                if (FMOD_CHECK_CALL(m_EventInstanceGetPaused(event_instance, &paused)))
+                {
+                    return std::optional<bool>{paused};
+                }
+                return std::optional<bool>{};
+            },
+            [](std::monostate)
+            { return std::optional<bool>{}; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::key_off(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceKeyOff(event_instance)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+std::optional<std::vector<float>> SoundManager::get_pitch(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{
+            [this](FMODStudio::EventInstance* event_instance)
+            {
+                float pitch;
+                float finalpitch;
+                if (FMOD_CHECK_CALL(m_EventInstanceGetPitch(event_instance, &pitch, &finalpitch)))
+                {
+                    auto pitch_arr = std::array<float, 2>{};
+                    return std::optional<std::vector<float>>{{pitch, finalpitch}};
+                }
+                return std::optional<std::vector<float>>{};
+            },
+            [](std::monostate)
+            { return std::optional<std::vector<float>>{}; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_pitch(CustomEventInstance fmod_event_instance, float pitch)
+{
+    return std::visit(
+        overloaded{[this, pitch](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetPitch(event_instance, pitch)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+std::optional<int> SoundManager::get_timeline_position(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{
+            [this](FMODStudio::EventInstance* event_instance)
+            {
+                int position;
+                if (FMOD_CHECK_CALL(m_EventInstanceGetTimelinePosition(event_instance, &position)))
+                {
+                    return std::optional<int>{position};
+                }
+                return std::optional<int>{};
+            },
+            [](std::monostate)
+            { return std::optional<int>{}; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_timeline_position(CustomEventInstance fmod_event_instance, int position)
+{
+    return std::visit(
+        overloaded{[this, position](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetTimelinePosition(event_instance, position)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+std::optional<std::vector<float>> SoundManager::get_volume(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{
+            [this](FMODStudio::EventInstance* event_instance)
+            {
+                float volume;
+                float finalvolume;
+                if (FMOD_CHECK_CALL(m_EventInstanceGetVolume(event_instance, &volume, &finalvolume)))
+                {
+                    return std::optional<std::vector<float>>{{volume, finalvolume}};
+                }
+                return std::optional<std::vector<float>>{};
+            },
+            [](std::monostate)
+            { return std::optional<std::vector<float>>{}; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_volume(CustomEventInstance fmod_event_instance, float volume)
+{
+    return std::visit(
+        overloaded{[this, volume](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetVolume(event_instance, volume)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+std::optional<std::vector<float>> SoundManager::get_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name)
+{
+    return std::visit(
+        overloaded{
+            [this, name](FMODStudio::EventInstance* event_instance)
+            {
+                float value;
+                float finalvalue;
+                if (FMOD_CHECK_CALL(m_EventInstanceGetParameterByName(event_instance, name.c_str(), &value, &finalvalue)))
+                {
+                    return std::optional<std::vector<float>>{{value, finalvalue}};
+                }
+                return std::optional<std::vector<float>>{};
+            },
+            [](std::monostate)
+            { return std::optional<std::vector<float>>{}; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name, float value, bool ignoreseekspeed)
+{
+    return std::visit(
+        overloaded{[this, name, value, ignoreseekspeed](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetParameterByName(event_instance, name.c_str(), value, ignoreseekspeed)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_parameter_by_name_with_label(CustomEventInstance fmod_event_instance, std::string name, std::string label, bool ignoreseekspeed)
+{
+    return std::visit(
+        overloaded{[this, name, label, ignoreseekspeed](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetParameterByNameWithLabel(event_instance, name.c_str(), label.c_str(), ignoreseekspeed)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+std::optional<std::vector<float>> SoundManager::get_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id)
+{
+    return std::visit(
+        overloaded{
+            [this, id](FMODStudio::EventInstance* event_instance)
+            {
+                float value;
+                float finalvalue;
+                if (FMOD_CHECK_CALL(m_EventInstanceGetParameterByID(event_instance, id, &value, &finalvalue)))
+                {
+                    return std::optional<std::vector<float>>{{value, finalvalue}};
+                }
+                return std::optional<std::vector<float>>{};
+            },
+            [](std::monostate)
+            { return std::optional<std::vector<float>>{}; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, float value, bool ignoreseekspeed)
+{
+    return std::visit(
+        overloaded{[this, id, value, ignoreseekspeed](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetParameterByID(event_instance, id, value, ignoreseekspeed)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::set_parameter_by_id_with_label(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, std::string label, bool ignoreseekspeed)
+{
+    return std::visit(
+        overloaded{[this, id, label, ignoreseekspeed](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceSetParameterByIDWithLabel(event_instance, id, label.c_str(), ignoreseekspeed)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::release(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::EventInstance* event_instance)
+                   { return FMOD_CHECK_CALL(m_EventInstanceRelease(event_instance)); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
+}
+bool SoundManager::event_instance_is_valid(CustomEventInstance fmod_event_instance)
+{
+    return std::visit(
+        overloaded{[this](FMODStudio::EventInstance* event_instance)
+                   { return m_EventInstanceIsValid(event_instance); },
+                   [](std::monostate)
+                   { return false; }},
+        fmod_event_instance.m_FmodHandle);
 }
 
 FMODpathGUIDmap SoundManager::create_fmod_path_guid_map(std::string_view path)

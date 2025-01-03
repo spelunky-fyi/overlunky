@@ -96,12 +96,12 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     };
 
     /// Gets an existing sound using a human readable FMOD GUID string
-    lua["get_sound_guid"] = [](std::string guid_string) -> sol::optional<CustomSound>
+    lua["get_event_desc_by_id"] = [](std::string guid_string) -> sol::optional<CustomEventDescription>
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (CustomSound event = backend->sound_manager->get_event_guid_string(guid_string))
+        if (CustomEventDescription event_description = backend->sound_manager->get_event_description_by_id_string(guid_string))
         {
-            return event;
+            return event_description;
         }
         return sol::nullopt;
     };
@@ -118,6 +118,154 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "ERROR",
         FMODStudio::LoadingState::Error);
 
+    lua.new_enum("FMOD_PLAYBACK_STATE",
+        "PLAYING",
+        FMODStudio::PlaybackState::Playing,
+        "STARTING",
+        FMODStudio::PlaybackState::Starting,
+        "STOPPED",
+        FMODStudio::PlaybackState::Stopped,
+        "STOPPING",
+        FMODStudio::PlaybackState::Stopping,
+        "SUSTAINING",
+        FMODStudio::PlaybackState::Sustaining);
+
+    lua.new_enum("FMOD_STOP_MODE",
+        "ALLOW_FADE_OUT",
+        FMODStudio::StopMode::AllowFadeOut,
+        "IMMEDIATE",
+        FMODStudio::StopMode::Immediate);
+
+    //lua.create_named_table("SOUND_TYPE", "ALLOW_FADE_OUT", 0, "IMMEDIATE", 1);
+
+    lua.new_enum("FMOD_PARAMETER_TYPE",
+        "GAME_CONTROLLED",
+        FMODStudio::ParameterType::GameControlled,
+        "AUTOMATIC_DISTANCE",
+        FMODStudio::ParameterType::AutomaticDistance,
+        "AUTOMATIC_EVENT_CONE_ANGLE",
+        FMODStudio::ParameterType::AutomaticEventConeAngle,
+        "AUTOMATIC_EVENT_ORIENTATION",
+        FMODStudio::ParameterType::AutomaticEventOrientation,
+        "AUTOMATIC_DIRECTION",
+        FMODStudio::ParameterType::AutomaticDirection,
+        "AUTOMATIC_ELEVATION",
+        FMODStudio::ParameterType::AutomaticElevation,
+        "AUTOMATIC_LISTENER_ORIENTATION",
+        FMODStudio::ParameterType::AutomaticListenerOrientation,
+        "AUTOMATIC_SPEED",
+        FMODStudio::ParameterType::AutomaticSpeed);
+
+    lua.new_enum("FMOD_PARAMETER_FLAGS",
+        "READ_ONLY",
+        FMODStudio::ParameterFlags::ReadOnly,
+        "AUTOMATIC",
+        FMODStudio::ParameterFlags::Automatic,
+        "GLOBAL",
+        FMODStudio::ParameterFlags::Global);
+
+    lua.new_usertype<FMODStudio::ParameterId>(
+        "ParameterId",
+        "data1",
+        &FMODStudio::ParameterId::data1,
+        "data2",
+        &FMODStudio::ParameterId::data2);
+
+    lua.new_usertype<FMODStudio::ParameterDescription>(
+        "ParameterDescription",
+        "name",
+        &FMODStudio::ParameterDescription::name,
+        "id",
+        &FMODStudio::ParameterDescription::id,
+        "minimum",
+        &FMODStudio::ParameterDescription::minimum,
+        "maximum",
+        &FMODStudio::ParameterDescription::maximum,
+        "defaultvalue",
+        &FMODStudio::ParameterDescription::defaultvalue,
+        "type",
+        &FMODStudio::ParameterDescription::type,
+        "flags",
+        &FMODStudio::ParameterDescription::flags);
+
+    lua.new_usertype<CustomEventDescription>(
+        "CustomEventDescription",
+        "createInstance",
+        &CustomEventDescription::createInstance,
+        "releaseAllInstances",
+        &CustomEventDescription::releaseAllInstances,
+        "loadSampleData",
+        &CustomEventDescription::loadSampleData,
+        "unloadSampleData",
+        &CustomEventDescription::unloadSampleData,
+        "getSampleLoadingState",
+        &CustomEventDescription::getSampleLoadingState,
+        "getParameterDescriptionByName",
+        &CustomEventDescription::getParameterDescriptionByName,
+        "isValid",
+        &CustomEventDescription::isValid);
+
+    auto stop = sol::overload(
+        static_cast<bool (CustomEventInstance::*)()>(&CustomEventInstance::stop),
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::StopMode)>(&CustomEventInstance::stop));
+    auto set_parameter_by_name = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(std::string, float)>(&CustomEventInstance::set_parameter_by_name),
+        static_cast<bool (CustomEventInstance::*)(std::string, float, bool)>(&CustomEventInstance::set_parameter_by_name));
+    auto set_parameter_by_name_with_label = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(std::string, std::string)>(&CustomEventInstance::set_parameter_by_name_with_label),
+        static_cast<bool (CustomEventInstance::*)(std::string, std::string, bool)>(&CustomEventInstance::set_parameter_by_name_with_label));
+    auto set_parameter_by_id = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, float)>(&CustomEventInstance::set_parameter_by_id),
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, float, bool)>(&CustomEventInstance::set_parameter_by_id));
+    auto set_parameter_by_id_with_label = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, std::string)>(&CustomEventInstance::set_parameter_by_id_with_label),
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, std::string, bool)>(&CustomEventInstance::set_parameter_by_id_with_label));
+
+    lua.new_usertype<CustomEventInstance>(
+        "CustomEventInstance",
+        "start",
+        &CustomEventInstance::start,
+        "stop",
+        stop,
+        "getPlaybackState",
+        &CustomEventInstance::get_playback_state,
+        "setPause",
+        &CustomEventInstance::set_pause,
+        "getPause",
+        &CustomEventInstance::get_pause,
+        "keyOff",
+        &CustomEventInstance::key_off,
+        "setPitch",
+        &CustomEventInstance::set_pitch,
+        "getPitch",
+        &CustomEventInstance::get_pitch,
+        "setTimelinePosition",
+        &CustomEventInstance::set_timeline_position,
+        "getTimelinePosition",
+        &CustomEventInstance::get_timeline_position,
+        "setVolume",
+        &CustomEventInstance::set_volume,
+        "getVolume",
+        &CustomEventInstance::get_volume,
+        "release",
+        &CustomEventInstance::release,
+        "isValid",
+        &CustomEventInstance::is_valid,
+        "getParameterByName",
+        &CustomEventInstance::get_parameter_by_name,
+        "setParameterByName",
+        set_parameter_by_name,
+        "setParameterByNameWithLabel",
+        set_parameter_by_name_with_label,
+        "setParameterByID",
+        set_parameter_by_id,
+        "setParameterByIDWithLabel",
+        set_parameter_by_id_with_label,
+        "release",
+        &CustomEventInstance::release,
+        "isValid",
+        &CustomEventInstance::is_valid);
+
     lua.new_usertype<CustomBank>(
         "CustomBank",
         "getLoadingState",
@@ -133,14 +281,14 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
     lua.new_usertype<FMODpathGUIDmap>(
         "CustomGUIDstringMap",
-        "get_sound_fmod_path",
-        [](FMODpathGUIDmap& pgm, std::string path) -> std::optional<CustomSound>
+        "getEventDescriptionByPath",
+        [](FMODpathGUIDmap& pgm, std::string path) -> std::optional<CustomEventDescription>
         {
-            if (CustomSound event = pgm.get_sound_fmod_event_path(path))
+            if (CustomEventDescription event_description = pgm.get_event_desc_from_path(path))
             {
-                return event;
+                return event_description;
             }
-            DEBUG("Failed to get CustomSound from FMODpathGUIDmap");
+            DEBUG("Failed to get CustomEventDescription from FMODpathGUIDmap");
             return sol::nullopt;
         }
     );
