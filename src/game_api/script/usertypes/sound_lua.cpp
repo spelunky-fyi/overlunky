@@ -136,8 +136,6 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "IMMEDIATE",
         FMODStudio::StopMode::Immediate);
 
-    //lua.create_named_table("SOUND_TYPE", "ALLOW_FADE_OUT", 0, "IMMEDIATE", 1);
-
     lua.new_enum("FMOD_PARAMETER_TYPE",
         "GAME_CONTROLLED",
         FMODStudio::ParameterType::GameControlled,

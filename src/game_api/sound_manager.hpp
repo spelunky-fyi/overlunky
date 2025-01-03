@@ -327,7 +327,6 @@ class SoundManager
     bool set_parameter_by_id_with_label(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, std::string label, bool ignoreseekspeed);
     bool release(CustomEventInstance fmod_event_instance);
     bool event_instance_is_valid(CustomEventInstance fmod_event_instance);
-    //bool set_callback(CustomEventInstance fmod_event_instance, SoundCallbackFunction callback);
 
     CustomSound get_sound(std::string path);
     CustomSound get_sound(const char* path);
