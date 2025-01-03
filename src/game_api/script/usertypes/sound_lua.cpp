@@ -60,14 +60,14 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
     /// Gets an existing bank if a file at the same path was already loaded
     lua["get_bank"] = [](std::string path) -> sol::optional<CustomBank>
-        {
-            auto backend = LuaBackend::get_calling_backend();
+    {
+        auto backend = LuaBackend::get_calling_backend();
         if (CustomBank bank = backend->sound_manager->get_existing_bank((backend->get_root_path() / path).string()))
-            {
-                return bank;
-            }
-            return sol::nullopt;
-        };
+        {
+            return bank;
+        }
+        return sol::nullopt;
+    };
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
