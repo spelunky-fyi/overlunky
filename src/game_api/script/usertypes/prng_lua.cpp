@@ -10,7 +10,8 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max, get
 
-#include "prng.hpp" // for PRNG, PRNG::ENTITY_VARIATION, PRNG::EXTRA_SPAWNS
+#include "prng.hpp"         // for PRNG, PRNG::ENTITY_VARIATION, PRNG::EXTRA_SPAWNS
+#include "thread_utils.hpp" // for HeapBase
 
 namespace NPRNG
 {
@@ -21,7 +22,7 @@ void register_usertypes(sol::state& lua)
     /// Seed the game prng.
     lua["seed_prng"] = [](int64_t seed)
     {
-        PRNG::get_main().seed(seed);
+        HeapBase::get().prng()->seed(seed);
     };
 
     /// PRNG (short for Pseudo-Random-Number-Generator) holds 10 128bit wide buffers of memory that are mutated on every generation of a random number.
@@ -48,12 +49,12 @@ void register_usertypes(sol::state& lua)
         &PRNG::set_pair);
 
     /// The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
-    lua["prng"] = &PRNG::get_main();
+    lua["prng"] = HeapBase::get_main().prng();
 
     /// Get the thread-local version of prng
     lua["get_local_prng"] = []() -> PRNG*
     {
-        return &PRNG::get_local();
+        return HeapBase::get().prng();
     };
 
     /// Determines what class of prng is used, which in turn determines which parts of the game's future prng is affected. See more info at [PRNG](#PRNG)

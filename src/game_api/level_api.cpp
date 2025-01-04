@@ -1088,8 +1088,6 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_size, std::uint32_t 
 {
     g_do_extra_spawns_trampoline(theme, border_size, level_width, level_height, layer);
 
-    PRNG& prng = PRNG::get_local();
-
     std::lock_guard lock{g_extra_spawn_logic_providers_lock};
     if (!g_extra_spawn_logic_providers.empty())
     {
@@ -1116,13 +1114,13 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_size, std::uint32_t 
                 }
             }
         }
-
+        PRNG* prng = HeapBase::get().prng();
         for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
         {
             auto& valid_pos = provider.transient_valid_positions;
             while (!valid_pos.empty() && provider.transient_num_remaining_spawns[layer] > 0)
             {
-                const auto random_idx = static_cast<std::size_t>(prng.internal_random_index(valid_pos.size(), PRNG::EXTRA_SPAWNS));
+                const auto random_idx = static_cast<std::size_t>(prng->internal_random_index(valid_pos.size(), PRNG::EXTRA_SPAWNS));
                 const auto idx = random_idx < valid_pos.size() ? random_idx : 0;
                 const auto& [x, y] = valid_pos[idx];
                 provider.provider.do_spawn(x, y, layer);

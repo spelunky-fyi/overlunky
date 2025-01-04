@@ -293,7 +293,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     static const auto tree_branch = to_id("ENT_TYPE_FLOOR_TREE_BRANCH");
     static const auto tree_deco = to_id("ENT_TYPE_DECORATION_TREE");
 
-    PRNG& prng = PRNG::get_local();
+    PRNG* prng = HeapBase::get().prng();
 
     // spawn the base
     Entity* current_piece = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
@@ -311,7 +311,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
                 break;
             }
             current_piece = layer_ptr->spawn_entity_over(tree_trunk, current_piece, 0.0f, 1.0f);
-            if (height == 0 && prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            if (height == 0 && prng->random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
             {
                 break;
             }
@@ -325,20 +325,20 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
         auto spawn_deco = [&](Entity* branch, bool left)
         {
             Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
-            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION)) * 12;
+            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng->random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION)) * 12;
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
         auto test_pos = current_piece->abs_position();
 
         if (static_cast<int>(test_pos.x) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.x + 1, test_pos.y) == nullptr &&
-            prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            prng->random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
             Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, 1.02f, 0.0f);
             spawn_deco(branch, false);
         }
         if (static_cast<int>(test_pos.x) - 1 > 0 && layer_ptr->get_grid_entity_at(test_pos.x - 1, test_pos.y) == nullptr &&
-            prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            prng->random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
             Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, -1.02f, 0.0f);
             branch->flags |= 1U << 16; // flag 17: facing left
@@ -383,8 +383,8 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
         }
         else
         {
-            auto& prng = PRNG::get_local();
-            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
+            auto prng = HeapBase::get().prng();
+            height = static_cast<uint16_t>(prng->random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
         }
 
         i_y += 3;
@@ -815,5 +815,5 @@ MagmamanSpawnPosition::MagmamanSpawnPosition(uint32_t x_, uint32_t y_)
 {
     x = x_;
     y = y_;
-    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
+    timer = static_cast<uint32_t>(HeapBase::get().prng()->random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
 }
