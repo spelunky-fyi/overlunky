@@ -1473,7 +1473,7 @@ short for state->money_shop_total + loop[inventory.money + inventory.collected_m
 
 #### int get_frame()
 
-Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
+Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags [PAUSE](#PAUSE).[FADE](#FADE) or [PAUSE](#PAUSE).ANKH.
 
 ### get_frametime
 
