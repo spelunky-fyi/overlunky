@@ -49,6 +49,10 @@ struct Items;
 struct Illumination;
 
 void fix_liquid_out_of_bounds();
+// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
+uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
+// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
+uint8_t enum_to_layer(const LAYER layer);
 
 #pragma pack(push, 1) // disable struct padding
 struct StateMemory
@@ -328,6 +332,16 @@ struct StateMemory
     {
         correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
     }
+    // safe
+    Layer* layer(LAYER l)
+    {
+        return layers[enum_to_layer(l)];
+    };
+    // safe
+    Layer* layer(uint8_t l)
+    {
+        return l == 1 ? layers[1] : layers[0];
+    }
 };
 #pragma pack(pop)
 
@@ -347,12 +361,6 @@ struct State
     // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
     // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
 
-    // use only if you only want the layer, otherwise use `ptr()->layers`
-    Layer* layer(uint8_t index) const
-    {
-        return ptr()->layers[index];
-    }
-
     void godmode(bool g);
     void godmode_companions(bool g);
     static void darkmode(bool g);
@@ -363,21 +371,6 @@ struct State
     static Vec2 click_position(float x, float y);
     static Vec2 screen_position(float x, float y);
 
-    uint32_t flags() const
-    {
-        return ptr()->level_flags;
-    }
-
-    void set_flags(uint32_t f)
-    {
-        ptr()->level_flags = f;
-    }
-
-    void set_pause(uint8_t p)
-    {
-        ptr()->pause = p;
-    }
-
     static uint32_t get_frame_count(StateMemory* state);
 
     static Entity* find(StateMemory* state, uint32_t uid);
@@ -387,11 +380,6 @@ struct State
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
     SaveData* savedata();
-    // Get the 0x4A0 offset
-    size_t get_offset() const
-    {
-        return location;
-    }
 
   private:
     State(size_t addr)
@@ -414,9 +402,6 @@ void init_state_update_hook();
 void init_process_input_hook();
 void init_game_loop_hook();
 void init_state_clone_hook();
-
-uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
-uint8_t enum_to_layer(const LAYER layer);
 
 uint32_t lowbias32(uint32_t x);
 uint32_t lowbias32_r(uint32_t x);

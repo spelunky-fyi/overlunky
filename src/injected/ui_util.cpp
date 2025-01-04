@@ -169,7 +169,7 @@ float UI::screen_distance(float x)
 }
 Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
 
     static const auto masks_order = {
         0x1,    // Player
@@ -190,7 +190,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     };
     if (s)
     {
-        std::tie(x, y) = state.click_position(x, y);
+        std::tie(x, y) = State::get().click_position(x, y);
     }
     Entity* current_entity = nullptr;
     float current_distance = radius;
@@ -207,7 +207,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 
     if (mask == 0)
     {
-        for (auto& item : state.layer(state.ptr_main()->camera_layer)->all_entities.entities())
+        for (auto& item : state->layers[state->camera_layer]->all_entities.entities())
         {
             check_distance(item);
         }
@@ -219,8 +219,8 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
             if ((mask & current_mask) == 0)
                 continue;
 
-            const auto& entities = state.layer(state.ptr_main()->camera_layer)->entities_by_mask.find(current_mask);
-            if (entities == state.layer(state.ptr_main()->camera_layer)->entities_by_mask.end())
+            const auto& entities = state->layers[state->camera_layer]->entities_by_mask.find(current_mask);
+            if (entities == state->layers[state->camera_layer]->entities_by_mask.end())
                 continue;
 
             for (auto& item : entities->second.entities())

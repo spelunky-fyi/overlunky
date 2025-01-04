@@ -40,10 +40,7 @@ std::vector<ENT_TYPE> get_proper_types(std::vector<ENT_TYPE> ent_types)
 
 int32_t get_grid_entity_at(float x, float y, LAYER layer)
 {
-    auto& state = State::get();
-    uint8_t actual_layer = enum_to_layer(layer);
-
-    if (Entity* ent = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    if (Entity* ent = HeapBase::get().state()->layer(layer)->get_grid_entity_at(x, y))
         return ent->uid;
 
     return -1;
@@ -51,16 +48,15 @@ int32_t get_grid_entity_at(float x, float y, LAYER layer)
 
 std::vector<uint32_t> get_entities_overlapping_grid(float x, float y, LAYER layer)
 {
-    auto& state = State::get();
-    uint8_t actual_layer = enum_to_layer(layer);
+    auto state = HeapBase::get().state();
     std::vector<uint32_t> uids;
-    auto entities = state.layer(actual_layer)->get_entities_overlapping_grid_at(x, y);
+    auto entities = state->layer(layer)->get_entities_overlapping_grid_at(x, y);
     if (entities)
         uids.insert(uids.end(), entities->uids().begin(), entities->uids().end());
     if (layer == LAYER::BOTH)
     {
         // enum_to_layer returns 0 for LAYER::BOTH, so we only need to add entities from second layer
-        auto entities2 = state.layer(1)->get_entities_overlapping_grid_at(x, y);
+        auto entities2 = state->layers[1]->get_entities_overlapping_grid_at(x, y);
         if (entities2)
             uids.insert(uids.end(), entities2->uids().begin(), entities2->uids().end());
     }
@@ -140,14 +136,13 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     }
     else
     {
-        uint8_t correct_layer = enum_to_layer(layer);
         if (proper_types.empty() || proper_types[0] == 0) // all types
         {
-            foreach_mask(mask, state->layers[correct_layer], insert_all_uids);
+            foreach_mask(mask, state->layer(layer), insert_all_uids);
         }
         else
         {
-            foreach_mask(mask, state->layers[correct_layer], push_matching_types);
+            foreach_mask(mask, state->layer(layer), push_matching_types);
         }
     }
     return found;
@@ -156,7 +151,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
 std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
 {
     // TODO: use entity regions?
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
     auto push_entities_at = [&x, &y, &radius, &proper_types, &found](const EntityList& entities)
@@ -171,14 +166,11 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
             }
         }
     };
+    foreach_mask(mask, state->layer(layer), push_entities_at);
     if (layer == LAYER::BOTH)
     {
-        foreach_mask(mask, state.layer(0), push_entities_at);
-        foreach_mask(mask, state.layer(1), push_entities_at);
-    }
-    else
-    {
-        foreach_mask(mask, state.layer(enum_to_layer(layer)), push_entities_at);
+        // if it's both, then the actual_layer is 0
+        foreach_mask(mask, state->layers[1], push_entities_at);
     }
     return found;
 }
@@ -186,20 +178,17 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
 std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
 {
     // TODO: use entity regions?
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     std::vector<uint32_t> result;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
+
+    result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state->layer(layer));
+
     if (layer == LAYER::BOTH)
     {
-        std::vector<uint32_t> result2;
-        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(0));
-        result2 = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(1));
+        // if it's both, then the actual_layer is 0
+        auto result2 = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state->layers[1]);
         result.insert(result.end(), result2.begin(), result2.end());
-    }
-    else
-    {
-        uint8_t actual_layer = enum_to_layer(layer);
-        result = get_entities_overlapping_by_pointer(proper_types, mask, hitbox.left, hitbox.bottom, hitbox.right, hitbox.top, state.layer(actual_layer));
     }
     return result;
 }
@@ -278,17 +267,17 @@ std::vector<uint32_t> get_entities_by_draw_depth(std::vector<uint8_t> draw_depth
 {
     auto state = State::get().ptr_local();
     std::vector<uint32_t> found;
-    auto actual_layer = enum_to_layer(l);
     for (auto draw_depth : draw_depths)
     {
         if (draw_depth > 52)
             continue;
 
-        auto uids_layer1 = state->layers[actual_layer]->entities_by_draw_depth[draw_depth].uids();
+        auto uids_layer1 = state->layer(l)->entities_by_draw_depth[draw_depth].uids();
         found.insert(found.end(), uids_layer1.begin(), uids_layer1.end());
 
-        if (l == LAYER::BOTH) // if it's both, then the actual_layer is 0
+        if (l == LAYER::BOTH)
         {
+            // if it's both, then the actual_layer is 0
             auto uids_layer2 = state->layers[1]->entities_by_draw_depth[draw_depth].uids();
             found.insert(found.end(), uids_layer2.begin(), uids_layer2.end());
         }

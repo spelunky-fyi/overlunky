@@ -18,6 +18,7 @@ Illumination* create_illumination(Vec2 pos, Color col, LIGHT_TYPE type, float si
 
         typedef Illumination* create_illumination_func(custom_vector<Illumination*>*, Vec2*, Color, LIGHT_TYPE, float, uint8_t light_flags, int32_t uid, uint8_t layer);
         static create_illumination_func* cif = (create_illumination_func*)(offset);
+        // enum_to_layer here does not use offset which you could argue should be used, since this function is comparable with spawn type function
         auto emitted_light = cif(state->lightsources, &pos, std::move(col), type, size, light_flags, uid, enum_to_layer(layer));
         return emitted_light;
     }

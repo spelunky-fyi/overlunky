@@ -1495,7 +1495,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                 }
                 uint32_t i_x = static_cast<uint32_t>(floor->x + 0.5f);
                 uint32_t i_y = static_cast<uint32_t>(floor->y + 0.5f);
-                State::get().layer(floor->layer)->grid_entities[i_y][i_x] = floor;
+                HeapBase::get().state()->layer(floor->layer)->grid_entities[i_y][i_x] = floor;
                 fix_decorations_at(floor->x, floor->y, (LAYER)floor->layer);
             }
         }

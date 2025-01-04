@@ -106,7 +106,7 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
         static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
 
         auto pos = entity->abs_position();
-        auto* layer_ptr = State::get().layer(entity->layer);
+        auto* layer_ptr = HeapBase::get().state()->layer(entity->layer);
 
         PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, pos.x + off_x, pos.y + off_y, false, 0.0f, 0.0f, false);
 
@@ -252,14 +252,12 @@ int get_entity_ai_state(uint32_t uid)
 
 uint32_t get_level_flags()
 {
-    auto& state = State::get();
-    return state.flags();
+    return HeapBase::get().state()->level_flags;
 }
 
 void set_level_flags(uint32_t flags)
 {
-    auto& state = State::get();
-    state.set_flags(flags);
+    HeapBase::get().state()->level_flags = flags;
 }
 
 ENT_TYPE get_entity_type(uint32_t uid)
@@ -1225,10 +1223,10 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto& state = State::get();
+        auto state = HeapBase::get().state();
         Vec2 offset;
         const auto actual_layer = enum_to_layer(layer, offset);
-        state.layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state.layer(actual_layer));
+        state->layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state->layers[actual_layer]);
 
         entity->detach(false);
         entity->x = offset.x + x;
@@ -1241,19 +1239,18 @@ void destroy_grid(int32_t uid)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto& state = State::get();
-        state.layer(entity->layer)->destroy_grid_entity(entity);
+        HeapBase::get().state()->layer(entity->layer)->destroy_grid_entity(entity);
     }
 }
 
 void destroy_grid(float x, float y, LAYER layer)
 {
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     uint8_t actual_layer = enum_to_layer(layer);
 
-    if (Entity* entity = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    if (Entity* entity = state->layers[actual_layer]->get_grid_entity_at(x, y))
     {
-        state.layer(entity->layer)->destroy_grid_entity(entity);
+        state->layer(entity->layer)->destroy_grid_entity(entity);
     }
 }
 
@@ -1785,7 +1782,7 @@ void destroy_layer(uint8_t layer)
         if (state->items->players[i] && state->items->players[i]->layer == layer)
             state->items->players[i] = nullptr;
     }
-    auto* layer_ptr = State::get().layer(layer);
+    auto* layer_ptr = HeapBase::get().state()->layer(layer);
     typedef void destroy_func(Layer*);
     static destroy_func* df = (destroy_func*)(offset);
     df(layer_ptr);
@@ -1800,7 +1797,7 @@ void destroy_level()
 void create_layer(uint8_t layer)
 {
     static const size_t offset = get_address("init_layer");
-    auto* layer_ptr = State::get().layer(layer);
+    auto* layer_ptr = HeapBase::get().state()->layer(layer);
     typedef void init_func(Layer*);
     static init_func* ilf = (init_func*)(offset);
     ilf(layer_ptr);

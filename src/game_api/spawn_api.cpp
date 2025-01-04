@@ -175,7 +175,7 @@ int32_t spawn_entity_abs(ENT_TYPE entity_type, float x, float y, LAYER layer, fl
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, vx, vy, false)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, vx, vy, false)->uid;
 }
 
 int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -187,7 +187,7 @@ int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.x, y + offset_position.y)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_entity_snap_to_floor(entity_type, x + offset_position.x, y + offset_position.y)->uid;
 }
 
 int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -199,7 +199,7 @@ int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER 
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, 0.0f, 0.0f, true)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, 0.0f, 0.0f, true)->uid;
 }
 
 int32_t spawn_entity_abs_nonreplaceable(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
@@ -216,7 +216,6 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto& state = State::get();
     Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
         return -1;
@@ -224,7 +223,7 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     if (layer > 1)
         return -1;
 
-    return state.layer(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
+    return HeapBase::get().state()->layers[layer]->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
 int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint8_t t)
@@ -236,7 +235,7 @@ int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_door(x + offset_position.x, y + offset_position.y, w, l, t)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_door(x + offset_position.x, y + offset_position.y, w, l, t)->uid;
 }
 
 void spawn_backdoor_abs(float x, float y)
@@ -245,10 +244,10 @@ void spawn_backdoor_abs(float x, float y)
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     DEBUG("Spawning backdoor on {}, {}", x, y);
-    Layer* front_layer = state.layer(0);
-    Layer* back_layer = state.layer(1);
+    Layer* front_layer = state->layers[0];
+    Layer* back_layer = state->layers[1];
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
@@ -264,7 +263,7 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_apep(x + offset_position.x, y + offset_position.y, right)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_apep(x + offset_position.x, y + offset_position.y, right)->uid;
 }
 
 int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
@@ -279,7 +278,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     x = std::roundf(x + offset_position.x);
     y = std::roundf(y + offset_position.y);
 
-    Layer* layer_ptr = State::get().layer(actual_layer);
+    Layer* layer_ptr = HeapBase::get().state()->layers[actual_layer];
 
     // Needs some space on top
     if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 1 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
@@ -359,7 +358,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
 
     Vec2 offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(l, offset);
-    const auto layer_ptr = State::get().layer(actual_layer);
+    const auto layer_ptr = HeapBase::get().state()->layers[actual_layer];
     const uint32_t i_x = static_cast<uint32_t>(x + offset.x + 0.5f);
     uint32_t i_y = static_cast<uint32_t>(y + offset.y + 0.5f);
     static const auto base = to_id("ENT_TYPE_FLOOR_MUSHROOM_BASE");
@@ -428,7 +427,7 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
 
     Vec2 offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(layer, offset);
-    const auto layer_ptr = State::get().layer(actual_layer);
+    const auto layer_ptr = HeapBase::get().state()->layers[actual_layer];
     const uint32_t i_x = static_cast<uint32_t>(x + offset.x + 0.5f);
     const uint32_t i_y = static_cast<uint32_t>(y + offset.y + 0.5f);
     const float g_x = static_cast<float>(i_x);
@@ -791,7 +790,7 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
 
     Vec2 offset;
     const auto l = enum_to_layer(layer, offset);
-    auto level_layer = State::get().layer(l);
+    auto level_layer = HeapBase::get().state()->layers[l];
 
     static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
     static const auto ana = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
