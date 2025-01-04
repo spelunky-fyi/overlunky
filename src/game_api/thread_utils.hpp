@@ -62,6 +62,8 @@ struct HeapBase
         return reinterpret_cast<LiquidPhysics*>(ptr + GAME_OFFSET::LIQUID_ENGINE);
     }
 
+    void copy_to(HeapBase other) const;
+
   protected:
     HeapBase(uintptr_t addr) noexcept
         : ptr(addr){};
@@ -114,3 +116,5 @@ class OnHeapPointer
   private:
     size_t ptr_;
 };
+
+void init_heap_clone_hook();

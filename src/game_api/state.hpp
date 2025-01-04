@@ -401,7 +401,6 @@ void set_write_load_opt(bool allow);
 void init_state_update_hook();
 void init_process_input_hook();
 void init_game_loop_hook();
-void init_state_clone_hook();
 
 uint32_t lowbias32(uint32_t x);
 uint32_t lowbias32_r(uint32_t x);
