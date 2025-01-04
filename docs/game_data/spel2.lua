@@ -2339,6 +2339,8 @@ do
     ---@field save fun(self): nil @Save over a previously allocated SaveState
     ---@field clear fun(self): nil @Delete the SaveState and free the memory. The SaveState can't be used after this.
     ---@field get_state fun(self): StateMemory @Access the StateMemory inside a SaveState
+    ---@field get_frame fun(self): integer @Get the current frame from the SaveState, equivelent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
+    ---@field get_prng fun(self): PRNG @Access the PRNG inside a SaveState
 
 ---@class BackgroundMusic
     ---@field game_startup BackgroundSound
@@ -6776,6 +6778,12 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
 end
 --## Static class functions
 
+SaveState = nil
+---Get the pre-allocated by the game save slot 1-4
+---@param save_slot integer
+---@return SaveState
+function SaveState:get(save_slot) end
+
 Color = nil
 ---@return Color
 function Color:white() end
@@ -6811,8 +6819,6 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
-
-SaveState = nil
 ---Create a new temporary SaveState/clone of the main level state. Unlike save_state slots that are preallocated by the game anyway, these will use 32MiB a pop and aren't freed automatically, so make sure to clear them or reuse the same one to save memory. The garbage collector will eventually clear the SaveStates you don't have a handle to any more though.
 ---@return SaveState
 function SaveState:new() end

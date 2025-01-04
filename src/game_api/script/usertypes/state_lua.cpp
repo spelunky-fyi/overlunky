@@ -18,6 +18,7 @@
 #include "items.hpp"              // for Items, SelectPlayerSlot, Items::is...
 #include "level_api.hpp"          // IWYU pragma: keep
 #include "online.hpp"             // for OnlinePlayer, OnlineLobby, Online
+#include "prng.hpp"               // IWYU pragma: keep
 #include "savestate.hpp"          // for SaveState
 #include "screen.hpp"             // IWYU pragma: keep
 #include "screen_arena.hpp"       // IWYU pragma: keep
@@ -603,14 +604,14 @@ void register_usertypes(sol::state& lua)
     lua["save_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4)
-            save_main_heap(slot);
+            SaveState::backup_main(slot);
     };
 
     /// Load level state from slot 1..4, if a save_state was made in this level.
     lua["load_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4 && get_save_state(slot))
-            load_main_heap(slot);
+            SaveState::restore_main(slot);
     };
 
     /// Clear save state from slot 1..4.
@@ -628,6 +629,22 @@ void register_usertypes(sol::state& lua)
         return nullptr;
     };
 
-    lua.new_usertype<SaveState>("SaveState", sol::constructors<SaveState()>(), "load", &SaveState::load, "save", &SaveState::save, "clear", &SaveState::clear, "get_state", &SaveState::get_state);
+    lua.new_usertype<SaveState>(
+        "SaveState",
+        sol::constructors<SaveState()>(),
+        "load",
+        &SaveState::load,
+        "save",
+        &SaveState::save,
+        "clear",
+        &SaveState::clear,
+        "get_state",
+        &SaveState::get_state,
+        "get_frame",
+        &SaveState::get_frame,
+        "get_prng",
+        &SaveState::get_prng,
+        "get",
+        &SaveState::get);
 }
 }; // namespace NState

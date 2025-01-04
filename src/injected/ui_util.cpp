@@ -888,12 +888,12 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
 
 void UI::load_state_as_main(int from)
 {
-    load_main_heap(from);
+    SaveState::restore_main(from);
 }
 
 void UI::save_main_state(int to)
 {
-    save_main_heap(to);
+    SaveState::backup_main(to);
 }
 
 StateMemory* UI::get_save_state(int slot)

@@ -5,7 +5,7 @@
 #include "script/events.hpp" // for pre_load_state
 #include "state.hpp"         // for State, get_state_ptr, enum_to_layer
 
-void save_main_heap(int slot_to)
+void SaveState::backup_main(int slot_to)
 {
     if (pre_save_state(slot_to, get_save_state(slot_to)))
         return;
@@ -18,7 +18,7 @@ void save_main_heap(int slot_to)
     post_save_state(slot_to, base_to.state());
 }
 
-void load_main_heap(int slot_from)
+void SaveState::restore_main(int slot_from)
 {
     if (pre_load_state(slot_from, get_save_state(slot_from)))
         return;
@@ -49,19 +49,6 @@ void invalidate_save_slots()
         if (state)
             state->screen = 0;
     }
-}
-
-SaveState::SaveState()
-    : base(reinterpret_cast<uintptr_t>(malloc(8ull * 0x400000)))
-{
-    save();
-}
-
-StateMemory* SaveState::get_state() const
-{
-    if (base.is_null())
-        return nullptr;
-    return base.state();
 }
 
 void SaveState::load()
