@@ -451,12 +451,6 @@ void flip_entity(uint32_t uid)
     }
 }
 
-void set_camera_position(float cx, float cy)
-{
-    auto& state = State::get();
-    state.set_camera_position(cx, cy);
-}
-
 void warp(uint8_t world, uint8_t level, uint8_t theme)
 {
     auto& state = State::get();

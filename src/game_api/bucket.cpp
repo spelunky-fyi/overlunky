@@ -132,7 +132,7 @@ bool PauseAPI::event(PAUSE_TYPE pause_event)
         set_paused(true);
 
     if (update_camera && ((block && (pause_event == PAUSE_TYPE::PRE_UPDATE || pause_event == PAUSE_TYPE::PRE_GAME_LOOP)) || ((pause_event == PAUSE_TYPE::PRE_UPDATE && (uint8_t)pause_type & 0x3f) && state->pause > 0)) && ((state->pause & 1) == 0 || (uint8_t)pause_type & 1))
-        update_camera_position();
+        state->camera->update_position();
 
     if ((pause_type & pause_event) != PAUSE_TYPE::NONE)
         blocked = block;

@@ -321,8 +321,9 @@ void Movable::set_position(float to_x, float to_y)
         rendering_info->x_dupe4 += dx;
         rendering_info->y_dupe4 += dy;
     }
-    if (State::get().ptr()->camera->focused_entity_uid == uid)
-        State::get().set_camera_position(dx, dy);
+    auto camera = HeapBase::get().state()->camera;
+    if (camera->focused_entity_uid == uid)
+        camera->set_position(dx, dy);
 }
 
 template <typename F>

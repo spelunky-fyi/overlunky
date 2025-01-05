@@ -4219,15 +4219,15 @@ void render_camera()
             tooltip("Focus the selected entity");
         }
 
-        auto [cx, cy] = State::get_camera_position();
+        auto [cx, cy] = Camera::get_position();
         ImGui::PushItemWidth(120.0f);
         ImGui::InputFloat("##CameraPosX", &cx, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            HeapBase::get().state()->camera->set_position(cx, cy);
         ImGui::SameLine(0, 4.0f);
         ImGui::InputFloat("Position##CameraPosY", &cy, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            HeapBase::get().state()->camera->set_position(cx, cy);
 
         ImGui::InputFloat("##CameraFocusX", &g_state->camera->focus_x, 0.1f, 1.0f);
         ImGui::SameLine(0, 4.0f);
@@ -5646,7 +5646,7 @@ void render_clickhandler()
                 g_state->camera->focus_x -= (current_pos.first - oryginal_pos.first) * g_camera_speed;
                 g_state->camera->focus_y -= (current_pos.second - oryginal_pos.second) * g_camera_speed;
                 if (g_state->pause != 0 || g_bucket->pause_api->paused() || !options["smooth_camera"])
-                    State::get().set_camera_position(g_state->camera->focus_x, g_state->camera->focus_y);
+                    HeapBase::get().state()->camera->set_position(g_state->camera->focus_x, g_state->camera->focus_y);
                 startpos = normalize(mouse_pos());
                 enable_camera_bounds = false;
                 set_camera_bounds(enable_camera_bounds);

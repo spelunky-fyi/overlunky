@@ -788,10 +788,6 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    Vec2 offset;
-    const auto l = enum_to_layer(layer, offset);
-    auto level_layer = HeapBase::get().state()->layers[l];
-
     static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
     static const auto ana = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
     static const auto egg_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
@@ -801,6 +797,9 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     if (char_type < ana || char_type > egg_child)
         return -1;
 
+    Vec2 offset;
+    const auto l = enum_to_layer(layer, offset);
+    auto level_layer = HeapBase::get().state()->layers[l];
     auto player_ghost_entity = level_layer->spawn_entity(player_ghost, x + offset.x, y + offset.y, false, 0, 0, false)->as<PlayerGhost>();
     if (player_ghost_entity)
     {

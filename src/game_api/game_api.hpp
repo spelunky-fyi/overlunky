@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "state_structs.hpp" // for Camera
+
 struct UnknownRenderStuff
 {
     size_t* unknown1;

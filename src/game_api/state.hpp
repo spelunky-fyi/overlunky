@@ -375,8 +375,6 @@ struct State
 
     static Entity* find(StateMemory* state, uint32_t uid);
 
-    static Vec2 get_camera_position();
-    void set_camera_position(float cx, float cy);
     void warp(uint8_t w, uint8_t l, uint8_t t);
     void set_seed(uint32_t seed);
     SaveData* savedata();
@@ -407,6 +405,5 @@ uint32_t lowbias32_r(uint32_t x);
 
 int64_t get_global_frame_count();
 int64_t get_global_update_count();
-void update_camera_position();
 
 bool get_forward_events();

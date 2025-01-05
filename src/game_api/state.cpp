@@ -349,7 +349,7 @@ float get_zoom_level()
 Vec2 State::click_position(float x, float y)
 {
     float cz = get_zoom_level();
-    auto [cx, cy] = get_camera_position();
+    auto [cx, cy] = Camera::get_position();
     float rx = cx + ZF * cz * x;
     float ry = cy + (ZF / 16.0f * 9.0f) * cz * y;
     return {rx, ry};
@@ -358,7 +358,7 @@ Vec2 State::click_position(float x, float y)
 Vec2 State::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
-    auto [cx, cy] = get_camera_position();
+    auto [cx, cy] = Camera::get_position();
     float rx = (x - cx) / cz / ZF;
     float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
@@ -448,26 +448,36 @@ void State::darkmode(bool g)
     }
 }
 
-Vec2 State::get_camera_position()
+Vec2 Camera::get_position()
 {
+    // = adjusted_focus_x/y - (adjusted_focus_x/y - calculated_focus_x/y) * (render frame-game frame difference)
     static const auto addr = (float*)get_address("camera_position");
     auto cx = *addr;
     auto cy = *(addr + 1);
     return {cx, cy};
 }
 
-void State::set_camera_position(float cx, float cy)
+void Camera::set_position(float cx, float cy)
 {
-    static const auto addr = (float*)get_address("camera_position");
-    auto* camera = ptr()->camera;
-    camera->focus_x = cx;
-    camera->focus_y = cy;
-    camera->adjusted_focus_x = cx;
-    camera->adjusted_focus_y = cy;
-    camera->calculated_focus_x = cx;
-    camera->calculated_focus_y = cy;
+    static const auto addr = (float*)get_address("camera_position"); // probably not needed
+    focus_x = cx;
+    focus_y = cy;
+    adjusted_focus_x = cx;
+    adjusted_focus_y = cy;
+    calculated_focus_x = cx;
+    calculated_focus_y = cy;
     *addr = cx;
     *(addr + 1) = cy;
+}
+
+void Camera::update_position()
+{
+    static const size_t offset = get_address("update_camera_position");
+    typedef void update_camera_func(Camera*);
+    static update_camera_func* ucf = (update_camera_func*)(offset);
+    ucf(this);
+    calculated_focus_x = adjusted_focus_x;
+    calculated_focus_y = adjusted_focus_y;
 }
 
 void State::warp(uint8_t w, uint8_t l, uint8_t t)
@@ -1068,15 +1078,4 @@ void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
 {
     std::erase_if(magmaman_positions, [x, y](MagmamanSpawnPosition& m_pos)
                   { return (m_pos.x == x && m_pos.y == y); });
-}
-
-void update_camera_position()
-{
-    auto camera = State::get().ptr()->camera;
-    static const size_t offset = get_address("update_camera_position");
-    typedef void update_camera_func(Camera*);
-    static update_camera_func* ucf = (update_camera_func*)(offset);
-    ucf(camera);
-    camera->calculated_focus_x = camera->adjusted_focus_x;
-    camera->calculated_focus_y = camera->adjusted_focus_y;
 }

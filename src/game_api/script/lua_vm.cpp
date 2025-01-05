@@ -1311,13 +1311,13 @@ end
     };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = []() -> std::pair<float, float>
-    {
-        return State::get_camera_position();
-    };
+    { return Camera::get_position(); };
     /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
-    lua["set_camera_position"] = set_camera_position;
+    lua["set_camera_position"] = [](float cx, float cy)
+    { HeapBase::get().state()->camera->set_position(cx, cy); };
     /// Updates the camera focus according to the params set in Camera, i.e. to apply normal camera movement when paused etc.
-    lua["update_camera_position"] = update_camera_position;
+    lua["update_camera_position"] = []()
+    { HeapBase::get().state()->camera->update_position(); };
 
     /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags
@@ -1779,9 +1779,7 @@ end
     /// Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first)
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
     lua["change_string"] = [](STRINGID id, std::u16string str)
-    {
-        return change_string(id, str);
-    };
+    { return change_string(id, str); };
 
     /// Add custom string, currently can only be used for names of shop items (EntityDB->description)
     /// Returns STRINGID of the new string
@@ -1790,9 +1788,7 @@ end
     /// Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
     /// if the entity has no localized name
     lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy) -> std::u16string
-    {
-        return get_entity_name(type, fallback_strategy.value_or(false));
-    };
+    { return get_entity_name(type, fallback_strategy.value_or(false)); };
 
     /// Adds custom name to the item by uid used in the shops
     /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
@@ -1967,21 +1963,15 @@ end
 
     /// Get the rva for a pattern name, used for debugging.
     lua["get_rva"] = [](std::string_view address_name) -> std::string
-    {
-        return fmt::format("{:X}", get_address(address_name) - Memory::get().at_exe(0));
-    };
+    { return fmt::format("{:X}", get_address(address_name) - Memory::get().at_exe(0)); };
 
     /// Get the rva for a vtable offset and index, used for debugging.
     lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index) -> std::string
-    {
-        return fmt::format("{:X}", get_virtual_function_address(offset, index));
-    };
+    { return fmt::format("{:X}", get_virtual_function_address(offset, index)); };
 
     /// Get memory address from a lua object
     lua["get_address"] = [&lua]([[maybe_unused]] sol::object o)
-    {
-        return fmt::format("{:X}", *(size_t*)lua_touserdata(lua, 1));
-    };
+    { return fmt::format("{:X}", *(size_t*)lua_touserdata(lua, 1)); };
 
     /// Log to spelunky.log
     lua["log_print"] = game_log;
@@ -2017,24 +2007,18 @@ end
     /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level.
     /// Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with [change_string](#change_string).
     lua["set_level_string"] = [](std::u16string str)
-    {
-        return set_level_string(str);
-    };
+    { return set_level_string(str); };
 
     /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
     lua["set_ending_unlock"] = set_ending_unlock;
 
     /// Get the thread-local version of state
     lua["get_local_state"] = []() -> StateMemory*
-    {
-        return State::get().ptr_local();
-    };
+    { return State::get().ptr_local(); };
 
     /// Get the thread-local version of players
     lua["get_local_players"] = []() -> std::vector<Player*>
-    {
-        return get_players(State::get().ptr_local());
-    };
+    { return get_players(State::get().ptr_local()); };
 
     /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
     lua["list_dir"] = [&lua](std::optional<std::string> dir)
