@@ -436,9 +436,9 @@ void render_version_warning()
     if (version_check_messages[(int)version_check_status.state].fade > 0)
     {
         if (version_check_status.start == 0)
-            version_check_status.start = get_global_frame_count();
+            version_check_status.start = API::get_global_frame_count();
 
-        auto duration = get_global_frame_count() - version_check_status.start;
+        auto duration = API::get_global_frame_count() - version_check_status.start;
         version_check_status.opacity = 1.0f - duration / version_check_messages[(int)version_check_status.state].fade;
         if (version_check_status.opacity <= 0.0f)
         {
@@ -9369,7 +9369,7 @@ void render_prohud()
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("TIMER:{}/{} GLOBAL:{:#06} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), get_global_frame_count(), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
+    std::string buf = fmt::format("TIMER:{}/{} GLOBAL:{:#06} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), API::get_global_frame_count(), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 

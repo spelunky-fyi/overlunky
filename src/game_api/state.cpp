@@ -43,10 +43,18 @@ static int64_t global_frame_count{0};
 static int64_t global_update_count{0};
 static bool g_forward_blocked_events{false};
 
-bool get_forward_events()
+bool API::get_forward_events()
 {
     return g_forward_blocked_events;
 }
+int64_t API::get_global_frame_count()
+{
+    return global_frame_count;
+};
+int64_t API::get_global_update_count()
+{
+    return global_update_count;
+};
 
 StateMemory* get_state_ptr()
 {
@@ -553,14 +561,6 @@ uint32_t State::get_frame_count(StateMemory* state)
 {
     return memory_read<uint32_t>((size_t)state - 0xd0);
 }
-int64_t get_global_frame_count()
-{
-    return global_frame_count;
-};
-int64_t get_global_update_count()
-{
-    return global_update_count;
-};
 
 using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};

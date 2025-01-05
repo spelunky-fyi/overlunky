@@ -54,7 +54,7 @@ bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen) const
     if (match && (trigger & PAUSE_TRIGGER::ONCE) != PAUSE_TRIGGER::NONE)
         trigger = PAUSE_TRIGGER::NONE;
 
-    if (match && last_trigger_frame == get_global_update_count())
+    if (match && last_trigger_frame == API::get_global_update_count())
         match = false;
 
     return match;
@@ -95,13 +95,13 @@ bool PauseAPI::event(PAUSE_TYPE pause_event)
         {
             set_paused(true);
             force = true;
-            last_trigger_frame = get_global_update_count();
+            last_trigger_frame = API::get_global_update_count();
         }
         if (check_trigger(unpause_trigger, unpause_screen))
         {
             set_paused(false);
             force = false;
-            last_trigger_frame = get_global_update_count();
+            last_trigger_frame = API::get_global_update_count();
         }
         last_fade_timer = state->fade_timer;
         last_level_flags = state->level_flags;

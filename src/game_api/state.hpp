@@ -48,11 +48,6 @@ class ThemeInfo;
 struct Items;
 struct Illumination;
 
-// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
-uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
-// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
-uint8_t enum_to_layer(const LAYER layer);
-
 #pragma pack(push, 1) // disable struct padding
 struct StateMemory
 {
@@ -393,9 +388,9 @@ void init(SoundManager* sound_manager = nullptr);
 void post_init();
 void set_do_hooks(bool do_hooks);
 void set_write_load_opt(bool allow);
-} // namespace API
 
 int64_t get_global_frame_count();
 int64_t get_global_update_count();
 
 bool get_forward_events();
+} // namespace API
