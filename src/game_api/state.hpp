@@ -48,7 +48,6 @@ class ThemeInfo;
 struct Items;
 struct Illumination;
 
-void fix_liquid_out_of_bounds();
 // safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
 uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
 // safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
@@ -395,13 +394,6 @@ void post_init();
 void set_do_hooks(bool do_hooks);
 void set_write_load_opt(bool allow);
 } // namespace API
-
-void init_state_update_hook();
-void init_process_input_hook();
-void init_game_loop_hook();
-
-uint32_t lowbias32(uint32_t x);
-uint32_t lowbias32_r(uint32_t x);
 
 int64_t get_global_frame_count();
 int64_t get_global_update_count();

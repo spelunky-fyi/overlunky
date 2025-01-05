@@ -24,6 +24,7 @@
 #include "movable.hpp"                           // for Movable
 #include "movable_behavior.hpp"                  // for init_behavior_hooks
 #include "render_api.hpp"                        // for init_render_api_hooks
+#include "rpc.hpp"                               // for lowbias32
 #include "savedata.hpp"                          // for SaveData
 #include "screen.hpp"                            // for Screen
 #include "script/events.hpp"                     // for pre_entity_instagib
@@ -51,7 +52,7 @@ StateMemory* get_state_ptr()
 {
     return HeapBase::get().state();
 }
-void fix_liquid_out_of_bounds()
+void LiquidPhysics::remove_liquid_oob()
 {
     auto state = HeapBase::get().state();
     if (!state->liquid_physics)
@@ -257,65 +258,6 @@ struct ThemeHookImpl
         }
     }
 };
-
-void API::init(SoundManager* sound_manager)
-{
-    if (!get_is_init())
-    {
-        get_is_init() = true;
-        if (get_write_load_opt())
-        {
-            do_write_load_opt();
-        }
-
-        if (get_do_hooks())
-        {
-            HeapBase::get_main().level_gen()->init();
-            init_spawn_hooks();
-            init_behavior_hooks();
-            init_render_api_hooks();
-            init_achievement_hooks();
-            hook_godmode_functions();
-            strings_init();
-            init_state_update_hook();
-            init_process_input_hook();
-            init_game_loop_hook();
-            init_heap_clone_hook();
-
-            auto bucket = Bucket::get();
-            bucket->count++;
-            if (!bucket->patches_applied)
-            {
-                bucket->patches_applied = true;
-                bucket->forward_blocked_events = true;
-                DEBUG("Applying patches");
-                patch_tiamat_kill_crash();
-                patch_orbs_limit();
-                patch_olmec_kill_crash();
-                patch_liquid_OOB();
-                patch_ushabti_error();
-                patch_entering_closed_door_crash();
-            }
-            else
-            {
-                DEBUG("Not applying patches, someone has already done it");
-                if (bucket->forward_blocked_events)
-                    g_forward_blocked_events = true;
-            }
-        }
-    }
-
-    if (sound_manager)
-        get_lua_vm(sound_manager);
-}
-void API::post_init()
-{
-    if (get_is_init())
-    {
-        StateMemory& state{*State::get().ptr_main()};
-        state.level_gen->hook_themes(ThemeHookImpl{});
-    }
-}
 
 State& State::get()
 {
@@ -541,24 +483,7 @@ SaveData* State::savedata()
     auto gm = get_game_manager();
     return gm->save_related->savedata.decode(); // wondering if it matters if it's local or not?
 }
-uint32_t lowbias32(uint32_t x)
-{
-    x ^= x >> 16;
-    x *= 0x7feb352d;
-    x ^= x >> 15;
-    x *= 0x846ca68b;
-    x ^= x >> 16;
-    return x;
-}
-uint32_t lowbias32_r(uint32_t x)
-{
-    x ^= x >> 16;
-    x *= 0x43021123U;
-    x ^= x >> 15 ^ x >> 30;
-    x *= 0x1d69e2a5U;
-    x ^= x >> 16;
-    return x;
-}
+
 Entity* State::find(StateMemory* state, uint32_t uid)
 {
     // Ported from MauveAlert's python code in the CAT tracker
@@ -1078,4 +1003,63 @@ void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
 {
     std::erase_if(magmaman_positions, [x, y](MagmamanSpawnPosition& m_pos)
                   { return (m_pos.x == x && m_pos.y == y); });
+}
+
+void API::init(SoundManager* sound_manager)
+{
+    if (!get_is_init())
+    {
+        get_is_init() = true;
+        if (get_write_load_opt())
+        {
+            do_write_load_opt();
+        }
+
+        if (get_do_hooks())
+        {
+            HeapBase::get_main().level_gen()->init();
+            init_spawn_hooks();
+            init_behavior_hooks();
+            init_render_api_hooks();
+            init_achievement_hooks();
+            hook_godmode_functions();
+            strings_init();
+            init_state_update_hook();
+            init_process_input_hook();
+            init_game_loop_hook();
+            init_heap_clone_hook();
+
+            auto bucket = Bucket::get();
+            bucket->count++;
+            if (!bucket->patches_applied)
+            {
+                bucket->patches_applied = true;
+                bucket->forward_blocked_events = true;
+                DEBUG("Applying patches");
+                patch_tiamat_kill_crash();
+                patch_orbs_limit();
+                patch_olmec_kill_crash();
+                patch_liquid_OOB();
+                patch_ushabti_error();
+                patch_entering_closed_door_crash();
+            }
+            else
+            {
+                DEBUG("Not applying patches, someone has already done it");
+                if (bucket->forward_blocked_events)
+                    g_forward_blocked_events = true;
+            }
+        }
+    }
+
+    if (sound_manager)
+        get_lua_vm(sound_manager);
+}
+void API::post_init()
+{
+    if (get_is_init())
+    {
+        StateMemory& state{*State::get().ptr_main()};
+        state.level_gen->hook_themes(ThemeHookImpl{});
+    }
 }

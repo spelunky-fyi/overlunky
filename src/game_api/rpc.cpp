@@ -2090,3 +2090,22 @@ uint8_t get_liquid_layer()
     static auto addr = get_address("check_if_collides_with_liquid_layer");
     return memory_read<uint8_t>(addr);
 }
+
+uint32_t lowbias32(uint32_t x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352d;
+    x ^= x >> 15;
+    x *= 0x846ca68b;
+    x ^= x >> 16;
+    return x;
+}
+uint32_t lowbias32_r(uint32_t x)
+{
+    x ^= x >> 16;
+    x *= 0x43021123U;
+    x ^= x >> 15 ^ x >> 30;
+    x *= 0x1d69e2a5U;
+    x ^= x >> 16;
+    return x;
+}

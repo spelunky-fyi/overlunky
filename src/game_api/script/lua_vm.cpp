@@ -1853,7 +1853,8 @@ end
     /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
     /// The patch however does not destroy the liquids that fall pass the level bounds,
     /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
-    lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
+    lua["fix_liquid_out_of_bounds"] = []()
+    { HeapBase::get().liquid_physics()->remove_liquid_oob(); };
 
     /// Return the name of the first matching number in an enum table
     // lua["enum_get_name"] = [](table enum, int value) -> string

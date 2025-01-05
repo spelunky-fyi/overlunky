@@ -932,6 +932,7 @@ struct LiquidPhysics
     uint32_t unknown13;
 
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE ent);
+    void remove_liquid_oob();
 };
 
 struct AITarget
