@@ -57,10 +57,11 @@ public:
     }
 
     std::optional <FMODStudio::LoadingState> getLoadingState();
-    std::optional <FMODStudio::LoadingState> getSampleLoadingState();
     bool loadSampleData();
-    bool unload();
     bool unloadSampleData();
+    std::optional <FMODStudio::LoadingState> getSampleLoadingState();
+    bool unload();
+    bool isValid();
 
 private:
     CustomBank(std::nullptr_t, std::nullptr_t)
@@ -292,10 +293,11 @@ class SoundManager
     CustomBank get_existing_bank(std::string_view path);
     void acquire_bank(FMOD::Bank* fmod_bank);
     std::optional <FMODStudio::LoadingState> get_bank_loading_state(CustomBank custom_bank);
-    std::optional <FMODStudio::LoadingState> get_bank_sample_loading_state(CustomBank custom_bank);
     bool load_bank_sample_data(CustomBank custom_bank);
-    bool unload_bank(FMOD::Bank* fmod_bank);
     bool unload_bank_sample_data(CustomBank custom_bank);
+    std::optional<FMODStudio::LoadingState> get_bank_sample_loading_state(CustomBank custom_bank);
+    bool unload_bank(FMOD::Bank* fmod_bank);
+    bool bank_is_valid(CustomBank custom_bank);
     FMODpathGUIDmap create_fmod_path_guid_map(std::string_view path);
     CustomEventInstance create_event_instance(FMODStudio::EventDescription* fmod_event);
     bool release_all_event_instances(FMODStudio::EventDescription* fmod_event);
@@ -409,10 +411,11 @@ class SoundManager
     FMODStudio::ParseID* m_StudioParseID{nullptr};
 
     FMODStudio::BankGetLoadingState* m_BankGetLoadingState{nullptr};
-    FMODStudio::BankGetSampleLoadingState* m_BankGetSampleLoadingState{nullptr};
     FMODStudio::BankLoadSampleData* m_BankLoadSampleData{nullptr};
-    FMODStudio::BankUnload* m_BankUnload{nullptr};
     FMODStudio::BankUnloadSampleData* m_BankUnloadSampleData{nullptr};
+    FMODStudio::BankGetSampleLoadingState* m_BankGetSampleLoadingState{nullptr};
+    FMODStudio::BankUnload* m_BankUnload{nullptr};
+    FMODStudio::BankIsValid* m_BankIsValid{nullptr};
 
     FMODStudio::EventDescriptionCreateInstance* m_EventCreateInstance{nullptr};
     FMODStudio::EventDescriptionReleaseAllInstances* m_EventDescriptionReleaseAllInstances{nullptr};

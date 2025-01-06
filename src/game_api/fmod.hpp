@@ -493,13 +493,14 @@ using SystemLoadBankFile = FMOD_RESULT(System*, const char*, LoadBankFlags, Bank
 using SystemGetBank = FMOD_RESULT(System*, const char*, Bank**);
 using SystemGetEventByID = FMOD_RESULT(System*, FMOD_GUID*, EventDescription**);
 
-using BankGetLoadingState = FMOD_RESULT(Bank*, LoadingState*);
-using BankGetSampleLoadingState = FMOD_RESULT(Bank*, LoadingState*);
-using BankLoadSampleData = FMOD_RESULT(Bank*);
-using BankUnload = FMOD_RESULT(Bank*);
-using BankUnloadSampleData = FMOD_RESULT(Bank*);
-
 using ParseID = FMOD_RESULT(const char*, FMOD_GUID*);
+
+using BankGetLoadingState = FMOD_RESULT(Bank*, LoadingState*);
+using BankLoadSampleData = FMOD_RESULT(Bank*);
+using BankUnloadSampleData = FMOD_RESULT(Bank*);
+using BankGetSampleLoadingState = FMOD_RESULT(Bank*, LoadingState*);
+using BankUnload = FMOD_RESULT(Bank*);
+using BankIsValid = bool(Bank*);
 
 using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
 

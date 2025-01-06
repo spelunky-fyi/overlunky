@@ -268,14 +268,16 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "CustomBank",
         "getLoadingState",
         &CustomBank::getLoadingState,
-        "getSampleLoadingState",
-        &CustomBank::getSampleLoadingState,
         "loadSampleData",
         &CustomBank::loadSampleData,
+        "unloadSampleData",
+        &CustomBank::unloadSampleData,
+        "getSampleLoadingState",
+        &CustomBank::getSampleLoadingState,
         "unload",
         &CustomBank::unload,
-        "unloadSampleData",
-        &CustomBank::unloadSampleData);
+        "isValid",
+        &CustomBank::isValid);
 
     lua.new_usertype<FMODpathGUIDmap>(
         "CustomGUIDstringMap",
