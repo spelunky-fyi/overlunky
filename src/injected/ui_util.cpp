@@ -33,11 +33,11 @@
 
 void UI::godmode(bool g)
 {
-    State::get().godmode(g);
+    API::godmode(g);
 }
 void UI::godmode_companions(bool g)
 {
-    State::get().godmode_companions(g);
+    API::godmode_companions(g);
 }
 void UI::death_enabled(bool g)
 {
@@ -45,15 +45,15 @@ void UI::death_enabled(bool g)
 }
 std::pair<float, float> UI::click_position(float x, float y)
 {
-    return State::click_position(x, y);
+    return API::click_position(x, y);
 }
 void UI::zoom(float level)
 {
-    State::get().zoom(level);
+    API::zoom(level);
 }
 void UI::zoom_reset()
 {
-    State::get().zoom_reset();
+    API::zoom_reset();
 }
 uint32_t UI::get_frame_count()
 {
@@ -66,14 +66,14 @@ void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
     if (state->items->player_inventories[0].health == 0)
         state->items->player_inventories[0].health = 4;
 
-    State::get().warp(world, level, theme);
+    HeapBase::get().state()->warp(world, level, theme);
 }
 void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
 {
-    auto state = State::get().ptr_main();
+    auto state = HeapBase::get().state();
     if (state->screen != 12)
     {
-        State::get().warp(world, level, theme);
+        state->warp(world, level, theme);
         return;
     }
     state->world_next = world;
@@ -115,8 +115,7 @@ void teleport_entity(Entity* ent, float dx, float dy, bool s, float vx, float vy
     {
         // screen coordinates -1..1
         // log::debug!("Teleporting to screen {}, {}", x, y);
-        auto& state = State::get();
-        auto [x_pos, y_pos] = state.click_position(dx, dy);
+        auto [x_pos, y_pos] = API::click_position(dx, dy);
         if (snap && abs(vx) + abs(vy) <= 0.04f)
         {
             x_pos = round(x_pos);
@@ -159,18 +158,16 @@ void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 }
 std::pair<float, float> UI::screen_position(float x, float y)
 {
-    return State::screen_position(x, y);
+    return API::screen_position(x, y);
 }
 float UI::screen_distance(float x)
 {
-    auto a = State::screen_position(0, 0);
-    auto b = State::screen_position(x, 0);
+    auto a = API::screen_position(0, 0);
+    auto b = API::screen_position(x, 0);
     return b.x - a.x;
 }
 Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
-    auto state = HeapBase::get().state();
-
     static const auto masks_order = {
         0x1,    // Player
         0x2,    // Mount
@@ -190,7 +187,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     };
     if (s)
     {
-        std::tie(x, y) = State::get().click_position(x, y);
+        std::tie(x, y) = API::click_position(x, y);
     }
     Entity* current_entity = nullptr;
     float current_distance = radius;
@@ -204,7 +201,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
             current_distance = distance;
         }
     };
-
+    auto state = HeapBase::get().state();
     if (mask == 0)
     {
         for (auto& item : state->layers[state->camera_layer]->all_entities.entities())
@@ -240,7 +237,7 @@ void UI::move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy,
 }
 SaveData* UI::savedata()
 {
-    return State::get().savedata();
+    return get_game_manager()->save_related->savedata.decode_local();
 }
 int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {

@@ -336,6 +336,9 @@ struct StateMemory
     {
         return l == 1 ? layers[1] : layers[0];
     }
+    void warp(uint8_t set_world, uint8_t set_level, uint8_t set_theme);
+    Entity* get_entity(uint32_t uid) const;
+    void set_seed(uint32_t set_seed);
 };
 #pragma pack(pop)
 
@@ -355,23 +358,7 @@ struct State
     // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
     // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
 
-    void godmode(bool g);
-    void godmode_companions(bool g);
-    static void darkmode(bool g);
-
-    void zoom(float level) const;
-    static void zoom_reset();
-
-    static Vec2 click_position(float x, float y);
-    static Vec2 screen_position(float x, float y);
-
     static uint32_t get_frame_count(StateMemory* state);
-
-    static Entity* find(StateMemory* state, uint32_t uid);
-
-    void warp(uint8_t w, uint8_t l, uint8_t t);
-    void set_seed(uint32_t seed);
-    SaveData* savedata();
 
   private:
     State(size_t addr)
@@ -393,4 +380,16 @@ int64_t get_global_frame_count();
 int64_t get_global_update_count();
 
 bool get_forward_events();
+
+void godmode(bool g);
+void godmode_companions(bool g);
+// do not use this!
+void darkmode(bool g);
+
+void zoom(float level);
+void zoom_reset();
+
+// maybe would fit better in render_api ?
+Vec2 click_position(float x, float y);
+Vec2 screen_position(float x, float y);
 } // namespace API

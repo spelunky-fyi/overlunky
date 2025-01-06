@@ -236,10 +236,7 @@ void Entity::set_enable_turning(bool enabled)
 
 Entity* get_entity_ptr(uint32_t uid)
 {
-    auto p = State::find(State::get().ptr(), uid);
-    // if (IsBadWritePtr(p, 0x178))
-    //     return nullptr;
-    return p;
+    return HeapBase::get().state()->get_entity(uid);
 }
 
 std::vector<uint32_t> Movable::get_all_behaviors()

@@ -9,7 +9,7 @@
 #include "entity.hpp"          // for Entity, to_id, EntityDB, entity_factory
 #include "logger.h"            // for DEBUG
 #include "movable.hpp"         // for Movable
-#include "rpc.hpp"             //
+#include "rpc.hpp"             // for update_liquid_collision_at
 #include "search.hpp"          // for get_address
 #include "state.hpp"           // for State, StateMemory
 
@@ -31,8 +31,7 @@ Entity* Layer::spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx
     }
     else if (screen)
     {
-        auto& state = State::get();
-        std::tie(x, y) = state.click_position(x, y);
+        std::tie(x, y) = API::click_position(x, y);
         min_speed_check = 0.04f;
         if (snap && abs(vx) + abs(vy) <= min_speed_check)
         {

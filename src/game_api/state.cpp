@@ -143,7 +143,17 @@ void API::set_write_load_opt(bool write_load_opt)
 static bool g_godmode_player_active = false;
 static bool g_godmode_companions_active = false;
 
-bool is_active_player(Entity* e)
+void API::godmode(bool g)
+{
+    g_godmode_player_active = g;
+}
+
+void API::godmode_companions(bool g)
+{
+    g_godmode_companions_active = g;
+}
+
+static bool is_active_player(Entity* e)
 {
     auto state = State::get().ptr();
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
@@ -222,16 +232,6 @@ void hook_godmode_functions()
     }
 }
 
-void State::godmode(bool g)
-{
-    g_godmode_player_active = g;
-}
-
-void State::godmode_companions(bool g)
-{
-    g_godmode_companions_active = g;
-}
-
 struct ThemeHookImpl
 {
     template <class FunT, class HookFunT>
@@ -290,13 +290,13 @@ StateMemory* State::ptr_local() const
     return p.decode_local();
 }
 
-float get_zoom_level()
+static float get_zoom_level()
 {
     auto game_api = GameAPI::get();
     return game_api->get_current_zoom();
 }
 
-Vec2 State::click_position(float x, float y)
+Vec2 API::click_position(float x, float y)
 {
     float cz = get_zoom_level();
     auto [cx, cy] = Camera::get_position();
@@ -305,7 +305,7 @@ Vec2 State::click_position(float x, float y)
     return {rx, ry};
 }
 
-Vec2 State::screen_position(float x, float y)
+Vec2 API::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
     auto [cx, cy] = Camera::get_position();
@@ -314,9 +314,9 @@ Vec2 State::screen_position(float x, float y)
     return {rx, ry};
 }
 
-void State::zoom(float level) const
+void API::zoom(float level)
 {
-    auto roomx = ptr()->w;
+    auto roomx = HeapBase::get().state()->w;
     if (level == 0.0)
     {
         switch (roomx)
@@ -366,7 +366,7 @@ void State::zoom(float level) const
     game_api->set_zoom(std::nullopt, level);
 }
 
-void State::zoom_reset()
+void API::zoom_reset()
 {
     recover_mem("zoom");
     auto game_api = GameAPI::get();
@@ -384,7 +384,7 @@ void StateMemory::force_current_theme(THEME t)
     }
 }
 
-void State::darkmode(bool g)
+void API::darkmode(bool g)
 {
     static const size_t addr_dark = get_address("force_dark_level");
 
@@ -430,39 +430,40 @@ void Camera::update_position()
     calculated_focus_y = adjusted_focus_y;
 }
 
-void State::warp(uint8_t w, uint8_t l, uint8_t t)
+void StateMemory::warp(uint8_t set_world, uint8_t set_level, uint8_t set_theme)
 {
-    // if (ptr()->screen < 11 || ptr()->screen > 20)
+    // if (screen < 11 || screen > 20)
     //     return;
-    if (ptr()->items->player_count < 1)
+    auto gm = get_game_manager();
+    if (items->player_count < 1)
     {
-        ptr()->items->player_select_slots[0].activated = true;
-        ptr()->items->player_select_slots[0].character = savedata()->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 285; // TODO: magic numbers
-        ptr()->items->player_count = 1;
+        auto savedata = gm->save_related->savedata.decode_local();
+        items->player_select_slots[0].activated = true;
+        items->player_select_slots[0].character = savedata->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        items->player_select_slots[0].texture_id = savedata->players[0] + 285; // TODO: magic numbers
+        items->player_count = 1;
     }
-    ptr()->world_next = w;
-    ptr()->level_next = l;
-    ptr()->theme_next = t;
-    if (ptr()->world_start < 1 || ptr()->level_start < 1 || ptr()->theme_start < 1 || ptr()->theme == 17)
+    world_next = set_world;
+    level_next = set_level;
+    theme_next = set_theme;
+    if (world_start < 1 || level_start < 1 || theme_start < 1 || theme == 17)
     {
-        ptr()->world_start = w;
-        ptr()->level_start = l;
-        ptr()->theme_start = t;
-        ptr()->quest_flags = 1;
+        world_start = set_world;
+        level_start = set_level;
+        theme_start = set_theme;
+        quest_flags = 1;
     }
-    if (t != 17)
+    if (set_theme != 17)
     {
-        ptr()->screen_next = 12;
+        screen_next = 12;
     }
     else
     {
-        ptr()->screen_next = 11;
+        screen_next = 11;
     }
-    ptr()->win_state = 0;
-    ptr()->loading = 1;
+    win_state = 0;
+    loading = 1;
 
-    static auto gm = get_game_manager();
     if (gm->main_menu_music)
     {
         gm->main_menu_music->kill(false);
@@ -470,29 +471,23 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     }
 }
 
-void State::set_seed(uint32_t seed)
+void StateMemory::set_seed(uint32_t set_seed)
 {
-    if (ptr()->screen < 11 || ptr()->screen > 20)
+    if (screen < 11 || screen > 20)
         return;
-    ptr()->seed = seed;
-    ptr()->world_start = 1;
-    ptr()->level_start = 1;
-    ptr()->theme_start = 1;
-    ptr()->world_next = 1;
-    ptr()->level_next = 1;
-    ptr()->theme_next = 1;
-    ptr()->quest_flags = 0x1e | 0x41;
-    ptr()->screen_next = 12;
-    ptr()->loading = 1;
+    seed = set_seed;
+    world_start = 1;
+    level_start = 1;
+    theme_start = 1;
+    world_next = 1;
+    level_next = 1;
+    theme_next = 1;
+    quest_flags = 0x1e | 0x41;
+    screen_next = 12;
+    loading = 1;
 }
 
-SaveData* State::savedata()
-{
-    auto gm = get_game_manager();
-    return gm->save_related->savedata.decode(); // wondering if it matters if it's local or not?
-}
-
-Entity* State::find(StateMemory* state, uint32_t uid)
+Entity* StateMemory::get_entity(uint32_t uid) const
 {
     // Ported from MauveAlert's python code in the CAT tracker
 
@@ -502,12 +497,12 @@ Entity* State::find(StateMemory* state, uint32_t uid)
         return nullptr;
     }
 
-    const uint32_t mask = state->uid_to_entity_mask;
+    const uint32_t mask = uid_to_entity_mask;
     const uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
     while (true)
     {
-        auto entry = state->uid_to_entity_data[cur_index];
+        auto entry = uid_to_entity_data[cur_index];
         if (entry.uid_plus_one == target_uid_plus_one)
         {
             return entry.entity;
@@ -527,7 +522,7 @@ Entity* State::find(StateMemory* state, uint32_t uid)
     }
 }
 
-LiquidPhysicsEngine* LiquidPhysics::get_correct_liquid_engine(ENT_TYPE liquid_type)
+LiquidPhysicsEngine* LiquidPhysics::get_correct_liquid_engine(ENT_TYPE liquid_type) const
 {
     static const ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
     static const ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);

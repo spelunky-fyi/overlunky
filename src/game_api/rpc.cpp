@@ -287,15 +287,15 @@ std::vector<Player*> get_players(StateMemory* state)
 
 std::tuple<float, float, float, float> screen_aabb(float left, float top, float right, float bottom)
 {
-    auto [sx1, sy1] = State::screen_position(left, top);
-    auto [sx2, sy2] = State::screen_position(right, bottom);
+    auto [sx1, sy1] = API::screen_position(left, top);
+    auto [sx2, sy2] = API::screen_position(right, bottom);
     return std::tuple{sx1, sy1, sx2, sy2};
 }
 
 float screen_distance(float x)
 {
-    auto a = State::screen_position(0, 0);
-    auto b = State::screen_position(x, 0);
+    auto a = API::screen_position(0, 0);
+    auto b = API::screen_position(x, 0);
     return b.x - a.x;
 }
 
@@ -449,18 +449,6 @@ void flip_entity(uint32_t uid)
             item->flags = flipflag(item->flags, 17);
         }
     }
-}
-
-void warp(uint8_t world, uint8_t level, uint8_t theme)
-{
-    auto& state = State::get();
-    state.warp(world, level, theme);
-}
-
-void set_seed(uint32_t seed)
-{
-    auto& state = State::get();
-    state.set_seed(seed);
 }
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)

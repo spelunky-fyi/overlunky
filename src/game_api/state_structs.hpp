@@ -931,7 +931,7 @@ struct LiquidPhysics
     uint8_t padding12c;
     uint32_t unknown13;
 
-    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE ent);
+    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE ent) const;
     void remove_liquid_oob();
 };
 

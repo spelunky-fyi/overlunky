@@ -364,7 +364,7 @@ end
         return nullptr;
     };
     /// Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
-    lua["savegame"] = State::get().savedata();
+    lua["savegame"] = get_game_manager()->save_related->savedata.decode();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
@@ -964,25 +964,27 @@ end
     };
 
     /// Warp to a level immediately.
-    lua["warp"] = warp;
+    lua["warp"] = [](uint8_t world, uint8_t level, uint8_t theme)
+    { HeapBase::get().state()->warp(world, level, theme); };
     /// Set seed and reset run.
-    lua["set_seed"] = set_seed;
+    lua["set_seed"] = [](uint32_t seed)
+    { HeapBase::get().state()->set_seed(seed); };
     /// Enable/disable godmode for players.
     lua["god"] = [](bool g)
-    { State::get().godmode(g); };
+    { API::godmode(g); };
     /// Enable/disable godmode for companions.
     lua["god_companions"] = [](bool g)
-    { State::get().godmode_companions(g); };
+    { API::godmode_companions(g); };
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     lua["force_dark_level"] = [](bool g)
-    { State::get().darkmode(g); };
+    { API::darkmode(g); };
     /// Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
     lua["zoom"] = [](float level)
-    { State::get().zoom(level); };
+    { API::zoom(level); };
     /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
     lua["zoom_reset"] = []()
-    { State::get().zoom_reset(); };
+    { API::zoom_reset(); };
     auto move_entity_abs = sol::overload(
         static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
         static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
@@ -1132,10 +1134,10 @@ end
     };
     /// Get the game coordinates at the screen position (`x`, `y`)
     lua["game_position"] = [](float x, float y) -> std::pair<float, float>
-    { return State::click_position(x, y); };
+    { return API::click_position(x, y); };
     /// Translate an entity position to screen position to be used in drawing functions
     lua["screen_position"] = [](float x, float y) -> std::pair<float, float>
-    { return State::screen_position(x, y); };
+    { return API::screen_position(x, y); };
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity

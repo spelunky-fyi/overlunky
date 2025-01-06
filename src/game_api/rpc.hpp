@@ -49,8 +49,6 @@ void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse = std::nullopt
 void destroy_entity(uint32_t uid);
 void apply_entity_db(uint32_t uid);
 void flip_entity(uint32_t uid);
-void warp(uint8_t w, uint8_t l, uint8_t t);
-void set_seed(uint32_t seed);
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type);
 void modify_sparktraps(float angle_increment = 0.015, float distance = 3.0);
 float* get_sparktraps_parameters_ptr(); // for UI
