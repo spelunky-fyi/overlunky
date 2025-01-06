@@ -29,6 +29,7 @@
 #include "level_api.hpp"                    // IWYU pragma: keep
 #include "logger.h"                         // for DEBUG
 #include "script.hpp"                       // for ScriptMessage, ScriptImage (ptr only), Scri...
+#include "thread_utils.hpp"                 // for HeapBase
 #include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext, CORNER_FINISH
 #include "util.hpp"                         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
@@ -338,7 +339,7 @@ class LuaBackend
     std::unordered_map<int, ScriptInput*> script_input;
     std::unordered_set<std::string> windows;
     std::unordered_set<std::string> console_commands;
-    std::unordered_map<StateMemory*, LocalStateData> local_state_datas; // TODO: change key from StateMemory* to HeapBase
+    std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
     bool manual_save{false};
     uint32_t last_save{0};
 
@@ -473,7 +474,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
-    void pre_copy_state(StateMemory* from, StateMemory* to);
+    void pre_copy_state(HeapBase from, HeapBase to);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);

@@ -552,11 +552,6 @@ LiquidPhysicsEngine* LiquidPhysics::get_correct_liquid_engine(ENT_TYPE liquid_ty
     return nullptr;
 }
 
-uint32_t State::get_frame_count(StateMemory* state)
-{
-    return memory_read<uint32_t>((size_t)state - 0xd0);
-}
-
 using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)

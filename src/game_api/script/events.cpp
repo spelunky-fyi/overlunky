@@ -518,7 +518,7 @@ void post_event(ON event)
         });
 }
 
-void pre_copy_state_event(StateMemory* from, StateMemory* to)
+void pre_copy_state_event(HeapBase from, HeapBase to)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)

@@ -354,11 +354,7 @@ struct State
     StateMemory* ptr() const;
     StateMemory* ptr_local() const;
 
-    // TODO: rest of the functions should probably be just static or moved out of here as they don't need State
-    // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
-    // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
 
-    static uint32_t get_frame_count(StateMemory* state);
 
   private:
     State(size_t addr)

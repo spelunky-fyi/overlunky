@@ -13,7 +13,7 @@ void SaveState::backup_main(int slot_to)
     auto base_from = HeapBase::get_main();
     auto base_to = HeapBase::get(static_cast<uint8_t>(slot_to - 1));
 
-    pre_copy_state_event(base_from.state(), base_to.state());
+    pre_copy_state_event(base_from, base_to);
     base_from.copy_to(base_to);
     post_save_state(slot_to, base_to.state());
 }
@@ -26,7 +26,7 @@ void SaveState::restore_main(int slot_from)
     auto base_from = HeapBase::get(static_cast<uint8_t>(slot_from - 1));
     auto base_to = HeapBase::get_main();
 
-    pre_copy_state_event(base_from.state(), base_to.state());
+    pre_copy_state_event(base_from, base_to);
     base_from.copy_to(base_to);
     post_load_state(slot_from, base_from.state());
 }

@@ -92,9 +92,8 @@ HeapBase HeapBase::get(uint8_t slot)
 void HeapClone(HeapBase heap_to, uint64_t heap_container_from)
 {
     auto heap_from = memory_read<uint64_t>(heap_container_from + 0x88);
-    StateMemory* state_from = reinterpret_cast<HeapBase&>(heap_from).state();
-    StateMemory* state_to = heap_to.state();
-    pre_copy_state_event(state_from, state_to);
+    HeapBase heap_base_from = reinterpret_cast<HeapBase&>(heap_from);
+    pre_copy_state_event(heap_base_from, heap_to);
 }
 
 // Original function params: clone_heap(ThreadStorageContainer to, ThreadStorageContainer from)

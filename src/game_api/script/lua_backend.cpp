@@ -85,7 +85,7 @@ LuaBackend::~LuaBackend()
 
 LocalStateData& LuaBackend::get_locals()
 {
-    return local_state_datas[State::get().ptr()];
+    return local_state_datas[HeapBase::get().state()];
 }
 
 void LuaBackend::clear()
@@ -281,7 +281,8 @@ bool LuaBackend::update()
             clear_custom_shopitem_names();
         }*/
         ScriptState& script_state = get_locals().state;
-        StateMemory* state = State::get().ptr();
+        HeapBase heap = HeapBase::get();
+        StateMemory* state = heap.state();
         if (state->screen != script_state.screen)
         {
             if (on_screen)
@@ -374,7 +375,7 @@ bool LuaBackend::update()
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
-            int now = State::get_frame_count(state);
+            int now = heap.frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now >= cb->lastRan + cb->interval && !is_callback_cleared(it->first))
@@ -411,7 +412,7 @@ bool LuaBackend::update()
             }
         }
 
-        auto now = State::get_frame_count(state);
+        auto now = heap.frame_count();
         for (auto& [id, callback] : load_callbacks)
         {
             if (callback.lastRan < 0)
@@ -459,7 +460,7 @@ bool LuaBackend::update()
                 }
                 case ON::GAMEFRAME:
                 {
-                    if (!state->pause && State::get_frame_count(state) != script_state.time_global &&
+                    if (!state->pause && heap.frame_count() != script_state.time_global &&
                         ((state->screen >= (int)ON::CAMP && state->screen <= (int)ON::DEATH) || state->screen == (int)ON::ARENA_MATCH))
                     {
                         handle_function<void>(this, callback.func);
@@ -1920,12 +1921,12 @@ void LuaBackend::copy_locals(StateMemory* from, StateMemory* to)
     }
 }
 
-void LuaBackend::pre_copy_state(StateMemory* from, StateMemory* to)
+void LuaBackend::pre_copy_state(HeapBase from, HeapBase to)
 {
     if (!get_enabled())
         return;
 
-    copy_locals(from, to);
+    copy_locals(from.state(), to.state());
     // auto now = HeapBase::get().frame_count();
     // for (auto& [id, callback] : callbacks)
     // {
