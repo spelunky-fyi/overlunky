@@ -30,66 +30,6 @@
 
 using namespace std::chrono_literals;
 
-void Entity::teleport(float dx, float dy, bool s, float vx, float vy, bool snap)
-{
-    if (overlay)
-        overlay->remove_item(uid);
-    overlay = NULL;
-    auto topmost = topmost_mount();
-    if (!s)
-    {
-        auto [x_pos, y_pos] = topmost->position();
-        // player relative coordinates
-        x_pos += dx;
-        y_pos += dy;
-        if (snap)
-        {
-            x_pos = round(x_pos);
-            y_pos = round(y_pos);
-        }
-        topmost->x = x_pos;
-        topmost->y = y_pos;
-    }
-    else
-    {
-        // screen coordinates -1..1
-        // log::debug!("Teleporting to screen {}, {}", x, y);
-        auto& state = State::get();
-        auto [x_pos, y_pos] = state.click_position(dx, dy);
-        if (snap && abs(vx) + abs(vy) <= 0.04f)
-        {
-            x_pos = round(x_pos);
-            y_pos = round(y_pos);
-        }
-        // log::debug!("Teleporting to {}, {}", x, y);
-        topmost->x = x_pos;
-        topmost->y = y_pos;
-    }
-    // set velocity
-    if (topmost->is_movable())
-    {
-        auto movable_ent = (Movable*)topmost;
-        movable_ent->velocityx = vx;
-        movable_ent->velocityy = vy;
-    }
-    return;
-}
-
-void Entity::teleport_abs(float dx, float dy, float vx, float vy)
-{
-    if (overlay)
-        overlay->remove_item(uid);
-    overlay = NULL;
-    x = dx;
-    y = dy;
-    if (is_movable())
-    {
-        auto movable_ent = this->as<Movable>();
-        movable_ent->velocityx = vx;
-        movable_ent->velocityy = vy;
-    }
-}
-
 void Entity::set_layer(LAYER layer_to)
 {
     uint8_t dest_layer = enum_to_layer(layer_to);
@@ -163,8 +103,11 @@ void Entity::perform_teleport(uint8_t delta_x, uint8_t delta_y)
     tp(this, delta_x, delta_y);
 }
 
-Vec2 Entity::position() const
+Vec2 Entity::abs_position() const
 {
+    // if (abs_x != -FLT_MAX && abs_y != -FLT_MAX) // shortcut, if available
+    //     return {abs_x, abs_y}; // using abs_x/y may have some issues https://github.com/spelunky-fyi/overlunky/issues/408
+
     auto [x_pos, y_pos] = position_self();
 
     // overlay exists if player is riding something / etc
@@ -176,13 +119,6 @@ Vec2 Entity::position() const
         overlay_nested = overlay_nested->overlay;
     }
     return {x_pos, y_pos};
-}
-
-void Entity::remove_item(uint32_t item_uid)
-{
-    auto entity = get_entity_ptr(item_uid);
-    if (entity)
-        remove_item_ptr(entity);
 }
 
 void Movable::poison(int16_t frames)
@@ -199,70 +135,45 @@ void Movable::poison(int16_t frames)
     write_mem_prot(offset_subsequent, frames, true);
 }
 
-std::tuple<float, float, uint8_t> get_position(uint32_t uid)
+Vec2 Entity::get_absolute_velocity() const
 {
-    Entity* ent = get_entity_ptr(uid);
-    if (ent)
-        return std::make_tuple(ent->position().x, ent->position().y, ent->layer);
+    Vec2 velocity;
+    if (is_movable())
+    {
+        auto mov = static_cast<const Movable*>(this);
+        velocity.x = mov->velocityx;
+        velocity.y = mov->velocityy;
+    }
+    else if (is_liquid())
+    {
+        auto liquid_engine = State::get().get_correct_liquid_engine(type->id);
+        velocity.x = liquid_engine->entity_velocities->x;
+        velocity.y = liquid_engine->entity_velocities->y;
+    }
 
-    return {0.0f, 0.0f, (uint8_t)0};
+    if (overlay)
+        velocity += overlay->get_absolute_velocity();
+
+    return velocity;
 }
 
-std::tuple<float, float, uint8_t> get_render_position(uint32_t uid)
+AABB Entity::get_hitbox(std::optional<bool> use_render_pos) const
 {
-    Entity* ent = get_entity_ptr(uid);
-    if (ent)
+    Vec2 pos;
+    if (use_render_pos.value_or(false) && rendering_info && !rendering_info->render_inactive)
     {
-        if (ent->rendering_info != nullptr && !ent->rendering_info->render_inactive)
-            return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
-        else
-            return get_position(uid);
+        pos.x = rendering_info->x;
+        pos.y = rendering_info->y;
     }
-    return {0.0f, 0.0f, (uint8_t)0};
-}
+    else
+        pos = abs_position();
 
-std::tuple<float, float> get_velocity(uint32_t uid)
-{
-    if (Entity* ent = get_entity_ptr(uid))
-    {
-        float vx{0.0f};
-        float vy{0.0f};
-        if (ent->is_movable())
-        {
-            Movable* mov = ent->as<Movable>();
-            vx = mov->velocityx;
-            vy = mov->velocityy;
-        }
-        else if (ent->is_liquid())
-        {
-            auto liquid_engine = State::get().get_correct_liquid_engine(ent->type->id);
-            vx = liquid_engine->entity_velocities->x;
-            vy = liquid_engine->entity_velocities->y;
-        }
-        if (ent->overlay)
-        {
-            auto [ovx, ovy] = get_velocity(ent->overlay->uid);
-            vx += ovx;
-            vy += ovy;
-        }
-        return std::tuple{vx, vy};
-    }
-    return std::tuple{0.0f, 0.0f};
-}
-
-AABB get_hitbox(uint32_t uid, bool use_render_pos)
-{
-    if (Entity* ent = get_entity_ptr(uid))
-    {
-        auto [x, y, l] = (use_render_pos ? get_render_position : get_position)(uid);
-        return AABB{
-            x - ent->hitboxx + ent->offsetx,
-            y + ent->hitboxy + ent->offsety,
-            x + ent->hitboxx + ent->offsetx,
-            y - ent->hitboxy + ent->offsety,
-        };
-    }
-    return AABB{0.0f, 0.0f, 0.0f, 0.0f};
+    return AABB{
+        pos.x - hitboxx + offsetx,
+        pos.y + hitboxy + offsety,
+        pos.x + hitboxx + offsetx,
+        pos.y - hitboxy + offsety,
+    };
 }
 
 TEXTURE Entity::get_texture() const
@@ -321,14 +232,6 @@ bool Entity::is_liquid() const
 void Entity::set_enable_turning(bool enabled)
 {
     set_entity_turning(this, enabled);
-}
-
-std::vector<uint32_t> Entity::get_items()
-{
-    if (items.size)
-        return std::vector<uint32_t>(items.uids().begin(), items.uids().end());
-
-    return {};
 }
 
 Entity* get_entity_ptr(uint32_t uid)

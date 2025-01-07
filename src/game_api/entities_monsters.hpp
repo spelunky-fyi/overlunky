@@ -1,6 +1,7 @@
 #pragma once
 
 #include "containers/custom_set.hpp"
+#include "containers/custom_vector.hpp"
 #include "entities_chars.hpp"
 #include "movable.hpp"
 #include "particles.hpp"
@@ -14,21 +15,17 @@ class Monster : public PowerupCapable
     int32_t chased_target_uid;
     uint32_t target_selection_timer;
 
-    virtual void increase_killcount() = 0; // increases state.kills_npc, is not called for normal monsters but they all have the same function
-
-    virtual void on_aggro(uint8_t, bool) = 0; // updates state.quests in case of npc
-
-    virtual void unknown_v97() = 0; // can't trigger it
-
-    virtual void on_shop_entered() = 0;
-
+    virtual void increase_killcount() = 0;    // 95, increases state.kills_npc, is not called for normal monsters but they all have the same function
+    virtual void on_aggro(uint8_t, bool) = 0; // 96, updates state.quests in case of npc
+    virtual void unknown_v97() = 0;           // 97, can't trigger it
+    virtual void on_shop_entered() = 0;       // 98
     // shopkeeper will walk towards you (doesn't work for Yang, even though he has the same virtual)
     // if disabled some monster will stop moving (like bats, jiangshi) some wont attack (crabman), shopkeeper can still kick you but won't fire his weapon
-    virtual void attack_logic_related() = 0;
-
-    virtual bool update_target(Entity* ent) = 0;
+    virtual void attack_logic_related(uint8_t, float) = 0; // 99
+    virtual bool update_target(Entity* ent, float&) = 0;   // 100, float from the function above, also works as an output?
 };
 
+// RoomOwner and NPC may have common subclass for the first two virtuals, but they later diverge, weapon type is the same spot, but they probably just made one first then copied over the virtuals
 class RoomOwner : public Monster
 {
   public:
@@ -49,41 +46,23 @@ class RoomOwner : public Monster
     uint16_t padding1;
     uint32_t padding2;
 
-    virtual void on_criminal_act_committed(uint8_t) = 0; // shows the appropriate message (vandal, cheater, ...)
-
+    virtual void on_criminal_act_committed(uint8_t reason) = 0; // shows the appropriate message (vandal, cheater, ...)
     // for shopkeepers: checks state.shoppie_aggro_levels, for waddler checks the state.quest_flags
     // if you return false, but you have attacked them before, they will be patrolling but won't attack you on sight
-    virtual bool should_attack_on_sight() = 0;
+    virtual bool should_attack_on_sight() = 0; // Tusk and Yang always return false (Yang won't show anymore if attacked before, Tusk is aggroed from the start on 6-3 when you attacked her in tidepool)
+    virtual bool is_angry_flag_set() = 0;      // checks state.level_flags 10-16 depending on the monster
 
-    virtual bool is_angry_flag_set() = 0; // checks state.level_flags 10-16 depending on the monster
-
-    // for shopkeeper: sets shopkeeper.shotgun_attack_delay to 6
+    // only for shopkeeper: sets shopkeeper.shotgun_attack_delay to 6
     // triggers only at the start when aggroed
-    // does nothing for yang, waddler, tun
     virtual void set_initial_attack_delay() = 0;
 
-    virtual Entity* on_spawn_weapon() = 0; // return the weapon entity that will be used to attack the player
-
+    virtual Entity* spawn_weapon() = 0; // return the weapon entity that will be used to attack the player
     virtual ENT_TYPE weapon_type() = 0; // the entity type of the weapon that will be spawned to attack the player
+    /// For weapons, checks if the entity should hit the trigger or not
+    virtual bool should_attack(std::tuple<Entity*, float, float, float> target) = 0; // parameter is some struct that contains the target
 
-    virtual bool can_attack() = 0; // parameter is some struct that contains the target
-
-    virtual void unknown_v108() = 0; // for shopkeepers, it loops over (some of) the items for sale
-
+    virtual void unknown_v108() = 0;           // for shopkeepers, it loops over (some of) the items for sale
     virtual void on_death_treasure_drop() = 0; // coins and if you're lucky, gold bar from shopkeeper
-};
-
-class WalkingMonster : public Monster
-{
-  public:
-    int32_t chatting_to_uid;
-    /// alternates between walking and pausing every time it reaches zero
-    int16_t walk_pause_timer;
-    /// used for chatting with other monsters, attack cooldowns etc.
-    int16_t cooldown_timer;
-    // Aggro or calm, if forced to return 0 it will not aggro unless you overlap his hitbox. For caveman this is called when he wakes up (from sleep or stun)
-    virtual bool can_aggro() = 0;
-    virtual void v_102() = 0; // parameter is some struct, that it changes and returns it (looks like 3x bool and more)
 };
 
 class NPC : public Monster
@@ -103,12 +82,27 @@ class NPC : public Monster
 
     virtual void on_criminal_act_committed() = 0;
     virtual bool should_attack_on_sight() = 0;
-    virtual void v_103() = 0;          // take some struct as parameter, sets the first qword to some constant (also returns it?), the first thing in the struct is actually two floats
-    virtual void on_interaction() = 0; // does the quests stuff etc.
-    virtual Entity* on_spawn_weapon() = 0;
+    virtual Vec2& v_103(Vec2&) = 0;              // only accessed when not angered
+    virtual void on_interaction(bool, bool) = 0; // does the quests stuff etc.
+    /// Do not use this function for Tusk or Waddler, small oversight by the devs, they never call this function for them, which would try to spawn entity type 0
+    virtual Entity* spawn_weapon() = 0;
     virtual ENT_TYPE weapon_type() = 0;
-    virtual bool can_attack() = 0;                 // parameter is some struct that contains the target
-    virtual void on_criminal_act_committed2() = 0; // calls the on_criminal_act_committed except for bodyguard which calls the should_attack_on_sight and turns off any speechbubble
+    /// For weapons, checks if the entity should hit the trigger or not
+    virtual bool should_attack(std::tuple<Entity*, float, float, float> target) = 0;
+    virtual void on_criminal_act_committed2(void*) = 0; // calls the on_criminal_act_committed except for bodyguard which calls the should_attack_on_sight and turns off any speech-bubble
+};
+
+class WalkingMonster : public Monster
+{
+  public:
+    int32_t chatting_to_uid;
+    /// alternates between walking and pausing every time it reaches zero
+    int16_t walk_pause_timer;
+    /// used for chatting with other monsters, attack cooldowns etc.
+    int16_t cooldown_timer;
+    // Aggro or calm, if forced to return 0 it will not aggro unless you overlap his hitbox. For caveman this is called when he wakes up (from sleep or stun)
+    virtual bool can_aggro() = 0;
+    virtual Entity* v_102(Entity*) = 0; // returns the same entity as provided in the parameter
 };
 
 enum class GHOST_BEHAVIOR : uint8_t
@@ -243,7 +237,7 @@ class Shopkeeper : public RoomOwner
 class Yang : public RoomOwner
 {
   public:
-    /// Table of uid's of the turkeys, goes only up to 3, is nil when yang is angry
+    /// Table of uids of the turkeys, goes only up to 3, is nil when yang is angry
     custom_set<int32_t> turkeys_in_den;
     uint8_t unknown4;
     uint8_t unknown5;
@@ -384,7 +378,7 @@ class Lavamander : public Monster
     uint16_t jump_pause_timer; // jump pause when cool; runs continuously when hot
     uint8_t lava_detection_timer;
     bool is_hot;
-    /// 0 - didnt_saw_player, 1 - saw_player, 2 - spited_lava; probably used so he won't spit imminently after seeing the player
+    /// 0 - didn't see player, 1 - saw player, 2 - spitted lava; probably used so he won't spit imminently after seeing the player
     uint8_t player_detect_state;
     uint8_t padding2;
 };
@@ -434,6 +428,7 @@ class Leprechaun : public WalkingMonster
     uint16_t gold;
     uint8_t timer_after_humping;
     uint8_t unknown;
+    custom_vector<ENT_TYPE> collected_treasure;
 };
 
 class Crocman : public WalkingMonster
@@ -586,8 +581,8 @@ class Anubis : public Monster
     bool awake;
 
     virtual void set_next_attack_timer() = 0; // sets next_attack_timer based on the psychic_orbs_counter
-    virtual void attack() = 0;
-    virtual void play_attack_sound() = 0; // also calls virtual 20
+    virtual void normal_attack() = 0;
+    virtual void play_attack_sound() = 0;
 };
 
 class Cobra : public Monster
@@ -724,13 +719,14 @@ class YetiQueen : public Monster
     uint32_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     uint8_t unknown_timer;
 
-    virtual void v_101() = 0;          // can't trigger
-    virtual void attack_related() = 0; // parameter is some struct, if disabled it doesn't do jump attack, but still does the protect head thing
-    virtual void v_103() = 0;          // return
-    virtual void jump_related() = 0;   // if disabled she squads but never makes the jump
-    virtual void on_death() = 0;       // spawns the drops
+    virtual void v_101() = 0;                  // can't trigger
+    virtual void attack_related(float[4]) = 0; // parameter is some struct, if disabled it doesn't do jump attack, but still does the protect head thing
+    virtual void v_103() = 0;                  // return
+    virtual void jump_related() = 0;           // if disabled she squads but never makes the jump
+    virtual void on_death() = 0;               // spawns the drops
 };
 
+// TODO: YetiKing should inherence from YetiQueen, should probably change the name of YetiQueen, since we don't know much about the functions and all, i leave it for someone in the future to deal with this xd
 class YetiKing : public Monster
 {
   public:
@@ -743,11 +739,11 @@ class YetiKing : public Monster
     ParticleEmitterInfo* particle_dust;
     ParticleEmitterInfo* particle_sparkles;
 
-    virtual void v_101() = 0;          // can't trigger
-    virtual void attack_related() = 0; // parameter is some struct, if disabled it doesn't do jump attack, but still does the protect head thing
-    virtual void on_attack() = 0;      // freezes stuff when attacks and spawns particles
-    virtual void screem_related() = 0; // if disabled he opens the mount but never screams
-    virtual void on_death() = 0;       // spawns the drops
+    virtual void v_101() = 0;                  // can't trigger
+    virtual void attack_related(float[4]) = 0; // parameter is some struct, if disabled it doesn't do jump attack, but still does the protect head thing
+    virtual void on_attack() = 0;              // freezes stuff when attacks and spawns particles
+    virtual void screem_related() = 0;         // if disabled he opens the mount but never screams
+    virtual void on_death() = 0;               // spawns the drops
 };
 
 class Lamassu : public Monster

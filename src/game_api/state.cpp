@@ -299,6 +299,7 @@ State& State::get()
             init_state_update_hook();
             init_process_input_hook();
             init_game_loop_hook();
+            init_state_clone_hook();
 
             auto bucket = Bucket::get();
             bucket->count++;
@@ -625,6 +626,10 @@ uint32_t State::get_frame_count() const
 {
     return memory_read<uint32_t>((size_t)ptr() - 0xd0);
 }
+uint32_t State::get_frame_count(StateMemory* state)
+{
+    return memory_read<uint32_t>((size_t)state - 0xd0);
+}
 int64_t get_global_frame_count()
 {
     return global_frame_count;
@@ -690,6 +695,42 @@ void init_state_update_hook()
     {
         DEBUG("Failed hooking state_refresh stuff: {}\n", error);
     }
+}
+
+void HeapClone(uint64_t heap_to, uint64_t heap_container_from)
+{
+    uint64_t location = State::get().get_offset();
+    StateMemory* state_from = reinterpret_cast<StateMemory*>(memory_read<uint64_t>(heap_container_from + 0x88) + location);
+    StateMemory* state_to = reinterpret_cast<StateMemory*>(heap_to + location);
+    pre_copy_state_event(state_from, state_to);
+}
+
+// Original function params: clone_heap(ThreadStorageContainer to, ThreadStorageContainer from)
+// HeapContainer has heap1 and heap2 variables, and some sort of timer, that just increases constantly, I guess to handle the rollback and multi-threaded stuff
+// The rest of what HeapContainer has is unknown for now
+// After writing to a chosen storage from the content of `from->heap1`, sets `to->heap2` to the newly copied thread storage
+void init_state_clone_hook()
+{
+    auto heap_clone = get_address("heap_clone");
+    // Hook the function after it has chosen a thread storage to write to, and pass it to the hook
+    size_t heap_clone_redirect_from_addr = heap_clone + 0x65;
+    const std::string redirect_code = fmt::format(
+        "\x51"             // PUSH       RCX
+        "\x52"             // PUSH       RDX
+        "\x41\x50"         // PUSH       R8
+        "\x41\x51"         // PUSH       R9
+        "\x48\x83\xEC\x28" // SUB        RSP, 28 // Shadow space + Stack alignment
+        "\x4C\x89\xC9"     // MOV        RCX, R9 == heap_to
+        "\x48\xb8{}"       // MOV        RAX, &HeapClone
+        "\xff\xd0"         // CALL       RAX
+        "\x48\x83\xC4\x28" // ADD        RSP, 28
+        "\x41\x59"         // POP        R9
+        "\x41\x58"         // POP        R8
+        "\x5A"             // POP        RDX
+        "\x59"sv,          // POP        RCX
+        to_le_bytes(&HeapClone));
+
+    patch_and_redirect(heap_clone_redirect_from_addr, 7, redirect_code, false, 0, false);
 }
 
 using OnProcessInput = void(void*);
@@ -823,7 +864,7 @@ uint8_t enum_to_layer(const LAYER layer, Vec2& player_position)
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
-            player_position = player->position();
+            player_position = player->abs_position();
             return player->layer;
         }
     }
@@ -1063,11 +1104,12 @@ Logic* LogicList::start_logic(LOGIC idx)
 
 void LogicList::stop_logic(LOGIC idx)
 {
-    if ((uint32_t)idx > 27 || logic_indexed[(uint32_t)idx] == nullptr)
+    auto index = static_cast<uint32_t>(idx);
+    if (index > 27 || logic_indexed[index] == nullptr)
         return;
 
-    delete logic_indexed[(uint32_t)idx];
-    logic_indexed[(uint32_t)idx] = nullptr;
+    delete logic_indexed[index];
+    logic_indexed[index] = nullptr;
 }
 
 void LogicList::stop_logic(Logic* log)
@@ -1075,20 +1117,15 @@ void LogicList::stop_logic(Logic* log)
     if (log == nullptr)
         return;
 
-    auto idx = log->logic_index;
+    auto idx = static_cast<uint32_t>(log->logic_index);
     delete log;
-    logic_indexed[(uint32_t)idx] = nullptr;
+    logic_indexed[idx] = nullptr;
 }
 
 void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
 {
-    for (auto it = magmaman_positions.begin(); it < magmaman_positions.end(); ++it)
-    {
-        if (it->x == x && it->y == y)
-        {
-            magmaman_positions.erase(it);
-        }
-    }
+    std::erase_if(magmaman_positions, [x, y](MagmamanSpawnPosition& m_pos)
+                  { return (m_pos.x == x && m_pos.y == y); });
 }
 
 void update_camera_position()

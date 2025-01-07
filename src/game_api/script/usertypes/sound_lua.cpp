@@ -399,6 +399,8 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         &SoundMeta::x,
         "y",
         &SoundMeta::y,
+        "sound_info",
+        &SoundMeta::sound_info,
         "left_channel",
         //&SoundMeta::left_channel,
         sol::property([](SoundMeta* sm)
@@ -410,14 +412,37 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "start_over",
         &SoundMeta::start_over,
         "playing",
-        &SoundMeta::playing);
+        &SoundMeta::playing,
+        "start",
+        &SoundMeta::start);
 
     lua.new_usertype<BackgroundSound>(
         "BackgroundSound",
         sol::base_classes,
         sol::bases<SoundMeta>());
 
+    lua.new_usertype<SoundInfo>(
+        "SoundInfo",
+        "sound_id",
+        sol::readonly(&SoundInfo::sound_id),
+        "sound_name",
+        sol::property([](SoundInfo& si)                 // -> VANILLA_SOUND
+                      { return si.sound_name /**/; })); // return copy, so it's read only
+
+    auto play_sound = sol::overload(static_cast<SoundMeta* (*)(SOUNDID, uint32_t)>(::play_sound), static_cast<SoundMeta* (*)(VANILLA_SOUND, uint32_t)>(::play_sound));
+
+    /// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
+    /// Returns SoundMeta, beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
     lua["play_sound"] = play_sound;
+
+    // lua["convert_sound_id"] = convert_sound_id;
+    /// NoDoc
+    lua["convert_sound_id"] = sol::overload([](SOUNDID id) -> const VANILLA_SOUND&
+                                            { auto back_end = LuaBackend::get_calling_backend(); 
+        return back_end->sound_manager->convert_sound_id(id); },
+                                            [](VANILLA_SOUND sound) -> SOUNDID
+                                            {auto back_end = LuaBackend::get_calling_backend(); 
+        return back_end->sound_manager->convert_sound_id(sound); });
 
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);

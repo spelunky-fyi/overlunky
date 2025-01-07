@@ -163,9 +163,7 @@ struct Players
         it_t last;
 
         lua_iterator_state(Players& mt)
-            : begin(mt.begin()), it(mt.begin()), last(mt.end())
-        {
-        }
+            : begin(mt.begin()), it(mt.begin()), last(mt.end()){};
     };
     static std::tuple<sol::object, sol::object> my_next(sol::user<lua_iterator_state&> user_it_state, sol::this_state l)
     {
@@ -1142,12 +1140,42 @@ end
     lua["screen_distance"] = screen_distance;
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
     /// you're standing on, not real level coordinates.
-    lua["get_position"] = get_position;
+    lua["get_position"] = [](int32_t uid) -> std::tuple<float, float, uint8_t>
+    {
+        Entity* ent = get_entity_ptr(uid);
+        if (ent)
+        {
+            auto pos = ent->abs_position();
+            return {pos.x, pos.y, ent->layer};
+        }
+        return {};
+    };
     /// Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
-    lua["get_render_position"] = get_render_position;
-    /// Get velocity `vx, vy` of an entity by uid. Use this, don't use `Entity.velocityx/velocityy` because those are relative to `Entity.overlay`.
-    lua["get_velocity"] = get_velocity;
-    /// Remove item by uid from entity
+    lua["get_render_position"] = [](int32_t uid) -> std::tuple<float, float, uint8_t>
+    {
+        Entity* ent = get_entity_ptr(uid);
+        if (ent)
+        {
+            if (ent->rendering_info != nullptr && !ent->rendering_info->render_inactive)
+                return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
+            else
+            {
+                auto pos = ent->abs_position();
+                return {pos.x, pos.y, ent->layer};
+            }
+        }
+        return {};
+    };
+    /// Get velocity `vx, vy` of an entity by uid. Use this to get velocity relative to the game world, (the `Entity.velocityx/velocityy` are relative to `Entity.overlay`). Only works for movable or liquid entities
+    lua["get_velocity"] = [](int32_t uid) -> std::tuple<float, float>
+    {
+        Entity* ent = get_entity_ptr(uid);
+        if (ent)
+            return ent->get_absolute_velocity();
+
+        return {};
+    };
+    /// Remove item by uid from entity. `check_autokill` defaults to true, checks if entity should be killed when missing overlay and kills it if so (can help with avoiding crashes)
     lua["entity_remove_item"] = entity_remove_item;
     /// Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
     lua["attach_ball_and_chain"] = attach_ball_and_chain;
@@ -1173,7 +1201,7 @@ end
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
     lua["pick_up"] = pick_up;
-    /// Drop an entity by uid
+    /// Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
     lua["drop"] = drop;
     /// Unequips the currently worn backitem
     lua["unequip_backitem"] = unequip_backitem;
@@ -1265,7 +1293,7 @@ end
         if (ea == nullptr || eb == nullptr)
             return -1.0f;
         else
-            return (float)std::sqrt(std::pow(ea->position().x - eb->position().x, 2) + std::pow(ea->position().y - eb->position().y, 2));
+            return (float)std::sqrt(std::pow(ea->abs_position().x - eb->abs_position().x, 2) + std::pow(ea->abs_position().y - eb->abs_position().y, 2));
     };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
     /// inside these boundaries. The order is: left x, top y, right x, bottom y
@@ -1743,11 +1771,11 @@ end
     /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
 
-    /// Get string behind STRINGID, don't use stringid directly for vanilla string, use [hash_to_stringid](#hash_to_stringid) first
+    /// Get string behind STRINGID, **don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first
     /// Will return the string of currently choosen language
     lua["get_string"] = get_string;
 
-    /// Change string at the given id (don't use stringid diretcly for vanilla string, use `hash_to_stringid` first)
+    /// Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first)
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
     lua["change_string"] = [](STRINGID id, std::u16string str)
     {
@@ -1785,7 +1813,7 @@ end
     /// ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
     /// ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}<br/>
     /// Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance").
-    /// If you use this function in the level with diceshop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser).
+    /// If you use this function in the level with dice shop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](#PrizeDispenser).
     /// Use empty table as argument to reset to the game default
     lua["change_diceshop_prizes"] = change_diceshop_prizes;
 
@@ -1927,6 +1955,12 @@ end
     /// optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
     lua["update_liquid_collision_at"] = update_liquid_collision_at;
 
+    /// Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
+    /// Returns a pair of water and lava, in that order.
+    /// Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
+    /// Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
+    lua["get_liquids_at"] = get_liquids_at;
+
     /// Disable all crust item spawns, returns whether they were already disabled before the call
     lua["disable_floor_embeds"] = disable_floor_embeds;
 
@@ -1990,13 +2024,13 @@ end
     lua["set_ending_unlock"] = set_ending_unlock;
 
     /// Get the thread-local version of state
-    lua["get_local_state"] = []()
+    lua["get_local_state"] = []() -> StateMemory*
     {
         return State::get().ptr_local();
     };
 
     /// Get the thread-local version of players
-    lua["get_local_players"] = []()
+    lua["get_local_players"] = []() -> std::vector<Player*>
     {
         return get_players(State::get().ptr_local());
     };
@@ -2236,7 +2270,7 @@ end
     /// Look at the example on how to mimic game layer switching behavior
     lua["set_camera_layer_control_enabled"] = set_camera_layer_control_enabled;
 
-    /// Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see set_frametime
+    /// Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see [set_frametime](#set_frametime)
     lua["set_speedhack"] = set_speedhack;
 
     /// Get the current speedhack multiplier
@@ -2263,7 +2297,7 @@ end
     /// Initializes some adventure run related values and loads the character select screen, as if starting a new adventure run from the Play menu. Character select can be skipped by changing `state.screen_next` right after calling this function, maybe with `warp()`. If player isn't already selected, make sure to set `state.items.player_select` and `state.items.player_count` appropriately too.
     lua["play_adventure"] = init_adventure;
 
-    /// Initializes some seedeed run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
+    /// Initializes some seeded run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
 
     /// Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
@@ -2574,7 +2608,7 @@ end
     // Params: int x, int y, ROOM_TEMPLATE room_template, PreHandleRoomTilesContext room_ctx
     // Return: `bool last_callback` to determine whether callbacks of the same type should be executed after this
     // Runs after a random room was selected and right before it would spawn entities for each tile code
-    // Allows you to modify the rooms content in the front and back layer as well as add a backlayer if not yet existant
+    // Allows you to modify the rooms content in the front and back layer as well as add a back layer if not yet existant
     // SAVE
     // Params: SaveContext save_ctx
     // Runs at the same times as ON.SCREEN, but receives the save_ctx
@@ -2583,7 +2617,7 @@ end
     // Runs as soon as your script is loaded, including reloads, then never again
     // RENDER_PRE_GAME
     // Params: VanillaRenderContext render_ctx
-    // Runs before the ingame part of the game is rendered. Return `true` to skip rendering.
+    // Runs before the in-game part of the game is rendered. Return `true` to skip rendering.
     // RENDER_POST_GAME
     // Params: VanillaRenderContext render_ctx
     // Runs after the level and HUD are rendered, before pause menus and blur effects

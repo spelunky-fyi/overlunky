@@ -30,6 +30,7 @@ class Movable;
 struct EntityHooksInfo;
 using ENT_FLAG = uint32_t;
 using ENT_MORE_FLAG = uint32_t;
+using DAMAGE_TYPE = uint16_t;
 
 enum class RECURSIVE_MODE
 {
@@ -57,13 +58,15 @@ class Entity
     /// Don't edit this directly, use `set_draw_depth` function
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
-    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
     float x;
-    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
     float y;
-    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    /// Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.
+    /// Use `get_absolute_position` for precise. Read only.
     float abs_x;
-    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    /// Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.
+    /// Use `get_absolute_position` for precise. Read only.
     float abs_y;
     /// Width of the sprite
     float w;
@@ -109,18 +112,18 @@ class Entity
     /* for the autodoc
     any user_data;
     */
-
-    size_t pointer()
+    // {x, y}
+    Vec2 position_self() const
     {
-        return (size_t)this;
+        return Vec2{x, y};
     }
-
-    Vec2 position() const;
-
-    void teleport(float dx, float dy, bool s, float vx, float vy, bool snap);
-    void teleport_abs(float dx, float dy, float vx, float vy);
-
-    /// Moves the entity to specified layer, nothing else happens, so this does not emulate a door transition
+    /// Get the absolute position of an entity in the game world
+    Vec2 abs_position() const;
+    /// Get's the velocity relative to the game world, only for movable or liquid entities
+    Vec2 get_absolute_velocity() const;
+    /// `use_render_pos` default is `false`
+    AABB get_hitbox(std::optional<bool> use_render_pos) const;
+    /// Moves the entity to specified layer with all it's items, nothing else happens, so this does not emulate a door transition
     void set_layer(LAYER layer);
     /// Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
     void apply_layer();
@@ -133,7 +136,7 @@ class Entity
     }
     /// Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
     void perform_teleport(uint8_t delta_x, uint8_t delta_y);
-
+    /// Returns the top entity in a chain (overlay)
     Entity* topmost()
     {
         auto cur = this;
@@ -143,7 +146,7 @@ class Entity
         }
         return cur;
     }
-
+    /// NoDoc
     Entity* topmost_mount()
     {
         auto topmost = this;
@@ -168,7 +171,7 @@ class Entity
     /// Use `overlaps_with(AABB hitbox)` instead
     bool overlaps_with(float rect_left, float rect_bottom, float rect_right, float rect_top) const
     {
-        const auto [posx, posy] = position();
+        const auto [posx, posy] = abs_position();
         const float left = posx - hitboxx + offsetx;
         const float right = posx + hitboxx + offsetx;
         const float bottom = posy - hitboxy + offsety;
@@ -179,7 +182,7 @@ class Entity
 
     bool overlaps_with(Entity* other) const
     {
-        const auto [other_posx, other_posy] = other->position();
+        const auto [other_posx, other_posy] = other->abs_position();
         const float other_left = other_posx - other->hitboxx + other->offsetx;
         const float other_right = other_posx + other->hitboxx + other->offsetx;
         const float other_top = other_posy + other->hitboxy + other->offsety;
@@ -187,12 +190,6 @@ class Entity
 
         return overlaps_with(other_left, other_bottom, other_right, other_top);
     }
-
-    Vec2 position_self() const
-    {
-        return Vec2{x, y};
-    }
-    void remove_item(uint32_t item_uid);
 
     TEXTURE get_texture() const;
     /// Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
@@ -206,25 +203,10 @@ class Entity
         return more_flags & 0x4000;
     };
 
-    // for supporting HookableVTable
-    uint32_t get_aux_id() const
+    std::vector<uint32_t> get_items() const
     {
-        return uid;
+        return std::vector<uint32_t>(items.uids().begin(), items.uids().end());
     }
-
-    // Needed despite HookableVTable for cleanup of arbitrary entity related data
-    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb)
-    {
-        return hook_dtor_impl(this, std::move(cb));
-    }
-    void clean_on_dtor(std::uint32_t dtor_cb_id)
-    {
-        clear_dtor_impl(this, dtor_cb_id);
-    }
-
-    void set_enable_turning(bool enabled);
-
-    std::vector<uint32_t> get_items();
 
     /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
@@ -243,13 +225,47 @@ class Entity
     {
         destroy_recursive(std::nullopt, {}, RECURSIVE_MODE::NONE);
     }
+    /// Detach from overlay
+    void detach(std::optional<bool> check_autokill)
+    {
+        if (overlay)
+            overlay->remove_item(this, check_autokill.value_or(true));
+    }
+    /// Attach to other entity (at the current relative position to it)
+    void attach(Entity* new_overlay)
+    {
+        if (new_overlay == overlay)
+            return;
 
+        detach(false);
+        auto const pos = new_overlay->abs_position();
+        x -= pos.x;
+        y -= pos.y;
+        overlay = new_overlay;
+        overlay->items.insert(this, false);
+    }
+
+    // for supporting HookableVTable
+    uint32_t get_aux_id() const
+    {
+        return uid;
+    }
+    // Needed despite HookableVTable for cleanup of arbitrary entity related data
+    std::uint32_t set_on_dtor(std::function<void(Entity*)> cb)
+    {
+        return hook_dtor_impl(this, std::move(cb));
+    }
+    void clean_on_dtor(std::uint32_t dtor_cb_id)
+    {
+        clear_dtor_impl(this, dtor_cb_id);
+    }
+    /// NoDoc
+    void set_enable_turning(bool enabled);
     template <typename T>
     T* as()
     {
         return static_cast<T*>(this);
     }
-
     static void set_hook_dtor_impl(
         std::function<std::uint32_t(Entity*, std::function<void(Entity*)>)> hook_fun,
         std::function<void(Entity*, std::uint32_t)> clear_fun)
@@ -262,63 +278,54 @@ class Entity
 
     virtual ~Entity() = 0;                    // virtual 0
     virtual void create_rendering_info() = 0; // 1
-    virtual void handle_state_machine() = 0;  // 2
-
+    virtual void update_state_machine() = 0;  // 2
     /// Kills the entity, you can set responsible to `nil` to ignore it
     virtual void kill(bool destroy_corpse, Entity* responsible) = 0; // 3
-
-    virtual void on_collision1(Entity* other_entity) = 0; // 4, triggers on collision between whip and hit object
-
+    /// Collisions with stuff that blocks you, like walls, floors, etc. Triggers for entities in it's EntityDB.collision_mask
+    virtual void on_collision1(Entity* other_entity) = 0; // 4
     /// Completely removes the entity from existence
-    virtual void destroy() = 0; // 5
-
-    virtual void apply_texture(Texture*) = 0;                         // 6
-    virtual void format_shopitem_name(char16_t*) = 0;                 // 7
-    virtual void generate_stomp_damage_particles(Entity* victim) = 0; // 8, particles when jumping on top of enemy
-    virtual float get_type_field_a8() = 0;                            // 9
-    virtual bool can_be_pushed() = 0;                                 // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
-    virtual bool v11() = 0;                                           // 11, for arrows: returns true if it's moving (for y possibily checks for some speed as well?)
+    virtual void destroy() = 0;                                                                   // 5
+    virtual void apply_texture(Texture*) = 0;                                                     // 6
+    virtual void format_shopitem_name(char16_t* output) = 0;                                      // 7
+    virtual void generate_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool killing) = 0; // 8, contact dmg
+    virtual float get_type_field_a8() = 0;                                                        // 9
+    virtual bool can_be_pushed() = 0;                                                             // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
+    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons)
     /// Returns true if entity is in water/lava
-    virtual bool is_in_liquid() = 0;                                         // 12
-    virtual bool check_type_properties_flags_19() = 0;                       // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
-    virtual uint32_t get_type_field_60() = 0;                                // 14
-    virtual void set_invisible(bool value) = 0;                              // 15
-    virtual void handle_turning_left(bool apply) = 0;                        // 16, if disabled, monsters don't turn left and keep walking in the wall (and other right-left issues)
-    virtual void set_draw_depth(uint8_t draw_depth) = 0;                     // 17
-    virtual void resume_ai() = 0;                                            // 18, works on entities with ai_func != 0; runs when companions are let go from being held. AI resumes anyway in 1.23.3
-    virtual float friction() = 0;                                            // 19
-    virtual void set_as_sound_source(SoundMeta*) = 0;                        // 20, update sound position to entity position?
-    virtual void remove_item_ptr(Entity*) = 0;                               // 21
+    virtual bool is_in_liquid() = 0;                                  // 12, drill always returns false
+    virtual bool check_type_properties_flags_19() = 0;                // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
+    virtual uint8_t get_type_field_60() = 0;                          // 14, the value is compared to entity state and used in some behavior function
+    virtual void set_invisible(bool value) = 0;                       // 15
+    virtual void flip(bool left) = 0;                                 // 16
+    virtual void set_draw_depth(uint8_t draw_depth, uint8_t b3f) = 0; // 17
+    virtual void reset_draw_depth() = 0;                              // 18
+    /// Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
+    virtual float friction() = 0;                     //              // 19
+    virtual void set_as_sound_source(SoundMeta*) = 0; //              // 20, update sound position to entity position?
+    /// Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
+    virtual void remove_item(Entity* entity, bool autokill_check) = 0;       // 21, if autokill_check is true, it will check if the entity has the "kill if overlay lost" flag and kill it if it's set
     virtual Entity* get_held_entity() = 0;                                   // 22
-    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", triggers use self as the first parameter
-    /// Triggers weapons and other held items like teleportter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
-    virtual bool trigger_action(Entity* user) = 0; // 24
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", triggers use self as the first parameter. Called when there is entity overlapping trigger entity, even if they don't move
+    /// Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    virtual bool trigger_action(Entity* user) = 0; //                        // 24, also used for throwables, disabling this for bomb make it always spawn an the ground, but you can still pick it up and throw it
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
-    virtual void activate(Entity* activator) = 0; // 25
-
-    virtual void on_collision2(Entity* other_entity) = 0; // 26, needs investigating, difference between this and on_collision1, maybe this is on_hitbox_overlap as it works for logical triggers
-
+    virtual void activate(Entity* activator) = 0; //                         // 25
+    /// More like on_overlap, triggers when entities touch/overlap each other. Triggers for entities in it's EntityDB.collision2_mask
+    virtual void on_collision2(Entity* other_entity) = 0; // 26
     /// e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
-    virtual uint16_t get_metadata() = 0;                // 27
-    virtual void apply_metadata(uint16_t metadata) = 0; // 28
-    virtual void on_walked_on_by(Entity* walker) = 0;   // 29, hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
-    virtual void on_walked_off_by(Entity* walker) = 0;  // 30, appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item_ptr
-    virtual void on_ledge_grab(Entity* who) = 0;        // 31, only ACTIVEFLOOR_FALLING_PLATFORM, does something with game menager
-    virtual void on_stood_on_by(Entity* entity) = 0;    // 32, e.g. pots, skulls, pushblocks, ... standing on floors
-    virtual void toggle_backlayer_illumination() = 0;   // 33, only for CHAR_*: when going to the backlayer, turns on player emitted light
-    virtual void v34() = 0;                             // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
-    virtual void liberate_from_shop() = 0;              // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
-
+    virtual uint16_t get_metadata() = 0;                    // 27
+    virtual void apply_metadata(uint16_t metadata) = 0;     // 28
+    virtual void on_walked_on_by(Entity* walker) = 0;       // 29, hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
+    virtual void on_walked_off_by(Entity* walker) = 0;      // 30, appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item
+    virtual void on_ledge_grab(Entity* who) = 0;            // 31, only ACTIVEFLOOR_FALLING_PLATFORM, does something with game menager
+    virtual void on_stood_on_by(Entity* entity, Vec2*) = 0; // 32, e.g. pots, skulls, pushblocks, ... standing on floors. The Vec2 is just a guess, it only compares Y with 0.1f
+    /// only for CHAR_*: when going to the backlayer, turns on/off player emitted light
+    virtual void toggle_backlayer_illumination() = 0; //    // 33
+    virtual void v34() = 0;                           //    // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
+    /// `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
+    virtual void liberate_from_shop(bool clear_parrent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0; // 36, This is actually just an initialize call that is happening once after  the entity is created
 };
 
-std::tuple<float, float, uint8_t> get_position(uint32_t uid);
-std::tuple<float, float, uint8_t> get_render_position(uint32_t uid);
-
-std::tuple<float, float> get_velocity(uint32_t uid);
-
-AABB get_hitbox(uint32_t uid, bool use_render_pos);
-
-struct EntityFactory* entity_factory();
 Entity* get_entity_ptr(uint32_t uid);

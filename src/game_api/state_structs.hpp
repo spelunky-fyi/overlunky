@@ -91,14 +91,37 @@ struct PlayerInputs
     };
 };
 
+struct QuestLogic
+{
+    // used to access flags in QuestsInfo
+    uint32_t id;
+
+    // called during layer loading by the state update, sets the level generation flags etc.
+    virtual void pre_level_gen() = 0;
+
+    // Gets called on every non-CO level by 18 virtual in current theme. Function checks whether the quest needs to be initialized.
+    // Yang: checks whether his quest status = 1 -> makes his pen work
+    // Sisters: make them appear on Olmec
+    // Horsing: makes him appear in Vlad's castle
+    // Sparrow: nop
+    // Tusk: populates pleasure palace with other characters depending on their quest state
+    // Beg: nop
+    virtual void post_level_gen() = 0;
+
+    // Only implemented for Beg quest, called by the 24 virtual in current theme
+    virtual void post_level_gen2() = 0;
+
+    virtual ~QuestLogic() = delete;
+};
+
 struct QuestsInfo
 {
-    size_t unknown1; // the first six are pointers to small similar objects
-    size_t unknown2; // that don't appear to change at all
-    size_t unknown3;
-    size_t unknown4;
-    size_t unknown5;
-    size_t unknown6;
+    QuestLogic* yang;
+    QuestLogic* jungle_sisters;
+    QuestLogic* van_horsing;
+    QuestLogic* sparrow;
+    QuestLogic* madame_tusk;
+    QuestLogic* beg;
     int8_t yang_state;
     int8_t jungle_sisters_flags; // flags! not state ; -1 = sisters angry
     int8_t van_horsing_state;
@@ -856,6 +879,14 @@ struct LiquidLake
     Entity* impostor_lake;
 };
 
+// Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is 6
+// Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6
+struct LiquidAmounts
+{
+    uint8_t lava;
+    uint8_t water;
+};
+
 struct LiquidPhysics
 {
     size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
@@ -886,11 +917,12 @@ struct LiquidPhysics
     custom_vector<LiquidLake> impostor_lakes;                 //
     uint32_t total_liquid_spawned;                            // Total number of spawned liquid entities, all types.
     uint32_t unknown8;                                        // padding probably
-    uint8_t* unknown9;                                        // array byte* ? game allocates 0x2F9E8 bytes for it, (0x2F9E8 / g_level_max_x * g_level_max_y = 18) which is weird, but i still think it's position based index, maybe it's 16 and accounts for more rows (grater level height)
-                                                              // always allocates after the LiquidPhysics
+
+    LiquidAmounts (*liquids_by_third_of_tile)[g_level_max_y * 3][g_level_max_x * 3]; // array byte* game allocates 0x2F9E8 bytes for it ((126 * 3) * (86 * 3) * 2 : y, x, liquid_type).
+                                                                                     // always allocates after the LiquidPhysics
 
     uint32_t total_liquid_spawned2; // Same as total_liquid_spawned?
-    bool unknown12;
+    bool unknown12;                 // if false, I think the game should check for liquids by looking for liquid entities rather than using the previous liquids array. Is set to true by the game actively
     uint8_t padding12a;
     uint8_t padding12b;
     uint8_t padding12c;

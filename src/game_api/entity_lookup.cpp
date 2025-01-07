@@ -163,7 +163,7 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     {
         for (auto& item : entities.entities())
         {
-            auto [ix, iy] = item->position();
+            auto [ix, iy] = item->abs_position();
             float distance = (float)std::sqrt(std::pow(x - ix, 2) + std::pow(y - iy, 2));
             if (distance < radius && entity_type_check(proper_types, item->type->id))
             {
