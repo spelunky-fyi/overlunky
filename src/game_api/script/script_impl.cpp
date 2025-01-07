@@ -23,7 +23,7 @@
 #include "script/handle_lua_function.hpp" // for handle_function
 #include "script/lua_backend.hpp"         // for LuaBackend, ON, ON::SCRIPT_DISABLE
 #include "script_util.hpp"                // for sanitize
-#include "state.hpp"                      // for State
+#include "thread_utils.hpp"               // for HeapBase
 
 class LuaConsole;
 class SoundManager;

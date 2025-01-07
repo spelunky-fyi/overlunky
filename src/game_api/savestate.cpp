@@ -3,7 +3,7 @@
 #include "memory.hpp"        // for write_mem_prot, write_mem_recoverable
 #include "online.hpp"        // for Online
 #include "script/events.hpp" // for pre_load_state
-#include "state.hpp"         // for State, get_state_ptr, enum_to_layer
+#include "state.hpp"         // for StateMemory
 
 void SaveState::backup_main(int slot_to)
 {

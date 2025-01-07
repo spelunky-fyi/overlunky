@@ -23,7 +23,7 @@
 #include "movable_behavior.hpp"      // for MovableBehavior
 #include "render_api.hpp"            // for RenderInfo
 #include "search.hpp"                // for get_address
-#include "state.hpp"                 // for State, StateMemory, enum_to_layer
+#include "state.hpp"                 // for StateMemory, enum_to_layer
 #include "state_structs.hpp"         // for LiquidPhysicsEngine
 #include "texture.hpp"               // for get_texture, Texture
 #include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...
@@ -36,20 +36,20 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == dest_layer)
         return;
 
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     if (this != this->topmost_mount())
         this->topmost_mount()->set_layer(layer_to);
 
     if (layer == 0 || layer == 1)
     {
-        auto ptr_from = state.ptr()->layers[layer];
+        auto ptr_from = state->layers[layer];
 
         using RemoveFromLayer = void(Layer*, Entity*);
         static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
         remove_from_layer(ptr_from, this);
     }
 
-    auto ptr_to = state.ptr()->layers[dest_layer];
+    auto ptr_to = state->layers[dest_layer];
 
     using AddToLayer = void(Layer*, Entity*);
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
@@ -63,7 +63,7 @@ void Entity::set_layer(LAYER layer_to)
 
 void Entity::apply_layer()
 {
-    auto ptr_to = State::get().ptr()->layers[layer];
+    auto ptr_to = HeapBase::get().state()->layer(layer);
 
     using AddToLayer = void(Layer*, Entity*);
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
@@ -79,8 +79,8 @@ void Entity::remove()
 {
     if (layer != 2)
     {
-        auto& state = State::get();
-        auto ptr_from = state.ptr()->layers[layer];
+        auto state = HeapBase::get().state();
+        auto ptr_from = state->layers[layer];
         if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
         {
             using RemoveFromLayer = void(Layer*, Entity*);

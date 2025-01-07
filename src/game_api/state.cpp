@@ -39,19 +39,19 @@
 #include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
 #include "vtable_hook.hpp"                       // for hook_vtable
 
-static int64_t global_frame_count{0};
-static int64_t global_update_count{0};
+static uint64_t global_frame_count{0};
+static uint64_t global_update_count{0};
 static bool g_forward_blocked_events{false};
 
 bool API::get_forward_events()
 {
     return g_forward_blocked_events;
 }
-int64_t API::get_global_frame_count()
+uint64_t API::get_global_frame_count()
 {
     return global_frame_count;
 };
-int64_t API::get_global_update_count()
+uint64_t API::get_global_update_count()
 {
     return global_update_count;
 };
@@ -155,10 +155,10 @@ void API::godmode_companions(bool g)
 
 static bool is_active_player(Entity* e)
 {
-    auto state = State::get().ptr();
+    auto items = HeapBase::get().state()->items;
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
     {
-        auto player = state->items->player(i);
+        auto player = items->players[i];
         if (player && player == e)
         {
             return true;
@@ -267,29 +267,6 @@ struct ThemeHookImpl
     }
 };
 
-State& State::get()
-{
-    static State s{0x4A0};
-    return s;
-}
-
-StateMemory* State::ptr_main() const
-{
-    OnHeapPointer<StateMemory> p(location);
-    return p.decode();
-}
-
-StateMemory* State::ptr() const
-{
-    return ptr_local();
-}
-
-StateMemory* State::ptr_local() const
-{
-    OnHeapPointer<StateMemory> p(location);
-    return p.decode_local();
-}
-
 static float get_zoom_level()
 {
     auto game_api = GameAPI::get();
@@ -377,7 +354,7 @@ void StateMemory::force_current_theme(THEME t)
 {
     if (t > 0 && t < 19)
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         if (t == 10 && !state->level_gen->theme_cosmicocean->sub_theme)
             state->level_gen->theme_cosmicocean->sub_theme = state->level_gen->theme_dwelling; // just set it to something, can't edit this atm
         state->current_theme = state->level_gen->themes[t - 1];
@@ -1049,7 +1026,19 @@ void API::post_init()
 {
     if (get_is_init())
     {
-        StateMemory& state{*State::get().ptr_main()};
-        state.level_gen->hook_themes(ThemeHookImpl{});
+        HeapBase::get().level_gen()->hook_themes(ThemeHookImpl{});
     }
+}
+
+std::vector<Player*> StateMemory::get_players()
+{
+    std::vector<Player*> found;
+    found.reserve(4);
+    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
+    {
+        auto player = items->players[i];
+        if (player)
+            found.push_back(player);
+    }
+    return found;
 }

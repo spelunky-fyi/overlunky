@@ -29,7 +29,7 @@
 #include "prng.hpp"                     // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
 #include "script/events.hpp"            // for post_entity_spawn, pre_entity_spawn
 #include "search.hpp"                   // for get_address
-#include "state.hpp"                    // for enum_to_layer, State, StateMemory
+#include "state.hpp"                    // for StateMemory
 #include "state_structs.hpp"            // for LiquidTileSpawnData, LiquidPhysics
 #include "util.hpp"                     // for OnScopeExit
 
@@ -611,9 +611,9 @@ SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
     // TODO: This still might not work very well and corner fill isn't actually floor spreading per level config definition, and should have a different SPAWN_TYPE (corner fill still happens when floor spreading chance is set to 0)
-    // const auto theme_floor = State::get().ptr_local()->current_theme->get_floor_spreading_type();
-    // const auto theme_floor2 = State::get().ptr_local()->current_theme->get_floor_spreading_type2();
-    auto state = State::get().ptr();
+    // const auto theme_floor = HeapBase::get().state()->current_theme->get_floor_spreading_type();
+    // const auto theme_floor2 = HeapBase::get().state()->current_theme->get_floor_spreading_type2();
+    auto state = HeapBase::get().state();
     auto [ax, ay, bx, by] = std::make_tuple(2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f);
     static const auto border_octo = to_id("ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS");
     static const auto border_dust = to_id("ENT_TYPE_FLOOR_DUSTWALL");
@@ -682,7 +682,7 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
 {
     if (player_slot < 1 || player_slot > 4)
         return -1;
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     auto& slot = state->items->player_select_slots[player_slot - 1];
     if (slot.character < to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") || slot.character > to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))
         return -1;
@@ -702,10 +702,10 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
     static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
     // move the back layer to front layer offset if spawning in back layer
     if (layer.has_value() && layer.value() == LAYER::BACK)
-        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
+        std::swap(state->layers[0], state->layers[1]);
     spawn_player(get_state_ptr()->items, player_slot - 1);
     if (layer.has_value() && layer.value() == LAYER::BACK)
-        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
+        std::swap(state->layers[0], state->layers[1]);
     state->level_gen->spawn_x = old_x;
     state->level_gen->spawn_y = old_y;
     auto player = state->items->player(player_slot - 1);
@@ -739,10 +739,10 @@ int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_template)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    StateMemory* state_ptr = State::get().ptr();
-    auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
+    auto level_gen = HeapBase::get().level_gen();
+    auto [ix, iy] = level_gen->get_room_index(x, y);
     uint32_t room_index = ix + iy * 8;
-    state_ptr->level_gen->set_room_template(ix, iy, real_layer, room_template);
+    level_gen->set_room_template(ix, iy, real_layer, room_template);
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(to_id("ENT_TYPE_MONS_SHOPKEEPER"), x, y, layer, 0, 0);
     auto keeper = get_entity_ptr(keeper_uid)->as<Shopkeeper>();
     keeper->shop_owner = true;
@@ -760,11 +760,11 @@ int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int1
     static const auto tun_id = to_id("ENT_TYPE_MONS_MERCHANT");
 
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    StateMemory* state_ptr = State::get().ptr();
-    auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
+    auto level_gen = HeapBase::get().level_gen();
+    auto [ix, iy] = level_gen->get_room_index(x, y);
     uint32_t room_index = ix + iy * 8;
     if (room_template >= 0)
-        state_ptr->level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
+        level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(owner_type, x, y, layer, 0, 0);
     if (owner_type == waddler_id || owner_type == yang_id || owner_type == tun_id)
     {

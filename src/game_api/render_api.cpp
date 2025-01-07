@@ -20,7 +20,7 @@
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
 #include "search.hpp"             // for get_address
-#include "state.hpp"              // for State, StateMemory
+#include "state.hpp"              // for StateMemory
 #include "strings.hpp"            //
 #include "texture.hpp"            // for Texture, get_textures, get_texture
 
@@ -518,7 +518,7 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     {
         if (texture_id < -3)
         {
-            texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture((DYNAMIC_TEXTURE)texture_id);
+            texture_id = HeapBase::get().state()->current_theme->get_dynamic_texture((DYNAMIC_TEXTURE)texture_id);
         }
         entity->texture = get_textures()->texture_map[texture_id];
     }

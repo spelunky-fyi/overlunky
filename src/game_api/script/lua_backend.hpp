@@ -341,7 +341,7 @@ class LuaBackend
     std::unordered_set<std::string> console_commands;
     std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
     bool manual_save{false};
-    uint32_t last_save{0};
+    uint64_t last_save{0};
 
     ImDrawList* draw_list{nullptr};
 

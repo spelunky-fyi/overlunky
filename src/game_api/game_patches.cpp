@@ -52,9 +52,7 @@ void patch_orbs_limit()
 
 bool check_if_ent_type_exists(ENT_TYPE type, int mask)
 {
-    StateMemory* state = State::get().ptr_local();
-    if (state == nullptr)
-        state = State::get().ptr_main();
+    StateMemory* state = HeapBase::get().state();
 
     const auto entities_map = &state->layers[0]->entities_by_mask; // game code only cares about the front layer, so we do the same
     auto it = entities_map->find(mask);

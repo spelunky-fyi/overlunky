@@ -29,7 +29,7 @@
 #include "screen.hpp"                 // for get_screen_ptr, Screen
 #include "script_util.hpp"            // for InputString
 #include "sound_manager.hpp"          // for SoundManager
-#include "state.hpp"                  // for StateMemory, State, get_...
+#include "state.hpp"                  // for StateMemory, get_...
 #include "strings.hpp"                // for clear_custom_shopitem_names
 #include "usertypes/gui_lua.hpp"      // for GuiDrawContext
 #include "usertypes/level_lua.hpp"    // for PreHandleRoomTilesContext
@@ -575,7 +575,7 @@ bool LuaBackend::update()
         if (manual_save)
         {
             manual_save = false;
-            last_save = local_frame;
+            last_save = API::get_global_frame_count();
         }
     }
     catch (const sol::error& e)
@@ -855,7 +855,7 @@ bool LuaBackend::pre_load_screen()
 
     auto now = HeapBase::get().frame_count();
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = HeapBase::get().state();
     if ((ON)state_ptr->screen_next <= ON::LEVEL && (ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
     {
         using namespace std::string_view_literals;
@@ -880,7 +880,7 @@ bool LuaBackend::pre_load_screen()
 
     if ((ON)state_ptr->screen == ON::LEVEL && (ON)state_ptr->screen_next != ON::DEATH && (state_ptr->quest_flags & 1) == 0)
     {
-        for (auto layer : State::get().ptr()->layers)
+        for (auto layer : HeapBase::get().state()->layers)
         {
             auto it = layer->entities_by_mask.find(1);
             if (it == layer->entities_by_mask.end())
@@ -1024,7 +1024,7 @@ void LuaBackend::post_room_generation()
 
 void LuaBackend::load_user_data()
 {
-    for (auto layer : State::get().ptr()->layers)
+    for (auto layer : HeapBase::get().state()->layers)
     {
         auto it = layer->entities_by_mask.find(1);
         if (it == layer->entities_by_mask.end())
@@ -1077,7 +1077,7 @@ void LuaBackend::post_level_generation()
 
     auto now = HeapBase::get().frame_count();
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = HeapBase::get().state();
     if ((ON)state_ptr->screen == ON::LEVEL)
     {
         load_user_data();
@@ -1124,7 +1124,7 @@ void LuaBackend::post_load_screen()
     if (!get_enabled())
         return;
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = HeapBase::get().state();
     if ((ON)state_ptr->screen == ON::TRANSITION)
     {
         load_user_data();

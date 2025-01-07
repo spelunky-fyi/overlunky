@@ -347,15 +347,10 @@ void SpelunkyConsole_LoadHistory(SpelunkyConsole* console, const char* path)
     console->load_history(path);
 }
 
-StateMemory& get_state()
-{
-    static StateMemory* state = State::get().ptr();
-    return *state;
-}
-
 SpelunkyScreen SpelunkyState_GetScreen()
 {
-    return static_cast<SpelunkyScreen>(get_state().screen);
+    auto state = HeapBase::get().state();
+    return static_cast<SpelunkyScreen>(state->screen);
 }
 
 int32_t Spelunky_SpawnEntity(uint32_t entity_id, int32_t layer, float x, float y, float vel_x, float vel_y)

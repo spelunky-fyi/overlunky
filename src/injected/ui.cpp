@@ -10018,7 +10018,7 @@ void init_ui(ImGuiContext* ctx)
     API::init(g_SoundManager.get());
     API::post_init();
 
-    g_state = State::get().ptr_main();
+    g_state = HeapBase::get_main().state();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();
     g_bucket = Bucket::get();

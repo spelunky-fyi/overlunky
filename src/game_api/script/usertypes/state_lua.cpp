@@ -24,7 +24,7 @@
 #include "screen_arena.hpp"       // IWYU pragma: keep
 #include "script/events.hpp"      // for pre_load_state
 #include "script/lua_backend.hpp" // for LuaBackend
-#include "state.hpp"              // for StateMemory, State, StateMemory::a...
+#include "state.hpp"              // for StateMemory, StateMemory::a...
 #include "state_structs.hpp"      // for ArenaConfigArenas, ArenaConfigItems
 
 namespace NState
@@ -581,24 +581,16 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 
     lua["toast_visible"] = []() -> bool
-    {
-        return State::get().ptr()->toast != 0;
-    };
+    { return HeapBase::get().state()->toast != 0; };
 
     lua["speechbubble_visible"] = []() -> bool
-    {
-        return State::get().ptr()->speechbubble != 0;
-    };
+    { return HeapBase::get().state()->speechbubble != 0; };
 
     lua["cancel_toast"] = []()
-    {
-        State::get().ptr()->toast_timer = 1000;
-    };
+    { HeapBase::get().state()->toast_timer = 1000; };
 
     lua["cancel_speechbubble"] = []()
-    {
-        State::get().ptr()->speechbubble_timer = 1000;
-    };
+    { HeapBase::get().state()->speechbubble_timer = 1000; };
 
     /// Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see SaveState if you need more.
     lua["save_state"] = [](int slot)

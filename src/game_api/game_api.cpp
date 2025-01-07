@@ -14,7 +14,7 @@ GameAPI* GameAPI::get()
 
 float GameAPI::get_current_zoom() const
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     return renderer->current_zoom + get_layer_transition_zoom_offset(state->camera_layer);
 }
 

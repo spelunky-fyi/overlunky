@@ -33,7 +33,7 @@
 #include "script/events.hpp"         // for post_load_screen, pre_load_screen
 #include "search.hpp"                // for get_address
 #include "spawn_api.hpp"             // for pop_spawn_type_flags, push_spawn_ty...
-#include "state.hpp"                 // for StateMemory, State, enum_to_layer
+#include "state.hpp"                 // for StateMemory
 #include "util.hpp"                  // for OnScopeExit, trim
 #include "vtable_hook.hpp"           // for hook_vtable
 
@@ -83,7 +83,7 @@ using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, Layer
 
 bool is_room_flipped(float x, float y)
 {
-    thread_local StateMemory* state_ptr = State::get().ptr_local();
+    thread_local StateMemory* state_ptr = HeapBase::get().state();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
     return state_ptr->level_gen->flipped_rooms->rooms[ix + iy * 8ull];
 }
@@ -912,7 +912,7 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
 
     if (tile_code > g_last_tile_code_id && tile_code < g_last_community_tile_code_id)
     {
-        auto* layer_ptr = State::get().ptr_local()->layers[layer];
+        auto* layer_ptr = HeapBase::get().state()->layers[layer];
         const CommunityTileCode& community_tile_code = g_community_tile_codes[tile_code - g_last_tile_code_id - 1];
         community_tile_code.func(community_tile_code, x, y, layer_ptr);
     }
@@ -940,6 +940,7 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
     if (!g_floor_requiring_entities.empty())
     {
         Entity* floor{nullptr};
+        auto state = HeapBase::get().state();
         for (auto& pending_entity : g_floor_requiring_entities)
         {
             for (const auto& pos : pending_entity.pos)
@@ -950,8 +951,7 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
                     {
                         if (floor == nullptr)
                         {
-                            auto* layer_ptr = State::get().ptr_local()->layers[layer];
-                            floor = layer_ptr->get_grid_entity_at(x, y);
+                            floor = state->layers[layer]->get_grid_entity_at(x, y);
                         }
 
                         if (floor != nullptr)
@@ -1052,7 +1052,7 @@ void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_
 }
 void get_room_size(const char* room_template_name, uint32_t& room_width, uint32_t& room_height)
 {
-    const auto room_template = State::get().ptr_local()->level_gen->data->get_room_template(room_template_name);
+    const auto room_template = HeapBase::get().level_gen()->data->get_room_template(room_template_name);
     if (!room_template)
     {
         DEBUG("Unkown room_template name {}", room_template_name);
@@ -1182,7 +1182,7 @@ using GatherRoomData = void(LevelGenData*, byte, int room_x, int, bool, uint8_t*
 GatherRoomData* g_gather_room_data_trampoline{nullptr};
 void gather_room_data(LevelGenData* tile_storage, byte param_2, int room_idx_x, int room_idx_y, bool hard_level, uint8_t* param_6, uint8_t* param_7, size_t param_8, uint8_t* param_9, uint8_t* param_10, uint8_t* out_room_width, uint8_t* out_room_height)
 {
-    const auto* level_gen = State::get().ptr()->level_gen;
+    const auto* level_gen = HeapBase::get().level_gen();
     for (size_t j = 0; j < 2; j++)
     {
         if (g_overridden_room_templates[j].has_value())
@@ -1228,7 +1228,7 @@ using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, SingleRoomData*, Si
 SpawnRoomFromTileCodes* g_spawn_room_from_tile_codes_trampoline{nullptr};
 void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, SingleRoomData* front_room_data, SingleRoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
 {
-    auto level_gen = State::get().ptr()->level_gen;
+    auto level_gen = HeapBase::get().level_gen();
 
     std::optional<SHOP_TYPE> before[2];
     for (size_t i = 0; i < 2; i++)
@@ -1273,11 +1273,11 @@ TestChance* g_test_chance{nullptr};
 
 bool handle_chance(SpawnInfo* spawn_info)
 {
-    auto level_gen_data = State::get().ptr()->level_gen->data;
 
     const uint8_t layer = 0; // only handles the front layer, backlayer is hardcoded
     auto* layer_ptr = HeapBase::get().state()->layer(layer);
-    LevelGenSystem* level_gen = State::get().ptr()->level_gen;
+    LevelGenSystem* level_gen = HeapBase::get().level_gen();
+    auto level_gen_data = level_gen->data;
     for (const CommunityChance& community_chance : g_community_chances)
     {
         if (level_gen->get_procedural_spawn_chance(community_chance.chance_id) != 0 && community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
@@ -1737,7 +1737,7 @@ uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template) co
 
 uint32_t ThemeInfo::get_aux_id() const
 {
-    thread_local const LevelGenSystem* level_gen_system = State::get().ptr_local()->level_gen;
+    thread_local const LevelGenSystem* level_gen_system = HeapBase::get().level_gen();
     for (size_t i = 0; i < std::size(level_gen_system->themes); i++)
     {
         if (level_gen_system->themes[i] == this)
@@ -1821,7 +1821,7 @@ Vec2 LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
 }
 std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, uint8_t l) const
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return std::nullopt;
@@ -1837,7 +1837,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
 }
 bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1857,7 +1857,7 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t r
 
 bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1866,7 +1866,7 @@ bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
 }
 bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y) const
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1875,7 +1875,7 @@ bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y) const
 }
 bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t /*l*/)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1886,7 +1886,7 @@ bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t
 }
 bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1905,7 +1905,7 @@ bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is
 
 bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE _shop_type)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1959,7 +1959,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id) const
         LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
         if (!this_chances.chances.empty())
         {
-            auto* state = State::get().ptr();
+            auto* state = HeapBase::get().state();
             if (this_chances.chances.size() >= state->level && state->level > 0)
             {
                 return this_chances.chances[state->level - 1];
@@ -1980,7 +1980,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id) const
         LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_trap_chances, chance_id);
         if (!this_chances.chances.empty())
         {
-            auto* state = State::get().ptr();
+            auto* state = HeapBase::get().state();
             if (this_chances.chances.size() >= state->level && state->level > 0)
             {
                 return this_chances.chances[state->level - 1];
@@ -2118,7 +2118,7 @@ void grow_vines(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 {
     area.abs();
 
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     const static auto grow_vine = to_id("ENT_TYPE_FLOOR_GROWABLE_VINE");
     const static auto tree_vine = to_id("ENT_TYPE_FLOOR_VINE_TREE_TOP");
     const static auto vine = to_id("ENT_TYPE_FLOOR_VINE");
@@ -2196,7 +2196,7 @@ void grow_poles(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 {
     area.abs();
 
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     const static auto grow_pole = to_id("ENT_TYPE_FLOOR_GROWABLE_CLIMBING_POLE");
     const static auto pole = to_id("ENT_TYPE_FLOOR_CLIMBING_POLE");
     const auto actual_layer = enum_to_layer(l);
@@ -2273,7 +2273,7 @@ void grow_poles(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 
 bool grow_chain_and_blocks()
 {
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     return grow_chain_and_blocks(state->w * 10 + 6, state->h * 8 + 6);
 }
 
@@ -2287,7 +2287,7 @@ bool grow_chain_and_blocks(uint32_t x, uint32_t y)
 void do_load_screen()
 {
     static auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     if (pre_load_screen())
         return;
     load_screen_fun(state, 0, 0);

@@ -60,7 +60,7 @@
 #include "search.hpp"                              // for get_address
 #include "settings_api.hpp"                        // for get_settings_name...
 #include "spawn_api.hpp"                           // for spawn_roomowner
-#include "state.hpp"                               // for State, StateMemory
+#include "state.hpp"                               // for StateMemory
 #include "strings.hpp"                             // for change_string
 #include "thread_utils.hpp"                        // for OnHeapPointer, HeapBase
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
@@ -144,16 +144,7 @@ struct Players
 
     void update()
     {
-        StateMemory* local_state = State::get().ptr_local();
-        if (local_state == nullptr)
-        {
-            StateMemory* main_state = State::get().ptr_main();
-            p = get_players(main_state);
-        }
-        else
-        {
-            p = get_players(local_state);
-        }
+        p = HeapBase::get().state()->get_players();
     }
     struct lua_iterator_state
     {
@@ -300,8 +291,6 @@ end
     NBucket::register_usertypes(lua);
     NColor::register_usertypes(lua);
 
-    StateMemory* main_state = State::get().ptr_main();
-
     /// NoDoc
     lua.new_usertype<Players>(
         "Players", sol::no_constructor, sol::meta_function::index, [](Players* p, const int index)
@@ -311,7 +300,7 @@ end
     Players players;
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
-    lua["state"] = main_state;
+    lua["state"] = HeapBase::get_main().state();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
@@ -322,7 +311,7 @@ end
     auto get_player = sol::overload(
         [&lua](int8_t slot) -> sol::object // -> Player
         {
-            for (auto player : get_players(State::get().ptr()))
+            for (auto player : HeapBase::get().state()->get_players())
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -331,7 +320,7 @@ end
         },
         [&lua](int8_t slot, bool or_ghost) -> sol::object
         {
-            for (auto player : get_players(State::get().ptr()))
+            for (auto player : HeapBase::get().state()->get_players())
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -465,8 +454,8 @@ end
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto state = State::get().ptr_main();
-        auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
+        int now = HeapBase::get().state()->time_level;
+        auto luaCb = IntervalCallback{cb, frames, now};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
@@ -1302,13 +1291,13 @@ end
     /// inside these boundaries. The order is: left x, top y, right x, bottom y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         return std::make_tuple(2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f);
     };
     /// Same as [get_bounds](#get_bounds) but returns AABB struct instead of loose floats
     lua["get_aabb_bounds"] = []() -> AABB
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         return {2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f};
     };
     /// Gets the current camera position in the level
@@ -1986,7 +1975,7 @@ end
     lua["save_progress"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        if (backend->last_save <= API::get_global_frame_count() - 120)
         {
             backend->manual_save = true;
             save_progress();
@@ -1999,7 +1988,7 @@ end
     lua["save_script"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= HeapBase::get().frame_count() - 120)
+        if (backend->last_save <= API::get_global_frame_count() - 120)
         {
             backend->manual_save = true;
             return true;
@@ -2017,11 +2006,11 @@ end
 
     /// Get the thread-local version of state
     lua["get_local_state"] = []() -> StateMemory*
-    { return State::get().ptr_local(); };
+    { return HeapBase::get().state(); };
 
     /// Get the thread-local version of players
     lua["get_local_players"] = []() -> std::vector<Player*>
-    { return get_players(State::get().ptr_local()); };
+    { return HeapBase::get().state()->get_players(); };
 
     /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
     lua["list_dir"] = [&lua](std::optional<std::string> dir)
@@ -2111,9 +2100,10 @@ end
         float ax = -0.98f;
         float f = 1.0f;
         uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
-        if (hs == 0 || State::get().ptr()->items->player_count > 3)
+        auto state = HeapBase::get().state();
+        if (hs == 0 || state->items->player_count > 3)
             f = 1.0f;
-        else if (hs == 1 || State::get().ptr()->items->player_count > 2)
+        else if (hs == 1 || state->items->player_count > 2)
             f = 1.15f;
         else
             f = 1.3f;

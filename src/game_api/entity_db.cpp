@@ -22,7 +22,7 @@
 #include "movable_behavior.hpp"      // for MovableBehavior
 #include "render_api.hpp"            // for RenderInfo
 #include "search.hpp"                // for get_address
-#include "state.hpp"                 // for State, StateMemory, enum_to_layer
+#include "state.hpp"                 // for StateMemory, enum_to_layer
 #include "state_structs.hpp"         // for LiquidPhysicsEngine
 #include "texture.hpp"               // for get_texture, Texture
 #include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...

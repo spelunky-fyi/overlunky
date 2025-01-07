@@ -89,7 +89,7 @@ void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
 
 std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     std::vector<uint32_t> found;
     const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
 
@@ -265,7 +265,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
 
 std::vector<uint32_t> get_entities_by_draw_depth(std::vector<uint8_t> draw_depths, LAYER l)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
     std::vector<uint32_t> found;
     for (auto draw_depth : draw_depths)
     {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstddef>  // for size_t
-#include <cstdint>  // for int64_t
+#include <cstdint>  // for uint32_t
 #include <stdlib.h> // for free
 
 struct PRNG;

@@ -7,7 +7,7 @@
 #include "layer.hpp"     // for EntityList, EntityList::Range, Layer, Entit...
 #include "movable.hpp"   // for Movable
 #include "spawn_api.hpp" // for spawn_entity_over
-#include "state.hpp"     // for State
+#include "state.hpp"     // for StateMemory
 #include "texture.hpp"   // for Texture
 
 void Floor::fix_border_tile_animation()

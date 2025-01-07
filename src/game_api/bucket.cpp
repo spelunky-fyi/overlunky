@@ -23,13 +23,13 @@ Bucket* Bucket::get()
 
 PAUSE_TYPE PauseAPI::get_pause()
 {
-    pause = (PAUSE_TYPE)(State::get().ptr()->pause | ((uint32_t)pause & ~0x3f));
+    pause = (PAUSE_TYPE)(HeapBase::get().state()->pause | ((uint32_t)pause & ~0x3f));
     return pause;
 }
 
 void PauseAPI::set_pause(PAUSE_TYPE flags)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     pause = flags;
     state->pause = (uint8_t)(((uint32_t)flags) & 0x3f);
 }
@@ -37,7 +37,7 @@ void PauseAPI::set_pause(PAUSE_TYPE flags)
 bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen) const
 {
     bool match = false;
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
 
     if (state->loading == 2 && (trigger & PAUSE_TRIGGER::SCREEN) != PAUSE_TRIGGER::NONE && (screen == PAUSE_SCREEN::NONE || (screen & (PAUSE_SCREEN)(1 << state->screen_next)) != PAUSE_SCREEN::NONE))
         match = true;
@@ -54,7 +54,7 @@ bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen) const
     if (match && (trigger & PAUSE_TRIGGER::ONCE) != PAUSE_TRIGGER::NONE)
         trigger = PAUSE_TRIGGER::NONE;
 
-    if (match && last_trigger_frame == API::get_global_update_count())
+    if (match && (uint64_t)last_trigger_frame == API::get_global_update_count())
         match = false;
 
     return match;
@@ -62,7 +62,7 @@ bool PauseAPI::check_trigger(PAUSE_TRIGGER& trigger, PAUSE_SCREEN& screen) const
 
 bool PauseAPI::loading()
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     auto gm = get_game_manager();
     bool loading = state->loading > 0 || state->fade_timer > 0 || (state->screen == 4 && gm->screen_menu->menu_text_opacity < 1) || (state->screen == 9 && (state->screen_character_select->topleft_woodpanel_esc_slidein == 0 || state->screen_character_select->start_pressed)) || state->logic->ouroboros;
     if ((state->loading == 3 && (state->fade_timer <= 1 || state->fade_length == 0)) || (state->loading == 1 && state->fade_timer == state->fade_length))
@@ -74,7 +74,7 @@ bool PauseAPI::event(PAUSE_TYPE pause_event)
 {
     bool block = false;
     std::optional<bool> force;
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
 
     if (skip_fade)
     {
@@ -142,7 +142,7 @@ bool PauseAPI::event(PAUSE_TYPE pause_event)
 
 void PauseAPI::post_loop()
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     if (skip)
         state->pause |= (uint8_t)pause_type & 0x3f;
     skip = false;
@@ -156,7 +156,7 @@ bool PauseAPI::pre_input()
         return false;
 
     auto gm = get_game_manager();
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
 
     if (bucket->pause_api->modifiers_block & bucket->pause_api->modifiers_down)
     {

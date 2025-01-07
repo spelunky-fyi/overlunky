@@ -45,7 +45,7 @@
 #include "prng.hpp"                     // for PRNG
 #include "screen.hpp"                   //
 #include "search.hpp"                   // for get_address, find_inst
-#include "state.hpp"                    // for State, get_state_ptr, enum_to_layer
+#include "state.hpp"                    // for get_state_ptr, enum_to_layer
 #include "state_structs.hpp"            // for ShopRestrictedItem, Illumination
 #include "thread_utils.hpp"             // for OnHeapPointer
 #include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
@@ -267,22 +267,6 @@ ENT_TYPE get_entity_type(uint32_t uid)
         return entity->type->id;
 
     return UINT32_MAX; // TODO: shouldn't this be 0?
-}
-
-std::vector<Player*> get_players(StateMemory* state)
-{
-    state = state != nullptr
-                ? state
-                : State::get().ptr();
-
-    std::vector<Player*> found;
-    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
-    {
-        auto player = state->items->player(i);
-        if (player)
-            found.push_back((Player*)player);
-    }
-    return found;
 }
 
 std::tuple<float, float, float, float> screen_aabb(float left, float top, float right, float bottom)
@@ -758,10 +742,10 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
 
     static const size_t offset = get_address("coord_inside_shop_zone");
-    auto state = State::get().ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
+    auto level_gen = HeapBase::get().level_gen();
     typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
     coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
-    return ciszf(state->level_gen, enum_to_layer(layer), x, y);
+    return ciszf(level_gen, enum_to_layer(layer), x, y);
 }
 
 void set_journal_enabled(bool b)
@@ -1255,7 +1239,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                auto state = State::get().ptr();
+                auto state = HeapBase::get().state();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is probably: show dialogs and other fx)
                 state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
@@ -1299,7 +1283,7 @@ std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start)
         auto bucket = Bucket::get();
         if (bucket->adventure_seed.first != 0)
             return bucket->adventure_seed;
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         auto current = get_adventure_seed(false);
         for (uint8_t i = 0; i < state->level_count + (state->screen == 12 || state->screen == 14 ? 1 : 0); ++i)
             current.second -= current.first;
@@ -1360,7 +1344,7 @@ void add_entity_to_liquid_collision(uint32_t uid, bool add)
 std::pair<uint8_t, uint8_t> get_liquids_at(float x, float y, LAYER layer)
 {
     uint8_t actual_layer = enum_to_layer(layer);
-    LiquidPhysics* liquid_physics = State::get().ptr()->liquid_physics;
+    LiquidPhysics* liquid_physics = HeapBase::get().liquid_physics();
     // if (y > 125.5f || y < .0f || x > 85.5f || x < .0f) // Original check by the game, can result is accesing the array out of bounds
     //     return 0;
     if (actual_layer != get_liquid_layer() || y < .0f || x < .0f)
@@ -1405,8 +1389,7 @@ void game_log(std::string message)
 
 void load_death_screen()
 {
-    auto state = State::get().ptr();
-    state->screen_death->init();
+    HeapBase::get().state()->screen_death->init();
 }
 
 void save_progress()
@@ -1673,7 +1656,7 @@ void set_boss_door_control_enabled(bool enable)
 void update_state()
 {
     static const size_t offset = get_address("state_refresh");
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     typedef void refresh_func(StateMemory*);
     static refresh_func* rf = (refresh_func*)(offset);
     rf(state);
@@ -1721,7 +1704,7 @@ ENT_TYPE add_custom_type()
 
 int32_t get_current_money()
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     int32_t money = state->money_shop_total;
     for (auto& inventory : state->items->player_inventories)
     {
@@ -1733,7 +1716,7 @@ int32_t get_current_money()
 
 int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     auto hud = get_hud();
     state->money_shop_total += amount;
     hud->money.counter += amount;
@@ -1743,7 +1726,7 @@ int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
 
 int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_t> display_time)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     auto hud = get_hud();
     uint8_t slot = player_slot - 1;
     if (slot > 3)
@@ -1758,11 +1741,11 @@ int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_
 void destroy_layer(uint8_t layer)
 {
     static const size_t offset = get_address("unload_layer");
-    auto state = State::get().ptr();
+    auto items = HeapBase::get().state()->items;
     for (auto i = 0; i < MAX_PLAYERS; ++i)
     {
-        if (state->items->players[i] && state->items->players[i]->layer == layer)
-            state->items->players[i] = nullptr;
+        if (items->players[i] && items->players[i]->layer == layer)
+            items->players[i] = nullptr;
     }
     auto* layer_ptr = HeapBase::get().state()->layer(layer);
     typedef void destroy_func(Layer*);
@@ -1793,7 +1776,7 @@ void create_level()
 
 void set_level_logic_enabled(bool enable)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     static const size_t offset = get_virtual_function_address(state->screen_level, 1);
 
     if (!enable)
@@ -1946,7 +1929,7 @@ void init_seeded(std::optional<uint32_t> seed)
     static const size_t offset = get_address("init_seeded");
     typedef void init_func(void*, uint32_t);
     static init_func* isf = (init_func*)(offset);
-    auto* state = State::get().ptr();
+    auto* state = HeapBase::get().state();
     isf(state, seed.value_or(state->seed));
 }
 

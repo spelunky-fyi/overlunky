@@ -34,7 +34,6 @@ void set_level_flags(uint32_t flags);
 uint32_t get_level_flags();
 ENT_TYPE get_entity_type(uint32_t uid);
 int get_entity_ai_state(uint32_t uid);
-std::vector<Player*> get_players(StateMemory* state);
 std::tuple<float, float, float, float> screen_aabb(float x1, float y1, float x2, float y2);
 float screen_distance(float x);
 std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::function<bool(Entity*)> predicate);

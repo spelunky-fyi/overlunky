@@ -47,6 +47,7 @@ struct LevelGenSystem;
 class ThemeInfo;
 struct Items;
 struct Illumination;
+class Player;
 
 #pragma pack(push, 1) // disable struct padding
 struct StateMemory
@@ -339,31 +340,11 @@ struct StateMemory
     void warp(uint8_t set_world, uint8_t set_level, uint8_t set_theme);
     Entity* get_entity(uint32_t uid) const;
     void set_seed(uint32_t set_seed);
+    std::vector<Player*> get_players();
 };
 #pragma pack(pop)
 
 StateMemory* get_state_ptr();
-
-struct State
-{
-    static State& get();
-
-    // Returns the main-thread version of StateMemory*
-    StateMemory* ptr_main() const;
-    // Returns the local-thread version of StateMemory*
-    StateMemory* ptr() const;
-    StateMemory* ptr_local() const;
-
-
-
-  private:
-    State(size_t addr)
-        : location(addr){};
-
-    size_t location;
-    State(const State&) = delete;
-    State& operator=(const State&) = delete;
-};
 
 namespace API
 {
@@ -372,8 +353,8 @@ void post_init();
 void set_do_hooks(bool do_hooks);
 void set_write_load_opt(bool allow);
 
-int64_t get_global_frame_count();
-int64_t get_global_update_count();
+uint64_t get_global_frame_count();
+uint64_t get_global_update_count();
 
 bool get_forward_events();
 
