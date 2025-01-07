@@ -1073,11 +1073,41 @@ bool SoundManager::bank_is_valid(CustomBank custom_bank)
         custom_bank.m_FmodHandle);
 }
 
+bool is_valid_hex_string(const std::string &str)
+{
+    return str.find_first_not_of("0123456789abcdefABCDEF", 2) == std::string::npos;
+}
+
+bool is_valid_fmod_guid_string(const std::string &str)
+{
+    if (str[0] != '{' || str[37] != '}')
+        return false;
+    else if (str[9] != '-')
+        return false;
+    else if (str[14] != '-')
+        return false;
+    else if (str[19] != '-')
+        return false;
+    else if (str[24] != '-')
+        return false;
+    else if (!is_valid_hex_string(str.substr(1, 8)))
+        return false;
+    else if (!is_valid_hex_string(str.substr(9, 4)))
+        return false;
+    else if (!is_valid_hex_string(str.substr(14, 4)))
+        return false;
+    else if (!is_valid_hex_string(str.substr(19, 4)))
+        return false;
+    else if (!is_valid_hex_string(str.substr(24, 12)))
+        return false;
+    return true;
+}
+
 FMODpathGUIDmap SoundManager::create_fmod_path_guid_map(std::string_view path)
 {
     if (std::ifstream guid_file = std::ifstream(std::string{path}))
     {
-        std::regex re("(\\{.*\\}) (event:.*)", std::regex_constants::icase);
+        std::regex re("event:\\/.*", std::regex_constants::icase);
         std::string line;
         std::smatch matches;
         std::unordered_map<std::string, FMOD::FMOD_GUID> newmap;
@@ -1086,25 +1116,32 @@ FMODpathGUIDmap SoundManager::create_fmod_path_guid_map(std::string_view path)
         {
             if (std::regex_search(line, matches, re))
             {
-                const char* FMOD_guid = matches[1].str().c_str();
-                std::string FMOD_event_path = matches[2].str();
-
-                FMOD::FMOD_GUID guid;
-                if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid, &guid)))
+                std::string FMOD_guid_str = line.substr(0, 38);
+                if (is_valid_fmod_guid_string(FMOD_guid_str))
                 {
-                    auto it = newmap.find(FMOD_event_path);
-                    if (it != newmap.end())
+                    std::string FMOD_event_path = matches[1].str();
+
+                    FMOD::FMOD_GUID guid;
+                    if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid_str.c_str(), &guid)))
                     {
-                        it->second = guid;
+                        auto it = newmap.find(FMOD_event_path);
+                        if (it != newmap.end())
+                        {
+                            it->second = guid;
+                        }
+                        else
+                        {
+                            newmap[FMOD_event_path] = std::move(guid);
+                        }
                     }
                     else
                     {
-                        newmap[FMOD_event_path] = std::move(guid);
+                        DEBUG("Failed to parse FMOD GUID string {}", FMOD_guid_str);
                     }
                 }
                 else
                 {
-                    DEBUG("Failed to parse FMOD GUID string {}", FMOD_guid);
+                    DEBUG("Invalid FMOD GUID string for line {}", line);
                 }
             }
         }
@@ -1129,11 +1166,15 @@ CustomEventDescription SoundManager::pathguidmap_lookup_event_id_by_path(FMODpat
 
 CustomEventDescription SoundManager::get_event_description_by_id_string(std::string guid_string)
 {
-    FMOD::FMOD_GUID guid;
-    if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
+    if (is_valid_fmod_guid_string(guid_string))
     {
-        return get_event_description_by_id(&guid);
+        FMOD::FMOD_GUID guid;
+        if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
+        {
+            return get_event_description_by_id(&guid);
+        }
     }
+    DEBUG("Invalid FMOD GUID string {}", guid_string);
     return CustomEventDescription{nullptr, nullptr};
 }
 CustomEventDescription SoundManager::get_event_description_by_id(FMODStudio::FMOD_GUID* guid)
@@ -1143,7 +1184,18 @@ CustomEventDescription SoundManager::get_event_description_by_id(FMODStudio::FMO
     {
         return CustomEventDescription{fmod_event, this};
     }
-    DEBUG("Could not get event for GUID {{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}", guid->Data1, guid->Data2, guid->Data3, guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3], guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
+    DEBUG("Could not get event for GUID {{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}",
+        guid->Data1,
+        guid->Data2,
+        guid->Data3,
+        guid->Data4[0],
+        guid->Data4[1],
+        guid->Data4[2],
+        guid->Data4[3],
+        guid->Data4[4],
+        guid->Data4[5],
+        guid->Data4[6],
+        guid->Data4[7]);
     return CustomEventDescription{nullptr, nullptr};
 }
 
