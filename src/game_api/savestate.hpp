@@ -2,7 +2,7 @@
 
 #include <cstdint> // for uint32_t, int8_t
 
-#include "thread_utils.hpp"
+#include "heap_base.hpp" // for HeapBase
 
 struct StateMemory;
 struct PRNG;

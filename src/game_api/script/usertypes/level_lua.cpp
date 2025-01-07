@@ -22,7 +22,7 @@
 #include <utility>          // for min, max, monostate, get
 
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
-#include "entity.hpp"                        // for to_id
+#include "entity_db.hpp"                     // for to_id
 #include "level_api.hpp"                     // for THEME_OVERRIDE, ThemeInfo
 #include "math.hpp"                          // for AABB
 #include "savedata.hpp"                      // for SaveData, Constellation...

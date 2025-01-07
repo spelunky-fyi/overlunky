@@ -12,8 +12,8 @@
 
 #include "bucket.hpp"
 #include "logger.h"
-#include "memory.hpp"
 #include "script/lua_backend.hpp"
+#include "search.hpp"
 #include "state.hpp"
 
 bool detect_wine()

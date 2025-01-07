@@ -8,6 +8,7 @@
 #include "render_api.hpp"
 #include "screen.hpp"
 #include "script.hpp"
+#include "search.hpp"
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"

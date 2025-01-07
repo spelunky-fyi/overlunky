@@ -1,6 +1,6 @@
 #include "theme_vtable_lua.hpp"
 
-#include "thread_utils.hpp" // for HeapBase
+#include "heap_base.hpp" // for HeapBase
 
 namespace NThemeVTables
 {

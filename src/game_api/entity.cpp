@@ -15,15 +15,16 @@
 
 #include "containers/custom_map.hpp" // for custom_map
 #include "entities_chars.hpp"        // for Player
-#include "entities_monsters.hpp"     //
+#include "entities_monsters.hpp"     // for MegaJellyfish
 #include "entity_hooks_info.hpp"     // for EntityHooksInfo
-#include "entity_lookup.hpp"         //
+#include "entity_lookup.hpp"         // for get_proper_types
+#include "heap_base.hpp"             // for HeapBase
 #include "memory.hpp"                // for write_mem_prot
 #include "movable.hpp"               // for Movable
 #include "movable_behavior.hpp"      // for MovableBehavior
 #include "render_api.hpp"            // for RenderInfo
 #include "search.hpp"                // for get_address
-#include "state.hpp"                 // for StateMemory, enum_to_layer
+#include "state.hpp"                 // for StateMemory
 #include "state_structs.hpp"         // for LiquidPhysicsEngine
 #include "texture.hpp"               // for get_texture, Texture
 #include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...

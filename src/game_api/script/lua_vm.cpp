@@ -39,6 +39,7 @@
 #include "game_api.hpp"                            //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
+#include "heap_base.hpp"                           // for OnHeapPointer, HeapBase
 #include "illumination.hpp"                        //
 #include "items.hpp"                               // for Inventory
 #include "layer.hpp"                               // for g_level_max_x
@@ -62,7 +63,6 @@
 #include "spawn_api.hpp"                           // for spawn_roomowner
 #include "state.hpp"                               // for StateMemory
 #include "strings.hpp"                             // for change_string
-#include "thread_utils.hpp"                        // for OnHeapPointer, HeapBase
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
 #include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes

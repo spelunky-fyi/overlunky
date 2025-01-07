@@ -1,12 +1,12 @@
 #include "illumination.hpp"
 
-#include "color.hpp"
-#include "entity.hpp"
-#include "math.hpp"
-#include "search.hpp"
-#include "state.hpp"
-#include "thread_utils.hpp"
 #include <type_traits>
+
+#include "color.hpp"  // for Color
+#include "entity.hpp" // for Entity
+#include "math.hpp"   // for Vec2
+#include "search.hpp" // for get_address
+#include "state.hpp"  // for get_state_ptr
 
 Illumination* create_illumination(Vec2 pos, Color col, LIGHT_TYPE type, float size, uint8_t light_flags, int32_t uid, LAYER layer)
 {

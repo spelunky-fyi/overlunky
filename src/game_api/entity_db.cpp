@@ -14,18 +14,17 @@
 #include <thread>    // for sleep_for
 #include <vector>    // for vector, _Vector_iterator, erase_if
 
-#include "containers/custom_map.hpp" // for custom_map
-#include "entities_chars.hpp"        // for Player
-#include "entity_hooks_info.hpp"     // for EntityHooksInfo
-#include "memory.hpp"                // for write_mem_prot
-#include "movable.hpp"               // for Movable
-#include "movable_behavior.hpp"      // for MovableBehavior
-#include "render_api.hpp"            // for RenderInfo
-#include "search.hpp"                // for get_address
-#include "state.hpp"                 // for StateMemory, enum_to_layer
-#include "state_structs.hpp"         // for LiquidPhysicsEngine
-#include "texture.hpp"               // for get_texture, Texture
-#include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...
+#include "entities_chars.hpp"    // for Player
+#include "entity_hooks_info.hpp" // for EntityHooksInfo
+#include "memory.hpp"            // for write_mem_prot
+#include "movable.hpp"           // for Movable
+#include "movable_behavior.hpp"  // for MovableBehavior
+#include "render_api.hpp"        // for RenderInfo
+#include "search.hpp"            // for get_address
+#include "state.hpp"             // for StateMemory, enum_to_layer
+#include "state_structs.hpp"     // for LiquidPhysicsEngine
+#include "texture.hpp"           // for get_texture, Texture
+#include "vtable_hook.hpp"       // for hook_vtable, hook_dtor, unregis...
 
 EntityDB::EntityDB(const ENT_TYPE other)
     : EntityDB(*get_type(other)){};

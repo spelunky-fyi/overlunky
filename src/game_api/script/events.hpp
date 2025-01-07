@@ -5,9 +5,9 @@
 #include <string>      // for u16string, string
 #include <string_view> // for string_view
 
-#include "aliases.hpp"      // for JournalPageType
-#include "lua_backend.hpp"  // for ON
-#include "thread_utils.hpp" // for HeapBase
+#include "aliases.hpp"     // for JournalPageType
+#include "heap_base.hpp"   // for HeapBase
+#include "lua_backend.hpp" // for ON
 
 class Entity;
 class JournalPage;

@@ -10,8 +10,8 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max, get
 
-#include "prng.hpp"         // for PRNG, PRNG::ENTITY_VARIATION, PRNG::EXTRA_SPAWNS
-#include "thread_utils.hpp" // for HeapBase
+#include "heap_base.hpp" // for HeapBase
+#include "prng.hpp"      // for PRNG, PRNG::ENTITY_VARIATION, PRNG::EXTRA_SPAWNS
 
 namespace NPRNG
 {

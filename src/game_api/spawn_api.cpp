@@ -17,8 +17,8 @@
 #include "entities_items.hpp"           // for ClimbableRope
 #include "entities_liquids.hpp"         // for Lava
 #include "entities_monsters.hpp"        // for Shopkeeper, RoomOwner
-#include "entity.hpp"                   // for to_id, Entity, get_entity_ptr, Enti...
-#include "entity_db.hpp"                // for EntityFactory
+#include "entity.hpp"                   // for Entity, get_entity_ptr, Enti...
+#include "entity_db.hpp"                // for EntityFactory, to_id
 #include "illumination.hpp"             //
 #include "items.hpp"                    //
 #include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x

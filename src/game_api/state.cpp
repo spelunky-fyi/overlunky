@@ -14,7 +14,7 @@
 #include "entities_chars.hpp"                    // for Player
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
 #include "entity_hooks_info.hpp"                 // for Player
-#include "game_api.hpp"                          //
+#include "game_api.hpp"                          // for GameAPI
 #include "game_manager.hpp"                      // for get_game_manager, GameManager, SaveR...
 #include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
@@ -31,11 +31,10 @@
 #include "script/lua_vm.hpp"                     // for get_lua_vm
 #include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
 #include "search.hpp"                            // for get_address
-#include "sound_manager.hpp"                     //
+#include "sound_manager.hpp"                     // for SoundManager
 #include "spawn_api.hpp"                         // for init_spawn_hooks
 #include "steam_api.hpp"                         // for init_achievement_hooks
 #include "strings.hpp"                           // for strings_init
-#include "thread_utils.hpp"                      // for OnHeapPointer
 #include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
 #include "vtable_hook.hpp"                       // for hook_vtable
 

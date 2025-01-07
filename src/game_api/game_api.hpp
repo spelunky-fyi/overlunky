@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "state_structs.hpp" // for Camera
+#include "heap_base.hpp" // for OnHeapPointer
 
 struct UnknownRenderStuff
 {
@@ -98,7 +98,7 @@ struct Renderer
     bool unknown87a[110];
     UnknownRenderStuff unknown87b[110];
 
-    OnHeapPointer<Camera> camera;
+    OnHeapPointer<struct Camera> camera;
     size_t unknown87d; // bool?
     size_t* unknown88;
     size_t swap_chain; // unsure? offset 0x80FD0

@@ -33,6 +33,7 @@
 #include "entity_lookup.hpp"            //
 #include "game_manager.hpp"             //
 #include "game_patches.hpp"             //
+#include "heap_base.hpp"                // for OnHeapPointer, HeapBase
 #include "illumination.hpp"             //
 #include "items.hpp"                    // for Items
 #include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
@@ -47,7 +48,6 @@
 #include "search.hpp"                   // for get_address, find_inst
 #include "state.hpp"                    // for get_state_ptr, enum_to_layer
 #include "state_structs.hpp"            // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"             // for OnHeapPointer
 #include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
 
 uint32_t setflag(uint32_t flags, int bit)
@@ -671,7 +671,7 @@ void force_olmec_phase_0(bool b)
     static const size_t offset = get_address("olmec_transition_phase_1");
 
     if (b)
-        write_mem_recoverable("force_olmec_phase_0", offset, "\xEB\x2E"s, true); // jbe -> jmp
+        write_mem_recoverable("force_olmec_phase_0", offset, "\xEB\x2E"sv, true); // jbe -> jmp
     else
         recover_mem("force_olmec_phase_0");
 }
@@ -707,8 +707,8 @@ void set_time_ghost_enabled(bool b)
     }
     else
     {
-        write_mem_recoverable("set_time_ghost_enabled", offset_trigger, "\xC3\x90\x90\x90"s, true);
-        write_mem_recoverable("set_time_ghost_enabled", offset_toast_trigger, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_trigger, "\xC3\x90\x90\x90"sv, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_toast_trigger, "\xC3\x90\x90\x90"sv, true);
     }
 }
 
@@ -719,7 +719,7 @@ void set_time_jelly_enabled(bool b)
     if (b)
         recover_mem("set_time_jelly_enabled");
     else
-        write_mem_recoverable("set_time_jelly_enabled", offset, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_jelly_enabled", offset, "\xC3\x90\x90\x90"sv, true);
 }
 
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
@@ -759,7 +759,7 @@ void set_camp_camera_bounds_enabled(bool b)
     if (b)
         recover_mem("camp_camera_bounds");
     else
-        write_mem_recoverable("camp_camera_bounds", offset, "\xC3\x90\x90"s, true);
+        write_mem_recoverable("camp_camera_bounds", offset, "\xC3\x90\x90"sv, true);
 }
 
 void set_explosion_mask(int32_t mask)

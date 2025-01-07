@@ -11,7 +11,7 @@
 #include "movable.hpp"         // for Movable
 #include "rpc.hpp"             // for update_liquid_collision_at
 #include "search.hpp"          // for get_address
-#include "state.hpp"           // for StateMemory
+#include "state.hpp"           // for StateMemory, API
 
 struct EntityFactory;
 
@@ -127,7 +127,7 @@ Entity* Layer::get_entity_at(float x, float y, uint32_t search_flags, uint32_t i
 
 Entity* Layer::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
-    auto screen = HeapBase::get().state()->screen_next;
+    auto screen = get_state_ptr()->screen_next;
     Entity* door;
     switch (screen)
     {

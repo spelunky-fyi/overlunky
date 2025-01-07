@@ -8,14 +8,13 @@
 #include <string_view>
 #include <utility>
 
-#include "entity.hpp"
-#include "layer.hpp"
-#include "memory.hpp"
-#include "movable.hpp"
-#include "search.hpp"
-#include "state.hpp"
-#include "state_structs.hpp"
-#include "virtual_table.hpp"
+#include "entity.hpp"        // for Entity
+#include "entity_db.hpp"     // for to_id
+#include "layer.hpp"         // for Layer, EntityList
+#include "memory.hpp"        // for Memory, get_address, memory_read ...
+#include "search.hpp"        // for get_address
+#include "state.hpp"         // for StateMemory
+#include "virtual_table.hpp" // for get_virtual_function_address
 
 void patch_orbs_limit()
 {
@@ -52,7 +51,7 @@ void patch_orbs_limit()
 
 bool check_if_ent_type_exists(ENT_TYPE type, int mask)
 {
-    StateMemory* state = HeapBase::get().state();
+    StateMemory* state = get_state_ptr();
 
     const auto entities_map = &state->layers[0]->entities_by_mask; // game code only cares about the front layer, so we do the same
     auto it = entities_map->find(mask);

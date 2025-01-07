@@ -25,11 +25,11 @@
 #include <vector>        // for vector
 
 #include "aliases.hpp"                      // for IMAGE, JournalPageType, SPAWN_TYPE
+#include "heap_base.hpp"                    // for HeapBase
 #include "hook_handler.hpp"                 // for HookHandler
 #include "level_api.hpp"                    // IWYU pragma: keep
 #include "logger.h"                         // for DEBUG
 #include "script.hpp"                       // for ScriptMessage, ScriptImage (ptr only), Scri...
-#include "thread_utils.hpp"                 // for HeapBase
 #include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext, CORNER_FINISH
 #include "util.hpp"                         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
