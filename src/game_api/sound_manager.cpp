@@ -146,73 +146,6 @@ FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_t
     return FMOD::FMOD_RESULT::OK;
 }
 
-CustomBank::CustomBank(const CustomBank& rhs)
-    : m_FmodHandle{ rhs.m_FmodHandle }, m_SoundManager{ rhs.m_SoundManager }
-{
-    if (m_SoundManager != nullptr)
-    {
-        std::visit(
-            overloaded{
-                [this](FMOD::Bank* bank)
-                { m_SoundManager->acquire_bank(bank); },
-                [](std::monostate) {},
-            },
-            rhs.m_FmodHandle);
-    }
-}
-CustomBank::CustomBank(CustomBank&& rhs) noexcept
-{
-    std::swap(m_FmodHandle, rhs.m_FmodHandle);
-    std::swap(m_SoundManager, rhs.m_SoundManager);
-}
-CustomBank::CustomBank(FMOD::Bank* fmod_bank, SoundManager* sound_manager)
-    : m_FmodHandle{ fmod_bank }, m_SoundManager{ sound_manager }
-{
-}
-CustomBank::~CustomBank()
-{
-    if (m_SoundManager != nullptr)
-    {
-        std::visit(
-            overloaded{
-                [this](FMOD::Bank* bank)
-                { m_SoundManager->acquire_bank(bank); },
-                [](std::monostate) {},
-            },
-            m_FmodHandle);
-    }
-}
-std::optional<FMODStudio::LoadingState> CustomBank::getLoadingState()
-{
-    return m_SoundManager->get_bank_loading_state(*this);
-}
-bool CustomBank::loadSampleData()
-{
-    return m_SoundManager->load_bank_sample_data(*this);
-}
-bool CustomBank::unloadSampleData()
-{
-    return m_SoundManager->unload_bank_sample_data(*this);
-}
-std::optional<FMODStudio::LoadingState> CustomBank::getSampleLoadingState()
-{
-    return m_SoundManager->get_bank_sample_loading_state(*this);
-}
-bool CustomBank::unload()
-{
-    return std::visit(
-        overloaded{
-            [=, this](FMOD::Bank* bank)
-            { return m_SoundManager->unload_bank(bank); },
-            [](std::monostate)
-            { return false; }},
-        m_FmodHandle);
-}
-bool CustomBank::isValid()
-{
-    return m_SoundManager->bank_is_valid(*this);
-}
-
 CustomSound::CustomSound(const CustomSound& rhs)
     : m_FmodHandle{rhs.m_FmodHandle}, m_SoundManager{rhs.m_SoundManager}
 {
@@ -223,7 +156,7 @@ CustomSound::CustomSound(const CustomSound& rhs)
                 [this](FMOD::Sound* sound)
                 { m_SoundManager->acquire_sound(sound); },
                 [](FMODStudio::EventDescription*) {},
-                [](std::monostate) {}
+                [](std::monostate) {},
             },
             rhs.m_FmodHandle);
     }
@@ -352,6 +285,73 @@ std::optional<float> PlayingSound::get_parameter(VANILLA_SOUND_PARAM parameter_i
 bool PlayingSound::set_parameter(VANILLA_SOUND_PARAM parameter_index, float value)
 {
     return m_SoundManager->set_parameter(*this, parameter_index, value);
+}
+
+CustomBank::CustomBank(const CustomBank& rhs)
+    : m_FmodHandle{rhs.m_FmodHandle}, m_SoundManager{rhs.m_SoundManager}
+{
+    if (m_SoundManager != nullptr)
+    {
+        std::visit(
+            overloaded{
+                [this](FMOD::Bank* bank)
+                { m_SoundManager->acquire_bank(bank); },
+                [](std::monostate) {},
+            },
+            rhs.m_FmodHandle);
+    }
+}
+CustomBank::CustomBank(CustomBank&& rhs) noexcept
+{
+    std::swap(m_FmodHandle, rhs.m_FmodHandle);
+    std::swap(m_SoundManager, rhs.m_SoundManager);
+}
+CustomBank::CustomBank(FMOD::Bank* fmod_bank, SoundManager* sound_manager)
+    : m_FmodHandle{fmod_bank}, m_SoundManager{sound_manager}
+{
+}
+CustomBank::~CustomBank()
+{
+    if (m_SoundManager != nullptr)
+    {
+        std::visit(
+            overloaded{
+                [this](FMOD::Bank* bank)
+                { m_SoundManager->acquire_bank(bank); },
+                [](std::monostate) {},
+            },
+            m_FmodHandle);
+    }
+}
+std::optional<FMODStudio::LoadingState> CustomBank::getLoadingState()
+{
+    return m_SoundManager->get_bank_loading_state(*this);
+}
+bool CustomBank::loadSampleData()
+{
+    return m_SoundManager->load_bank_sample_data(*this);
+}
+bool CustomBank::unloadSampleData()
+{
+    return m_SoundManager->unload_bank_sample_data(*this);
+}
+std::optional<FMODStudio::LoadingState> CustomBank::getSampleLoadingState()
+{
+    return m_SoundManager->get_bank_sample_loading_state(*this);
+}
+bool CustomBank::unload()
+{
+    return std::visit(
+        overloaded{
+            [=, this](FMOD::Bank* bank)
+            { return m_SoundManager->unload_bank(bank); },
+            [](std::monostate)
+            { return false; }},
+        m_FmodHandle);
+}
+bool CustomBank::isValid()
+{
+    return m_SoundManager->bank_is_valid(*this);
 }
 
 CustomEventDescription::CustomEventDescription(const CustomEventDescription& rhs)
