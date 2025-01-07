@@ -911,39 +911,6 @@ PlayingSound SoundManager::play_sound(FMOD::Sound* fmod_sound, bool paused, bool
     return PlayingSound{channel, this};
 }
 
-CustomEventDescription SoundManager::pathguidmap_lookup_event_id_by_path(FMODpathGUIDmap map, std::string path)
-{
-    auto it = map.m_PathGUIDmap.find(path);
-    if (it != map.m_PathGUIDmap.end())
-    {
-        return get_event_description_by_id(&it->second);
-    }
-    DEBUG("Could not find event path {} in FMODpathGUIDmap", path);
-    return CustomEventDescription{nullptr, nullptr};
-}
-
-CustomEventDescription SoundManager::get_event_description_by_id_string(std::string guid_string)
-{
-    FMOD::FMOD_GUID guid;
-    if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
-    {
-        return get_event_description_by_id(&guid);
-    }
-    return CustomEventDescription{nullptr, nullptr};
-}
-
-CustomEventDescription SoundManager::get_event_description_by_id(FMODStudio::FMOD_GUID* guid)
-{
-    FMODStudio::EventDescription* fmod_event;
-    if (FMOD_CHECK_CALL(m_SystemGetEventByID(m_FmodStudioSystem, guid, &fmod_event)))
-    {
-        return CustomEventDescription{fmod_event, this};
-    }
-    DEBUG("Could not get event for GUID {{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}",
-        guid->Data1, guid->Data2, guid->Data3, guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3], guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
-    return CustomEventDescription{nullptr, nullptr};
-}
-
 CustomSound SoundManager::get_event(std::string_view event_name)
 {
     auto it = m_SoundData.NameToEvent.find(event_name);
@@ -1104,6 +1071,80 @@ bool SoundManager::bank_is_valid(CustomBank custom_bank)
                    [](std::monostate)
                    { return false; }},
         custom_bank.m_FmodHandle);
+}
+
+FMODpathGUIDmap SoundManager::create_fmod_path_guid_map(std::string_view path)
+{
+    if (std::ifstream guid_file = std::ifstream(std::string{path}))
+    {
+        std::regex re("(\\{.*\\}) (event:.*)", std::regex_constants::icase);
+        std::string line;
+        std::smatch matches;
+        std::unordered_map<std::string, FMOD::FMOD_GUID> newmap;
+
+        while (std::getline(guid_file, line))
+        {
+            if (std::regex_search(line, matches, re))
+            {
+                const char* FMOD_guid = matches[1].str().c_str();
+                std::string FMOD_event_path = matches[2].str();
+
+                FMOD::FMOD_GUID guid;
+                if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid, &guid)))
+                {
+                    auto it = newmap.find(FMOD_event_path);
+                    if (it != newmap.end())
+                    {
+                        it->second = guid;
+                    }
+                    else
+                    {
+                        newmap[FMOD_event_path] = std::move(guid);
+                    }
+                }
+                else
+                {
+                    DEBUG("Failed to parse FMOD GUID string {}", FMOD_guid);
+                }
+            }
+        }
+        if (!newmap.empty())
+        {
+            return FMODpathGUIDmap{newmap, this};
+        }
+    }
+    DEBUG("Failed to create FMOD path GUID map.");
+    return FMODpathGUIDmap{nullptr, nullptr};
+}
+CustomEventDescription SoundManager::pathguidmap_lookup_event_id_by_path(FMODpathGUIDmap map, std::string path)
+{
+    auto it = map.m_PathGUIDmap.find(path);
+    if (it != map.m_PathGUIDmap.end())
+    {
+        return get_event_description_by_id(&it->second);
+    }
+    DEBUG("Could not find event path {} in FMODpathGUIDmap", path);
+    return CustomEventDescription{nullptr, nullptr};
+}
+
+CustomEventDescription SoundManager::get_event_description_by_id_string(std::string guid_string)
+{
+    FMOD::FMOD_GUID guid;
+    if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
+    {
+        return get_event_description_by_id(&guid);
+    }
+    return CustomEventDescription{nullptr, nullptr};
+}
+CustomEventDescription SoundManager::get_event_description_by_id(FMODStudio::FMOD_GUID* guid)
+{
+    FMODStudio::EventDescription* fmod_event;
+    if (FMOD_CHECK_CALL(m_SystemGetEventByID(m_FmodStudioSystem, guid, &fmod_event)))
+    {
+        return CustomEventDescription{fmod_event, this};
+    }
+    DEBUG("Could not get event for GUID {{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}", guid->Data1, guid->Data2, guid->Data3, guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3], guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
+    return CustomEventDescription{nullptr, nullptr};
 }
 
 CustomEventInstance SoundManager::create_event_instance(FMODStudio::EventDescription* fmod_event)
@@ -1418,50 +1459,6 @@ bool SoundManager::event_instance_is_valid(CustomEventInstance fmod_event_instan
                    [](std::monostate)
                    { return false; }},
         fmod_event_instance.m_FmodHandle);
-}
-
-FMODpathGUIDmap SoundManager::create_fmod_path_guid_map(std::string_view path)
-{
-    if (std::ifstream guid_file = std::ifstream(std::string{path}))
-    {
-        std::regex re("(\\{.*\\}) (event:.*)", std::regex_constants::icase);
-        std::string line;
-        std::smatch matches;
-        std::unordered_map<std::string, FMOD::FMOD_GUID> newmap;
-
-        while (std::getline(guid_file, line))
-        {
-            if (std::regex_search(line, matches, re))
-            {
-                const char* FMOD_guid = matches[1].str().c_str();
-                std::string FMOD_event_path = matches[2].str();
-
-                FMOD::FMOD_GUID guid;
-                if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid, &guid)))
-                {
-                    auto it = newmap.find(FMOD_event_path);
-                    if (it != newmap.end())
-                    {
-                        it->second = guid;
-                    }
-                    else
-                    {
-                        newmap[FMOD_event_path] = std::move(guid);
-                    }
-                }
-                else
-                {
-                    DEBUG("Failed to parse FMOD GUID string {}", FMOD_guid);
-                }
-            }
-        }
-        if (!newmap.empty())
-        {
-            return FMODpathGUIDmap{newmap, this};
-        }
-    }
-    DEBUG("Failed to create FMOD path GUID map.");
-    return FMODpathGUIDmap{nullptr, nullptr};
 }
 
 bool SoundManager::is_playing(PlayingSound playing_sound)
