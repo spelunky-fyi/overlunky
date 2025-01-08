@@ -1119,24 +1119,31 @@ FMODpathGUIDmap SoundManager::create_fmod_path_guid_map(std::string_view path)
                 std::string FMOD_guid_str = line.substr(0, 38);
                 if (is_valid_fmod_guid_string(FMOD_guid_str))
                 {
-                    std::string FMOD_event_path = matches[1].str();
+                    std::string FMOD_event_path = matches[0].str();
 
-                    FMOD::FMOD_GUID guid;
-                    if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid_str.c_str(), &guid)))
+                    if (!FMOD_event_path.empty())
                     {
-                        auto it = newmap.find(FMOD_event_path);
-                        if (it != newmap.end())
+                        FMOD::FMOD_GUID guid;
+                        if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid_str.c_str(), &guid)))
                         {
-                            it->second = guid;
+                            auto it = newmap.find(FMOD_event_path);
+                            if (it != newmap.end())
+                            {
+                                it->second = guid;
+                            }
+                            else
+                            {
+                                newmap[FMOD_event_path] = std::move(guid);
+                            }
                         }
                         else
                         {
-                            newmap[FMOD_event_path] = std::move(guid);
+                            DEBUG("Failed to parse FMOD GUID string \"{}\"", FMOD_guid_str);
                         }
                     }
                     else
                     {
-                        DEBUG("Failed to parse FMOD GUID string \"{}\"", FMOD_guid_str);
+                        DEBUG("Invalid FMOD Event Path \"{}\" for line \"{}\"", FMOD_event_path, line);
                     }
                 }
                 else
