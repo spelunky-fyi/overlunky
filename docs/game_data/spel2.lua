@@ -446,11 +446,11 @@ function set_pre_entity_spawn(cb, flags, mask, ...) end
 ---@return CallbackId
 function set_post_entity_spawn(cb, flags, mask, ...) end
 ---Warp to a level immediately.
----@param w integer
----@param l integer
----@param t integer
+---@param world integer
+---@param level integer
+---@param theme integer
 ---@return nil
-function warp(w, l, t) end
+function warp(world, level, theme) end
 ---Set seed and reset run.
 ---@param seed integer
 ---@return nil

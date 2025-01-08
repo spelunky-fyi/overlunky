@@ -1208,6 +1208,7 @@ end
     lua["get_frame"] = []() -> uint32_t
     { return HeapBase::get().frame_count(); };
     /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+    // lua["get_global_frame"] = []() -> int
     lua["get_global_frame"] = API::get_global_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.
     lua["get_ms"] = []()

@@ -2215,7 +2215,7 @@ Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDAT
 
 > Search script examples for [warp](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=warp)
 
-#### nil warp(int w, int l, int t)
+#### nil warp(int world, int level, int theme)
 
 Warp to a level immediately.
 
