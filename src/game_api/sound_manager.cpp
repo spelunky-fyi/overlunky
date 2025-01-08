@@ -1136,12 +1136,12 @@ FMODpathGUIDmap SoundManager::create_fmod_path_guid_map(std::string_view path)
                     }
                     else
                     {
-                        DEBUG("Failed to parse FMOD GUID string {}", FMOD_guid_str);
+                        DEBUG("Failed to parse FMOD GUID string \"{}\"", FMOD_guid_str);
                     }
                 }
                 else
                 {
-                    DEBUG("Invalid FMOD GUID string for line {}", line);
+                    DEBUG("Invalid FMOD GUID string for line \"{}\"", line);
                 }
             }
         }
@@ -1160,21 +1160,24 @@ CustomEventDescription SoundManager::pathguidmap_lookup_event_id_by_path(FMODpat
     {
         return get_event_description_by_id(&it->second);
     }
-    DEBUG("Could not find event path {} in FMODpathGUIDmap", path);
+    DEBUG("Could not find event path \"{}\" in FMODpathGUIDmap", path);
     return CustomEventDescription{nullptr, nullptr};
 }
 
 CustomEventDescription SoundManager::get_event_description_by_id_string(std::string guid_string)
 {
-    if (is_valid_fmod_guid_string(guid_string))
+    if (guid_string.length() == 38)
     {
-        FMOD::FMOD_GUID guid;
-        if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
+        if (is_valid_fmod_guid_string(guid_string))
         {
-            return get_event_description_by_id(&guid);
+            FMOD::FMOD_GUID guid;
+            if (FMOD_CHECK_CALL(m_StudioParseID(guid_string.c_str(), &guid)))
+            {
+                return get_event_description_by_id(&guid);
+            }
         }
     }
-    DEBUG("Invalid FMOD GUID string {}", guid_string);
+    DEBUG("Failed to parse FMOD GUID string \"{}\"", guid_string);
     return CustomEventDescription{nullptr, nullptr};
 }
 CustomEventDescription SoundManager::get_event_description_by_id(FMODStudio::FMOD_GUID* guid)
