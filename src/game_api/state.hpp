@@ -360,7 +360,7 @@ bool get_forward_events();
 
 void godmode(bool g);
 void godmode_companions(bool g);
-// do not use this!
+// Deprecated: do not use this!
 void darkmode(bool g);
 
 void zoom(float level);

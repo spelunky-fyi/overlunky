@@ -3843,6 +3843,244 @@ Use `set_callback(function, ON.GUIFRAME)` instead
 `nil load_script()`<br/>
 Same as import().
 
+### setflag
+
+
+> Search script examples for [setflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setflag)
+
+`nil setflag()`<br/>
+
+### clrflag
+
+
+> Search script examples for [clrflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
+
+`nil clrflag()`<br/>
+
+### testflag
+
+
+> Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
+
+`nil testflag()`<br/>
+
+### generate_particles
+
+
+> Search script examples for [generate_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
+
+#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
+
+Use `generate_world_particles`
+
+### draw_line
+
+
+> Search script examples for [draw_line](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
+
+`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_line` instead
+
+### draw_rect
+
+
+> Search script examples for [draw_rect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect)
+
+`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_rect` instead
+
+### draw_rect_filled
+
+
+> Search script examples for [draw_rect_filled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled)
+
+`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_rect_filled` instead
+
+### draw_circle
+
+
+> Search script examples for [draw_circle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle)
+
+`nil draw_circle(float x, float y, float radius, float thickness, uColor color)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_circle` instead
+
+### draw_circle_filled
+
+
+> Search script examples for [draw_circle_filled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled)
+
+`nil draw_circle_filled(float x, float y, float radius, uColor color)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_circle_filled` instead
+
+### draw_text
+
+
+> Search script examples for [draw_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
+
+`nil draw_text(float x, float y, float size, string text, uColor color)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_text` instead
+
+### draw_image
+
+
+> Search script examples for [draw_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
+
+`nil draw_image(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_image` instead
+
+### draw_image_rotated
+
+
+> Search script examples for [draw_image_rotated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated)
+
+`nil draw_image_rotated(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.draw_image_rotated` instead
+
+### window
+
+
+> Search script examples for [window](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
+
+`nil window(string title, float x, float y, float w, float h, bool movable, function callback)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.window` instead
+
+### win_text
+
+
+> Search script examples for [win_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
+
+`nil win_text(string text)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_text` instead
+
+### win_separator
+
+
+> Search script examples for [win_separator](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator)
+
+`nil win_separator()`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_separator` instead
+
+### win_inline
+
+
+> Search script examples for [win_inline](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline)
+
+`nil win_inline()`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_inline` instead
+
+### win_sameline
+
+
+> Search script examples for [win_sameline](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline)
+
+`nil win_sameline(float offset, float spacing)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_sameline` instead
+
+### win_button
+
+
+> Search script examples for [win_button](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button)
+
+`bool win_button(string text)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_button` instead
+
+### win_input_text
+
+
+> Search script examples for [win_input_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text)
+
+`string win_input_text(string label, string value)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_input_text` instead
+
+### win_input_int
+
+
+> Search script examples for [win_input_int](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int)
+
+`int win_input_int(string label, int value)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_input_int` instead
+
+### win_input_float
+
+
+> Search script examples for [win_input_float](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float)
+
+`float win_input_float(string label, float value)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_input_float` instead
+
+### win_slider_int
+
+
+> Search script examples for [win_slider_int](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int)
+
+`int win_slider_int(string label, int value, int min, int max)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_slider_int` instead
+
+### win_drag_int
+
+
+> Search script examples for [win_drag_int](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int)
+
+`int win_drag_int(string label, int value, int min, int max)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_drag_int` instead
+
+### win_slider_float
+
+
+> Search script examples for [win_slider_float](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float)
+
+`float win_slider_float(string label, float value, float min, float max)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_slider_float` instead
+
+### win_drag_float
+
+
+> Search script examples for [win_drag_float](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float)
+
+`float win_drag_float(string label, float value, float min, float max)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_drag_float` instead
+
+### win_check
+
+
+> Search script examples for [win_check](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check)
+
+`bool win_check(string label, bool value)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_check` instead
+
+### win_combo
+
+
+> Search script examples for [win_combo](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo)
+
+`int win_combo(string label, int selected, string opts)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_combo` instead
+
+### win_pushid
+
+
+> Search script examples for [win_pushid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid)
+
+`nil win_pushid(int id)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_pushid` instead
+
+### win_popid
+
+
+> Search script examples for [win_popid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid)
+
+`nil win_popid()`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_popid` instead
+
+### win_image
+
+
+> Search script examples for [win_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
+
+`nil win_image(IMAGE image, float width, float height)`<br/>
+Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
+
 ### read_prng
 
 
@@ -3933,27 +4171,6 @@ Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow
 
 This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
-
-### setflag
-
-
-> Search script examples for [setflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setflag)
-
-`nil setflag()`<br/>
-
-### clrflag
-
-
-> Search script examples for [clrflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clrflag)
-
-`nil clrflag()`<br/>
-
-### testflag
-
-
-> Search script examples for [testflag](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=testflag)
-
-`nil testflag()`<br/>
 
 ### steal_input
 
@@ -4193,220 +4410,3 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right after the entity is rendered.
 Use this only when no other approach works, this call can be expensive if overused.
 <br/>The callback signature is nil post_render([VanillaRenderContext](#VanillaRenderContext) render_ctx, [Entity](#Entity) self)
-
-### generate_particles
-
-
-> Search script examples for [generate_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
-
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
-
-Use `generate_world_particles`
-
-### draw_line
-
-
-> Search script examples for [draw_line](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_line)
-
-`nil draw_line(float x1, float y1, float x2, float y2, float thickness, uColor color)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_line` instead
-
-### draw_rect
-
-
-> Search script examples for [draw_rect](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect)
-
-`nil draw_rect(float x1, float y1, float x2, float y2, float thickness, float rounding, uColor color)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_rect` instead
-
-### draw_rect_filled
-
-
-> Search script examples for [draw_rect_filled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_rect_filled)
-
-`nil draw_rect_filled(float x1, float y1, float x2, float y2, float rounding, uColor color)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_rect_filled` instead
-
-### draw_circle
-
-
-> Search script examples for [draw_circle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle)
-
-`nil draw_circle(float x, float y, float radius, float thickness, uColor color)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_circle` instead
-
-### draw_circle_filled
-
-
-> Search script examples for [draw_circle_filled](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_circle_filled)
-
-`nil draw_circle_filled(float x, float y, float radius, uColor color)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_circle_filled` instead
-
-### draw_text
-
-
-> Search script examples for [draw_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_text)
-
-`nil draw_text(float x, float y, float size, string text, uColor color)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_text` instead
-
-### draw_image
-
-
-> Search script examples for [draw_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image)
-
-`nil draw_image(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_image` instead
-
-### draw_image_rotated
-
-
-> Search script examples for [draw_image_rotated](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_image_rotated)
-
-`nil draw_image_rotated(IMAGE image, float x1, float y1, float x2, float y2, float uvx1, float uvy1, float uvx2, float uvy2, uColor color, float angle, float px, float py)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.draw_image_rotated` instead
-
-### window
-
-
-> Search script examples for [window](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=window)
-
-`nil window(string title, float x, float y, float w, float h, bool movable, function callback)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.window` instead
-
-### win_text
-
-
-> Search script examples for [win_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_text)
-
-`nil win_text(string text)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_text` instead
-
-### win_separator
-
-
-> Search script examples for [win_separator](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_separator)
-
-`nil win_separator()`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_separator` instead
-
-### win_inline
-
-
-> Search script examples for [win_inline](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_inline)
-
-`nil win_inline()`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_inline` instead
-
-### win_sameline
-
-
-> Search script examples for [win_sameline](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_sameline)
-
-`nil win_sameline(float offset, float spacing)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_sameline` instead
-
-### win_button
-
-
-> Search script examples for [win_button](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_button)
-
-`bool win_button(string text)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_button` instead
-
-### win_input_text
-
-
-> Search script examples for [win_input_text](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_text)
-
-`string win_input_text(string label, string value)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_input_text` instead
-
-### win_input_int
-
-
-> Search script examples for [win_input_int](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_int)
-
-`int win_input_int(string label, int value)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_input_int` instead
-
-### win_input_float
-
-
-> Search script examples for [win_input_float](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_input_float)
-
-`float win_input_float(string label, float value)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_input_float` instead
-
-### win_slider_int
-
-
-> Search script examples for [win_slider_int](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_int)
-
-`int win_slider_int(string label, int value, int min, int max)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_slider_int` instead
-
-### win_drag_int
-
-
-> Search script examples for [win_drag_int](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_int)
-
-`int win_drag_int(string label, int value, int min, int max)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_drag_int` instead
-
-### win_slider_float
-
-
-> Search script examples for [win_slider_float](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_slider_float)
-
-`float win_slider_float(string label, float value, float min, float max)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_slider_float` instead
-
-### win_drag_float
-
-
-> Search script examples for [win_drag_float](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_drag_float)
-
-`float win_drag_float(string label, float value, float min, float max)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_drag_float` instead
-
-### win_check
-
-
-> Search script examples for [win_check](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_check)
-
-`bool win_check(string label, bool value)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_check` instead
-
-### win_combo
-
-
-> Search script examples for [win_combo](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_combo)
-
-`int win_combo(string label, int selected, string opts)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_combo` instead
-
-### win_pushid
-
-
-> Search script examples for [win_pushid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_pushid)
-
-`nil win_pushid(int id)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_pushid` instead
-
-### win_popid
-
-
-> Search script examples for [win_popid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_popid)
-
-`nil win_popid()`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_popid` instead
-
-### win_image
-
-
-> Search script examples for [win_image](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=win_image)
-
-`nil win_image(IMAGE image, float width, float height)`<br/>
-Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
