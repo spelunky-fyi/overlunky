@@ -1944,8 +1944,6 @@ function get_color(color_name, alpha) end
 --## Types
 do
 
----@class Players
-
 ---@class SaveContext
     ---@field save fun(self, data: string): boolean
 
