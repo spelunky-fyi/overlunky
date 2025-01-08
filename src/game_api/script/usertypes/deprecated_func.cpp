@@ -5,16 +5,16 @@
 #include <sol/sol.hpp> //
 #include <vector>      // for vector
 
-#include "aliases.hpp"                             // for CallbackId
-#include "entities_chars.hpp"                      // for Player
-#include "entities_items.hpp"                      // for PlayerGhost
-#include "entity.hpp"                              // for get_entity_ptr
-#include "entity_lookup.hpp"                       // for get_entities
-#include "rpc.hpp"                                 // for read_prng
-#include "script/handle_lua_function.hpp"          // for handle_function
-#include "script/lua_backend.hpp"                  // for LuaBackend
-#include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
-#include "state.hpp"                               // for darkmode
+#include "aliases.hpp"                    // for CallbackId
+#include "entities_chars.hpp"             // for Player
+#include "entities_items.hpp"             // for PlayerGhost
+#include "entity.hpp"                     // for get_entity_ptr
+#include "entity_lookup.hpp"              // for get_entities
+#include "rpc.hpp"                        // for read_prng
+#include "script/handle_lua_function.hpp" // for handle_function
+#include "script/lua_backend.hpp"         // for LuaBackend
+#include "state.hpp"                      // for darkmode
+#include "vanilla_render_lua.hpp"         // for VanillaRenderContext
 
 namespace NDeprecated
 {

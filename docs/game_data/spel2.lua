@@ -247,204 +247,6 @@ function register_option_callback(name, value, on_render) end
 ---@param name string
 ---@return nil
 function unregister_option(name) end
----Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
----Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
----`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
----`amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@return nil
-function spawn_liquid(entity_type, x, y) end
----Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
----Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
----`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
----`amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param velocityx number
----@param velocityy number
----@param liquid_flags integer
----@param amount integer
----@param blobs_separation number
----@return nil
-function spawn_liquid(entity_type, x, y, velocityx, velocityy, liquid_flags, amount, blobs_separation) end
----Spawn an entity in position with some velocity and return the uid of spawned entity.
----Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYER(n), where (n) is a player number (1-4).
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@param vx number
----@param vy number
----@return integer
-function spawn_entity(entity_type, x, y, layer, vx, vy) end
----Short for [spawn_entity](https://spelunky-fyi.github.io/overlunky/#spawn_entity).
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@param vx number
----@param vy number
----@return integer
-function spawn(entity_type, x, y, layer, vx, vy) end
----Spawns an entity directly on the floor below the tile at the given position.
----Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@return integer
-function spawn_entity_snapped_to_floor(entity_type, x, y, layer) end
----Short for [spawn_entity_snapped_to_floor](https://spelunky-fyi.github.io/overlunky/#spawn_entity_snapped_to_floor).
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@return integer
-function spawn_on_floor(entity_type, x, y, layer) end
----Spawn a grid entity, such as floor or traps, that snaps to the grid.
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@return integer
-function spawn_grid_entity(entity_type, x, y, layer) end
----Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@param vx number
----@param vy number
----@return integer
-function spawn_entity_nonreplaceable(entity_type, x, y, layer, vx, vy) end
----Short for [spawn_entity_nonreplaceable](https://spelunky-fyi.github.io/overlunky/#spawn_entity_nonreplaceable).
----@param entity_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@param vx number
----@param vy number
----@return integer
-function spawn_critical(entity_type, x, y, layer, vx, vy) end
----Spawn a door to another world, level and theme and return the uid of spawned entity.
----Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
----@param x number
----@param y number
----@param layer LAYER
----@param w integer
----@param l integer
----@param t integer
----@return integer
-function spawn_door(x, y, layer, w, l, t) end
----Short for [spawn_door](https://spelunky-fyi.github.io/overlunky/#spawn_door).
----@param x number
----@param y number
----@param layer LAYER
----@param w integer
----@param l integer
----@param t integer
----@return integer
-function door(x, y, layer, w, l, t) end
----Spawn a door to backlayer.
----@param x number
----@param y number
----@return nil
-function spawn_layer_door(x, y) end
----Short for [spawn_layer_door](https://spelunky-fyi.github.io/overlunky/#spawn_layer_door).
----@param x number
----@param y number
----@return nil
-function layer_door(x, y) end
----Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
----@param x number
----@param y number
----@param layer LAYER
----@param right boolean
----@return integer
-function spawn_apep(x, y, layer, right) end
----Spawns and grows a tree
----@param x number
----@param y number
----@param layer LAYER
----@param height integer
----@return integer
-function spawn_tree(x, y, layer, height) end
----Spawns and grows a tree
----@param x number
----@param y number
----@param layer LAYER
----@return integer
-function spawn_tree(x, y, layer) end
----Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
----Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
----Returns uid of the base or -1 if it wasn't able to spawn
----@param x number
----@param y number
----@param l LAYER
----@param height integer
----@return integer
-function spawn_mushroom(x, y, l, height) end
----Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
----Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
----Returns uid of the base or -1 if it wasn't able to spawn
----@param x number
----@param y number
----@param l LAYER
----@return integer
-function spawn_mushroom(x, y, l) end
----Spawns an already unrolled rope as if created by player
----@param x number
----@param y number
----@param layer LAYER
----@param texture TEXTURE
----@return integer
-function spawn_unrolled_player_rope(x, y, layer, texture) end
----Spawns an already unrolled rope as if created by player
----@param x number
----@param y number
----@param layer LAYER
----@param texture TEXTURE
----@param max_length integer
----@return integer
-function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
----Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
----If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
----@param player_slot integer
----@param x number?
----@param y number?
----@param layer LAYER?
----@return integer
-function spawn_player(player_slot, x, y, layer) end
----Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input) and send_input to control it
----or change it's `player_inputs` to the `input` of real player so he can control it directly
----@param char_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@return integer
-function spawn_playerghost(char_type, x, y, layer) end
----Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
----This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
----In many cases replacing the intended entity won't have the intended effect or will even break the game, so use only if you really know what you're doing.
----The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
----@param cb fun(entity_type: ENT_TYPE, x: number, y: number, layer: integer, overlay_entity: Entity, spawn_flags: SPAWN_TYPE): integer?
----@param flags SPAWN_TYPE
----@param mask integer
----@vararg any
----@return CallbackId
-function set_pre_entity_spawn(cb, flags, mask, ...) end
----Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
----This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
----The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
----@param cb fun(ent: Entity, spawn_flags: SPAWN_TYPE): nil
----@param flags SPAWN_TYPE
----@param mask integer
----@vararg any
----@return CallbackId
-function set_post_entity_spawn(cb, flags, mask, ...) end
 ---Warp to a level immediately.
 ---@param world integer
 ---@param level integer
@@ -686,20 +488,6 @@ function entity_remove_item(uid, item_uid, check_autokill) end
 ---@param off_y number
 ---@return integer
 function attach_ball_and_chain(uid, off_x, off_y) end
----Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
----@param entity_type ENT_TYPE
----@param over_uid integer
----@param x number
----@param y number
----@return integer
-function spawn_entity_over(entity_type, over_uid, x, y) end
----Short for [spawn_entity_over](https://spelunky-fyi.github.io/overlunky/#spawn_entity_over)
----@param entity_type ENT_TYPE
----@param over_uid integer
----@param x number
----@param y number
----@return integer
-function spawn_over(entity_type, over_uid, x, y) end
 ---Check if the entity `uid` has some specific `item_uid` by uid in their inventory
 ---@param uid integer
 ---@param item_uid integer
@@ -888,13 +676,6 @@ function waddler_set_entity_meta(slot, meta) end
 ---@param slot integer
 ---@return integer
 function waddler_entity_type_in_slot(slot) end
----Spawn a companion (hired hand, player character, eggplant child)
----@param companion_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@return integer
-function spawn_companion(companion_type, x, y, layer) end
 ---Calculate the tile distance of two entities by uid
 ---@param uid_a integer
 ---@param uid_b integer
@@ -1145,21 +926,6 @@ function set_setting(setting, value) end
 ---Short for print(string.format(...))
 ---@return nil
 function printf() end
----Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](https://spelunky-fyi.github.io/overlunky/#spawn_roomowner).
----@param x number
----@param y number
----@param layer LAYER
----@param room_template ROOM_TEMPLATE
----@return integer
-function spawn_shopkeeper(x, y, layer, room_template) end
----Spawn a RoomOwner (or a few other like [CavemanShopkeeper](https://spelunky-fyi.github.io/overlunky/#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
----@param owner_type ENT_TYPE
----@param x number
----@param y number
----@param layer LAYER
----@param room_template ROOM_TEMPLATE
----@return integer
-function spawn_roomowner(owner_type, x, y, layer, room_template) end
 ---Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.
 ---@param run_start boolean?
 ---@return integer, integer
@@ -1940,6 +1706,240 @@ function rgba(r, g, b, a) end
 ---@param alpha integer?
 ---@return uColor
 function get_color(color_name, alpha) end
+---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
+---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
+---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
+---`amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@return nil
+function spawn_liquid(entity_type, x, y) end
+---Spawn liquids, always spawns in the front layer, will have fun effects if `entity_type` is not a liquid (only the short version, without velocity etc.).
+---Don't overuse this, you are still restricted by the liquid pool sizes and thus might crash the game.
+---`liquid_flags` - not much known about, 2 - will probably crash the game, 3 - pause_physics, 6-12 is probably agitation, surface_tension etc. set to 0 to ignore
+---`amount` - it will spawn amount x amount (so 1 = 1, 2 = 4, 3 = 6 etc.), `blobs_separation` is optional
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param velocityx number
+---@param velocityy number
+---@param liquid_flags integer
+---@param amount integer
+---@param blobs_separation number
+---@return nil
+function spawn_liquid(entity_type, x, y, velocityx, velocityy, liquid_flags, amount, blobs_separation) end
+---Spawn an entity in position with some velocity and return the uid of spawned entity.
+---Uses level coordinates with [LAYER.FRONT](#LAYER) and LAYER.BACK, but player-relative coordinates with LAYER.PLAYER(n), where (n) is a player number (1-4).
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn_entity(entity_type, x, y, layer, vx, vy) end
+---Short for [spawn_entity](https://spelunky-fyi.github.io/overlunky/#spawn_entity).
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn(entity_type, x, y, layer, vx, vy) end
+---Spawns an entity directly on the floor below the tile at the given position.
+---Use this to avoid the little fall that some entities do when spawned during level gen callbacks.
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_entity_snapped_to_floor(entity_type, x, y, layer) end
+---Short for [spawn_entity_snapped_to_floor](https://spelunky-fyi.github.io/overlunky/#spawn_entity_snapped_to_floor).
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_on_floor(entity_type, x, y, layer) end
+---Spawn a grid entity, such as floor or traps, that snaps to the grid.
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_grid_entity(entity_type, x, y, layer) end
+---Same as `spawn_entity` but does not trigger any pre-entity-spawn callbacks, so it will not be replaced by another script
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn_entity_nonreplaceable(entity_type, x, y, layer, vx, vy) end
+---Short for [spawn_entity_nonreplaceable](https://spelunky-fyi.github.io/overlunky/#spawn_entity_nonreplaceable).
+---@param entity_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param vx number
+---@param vy number
+---@return integer
+function spawn_critical(entity_type, x, y, layer, vx, vy) end
+---Spawn a door to another world, level and theme and return the uid of spawned entity.
+---Uses level coordinates with LAYER.FRONT and LAYER.BACK, but player-relative coordinates with LAYER.PLAYERn
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param w integer
+---@param l integer
+---@param t integer
+---@return integer
+function spawn_door(x, y, layer, w, l, t) end
+---Short for [spawn_door](https://spelunky-fyi.github.io/overlunky/#spawn_door).
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param w integer
+---@param l integer
+---@param t integer
+---@return integer
+function door(x, y, layer, w, l, t) end
+---Spawn a door to backlayer.
+---@param x number
+---@param y number
+---@return nil
+function spawn_layer_door(x, y) end
+---Short for [spawn_layer_door](https://spelunky-fyi.github.io/overlunky/#spawn_layer_door).
+---@param x number
+---@param y number
+---@return nil
+function layer_door(x, y) end
+---Spawns apep with the choice if it going left or right, if you want the game to choose use regular spawn functions with `ENT_TYPE.MONS_APEP_HEAD`
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param right boolean
+---@return integer
+function spawn_apep(x, y, layer, right) end
+---Spawns and grows a tree
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param height integer
+---@return integer
+function spawn_tree(x, y, layer, height) end
+---Spawns and grows a tree
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_tree(x, y, layer) end
+---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+---Returns uid of the base or -1 if it wasn't able to spawn
+---@param x number
+---@param y number
+---@param l LAYER
+---@param height integer
+---@return integer
+function spawn_mushroom(x, y, l, height) end
+---Spawns and grows mushroom, height relates to the trunk, without it, it will roll the game default 3-5 height
+---Regardless, if there is not enough space, it will spawn shorter one or if there is no space even for the smallest one, it will just not spawn at all
+---Returns uid of the base or -1 if it wasn't able to spawn
+---@param x number
+---@param y number
+---@param l LAYER
+---@return integer
+function spawn_mushroom(x, y, l) end
+---Spawns an already unrolled rope as if created by player
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param texture TEXTURE
+---@return integer
+function spawn_unrolled_player_rope(x, y, layer, texture) end
+---Spawns an already unrolled rope as if created by player
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param texture TEXTURE
+---@param max_length integer
+---@return integer
+function spawn_unrolled_player_rope(x, y, layer, texture, max_length) end
+---Spawn a player in given location, if player of that slot already exist it will spawn clone, the game may crash as this is very unexpected situation
+---If you want to respawn a player that is a ghost, set in his Inventory `health` to above 0, and `time_of_death` to 0 and call this function, the ghost entity will be removed automatically
+---@param player_slot integer
+---@param x number?
+---@param y number?
+---@param layer LAYER?
+---@return integer
+function spawn_player(player_slot, x, y, layer) end
+---Spawn the PlayerGhost entity, it will not move and not be connected to any player, you can then use [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input) and send_input to control it
+---or change it's `player_inputs` to the `input` of real player so he can control it directly
+---@param char_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_playerghost(char_type, x, y, layer) end
+---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
+---This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
+---In many cases replacing the intended entity won't have the intended effect or will even break the game, so use only if you really know what you're doing.
+---The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
+---@param cb fun(entity_type: ENT_TYPE, x: number, y: number, layer: integer, overlay_entity: Entity, spawn_flags: SPAWN_TYPE): integer?
+---@param flags SPAWN_TYPE
+---@param mask integer
+---@vararg any
+---@return CallbackId
+function set_pre_entity_spawn(cb, flags, mask, ...) end
+---Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
+---This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
+---The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
+---@param cb fun(ent: Entity, spawn_flags: SPAWN_TYPE): nil
+---@param flags SPAWN_TYPE
+---@param mask integer
+---@vararg any
+---@return CallbackId
+function set_post_entity_spawn(cb, flags, mask, ...) end
+---Spawn a Shopkeeper in the coordinates and make the room their shop. Returns the Shopkeeper uid. Also see [spawn_roomowner](https://spelunky-fyi.github.io/overlunky/#spawn_roomowner).
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param room_template ROOM_TEMPLATE
+---@return integer
+function spawn_shopkeeper(x, y, layer, room_template) end
+---Spawn a RoomOwner (or a few other like [CavemanShopkeeper](https://spelunky-fyi.github.io/overlunky/#CavemanShopkeeper)) in the coordinates and make them own the room, optionally changing the room template. Returns the RoomOwner uid.
+---@param owner_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@param room_template ROOM_TEMPLATE
+---@return integer
+function spawn_roomowner(owner_type, x, y, layer, room_template) end
+---Spawn an entity of `entity_type` attached to some other entity `over_uid`, in offset `x`, `y`
+---@param entity_type ENT_TYPE
+---@param over_uid integer
+---@param x number
+---@param y number
+---@return integer
+function spawn_entity_over(entity_type, over_uid, x, y) end
+---Short for [spawn_entity_over](https://spelunky-fyi.github.io/overlunky/#spawn_entity_over)
+---@param entity_type ENT_TYPE
+---@param over_uid integer
+---@param x number
+---@param y number
+---@return integer
+function spawn_over(entity_type, over_uid, x, y) end
+---Spawn a companion (hired hand, player character, eggplant child)
+---@param companion_type ENT_TYPE
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer
+function spawn_companion(companion_type, x, y, layer) end
 
 --## Types
 do
