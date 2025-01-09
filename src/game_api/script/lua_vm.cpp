@@ -227,7 +227,7 @@ end
             }
             if (or_ghost)
             {
-                for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), 0x8u, LAYER::BOTH))
+                for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), ENTITY_MASK::ITEM, LAYER::BOTH))
                 {
                     auto player = get_entity_ptr(uid)->as<PlayerGhost>();
                     if (player->inventory->player_slot == slot - 1)
@@ -244,7 +244,7 @@ end
     /// Returns PlayerGhost with this player slot 1..4
     lua["get_playerghost"] = [](int8_t slot) -> PlayerGhost*
     {
-        for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), 0x8u, LAYER::BOTH))
+        for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), ENTITY_MASK::ITEM, LAYER::BOTH))
         {
             auto player = get_entity_ptr(uid)->as<PlayerGhost>();
             if (player->inventory->player_slot == slot - 1)
@@ -817,8 +817,8 @@ end
     };
 
     auto get_entities_by = sol::overload(
-        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, LAYER)>(::get_entities_by),
-        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, LAYER)>(::get_entities_by));
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, ENTITY_MASK, LAYER)>(::get_entities_by),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, ENTITY_MASK, LAYER)>(::get_entities_by));
     /// Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
     /// Recommended to always set the mask, even if you look for one entity type
     lua["get_entities_by"] = get_entities_by;
@@ -844,15 +844,15 @@ end
     };
 
     auto get_entities_at = sol::overload(
-        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, float, float, LAYER, float)>(::get_entities_at),
-        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, float, float, LAYER, float)>(::get_entities_at));
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, ENTITY_MASK, float, float, LAYER, float)>(::get_entities_at),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, ENTITY_MASK, float, float, LAYER, float)>(::get_entities_at));
     /// Get uids of matching entities inside some radius ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     /// Recommended to always set the mask, even if you look for one entity type
     lua["get_entities_at"] = get_entities_at;
 
     auto get_entities_overlapping_hitbox = sol::overload(
-        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, AABB, LAYER)>(::get_entities_overlapping_hitbox),
-        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, AABB, LAYER)>(::get_entities_overlapping_hitbox));
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, ENTITY_MASK, AABB, LAYER)>(::get_entities_overlapping_hitbox),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, ENTITY_MASK, AABB, LAYER)>(::get_entities_overlapping_hitbox));
     /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     lua["get_entities_overlapping_hitbox"] = get_entities_overlapping_hitbox;
     /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
@@ -937,8 +937,8 @@ end
     lua["entity_has_item_type"] = entity_has_item_type;
 
     auto entity_get_items_by = sol::overload(
-        static_cast<std::vector<uint32_t> (*)(uint32_t, ENT_TYPE, uint32_t)>(::entity_get_items_by),
-        static_cast<std::vector<uint32_t> (*)(uint32_t, std::vector<ENT_TYPE>, uint32_t)>(::entity_get_items_by));
+        static_cast<std::vector<uint32_t> (*)(uint32_t, ENT_TYPE, ENTITY_MASK)>(::entity_get_items_by),
+        static_cast<std::vector<uint32_t> (*)(uint32_t, std::vector<ENT_TYPE>, ENTITY_MASK)>(::entity_get_items_by));
     /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
     lua["entity_get_items_by"] = entity_get_items_by;
     /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.

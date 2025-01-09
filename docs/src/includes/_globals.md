@@ -305,7 +305,7 @@ Use this only when no other approach works, this call can be expensive if overus
 
 > Search script examples for [set_post_entity_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_entity_spawn)
 
-#### [CallbackId](#Aliases) set_post_entity_spawn(function cb, [SPAWN_TYPE](#SPAWN_TYPE) flags, int mask, variadic_args entity_types)
+#### [CallbackId](#Aliases) set_post_entity_spawn(function cb, [SPAWN_TYPE](#SPAWN_TYPE) flags, [MASK](#MASK) mask, variadic_args entity_types)
 
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
@@ -327,7 +327,7 @@ Sets a callback that is called right after the screen is drawn.
 
 > Search script examples for [set_pre_entity_spawn](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_entity_spawn)
 
-#### [CallbackId](#Aliases) set_pre_entity_spawn(function cb, [SPAWN_TYPE](#SPAWN_TYPE) flags, int mask, variadic_args entity_types)
+#### [CallbackId](#Aliases) set_pre_entity_spawn(function cb, [SPAWN_TYPE](#SPAWN_TYPE) flags, [MASK](#MASK) mask, variadic_args entity_types)
 
 Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
 This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
@@ -541,9 +541,9 @@ Calls the enter door function, position doesn't matter, can also enter closed do
 
 > Search script examples for [entity_get_items_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=entity_get_items_by)
 
-#### vector&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask)
+#### vector&lt;int&gt; entity_get_items_by(int uid, array<[ENT_TYPE](#ENT_TYPE)> entity_types, [MASK](#MASK) mask)
 
-#### vector&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, int mask)
+#### vector&lt;int&gt; entity_get_items_by(int uid, [ENT_TYPE](#ENT_TYPE) entity_type, [MASK](#MASK) mask)
 
 Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
 
@@ -617,9 +617,9 @@ Get door target `world`, `level`, `theme`
 
 > Search script examples for [get_entities_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_at)
 
-#### vector&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
+#### vector&lt;int&gt; get_entities_at(array<[ENT_TYPE](#ENT_TYPE)> entity_types, [MASK](#MASK) mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
-#### vector&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float x, float y, [LAYER](#LAYER) layer, float radius)
+#### vector&lt;int&gt; get_entities_at([ENT_TYPE](#ENT_TYPE) entity_type, [MASK](#MASK) mask, float x, float y, [LAYER](#LAYER) layer, float radius)
 
 Get uids of matching entities inside some radius ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 Recommended to always set the mask, even if you look for one entity type
@@ -640,9 +640,9 @@ end
 
 > Search script examples for [get_entities_by](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by)
 
-#### vector&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by(array<[ENT_TYPE](#ENT_TYPE)> entity_types, [MASK](#MASK) mask, [LAYER](#LAYER) layer)
 
-#### vector&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_by([ENT_TYPE](#ENT_TYPE) entity_type, [MASK](#MASK) mask, [LAYER](#LAYER) layer)
 
 Get uids of entities by some conditions ([ENT_TYPE](#ENT_TYPE), [MASK](#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
 Recommended to always set the mask, even if you look for one entity type
@@ -696,9 +696,9 @@ Get uids of static entities overlapping this grid position (decorations, backgro
 
 > Search script examples for [get_entities_overlapping_hitbox](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping_hitbox)
 
-#### vector&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping_hitbox(array<[ENT_TYPE](#ENT_TYPE)> entity_types, [MASK](#MASK) mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
-#### vector&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, int mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping_hitbox([ENT_TYPE](#ENT_TYPE) entity_type, [MASK](#MASK) mask, [AABB](#AABB) hitbox, [LAYER](#LAYER) layer)
 
 Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 
@@ -4120,7 +4120,7 @@ Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
 
-#### vector&lt;int&gt; get_entities_by_mask(int mask)
+#### vector&lt;int&gt; get_entities_by_mask([MASK](#MASK) mask)
 
 Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
@@ -4138,9 +4138,9 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, [MASK](#MASK) mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 
-#### vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
+#### vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, [MASK](#MASK) mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
 
 Use `get_entities_overlapping_hitbox` instead
 

@@ -174,7 +174,7 @@ bool on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     {
         return false;
     }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER)
     {
         return false;
     }
@@ -190,7 +190,7 @@ void on_instagib(Entity* victim, bool destroy_corpse, size_t param_3)
     {
         return;
     }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER)
     {
         return;
     }

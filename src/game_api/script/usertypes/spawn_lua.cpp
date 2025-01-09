@@ -89,7 +89,7 @@ void register_usertypes(sol::state& lua)
     /// This is run before the entity is spawned, spawn your own entity and return its uid to replace the intended spawn.
     /// In many cases replacing the intended entity won't have the intended effect or will even break the game, so use only if you really know what you're doing.
     /// <br/>The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
-    lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
+    lua["set_pre_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, ENTITY_MASK mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();
@@ -110,7 +110,7 @@ void register_usertypes(sol::state& lua)
     /// Add a callback for a spawn of specific entity types or mask. Set `mask` to `MASK.ANY` to ignore that.
     /// This is run right after the entity is spawned but before and particular properties are changed, e.g. owner or velocity.
     /// <br/>The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
-    lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, int mask, sol::variadic_args entity_types) -> CallbackId
+    lua["set_post_entity_spawn"] = [](sol::function cb, SPAWN_TYPE flags, ENTITY_MASK mask, sol::variadic_args entity_types) -> CallbackId
     {
         std::vector<ENT_TYPE> types;
         sol::type va_type = entity_types.get_type();

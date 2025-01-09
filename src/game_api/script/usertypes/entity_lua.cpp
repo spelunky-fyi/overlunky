@@ -202,10 +202,10 @@ void register_usertypes(sol::state& lua)
 
     auto kill_recursive = sol::overload(
         static_cast<void (Entity::*)(bool, Entity*)>(&Entity::kill_recursive),
-        static_cast<void (Entity::*)(bool, Entity*, std::optional<uint32_t>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::kill_recursive));
+        static_cast<void (Entity::*)(bool, Entity*, std::optional<ENTITY_MASK>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::kill_recursive));
     auto destroy_recursive = sol::overload(
         static_cast<void (Entity::*)()>(&Entity::destroy_recursive),
-        static_cast<void (Entity::*)(std::optional<uint32_t>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::destroy_recursive));
+        static_cast<void (Entity::*)(std::optional<ENTITY_MASK>, std::vector<ENT_TYPE>, RECURSIVE_MODE)>(&Entity::destroy_recursive));
 
     auto entity_type = lua.new_usertype<Entity>("Entity");
     entity_type["type"] = &Entity::type;

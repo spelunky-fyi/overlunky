@@ -40,8 +40,8 @@ void register_usertypes(sol::state& lua)
     /// Use `get_entities_by(0, MASK.ANY, layer)` instead
     lua["get_entities_by_layer"] = get_entities_by_layer;
     auto get_entities_overlapping = sol::overload(
-        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, uint32_t, float, float, float, float, LAYER)>(::get_entities_overlapping),
-        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, uint32_t, float, float, float, float, LAYER)>(::get_entities_overlapping));
+        static_cast<std::vector<uint32_t> (*)(ENT_TYPE, ENTITY_MASK, float, float, float, float, LAYER)>(::get_entities_overlapping),
+        static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, ENTITY_MASK, float, float, float, float, LAYER)>(::get_entities_overlapping));
     /// Deprecated
     /// Use `get_entities_overlapping_hitbox` instead
     lua["get_entities_overlapping"] = get_entities_overlapping;

@@ -355,7 +355,7 @@ void UI::set_camp_camera_bounds_enabled(bool b)
 {
     ::set_camp_camera_bounds_enabled(b);
 }
-std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
+std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask, LAYER layer)
 {
     return ::get_entities_by(entity_types, mask, layer);
 }
@@ -400,9 +400,9 @@ void UI::steam_achievements(bool on)
 }
 int32_t UI::destroy_entity_items(Entity* ent)
 {
-    if (ent->type->search_flags & 0x80)
+    if ((ent->type->search_flags & ENTITY_MASK::ACTIVEFLOOR) == ENTITY_MASK::ACTIVEFLOOR)
         return 0;
-    auto items = entity_get_items_by(ent->uid, 0, 0);
+    auto items = entity_get_items_by(ent->uid, 0, ENTITY_MASK::ANY); // TODO: use ent->items
     if (items.size() == 0)
         return -1;
     std::vector<uint32_t>::reverse_iterator it = items.rbegin();
@@ -410,17 +410,18 @@ int32_t UI::destroy_entity_items(Entity* ent)
     while (it != items.rend())
     {
         auto item = get_entity_ptr(*it);
-        if (item->type->search_flags & 0x81)
-            continue;
-        UI::destroy_entity_items(item);
-        UI::safe_destroy(item, false, false);
-        it++;
+        if (!(item->type->search_flags & (ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::PLAYER)))
+        {
+            UI::destroy_entity_items(item);
+            UI::safe_destroy(item, false, false);
+            it++;
+        }
     }
     return last_uid;
 }
 bool UI::destroy_entity_item_type(Entity* ent, ENT_TYPE type)
 {
-    auto items = entity_get_items_by(ent->uid, 0, 0);
+    auto items = entity_get_items_by(ent->uid, 0, ENTITY_MASK::ANY); // TODO: use ent->items
     if (items.size() == 0)
         return false;
     auto destroyed = false;
@@ -467,13 +468,13 @@ void UI::update_floor_at(float x, float y, LAYER l)
     if (uid == -1)
         return;
     auto ent = get_entity_ptr(uid);
-    if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
+    if (!(ent->type->search_flags & ENTITY_MASK::FLOOR) || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
     auto state = HeapBase::get().state();
     if (test_flag(state->special_visibility_flags, 1))
     {
-        for (auto item : entity_get_items_by(floor->uid, 0, 0x8))
+        for (auto item : entity_get_items_by(floor->uid, 0, ENTITY_MASK::ITEM))
         {
             auto embed = get_entity_ptr(item);
             clr_flag(embed->flags, 1);
@@ -499,7 +500,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
             floor->decos[i] = -1;
         }
     }
-    for (auto deco : entity_get_items_by(floor->uid, destroy_deco, 0x200))
+    for (auto deco : entity_get_items_by(floor->uid, destroy_deco, ENTITY_MASK::DECORATION))
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
@@ -508,7 +509,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
             deco_ent->destroy();
         }
     }
-    for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 0.5f))
+    for (auto deco : get_entities_at(destroy_deco, ENTITY_MASK::ANY, x, y, l, 0.5f))
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
@@ -568,7 +569,7 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
         to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"),
     };
 
-    for (auto bg : get_entities_at(cleanup_ents, 0, x, y, l, 0.1f))
+    for (auto bg : get_entities_at(cleanup_ents, ENTITY_MASK::ANY, x, y, l, 0.1f))
     {
         auto bg_ent = get_entity_ptr(bg);
         if (bg_ent)
@@ -580,7 +581,7 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
         while (true)
         {
             y -= 1.0f;
-            auto bgs = get_entities_at(platform_bg, 0x400, x, y, l, 0.1f);
+            auto bgs = get_entities_at(platform_bg, ENTITY_MASK::BG, x, y, l, 0.1f);
             if (bgs.size() == 0)
                 return;
             for (auto bg : bgs)
@@ -595,13 +596,13 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
     {
         if (type == layer_door || type == logical_door)
             l = LAYER::BOTH;
-        auto door_parts = get_entities_at(door_crap, 0, x, y, l, 0.5f);
+        auto door_parts = get_entities_at(door_crap, ENTITY_MASK::ANY, x, y, l, 0.5f);
         for (auto part : door_parts)
         {
             auto ent = get_entity_ptr(part);
             ent->destroy();
         }
-        for (auto uid : get_entities_at(door_platform, 0x100, x, y - 1.0f, l, 0.5f))
+        for (auto uid : get_entities_at(door_platform, ENTITY_MASK::FLOOR, x, y - 1.0f, l, 0.5f))
         {
             auto ent = get_entity_ptr(uid);
             ent->destroy();
@@ -733,7 +734,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
                 check->destroy();
                 return;
             }
-            else if (in_array(check->type->id, kill_last_overlay) || (check->type->search_flags & 0x200 && check->draw_depth <= 11)) // normal floor decorations, missing those and killing floor is not good
+            else if (in_array(check->type->id, kill_last_overlay) || ((check->type->search_flags & ENTITY_MASK::DECORATION) == ENTITY_MASK::DECORATION && check->draw_depth <= 11)) // normal floor decorations, missing those and killing floor is not good
             {
                 kill_entity_overlay(check);
                 return;
@@ -753,7 +754,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
             }
             else if (in_array(check->type->id, backitems))
             {
-                if (check->overlay && (check->overlay->type->search_flags & 0x5) > 0)
+                if (check->overlay && check->overlay->is_movable() && check->overlay->as<Movable>()->is_powerup_capable())
                 {
                     auto wearer = check->overlay->as<PowerupCapable>();
                     for (const auto& [powerup_type, powerup_entity] : wearer->powerups)
@@ -775,7 +776,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
-        if (sf & 0x100)
+        if ((sf & ENTITY_MASK::FLOOR) == ENTITY_MASK::FLOOR)
         {
             if (test_flag(ent->flags, 3)) // solid floor
                 update_liquid_collision_at(x, y, false);
@@ -785,7 +786,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         {
             ent->kill(true, ent);
         }
-        else if (sf & 0x2)
+        else if ((sf & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT)
         {
             auto mount = ent->as<Mount>();
             mount->remove_rider();
@@ -804,7 +805,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
 }
 std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
 {
-    return get_entities_overlapping_hitbox(0, mask, hitbox, layer);
+    return get_entities_overlapping_hitbox(0, (ENTITY_MASK)mask, hitbox, layer);
 }
 
 bool UI::get_focus()

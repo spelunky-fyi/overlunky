@@ -360,14 +360,14 @@ function filter_entities(entities, predicate) end
 ---Get uids of entities by some conditions ([ENT_TYPE](https://spelunky-fyi.github.io/overlunky/#ENT_TYPE), [MASK](https://spelunky-fyi.github.io/overlunky/#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
 ---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_types ENT_TYPE[]
----@param mask integer
+---@param mask MASK
 ---@param layer LAYER
 ---@return integer[]
 function get_entities_by(entity_types, mask, layer) end
 ---Get uids of entities by some conditions ([ENT_TYPE](https://spelunky-fyi.github.io/overlunky/#ENT_TYPE), [MASK](https://spelunky-fyi.github.io/overlunky/#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types.
 ---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_type ENT_TYPE
----@param mask integer
+---@param mask MASK
 ---@param layer LAYER
 ---@return integer[]
 function get_entities_by(entity_type, mask, layer) end
@@ -380,7 +380,7 @@ function get_entities_by_type(...) end
 ---Get uids of matching entities inside some radius ([ENT_TYPE](https://spelunky-fyi.github.io/overlunky/#ENT_TYPE), [MASK](https://spelunky-fyi.github.io/overlunky/#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 ---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_types ENT_TYPE[]
----@param mask integer
+---@param mask MASK
 ---@param x number
 ---@param y number
 ---@param layer LAYER
@@ -390,7 +390,7 @@ function get_entities_at(entity_types, mask, x, y, layer, radius) end
 ---Get uids of matching entities inside some radius ([ENT_TYPE](https://spelunky-fyi.github.io/overlunky/#ENT_TYPE), [MASK](https://spelunky-fyi.github.io/overlunky/#MASK)). Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 ---Recommended to always set the mask, even if you look for one entity type
 ---@param entity_type ENT_TYPE
----@param mask integer
+---@param mask MASK
 ---@param x number
 ---@param y number
 ---@param layer LAYER
@@ -399,14 +399,14 @@ function get_entities_at(entity_types, mask, x, y, layer, radius) end
 function get_entities_at(entity_type, mask, x, y, layer, radius) end
 ---Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 ---@param entity_types ENT_TYPE[]
----@param mask integer
+---@param mask MASK
 ---@param hitbox AABB
 ---@param layer LAYER
 ---@return integer[]
 function get_entities_overlapping_hitbox(entity_types, mask, hitbox, layer) end
 ---Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
 ---@param entity_type ENT_TYPE
----@param mask integer
+---@param mask MASK
 ---@param hitbox AABB
 ---@param layer LAYER
 ---@return integer[]
@@ -506,13 +506,13 @@ function entity_has_item_type(uid, entity_type) end
 ---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](https://spelunky-fyi.github.io/overlunky/#MASK)) to filter, set them to 0 to return all attached entities.
 ---@param uid integer
 ---@param entity_types ENT_TYPE[]
----@param mask integer
+---@param mask MASK
 ---@return integer[]
 function entity_get_items_by(uid, entity_types, mask) end
 ---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](https://spelunky-fyi.github.io/overlunky/#MASK)) to filter, set them to 0 to return all attached entities.
 ---@param uid integer
 ---@param entity_type ENT_TYPE
----@param mask integer
+---@param mask MASK
 ---@return integer[]
 function entity_get_items_by(uid, entity_type, mask) end
 ---Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
@@ -1891,7 +1891,7 @@ function spawn_playerghost(char_type, x, y, layer) end
 ---The callback signature is optional<int> pre_entity_spawn(ENT_TYPE entity_type, float x, float y, int layer, Entity overlay_entity, SPAWN_TYPE spawn_flags)
 ---@param cb fun(entity_type: ENT_TYPE, x: number, y: number, layer: integer, overlay_entity: Entity, spawn_flags: SPAWN_TYPE): integer?
 ---@param flags SPAWN_TYPE
----@param mask integer
+---@param mask MASK
 ---@vararg any
 ---@return CallbackId
 function set_pre_entity_spawn(cb, flags, mask, ...) end
@@ -1900,7 +1900,7 @@ function set_pre_entity_spawn(cb, flags, mask, ...) end
 ---The callback signature is nil post_entity_spawn(Entity ent, SPAWN_TYPE spawn_flags)
 ---@param cb fun(ent: Entity, spawn_flags: SPAWN_TYPE): nil
 ---@param flags SPAWN_TYPE
----@param mask integer
+---@param mask MASK
 ---@vararg any
 ---@return CallbackId
 function set_post_entity_spawn(cb, flags, mask, ...) end
@@ -2491,7 +2491,7 @@ function PRNG:random(min, max) end
 
 ---@class EntityDB
     ---@field id ENT_TYPE
-    ---@field search_flags integer @MASK
+    ---@field search_flags MASK @MASK
     ---@field width number
     ---@field height number
     ---@field draw_depth integer
@@ -2703,7 +2703,7 @@ function Entity:overlaps_with(other) end
 ---destroy_corpse and responsible are the standard parameters for the kill function
 ---@param destroy_corpse boolean
 ---@param responsible Entity
----@param mask integer?
+---@param mask MASK?
 ---@param ent_types ENT_TYPE[]
 ---@param rec_mode RECURSIVE_MODE
 ---@return nil
@@ -2715,7 +2715,7 @@ function Entity:kill_recursive(destroy_corpse, responsible, mask, ent_types, rec
 function Entity:kill_recursive(destroy_corpse, responsible) end
 ---Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
 ---To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
----@param mask integer?
+---@param mask MASK?
 ---@param ent_types ENT_TYPE[]
 ---@param rec_mode RECURSIVE_MODE
 ---@return nil

@@ -920,7 +920,7 @@ bool LuaBackend::pre_load_screen()
                     saved.held = get_user_data(ent->holding_uid);
                     should_save = true;
                 }
-                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && user_datas.contains(ent->overlay->uid))
+                if (ent->overlay && (ent->overlay->type->search_flags & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT && user_datas.contains(ent->overlay->uid))
                 {
                     saved.mount = get_user_data(ent->overlay->uid);
                     should_save = true;
@@ -1058,7 +1058,7 @@ void LuaBackend::load_user_data()
                     set_user_data(*ent, saved_user_datas[slot].self.value());
                 if (ent->holding_uid != -1 && saved_user_datas[slot].held.has_value())
                     set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
-                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
+                if (ent->overlay && (ent->overlay->type->search_flags & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT && saved_user_datas[slot].mount.has_value())
                     set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
                 for (auto& [type, powerup] : ent->powerups)
                 {
@@ -1255,7 +1255,7 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
         if (is_callback_cleared(callback.id))
             continue;
 
-        bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
+        bool mask_match = callback.entity_mask == ENTITY_MASK::ANY || !!(get_type(entity_type)->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
         if (mask_match && flags_match)
         {
@@ -1284,7 +1284,7 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
         if (is_callback_cleared(callback.id))
             continue;
 
-        bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
+        bool mask_match = callback.entity_mask == ENTITY_MASK::ANY || !!(entity->type->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
         if (mask_match && flags_match)
         {

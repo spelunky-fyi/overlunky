@@ -352,7 +352,7 @@ void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> che
 
 void lock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
+    std::vector<uint32_t> items = get_entities_at({}, ENTITY_MASK::ANY, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);
@@ -372,7 +372,7 @@ void lock_door_at(float x, float y)
 
 void unlock_door_at(float x, float y)
 {
-    std::vector<uint32_t> items = get_entities_at({}, 0, x, y, LAYER::FRONT, 1);
+    std::vector<uint32_t> items = get_entities_at({}, ENTITY_MASK::ANY, x, y, LAYER::FRONT, 1);
     for (auto id : items)
     {
         Entity* door = get_entity_ptr(id);

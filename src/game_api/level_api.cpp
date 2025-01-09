@@ -175,7 +175,7 @@ void g_spawn_punishball_attach(const CommunityTileCode& self, float x, float y, 
     y += static_cast<float>(offset_y);
     auto do_spawn = [=]()
     {
-        std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
+        std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, ENTITY_MASK::ANY, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
         if (!entities_neighbour.empty())
         {
             get_entity_ptr(attach_ball_and_chain(entities_neighbour.front(), -static_cast<float>(offset_x), -static_cast<float>(offset_y)));
@@ -460,7 +460,7 @@ std::array g_community_tile_codes{
 
             Olmite* olmite = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Olmite>();
 
-            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({}, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
+            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({}, ENTITY_MASK::MONSTER, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
             {
                 if (Entity* ent = get_entity_ptr(uid))
@@ -505,7 +505,7 @@ std::array g_community_tile_codes{
                       {
                           auto do_spawn = [=]()
                           {
-                              std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
+                              std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, ENTITY_MASK::ANY, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
                               if (!entities_neighbour.empty())
                               {
                                   layer->spawn_entity_over(self.entity_id, get_entity_ptr(entities_neighbour.front()), 0.0f, 1.0f);
@@ -566,7 +566,8 @@ auto g_SafeTestFunc = [](float x, float y, Layer* layer)
 auto g_PositionTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
 {
     uint32_t default_mask = 0x6180;
-    uint32_t empty_mask = 0x61bf;
+    ENTITY_MASK empty_mask = ENTITY_MASK::LIQUID | ENTITY_MASK::FLOOR | ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER |
+                             ENTITY_MASK::ITEM | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::ROPE | ENTITY_MASK::EXPLOSION;
 
     if (flags & (uint32_t)POS_TYPE::DEFAULT)
         flags = (uint32_t)POS_TYPE::FLOOR | (uint32_t)POS_TYPE::SAFE | (uint32_t)POS_TYPE::EMPTY;
@@ -574,7 +575,7 @@ auto g_PositionTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
     if (flags & (uint32_t)POS_TYPE::WATER || flags & (uint32_t)POS_TYPE::LAVA)
     {
         default_mask -= 0x6000;
-        empty_mask -= 0x6000;
+        empty_mask = empty_mask ^ ENTITY_MASK::LIQUID;
     }
 
     if (flags & (uint32_t)POS_TYPE::FLOOR)
