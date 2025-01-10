@@ -14,7 +14,7 @@
 
 #include "color.hpp"                     // for Color, Color::a, Color::b, Color::g
 #include "containers/game_allocator.hpp" // for game_allocator
-#include "custom_types.hpp"              // for get_custom_types_map
+#include "custom_types.hpp"              // for get_custom_types_vector
 #include "entities_chars.hpp"            // for Player
 #include "entity.hpp"                    // for Entity, EntityDB, Animation, Rect
 #include "items.hpp"                     // for Inventory
@@ -22,7 +22,6 @@
 #include "movable.hpp"                   // for Movable, Movable::falling_timer
 #include "render_api.hpp"                // for RenderInfo, RenderInfo::flip_horiz...
 #include "script/lua_backend.hpp"        // for LuaBackend
-#include "script/safe_cb.hpp"            // for make_safe_cb
 
 namespace NEntity
 {
@@ -87,79 +86,6 @@ void register_usertypes(sol::state& lua)
     entitydb_type["animations"] = &EntityDB::animations;
     entitydb_type["default_special_offsetx"] = &EntityDB::default_special_offsetx;
     entitydb_type["default_special_offsety"] = &EntityDB::default_special_offsety;
-
-    /// Some information used to render the entity, can not be changed, used in Entity
-    lua.new_usertype<RenderInfo>(
-        "RenderInfo",
-        "x",
-        &RenderInfo::x,
-        "y",
-        &RenderInfo::y,
-        "offset_x",
-        &RenderInfo::offset_x,
-        "offset_y",
-        &RenderInfo::offset_y,
-        "shader",
-        &RenderInfo::shader,
-        "source",
-        &RenderInfo::source,
-        "destination",
-        sol::property(
-            [](const RenderInfo& ri) -> Quad
-            { return Quad{
-                  ri.destination_bottom_left_x,
-                  ri.destination_bottom_left_y,
-                  ri.destination_bottom_right_x,
-                  ri.destination_bottom_right_y,
-                  ri.destination_top_right_x,
-                  ri.destination_top_right_y,
-                  ri.destination_top_left_x,
-                  ri.destination_top_left_y,
-              }; }),
-        "tilew",
-        &RenderInfo::tilew,
-        "tileh",
-        &RenderInfo::tileh,
-        "facing_left",
-        &RenderInfo::flip_horizontal,
-        "angle",
-        &RenderInfo::angle1,
-        "animation_frame",
-        &RenderInfo::animation_frame,
-        "render_inactive",
-        &RenderInfo::render_inactive,
-        "brightness",
-        &RenderInfo::brightness,
-        "texture_num",
-        sol::readonly(&RenderInfo::texture_num),
-        "get_entity",
-        &RenderInfo::get_entity,
-        "set_normal_map_texture",
-        &RenderInfo::set_normal_map_texture,
-        "get_second_texture",
-        [](const RenderInfo& ri) -> std::optional<TEXTURE>
-        {
-            if (!ri.texture_names[1] || ri.texture_num < 2)
-            {
-                return std::nullopt;
-            }
-            return ::get_texture(std::string_view(*ri.texture_names[1])) /**/;
-        },
-        "get_third_texture",
-        [](const RenderInfo& ri) -> std::optional<TEXTURE>
-        {
-            if (!ri.texture_names[2] || ri.texture_num < 3)
-            {
-                return std::nullopt;
-            }
-            return ::get_texture(std::string_view(*ri.texture_names[2])) /**/;
-        },
-        "set_second_texture",
-        &RenderInfo::set_second_texture,
-        "set_third_texture",
-        &RenderInfo::set_third_texture,
-        "set_texture_num",
-        &RenderInfo::set_texture_num);
 
     auto get_overlay = [&lua](Entity& entity)
     {
