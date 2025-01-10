@@ -436,16 +436,6 @@ end
             }
         });
 
-    lua.create_named_table("HOTKEY_TYPE", "NORMAL", HOTKEY_TYPE::NORMAL, "GLOBAL", HOTKEY_TYPE::GLOBAL, "INPUT", HOTKEY_TYPE::INPUT);
-    /* HOTKEY_TYPE
-    // NORMAL
-    // Suppressed when the game window is inactive or inputting text in this tool instance (get_io().wantkeyboard == true). Can't detect if OL is in a text input and script is running in PL though. Use ImGuiIO if you need to do that.
-    // GLOBAL
-    // Enabled even when the game window is inactive and will capture keys even from other programs.
-    // INPUT
-    // Enabled even when inputting text and will override normal text input keys.
-    */
-
     /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");
 
