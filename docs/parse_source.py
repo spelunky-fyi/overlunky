@@ -173,6 +173,7 @@ api_files = [
     "../src/game_api/script/usertypes/color_lua.cpp",
     "../src/game_api/script/usertypes/deprecated_func.cpp",
     "../src/game_api/script/usertypes/spawn_lua.cpp",
+    "../src/game_api/script/usertypes/options_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",

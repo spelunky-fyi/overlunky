@@ -185,68 +185,6 @@ function toast(message) end
 ---@param top boolean
 ---@return nil
 function say(entity_uid, message, sound_type, top) end
----Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
----limits, you can override them in the UI with double click.
----@param name string
----@param desc string
----@param long_desc string
----@param value integer
----@param min integer
----@param max integer
----@return nil
-function register_option_int(name, desc, long_desc, value, min, max) end
----Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
----limits, you can override them in the UI with double click.
----@param name string
----@param desc string
----@param long_desc string
----@param value number
----@param min number
----@param max number
----@return nil
-function register_option_float(name, desc, long_desc, value, min, max) end
----Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
----@param name string
----@param desc string
----@param long_desc string
----@param value boolean
----@return nil
-function register_option_bool(name, desc, long_desc, value) end
----Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
----@param name string
----@param desc string
----@param long_desc string
----@param value string
----@return nil
-function register_option_string(name, desc, long_desc, value) end
----Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
----with a double `\0\0` at the end. `value` is the default index 1..n.
----@param name string
----@param desc string
----@param long_desc string
----@param opts string
----@param value integer
----@return nil
-function register_option_combo(name, desc, long_desc, opts, value) end
----Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
----@param name string
----@param desc string
----@param long_desc string
----@param on_click function
----@return nil
-function register_option_button(name, desc, long_desc, on_click) end
----Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name.
----`value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
----The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
----@param name string
----@param value any
----@param on_render fun(draw_ctx: GuiDrawContext): any?
----@return nil
-function register_option_callback(name, value, on_render) end
----Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
----@param name string
----@return nil
-function unregister_option(name) end
 ---Warp to a level immediately.
 ---@param world integer
 ---@param level integer
@@ -1940,6 +1878,68 @@ function spawn_over(entity_type, over_uid, x, y) end
 ---@param layer LAYER
 ---@return integer
 function spawn_companion(companion_type, x, y, layer) end
+---Add an integer option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+---limits, you can override them in the UI with double click.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value integer
+---@param min integer
+---@param max integer
+---@return nil
+function register_option_int(name, desc, long_desc, value, min, max) end
+---Add a float option that the user can change in the UI. Read with `options.name`, `value` is the default. Keep in mind these are just soft
+---limits, you can override them in the UI with double click.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value number
+---@param min number
+---@param max number
+---@return nil
+function register_option_float(name, desc, long_desc, value, min, max) end
+---Add a boolean option that the user can change in the UI. Read with `options.name`, `value` is the default.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value boolean
+---@return nil
+function register_option_bool(name, desc, long_desc, value) end
+---Add a string option that the user can change in the UI. Read with `options.name`, `value` is the default.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param value string
+---@return nil
+function register_option_string(name, desc, long_desc, value) end
+---Add a combobox option that the user can change in the UI. Read the int index of the selection with `options.name`. Separate `opts` with `\0`,
+---with a double `\0\0` at the end. `value` is the default index 1..n.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param opts string
+---@param value integer
+---@return nil
+function register_option_combo(name, desc, long_desc, opts, value) end
+---Add a button that the user can click in the UI. Sets the timestamp of last click on value and runs the callback function.
+---@param name string
+---@param desc string
+---@param long_desc string
+---@param on_click function
+---@return nil
+function register_option_button(name, desc, long_desc, on_click) end
+---Add custom options using the window drawing functions. Everything drawn in the callback will be rendered in the options window and the return value saved to `options[name]` or overwriting the whole `options` table if using and empty name.
+---`value` is the default value, and pretty important because anything defined in the callback function will only be defined after the options are rendered. See the example for details.
+---The callback signature is optional<any> on_render(GuiDrawContext draw_ctx)
+---@param name string
+---@param value any
+---@param on_render fun(draw_ctx: GuiDrawContext): any?
+---@return nil
+function register_option_callback(name, value, on_render) end
+---Removes an option by name. To make complicated conditionally visible options you should probably just use register_option_callback though.
+---@param name string
+---@return nil
+function unregister_option(name) end
 
 --## Types
 do
