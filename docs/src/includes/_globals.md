@@ -585,15 +585,6 @@ Remove item by uid from entity. `check_autokill` defaults to true, checks if ent
 
 Returns a list of all uids in `entities` for which `predicate(get_entity(uid))` returns true
 
-### flip_entity
-
-
-> Search script examples for [flip_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
-
-#### nil flip_entity(int uid)
-
-Flip entity around by uid. All new entities face right by default.
-
 ### force_olmec_phase_0
 
 
@@ -4410,3 +4401,12 @@ Returns unique id for the callback to be used in [clear_entity_callback](#clear_
 Sets a callback that is called right after the entity is rendered.
 Use this only when no other approach works, this call can be expensive if overused.
 <br/>The callback signature is nil post_render([VanillaRenderContext](#VanillaRenderContext) render_ctx, [Entity](#Entity) self)
+
+### flip_entity
+
+
+> Search script examples for [flip_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
+
+#### nil flip_entity(int uid)
+
+Use `Entity:flip` instead

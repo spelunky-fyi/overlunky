@@ -390,15 +390,6 @@ void unlock_door_at(float x, float y)
     }
 }
 
-void carry(uint32_t mount_uid, uint32_t rider_uid)
-{
-    auto mount = get_entity_ptr(mount_uid)->as<Mount>();
-    auto rider = get_entity_ptr(rider_uid)->as<Movable>();
-    if (mount == nullptr || rider == nullptr)
-        return;
-    mount->carry(rider);
-}
-
 void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse)
 {
     Entity* ent = get_entity_ptr(uid);

@@ -583,12 +583,6 @@ end
         say(hud, entity, message.c_str(), sound_type, top);
     };
 
-    /// Warp to a level immediately.
-    lua["warp"] = [](uint8_t world, uint8_t level, uint8_t theme)
-    { HeapBase::get().state()->warp(world, level, theme); };
-    /// Set seed and reset run.
-    lua["set_seed"] = [](uint32_t seed)
-    { HeapBase::get().state()->set_seed(seed); };
     /// Enable/disable godmode for players.
     lua["god"] = [](bool g)
     { API::godmode(g); };
@@ -601,61 +595,11 @@ end
     /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
     lua["zoom_reset"] = []()
     { API::zoom_reset(); };
-    auto move_entity_abs = sol::overload(
-        static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
-        static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
-    /// Teleport entity to coordinates with optional velocity
-    lua["move_entity"] = move_entity_abs;
-    /// Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
-    lua["move_grid_entity"] = move_grid_entity;
-    auto destroy_grid = sol::overload(
-        static_cast<void (*)(int32_t uid)>(::destroy_grid),
-        static_cast<void (*)(float x, float y, LAYER layer)>(::destroy_grid));
-    /// Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
-    /// Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
-    lua["destroy_grid"] = destroy_grid;
-    /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
-    lua["set_door_target"] = set_door_target;
-    /// Short for [set_door_target](#set_door_target).
-    lua["set_door"] = set_door_target;
-    /// Get door target `world`, `level`, `theme`
-    lua["get_door_target"] = get_door_target;
+
     /// Set the contents of [Coffin](#Coffin), [Present](#Present), [Pot](#Pot), [Container](#Container)
     /// Check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) for what the exact ENT_TYPE's can this function affect
     lua["set_contents"] = set_contents;
-    /// Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
-    // lua["get_entity"] = [](uint32_t uid) -> Entity*{};
-    /// NoDoc
-    /// Get the [Entity](#Entity) behind an uid, without converting to the correct type (do not use, use `get_entity` instead)
-    lua["get_entity_raw"] = get_entity_ptr;
-    lua.script(R"##(
-        function cast_entity(entity_raw)
-            if entity_raw == nil then
-                return nil
-            end
 
-            local cast_fun = TYPE_MAP[entity_raw.type.id]
-            if cast_fun ~= nil then
-                return cast_fun(entity_raw)
-            else
-                return entity_raw
-            end
-        end
-        function get_entity(ent_uid)
-            if ent_uid == nil then
-                return nil
-            end
-
-            local entity_raw = get_entity_raw(ent_uid)
-            if entity_raw == nil then
-                return nil
-            end
-
-            return cast_entity(entity_raw)
-        end
-        )##");
-    /// Get the [EntityDB](#EntityDB) behind an ENT_TYPE...
-    lua["get_type"] = get_type;
     /// Gets a grid entity, such as floor or spikes, at the given position and layer.
     lua["get_grid_entity_at"] = get_grid_entity_at;
     /// Get uids of static entities overlapping this grid position (decorations, backgrounds etc.)
@@ -706,23 +650,7 @@ end
         static_cast<std::vector<uint32_t> (*)(std::vector<ENT_TYPE>, ENTITY_MASK, AABB, LAYER)>(::get_entities_overlapping_hitbox));
     /// Get uids of matching entities overlapping with the given hitbox. Set `entity_type` or `mask` to `0` to ignore that, can also use table of entity_types
     lua["get_entities_overlapping_hitbox"] = get_entities_overlapping_hitbox;
-    /// Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
-    /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
-    lua["attach_entity"] = attach_entity_by_uid;
-    /// Get the `flags` field from entity by uid
-    lua["get_entity_flags"] = get_entity_flags;
-    /// Set the `flags` field from entity by uid
-    lua["set_entity_flags"] = set_entity_flags;
-    /// Get the `more_flags` field from entity by uid
-    lua["get_entity_flags2"] = get_entity_flags2;
-    /// Set the `more_flags` field from entity by uid
-    lua["set_entity_flags2"] = set_entity_flags2;
-    /// Get `state.level_flags`
-    lua["get_level_flags"] = get_level_flags;
-    /// Set `state.level_flags`
-    lua["set_level_flags"] = set_level_flags;
-    /// Get the ENT_TYPE... of the entity by uid
-    lua["get_entity_type"] = get_entity_type;
+
     /// Get the current set zoom level
     lua["get_zoom_level"] = []() -> float
     {
@@ -737,77 +665,6 @@ end
     { return API::screen_position(x, y); };
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
-    /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
-    /// you're standing on, not real level coordinates.
-    lua["get_position"] = [](int32_t uid) -> std::tuple<float, float, uint8_t>
-    {
-        Entity* ent = get_entity_ptr(uid);
-        if (ent)
-        {
-            auto pos = ent->abs_position();
-            return {pos.x, pos.y, ent->layer};
-        }
-        return {};
-    };
-    /// Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
-    lua["get_render_position"] = [](int32_t uid) -> std::tuple<float, float, uint8_t>
-    {
-        Entity* ent = get_entity_ptr(uid);
-        if (ent)
-        {
-            if (ent->rendering_info != nullptr && !ent->rendering_info->render_inactive)
-                return std::make_tuple(ent->rendering_info->x, ent->rendering_info->y, ent->layer);
-            else
-            {
-                auto pos = ent->abs_position();
-                return {pos.x, pos.y, ent->layer};
-            }
-        }
-        return {};
-    };
-    /// Get velocity `vx, vy` of an entity by uid. Use this to get velocity relative to the game world, (the `Entity.velocityx/velocityy` are relative to `Entity.overlay`). Only works for movable or liquid entities
-    lua["get_velocity"] = [](int32_t uid) -> std::tuple<float, float>
-    {
-        Entity* ent = get_entity_ptr(uid);
-        if (ent)
-            return ent->get_absolute_velocity();
-
-        return {};
-    };
-    /// Remove item by uid from entity. `check_autokill` defaults to true, checks if entity should be killed when missing overlay and kills it if so (can help with avoiding crashes)
-    lua["entity_remove_item"] = entity_remove_item;
-    /// Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
-    lua["attach_ball_and_chain"] = attach_ball_and_chain;
-    /// Check if the entity `uid` has some specific `item_uid` by uid in their inventory
-    lua["entity_has_item_uid"] = entity_has_item_uid;
-
-    auto entity_has_item_type = sol::overload(
-        static_cast<bool (*)(uint32_t, ENT_TYPE)>(::entity_has_item_type),
-        static_cast<bool (*)(uint32_t, std::vector<ENT_TYPE>)>(::entity_has_item_type));
-    /// Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
-    lua["entity_has_item_type"] = entity_has_item_type;
-
-    auto entity_get_items_by = sol::overload(
-        static_cast<std::vector<uint32_t> (*)(uint32_t, ENT_TYPE, ENTITY_MASK)>(::entity_get_items_by),
-        static_cast<std::vector<uint32_t> (*)(uint32_t, std::vector<ENT_TYPE>, ENTITY_MASK)>(::entity_get_items_by));
-    /// Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](#MASK)) to filter, set them to 0 to return all attached entities.
-    lua["entity_get_items_by"] = entity_get_items_by;
-    /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
-    lua["kill_entity"] = kill_entity;
-    /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
-    lua["pick_up"] = pick_up;
-    /// Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
-    lua["drop"] = drop;
-    /// Unequips the currently worn backitem
-    lua["unequip_backitem"] = unequip_backitem;
-    /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
-    lua["worn_backitem"] = worn_backitem;
-    /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
-    lua["apply_entity_db"] = apply_entity_db;
-    /// Try to lock the exit at coordinates
-    lua["lock_door_at"] = lock_door_at;
-    /// Try to unlock the exit at coordinates
-    lua["unlock_door_at"] = unlock_door_at;
     /// Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH.
     lua["get_frame"] = []() -> uint32_t
     { return HeapBase::get().frame_count(); };
@@ -817,8 +674,6 @@ end
     /// Get the current timestamp in milliseconds since the Unix Epoch.
     lua["get_ms"] = []()
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
-    /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
-    lua["carry"] = carry;
     /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
     lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
     /// Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
@@ -834,8 +689,6 @@ end
     lua["activate_sparktraps_hack"] = activate_sparktraps_hack;
     /// Set layer to search for storage items on
     lua["set_storage_layer"] = set_storage_layer;
-    /// Flip entity around by uid. All new entities face right by default.
-    lua["flip_entity"] = flip_entity;
     /// Sets the Y-level at which Olmec changes phases
     lua["set_olmec_phase_y_level"] = set_olmec_phase_y_level;
     /// Forces Olmec to stay on phase 0 (stomping)
@@ -860,29 +713,6 @@ end
     lua["is_inside_active_shop_room"] = is_inside_active_shop_room;
     /// Checks whether a coordinate is inside a shop zone, the rectangle where the camera zooms in a bit. Does not check if the shop is still active!
     lua["is_inside_shop_zone"] = is_inside_shop_zone;
-    /// Returns how many of a specific entity type Waddler has stored
-    lua["waddler_count_entity"] = waddler_count_entity;
-    /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
-    lua["waddler_store_entity"] = waddler_store_entity;
-    /// Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
-    lua["waddler_remove_entity"] = waddler_remove_entity;
-    /// Gets the 16-bit meta-value associated with the entity type in the associated slot
-    lua["waddler_get_entity_meta"] = waddler_get_entity_meta;
-    /// Sets the 16-bit meta-value associated with the entity type in the associated slot
-    lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
-    /// Gets the entity type of the item in the provided slot
-    lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
-
-    /// Calculate the tile distance of two entities by uid
-    lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float
-    {
-        Entity* ea = get_entity_ptr(uid_a);
-        Entity* eb = get_entity_ptr(uid_b);
-        if (ea == nullptr || eb == nullptr)
-            return -1.0f;
-        else
-            return (float)std::sqrt(std::pow(ea->abs_position().x - eb->abs_position().x, 2) + std::pow(ea->abs_position().y - eb->abs_position().y, 2));
-    };
     /// Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
     /// inside these boundaries. The order is: left x, top y, right x, bottom y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
@@ -1018,34 +848,21 @@ end
     /// Convert the hash to stringid
     /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
-
     /// Get string behind STRINGID, **don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first
     /// Will return the string of currently choosen language
     lua["get_string"] = get_string;
-
     /// Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first)
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
     lua["change_string"] = [](STRINGID id, std::u16string str)
     { return change_string(id, str); };
-
     /// Add custom string, currently can only be used for names of shop items (EntityDB->description)
     /// Returns STRINGID of the new string
     lua["add_string"] = add_string;
-
-    /// Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
-    /// if the entity has no localized name
-    lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy) -> std::u16string
-    { return get_entity_name(type, fallback_strategy.value_or(false)); };
-
     /// Adds custom name to the item by uid used in the shops
     /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
     lua["add_custom_name"] = add_custom_name;
-
     /// Clears the name set with [add_custom_name](#add_custom_name)
     lua["clear_custom_name"] = clear_custom_name;
-
-    /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
-    lua["enter_door"] = enter_door;
 
     /// Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:<br/>
     /// {MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}<br/>
@@ -1072,9 +889,6 @@ end
     /// Max 255 types.
     /// Use empty table as argument to reset to the game default
     lua["change_waddler_drop"] = change_waddler_drop;
-
-    /// Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
-    lua["poison_entity"] = poison_entity;
 
     /// Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
     /// `beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing. Set `health` to 0 to return to the game defaults
@@ -1236,14 +1050,6 @@ end
     /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
     lua["set_ending_unlock"] = set_ending_unlock;
 
-    /// Get the thread-local version of state
-    lua["get_local_state"] = []() -> StateMemory*
-    { return HeapBase::get().state(); };
-
-    /// Get the thread-local version of players
-    lua["get_local_players"] = []() -> std::vector<Player*>
-    { return HeapBase::get().state()->get_players(); };
-
     /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
     lua["list_dir"] = [&lua](std::optional<std::string> dir)
     {
@@ -1371,9 +1177,6 @@ end
     /// Allows you to disable the control over the door for Hundun and Tiamat
     /// This will also prevent game crashing when there is no exit door when they are in level
     lua["set_boss_door_control_enabled"] = set_boss_door_control_enabled;
-
-    /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
-    lua["update_state"] = update_state;
 
     /// Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
     lua["set_frametime"] = set_frametime;

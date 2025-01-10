@@ -185,16 +185,6 @@ function toast(message) end
 ---@param top boolean
 ---@return nil
 function say(entity_uid, message, sound_type, top) end
----Warp to a level immediately.
----@param world integer
----@param level integer
----@param theme integer
----@return nil
-function warp(world, level, theme) end
----Set seed and reset run.
----@param seed integer
----@return nil
-function set_seed(seed) end
 ---Enable/disable godmode for players.
 ---@param g boolean
 ---@return nil
@@ -210,74 +200,12 @@ function zoom(level) end
 ---Reset the default zoom levels for all areas and sets current zoom level to 13.5.
 ---@return nil
 function zoom_reset() end
----Teleport entity to coordinates with optional velocity
----@param uid integer
----@param x number
----@param y number
----@param vx number
----@param vy number
----@return nil
-function move_entity(uid, x, y, vx, vy) end
----Teleport entity to coordinates with optional velocity
----@param uid integer
----@param x number
----@param y number
----@param vx number
----@param vy number
----@param layer LAYER
----@return nil
-function move_entity(uid, x, y, vx, vy, layer) end
----Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
----@param uid integer
----@param x number
----@param y number
----@param layer LAYER
----@return nil
-function move_grid_entity(uid, x, y, layer) end
----Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
----Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
----@param uid integer
----@return nil
-function destroy_grid(uid) end
----Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
----Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
----@param x number
----@param y number
----@param layer LAYER
----@return nil
-function destroy_grid(x, y, layer) end
----Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
----@param uid integer
----@param w integer
----@param l integer
----@param t integer
----@return nil
-function set_door_target(uid, w, l, t) end
----Short for [set_door_target](https://spelunky-fyi.github.io/overlunky/#set_door_target).
----@param uid integer
----@param w integer
----@param l integer
----@param t integer
----@return nil
-function set_door(uid, w, l, t) end
----Get door target `world`, `level`, `theme`
----@param uid integer
----@return integer, integer, integer
-function get_door_target(uid) end
 ---Set the contents of [Coffin](https://spelunky-fyi.github.io/overlunky/#Coffin), [Present](https://spelunky-fyi.github.io/overlunky/#Present), [Pot](https://spelunky-fyi.github.io/overlunky/#Pot), [Container](https://spelunky-fyi.github.io/overlunky/#Container)
 ---Check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) for what the exact ENT_TYPE's can this function affect
 ---@param uid integer
 ---@param item_entity_type ENT_TYPE
 ---@return nil
 function set_contents(uid, item_entity_type) end
----Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
----@param uid integer
----@return Entity
-function get_entity(uid) end
----Get the [EntityDB](https://spelunky-fyi.github.io/overlunky/#EntityDB) behind an ENT_TYPE...
----@param id ENT_TYPE
----@return EntityDB
-function get_type(id) end
 ---Gets a grid entity, such as floor or spikes, at the given position and layer.
 ---@param x number
 ---@param y number
@@ -349,41 +277,6 @@ function get_entities_overlapping_hitbox(entity_types, mask, hitbox, layer) end
 ---@param layer LAYER
 ---@return integer[]
 function get_entities_overlapping_hitbox(entity_type, mask, hitbox, layer) end
----Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
----However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
----@param overlay_uid integer
----@param attachee_uid integer
----@return nil
-function attach_entity(overlay_uid, attachee_uid) end
----Get the `flags` field from entity by uid
----@param uid integer
----@return integer
-function get_entity_flags(uid) end
----Set the `flags` field from entity by uid
----@param uid integer
----@param flags integer
----@return nil
-function set_entity_flags(uid, flags) end
----Get the `more_flags` field from entity by uid
----@param uid integer
----@return integer
-function get_entity_flags2(uid) end
----Set the `more_flags` field from entity by uid
----@param uid integer
----@param flags integer
----@return nil
-function set_entity_flags2(uid, flags) end
----Get `state.level_flags`
----@return integer
-function get_level_flags() end
----Set `state.level_flags`
----@param flags integer
----@return nil
-function set_level_flags(flags) end
----Get the ENT_TYPE... of the entity by uid
----@param uid integer
----@return ENT_TYPE
-function get_entity_type(uid) end
 ---Get the current set zoom level
 ---@return number
 function get_zoom_level() end
@@ -401,95 +294,6 @@ function screen_position(x, y) end
 ---@param x number
 ---@return number
 function screen_distance(x) end
----Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
----you're standing on, not real level coordinates.
----@param uid integer
----@return number, number, integer
-function get_position(uid) end
----Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
----@param uid integer
----@return number, number, integer
-function get_render_position(uid) end
----Get velocity `vx, vy` of an entity by uid. Use this to get velocity relative to the game world, (the `Entity.velocityx/velocityy` are relative to `Entity.overlay`). Only works for movable or liquid entities
----@param uid integer
----@return number, number
-function get_velocity(uid) end
----Remove item by uid from entity. `check_autokill` defaults to true, checks if entity should be killed when missing overlay and kills it if so (can help with avoiding crashes)
----@param uid integer
----@param item_uid integer
----@param check_autokill boolean?
----@return nil
-function entity_remove_item(uid, item_uid, check_autokill) end
----Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
----@param uid integer
----@param off_x number
----@param off_y number
----@return integer
-function attach_ball_and_chain(uid, off_x, off_y) end
----Check if the entity `uid` has some specific `item_uid` by uid in their inventory
----@param uid integer
----@param item_uid integer
----@return boolean
-function entity_has_item_uid(uid, item_uid) end
----Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
----@param uid integer
----@param entity_types ENT_TYPE[]
----@return boolean
-function entity_has_item_type(uid, entity_types) end
----Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
----@param uid integer
----@param entity_type ENT_TYPE
----@return boolean
-function entity_has_item_type(uid, entity_type) end
----Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](https://spelunky-fyi.github.io/overlunky/#MASK)) to filter, set them to 0 to return all attached entities.
----@param uid integer
----@param entity_types ENT_TYPE[]
----@param mask MASK
----@return integer[]
-function entity_get_items_by(uid, entity_types, mask) end
----Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](https://spelunky-fyi.github.io/overlunky/#MASK)) to filter, set them to 0 to return all attached entities.
----@param uid integer
----@param entity_type ENT_TYPE
----@param mask MASK
----@return integer[]
-function entity_get_items_by(uid, entity_type, mask) end
----Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
----@param uid integer
----@param destroy_corpse boolean?
----@return nil
-function kill_entity(uid, destroy_corpse) end
----Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
----@param who_uid integer
----@param what_uid integer
----@return nil
-function pick_up(who_uid, what_uid) end
----Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
----@param who_uid integer
----@param what_uid integer?
----@return nil
-function drop(who_uid, what_uid) end
----Unequips the currently worn backitem
----@param who_uid integer
----@return nil
-function unequip_backitem(who_uid) end
----Returns the uid of the currently worn backitem, or -1 if wearing nothing
----@param who_uid integer
----@return integer
-function worn_backitem(who_uid) end
----Apply changes made in [get_type](https://spelunky-fyi.github.io/overlunky/#get_type)() to entity instance by uid.
----@param uid integer
----@return nil
-function apply_entity_db(uid) end
----Try to lock the exit at coordinates
----@param x number
----@param y number
----@return nil
-function lock_door_at(x, y) end
----Try to unlock the exit at coordinates
----@param x number
----@param y number
----@return nil
-function unlock_door_at(x, y) end
 ---Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH.
 ---@return integer
 function get_frame() end
@@ -499,11 +303,6 @@ function get_global_frame() end
 ---Get the current timestamp in milliseconds since the Unix Epoch.
 ---@return nil
 function get_ms() end
----Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
----@param mount_uid integer
----@param rider_uid integer
----@return nil
-function carry(mount_uid, rider_uid) end
 ---Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
 ---@param threshold integer
 ---@return nil
@@ -530,10 +329,6 @@ function activate_sparktraps_hack(activate) end
 ---@param layer LAYER
 ---@return nil
 function set_storage_layer(layer) end
----Flip entity around by uid. All new entities face right by default.
----@param uid integer
----@return nil
-function flip_entity(uid) end
 ---Sets the Y-level at which Olmec changes phases
 ---@param phase integer
 ---@param y number
@@ -588,37 +383,6 @@ function is_inside_active_shop_room(x, y, layer) end
 ---@param layer LAYER
 ---@return boolean
 function is_inside_shop_zone(x, y, layer) end
----Returns how many of a specific entity type Waddler has stored
----@param entity_type ENT_TYPE
----@return integer
-function waddler_count_entity(entity_type) end
----Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
----@param entity_type ENT_TYPE
----@return integer
-function waddler_store_entity(entity_type) end
----Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
----@param entity_type ENT_TYPE
----@param amount_to_remove integer
----@return nil
-function waddler_remove_entity(entity_type, amount_to_remove) end
----Gets the 16-bit meta-value associated with the entity type in the associated slot
----@param slot integer
----@return integer
-function waddler_get_entity_meta(slot) end
----Sets the 16-bit meta-value associated with the entity type in the associated slot
----@param slot integer
----@param meta integer
----@return nil
-function waddler_set_entity_meta(slot, meta) end
----Gets the entity type of the item in the provided slot
----@param slot integer
----@return integer
-function waddler_entity_type_in_slot(slot) end
----Calculate the tile distance of two entities by uid
----@param uid_a integer
----@param uid_b integer
----@return number
-function distance(uid_a, uid_b) end
 ---Basically gets the absolute coordinates of the area inside the unbreakable bedrock walls, from wall to wall. Every solid entity should be
 ---inside these boundaries. The order is: left x, top y, right x, bottom y
 ---@return number, number, number, number
@@ -733,12 +497,6 @@ function change_string(id, str) end
 ---@param str string
 ---@return STRINGID
 function add_string(str) end
----Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
----if the entity has no localized name
----@param type ENT_TYPE
----@param fallback_strategy boolean?
----@return string
-function get_entity_name(type, fallback_strategy) end
 ---Adds custom name to the item by uid used in the shops
 ---This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
 ---@param uid integer
@@ -749,11 +507,6 @@ function add_custom_name(uid, name) end
 ---@param uid integer
 ---@return nil
 function clear_custom_name(uid) end
----Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
----@param player_uid integer
----@param door_uid integer
----@return nil
-function enter_door(player_uid, door_uid) end
 ---Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
 ---{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
 ---Use empty table as argument to reset to the game default
@@ -784,10 +537,6 @@ function change_altar_damage_spawns(ent_types) end
 ---@param ent_types ENT_TYPE[]
 ---@return nil
 function change_waddler_drop(ent_types) end
----Poisons entity, to cure poison set [Movable](https://spelunky-fyi.github.io/overlunky/#Movable).`poison_tick_timer` to -1
----@param entity_uid integer
----@return nil
-function poison_entity(entity_uid) end
 ---Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
 ---`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing. Set `health` to 0 to return to the game defaults
 ---If you set `health` above the game max health it will be forced down to the game max
@@ -929,12 +678,6 @@ function set_level_string(str) end
 ---@param type ENT_TYPE
 ---@return nil
 function set_ending_unlock(type) end
----Get the thread-local version of state
----@return StateMemory
-function get_local_state() end
----Get the thread-local version of players
----@return Player[]
-function get_local_players() end
 ---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 ---@param dir string?
 ---@return nil
@@ -981,9 +724,6 @@ function activate_hundun_hack(activate) end
 ---@param enable boolean
 ---@return nil
 function set_boss_door_control_enabled(enable) end
----Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
----@return nil
-function update_state() end
 ---Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
 ---@param frametime double?
 ---@return nil
@@ -1142,6 +882,58 @@ function clear_state(slot) end
 ---@param slot integer
 ---@return StateMemory
 function get_save_state(slot) end
+---Get the thread-local version of state
+---@return StateMemory
+function get_local_state() end
+---Get the thread-local version of players
+---@return Player[]
+function get_local_players() end
+---Warp to a level immediately.
+---@param world integer
+---@param level integer
+---@param theme integer
+---@return nil
+function warp(world, level, theme) end
+---Set seed and reset run.
+---@param seed integer
+---@return nil
+function set_seed(seed) end
+---Get `state.level_flags`
+---@return integer
+function get_level_flags() end
+---Set `state.level_flags`
+---@param flags integer
+---@return nil
+function set_level_flags(flags) end
+---Returns how many of a specific entity type Waddler has stored
+---@param entity_type ENT_TYPE
+---@return integer
+function waddler_count_entity(entity_type) end
+---Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
+---@param entity_type ENT_TYPE
+---@return integer
+function waddler_store_entity(entity_type) end
+---Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
+---@param entity_type ENT_TYPE
+---@param amount_to_remove integer
+---@return nil
+function waddler_remove_entity(entity_type, amount_to_remove) end
+---Gets the 16-bit meta-value associated with the entity type in the associated slot
+---@param slot integer
+---@return integer
+function waddler_get_entity_meta(slot) end
+---Sets the 16-bit meta-value associated with the entity type in the associated slot
+---@param slot integer
+---@param meta integer
+---@return nil
+function waddler_set_entity_meta(slot, meta) end
+---Gets the entity type of the item in the provided slot
+---@param slot integer
+---@return integer
+function waddler_entity_type_in_slot(slot) end
+---Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
+---@return nil
+function update_state() end
 ---Returns RawInput, a game structure for raw keyboard and controller state
 ---@return RawInput
 function get_raw_input() end
@@ -1152,6 +944,172 @@ function seed_prng(seed) end
 ---Get the thread-local version of prng
 ---@return PRNG
 function get_local_prng() end
+---Get the Entity behind an uid, converted to the correct type. To see what type you will get, consult the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md)
+---@param uid integer
+---@return Entity
+function get_entity(uid) end
+---Get the [EntityDB](https://spelunky-fyi.github.io/overlunky/#EntityDB) behind an ENT_TYPE...
+---@param id ENT_TYPE
+---@return EntityDB
+function get_type(id) end
+---Get the ENT_TYPE... of the entity by uid
+---@param uid integer
+---@return ENT_TYPE
+function get_entity_type(uid) end
+---Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
+---if the entity has no localized name
+---@param type ENT_TYPE
+---@param fallback_strategy boolean?
+---@return string
+function get_entity_name(type, fallback_strategy) end
+---Teleport entity to coordinates with optional velocity
+---@param uid integer
+---@param x number
+---@param y number
+---@param vx number
+---@param vy number
+---@return nil
+function move_entity(uid, x, y, vx, vy) end
+---Teleport entity to coordinates with optional velocity
+---@param uid integer
+---@param x number
+---@param y number
+---@param vx number
+---@param vy number
+---@param layer LAYER
+---@return nil
+function move_entity(uid, x, y, vx, vy, layer) end
+---Teleport grid entity, the destination should be whole number, this ensures that the collisions will work properly
+---@param uid integer
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return nil
+function move_grid_entity(uid, x, y, layer) end
+---Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+---Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
+---@param uid integer
+---@return nil
+function destroy_grid(uid) end
+---Destroy the grid entity (by uid or position), and its item entities, removing them from the grid without dropping particles or gold.
+---Will also destroy monsters or items that are standing on a linked activefloor or chain, though excludes MASK.PLAYER to prevent crashes
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return nil
+function destroy_grid(x, y, layer) end
+---Attaches `attachee` to `overlay`, similar to setting `get_entity(attachee).overlay = get_entity(overlay)`.
+---However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
+---@param overlay_uid integer
+---@param attachee_uid integer
+---@return nil
+function attach_entity(overlay_uid, attachee_uid) end
+---Get the `flags` field from entity by uid
+---@param uid integer
+---@return integer
+function get_entity_flags(uid) end
+---Set the `flags` field from entity by uid
+---@param uid integer
+---@param flags integer
+---@return nil
+function set_entity_flags(uid, flags) end
+---Get the `more_flags` field from entity by uid
+---@param uid integer
+---@return integer
+function get_entity_flags2(uid) end
+---Set the `more_flags` field from entity by uid
+---@param uid integer
+---@param flags integer
+---@return nil
+function set_entity_flags2(uid, flags) end
+---Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
+---you're standing on, not real level coordinates.
+---@param uid integer
+---@return number, number, integer
+function get_position(uid) end
+---Get interpolated render position `x, y, layer` of entity by uid. This gives smooth hitboxes for 144Hz master race etc...
+---@param uid integer
+---@return number, number, integer
+function get_render_position(uid) end
+---Get velocity `vx, vy` of an entity by uid. Use this to get velocity relative to the game world, (the `Entity.velocityx/velocityy` are relative to `Entity.overlay`). Only works for movable or liquid entities
+---@param uid integer
+---@return number, number
+function get_velocity(uid) end
+---Remove item by uid from entity. `check_autokill` defaults to true, checks if entity should be killed when missing overlay and kills it if so (can help with avoiding crashes)
+---@param uid integer
+---@param item_uid integer
+---@param check_autokill boolean?
+---@return nil
+function entity_remove_item(uid, item_uid, check_autokill) end
+---Spawns and attaches ball and chain to `uid`, the initial position of the ball is at the entity position plus `off_x`, `off_y`
+---@param uid integer
+---@param off_x number
+---@param off_y number
+---@return integer
+function attach_ball_and_chain(uid, off_x, off_y) end
+---Check if the entity `uid` has some specific `item_uid` by uid in their inventory
+---@param uid integer
+---@param item_uid integer
+---@return boolean
+function entity_has_item_uid(uid, item_uid) end
+---Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
+---@param uid integer
+---@param entity_types ENT_TYPE[]
+---@return boolean
+function entity_has_item_type(uid, entity_types) end
+---Check if the entity `uid` has some ENT_TYPE `entity_type` in their inventory, can also use table of entity_types
+---@param uid integer
+---@param entity_type ENT_TYPE
+---@return boolean
+function entity_has_item_type(uid, entity_type) end
+---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](https://spelunky-fyi.github.io/overlunky/#MASK)) to filter, set them to 0 to return all attached entities.
+---@param uid integer
+---@param entity_types ENT_TYPE[]
+---@param mask MASK
+---@return integer[]
+function entity_get_items_by(uid, entity_types, mask) end
+---Gets uids of entities attached to given entity uid. Use `entity_type` and `mask` ([MASK](https://spelunky-fyi.github.io/overlunky/#MASK)) to filter, set them to 0 to return all attached entities.
+---@param uid integer
+---@param entity_type ENT_TYPE
+---@param mask MASK
+---@return integer[]
+function entity_get_items_by(uid, entity_type, mask) end
+---Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
+---@param uid integer
+---@param destroy_corpse boolean?
+---@return nil
+function kill_entity(uid, destroy_corpse) end
+---Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
+---@param who_uid integer
+---@param what_uid integer
+---@return nil
+function pick_up(who_uid, what_uid) end
+---Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
+---@param who_uid integer
+---@param what_uid integer?
+---@return nil
+function drop(who_uid, what_uid) end
+---Unequips the currently worn backitem
+---@param who_uid integer
+---@return nil
+function unequip_backitem(who_uid) end
+---Returns the uid of the currently worn backitem, or -1 if wearing nothing
+---@param who_uid integer
+---@return integer
+function worn_backitem(who_uid) end
+---Apply changes made in [get_type](https://spelunky-fyi.github.io/overlunky/#get_type)() to entity instance by uid.
+---@param uid integer
+---@return nil
+function apply_entity_db(uid) end
+---Calculate the tile distance of two entities by uid
+---@param uid_a integer
+---@param uid_b integer
+---@return number
+function distance(uid_a, uid_b) end
+---Poisons entity, to cure poison set [Movable](https://spelunky-fyi.github.io/overlunky/#Movable).`poison_tick_timer` to -1
+---@param entity_uid integer
+---@return nil
+function poison_entity(entity_uid) end
 ---Same as `Player.get_name`
 ---@param type_id ENT_TYPE
 ---@return string
@@ -1173,6 +1131,44 @@ function is_character_female(type_id) end
 ---@param color Color
 ---@return nil
 function set_character_heart_color(type_id, color) end
+---Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
+---@param uid integer
+---@param w integer
+---@param l integer
+---@param t integer
+---@return nil
+function set_door_target(uid, w, l, t) end
+---Short for [set_door_target](https://spelunky-fyi.github.io/overlunky/#set_door_target).
+---@param uid integer
+---@param w integer
+---@param l integer
+---@param t integer
+---@return nil
+function set_door(uid, w, l, t) end
+---Get door target `world`, `level`, `theme`
+---@param uid integer
+---@return integer, integer, integer
+function get_door_target(uid) end
+---Try to lock the exit at coordinates
+---@param x number
+---@param y number
+---@return nil
+function lock_door_at(x, y) end
+---Try to unlock the exit at coordinates
+---@param x number
+---@param y number
+---@return nil
+function unlock_door_at(x, y) end
+---Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+---@param player_uid integer
+---@param door_uid integer
+---@return nil
+function enter_door(player_uid, door_uid) end
+---Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
+---@param mount_uid integer
+---@param rider_uid integer
+---@return nil
+function carry(mount_uid, rider_uid) end
 ---Make a `CustomMovableBehavior`, if `base_behavior` is `nil` you will have to set all of the
 ---behavior functions. If a behavior with `behavior_name` already exists for your script it will
 ---be returned instead.

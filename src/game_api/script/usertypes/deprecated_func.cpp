@@ -397,5 +397,8 @@ void register_usertypes(sol::state& lua)
         }
         return sol::nullopt;
     };
+    /// Deprecated
+    /// Use `Entity:flip` instead
+    lua["flip_entity"] = flip_entity;
 }
 } // namespace NDeprecated

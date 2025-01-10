@@ -43,7 +43,6 @@ void set_contents(uint32_t uid, ENT_TYPE item_entity_type);
 void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> check_autokill);
 void lock_door_at(float x, float y);
 void unlock_door_at(float x, float y);
-void carry(uint32_t mount_uid, uint32_t rider_uid);
 void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse = std::nullopt);
 void destroy_entity(uint32_t uid);
 void apply_entity_db(uint32_t uid);

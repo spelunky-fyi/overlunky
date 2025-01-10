@@ -12,6 +12,7 @@
 #include "entities_floors.hpp" // for MotherStatue, Floor, ExitDoor, Door
 #include "entity.hpp"          // for Entity
 #include "illumination.hpp"    // IWYU pragma: keep
+#include "rpc.hpp"             // for set_door_target, get_door_target
 #include "sound_manager.hpp"   // IWYU pragma: keep
 
 namespace NEntitiesFloors
@@ -407,5 +408,18 @@ void register_usertypes(sol::state& lua)
         &JungleSpearTrap::trigger,
         sol::base_classes,
         sol::bases<Entity, Floor>());
+
+    /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
+    lua["set_door_target"] = set_door_target;
+    /// Short for [set_door_target](#set_door_target).
+    lua["set_door"] = set_door_target;
+    /// Get door target `world`, `level`, `theme`
+    lua["get_door_target"] = get_door_target;
+    /// Try to lock the exit at coordinates
+    lua["lock_door_at"] = lock_door_at;
+    /// Try to unlock the exit at coordinates
+    lua["unlock_door_at"] = unlock_door_at;
+    /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+    lua["enter_door"] = enter_door;
 }
 } // namespace NEntitiesFloors
