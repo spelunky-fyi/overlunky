@@ -429,6 +429,9 @@ for func in ps.funcs:
         cat = "Callback functions"
     elif any(subs in func["name"] for subs in ["flag", "clr_mask", "flip_mask", "set_mask", "test_mask"]):
         cat = "Flag functions"
+    elif any(subs in func["file"] for subs in ["game_patches_lua.cpp"]) or any(
+        subs in func["name"] for subs in ["replace_drop", "set_drop_chance"]):
+        cat = "Game patching functions"
     elif any(subs in func["name"] for subs in ["shop"]):
         cat = "Shop functions"
     elif any(subs in func["name"] for subs in ["_room"]):
@@ -506,6 +509,10 @@ for func in ps.funcs:
 
 for cat in sorted(func_cats):
     print("\n## " + cat + "\n")
+    if cat.startswith("Game patch"):
+        print(
+    "<aside class='warning'>These functions modify the game code, which is hard to keep track and reverse for online rollback mechanics. If you care about online compatibility of your mod, consider using them only during level generation etc.</aside>"
+)
     for lf in sorted(func_cats[cat], key=lambda x: x["name"]):
         if len(ps.rpcfunc(lf["cpp"])):
             print_lf(lf)

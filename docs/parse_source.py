@@ -566,6 +566,7 @@ def run_parse():
                             "cpp": replace_fun(m.group(2)),
                             "comment": comment,
                             "cb_signature": cb_signature,
+                            "file": file,
                         }
                         if not comment or "NoDoc" not in comment[0]:
                             if comment and comment[0] == "Deprecated":
