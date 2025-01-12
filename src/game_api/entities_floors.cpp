@@ -840,3 +840,17 @@ void Door::unlock(bool unlock)
         }
     }
 }
+
+std::tuple<uint8_t, uint8_t, uint8_t> ExitDoor::get_target() const
+{
+    if (special_door)
+    {
+        return {world, level, theme};
+    }
+
+    auto state = get_state_ptr();
+    if (state->screen == 11) // camp
+        return {};
+    else
+        return {state->world_next, state->level_next, state->theme_next};
+}

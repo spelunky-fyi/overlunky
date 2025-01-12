@@ -116,6 +116,10 @@ void register_usertypes(sol::state& lua)
         &ExitDoor::world,
         "theme",
         &ExitDoor::theme,
+        "set_target",
+        &ExitDoor::set_target,
+        "get_target",
+        &ExitDoor::get_target,
         sol::base_classes,
         sol::bases<Entity, Floor, Door>());
 

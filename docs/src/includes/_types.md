@@ -3947,6 +3947,8 @@ int | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) |
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [world](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) | 
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
+nil | [set_target(int ww, int l, int t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_target) | 
+tuple&lt;int, int, int&gt; | [get_target()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_target) | Get target world, level, theme of this door. If the `special_door` is false, it returns the StateMemory world_next, level_next, theme_next
 
 ### Floor
 
