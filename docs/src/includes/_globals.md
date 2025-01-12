@@ -775,15 +775,6 @@ Get the [EntityDB](#EntityDB) behind an [ENT_TYPE](#ENT_TYPE)...
 
 Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
 
-### lock_door_at
-
-
-> Search script examples for [lock_door_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_door_at)
-
-#### nil lock_door_at(float x, float y)
-
-Try to lock the exit at coordinates
-
 ### modify_ankh_health_gain
 
 
@@ -1000,15 +991,6 @@ Determines whether the time jelly appears in cosmic ocean
 
 Unequips the currently worn backitem
 
-### unlock_door_at
-
-
-> Search script examples for [unlock_door_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlock_door_at)
-
-#### nil unlock_door_at(float x, float y)
-
-Try to unlock the exit at coordinates
-
 ### waddler_count_entity
 
 
@@ -1155,7 +1137,7 @@ Flips the nth bit in a number. This doesn't actually change the variable you pas
 
 > Search script examples for [get_entity_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags)
 
-#### int get_entity_flags(int uid)
+#### [ENT_FLAG](#ENT_FLAG) get_entity_flags(int uid)
 
 Get the `flags` field from entity by uid
 
@@ -1164,7 +1146,7 @@ Get the `flags` field from entity by uid
 
 > Search script examples for [get_entity_flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_flags2)
 
-#### int get_entity_flags2(int uid)
+#### [ENT_MORE_FLAG](#ENT_MORE_FLAG) get_entity_flags2(int uid)
 
 Get the `more_flags` field from entity by uid
 
@@ -1182,7 +1164,7 @@ Get `state.level_flags`
 
 > Search script examples for [set_entity_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_entity_flags)
 
-#### nil set_entity_flags(int uid, int flags)
+#### nil set_entity_flags(int uid, [ENT_FLAG](#ENT_FLAG) flags)
 
 Set the `flags` field from entity by uid
 
@@ -1191,7 +1173,7 @@ Set the `flags` field from entity by uid
 
 > Search script examples for [set_entity_flags2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_entity_flags2)
 
-#### nil set_entity_flags2(int uid, int flags)
+#### nil set_entity_flags2(int uid, [ENT_MORE_FLAG](#ENT_MORE_FLAG) flags)
 
 Set the `more_flags` field from entity by uid
 
@@ -4140,8 +4122,7 @@ Use `get_entities_overlapping_hitbox` instead
 
 > Search script examples for [get_entity_ai_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
 
-#### int get_entity_ai_state(int uid)
-
+`int get_entity_ai_state(int uid)`<br/>
 As the name is misleading. use [Movable](#Movable).`move_state` field instead
 
 ### set_arrowtrap_projectile
@@ -4407,6 +4388,21 @@ Use this only when no other approach works, this call can be expensive if overus
 
 > Search script examples for [flip_entity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_entity)
 
-#### nil flip_entity(int uid)
-
+`nil flip_entity(int uid)`<br/>
 Use `Entity:flip` instead
+
+### lock_door_at
+
+
+> Search script examples for [lock_door_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lock_door_at)
+
+`nil lock_door_at(float x, float y)`<br/>
+use `Door:unlock` instead
+
+### unlock_door_at
+
+
+> Search script examples for [unlock_door_at](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unlock_door_at)
+
+`nil unlock_door_at(float x, float y)`<br/>
+use `Door:unlock` instead

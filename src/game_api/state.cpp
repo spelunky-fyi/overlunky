@@ -360,20 +360,6 @@ void StateMemory::force_current_theme(THEME t)
     }
 }
 
-void API::darkmode(bool g)
-{
-    static const size_t addr_dark = get_address("force_dark_level");
-
-    if (g)
-    {
-        write_mem_recoverable("darkmode", addr_dark, "\x90\x90"sv, true);
-    }
-    else
-    {
-        recover_mem("darkmode");
-    }
-}
-
 Vec2 Camera::get_position()
 {
     // = adjusted_focus_x/y - (adjusted_focus_x/y - calculated_focus_x/y) * (render frame-game frame difference)

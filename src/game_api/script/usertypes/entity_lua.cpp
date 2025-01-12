@@ -378,13 +378,35 @@ void register_usertypes(sol::state& lua)
     /// However this function offsets `attachee` (so you don't have to) and inserts it into `overlay`'s inventory.
     lua["attach_entity"] = attach_entity_by_uid;
     /// Get the `flags` field from entity by uid
-    lua["get_entity_flags"] = get_entity_flags;
+    lua["get_entity_flags"] = [](uint32_t uid) -> ENT_FLAG
+    {
+        auto ent = get_entity_ptr(uid);
+        if (ent)
+            return ent->flags;
+        return {};
+    };
     /// Set the `flags` field from entity by uid
-    lua["set_entity_flags"] = set_entity_flags;
+    lua["set_entity_flags"] = [](uint32_t uid, ENT_FLAG flags)
+    {
+        auto ent = get_entity_ptr(uid);
+        if (ent)
+            ent->flags = flags;
+    };
     /// Get the `more_flags` field from entity by uid
-    lua["get_entity_flags2"] = get_entity_flags2;
+    lua["get_entity_flags2"] = [](uint32_t uid) -> ENT_MORE_FLAG
+    {
+        auto ent = get_entity_ptr(uid);
+        if (ent)
+            return ent->more_flags;
+        return {};
+    };
     /// Set the `more_flags` field from entity by uid
-    lua["set_entity_flags2"] = set_entity_flags2;
+    lua["set_entity_flags2"] = [](uint32_t uid, ENT_MORE_FLAG flags)
+    {
+        auto ent = get_entity_ptr(uid);
+        if (ent)
+            ent->more_flags = flags;
+    };
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
     /// you're standing on, not real level coordinates.
     lua["get_position"] = [](int32_t uid) -> std::tuple<float, float, uint8_t>

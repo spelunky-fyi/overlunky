@@ -10,9 +10,12 @@
 #include "entities_items.hpp"             // for PlayerGhost
 #include "entity.hpp"                     // for get_entity_ptr
 #include "entity_lookup.hpp"              // for get_entities
+#include "heap_base.hpp"                  // for HeapBase
+#include "movable.hpp"                    // for Movable
 #include "rpc.hpp"                        // for read_prng
 #include "script/handle_lua_function.hpp" // for handle_function
 #include "script/lua_backend.hpp"         // for LuaBackend
+#include "search.hpp"                     // for get_address
 #include "state.hpp"                      // for darkmode
 #include "vanilla_render_lua.hpp"         // for VanillaRenderContext
 
@@ -23,12 +26,24 @@ void register_usertypes(sol::state& lua)
     /// Deprecated
     /// Read the game prng state. Use [prng](#PRNG):get_pair() instead.
     lua["read_prng"] = []() -> std::vector<int64_t>
-    { return read_prng(); };
+    {
+        std::vector<int64_t> prng_raw;
+        prng_raw.resize(20);
+        auto prng = reinterpret_cast<int64_t*>(HeapBase::get().prng());
+        std::memcpy(prng_raw.data(), prng, sizeof(int64_t) * 20);
+        return prng_raw;
+    };
 
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     lua["force_dark_level"] = [](bool g)
-    { API::darkmode(g); };
+    {
+        static const size_t addr_dark = get_address("force_dark_level");
+        if (g)
+            write_mem_recoverable("darkmode", addr_dark, "\x90\x90"sv, true);
+        else
+            recover_mem("darkmode");
+    };
 
     /// Deprecated
     /// Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
@@ -48,7 +63,13 @@ void register_usertypes(sol::state& lua)
 
     /// Deprecated
     /// As the name is misleading. use Movable.`move_state` field instead
-    lua["get_entity_ai_state"] = get_entity_ai_state;
+    lua["get_entity_ai_state"] = [](uint32_t uid) -> uint8_t
+    {
+        auto ent = get_entity_ptr(uid)->as<Movable>();
+        if (ent && ent->is_movable())
+            return ent->move_state;
+        return 0;
+    };
 
     /// Deprecated
     /// Use [replace_drop](#replace_drop)(DROP.ARROWTRAP_WOODENARROW, new_arrow_type) and [replace_drop](#replace_drop)(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead
@@ -399,6 +420,62 @@ void register_usertypes(sol::state& lua)
     };
     /// Deprecated
     /// Use `Entity:flip` instead
-    lua["flip_entity"] = flip_entity;
+    lua["flip_entity"] = [](uint32_t uid) -> void
+    {
+        Entity* ent = get_entity_ptr(uid);
+        if (ent == nullptr)
+            return;
+        ent->flags ^= 0x10000;
+        if (ent->items.size > 0)
+        {
+            for (auto item : ent->items.entities())
+            {
+                item->flags ^= 0x10000;
+            }
+        }
+    };
+
+    /// Deprecated
+    /// use `Door:unlock` instead
+    lua["lock_door_at"] = [](float x, float y)
+    {
+        std::vector<uint32_t> items = get_entities_at({}, ENTITY_MASK::ANY, x, y, LAYER::FRONT, 1);
+        for (auto id : items)
+        {
+            Entity* door = get_entity_ptr(id);
+            if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
+            {
+                door->flags &= ~(1U << 19);
+                door->flags |= 1U << 21;
+            }
+            else if (
+                door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
+                door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
+            {
+                door->animation_frame &= ~1U;
+            }
+        }
+    };
+    /// Deprecated
+    /// use `Door:unlock` instead
+    lua["unlock_door_at"] = [](float x, float y)
+    {
+        std::vector<uint32_t> items = get_entities_at({}, ENTITY_MASK::ANY, x, y, LAYER::FRONT, 1);
+        for (auto id : items)
+        {
+            Entity* door = get_entity_ptr(id);
+            if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
+            {
+                door->flags |= 1U << 19;
+                door->flags &= ~(1U << 21);
+            }
+            else if (
+                door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
+                door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
+            {
+                door->animation_frame |= 1U;
+            }
+        }
+    };
 }
 } // namespace NDeprecated

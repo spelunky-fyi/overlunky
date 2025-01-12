@@ -1006,20 +1006,20 @@ function destroy_grid(x, y, layer) end
 function attach_entity(overlay_uid, attachee_uid) end
 ---Get the `flags` field from entity by uid
 ---@param uid integer
----@return integer
+---@return ENT_FLAG
 function get_entity_flags(uid) end
 ---Set the `flags` field from entity by uid
 ---@param uid integer
----@param flags integer
+---@param flags ENT_FLAG
 ---@return nil
 function set_entity_flags(uid, flags) end
 ---Get the `more_flags` field from entity by uid
 ---@param uid integer
----@return integer
+---@return ENT_MORE_FLAG
 function get_entity_flags2(uid) end
 ---Set the `more_flags` field from entity by uid
 ---@param uid integer
----@param flags integer
+---@param flags ENT_MORE_FLAG
 ---@return nil
 function set_entity_flags2(uid, flags) end
 ---Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
@@ -1149,16 +1149,6 @@ function set_door(uid, w, l, t) end
 ---@param uid integer
 ---@return integer, integer, integer
 function get_door_target(uid) end
----Try to lock the exit at coordinates
----@param x number
----@param y number
----@return nil
-function lock_door_at(x, y) end
----Try to unlock the exit at coordinates
----@param x number
----@param y number
----@return nil
-function unlock_door_at(x, y) end
 ---Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
 ---@param player_uid integer
 ---@param door_uid integer
@@ -2988,6 +2978,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field timer integer
     ---@field world integer
     ---@field theme integer
+    ---@field set_target fun(self, ww: integer, l: integer, t: integer): nil
+    ---@field get_target fun(self): integer, integer, integer @Get target world, level, theme of this door. If the `special_door` is false, it returns the StateMemory world_next, level_next, theme_next
 
 ---@class DecoratedDoor : ExitDoor
     ---@field special_bg Entity

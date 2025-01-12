@@ -204,7 +204,7 @@ struct StateMemory
     uint32_t time_level;
     uint32_t time_speedrun;
     uint32_t money_last_levels;
-    int32_t level_flags;
+    uint32_t level_flags;
     PRESENCE_FLAG presence_flags;
     /// the contents of the special coffin that will be spawned during levelgen
     ENT_TYPE coffin_contents;
@@ -360,8 +360,6 @@ bool get_forward_events();
 
 void godmode(bool g);
 void godmode_companions(bool g);
-// Deprecated: do not use this!
-void darkmode(bool g);
 
 void zoom(float level);
 void zoom_reset();

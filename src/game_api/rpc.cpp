@@ -212,54 +212,6 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
     }
 }
 
-uint32_t get_entity_flags(uint32_t uid)
-{
-    auto ent = get_entity_ptr(uid);
-    if (ent)
-        return ent->flags;
-    return 0;
-}
-
-void set_entity_flags(uint32_t uid, uint32_t flags)
-{
-    auto ent = get_entity_ptr(uid);
-    if (ent)
-        ent->flags = flags;
-}
-
-uint32_t get_entity_flags2(uint32_t uid)
-{
-    auto ent = get_entity_ptr(uid);
-    if (ent)
-        return ent->more_flags;
-    return 0;
-}
-
-void set_entity_flags2(uint32_t uid, uint32_t flags)
-{
-    auto ent = get_entity_ptr(uid);
-    if (ent)
-        ent->more_flags = flags;
-}
-
-int get_entity_ai_state(uint32_t uid)
-{
-    auto ent = get_entity_ptr(uid)->as<Movable>();
-    if (ent && ent->is_movable())
-        return ent->move_state;
-    return 0;
-}
-
-uint32_t get_level_flags()
-{
-    return HeapBase::get().state()->level_flags;
-}
-
-void set_level_flags(uint32_t flags)
-{
-    HeapBase::get().state()->level_flags = flags;
-}
-
 ENT_TYPE get_entity_type(uint32_t uid)
 {
     auto entity = get_entity_ptr(uid);
@@ -298,26 +250,6 @@ std::vector<uint32_t> filter_entities(std::vector<uint32_t> entities, std::funct
     return filtered_entities;
 }
 
-void set_door_target(uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
-{
-    if (auto door = get_entity_ptr(uid)->as<ExitDoor>())
-    {
-        door->world = w;
-        door->level = l;
-        door->theme = t;
-        door->special_door = true;
-    }
-}
-
-std::tuple<uint8_t, uint8_t, uint8_t> get_door_target(uint32_t uid)
-{
-    auto door = get_entity_ptr(uid)->as<ExitDoor>();
-    if (door == nullptr || !door->special_door)
-        return std::make_tuple((uint8_t)0, (uint8_t)0, (uint8_t)0);
-
-    return std::make_tuple(door->world, door->level, door->theme);
-}
-
 void set_contents(uint32_t uid, ENT_TYPE item_entity_type)
 {
     Entity* container = get_entity_ptr(uid);
@@ -350,46 +282,6 @@ void entity_remove_item(uint32_t uid, uint32_t item_uid, std::optional<bool> che
         entity->remove_item(entity_item, check_autokill.value_or(true));
 }
 
-void lock_door_at(float x, float y)
-{
-    std::vector<uint32_t> items = get_entities_at({}, ENTITY_MASK::ANY, x, y, LAYER::FRONT, 1);
-    for (auto id : items)
-    {
-        Entity* door = get_entity_ptr(id);
-        if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
-        {
-            door->flags &= ~(1U << 19);
-            door->flags |= 1U << 21;
-        }
-        else if (
-            door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
-            door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
-        {
-            door->animation_frame &= ~1U;
-        }
-    }
-}
-
-void unlock_door_at(float x, float y)
-{
-    std::vector<uint32_t> items = get_entities_at({}, ENTITY_MASK::ANY, x, y, LAYER::FRONT, 1);
-    for (auto id : items)
-    {
-        Entity* door = get_entity_ptr(id);
-        if (door->type->id >= to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE") && door->type->id <= to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD"))
-        {
-            door->flags |= 1U << 19;
-            door->flags &= ~(1U << 21);
-        }
-        else if (
-            door->type->id == to_id("ENT_TYPE_BG_DOOR") || door->type->id == to_id("ENT_TYPE_BG_DOOR_COG") ||
-            door->type->id == to_id("ENT_TYPE_BG_DOOR_EGGPLANT_WORLD"))
-        {
-            door->animation_frame |= 1U;
-        }
-    }
-}
-
 void kill_entity(uint32_t uid, std::optional<bool> destroy_corpse)
 {
     Entity* ent = get_entity_ptr(uid);
@@ -409,21 +301,6 @@ void apply_entity_db(uint32_t uid)
     Entity* ent = get_entity_ptr(uid);
     if (ent != nullptr)
         ent->apply_db();
-}
-
-void flip_entity(uint32_t uid)
-{
-    Entity* ent = get_entity_ptr(uid);
-    if (ent == nullptr)
-        return;
-    ent->flags = flipflag(ent->flags, 17);
-    if (ent->items.size > 0)
-    {
-        for (auto item : ent->items.entities())
-        {
-            item->flags = flipflag(item->flags, 17);
-        }
-    }
 }
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
@@ -521,15 +398,6 @@ void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscap
     // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
     static const auto blood_multiplication = get_address("blood_multiplication");
     write_mem_prot(blood_multiplication, vladscape_multiplier, true);
-}
-
-std::vector<int64_t> read_prng()
-{
-    std::vector<int64_t> prng_raw;
-    prng_raw.resize(20);
-    auto prng = reinterpret_cast<int64_t*>(HeapBase::get().prng());
-    std::memcpy(prng_raw.data(), prng, sizeof(int64_t) * 20);
-    return prng_raw;
 }
 
 void pick_up(uint32_t who_uid, uint32_t what_uid)

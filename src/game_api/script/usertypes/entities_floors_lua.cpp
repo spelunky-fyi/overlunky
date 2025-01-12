@@ -410,15 +410,26 @@ void register_usertypes(sol::state& lua)
         sol::bases<Entity, Floor>());
 
     /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
-    lua["set_door_target"] = set_door_target;
+    lua["set_door_target"] = [](uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
+    {
+        if (auto door = get_entity_ptr(uid)->as<ExitDoor>())
+            door->set_target(w, l, t);
+    };
     /// Short for [set_door_target](#set_door_target).
-    lua["set_door"] = set_door_target;
+    lua["set_door"] = [](uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
+    {
+        if (auto door = get_entity_ptr(uid)->as<ExitDoor>())
+            door->set_target(w, l, t);
+    };
     /// Get door target `world`, `level`, `theme`
-    lua["get_door_target"] = get_door_target;
-    /// Try to lock the exit at coordinates
-    lua["lock_door_at"] = lock_door_at;
-    /// Try to unlock the exit at coordinates
-    lua["unlock_door_at"] = unlock_door_at;
+    lua["get_door_target"] = [](uint32_t uid) -> std::tuple<uint8_t, uint8_t, uint8_t>
+    {
+        auto door = get_entity_ptr(uid)->as<ExitDoor>();
+        if (door == nullptr || !door->special_door)
+            return {};
+
+        return std::make_tuple(door->world, door->level, door->theme);
+    };
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
     lua["enter_door"] = enter_door;
 }

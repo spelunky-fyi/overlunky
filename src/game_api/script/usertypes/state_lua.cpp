@@ -653,9 +653,15 @@ void register_usertypes(sol::state& lua)
     lua["set_seed"] = [](uint32_t seed)
     { HeapBase::get().state()->set_seed(seed); };
     /// Get `state.level_flags`
-    lua["get_level_flags"] = get_level_flags;
+    lua["get_level_flags"] = []() -> uint32_t
+    {
+        return HeapBase::get().state()->level_flags;
+    };
     /// Set `state.level_flags`
-    lua["set_level_flags"] = set_level_flags;
+    lua["set_level_flags"] = [](uint32_t flags)
+    {
+        HeapBase::get().state()->level_flags = flags;
+    };
     /// Returns how many of a specific entity type Waddler has stored
     lua["waddler_count_entity"] = waddler_count_entity;
     /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
