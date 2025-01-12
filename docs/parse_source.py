@@ -126,6 +126,7 @@ header_files = [
     "../src/game_api/bucket.hpp",
     "../src/game_api/socket.hpp",
     "../src/game_api/savestate.hpp",
+    "../src/game_api/game_patches.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -174,6 +175,7 @@ api_files = [
     "../src/game_api/script/usertypes/deprecated_func.cpp",
     "../src/game_api/script/usertypes/spawn_lua.cpp",
     "../src/game_api/script/usertypes/options_lua.cpp",
+    "../src/game_api/script/usertypes/game_patches_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",

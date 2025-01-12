@@ -4130,8 +4130,7 @@ As the name is misleading. use [Movable](#Movable).`move_state` field instead
 
 > Search script examples for [set_arrowtrap_projectile](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
 
-#### nil set_arrowtrap_projectile([ENT_TYPE](#ENT_TYPE) regular_entity_type, [ENT_TYPE](#ENT_TYPE) poison_entity_type)
-
+`nil set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)`<br/>
 Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow_type) and [replace_drop](#replace_drop)([DROP](#DROP).POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead
 
 ### set_blood_multiplication
@@ -4139,8 +4138,7 @@ Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow
 
 > Search script examples for [set_blood_multiplication](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
 
-#### nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)
-
+`nil set_blood_multiplication(int /default_multiplier/, int vladscape_multiplier)`<br/>
 This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
 

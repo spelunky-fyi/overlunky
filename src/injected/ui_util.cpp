@@ -16,6 +16,7 @@
 #include "entity_lookup.hpp"         //
 #include "game_api.hpp"              //
 #include "game_manager.hpp"          // for get_game_manager, GameManager
+#include "game_patches.hpp"          //
 #include "illumination.hpp"          //
 #include "items.hpp"                 // for Items
 #include "layer.hpp"                 // for Layer, EntityList::Range, Entit...

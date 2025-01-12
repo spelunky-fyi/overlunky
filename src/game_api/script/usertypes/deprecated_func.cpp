@@ -73,12 +73,23 @@ void register_usertypes(sol::state& lua)
 
     /// Deprecated
     /// Use [replace_drop](#replace_drop)(DROP.ARROWTRAP_WOODENARROW, new_arrow_type) and [replace_drop](#replace_drop)(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead
-    lua["set_arrowtrap_projectile"] = set_arrowtrap_projectile;
+    lua["set_arrowtrap_projectile"] = [](ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
+    {
+        static const auto arrowtrap = get_address("arrowtrap_projectile");
+        static const auto poison_arrowtrap = get_address("poison_arrowtrap_projectile");
+        write_mem_prot(arrowtrap, regular_entity_type, true);
+        write_mem_prot(poison_arrowtrap, poison_entity_type, true);
+    };
 
     /// Deprecated
     /// This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
     /// `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
-    lua["set_blood_multiplication"] = set_blood_multiplication;
+    lua["set_blood_multiplication"] = [](uint32_t /*default_multiplier*/, uint32_t vladscape_multiplier)
+    {
+        // Due to changes in 1.23.x, the default multiplier is automatically vlads - 1.
+        static const auto blood_multiplication = get_address("blood_multiplication");
+        write_mem_prot(blood_multiplication, vladscape_multiplier, true);
+    };
 
     /// Deprecated
     /// Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.

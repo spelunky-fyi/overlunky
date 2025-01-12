@@ -500,7 +500,12 @@ void register_usertypes(sol::state& lua)
     /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
     lua["worn_backitem"] = worn_backitem;
     /// Apply changes made in [get_type](#get_type)() to entity instance by uid.
-    lua["apply_entity_db"] = apply_entity_db;
+    lua["apply_entity_db"] = [](uint32_t uid)
+    {
+        Entity* ent = get_entity_ptr(uid);
+        if (ent != nullptr)
+            ent->apply_db();
+    };
     /// Calculate the tile distance of two entities by uid
     lua["distance"] = [](uint32_t uid_a, uint32_t uid_b) -> float
     {

@@ -303,74 +303,10 @@ function get_global_frame() end
 ---Get the current timestamp in milliseconds since the Unix Epoch.
 ---@return nil
 function get_ms() end
----Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
----@param threshold integer
----@return nil
-function set_kapala_blood_threshold(threshold) end
----Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
----If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
----@param icon_index integer
----@return nil
-function set_kapala_hud_icon(icon_index) end
----Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
----Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
----Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
----@param angle_increment number
----@param distance number
----@return nil
-function modify_sparktraps(angle_increment, distance) end
----Activate custom variables for speed and distance in the `ITEM_SPARK`
----note: because those the variables are custom and game does not initiate them, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
----default game values are: speed = -0.015, distance = 3.0
----@param activate boolean
----@return nil
-function activate_sparktraps_hack(activate) end
----Set layer to search for storage items on
----@param layer LAYER
----@return nil
-function set_storage_layer(layer) end
----Sets the Y-level at which Olmec changes phases
----@param phase integer
----@param y number
----@return nil
-function set_olmec_phase_y_level(phase, y) end
----Forces Olmec to stay on phase 0 (stomping)
----@param b boolean
----@return nil
-function force_olmec_phase_0(b) end
----Determines when the ghost appears, either when the player is cursed or not
----@param normal integer
----@param cursed integer
----@return nil
-function set_ghost_spawn_times(normal, cursed) end
----Determines whether the ghost appears when breaking the ghost pot
----@param enable boolean
----@return nil
-function set_cursepot_ghost_enabled(enable) end
----Determines whether the time ghost appears, including the showing of the ghost toast
----@param b boolean
----@return nil
-function set_time_ghost_enabled(b) end
----Determines whether the time jelly appears in cosmic ocean
----@param b boolean
----@return nil
-function set_time_jelly_enabled(b) end
 ---Enables or disables the journal
 ---@param b boolean
 ---@return nil
 function set_journal_enabled(b) end
----Enables or disables the default position based camp camera bounds, to set them manually yourself
----@param b boolean
----@return nil
-function set_camp_camera_bounds_enabled(b) end
----Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
----@param mask integer
----@return nil
-function set_explosion_mask(mask) end
----Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
----@param length integer
----@return nil
-function set_max_rope_length(length) end
 ---Checks whether a coordinate is inside a room containing an active shop. This function checks whether the shopkeeper is still alive.
 ---@param x number
 ---@param y number
@@ -507,53 +443,12 @@ function add_custom_name(uid, name) end
 ---@param uid integer
 ---@return nil
 function clear_custom_name(uid) end
----Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
----{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
----Use empty table as argument to reset to the game default
----@param ent_types ENT_TYPE[]
----@return nil
-function change_sunchallenge_spawns(ent_types) end
----Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
----{ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
----ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
----ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
----Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance").
----If you use this function in the level with dice shop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](https://spelunky-fyi.github.io/overlunky/#PrizeDispenser).
----Use empty table as argument to reset to the game default
----@param ent_types ENT_TYPE[]
----@return nil
-function change_diceshop_prizes(ent_types) end
----Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
----{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
----Max 255 types.
----Use empty table as argument to reset to the game default
----@param ent_types ENT_TYPE[]
----@return nil
-function change_altar_damage_spawns(ent_types) end
----Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
----{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
----Max 255 types.
----Use empty table as argument to reset to the game default
----@param ent_types ENT_TYPE[]
----@return nil
-function change_waddler_drop(ent_types) end
----Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
----`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing. Set `health` to 0 to return to the game defaults
----If you set `health` above the game max health it will be forced down to the game max
----@param max_health integer
----@param beat_add_health integer
----@return nil
-function modify_ankh_health_gain(max_health, beat_add_health) end
 ---Adds entity as shop item, has to be of [Purchasable](https://spelunky-fyi.github.io/overlunky/#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the Purchasable entity types.
 ---Adding other entities will result in not obtainable items or game crash
 ---@param item_uid integer
 ---@param shop_owner_uid integer
 ---@return nil
 function add_item_to_shop(item_uid, shop_owner_uid) end
----Change the amount of frames after the damage from poison is applied
----@param frames integer
----@return nil
-function change_poison_timer(frames) end
 ---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
 ---@param pos Vec2
 ---@param color Color
@@ -639,10 +534,6 @@ function update_liquid_collision_at(x, y, add, layer) end
 ---@param layer LAYER
 ---@return integer, integer
 function get_liquids_at(x, y, layer) end
----Disable all crust item spawns, returns whether they were already disabled before the call
----@param disable boolean
----@return boolean
-function disable_floor_embeds(disable) end
 ---Get the rva for a pattern name, used for debugging.
 ---@param address_name string
 ---@return string
@@ -674,10 +565,6 @@ function save_script() end
 ---@param str string
 ---@return nil
 function set_level_string(str) end
----Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
----@param type ENT_TYPE
----@return nil
-function set_ending_unlock(type) end
 ---List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
 ---@param dir string?
 ---@return nil
@@ -693,37 +580,6 @@ function list_char_mods() end
 ---@param index integer
 ---@return AABB
 function get_hud_position(index) end
----Olmec cutscene moves Olmec and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and Olmec will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with Olmec in the hole.
----@param enable boolean
----@return nil
-function set_olmec_cutscene_enabled(enable) end
----Tiamat cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want Tiamat kill to be required
----@param enable boolean
----@return nil
-function set_tiamat_cutscene_enabled(enable) end
----Activate custom variables for position used for detecting the player (normally hardcoded)
----note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending set_post_entity_spawn
----default game values are: attack_x = 17.5 attack_y = 62.5
----@param activate boolean
----@return nil
-function activate_tiamat_position_hack(activate) end
----Activate custom variables for speed and y coordinate limit for crushing elevator
----note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending set_post_entity_spawn
----default game values are: speed = 0.0125, y_limit = 98.5
----@param activate boolean
----@return nil
-function activate_crush_elevator_hack(activate) end
----Activate custom variables for y coordinate limit for hundun and spawn of it's heads
----note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending set_post_entity_spawn
----default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
----@param activate boolean
----@return nil
-function activate_hundun_hack(activate) end
----Allows you to disable the control over the door for Hundun and Tiamat
----This will also prevent game crashing when there is no exit door when they are in level
----@param enable boolean
----@return nil
-function set_boss_door_control_enabled(enable) end
 ---Set engine target frametime (1/framerate, default 1/60). Always capped by your GPU max FPS / VSync. To run the engine faster than rendered FPS, try update_state. Set to 0 to go as fast as possible. Call without arguments to reset. Also see set_speedhack
 ---@param frametime double?
 ---@return nil
@@ -790,14 +646,6 @@ function create_level() end
 ---@param layer integer
 ---@return nil
 function create_layer(layer) end
----Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
----@param enable boolean
----@return nil
-function set_level_logic_enabled(enable) end
----Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
----@param enable boolean
----@return nil
-function set_start_level_paused(enable) end
 ---Returns true if the level pause hack is enabled
 ---@return boolean
 function get_start_level_paused() end
@@ -815,12 +663,6 @@ function buttons_to_inputs(x, y, buttons) end
 ---@param enable boolean
 ---@return nil
 function set_infinite_loop_detection_enabled(enable) end
----This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
----Letting you control those manually.
----Look at the example on how to mimic game layer switching behavior
----@param enable boolean
----@return nil
-function set_camera_layer_control_enabled(enable) end
 ---Set multiplier (default 1.0) for a QueryPerformanceCounter hook based speedhack, similar to the one in Cheat Engine. Call without arguments to reset. Also see [set_frametime](https://spelunky-fyi.github.io/overlunky/#set_frametime)
 ---@param multiplier number?
 ---@return nil
@@ -841,12 +683,6 @@ function play_adventure() end
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
----Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
----This sadly also makes lavamanders extinct, since the logic for their spawn is hardcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
----Everything should be working more or less correctly (report on community discord if you find something unusual)
----@param l LAYER
----@return nil
-function set_liquid_layer(l) end
 ---Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
 ---@return integer
 function get_liquid_layer() end
@@ -1926,6 +1762,170 @@ function register_option_callback(name, value, on_render) end
 ---@param name string
 ---@return nil
 function unregister_option(name) end
+---Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
+---@param threshold integer
+---@return nil
+function set_kapala_blood_threshold(threshold) end
+---Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
+---If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
+---@param icon_index integer
+---@return nil
+function set_kapala_hud_icon(icon_index) end
+---Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center
+---Speed: expressed as the amount that should be added to the angle every frame (use a negative number to go in the other direction)
+---Distance from center: if you go above 3.0 the game might crash because a spark may go out of bounds!
+---@param angle_increment number
+---@param distance number
+---@return nil
+function modify_sparktraps(angle_increment, distance) end
+---Activate custom variables for speed and distance in the `ITEM_SPARK`
+---note: because those the variables are custom and game does not initiate them, you need to do it yourself for each spark, recommending `set_post_entity_spawn`
+---default game values are: speed = -0.015, distance = 3.0
+---@param activate boolean
+---@return nil
+function activate_sparktraps_hack(activate) end
+---Set layer to search for storage items on
+---@param layer LAYER
+---@return nil
+function set_storage_layer(layer) end
+---Sets the Y-level at which Olmec changes phases
+---@param phase integer
+---@param y number
+---@return nil
+function set_olmec_phase_y_level(phase, y) end
+---Forces Olmec to stay on phase 0 (stomping)
+---@param b boolean
+---@return nil
+function force_olmec_phase_0(b) end
+---Determines when the ghost appears, either when the player is cursed or not
+---@param normal integer
+---@param cursed integer
+---@return nil
+function set_ghost_spawn_times(normal, cursed) end
+---Determines whether the ghost appears when breaking the ghost pot
+---@param enable boolean
+---@return nil
+function set_cursepot_ghost_enabled(enable) end
+---Determines whether the time ghost appears, including the showing of the ghost toast
+---@param b boolean
+---@return nil
+function set_time_ghost_enabled(b) end
+---Determines whether the time jelly appears in cosmic ocean
+---@param b boolean
+---@return nil
+function set_time_jelly_enabled(b) end
+---Enables or disables the default position based camp camera bounds, to set them manually yourself
+---@param b boolean
+---@return nil
+function set_camp_camera_bounds_enabled(b) end
+---Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR
+---@param mask integer
+---@return nil
+function set_explosion_mask(mask) end
+---Sets the maximum length of a thrown rope (anchor segment not included). Unfortunately, setting this higher than default (6) creates visual glitches in the rope, even though it is fully functional.
+---@param length integer
+---@return nil
+function set_max_rope_length(length) end
+---Change ENT_TYPE's spawned by `FLOOR_SUNCHALLENGE_GENERATOR`, by default there are 4:
+---{MONS_WITCHDOCTOR, MONS_VAMPIRE, MONS_SORCERESS, MONS_NECROMANCER}
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_sunchallenge_spawns(ent_types) end
+---Change ENT_TYPE's spawned in dice shops (Madame Tusk as well), by default there are 25:
+---{ITEM_PICKUP_BOMBBAG, ITEM_PICKUP_BOMBBOX, ITEM_PICKUP_ROPEPILE, ITEM_PICKUP_COMPASS, ITEM_PICKUP_PASTE, ITEM_PICKUP_PARACHUTE, ITEM_PURCHASABLE_CAPE, ITEM_PICKUP_SPECTACLES, ITEM_PICKUP_CLIMBINGGLOVES, ITEM_PICKUP_PITCHERSMITT,
+---ENT_TYPE_ITEM_PICKUP_SPIKESHOES, ENT_TYPE_ITEM_PICKUP_SPRINGSHOES, ITEM_MACHETE, ITEM_BOOMERANG, ITEM_CROSSBOW, ITEM_SHOTGUN, ITEM_FREEZERAY, ITEM_WEBGUN, ITEM_CAMERA, ITEM_MATTOCK, ITEM_PURCHASABLE_JETPACK, ITEM_PURCHASABLE_HOVERPACK,
+---ITEM_TELEPORTER, ITEM_PURCHASABLE_TELEPORTER_BACKPACK, ITEM_PURCHASABLE_POWERPACK}
+---Min 6, Max 255, if you want less then 6 you need to write some of them more then once (they will have higher "spawn chance").
+---If you use this function in the level with dice shop in it, you have to update `item_ids` in the [ITEM_DICE_PRIZE_DISPENSER](https://spelunky-fyi.github.io/overlunky/#PrizeDispenser).
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_diceshop_prizes(ent_types) end
+---Change ENT_TYPE's spawned when you damage the altar, by default there are 6:
+---{MONS_BAT, MONS_BEE, MONS_SPIDER, MONS_JIANGSHI, MONS_FEMALE_JIANGSHI, MONS_VAMPIRE}
+---Max 255 types.
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_altar_damage_spawns(ent_types) end
+---Change ENT_TYPE's spawned when Waddler dies, by default there are 3:
+---{ITEM_PICKUP_COMPASS, ITEM_CHEST, ITEM_KEY}
+---Max 255 types.
+---Use empty table as argument to reset to the game default
+---@param ent_types ENT_TYPE[]
+---@return nil
+function change_waddler_drop(ent_types) end
+---Change how much health the ankh gives you after death, with every beat (the heart beat effect) it will add `beat_add_health` to your health,
+---`beat_add_health` has to be divisor of `health` and can't be 0, otherwise the function does nothing. Set `health` to 0 to return to the game defaults
+---If you set `health` above the game max health it will be forced down to the game max
+---@param max_health integer
+---@param beat_add_health integer
+---@return nil
+function modify_ankh_health_gain(max_health, beat_add_health) end
+---Change the amount of frames after the damage from poison is applied
+---@param frames integer
+---@return nil
+function change_poison_timer(frames) end
+---Disable all crust item spawns, returns whether they were already disabled before the call
+---@param disable boolean
+---@return boolean
+function disable_floor_embeds(disable) end
+---Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
+---@param type ENT_TYPE
+---@return nil
+function set_ending_unlock(type) end
+---Olmec cutscene moves Olmec and destroys the four floor tiles, so those things never happen if the cutscene is disabled, and Olmec will spawn on even ground. More useful for level gen mods, where the cutscene doesn't make sense. You can also set olmec_cutscene.timer to the last frame (809) to skip to the end, with Olmec in the hole.
+---@param enable boolean
+---@return nil
+function set_olmec_cutscene_enabled(enable) end
+---Tiamat cutscene is also responsible for locking the exit door, so you may need to close it yourself if you still want Tiamat kill to be required
+---@param enable boolean
+---@return nil
+function set_tiamat_cutscene_enabled(enable) end
+---Activate custom variables for position used for detecting the player (normally hardcoded)
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each Tiamat entity, recommending set_post_entity_spawn
+---default game values are: attack_x = 17.5 attack_y = 62.5
+---@param activate boolean
+---@return nil
+function activate_tiamat_position_hack(activate) end
+---Activate custom variables for speed and y coordinate limit for crushing elevator
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each CrushElevator entity, recommending set_post_entity_spawn
+---default game values are: speed = 0.0125, y_limit = 98.5
+---@param activate boolean
+---@return nil
+function activate_crush_elevator_hack(activate) end
+---Activate custom variables for y coordinate limit for hundun and spawn of it's heads
+---note: because those variables are custom and game does not initiate them, you need to do it yourself for each Hundun entity, recommending set_post_entity_spawn
+---default game value are: y_limit = 98.5, rising_speed_x = 0, rising_speed_y = 0.0125, bird_head_spawn_y = 55, snake_head_spawn_y = 71
+---@param activate boolean
+---@return nil
+function activate_hundun_hack(activate) end
+---Allows you to disable the control over the door for Hundun and Tiamat
+---This will also prevent game crashing when there is no exit door when they are in level
+---@param enable boolean
+---@return nil
+function set_boss_door_control_enabled(enable) end
+---Setting to false disables all player logic in SCREEN.LEVEL, mainly the death screen from popping up if all players are dead or missing, but also shop camera zoom and some other small things.
+---@param enable boolean
+---@return nil
+function set_level_logic_enabled(enable) end
+---Setting to true will stop the state update from unpausing after a screen load, leaving you with state.pause == PAUSE.FADE on the first frame to do what you want.
+---@param enable boolean
+---@return nil
+function set_start_level_paused(enable) end
+---This disables the `state.camera_layer` to be forced to the `(leader player).layer` and setting of the `state.layer_transition_timer` & `state.transition_to_layer` when player enters layer door.
+---Letting you control those manually.
+---Look at the example on how to mimic game layer switching behavior
+---@param enable boolean
+---@return nil
+function set_camera_layer_control_enabled(enable) end
+---Change layer at which the liquid spawns in, THIS FUNCTION NEEDS TO BE CALLED BEFORE THE LEVEL IS BUILD, otherwise collisions and other stuff will be wrong for the newly spawned liquid
+---This sadly also makes lavamanders extinct, since the logic for their spawn is hardcoded to front layer with bunch of other unrelated stuff (you can still spawn them with script or place them directly in level files)
+---Everything should be working more or less correctly (report on community discord if you find something unusual)
+---@param l LAYER
+---@return nil
+function set_liquid_layer(l) end
 
 --## Types
 do
