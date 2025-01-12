@@ -19,7 +19,7 @@
 #include "level_api.hpp"          // IWYU pragma: keep
 #include "online.hpp"             // for OnlinePlayer, OnlineLobby, Online
 #include "prng.hpp"               // IWYU pragma: keep
-#include "rpc.hpp"                // for get_level_flags, set_level_flags
+#include "rpc.hpp"                // for waddler_count_entity ...
 #include "savestate.hpp"          // for SaveState
 #include "screen.hpp"             // IWYU pragma: keep
 #include "screen_arena.hpp"       // IWYU pragma: keep

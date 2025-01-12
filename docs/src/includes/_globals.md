@@ -847,7 +847,7 @@ Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
 
 > Search script examples for [replace_drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=replace_drop)
 
-#### nil replace_drop(int drop_id, [ENT_TYPE](#ENT_TYPE) new_drop_entity_type)
+#### nil replace_drop([DROP](#DROP) drop_id, [ENT_TYPE](#ENT_TYPE) new_drop_entity_type)
 
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop([DROP](#DROP).VAN_HORSING_DIAMOND, [ENT_TYPE](#ENT_TYPE).ITEM_PLASMACANNON))
 Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
@@ -904,7 +904,7 @@ Make an [ENT_TYPE](#ENT_TYPE).FLOOR_DOOR_EXIT go to world `w`, level `l`, theme 
 
 > Search script examples for [set_drop_chance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_drop_chance)
 
-#### nil set_drop_chance(int dropchance_id, int new_drop_chance)
+#### nil set_drop_chance([DROPCHANCE](#DROPCHANCE) dropchance_id, int new_drop_chance)
 
 Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance([DROPCHANCE](#DROPCHANCE).MOLE_MATTOCK, 10) for a 1 in 10 chance)
 Use `-1` as dropchance_id to reset all to default

@@ -12,7 +12,6 @@
 #include "entities_floors.hpp" // for MotherStatue, Floor, ExitDoor, Door
 #include "entity.hpp"          // for Entity
 #include "illumination.hpp"    // IWYU pragma: keep
-#include "rpc.hpp"             // for set_door_target, get_door_target
 #include "sound_manager.hpp"   // IWYU pragma: keep
 
 namespace NEntitiesFloors
@@ -435,6 +434,14 @@ void register_usertypes(sol::state& lua)
         return std::make_tuple(door->world, door->level, door->theme);
     };
     /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
-    lua["enter_door"] = enter_door;
+    lua["enter_door"] = [](int32_t player_uid, int32_t door_uid)
+    {
+        auto player = get_entity_ptr(player_uid);
+        auto door = get_entity_ptr(door_uid)->as<Door>();
+        if (player == nullptr || door == nullptr)
+            return;
+
+        door->enter(player);
+    };
 }
 } // namespace NEntitiesFloors

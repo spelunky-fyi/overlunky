@@ -465,9 +465,36 @@ void register_usertypes(sol::state& lua)
     /// Kills an entity by uid. `destroy_corpse` defaults to `true`, if you are killing for example a caveman and want the corpse to stay make sure to pass `false`.
     lua["kill_entity"] = kill_entity;
     /// Pick up another entity by uid. Make sure you're not already holding something, or weird stuff will happen.
-    lua["pick_up"] = pick_up;
+    lua["pick_up"] = [](uint32_t who_uid, uint32_t what_uid)
+    {
+        Movable* ent = get_entity_ptr(who_uid)->as<Movable>();
+        Movable* item = get_entity_ptr(what_uid)->as<Movable>();
+        if (ent != nullptr && item != nullptr)
+        {
+            ent->pick_up(item);
+        }
+    };
     /// Drop held entity, `what_uid` optional, if set, it will check if entity is holding that entity first before dropping it
-    lua["drop"] = drop;
+    lua["drop"] = [](uint32_t who_uid, std::optional<uint32_t> what_uid)
+    {
+        auto ent = get_entity_ptr(who_uid);
+        if (ent == nullptr)
+            return;
+
+        if (!ent->is_movable()) // game would probably use the is_player_or_monster function here, since they are the only ones who should be able to hold something
+            return;
+
+        auto mov = ent->as<Movable>();
+        if (what_uid.has_value()) // should we handle what_uid = -1 the same way?
+        {
+            auto item = get_entity_ptr(what_uid.value());
+            if (item == nullptr)
+                return;
+            if (item->overlay != mov && mov->holding_uid == what_uid)
+                return;
+        }
+        mov->drop();
+    };
     /// Unequips the currently worn backitem
     lua["unequip_backitem"] = unequip_backitem;
     /// Returns the uid of the currently worn backitem, or -1 if wearing nothing

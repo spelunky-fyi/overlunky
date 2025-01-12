@@ -1467,13 +1467,13 @@ function reset_lut(layer) end
 function get_hud() end
 ---Alters the drop chance for the provided monster-item combination (use e.g. set_drop_chance(DROPCHANCE.MOLE_MATTOCK, 10) for a 1 in 10 chance)
 ---Use `-1` as dropchance_id to reset all to default
----@param dropchance_id integer
+---@param dropchance_id DROPCHANCE
 ---@param new_drop_chance integer
 ---@return nil
 function set_drop_chance(dropchance_id, new_drop_chance) end
 ---Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
 ---Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
----@param drop_id integer
+---@param drop_id DROP
 ---@param new_drop_entity_type ENT_TYPE
 ---@return nil
 function replace_drop(drop_id, new_drop_entity_type) end

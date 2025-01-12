@@ -400,37 +400,6 @@ void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscap
     write_mem_prot(blood_multiplication, vladscape_multiplier, true);
 }
 
-void pick_up(uint32_t who_uid, uint32_t what_uid)
-{
-    Movable* ent = (Movable*)get_entity_ptr(who_uid);
-    Movable* item = (Movable*)get_entity_ptr(what_uid);
-    if (ent != nullptr && item != nullptr)
-    {
-        ent->pick_up(item);
-    }
-}
-
-void drop(uint32_t who_uid, std::optional<uint32_t> what_uid)
-{
-    auto ent = get_entity_ptr(who_uid);
-    if (ent == nullptr)
-        return;
-
-    if (!ent->is_movable()) // game would probably use the is_player_or_monster function here, since they are the only ones who should be able to hold something
-        return;
-
-    auto mov = ent->as<Movable>();
-    if (what_uid.has_value()) // should we handle what_uid = -1 the same way?
-    {
-        auto item = get_entity_ptr(what_uid.value());
-        if (item == nullptr)
-            return;
-        if (item->overlay != mov && mov->holding_uid == what_uid)
-            return;
-    }
-    mov->drop();
-}
-
 void unequip_backitem(uint32_t who_uid)
 {
     static const size_t offset = get_address("unequip");
@@ -606,12 +575,6 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
     return ciszf(level_gen, enum_to_layer(layer), x, y);
 }
-
-void set_journal_enabled(bool b)
-{
-    get_journal_enabled() = b;
-}
-
 void set_camp_camera_bounds_enabled(bool b)
 {
     static const size_t offset = get_address("enforce_camp_camera_bounds");
@@ -750,16 +713,6 @@ uint32_t waddler_entity_type_in_slot(uint8_t slot)
         return state->waddler_storage[slot];
     }
     return 0;
-}
-
-void enter_door(int32_t player_uid, int32_t door_uid)
-{
-    auto player = get_entity_ptr(player_uid);
-    auto door = get_entity_ptr(door_uid)->as<Door>();
-    if (player == nullptr || door == nullptr)
-        return;
-
-    door->enter(player);
 }
 
 void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
@@ -1510,15 +1463,6 @@ void set_boss_door_control_enabled(bool enable)
     }
     else
         recover_mem("set_boss_door_control_enabled");
-}
-
-void update_state()
-{
-    static const size_t offset = get_address("state_refresh");
-    auto state = HeapBase::get().state();
-    typedef void refresh_func(StateMemory*);
-    static refresh_func* rf = (refresh_func*)(offset);
-    rf(state);
 }
 
 void set_frametime(std::optional<double> frametime)

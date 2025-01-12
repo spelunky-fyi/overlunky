@@ -702,7 +702,8 @@ end
     /// Determines whether the time jelly appears in cosmic ocean
     lua["set_time_jelly_enabled"] = set_time_jelly_enabled;
     /// Enables or disables the journal
-    lua["set_journal_enabled"] = set_journal_enabled;
+    lua["set_journal_enabled"] = [](bool b)
+    { get_journal_enabled() = b; };
     /// Enables or disables the default position based camp camera bounds, to set them manually yourself
     lua["set_camp_camera_bounds_enabled"] = set_camp_camera_bounds_enabled;
     /// Sets which entities are affected by a bomb explosion. Default = MASK.PLAYER | MASK.MOUNT | MASK.MONSTER | MASK.ITEM | MASK.ACTIVEFLOOR | MASK.FLOOR

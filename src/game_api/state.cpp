@@ -514,6 +514,15 @@ LiquidPhysicsEngine* LiquidPhysics::get_correct_liquid_engine(ENT_TYPE liquid_ty
     return nullptr;
 }
 
+void update_state()
+{
+    static const size_t offset = get_address("state_refresh");
+    auto state = HeapBase::get().state();
+    typedef void refresh_func(StateMemory*);
+    static refresh_func* rf = (refresh_func*)(offset);
+    rf(state);
+}
+
 using OnStateUpdate = void(StateMemory*);
 OnStateUpdate* g_state_update_trampoline{nullptr};
 void StateUpdate(StateMemory* s)

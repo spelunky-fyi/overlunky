@@ -345,6 +345,7 @@ struct StateMemory
 #pragma pack(pop)
 
 StateMemory* get_state_ptr();
+void update_state();
 
 namespace API
 {
