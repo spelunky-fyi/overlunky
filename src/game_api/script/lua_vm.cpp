@@ -353,7 +353,7 @@ end
         return nullptr;
     };
     /// Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
-    lua["savegame"] = get_game_manager()->save_related->savedata.decode();
+    lua["savegame"] = get_game_manager()->save_related->savedata.decode_main();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];

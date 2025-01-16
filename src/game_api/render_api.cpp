@@ -659,7 +659,7 @@ void init_render_api_hooks()
 
 Entity* RenderInfo::get_entity() const
 {
-    return entity_offset.decode_local();
+    return entity_offset.decode();
 }
 
 uint32_t RenderInfo::get_aux_id() const

@@ -237,7 +237,7 @@ void UI::move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy,
 }
 SaveData* UI::savedata()
 {
-    return get_game_manager()->save_related->savedata.decode_local();
+    return get_game_manager()->save_related->savedata.decode();
 }
 int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {

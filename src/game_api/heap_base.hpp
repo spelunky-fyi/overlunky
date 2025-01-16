@@ -66,7 +66,7 @@ struct HeapBase
 
   protected:
     HeapBase(uintptr_t addr) noexcept
-        : ptr(addr){};
+        : ptr(addr) {};
 
     void free()
     {
@@ -100,17 +100,16 @@ class OnHeapPointer
 {
   public:
     explicit OnHeapPointer(size_t ptr)
-        : ptr_(ptr){};
+        : ptr_(ptr) {};
 
-    T* decode() const // TODO: change to decode_main and decode
+    T* decode_main() const
     {
         return reinterpret_cast<T*>(ptr_ + HeapBase::get_main().address());
     }
 
-    T* decode_local() const
+    T* decode() const
     {
-        auto lhb = HeapBase::get();
-        return reinterpret_cast<T*>(ptr_ + lhb.address());
+        return reinterpret_cast<T*>(ptr_ + HeapBase::get().address());
     }
 
   private:

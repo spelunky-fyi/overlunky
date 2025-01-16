@@ -413,7 +413,7 @@ void StateMemory::warp(uint8_t set_world, uint8_t set_level, uint8_t set_theme)
     auto gm = get_game_manager();
     if (items->player_count < 1)
     {
-        auto savedata = gm->save_related->savedata.decode_local();
+        auto savedata = gm->save_related->savedata.decode();
         items->player_select_slots[0].activated = true;
         items->player_select_slots[0].character = savedata->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
         items->player_select_slots[0].texture_id = savedata->players[0] + 285; // TODO: magic numbers
