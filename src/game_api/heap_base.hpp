@@ -66,7 +66,7 @@ struct HeapBase
 
   protected:
     HeapBase(uintptr_t addr) noexcept
-        : ptr(addr) {};
+        : ptr(addr){};
 
     void free()
     {
@@ -100,7 +100,7 @@ class OnHeapPointer
 {
   public:
     explicit OnHeapPointer(size_t ptr)
-        : ptr_(ptr) {};
+        : ptr_(ptr){};
 
     T* decode_main() const
     {
