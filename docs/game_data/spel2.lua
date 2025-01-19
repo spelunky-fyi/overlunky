@@ -476,11 +476,6 @@ function create_illumination(color, size, uid) end
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
----Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
----The patch however does not destroy the liquids that fall pass the level bounds,
----so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
----@return nil
-function fix_liquid_out_of_bounds() end
 ---Return the name of the first matching number in an enum table
 ---@param enum table
 ---@param value integer
@@ -770,6 +765,11 @@ function waddler_entity_type_in_slot(slot) end
 ---Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
 ---@return nil
 function update_state() end
+---Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+---The patch however does not destroy the liquids that fall pass the level bounds,
+---so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
+---@return nil
+function fix_liquid_out_of_bounds() end
 ---Returns RawInput, a game structure for raw keyboard and controller state
 ---@return RawInput
 function get_raw_input() end

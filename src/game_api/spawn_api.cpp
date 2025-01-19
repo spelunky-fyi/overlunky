@@ -23,6 +23,7 @@
 #include "items.hpp"                    //
 #include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x
 #include "level_api.hpp"                // for LevelGenSystem, ThemeInfo
+#include "liquid_engine.hpp"            // for LiquidPhysicsEngine
 #include "logger.h"                     // for DEBUG
 #include "math.hpp"                     // for AABB
 #include "memory.hpp"                   // for write_mem_prot, memory_read

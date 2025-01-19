@@ -37,6 +37,7 @@
 #include "illumination.hpp"             //
 #include "items.hpp"                    // for Items
 #include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
+#include "liquid_engine.hpp"            // for LiquidPhysicsEngine
 #include "logger.h"                     // for DEBUG
 #include "math.hpp"                     // for AABB
 #include "memory.hpp"                   // for write_mem_prot, write_mem_recoverable

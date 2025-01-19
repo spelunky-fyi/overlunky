@@ -17,6 +17,7 @@
 #include "illumination.hpp"       // IWYU pragma: keep
 #include "items.hpp"              // for Items, SelectPlayerSlot, Items::is...
 #include "level_api.hpp"          // IWYU pragma: keep
+#include "liquid_engine.hpp"      // for LiquidPhysicsEngine
 #include "online.hpp"             // for OnlinePlayer, OnlineLobby, Online
 #include "prng.hpp"               // IWYU pragma: keep
 #include "rpc.hpp"                // for waddler_count_entity ...
@@ -676,5 +677,10 @@ void register_usertypes(sol::state& lua)
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
     /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
     lua["update_state"] = update_state;
+    /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+    /// The patch however does not destroy the liquids that fall pass the level bounds,
+    /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
+    lua["fix_liquid_out_of_bounds"] = []()
+    { HeapBase::get().liquid_physics()->remove_liquid_oob()/**/; };
 }
 }; // namespace NState

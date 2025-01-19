@@ -45,6 +45,7 @@
 #include "illumination.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
+#include "liquid_engine.hpp"
 #include "logger.h"
 #include "math.hpp"
 #include "savedata.hpp"
@@ -54,6 +55,7 @@
 #include "socket.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
+#include "state_structs.hpp"
 #include "steam_api.hpp"
 #include "version.hpp"
 #include "window_api.hpp"

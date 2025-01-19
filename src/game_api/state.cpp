@@ -19,6 +19,7 @@
 #include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
 #include "level_api.hpp"                         // for LevelGenSystem, LevelGenSystem::(ano...
+#include "liquid_engine.hpp"                     // for LiquidPhysicsEngine
 #include "logger.h"                              // for DEBUG
 #include "memory.hpp"                            // for write_mem_prot, memory_read
 #include "movable.hpp"                           // for Movable

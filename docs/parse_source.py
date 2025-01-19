@@ -127,6 +127,7 @@ header_files = [
     "../src/game_api/socket.hpp",
     "../src/game_api/savestate.hpp",
     "../src/game_api/game_patches.hpp",
+    "../src/game_api/liquid_engine.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
