@@ -2513,6 +2513,7 @@ float | [credits_progression](https://github.com/spelunky-fyi/overlunky/search?l
 
 ### ScreenDeath
 
+The POST render call will only be visible in the polaroid area on the left of the book. The Journal is drawn on top of that.
 Derived from [Screen](#Screen)
 
 
