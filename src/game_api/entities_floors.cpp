@@ -782,9 +782,8 @@ void Door::unlock(bool unlock)
                     // there is locked door sprite in both textures, so we don't mess with it and just use animation_frame when locking back up
                     // added example in the API doc on how to do the texture correctly for the other variant
                     if (unlock && item->get_texture() == 202) // TEXTURE.DATA_TEXTURES_DECO_EGGPLANT_0
-                    {
-                        item->set_texture(200); // TEXTURE.DATA_TEXTURES_FLOOR_SUNKEN_3
-                    }
+                        item->set_texture(200);               // TEXTURE.DATA_TEXTURES_FLOOR_SUNKEN_3
+
                     break;
                 }
             }
@@ -830,13 +829,9 @@ void Door::unlock(bool unlock)
     else if (ent_type == eggchild_room_door)
     {
         if (unlock)
-        {
             this->set_invisible(false);
-        }
         else
-        {
             this->set_invisible(true);
-        }
     }
     else if (ent_type >= eggship_door && ent_type < eggship_door + 3) // DOOR_EGGSHIP, DOOR_EGGSHIP_ATREZZO, DOOR_EGGSHIP_ROOM
     {
@@ -853,7 +848,6 @@ void Door::unlock(bool unlock)
                 if (ent->type->id == eggship_fx_door)
                 {
                     ent->animation_frame = unlock ? 15 : 2;
-
                     break;
                 }
             }

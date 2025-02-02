@@ -6762,6 +6762,7 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     ---@field count integer @Number of API instances present
+    ---@field custom_strings table<STRINGID, string> @Holds all the custom strings added thru [add_string](#add_string), read only 
 
 ---@class Color
     ---@field r number

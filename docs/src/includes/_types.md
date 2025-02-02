@@ -612,6 +612,7 @@ map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search
 [PauseAPI](#PauseAPI) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | [PauseAPI](#PauseAPI) is used by [Overlunky](#Overlunky) and can be used to control the [Overlunky](#Overlunky) pause options from scripts. Can be accessed from the global `pause` more easily.
 [SharedIO](#SharedIO) | [io](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=io) | Shared part of [ImGuiIO](#ImGuiIO) to block keyboard/mouse input across API instances.
 int | [count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) | Number of API instances present
+map&lt;[STRINGID](#Aliases), string&gt; | [custom_strings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=custom_strings) | Holds all the custom strings added thru [add_string](#add_string), read only 
 
 ### Color
 
