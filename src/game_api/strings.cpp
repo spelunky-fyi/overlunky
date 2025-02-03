@@ -38,8 +38,13 @@ void on_shopitemnameformat(Entity* item, char16_t* buffer)
     if (items_stringid >= g_original_string_ids_end)
     {
         const STRINGID buy_stringid = hash_to_stringid(0x21683743); // get id of the "Buy %s" text
-        constexpr auto buffer_size = 0x800;                         // TODO: maybe add check if the buffer size is to small?
 
+        constexpr auto buffer_size = 0x800; // game allocates 0x1000 on stack, then uses pointer to it and 0x800 and calls __stdio_common_vswprintf (according to the x64dbg)
+                                            // the MS documentation for this states that the size is supposedly in bytes, not in characters
+                                            // documentation of the _vswprintf says that it takes number of characters, just like the swprintf_s that we use here
+                                            // so should we now use 0x800 or 0x400 as size here? who knows
+
+        // TODO: maybe add check if the buffer size is to small?
         swprintf_s((wchar_t*)buffer, buffer_size, (wchar_t*)get_string(buy_stringid), get_string(items_stringid));
         return;
     }
