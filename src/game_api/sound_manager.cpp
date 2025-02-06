@@ -1194,7 +1194,7 @@ CustomEventDescription SoundManager::get_event_description_by_id(FMODStudio::FMO
     {
         return CustomEventDescription{fmod_event, this};
     }
-    DEBUG("Could not get event for GUID {{{:X}-{:X}-{:X}-{:X}{:X}-{:X}{:X}{:X}{:X}{:X}{:X}}}",
+    DEBUG("Could not get event for GUID {{{:08X}-{:04X}-{:04X}-{:02X}{:02X}-{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}}}",
         guid->Data1,
         guid->Data2,
         guid->Data3,
