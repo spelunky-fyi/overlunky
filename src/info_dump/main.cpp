@@ -974,7 +974,7 @@ void get_vtables()
         {
             if (it.id)
             {
-                const size_t record = (size_t) * (offsets.begin() + idx);
+                const size_t record = (size_t)*(offsets.begin() + idx);
                 const auto vtable_b = vtable_off + record;
 
                 file << std::dec << it.id << "," << it.name
@@ -1060,7 +1060,7 @@ void to_json(float_json& j, const EntityDB& ent)
 void to_json(float_json& j, const Texture& tex)
 {
     j = float_json{
-        {"path", *tex.name},
+        {"path", tex.default_texture->name},
         {"width", tex.width},
         {"height", tex.height},
         {"num_tiles",
@@ -1174,7 +1174,7 @@ void run()
         for (std::size_t i = 0; i < textures_ptr->num_textures; i++)
         {
             Texture& tex = textures_ptr->textures[i];
-            if (tex.name != nullptr)
+            if (tex.default_texture != nullptr)
             {
                 textures[std::to_string(tex.id)] = tex;
             }
@@ -1189,9 +1189,9 @@ void run()
         std::unordered_map<std::string, uint32_t> counts;
         for (auto* tex : get_textures()->texture_map)
         {
-            if (tex != nullptr && tex->name != nullptr)
+            if (tex != nullptr && tex->default_texture != nullptr)
             {
-                std::string clean_tex_name = *tex->name;
+                std::string clean_tex_name = tex->default_texture->name;
                 std::transform(
                     clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
                     { return (unsigned char)std::toupper(c); });

@@ -16,8 +16,8 @@
 #include <vector>       // for vector
 
 #include "entity.hpp"     // for EntityItem, list_entities
+#include "game_api.hpp"   // for Renderer->swap_chain
 #include "logger.h"       // for DEBUG
-#include "render_api.hpp" // for RenderAPI
 #include "search.hpp"     // for preload_addresses, register_application_ve...
 #include "ui.hpp"         // for create_box, init_ui
 #include "version.hpp"    // for get_version
@@ -56,7 +56,7 @@ std::vector<ProcessInfo> get_processes()
         auto name = ppe.szExeFile;
         if (auto delim = strrchr(name, '\\'))
             name = delim;
-        res.push_back({name, ppe.th32ProcessID});
+        res.emplace_back(name, ppe.th32ProcessID);
         proc = Process32Next(snapshot, &ppe);
     }
     return res;
@@ -133,9 +133,9 @@ void run()
         std::this_thread::sleep_for(100ms);
     }
 
-    auto& api = RenderAPI::get();
+    auto api = GameAPI::get();
     init_ui();
-    init_hooks((void*)api.swap_chain());
+    init_hooks((void*)api->renderer->swap_chain);
 }
 
 extern "C" __declspec(dllexport) const char* dll_version()

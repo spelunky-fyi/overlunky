@@ -143,7 +143,7 @@ void register_usertypes(sol::state& lua)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.texture_names[1])) /**/;
+            return ::get_texture(std::string_view(ri.texture_names[1]->name)) /**/;
         },
         "get_third_texture",
         [](const RenderInfo& ri) -> std::optional<TEXTURE>
@@ -152,7 +152,7 @@ void register_usertypes(sol::state& lua)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.texture_names[2])) /**/;
+            return ::get_texture(std::string_view(ri.texture_names[2]->name)) /**/;
         },
         "set_second_texture",
         &RenderInfo::set_second_texture,
