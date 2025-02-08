@@ -38,7 +38,7 @@ struct UnknownRenderStuff
 struct DxBuffer
 {
     ID3D11Buffer* buffer;
-    // potentially another object here?
+    // potentially another object here? or just some allocator weirdness
 
     virtual ~DxBuffer() = 0;
     virtual void func1() = 0; // create buffer?
@@ -226,15 +226,10 @@ struct Renderer
     Vec2 render_offset_x;
 
     float unknown136a;     // probably related to unknown134a
-    float render_zoom_out; // zooms out the rendered part of the game inside the window
+    float render_zoom_out; // probably related to unknown134b, zooms out the rendered part of the game inside the window
 
     ID3DUserDefinedAnnotation* unknown137;
 
-    // a lot of stuff more, total size is 0x81138 bytes
-
-    // somewhere there should be shaders stored
-
-    // added just to have the vtable
     virtual ~Renderer() = 0;
     virtual void some_dx_stuff() = 0; // it actually has a ton of parameters
     virtual void vunknown2() = 0;
@@ -248,6 +243,7 @@ struct Renderer
 
     // 58 or 59 virtuals in total
 };
+static_assert(sizeof(Renderer) == 0x81138);
 
 struct UnknownAPIStuff
 {

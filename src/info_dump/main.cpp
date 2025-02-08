@@ -974,7 +974,7 @@ void get_vtables()
         {
             if (it.id)
             {
-                const size_t record = (size_t)*(offsets.begin() + idx);
+                const size_t record = (size_t) * (offsets.begin() + idx);
                 const auto vtable_b = vtable_off + record;
 
                 file << std::dec << it.id << "," << it.name

@@ -267,14 +267,12 @@ void reload_texture(Resource* texture_name)
 {
     using LoadTextureFunT = void(Renderer*, Resource*);
 
-    auto& render = RenderAPI::get();
-
     // Find this by first finding a function that is called with "loading.DDS" as a first param
     // That function contains a single virtual call (it's done on the render) which is a call
     // to the wanted function
     static constexpr size_t c_LoadTextureVirtualIndex = 0x2E;
 
-    auto renderer_ptr = render.renderer();
+    auto renderer_ptr = GameAPI::get()->renderer;
     auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, c_LoadTextureVirtualIndex);
 
     if (texture_name->dx_resource)
