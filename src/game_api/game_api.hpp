@@ -13,12 +13,11 @@ struct ID3D11DepthStencilState;
 struct ID3DUserDefinedAnnotation;
 struct IDXGIAdapter4;
 struct IDXGISwapChain4;
-struct ID3D11Texture2D;
 struct ID3D11Texture2D1;
 struct ID3D11RasterizerState2;
 struct ID3D11Buffer;
-struct ID3D11ShaderResourceView;
-struct ID3D11RenderTargetView;
+struct ID3D11ShaderResourceView1;
+struct ID3D11RenderTargetView1;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 struct ID3D11InputLayout;
@@ -41,33 +40,35 @@ struct DxBuffer
     // potentially another object here? or just some allocator weirdness
 
     virtual ~DxBuffer() = 0;
-    virtual void func1() = 0; // create buffer?
-    virtual void func2() = 0; // calls some QueryInterface stuff
+    virtual bool func1(uint32_t, bool) = 0; // create buffer?
+    virtual size_t func2() = 0;             // calls some QueryInterface stuff
     virtual void func3() = 0;
     virtual ID3D11Buffer* get_buffer() = 0;
 };
 
 struct DxResource
 {
-    ID3D11Texture2D* dx_id;
-    ID3D11ShaderResourceView* dx_shader;
-    ID3D11RenderTargetView* dx_target_view; // optional object, in TextureDB only used only for keyboard_buttons "texture"
+    ID3D11Texture2D1* dx_id;
+    ID3D11ShaderResourceView1* dx_shader;
+    ID3D11RenderTargetView1* dx_target_view; // optional object, in TextureDB only used only for keyboard_buttons "texture"
 
     // all vtables for textures are identical
     virtual bool unknown1(uint32_t, uint32_t, uint8_t) = 0;
     virtual void release() = 0;  // calls Release on all objects
     virtual void unknown2() = 0; // just return
-    virtual ID3D11RenderTargetView* get_render_target_view() = 0;
-    virtual ID3D11Texture2D* get_dx_id() = 0;
+    virtual ID3D11RenderTargetView1* get_render_target_view() = 0;
+    virtual ID3D11Texture2D1* get_dx_id() = 0;
     virtual ~DxResource() = delete;
 };
 
 struct DxShader
 {
-    size_t unknown; // this is either a vtable with one function, or object with pointer to function as the first element
     ID3D11VertexShader* vertex;
     ID3D11PixelShader* pixel;
     ID3D11InputLayout* layout;
+
+    virtual void set_shader_resource() = 0;
+    virtual ~DxShader() = delete;
 };
 
 struct Renderer
@@ -96,9 +97,9 @@ struct Renderer
     // uint8_t padding[7];
 
     ID3D11BlendState1* unknown1f[5];
-    ID3D11SamplerState* unknown1g[5];
+    ID3D11SamplerState* unknown1g[6];
 
-    DxBuffer* unknown1h[15];
+    DxBuffer* unknown1h[14];
 
     uint32_t unknown2;
     uint32_t unknown3;
@@ -151,7 +152,7 @@ struct Renderer
     size_t unknown69[3];              // probably also vector, but it's null when i checked
     std::vector<Resource*> unknown70; // menu textures?
     std::vector<Resource*> unknown71; // only the ai.dds
-    size_t unknown[8];                // null
+    size_t unknown[8];                // null, two more vectors + some 2 pointers?
 
     uint8_t unknown80;
     uint8_t unknown81;
@@ -166,7 +167,7 @@ struct Renderer
     uint8_t unknown85;
     // uint8_t unknown86[6]; // padding probably
 
-    void* unknown87; // some vtables
+    DxShader* unknown87; // shaders? 99 of them?
 
     bool unknown87a[112]; // probably size 110
 
@@ -174,11 +175,11 @@ struct Renderer
 
     OnHeapPointer<Camera> camera;
 
-    DxShader* unknown87d; // shaders?
+    size_t unknown87d; 
     IDXGIAdapter4* unknown88;
     IDXGISwapChain4* swap_chain;
     void* unknown89; // CID3D11Forwarder ?
-    void* unknown90; // x64dbg claims ID3D11DeviceContext5** but that struct doesn't seam to exist?
+    void* unknown90; // some ID3D11DeviceContext stuff
     size_t unknown91;
     ID3D11Texture2D1* unknown92;
     ID3D11DepthStencilView* unknown93;
