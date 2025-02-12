@@ -470,7 +470,7 @@ bool CustomEventInstance::set_pitch(float pitch)
 {
     return m_SoundManager->set_pitch(*this, pitch);
 }
-std::optional<std::vector<float>> CustomEventInstance::get_pitch()
+std::optional<float> CustomEventInstance::get_pitch()
 {
     return m_SoundManager->get_pitch(*this);
 }
@@ -486,11 +486,11 @@ bool CustomEventInstance::set_volume(float volume)
 {
     return m_SoundManager->set_volume(*this, volume);
 }
-std::optional<std::vector<float>> CustomEventInstance::get_volume()
+std::optional<float> CustomEventInstance::get_volume()
 {
     return m_SoundManager->get_volume(*this);
 }
-std::optional<std::vector<float>> CustomEventInstance::get_parameter_by_name(std::string name)
+std::optional<float> CustomEventInstance::get_parameter_by_name(std::string name)
 {
     return m_SoundManager->get_parameter_by_name(*this, name);
 }
@@ -510,7 +510,7 @@ bool CustomEventInstance::set_parameter_by_name_with_label(std::string name, std
 {
     return m_SoundManager->set_parameter_by_name_with_label(*this, name, label, ignoreseekspeed);
 }
-std::optional<std::vector<float>> CustomEventInstance::get_parameter_by_id(FMODStudio::ParameterId id)
+std::optional<float> CustomEventInstance::get_parameter_by_id(FMODStudio::ParameterId id)
 {
     return m_SoundManager->get_parameter_by_id(*this, id);
 }
@@ -931,7 +931,7 @@ PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, 
     return PlayingSound{instance, this};
 }
 
-CustomBank SoundManager::get_bank(std::string path)
+CustomBank SoundManager::get_bank(std::string path, FMODStudio::LoadBankFlags flags)
 {
     DEBUG("Loading bank file from path {}", path);
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [&path](const Bank& bank)
@@ -942,13 +942,11 @@ CustomBank SoundManager::get_bank(std::string path)
         return CustomBank{ it->fmod_bank, this };
     }
 
-    FMODStudio::LoadBankFlags load_bank_flags = (FMODStudio::LoadBankFlags)(FMODStudio::LoadBankFlags::Nonblocking);
-
     Bank new_bank;
     new_bank.ref_count = 1;
     new_bank.path = std::move(path);
 
-    FMOD::FMOD_RESULT err = m_SystemLoadBankFile(m_FmodStudioSystem, new_bank.path.c_str(), load_bank_flags, &new_bank.fmod_bank);
+    FMOD::FMOD_RESULT err = m_SystemLoadBankFile(m_FmodStudioSystem, new_bank.path.c_str(), flags, &new_bank.fmod_bank);
     if (err != FMOD::FMOD_RESULT::OK)
     {
         DEBUG("Failed loading bank file {}\nFMOD result: {}", new_bank.path, FMOD::ErrStr(err));
@@ -959,9 +957,9 @@ CustomBank SoundManager::get_bank(std::string path)
     m_BankStorage.push_back(std::move(new_bank));
     return CustomBank{ m_BankStorage.back().fmod_bank, this };
 }
-CustomBank SoundManager::get_bank(const char* path)
+CustomBank SoundManager::get_bank(const char* path, FMODStudio::LoadBankFlags flags)
 {
-    return get_bank(std::string{ path });
+    return get_bank(std::string{ path }, flags);
 }
 CustomBank SoundManager::get_existing_bank(std::string_view path)
 {
@@ -1351,23 +1349,21 @@ bool SoundManager::key_off(CustomEventInstance fmod_event_instance)
                    { return false; }},
         fmod_event_instance.m_FmodHandle);
 }
-std::optional<std::vector<float>> SoundManager::get_pitch(CustomEventInstance fmod_event_instance)
+std::optional<float> SoundManager::get_pitch(CustomEventInstance fmod_event_instance)
 {
     return std::visit(
         overloaded{
             [this](FMODStudio::EventInstance* event_instance)
             {
                 float pitch;
-                float finalpitch;
-                if (FMOD_CHECK_CALL(m_EventInstanceGetPitch(event_instance, &pitch, &finalpitch)))
+                if (FMOD_CHECK_CALL(m_EventInstanceGetPitch(event_instance, &pitch, nullptr)))
                 {
-                    auto pitch_arr = std::array<float, 2>{};
-                    return std::optional<std::vector<float>>{{pitch, finalpitch}};
+                    return std::optional<float>{pitch};
                 }
-                return std::optional<std::vector<float>>{};
+                return std::optional<float>{};
             },
             [](std::monostate)
-            { return std::optional<std::vector<float>>{}; }},
+            { return std::optional<float>{}; }},
         fmod_event_instance.m_FmodHandle);
 }
 bool SoundManager::set_pitch(CustomEventInstance fmod_event_instance, float pitch)
@@ -1405,22 +1401,21 @@ bool SoundManager::set_timeline_position(CustomEventInstance fmod_event_instance
                    { return false; }},
         fmod_event_instance.m_FmodHandle);
 }
-std::optional<std::vector<float>> SoundManager::get_volume(CustomEventInstance fmod_event_instance)
+std::optional<float> SoundManager::get_volume(CustomEventInstance fmod_event_instance)
 {
     return std::visit(
         overloaded{
             [this](FMODStudio::EventInstance* event_instance)
             {
                 float volume;
-                float finalvolume;
-                if (FMOD_CHECK_CALL(m_EventInstanceGetVolume(event_instance, &volume, &finalvolume)))
+                if (FMOD_CHECK_CALL(m_EventInstanceGetVolume(event_instance, &volume, nullptr)))
                 {
-                    return std::optional<std::vector<float>>{{volume, finalvolume}};
+                    return std::optional<float>{volume};
                 }
-                return std::optional<std::vector<float>>{};
+                return std::optional<float>{};
             },
             [](std::monostate)
-            { return std::optional<std::vector<float>>{}; }},
+            { return std::optional<float>{}; }},
         fmod_event_instance.m_FmodHandle);
 }
 bool SoundManager::set_volume(CustomEventInstance fmod_event_instance, float volume)
@@ -1432,22 +1427,21 @@ bool SoundManager::set_volume(CustomEventInstance fmod_event_instance, float vol
                    { return false; }},
         fmod_event_instance.m_FmodHandle);
 }
-std::optional<std::vector<float>> SoundManager::get_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name)
+std::optional<float> SoundManager::get_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name)
 {
     return std::visit(
         overloaded{
             [this, name](FMODStudio::EventInstance* event_instance)
             {
                 float value;
-                float finalvalue;
-                if (FMOD_CHECK_CALL(m_EventInstanceGetParameterByName(event_instance, name.c_str(), &value, &finalvalue)))
+                if (FMOD_CHECK_CALL(m_EventInstanceGetParameterByName(event_instance, name.c_str(), &value, nullptr)))
                 {
-                    return std::optional<std::vector<float>>{{value, finalvalue}};
+                    return std::optional<float>{value};
                 }
-                return std::optional<std::vector<float>>{};
+                return std::optional<float>{};
             },
             [](std::monostate)
-            { return std::optional<std::vector<float>>{}; }},
+            { return std::optional<float>{}; }},
         fmod_event_instance.m_FmodHandle);
 }
 bool SoundManager::set_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name, float value, bool ignoreseekspeed)
@@ -1468,22 +1462,21 @@ bool SoundManager::set_parameter_by_name_with_label(CustomEventInstance fmod_eve
                    { return false; }},
         fmod_event_instance.m_FmodHandle);
 }
-std::optional<std::vector<float>> SoundManager::get_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id)
+std::optional<float> SoundManager::get_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id)
 {
     return std::visit(
         overloaded{
             [this, id](FMODStudio::EventInstance* event_instance)
             {
                 float value;
-                float finalvalue;
-                if (FMOD_CHECK_CALL(m_EventInstanceGetParameterByID(event_instance, id, &value, &finalvalue)))
+                if (FMOD_CHECK_CALL(m_EventInstanceGetParameterByID(event_instance, id, &value, nullptr)))
                 {
-                    return std::optional<std::vector<float>>{{value, finalvalue}};
+                    return std::optional<float>{value};
                 }
-                return std::optional<std::vector<float>>{};
+                return std::optional<float>{};
             },
             [](std::monostate)
-            { return std::optional<std::vector<float>>{}; }},
+            { return std::optional<float>{}; }},
         fmod_event_instance.m_FmodHandle);
 }
 bool SoundManager::set_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, float value, bool ignoreseekspeed)

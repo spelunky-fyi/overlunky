@@ -47,11 +47,21 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         return;
     }
 
+    lua.new_enum("FMOD_LOAD_BANK_FLAGS",
+        "NORMAL",
+        FMODStudio::LoadBankFlags::Normal,
+        "NONBLOCKING",
+        FMODStudio::LoadBankFlags::Nonblocking,
+        "DECOMPRESS_SAMPLES",
+        FMODStudio::LoadBankFlags::DecompressSamples,
+        "UNENCRYPTED",
+        FMODStudio::LoadBankFlags::Unencrypted);
+
     /// Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
-    lua["load_bank"] = [](std::string path) -> sol::optional<CustomBank>
+    lua["load_bank"] = [](std::string path, FMODStudio::LoadBankFlags flags) -> sol::optional<CustomBank>
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (CustomBank bank = backend->sound_manager->get_bank((backend->get_root_path() / path).string()))
+        if (CustomBank bank = backend->sound_manager->get_bank((backend->get_root_path() / path).string(), flags))
         {
             return bank;
         }

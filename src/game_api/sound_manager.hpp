@@ -170,9 +170,6 @@ class CustomEventDescription
 
     std::optional<FMODStudio::ParameterDescription> getParameterDescriptionByName(std::string name);
 
-    // TODO probably not worth implementing userdata stuff
-    //bool set_user_data(std::string userdata);
-    //std::string get_user_data();
     bool isValid();
 
   private:
@@ -208,27 +205,22 @@ class CustomEventInstance
     bool key_off();
 
     bool set_pitch(float pitch);
-    std::optional<std::vector<float>> get_pitch();
+    std::optional<float> get_pitch();
     bool set_timeline_position(int position);
     std::optional<int> get_timeline_position();
     bool set_volume(float volume);
-    std::optional<std::vector<float>> get_volume();
+    std::optional<float> get_volume();
     
-    std::optional<std::vector<float>> get_parameter_by_name(std::string name);
+    std::optional<float> get_parameter_by_name(std::string name);
     bool set_parameter_by_name(std::string name, float value);
     bool set_parameter_by_name(std::string name, float value, bool ignoreseekspeed);
     bool set_parameter_by_name_with_label(std::string name, std::string label);
     bool set_parameter_by_name_with_label(std::string name, std::string label, bool ignoreseekspeed);
-    std::optional<std::vector<float>> get_parameter_by_id(FMODStudio::ParameterId id);
+    std::optional<float> get_parameter_by_id(FMODStudio::ParameterId id);
     bool set_parameter_by_id(FMODStudio::ParameterId id, float value);
     bool set_parameter_by_id(FMODStudio::ParameterId id, float value, bool ignoreseekspeed);
     bool set_parameter_by_id_with_label(FMODStudio::ParameterId id, std::string label);
     bool set_parameter_by_id_with_label(FMODStudio::ParameterId id, std::string label, bool ignoreseekspeed);
-
-    // TODO probably not worth implementing?
-    //bool set_callback(SoundCallbackFunction callback);
-    //bool set_user_data(std::string userdata);
-    //std::string get_user_data();
 
     bool release();
     bool is_valid();
@@ -288,8 +280,8 @@ class SoundManager
         return m_IsInit;
     }
 
-    CustomBank get_bank(std::string path);
-    CustomBank get_bank(const char* path);
+    CustomBank get_bank(std::string path, FMODStudio::LoadBankFlags flags);
+    CustomBank get_bank(const char* path, FMODStudio::LoadBankFlags flags);
     CustomBank get_existing_bank(std::string_view path);
     void acquire_bank(FMOD::Bank* fmod_bank);
     std::optional <FMODStudio::LoadingState> get_bank_loading_state(CustomBank custom_bank);
@@ -323,15 +315,15 @@ class SoundManager
     std::optional<bool> get_pause(CustomEventInstance fmod_event_instance);
     bool key_off(CustomEventInstance fmod_event_instance);
     bool set_pitch(CustomEventInstance fmod_event_instance, float pitch);
-    std::optional<std::vector<float>> get_pitch(CustomEventInstance fmod_event_instance);
+    std::optional<float> get_pitch(CustomEventInstance fmod_event_instance);
     bool set_timeline_position(CustomEventInstance fmod_event_instance, int position);
     std::optional<int> get_timeline_position(CustomEventInstance fmod_event_instance);
     bool set_volume(CustomEventInstance fmod_event_instance, float volume);
-    std::optional<std::vector<float>> get_volume(CustomEventInstance fmod_event_instance);
-    std::optional<std::vector<float>> get_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name);
+    std::optional<float> get_volume(CustomEventInstance fmod_event_instance);
+    std::optional<float> get_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name);
     bool set_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name, float value, bool ignoreseekspeed);
     bool set_parameter_by_name_with_label(CustomEventInstance fmod_event_instance, std::string name, std::string label, bool ignoreseekspeed);
-    std::optional<std::vector<float>> get_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id);
+    std::optional<float> get_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id);
     bool set_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, float value, bool ignoreseekspeed);
     bool set_parameter_by_id_with_label(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, std::string label, bool ignoreseekspeed);
     bool release(CustomEventInstance fmod_event_instance);
