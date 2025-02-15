@@ -61,11 +61,7 @@ StateMemory* get_state_ptr()
 }
 void LiquidPhysics::remove_liquid_oob()
 {
-    auto state = HeapBase::get().state();
-    if (!state->liquid_physics)
-        return;
-
-    for (const auto& it : state->liquid_physics->pools)
+    for (const auto& it : pools)
     {
         if (it.physics_engine == nullptr || it.physics_engine->pause_physics)
             continue;
