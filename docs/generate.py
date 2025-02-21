@@ -97,9 +97,12 @@ def format_af(lf, af):
     return fun
 
 
-def print_af(lf, af):
+def print_af(lf, af, deprecated = False):
     fun = format_af(lf, af)
-    print(f"#### {fun}\n")
+    if deprecated:
+        print(f"`{fun}`<br/>")
+    else:
+        print(f"#### {fun}\n")
     comments = af["comment"]
     if comments:
         comment = " ".join(comments)
@@ -108,7 +111,7 @@ def print_af(lf, af):
         print()
 
 
-def print_lf(lf):
+def print_lf(lf, deprecated = False):
     comments = lf["comment"]
     if comments and "NoDoc" in comments[0]:
         return
@@ -120,7 +123,7 @@ def print_lf(lf):
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
     for af in ps.rpcfunc(lf["cpp"]):
-        print_af(lf, af)
+        print_af(lf, af, deprecated)
     for com in comments:
         com = link_custom_type(com)
         print(com)
@@ -552,7 +555,7 @@ for lf in ps.events:
 for lf in ps.deprecated_funcs:
     lf["comment"].pop(0)
     if len(ps.rpcfunc(lf["cpp"])):
-        print_lf(lf)
+        print_lf(lf, True)
     elif not (lf["name"].startswith("on_") or lf["name"] in ps.not_functions):
         if lf["comment"] and "NoDoc" in lf["comment"][0]:
             continue
