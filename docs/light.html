@@ -6816,44 +6816,52 @@ Set level flag 18 on post room generation instead, to properly force every level
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities">get_entities</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities'>vector&lt;int&gt; get_entities()</h4>
-<p>Use <code>get_entities_by(0, MASK.ANY, LAYER.BOTH)</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities()</code><br/>
+Use <code>get_entities_by(0, MASK.ANY, LAYER.BOTH)</code> instead</p>
 <h3 id='get_entities_by_mask'>get_entities_by_mask</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_mask">get_entities_by_mask</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities_by_mask-int-mask'>vector&lt;int&gt; get_entities_by_mask(int mask)</h4>
-<p>Use <code>get_entities_by(0, mask, LAYER.BOTH)</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities_by_mask(int mask)</code><br/>
+Use <code>get_entities_by(0, mask, LAYER.BOTH)</code> instead</p>
 <h3 id='get_entities_by_layer'>get_entities_by_layer</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_layer">get_entities_by_layer</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities_by_layer-LAYER-layer'>vector&lt;int&gt; get_entities_by_layer(<a href="#LAYER">LAYER</a> layer)</h4>
-<p>Use <code>get_entities_by(0, MASK.ANY, layer)</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities_by_layer([LAYER](#LAYER) layer)</code><br/>
+Use <code>get_entities_by(0, MASK.ANY, layer)</code> instead</p>
 <h3 id='get_entities_overlapping'>get_entities_overlapping</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_overlapping">get_entities_overlapping</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities_overlapping-array-lt-ENT_TYPE-gt-entity_types-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='vector-lt-int-gt-get_entities_overlapping-ENT_TYPE-entity_type-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4>
-<p>Use <code>get_entities_overlapping_hitbox</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities_overlapping(array&lt;[ENT_TYPE](#ENT_TYPE)&gt; entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)</code><br/>
+<code>vector&amp;lt;int&amp;gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)</code><br/>
+Use <code>get_entities_overlapping_hitbox</code> instead</p>
 <h3 id='get_entity_ai_state'>get_entity_ai_state</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_ai_state">get_entity_ai_state</a></p>
 </blockquote>
-<h4 id='int-get_entity_ai_state-int-uid'>int get_entity_ai_state(int uid)</h4>
-<p>As the name is misleading. use <a href="#Movable">Movable</a>.<code>move_state</code> field instead</p>
+
+<p><code>int get_entity_ai_state(int uid)</code><br/>
+As the name is misleading. use <a href="#Movable">Movable</a>.<code>move_state</code> field instead</p>
 <h3 id='set_arrowtrap_projectile'>set_arrowtrap_projectile</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_arrowtrap_projectile">set_arrowtrap_projectile</a></p>
 </blockquote>
-<h4 id='nil-set_arrowtrap_projectile-ENT_TYPE-regular_entity_type-ENT_TYPE-poison_entity_type'>nil set_arrowtrap_projectile(<a href="#ENT_TYPE">ENT_TYPE</a> regular_entity_type, <a href="#ENT_TYPE">ENT_TYPE</a> poison_entity_type)</h4>
-<p>Use <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.ARROWTRAP_WOODENARROW, new_arrow_type) and <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead</p>
+
+<p><code>nil set_arrowtrap_projectile([ENT_TYPE](#ENT_TYPE) regular_entity_type, [ENT_TYPE](#ENT_TYPE) poison_entity_type)</code><br/>
+Use <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.ARROWTRAP_WOODENARROW, new_arrow_type) and <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead</p>
 <h3 id='set_blood_multiplication'>set_blood_multiplication</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_blood_multiplication">set_blood_multiplication</a></p>
 </blockquote>
-<h4 id='nil-set_blood_multiplication-int-default_multiplier-int-vladscape_multiplier'>nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)</h4>
-<p>This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
+
+<p><code>nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)</code><br/>
+This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 <code>default_multiplier</code> doesn&#39;t do anything due to some changes in last game updates, <code>vladscape_multiplier</code> only changes the multiplier to some entities death&#39;s blood spit</p>
 <h3 id='setflag'>setflag</h3>
 <blockquote>
@@ -7094,8 +7102,9 @@ Use this only when no other approach works, this call can be expensive if overus
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generate_particles">generate_particles</a></p>
 </blockquote>
-<h4 id='ParticleEmitterInfo-generate_particles-PARTICLEEMITTER-particle_emitter_id-int-uid'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_particles(<a href="#PARTICLEEMITTER">PARTICLEEMITTER</a> particle_emitter_id, int uid)</h4>
-<p>Use <code>generate_world_particles</code></p>
+
+<p><code>[ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)</code><br/>
+Use <code>generate_world_particles</code></p>
 <h3 id='draw_line'>draw_line</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_line">draw_line</a></p>
