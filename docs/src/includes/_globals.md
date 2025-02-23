@@ -2274,6 +2274,7 @@ Current mouse cursor position in screen coordinates.
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, int uid)
 
 Creates a new [Illumination](#Illumination). Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+Warning: this is only valid for current level!
 
 ### refresh_illumination
 
