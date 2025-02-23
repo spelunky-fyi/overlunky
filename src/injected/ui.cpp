@@ -2019,6 +2019,8 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
         g_game_manager->game_props->input_index[0] = 0;
     if (g_game_manager->game_props->input_index[4] == -1)
         g_game_manager->game_props->input_index[4] = 0;
+
+    g_game_manager->screen_menu->loaded_once = true;
 }
 
 void restart_adventure()
