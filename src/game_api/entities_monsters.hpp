@@ -1,13 +1,13 @@
 #pragma once
 
+#include <cstdint>
+
 #include "containers/custom_set.hpp"
 #include "containers/custom_vector.hpp"
 #include "entities_chars.hpp"
 #include "movable.hpp"
 #include "particles.hpp"
 #include "sound_manager.hpp"
-
-#include <cstdint>
 
 class Monster : public PowerupCapable
 {

@@ -27,17 +27,17 @@
 #include "savestate.hpp"             // for copy_save_slot
 #include "search.hpp"                //
 #include "spawn_api.hpp"             // for spawn_liquid, spawn_companion
-#include "state.hpp"                 // for State, StateMemory
+#include "state.hpp"                 // for StateMemory
 #include "state_structs.hpp"         // for Camera, Illumination (ptr only)
 #include "steam_api.hpp"             // for disable_steam_achievements, ena...
 
 void UI::godmode(bool g)
 {
-    State::get().godmode(g);
+    API::godmode(g);
 }
 void UI::godmode_companions(bool g)
 {
-    State::get().godmode_companions(g);
+    API::godmode_companions(g);
 }
 void UI::death_enabled(bool g)
 {
@@ -45,35 +45,35 @@ void UI::death_enabled(bool g)
 }
 std::pair<float, float> UI::click_position(float x, float y)
 {
-    return State::click_position(x, y);
+    return API::click_position(x, y);
 }
 void UI::zoom(float level)
 {
-    State::get().zoom(level);
+    API::zoom(level);
 }
 void UI::zoom_reset()
 {
-    State::get().zoom_reset();
+    API::zoom_reset();
 }
 uint32_t UI::get_frame_count()
 {
-    return State::get().get_frame_count();
+    return HeapBase::get().frame_count();
 }
 void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 {
-    static auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
 
     if (state->items->player_inventories[0].health == 0)
         state->items->player_inventories[0].health = 4;
 
-    State::get().warp(world, level, theme);
+    HeapBase::get().state()->warp(world, level, theme);
 }
 void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
 {
-    auto state = State::get().ptr_main();
+    auto state = HeapBase::get().state();
     if (state->screen != 12)
     {
-        State::get().warp(world, level, theme);
+        state->warp(world, level, theme);
         return;
     }
     state->world_next = world;
@@ -115,8 +115,7 @@ void teleport_entity(Entity* ent, float dx, float dy, bool s, float vx, float vy
     {
         // screen coordinates -1..1
         // log::debug!("Teleporting to screen {}, {}", x, y);
-        auto& state = State::get();
-        auto [x_pos, y_pos] = state.click_position(dx, dy);
+        auto [x_pos, y_pos] = API::click_position(dx, dy);
         if (snap && abs(vx) + abs(vy) <= 0.04f)
         {
             x_pos = round(x_pos);
@@ -150,27 +149,25 @@ void UI::teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy
 }
 void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto state = State::get().ptr_main();
+    auto state = HeapBase::get().state();
 
-    auto player = state->items->player(0);
+    auto player = state->items->players[0];
     if (player == nullptr)
         return;
     teleport_entity(player, x, y, s, vx, vy, snap);
 }
 std::pair<float, float> UI::screen_position(float x, float y)
 {
-    return State::screen_position(x, y);
+    return API::screen_position(x, y);
 }
 float UI::screen_distance(float x)
 {
-    auto a = State::screen_position(0, 0);
-    auto b = State::screen_position(x, 0);
+    auto a = API::screen_position(0, 0);
+    auto b = API::screen_position(x, 0);
     return b.x - a.x;
 }
 Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
 {
-    auto& state = State::get();
-
     static const auto masks_order = {
         0x1,    // Player
         0x2,    // Mount
@@ -190,7 +187,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     };
     if (s)
     {
-        std::tie(x, y) = state.click_position(x, y);
+        std::tie(x, y) = API::click_position(x, y);
     }
     Entity* current_entity = nullptr;
     float current_distance = radius;
@@ -204,10 +201,10 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
             current_distance = distance;
         }
     };
-
+    auto state = HeapBase::get().state();
     if (mask == 0)
     {
-        for (auto& item : state.layer(state.ptr_main()->camera_layer)->all_entities.entities())
+        for (auto& item : state->layers[state->camera_layer]->all_entities.entities())
         {
             check_distance(item);
         }
@@ -219,8 +216,8 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
             if ((mask & current_mask) == 0)
                 continue;
 
-            const auto& entities = state.layer(state.ptr_main()->camera_layer)->entities_by_mask.find(current_mask);
-            if (entities == state.layer(state.ptr_main()->camera_layer)->entities_by_mask.end())
+            const auto& entities = state->layers[state->camera_layer]->entities_by_mask.find(current_mask);
+            if (entities == state->layers[state->camera_layer]->entities_by_mask.end())
                 continue;
 
             for (auto& item : entities->second.entities())
@@ -240,11 +237,11 @@ void UI::move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy,
 }
 SaveData* UI::savedata()
 {
-    return State::get().savedata();
+    return get_game_manager()->save_related->savedata.decode();
 }
 int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
 
     if (!s)
     {
@@ -256,12 +253,12 @@ int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float v
 }
 int32_t UI::spawn_grid(ENT_TYPE entity_type, float x, float y, uint8_t layer)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
     return state->layers[layer]->spawn_entity(entity_type, x, y, false, 0, 0, false)->uid;
 }
 int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
     x += state->camera->focus_x;
     y += state->camera->focus_y;
 
@@ -271,7 +268,7 @@ int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 }
 void UI::spawn_backdoor(float x, float y)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
     x += state->camera->focus_x;
     y += state->camera->focus_y;
 
@@ -344,7 +341,7 @@ ENT_TYPE UI::get_entity_type(int32_t uid)
 }
 std::vector<Player*> UI::get_players()
 {
-    return ::get_players(State::get().ptr_main());
+    return HeapBase::get().state()->get_players();
 }
 int32_t UI::get_grid_entity_at(float x, float y, LAYER l)
 {
@@ -388,13 +385,11 @@ std::pair<float, float> UI::get_room_pos(uint32_t x, uint32_t y)
 }
 std::string_view UI::get_room_template_name(uint16_t room_template)
 {
-    const auto state = State::get().ptr_main();
-    return state->level_gen->get_room_template_name(room_template);
+    return HeapBase::get().level_gen()->get_room_template_name(room_template);
 }
 std::optional<uint16_t> UI::get_room_template(uint32_t x, uint32_t y, uint8_t l)
 {
-    const auto state = State::get().ptr_main();
-    return state->level_gen->get_room_template(x, y, l);
+    return HeapBase::get().level_gen()->get_room_template(x, y, l);
 }
 void UI::steam_achievements(bool on)
 {
@@ -475,7 +470,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
     if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
-    auto state = State::get().ptr_main();
+    auto state = HeapBase::get().state();
     if (test_flag(state->special_visibility_flags, 1))
     {
         for (auto item : entity_get_items_by(floor->uid, 0, 0x8))
@@ -687,7 +682,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         {
             if (check && in_array(check->type->id, olmecs))
             {
-                auto state = State::get().ptr();
+                auto state = HeapBase::get().state();
                 if (state->logic->olmec_cutscene)
                 {
                     // if cutscene is still running, perform the last frame of cutscene before killing olmec
@@ -838,7 +833,8 @@ void UI::spawn_player(uint8_t player_slot, std::optional<float> x, std::optional
 
 std::pair<float, float> UI::spawn_position()
 {
-    return {State::get().ptr()->level_gen->spawn_x, State::get().ptr()->level_gen->spawn_y};
+    auto level_gen = HeapBase::get().level_gen();
+    return {level_gen->spawn_x, level_gen->spawn_y};
 }
 
 void UI::load_death_screen()
@@ -886,9 +882,14 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
     ::set_adventure_seed(first, second);
 }
 
-void UI::copy_state(int from, int to)
+void UI::load_state_as_main(int from)
 {
-    ::copy_save_slot(from, to);
+    SaveState::restore_main(from);
+}
+
+void UI::save_main_state(int to)
+{
+    SaveState::backup_main(to);
 }
 
 StateMemory* UI::get_save_state(int slot)

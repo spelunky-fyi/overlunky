@@ -290,7 +290,7 @@ class Entity
     virtual void generate_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool killing) = 0; // 8, contact dmg
     virtual float get_type_field_a8() = 0;                                                        // 9
     virtual bool can_be_pushed() = 0;                                                             // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
-    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons)
+    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons), theme procedural spawn uses this
     /// Returns true if entity is in water/lava
     virtual bool is_in_liquid() = 0;                                  // 12, drill always returns false
     virtual bool check_type_properties_flags_19() = 0;                // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger

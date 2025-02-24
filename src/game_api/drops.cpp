@@ -5,9 +5,9 @@
 #include <string_view> //
 #include <utility>     // for min, max
 
-#include "entity.hpp" // for to_id
-#include "memory.hpp" // for Memory, recover_mem, write_mem_recoverable
-#include "search.hpp" // for find_inst
+#include "entity_db.hpp" // for to_id
+#include "memory.hpp"    // for Memory, recover_mem, write_mem_recoverable
+#include "search.hpp"    // for find_inst
 
 std::vector<DropEntry> drop_entries{
     {"ALTAR_DICE_CLIMBINGGLOVES", "\xBA\x0D\x02\x00\x00\xEB\x05"sv, VTABLE_OFFSET::NONE, 0, 1}, // VTABLE_OFFSET::FLOOR_ALTAR, 26
