@@ -39,6 +39,8 @@ void register_usertypes(sol::state& lua)
         &PowerupCapable::unequip_backitem,
         "worn_backitem",
         &PowerupCapable::worn_backitem,
+        "set_jetpack_fuel",
+        &Player::set_jetpack_fuel,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -121,7 +123,6 @@ void register_usertypes(sol::state& lua)
     player_type["coyote_timer"] = &Player::coyote_timer;
     player_type["swim_timer"] = &Player::swim_timer;
     player_type["hired_hand_name"] = &Player::hired_hand_name;
-    player_type["set_jetpack_fuel"] = &Player::set_jetpack_fuel;
     player_type["kapala_blood_amount"] = &Player::kapala_blood_amount;
     player_type["get_name"] = &Player::get_name;
     player_type["get_short_name"] = &Player::get_short_name;

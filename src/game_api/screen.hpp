@@ -651,10 +651,12 @@ class ScreenTransition : public Screen // ID: 13
     TextureRenderingInfo big_dollar_sign;
     TextureRenderingInfo unknown26;
 
-    char16_t string_buffer[130]; // UTF16 string
-    uint32_t stats_scroll_unfurl_sequence;
-    uint32_t unknown30;
-    uint32_t unknown31;
+    char16_t string_buffer[130];           // UTF16 string
+    uint32_t stats_scroll_unfurl_sequence; // many times treated as 16 bit
+    int32_t unknown30;                     // number used for the counting effect (for ex. compares it to the kill_level and if it's different it plays the sound and all and increments the player_stats_scroll_numeric_value
+    bool showing_stats;                    // just a guess
+    bool counting_money;                   // just a guess
+    // uint16_t padding probably
 
     std::array<int32_t, MAX_PLAYERS> player_stats_scroll_numeric_value;
     std::array<TextureRenderingInfo, MAX_PLAYERS> player_secondary_icon;
@@ -682,7 +684,6 @@ class ScreenTransition : public Screen // ID: 13
     std::array<uint8_t, MAX_PLAYERS> buttons;
 };
 
-/// The POST render call will only be visible in the polaroid area on the left of the book. The book is apparently drawn on top of that.
 class ScreenDeath : public Screen // ID: 14
 {
   public:

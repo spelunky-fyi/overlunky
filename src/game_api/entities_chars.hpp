@@ -92,6 +92,7 @@ class PowerupCapable : public Movable
     void unequip_backitem();
     /// Returns the uid of the currently worn backitem, or -1 if wearing nothing
     int32_t worn_backitem();
+    void set_jetpack_fuel(uint8_t fuel) const;
 
     /// only triggers when entity has kapala
     virtual bool on_blood_collision() = 0;
@@ -128,7 +129,6 @@ class Player : public PowerupCapable
     uint8_t timer_since_last_jump; // something different happens before or after 6
     uint8_t can_use;               // is compared with bit numbers, so probably flags
 
-    void set_jetpack_fuel(uint8_t fuel);
     uint8_t kapala_blood_amount();
 
     void set_name(std::u16string name);
