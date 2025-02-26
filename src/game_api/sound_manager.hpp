@@ -291,9 +291,6 @@ class SoundManager
     bool unload_bank(FMOD::Bank* fmod_bank);
     bool bank_is_valid(CustomBank custom_bank);
 
-    bool is_valid_hex_string(const std::string& str);
-    bool is_valid_guid_string(const std::string& str);
-
     FMODpathGUIDmap create_fmod_path_guid_map(std::string_view path);
     CustomEventDescription pathguidmap_lookup_event_id_by_path(FMODpathGUIDmap map, std::string path);
 
