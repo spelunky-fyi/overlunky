@@ -1,20 +1,5 @@
 #include "prng.hpp"
 
-#include "state.hpp" // for State
-
-PRNG& PRNG::get_main()
-{
-    const auto& state = State::get();
-    static PRNG* prng = (PRNG*)((size_t)state.ptr_main() - 0xb0);
-    return *prng;
-}
-PRNG& PRNG::get_local()
-{
-    const auto& state = State::get();
-    PRNG* prng = (PRNG*)((size_t)state.ptr_local() - 0xb0);
-    return *prng;
-}
-
 void PRNG::seed(int64_t seed)
 {
     auto next_pair = [useed = static_cast<uint64_t>(seed)]() mutable

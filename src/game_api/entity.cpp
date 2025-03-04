@@ -15,15 +15,16 @@
 
 #include "containers/custom_map.hpp" // for custom_map
 #include "entities_chars.hpp"        // for Player
-#include "entities_monsters.hpp"     //
+#include "entities_monsters.hpp"     // for MegaJellyfish
 #include "entity_hooks_info.hpp"     // for EntityHooksInfo
-#include "entity_lookup.hpp"         //
+#include "entity_lookup.hpp"         // for get_proper_types
+#include "heap_base.hpp"             // for HeapBase
 #include "memory.hpp"                // for write_mem_prot
 #include "movable.hpp"               // for Movable
 #include "movable_behavior.hpp"      // for MovableBehavior
 #include "render_api.hpp"            // for RenderInfo
 #include "search.hpp"                // for get_address
-#include "state.hpp"                 // for State, StateMemory, enum_to_layer
+#include "state.hpp"                 // for StateMemory
 #include "state_structs.hpp"         // for LiquidPhysicsEngine
 #include "texture.hpp"               // for get_texture, Texture
 #include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...
@@ -36,20 +37,20 @@ void Entity::set_layer(LAYER layer_to)
     if (layer == dest_layer)
         return;
 
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     if (this != this->topmost_mount())
         this->topmost_mount()->set_layer(layer_to);
 
     if (layer == 0 || layer == 1)
     {
-        auto ptr_from = state.ptr()->layers[layer];
+        auto ptr_from = state->layers[layer];
 
         using RemoveFromLayer = void(Layer*, Entity*);
         static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
         remove_from_layer(ptr_from, this);
     }
 
-    auto ptr_to = state.ptr()->layers[dest_layer];
+    auto ptr_to = state->layers[dest_layer];
 
     using AddToLayer = void(Layer*, Entity*);
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
@@ -63,7 +64,7 @@ void Entity::set_layer(LAYER layer_to)
 
 void Entity::apply_layer()
 {
-    auto ptr_to = State::get().ptr()->layers[layer];
+    auto ptr_to = HeapBase::get().state()->layer(layer);
 
     using AddToLayer = void(Layer*, Entity*);
     static AddToLayer* add_to_layer = (AddToLayer*)get_address("add_to_layer");
@@ -79,8 +80,8 @@ void Entity::remove()
 {
     if (layer != 2)
     {
-        auto& state = State::get();
-        auto ptr_from = state.ptr()->layers[layer];
+        auto state = HeapBase::get().state();
+        auto ptr_from = state->layers[layer];
         if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
         {
             using RemoveFromLayer = void(Layer*, Entity*);
@@ -146,7 +147,7 @@ Vec2 Entity::get_absolute_velocity() const
     }
     else if (is_liquid())
     {
-        auto liquid_engine = State::get().get_correct_liquid_engine(type->id);
+        auto liquid_engine = HeapBase::get().liquid_physics()->get_correct_liquid_engine(type->id);
         velocity.x = liquid_engine->entity_velocities->x;
         velocity.y = liquid_engine->entity_velocities->y;
     }
@@ -236,10 +237,7 @@ void Entity::set_enable_turning(bool enabled)
 
 Entity* get_entity_ptr(uint32_t uid)
 {
-    auto p = State::find(State::get().ptr(), uid);
-    // if (IsBadWritePtr(p, 0x178))
-    //     return nullptr;
-    return p;
+    return HeapBase::get().state()->get_entity(uid);
 }
 
 std::vector<uint32_t> Movable::get_all_behaviors()
@@ -321,8 +319,9 @@ void Movable::set_position(float to_x, float to_y)
         rendering_info->x_dupe4 += dx;
         rendering_info->y_dupe4 += dy;
     }
-    if (State::get().ptr()->camera->focused_entity_uid == uid)
-        State::get().set_camera_position(dx, dy);
+    auto camera = HeapBase::get().state()->camera;
+    if (camera->focused_entity_uid == uid)
+        camera->set_position(dx, dy);
 }
 
 template <typename F>

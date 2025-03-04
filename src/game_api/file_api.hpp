@@ -1,11 +1,10 @@
 #pragma once
 
-#include <cstdint>
-#include <cstdlib>
-#include <string>
-#include <string_view>
-
-#include <Windows.h>
+#include <cstddef>     // for size_t
+#include <cstdlib>     // for malloc
+#include <d3d11.h>     // for ID3D11ShaderResourceView
+#include <string>      // for string
+#include <string_view> // string_view
 
 using AllocFun = decltype(malloc);
 

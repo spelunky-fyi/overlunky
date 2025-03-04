@@ -2,16 +2,17 @@
 
 #include <atomic>
 #include <chrono>
+#include <string>
+#include <string_view>
 
-#include <d3d11.h>
 #include <detours.h>
 
-#include "containers/game_allocator.hpp"
-
-#include "memory.hpp"
-#include "render_api.hpp"
-#include "util.hpp"
-#include "window_api.hpp"
+#include "color.hpp"                     // for Color
+#include "containers/game_allocator.hpp" // game_malloc
+#include "render_api.hpp"                // for RenderAPI
+#include "search.hpp"                    // for get_address
+#include "util.hpp"                      // for OnScopeExit
+#include "window_api.hpp"                // for get_device
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -56,7 +57,7 @@ MakeSavePathCallback g_MakeSavePathCallback{nullptr};
 
 std::string hash_path(std::string_view path)
 {
-    auto abs_path = std::filesystem::absolute(path).make_preferred();
+    auto& abs_path = std::filesystem::absolute(path).make_preferred();
     auto abs_path_str = abs_path.string();
     uint64_t res = 10000019;
     int i = 0;

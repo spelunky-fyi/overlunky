@@ -12,8 +12,8 @@
 
 #include "bucket.hpp"
 #include "logger.h"
-#include "memory.hpp"
 #include "script/lua_backend.hpp"
+#include "search.hpp"
 #include "state.hpp"
 
 bool detect_wine()
@@ -132,7 +132,7 @@ LRESULT CALLBACK hkWndProc(HWND window, UINT message, WPARAM wParam, LPARAM lPar
     /*if (bucket->io->WantCaptureKeyboard.value_or(false) && (message == WM_KEYDOWN || message == WM_KEYUP))
         consumed_input = true;*/
 
-    if (get_forward_events() && bucket->io->WantCaptureMouse.value_or(false) && message >= WM_LBUTTONDOWN && message <= WM_MOUSEWHEEL)
+    if (API::get_forward_events() && bucket->io->WantCaptureMouse.value_or(false) && message >= WM_LBUTTONDOWN && message <= WM_MOUSEWHEEL)
         consumed_input = true;
 
     if (!consumed_input)
@@ -267,7 +267,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
 
     if (bucket->count > 1)
     {
-        if (!get_forward_events())
+        if (!API::get_forward_events())
         {
             bucket->io->WantCaptureMouse = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow) && g.HoveredWindow && strcmp(g.HoveredWindow->Name, "Clickhandler");
             bucket->io->WantCaptureKeyboard = ImGui::GetIO().WantCaptureKeyboard;
@@ -338,7 +338,7 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
         g_PostDrawCallback();
     }
 
-    if (get_forward_events() || bucket->count == 1)
+    if (API::get_forward_events() || bucket->count == 1)
     {
         bucket->io->WantCaptureKeyboard = std::nullopt;
         bucket->io->WantCaptureMouse = std::nullopt;
