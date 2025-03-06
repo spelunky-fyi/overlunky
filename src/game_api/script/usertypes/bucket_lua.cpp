@@ -67,6 +67,9 @@ void register_usertypes(sol::state& lua)
     bucket_type["pause"] = &Bucket::pause_api;
     bucket_type["io"] = &Bucket::io;
     bucket_type["count"] = sol::readonly(&Bucket::count);
+    /// Holds all the custom strings added thru [add_string](#add_string), read only
+    bucket_type["custom_strings"] = sol::property([](Bucket& bucket) -> std::unordered_map<STRINGID, std::u16string>
+                                                  { return bucket.custom_strings; });
 
     /// Returns the Bucket of data stored in shared memory between Overlunky and Playlunky
     // lua["get_bucket"] = []() -> Bucket*

@@ -12,6 +12,7 @@
 #include <unordered_map> // for unordered_map, _Umap_traits...
 #include <utility>       // for max, min, pair
 
+#include "bucket.hpp"                    // for Bucket
 #include "constants.hpp"                 //
 #include "containers/game_allocator.hpp" // for game_free, game_malloc
 #include "detours.h"                     // for DetourAttach, DetourTransac...
@@ -23,25 +24,27 @@
 #include "virtual_table.hpp"             // for get_virtual_function_address
 
 static STRINGID g_original_string_ids_end{std::numeric_limits<STRINGID>::max()};
-std::unordered_map<STRINGID, std::u16string> g_custom_strings;
-std::unordered_map<uint32_t, STRINGID> g_custom_shopitem_names;
 
 using OnShopItemNameFormatFun = void(Entity*, char16_t*);
 OnShopItemNameFormatFun* g_on_shopnameformat_trampoline{nullptr};
 void on_shopitemnameformat(Entity* item, char16_t* buffer)
 {
     STRINGID items_stringid = item->type->description;
-    auto it = g_custom_shopitem_names.find(item->uid);
-    if (it != g_custom_shopitem_names.end())
-    {
+    auto bucket = Bucket::get();
+    auto it = bucket->custom_shopitem_names.find(item->uid);
+    if (it != bucket->custom_shopitem_names.end())
         items_stringid = it->second;
-    }
 
     if (items_stringid >= g_original_string_ids_end)
     {
         const STRINGID buy_stringid = hash_to_stringid(0x21683743); // get id of the "Buy %s" text
-        constexpr auto buffer_size = 0x800;                         // maybe TODO: add check if the buffer size is to small?
 
+        constexpr auto buffer_size = 0x800; // game allocates 0x1000 on stack, then uses pointer to it and 0x800 and calls __stdio_common_vswprintf (according to the x64dbg)
+                                            // the MS documentation for this states that the size is supposedly in bytes, not in characters
+                                            // documentation of the _vswprintf says that it takes number of characters, just like the swprintf_s that we use here
+                                            // so should we now use 0x800 or 0x400 as size here? who knows
+
+        // TODO: maybe add check if the buffer size is to small?
         swprintf_s((wchar_t*)buffer, buffer_size, (wchar_t*)get_string(buy_stringid), get_string(items_stringid));
         return;
     }
@@ -51,16 +54,14 @@ void on_shopitemnameformat(Entity* item, char16_t* buffer)
 
 using OnNPCDialogueFun = void(size_t, Entity*, char16_t*, int, bool);
 OnNPCDialogueFun* g_speach_bubble_trampoline{nullptr};
-void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound_type, bool top)
+void OnNPCDialogue(size_t hud, Entity* NPC, char16_t* buffer, int shoppie_sound_type, bool top)
 {
     std::u16string str = pre_speach_bubble(NPC, buffer);
-    char16_t* new_string = NULL;
+    char16_t* new_string = nullptr;
     if (str != no_return_str)
     {
         if (str.empty())
-        {
             return;
-        }
 
         const auto data_size = str.size() * sizeof(char16_t);
         new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
@@ -69,7 +70,7 @@ void OnNPCDialogue(size_t func, Entity* NPC, char16_t* buffer, int shoppie_sound
 
         buffer = new_string;
     }
-    g_speach_bubble_trampoline(func, NPC, buffer, shoppie_sound_type, top);
+    g_speach_bubble_trampoline(hud, NPC, buffer, shoppie_sound_type, top);
     game_free((void*)new_string);
 }
 
@@ -78,13 +79,11 @@ OnToastFun* g_toast_trampoline{nullptr};
 void OnToast(char16_t* buffer)
 {
     std::u16string str = pre_toast(buffer);
-    char16_t* new_string = NULL;
+    char16_t* new_string = nullptr;
     if (str != no_return_str)
     {
         if (str.empty())
-        {
             return;
-        }
 
         const auto data_size = str.size() * sizeof(char16_t);
         new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
@@ -100,6 +99,9 @@ void OnToast(char16_t* buffer)
 void strings_init()
 {
     g_original_string_ids_end = get_type(1)->description; // get wrong stringid from bordertile
+    auto bucket = Bucket::get();
+    if (bucket->next_stringid == 0)
+        bucket->next_stringid = g_original_string_ids_end + 1;
 
     auto addr_format_shopitem = Memory::get().at_exe(get_virtual_function_address(VTABLE_OFFSET::ITEM_PICKUP_ROPEPILE, 7));
     auto addr_npcdialogue = get_address("speech_bubble_fun");
@@ -135,28 +137,22 @@ STRINGID hash_to_stringid(uint32_t hash)
     for (auto& it : string_hashes)
     {
         if (it == hash)
-        {
             return (STRINGID)(&it - &string_hashes[0]);
-        }
     }
-
     return g_original_string_ids_end;
 }
 
 const char16_t* get_string(STRINGID string_id)
 {
     if (string_id == g_original_string_ids_end)
-    {
         return u"";
-    }
 
     if (string_id > g_original_string_ids_end)
     {
-        auto it = g_custom_strings.find(string_id);
-        if (it != g_custom_strings.end())
-        {
+        auto bucket = Bucket::get();
+        auto it = bucket->custom_strings.find(string_id);
+        if (it != bucket->custom_strings.end())
             return it->second.data();
-        }
 
         return u"";
     }
@@ -183,66 +179,69 @@ void change_string(STRINGID string_id, std::u16string_view str)
     }
     else if (string_id > g_original_string_ids_end)
     {
-        auto it = g_custom_strings.find(string_id);
-        if (it != g_custom_strings.end())
-        {
+        auto bucket = Bucket::get();
+        auto it = bucket->custom_strings.find(string_id);
+        if (it != bucket->custom_strings.end())
             it->second = str;
-        }
     }
     else
     {
-        auto strings_table = get_strings_table();
-        const char16_t** old_string = strings_table + string_id;
-
+        const char16_t** old_string = get_strings_table() + string_id;
         if (std::char_traits<char16_t>::length(*old_string) < str.length())
         {
             const auto data_size = str.size() * sizeof(char16_t);
             char16_t* new_string = (char16_t*)game_malloc(data_size + sizeof(char16_t));
-            new_string[str.size()] = u'\0';
-            memcpy(new_string, str.data(), data_size);
+            new_string[str.size()] = NULL;
+            std::memcpy(new_string, str.data(), data_size);
 
             game_free((void*)*old_string);
             *old_string = new_string;
         }
         else
         {
-            memcpy(const_cast<char16_t*>(*old_string), str.data(), str.length() * sizeof(char16_t));
-            *(const_cast<char16_t*>(*old_string) + str.length()) = NULL;
+            char16_t* nc_old_string = const_cast<char16_t*>(*old_string);
+            std::memcpy(nc_old_string, str.data(), str.length() * sizeof(char16_t));
+            *(nc_old_string + str.length()) = NULL;
         }
     }
 }
 
 STRINGID add_string(std::u16string str) // future idea: add more strings variants for all languages?
 {
-    STRINGID new_id = g_original_string_ids_end + (STRINGID)g_custom_strings.size() + 1;
-    g_custom_strings[new_id] = std::move(str);
+    auto bucket = Bucket::get();
+    STRINGID new_id = bucket->next_stringid++;
+    if (bucket->next_stringid == 0) // lazy overflow protection
+        bucket->next_stringid = g_original_string_ids_end + 1;
+
+    bucket->custom_strings[new_id] = std::move(str);
     return new_id;
 }
 
 void add_custom_name(uint32_t uid, std::u16string name)
 {
+    auto bucket = Bucket::get();
     clear_custom_name(uid);
-    g_custom_shopitem_names[uid] = add_string(std::move(name));
+    bucket->custom_shopitem_names[uid] = add_string(std::move(name));
 }
 
 void clear_custom_name(uint32_t uid)
 {
-    auto it = g_custom_shopitem_names.find(uid);
-    if (it != g_custom_shopitem_names.end())
+    auto bucket = Bucket::get();
+    auto it = bucket->custom_shopitem_names.find(uid);
+    if (it != bucket->custom_shopitem_names.end())
     {
-        g_custom_strings.erase(it->second);
-        g_custom_shopitem_names.erase(it);
+        bucket->custom_strings.erase(it->second);
+        bucket->custom_shopitem_names.erase(it);
     }
 }
 
 void clear_custom_shopitem_names()
 {
-    for (auto& [uid, string_id] : g_custom_shopitem_names)
-    {
-        g_custom_strings.erase(string_id);
-    }
+    auto bucket = Bucket::get();
+    for (auto& [uid, string_id] : bucket->custom_shopitem_names)
+        bucket->custom_strings.erase(string_id);
 
-    g_custom_shopitem_names.clear();
+    bucket->custom_shopitem_names.clear();
 }
 
 std::u16string get_entity_name(ENT_TYPE id, bool fallback_strategy)
@@ -260,9 +259,7 @@ std::u16string get_entity_name(ENT_TYPE id, bool fallback_strategy)
         for (size_t i = 1; i < enum_name.size(); i++)
         {
             if (enum_name[i - 1] != ' ' && enum_name[i] != ' ')
-            {
                 enum_name[i] = (char)std::tolower((int)enum_name[i]);
-            }
         }
 
         using cvt_type = std::codecvt_utf8_utf16<char16_t>;
