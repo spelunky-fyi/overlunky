@@ -239,9 +239,6 @@ struct RenderAPI
 
     static RenderAPI& get();
 
-    Renderer* renderer() const;
-    size_t swap_chain() const;
-
     void set_lut(TEXTURE texture_id, uint8_t layer);
     void reset_lut(uint8_t layer);
 
@@ -323,7 +320,7 @@ struct RenderInfo
     uint32_t animation_frame;
     uint32_t unknown38; // padding
     Texture* texture;   // probably just used for definition
-    const char** texture_names[7];
+    Resource* texture_names[7];
     // second_texture_name Normal map texture on COG entities (shader 30), shine texture on ice entities. May not have a correct value on entities that don't use it
     // third_texture_name Shine texture on COG entities (shader 30). May not have a correct value on entities that don't use it
 
