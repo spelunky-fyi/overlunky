@@ -47,6 +47,9 @@ add_compile_definitions(WIN32_LEAN_AND_MEAN)
 # Related links: https://github.com/microsoft/STL/releases/tag/vs-2022-17.10 | https://github.com/actions/runner-images/issues/10004
 add_compile_definitions(_DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR)
 
+# Temp fix for the new MSVC tools requiring minimum clang 18, for the time being we're staying on clang 17
+add_compile_definitions(_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH)
+
 if(BUILD_OVERLUNKY)
   add_compile_definitions(SPEL2_EDITABLE_SCRIPTS)
   add_compile_definitions(SPEL2_EXTRA_ANNOYING_SCRIPT_ERRORS)
