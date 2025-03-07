@@ -16,6 +16,9 @@ class SaveState
     {
         save();
     }
+    /// NoDoc
+    SaveState(uint8_t index)
+        : base(HeapBase::get(index)){};
     ~SaveState()
     {
         clear();
@@ -24,8 +27,7 @@ class SaveState
     static SaveState get(int save_slot)
     {
         int8_t index = static_cast<int8_t>(save_slot - 1);
-        SaveState save_from_slot;
-        save_from_slot.base = HeapBase::get(index);
+        SaveState save_from_slot(index);
         save_from_slot.slot = index;
         return save_from_slot;
     }
