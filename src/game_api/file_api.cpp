@@ -57,8 +57,7 @@ MakeSavePathCallback g_MakeSavePathCallback{nullptr};
 
 std::string hash_path(std::string_view path)
 {
-    auto& abs_path = std::filesystem::absolute(path).make_preferred();
-    auto abs_path_str = abs_path.string();
+    auto abs_path_str = std::filesystem::absolute(path).make_preferred().string();
     uint64_t res = 10000019;
     int i = 0;
     do
