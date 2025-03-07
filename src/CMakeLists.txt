@@ -74,6 +74,7 @@ if(MSVC)
 
         if(CLANG)
                 target_compile_options(overlunky_warnings INTERFACE -Wshadow-all -Wno-missing-field-initializers -Wno-microsoft-cast -Wno-gnu-anonymous-struct -Wno-nested-anon-types -Wno-gnu-zero-variadic-macro-arguments -Wno-microsoft-enum-value -Wno-deprecated-declarations -Wno-language-extension-token -Wno-sign-compare)
+                target_compile_options(overlunky_warnings INTERFACE -D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH)
         endif()
 else()
         target_compile_options(overlunky_warnings INTERFACE -Wall -Wextra -pedantic -Werror)
