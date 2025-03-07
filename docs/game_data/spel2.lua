@@ -6779,7 +6779,7 @@ end
 --## Static class functions
 
 SaveState = nil
----Get the pre-allocated by the game save slot 1-4
+---Get the pre-allocated by the game save slot 1-4. Call as `SaveState.get(slot)`
 ---@param save_slot integer
 ---@return SaveState
 function SaveState:get(save_slot) end

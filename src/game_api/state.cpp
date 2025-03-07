@@ -381,7 +381,7 @@ Vec2 Camera::get_position()
 
 void Camera::set_position(float cx, float cy)
 {
-    static const auto addr = (float*)get_address("camera_position"); // probably not needed
+    static const auto addr = (float*)get_address("camera_position");
     focus_x = cx;
     focus_y = cy;
     adjusted_focus_x = cx;
