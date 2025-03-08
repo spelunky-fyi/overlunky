@@ -317,7 +317,7 @@ CustomBank::~CustomBank()
         std::visit(
             overloaded{
                 [this](FMOD::Bank* bank)
-                { m_SoundManager->acquire_bank(bank); },
+                { m_SoundManager->destroy_bank(bank); },
                 [](std::monostate) {},
             },
             m_FmodHandle);
@@ -983,6 +983,18 @@ void SoundManager::acquire_bank(FMOD::Bank* fmod_bank)
     }
 
     it->ref_count++;
+}
+void SoundManager::destroy_bank(FMOD::Bank* fmod_bank)
+{
+    auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [fmod_bank](const Bank& bank)
+                           { return bank.fmod_bank == fmod_bank; });
+    if (it == m_BankStorage.end())
+    {
+        DEBUG("Trying to destroy bank that does not exist...");
+        return;
+    }
+
+    it->ref_count--;
 }
 std::optional<FMODStudio::LoadingState> SoundManager::get_bank_loading_state(CustomBank custom_bank)
 {
