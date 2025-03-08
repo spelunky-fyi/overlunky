@@ -92,6 +92,7 @@ struct HeapBase
     };
     static const uint8_t MAX_SAVE_SLOTS = 5;
     friend class SaveState;
+    friend struct HeapClone;
 };
 
 // Used for objects that are allocated with the game's custom allocator
