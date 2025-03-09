@@ -764,10 +764,11 @@ function lock_door_at(x, y) end
 ---@param y number
 ---@return nil
 function unlock_door_at(x, y) end
----Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH.
+---Get the frame count from the main game state. You can use this to make some timers yourself, the engine runs at 60fps.
+---This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH. Rolls back with online rollback etc.
 ---@return integer
 function get_frame() end
----Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+---Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
 ---@return integer
 function get_global_frame() end
 ---Get the current timestamp in milliseconds since the Unix Epoch.

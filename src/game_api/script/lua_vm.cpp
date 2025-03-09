@@ -1204,10 +1204,11 @@ end
     lua["lock_door_at"] = lock_door_at;
     /// Try to unlock the exit at coordinates
     lua["unlock_door_at"] = unlock_door_at;
-    /// Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH.
+    /// Get the frame count from the main game state. You can use this to make some timers yourself, the engine runs at 60fps.
+    /// This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH. Rolls back with online rollback etc.
     lua["get_frame"] = []() -> uint32_t
     { return HeapBase::get().frame_count(); };
-    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
     // lua["get_global_frame"] = []() -> int
     lua["get_global_frame"] = API::get_global_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.

@@ -1473,7 +1473,8 @@ short for state->money_shop_total + loop[inventory.money + inventory.collected_m
 
 #### int get_frame()
 
-Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags [PAUSE](#PAUSE).[FADE](#FADE) or [PAUSE](#PAUSE).ANKH.
+Get the frame count from the main game state. You can use this to make some timers yourself, the engine runs at 60fps.
+This counter is paused if the pause is set with flags [PAUSE](#PAUSE).[FADE](#FADE) or [PAUSE](#PAUSE).ANKH. Rolls back with online rollback etc.
 
 ### get_frametime
 
@@ -1500,7 +1501,7 @@ Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 
 #### int get_global_frame()
 
-Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
 
 ### get_hud
 
