@@ -1017,6 +1017,9 @@ nil | [load()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load) | 
 nil | [save()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) | Save over a previously allocated [SaveState](#SaveState)
 nil | [clear()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear) | Delete the [SaveState](#SaveState) and free the memory. The [SaveState](#SaveState) can't be used after this.
 [StateMemory](#StateMemory) | [get_state()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state) | Access the [StateMemory](#StateMemory) inside a [SaveState](#SaveState)
+int | [get_frame()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frame) | Get the current frame from the [SaveState](#SaveState), equivelent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
+[PRNG](#PRNG) | [get_prng()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_prng) | Access the [PRNG](#PRNG) inside a [SaveState](#SaveState)
+[SaveState](#SaveState) | [get(int save_slot)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get) | Get the pre-allocated by the game save slot 1-4. Call as `SaveState.get(slot)`
 
 ### SharedIO
 
@@ -1830,6 +1833,7 @@ Type | Name | Description
 array&lt;[OnlinePlayer](#OnlinePlayer), 4&gt; | [online_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) | 
 [OnlinePlayer](#OnlinePlayer) | [local_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=local_player) | 
 [OnlineLobby](#OnlineLobby) | [lobby](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lobby) | 
+bool | [is_active()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_active) | 
 
 ### OnlineLobby
 

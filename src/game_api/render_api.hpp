@@ -15,9 +15,9 @@
 #include "color.hpp"                         // for Color
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/game_vector.hpp"        // for game_vector
+#include "heap_base.hpp"                     // for OnHeapPointer
 #include "math.hpp"                          // for Quad, AABB (ptr only)
 #include "texture.hpp"                       // for Texture
-#include "thread_utils.hpp"                  // for OnHeapPointer
 
 struct JournalUI;
 struct Layer;

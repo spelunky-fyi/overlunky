@@ -446,11 +446,11 @@ function set_pre_entity_spawn(cb, flags, mask, ...) end
 ---@return CallbackId
 function set_post_entity_spawn(cb, flags, mask, ...) end
 ---Warp to a level immediately.
----@param w integer
----@param l integer
----@param t integer
+---@param world integer
+---@param level integer
+---@param theme integer
 ---@return nil
-function warp(w, l, t) end
+function warp(world, level, theme) end
 ---Set seed and reset run.
 ---@param seed integer
 ---@return nil
@@ -764,10 +764,11 @@ function lock_door_at(x, y) end
 ---@param y number
 ---@return nil
 function unlock_door_at(x, y) end
----Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
+---Get the frame count from the main game state. You can use this to make some timers yourself, the engine runs at 60fps.
+---This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH. Rolls back with online rollback etc.
 ---@return integer
 function get_frame() end
----Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+---Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
 ---@return integer
 function get_global_frame() end
 ---Get the current timestamp in milliseconds since the Unix Epoch.
@@ -1112,7 +1113,7 @@ function create_illumination(color, size, x, y) end
 ---@param uid integer
 ---@return Illumination
 function create_illumination(color, size, uid) end
----Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
+---Refreshes an Illumination, keeps it from fading out, short for `illumination.timer = get_frame()`
 ---@param illumination Illumination
 ---@return nil
 function refresh_illumination(illumination) end
@@ -2311,6 +2312,7 @@ do
     ---@field online_players OnlinePlayer[] @size: 4
     ---@field local_player OnlinePlayer
     ---@field lobby OnlineLobby
+    ---@field is_active fun(self): boolean
 
 ---@class OnlinePlayer
     ---@field game_mode GAME_MODE
@@ -2342,6 +2344,8 @@ do
     ---@field save fun(self): nil @Save over a previously allocated SaveState
     ---@field clear fun(self): nil @Delete the SaveState and free the memory. The SaveState can't be used after this.
     ---@field get_state fun(self): StateMemory @Access the StateMemory inside a SaveState
+    ---@field get_frame fun(self): integer @Get the current frame from the SaveState, equivelent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
+    ---@field get_prng fun(self): PRNG @Access the PRNG inside a SaveState
 
 ---@class BackgroundMusic
     ---@field game_startup BackgroundSound
@@ -6780,6 +6784,12 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
 end
 --## Static class functions
 
+SaveState = nil
+---Get the pre-allocated by the game save slot 1-4. Call as `SaveState.get(slot)`
+---@param save_slot integer
+---@return SaveState
+function SaveState:get(save_slot) end
+
 Color = nil
 ---@return Color
 function Color:white() end
@@ -6815,8 +6825,6 @@ function Color:fuchsia() end
 function Color:purple() end
 
 --## Constructors
-
-SaveState = nil
 ---Create a new temporary SaveState/clone of the main level state. Unlike save_state slots that are preallocated by the game anyway, these will use 32MiB a pop and aren't freed automatically, so make sure to clear them or reuse the same one to save memory. The garbage collector will eventually clear the SaveStates you don't have a handle to any more though.
 ---@return SaveState
 function SaveState:new() end

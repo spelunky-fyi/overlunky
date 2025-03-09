@@ -140,7 +140,7 @@ struct Camera
     float bounds_right;
     float bounds_bottom;
     float bounds_top;
-    float adjusted_focus_x; // focus adjusted so camera doesn't show beyond borders, can be updated manually by setting inertia to 5 and calling update_camera_position()
+    float adjusted_focus_x; // focus adjusted so camera doesn't show beyond borders, can be updated manually by setting inertia to 5 and calling update_camera_position(), updated per frame
     float adjusted_focus_y;
     float calculated_focus_x; // forced values
     float calculated_focus_y;
@@ -185,6 +185,9 @@ struct Camera
         bounds_bottom = bounds.bottom;
         bounds_top = bounds.top;
     }
+    static Vec2 get_position();
+    void set_position(float cx, float cy);
+    void update_position();
 };
 
 struct JournalProgressStickerSlot
@@ -927,6 +930,9 @@ struct LiquidPhysics
     uint8_t padding12b;
     uint8_t padding12c;
     uint32_t unknown13;
+
+    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE ent) const;
+    void remove_liquid_oob();
 };
 
 struct AITarget

@@ -22,7 +22,7 @@
 #include <utility>          // for min, max, monostate, get
 
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
-#include "entity.hpp"                        // for to_id
+#include "entity_db.hpp"                     // for to_id
 #include "level_api.hpp"                     // for THEME_OVERRIDE, ThemeInfo
 #include "math.hpp"                          // for AABB
 #include "savedata.hpp"                      // for SaveData, Constellation...
@@ -30,7 +30,7 @@
 #include "script/lua_backend.hpp"            // for LuaBackend, LevelGenCal...
 #include "script/safe_cb.hpp"                // for make_safe_cb
 #include "script/sol_helper.hpp"             // for ZeroIndexArray
-#include "state.hpp"                         // for State, StateMemory, enu...
+#include "state.hpp"                         // for StateMemory, enu...
 #include "state_structs.hpp"                 // for QuestsInfo, Camera, Que...
 
 void PreLoadLevelFilesContext::override_level_files(std::vector<std::string> levels)
@@ -45,47 +45,47 @@ void PreLoadLevelFilesContext::add_level_files(std::vector<std::string> levels)
 bool PostRoomGenerationContext::set_room_template(uint32_t x, uint32_t y, LAYER layer, ROOM_TEMPLATE room_template)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    return State::get().ptr_local()->level_gen->set_room_template(x, y, real_layer, room_template);
+    return HeapBase::get().level_gen()->set_room_template(x, y, real_layer, room_template);
 }
 bool PostRoomGenerationContext::mark_as_machine_room_origin(uint32_t x, uint32_t y, LAYER layer)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    return State::get().ptr_local()->level_gen->mark_as_machine_room_origin(x, y, real_layer);
+    return HeapBase::get().level_gen()->mark_as_machine_room_origin(x, y, real_layer);
 }
 bool PostRoomGenerationContext::mark_as_set_room(uint32_t x, uint32_t y, LAYER layer)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, real_layer, true);
+    return HeapBase::get().level_gen()->mark_as_set_room(x, y, real_layer, true);
 }
 bool PostRoomGenerationContext::unmark_as_set_room(uint32_t x, uint32_t y, LAYER layer)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    return State::get().ptr_local()->level_gen->mark_as_set_room(x, y, real_layer, false);
+    return HeapBase::get().level_gen()->mark_as_set_room(x, y, real_layer, false);
 }
 
 bool PostRoomGenerationContext::set_shop_type(uint32_t x, uint32_t y, LAYER layer, int32_t shop_type)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    return State::get().ptr_local()->level_gen->set_shop_type(x, y, real_layer, static_cast<SHOP_TYPE>(shop_type));
+    return HeapBase::get().level_gen()->set_shop_type(x, y, real_layer, static_cast<SHOP_TYPE>(shop_type));
 }
 
 bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance)
 {
-    return State::get().ptr_local()->level_gen->set_procedural_spawn_chance(chance_id, inverse_chance);
+    return HeapBase::get().level_gen()->set_procedural_spawn_chance(chance_id, inverse_chance);
 }
 
 void PostRoomGenerationContext::set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer)
 {
-    State::get().ptr_local()->level_gen->data->set_num_extra_spawns(extra_spawn_id, num_spawns_front_layer, num_spawns_back_layer);
+    HeapBase::get().level_gen()->data->set_num_extra_spawns(extra_spawn_id, num_spawns_front_layer, num_spawns_back_layer);
 }
 
 std::optional<SHORT_TILE_CODE> PostRoomGenerationContext::define_short_tile_code(ShortTileCodeDef short_tile_code_def)
 {
-    return State::get().ptr_local()->level_gen->data->define_short_tile_code(short_tile_code_def);
+    return HeapBase::get().level_gen()->data->define_short_tile_code(short_tile_code_def);
 }
 void PostRoomGenerationContext::change_short_tile_code(SHORT_TILE_CODE short_tile_code, ShortTileCodeDef short_tile_code_def)
 {
-    State::get().ptr_local()->level_gen->data->change_short_tile_code(short_tile_code, short_tile_code_def);
+    HeapBase::get().level_gen()->data->change_short_tile_code(short_tile_code, short_tile_code_def);
 }
 
 std::optional<SHORT_TILE_CODE> PreHandleRoomTilesContext::get_short_tile_code(uint32_t tx, uint32_t ty, LAYER layer) const
@@ -434,7 +434,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->reset_theme_flags();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->reset_theme_flags();
         run_post_func<std::monostate>(index);
     }
     void init_flags()
@@ -444,7 +444,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->init_flags();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->init_flags();
         run_post_func<std::monostate>(index);
     }
     void init_level()
@@ -454,7 +454,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->init_level();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->init_level();
         run_post_func<std::monostate>(index);
     }
     void init_rooms()
@@ -464,7 +464,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->init_rooms();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->init_rooms();
         run_post_func<std::monostate>(index);
     }
     void generate_path(bool reset)
@@ -474,7 +474,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index, reset);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->generate_path(reset);
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->generate_path(reset);
         run_post_func<std::monostate>(index, reset);
     }
     void add_special_rooms()
@@ -484,7 +484,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_special_rooms();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->add_special_rooms();
         run_post_func<std::monostate>(index);
     }
     void add_player_coffin()
@@ -494,7 +494,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_player_coffin();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->add_player_coffin();
         run_post_func<std::monostate>(index);
     }
     void add_dirk_coffin()
@@ -504,7 +504,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_dirk_coffin();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->add_dirk_coffin();
         run_post_func<std::monostate>(index);
     }
     void add_idol()
@@ -514,7 +514,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_idol();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->add_idol();
         run_post_func<std::monostate>(index);
     }
     void add_vault()
@@ -524,7 +524,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_vault();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->add_vault();
         run_post_func<std::monostate>(index);
     }
     void add_coffin()
@@ -534,7 +534,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_coffin();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->add_coffin();
         run_post_func<std::monostate>(index);
     }
     void add_special_feeling()
@@ -544,7 +544,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->add_special_feeling();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->add_special_feeling();
         run_post_func<std::monostate>(index);
     }
     void spawn_level()
@@ -554,7 +554,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->spawn_level();
+            HeapBase::get().level_gen()->themes[get_override_theme_or_dwelling(index)]->spawn_level();
         run_post_func<std::monostate>(index);
     }
     void spawn_border()
@@ -564,7 +564,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->spawn_border();
+            HeapBase::get().level_gen()->themes[get_override_theme_or_dwelling(index)]->spawn_border();
         run_post_func<std::monostate>(index);
     }
     void post_process_level()
@@ -574,7 +574,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->post_process_level();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->post_process_level();
         run_post_func<std::monostate>(index);
     }
     void spawn_traps()
@@ -584,7 +584,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_traps();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_traps();
         run_post_func<std::monostate>(index);
     }
     void post_process_entities()
@@ -594,7 +594,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->post_process_entities();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->post_process_entities();
         run_post_func<std::monostate>(index);
     }
     void spawn_procedural()
@@ -604,7 +604,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_procedural();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_procedural();
         run_post_func<std::monostate>(index);
     }
     void spawn_background()
@@ -614,7 +614,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_background();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_background();
         run_post_func<std::monostate>(index);
     }
     void spawn_lights()
@@ -624,7 +624,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_lights();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_lights();
         run_post_func<std::monostate>(index);
     }
     void spawn_transition()
@@ -634,7 +634,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_transition();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_transition();
         run_post_func<std::monostate>(index);
     }
     void post_transition()
@@ -644,7 +644,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->post_transition();
+            HeapBase::get().level_gen()->themes[get_override_theme_or_dwelling(index)]->post_transition();
         run_post_func<std::monostate>(index);
     }
     void spawn_players()
@@ -654,7 +654,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->spawn_players();
+            HeapBase::get().level_gen()->themes[get_override_theme_or_dwelling(index)]->spawn_players();
         run_post_func<std::monostate>(index);
     }
     void spawn_effects()
@@ -664,12 +664,12 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_effects();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_effects();
         else
         {
             // set sane camera bounds anyway for your convenience
             // you can always change this in post
-            auto state = State::get().ptr();
+            auto state = HeapBase::get().state();
             state->camera->bounds_left = 0.5f;
             state->camera->bounds_top = 124.5f;
             state->camera->bounds_right = 10.0f * state->w + 4.5f;
@@ -689,7 +689,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint8_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_theme_id();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_theme_id();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -701,7 +701,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint8_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_base_id();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_base_id();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -713,7 +713,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_floor_spreading_type();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_floor_spreading_type();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -725,7 +725,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_floor_spreading_type2();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_floor_spreading_type2();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -737,7 +737,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<bool>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_transition_styled_floor();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_transition_styled_floor();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -749,7 +749,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_floor_spreading_type2();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_floor_spreading_type2();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -761,7 +761,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_transition_styled_floor_type();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_transition_styled_floor_type();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -773,7 +773,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_backwall_type();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_backwall_type();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -785,7 +785,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_border_type();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_border_type();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -797,7 +797,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_critter_type();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_critter_type();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -809,7 +809,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<float>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_liquid_gravity();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_liquid_gravity();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -821,7 +821,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<bool>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_player_damage();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_player_damage();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -833,7 +833,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<bool>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_explosion_soot();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_explosion_soot();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -845,7 +845,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_backlayer_lut();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_backlayer_lut();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -857,7 +857,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<float>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_backlayer_light_level();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_backlayer_light_level();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -869,7 +869,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<bool>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_loop();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_loop();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -881,7 +881,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint8_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_vault_level();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_vault_level();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -905,7 +905,7 @@ class CustomTheme : public ThemeInfo
         else if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index, texture_id).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_dynamic_texture(texture_id);
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_dynamic_texture(texture_id);
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -916,18 +916,18 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme_or_dwelling(index)]->pre_transition();
+            HeapBase::get().level_gen()->themes[get_override_theme_or_dwelling(index)]->pre_transition();
         run_post_func<std::monostate>(index);
     }
     uint32_t get_exit_room_y_level()
     {
         auto index = THEME_OVERRIDE::EXIT_ROOM_Y_LEVEL;
-        uint32_t ret = State::get().ptr_local()->h - 1;
+        uint32_t ret = HeapBase::get().state()->h - 1;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_exit_room_y_level();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_exit_room_y_level();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -939,7 +939,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             ret = run_override_func<uint32_t>(index).value_or(ret);
         else if (get_override_enabled(index))
-            ret = State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->get_shop_chance();
+            ret = HeapBase::get().level_gen()->themes[get_override_theme(index)]->get_shop_chance();
         run_post_func<std::monostate>(index, ret);
         return ret;
     }
@@ -950,7 +950,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_decoration();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_decoration();
         run_post_func<std::monostate>(index);
     }
     void spawn_decoration2()
@@ -960,7 +960,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_decoration2();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_decoration2();
         run_post_func<std::monostate>(index);
     }
     void spawn_extra()
@@ -970,7 +970,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->spawn_extra();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_extra();
         run_post_func<std::monostate>(index);
     }
     void do_procedural_spawn(SpawnInfo* info)
@@ -980,7 +980,7 @@ class CustomTheme : public ThemeInfo
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index, info);
         else if (get_override_enabled(index))
-            State::get().ptr_local()->level_gen->themes[get_override_theme(index)]->do_procedural_spawn(info);
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->do_procedural_spawn(info);
         run_post_func<std::monostate>(index, info);
     }
 };
@@ -1026,12 +1026,12 @@ void register_usertypes(sol::state& lua)
     /// Gets a short tile code based on definition, returns `nil` if it can't be found
     lua["get_short_tile_code"] = [](ShortTileCodeDef short_tile_code_def) -> std::optional<uint8_t>
     {
-        return State::get().ptr_local()->level_gen->data->get_short_tile_code(short_tile_code_def);
+        return HeapBase::get().level_gen()->data->get_short_tile_code(short_tile_code_def);
     };
     /// Gets the definition of a short tile code (if available), will vary depending on which file is loaded
     lua["get_short_tile_code_definition"] = [](SHORT_TILE_CODE short_tile_code) -> std::optional<ShortTileCodeDef>
     {
-        return State::get().ptr_local()->level_gen->data->get_short_tile_code_def(short_tile_code);
+        return HeapBase::get().level_gen()->data->get_short_tile_code_def(short_tile_code);
     };
 
     /// Define a new procedural spawn, the function `nil do_spawn(float x, float y, LAYER layer)` contains your code to spawn the thing, whatever it is.
@@ -1083,57 +1083,57 @@ void register_usertypes(sol::state& lua)
     /// The value only makes sense after level generation is complete, aka after `ON.POST_LEVEL_GENERATION` has run.
     lua["get_missing_extra_spawns"] = [](std::uint32_t extra_spawn_chance_id) -> std::pair<std::uint32_t, std::uint32_t>
     {
-        return State::get().ptr()->level_gen->data->get_missing_extra_spawns(extra_spawn_chance_id);
+        return HeapBase::get().level_gen()->data->get_missing_extra_spawns(extra_spawn_chance_id);
     };
 
     /// Transform a position to a room index to be used in `get_room_template` and `PostRoomGenerationContext.set_room_template`
     lua["get_room_index"] = [](float x, float y) -> std::pair<int, int>
     {
-        return State::get().ptr_local()->level_gen->get_room_index(x, y);
+        return HeapBase::get().level_gen()->get_room_index(x, y);
     };
     /// Transform a room index into the top left corner position in the room
     lua["get_room_pos"] = [](int x, int y) -> std::pair<float, float>
     {
-        return State::get().ptr_local()->level_gen->get_room_pos(x, y);
+        return HeapBase::get().level_gen()->get_room_pos(x, y);
     };
     /// Get the room template given a certain index, returns `nil` if coordinates are out of bounds
     lua["get_room_template"] = [](int x, int y, LAYER layer) -> std::optional<uint16_t>
     {
         const uint8_t real_layer = enum_to_layer(layer);
-        return State::get().ptr_local()->level_gen->get_room_template(x, y, real_layer);
+        return HeapBase::get().level_gen()->get_room_template(x, y, real_layer);
     };
     /// Get whether a room is flipped at the given index, returns `false` if coordinates are out of bounds
     lua["is_room_flipped"] = [](int x, int y) -> bool
     {
-        return State::get().ptr_local()->level_gen->is_room_flipped(x, y);
+        return HeapBase::get().level_gen()->is_room_flipped(x, y);
     };
     /// Get whether a room is the origin of a machine room
     lua["is_machine_room_origin"] = [](int x, int y) -> bool
     {
-        return State::get().ptr_local()->level_gen->is_machine_room_origin(x, y);
+        return HeapBase::get().level_gen()->is_machine_room_origin(x, y);
     };
     /// For debugging only, get the name of a room template, returns `'invalid'` if room template is not defined
     lua["get_room_template_name"] = [](int16_t room_template) -> std::string_view
     {
-        return State::get().ptr_local()->level_gen->get_room_template_name(room_template);
+        return HeapBase::get().level_gen()->get_room_template_name(room_template);
     };
 
     /// Define a new room template to use with `set_room_template`
     lua["define_room_template"] = [](std::string room_template, ROOM_TEMPLATE_TYPE type) -> uint16_t
     {
-        return State::get().ptr_local()->level_gen->data->define_room_template(std::move(room_template), static_cast<RoomTemplateType>(type));
+        return HeapBase::get().level_gen()->data->define_room_template(std::move(room_template), static_cast<RoomTemplateType>(type));
     };
     /// Set the size of room template in tiles, the template must be of type `ROOM_TEMPLATE_TYPE.MACHINE_ROOM`.
     lua["set_room_template_size"] = [](uint16_t room_template, uint16_t width, uint16_t height) -> bool
     {
-        return State::get().ptr_local()->level_gen->data->set_room_template_size(room_template, width, height);
+        return HeapBase::get().level_gen()->data->set_room_template_size(room_template, width, height);
     };
 
     /// Get the inverse chance of a procedural spawn for the current level.
     /// A return value of 0 does not mean the chance is infinite, it means the chance is zero.
     lua["get_procedural_spawn_chance"] = [](PROCEDURAL_CHANCE chance_id) -> uint32_t
     {
-        return State::get().ptr_local()->level_gen->get_procedural_spawn_chance(chance_id);
+        return HeapBase::get().level_gen()->get_procedural_spawn_chance(chance_id);
     };
 
     /// Gets the sub theme of the current cosmic ocean level, returns COSUBTHEME.NONE if the current level is not a CO level.
@@ -1144,13 +1144,13 @@ void register_usertypes(sol::state& lua)
     /// Gets the value for the specified config
     lua["get_level_config"] = [](LEVEL_CONFIG config) -> uint32_t
     {
-        return State::get().ptr_local()->level_gen->data->level_config[config];
+        return HeapBase::get().level_gen()->data->level_config[config];
     };
 
     /// Set the value for the specified config
     lua["set_level_config"] = [](LEVEL_CONFIG config, uint32_t value)
     {
-        State::get().ptr_local()->level_gen->data->level_config[config] = value;
+        HeapBase::get().level_gen()->data->level_config[config] = value;
     };
 
     auto grow_vines = sol::overload(
@@ -1326,16 +1326,19 @@ void register_usertypes(sol::state& lua)
     lua["force_custom_theme"] = sol::overload(
         [](CustomTheme* customtheme)
         {
-            State::get().ptr()->current_theme = customtheme;
+            HeapBase::get().state()->current_theme = customtheme;
         },
         [](ThemeInfo* customtheme)
         {
-            State::get().ptr()->current_theme = customtheme;
+            HeapBase::get().state()->current_theme = customtheme;
         },
         [](uint32_t customtheme)
         {
             if (customtheme < 18)
-                State::get().ptr()->current_theme = State::get().ptr()->level_gen->themes[customtheme - 1];
+            {
+                auto state = HeapBase::get().state();
+                state->current_theme = state->level_gen->themes[customtheme - 1];
+            }
         });
 
     /// Force current subtheme used in the CO theme. You can pass a CustomTheme, ThemeInfo or THEME. Not to be confused with force_co_subtheme.
@@ -1343,16 +1346,19 @@ void register_usertypes(sol::state& lua)
     lua["force_custom_subtheme"] = sol::overload(
         [](CustomTheme* customtheme)
         {
-            State::get().ptr()->level_gen->theme_cosmicocean->sub_theme = customtheme;
+            HeapBase::get().level_gen()->theme_cosmicocean->sub_theme = customtheme;
         },
         [](ThemeInfo* customtheme)
         {
-            State::get().ptr()->level_gen->theme_cosmicocean->sub_theme = customtheme;
+            HeapBase::get().level_gen()->theme_cosmicocean->sub_theme = customtheme;
         },
         [](uint32_t customtheme)
         {
             if (customtheme < 18)
-                State::get().ptr()->level_gen->theme_cosmicocean->sub_theme = State::get().ptr()->level_gen->themes[customtheme - 1];
+            {
+                auto level_gen = HeapBase::get().level_gen();
+                level_gen->theme_cosmicocean->sub_theme = level_gen->themes[customtheme - 1];
+            }
         });
 
     /// Context received in ON.PRE_LOAD_LEVEL_FILES, used for forcing specific `.lvl` files to load.
@@ -1715,13 +1721,13 @@ void register_usertypes(sol::state& lua)
         "FLAGGED_LIQUID_ROOMS",
         16);
 
-    StateMemory* main_state = State::get().ptr_main();
+    LevelGenSystem* level_gen = HeapBase::get_main().level_gen();
 
     lua.create_named_table("TILE_CODE"
                            //, "EMPTY", 0
                            //, "", ...check__[tile_codes.txt]\[game_data/tile_codes.txt\]...
     );
-    for (const auto& [tile_code_name, tile_code] : main_state->level_gen->data->tile_codes)
+    for (const auto& [tile_code_name, tile_code] : level_gen->data->tile_codes)
     {
         std::string clean_tile_code_name = tile_code_name.c_str();
         std::transform(
@@ -1736,7 +1742,7 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
 
-    auto room_templates = main_state->level_gen->data->room_templates;
+    auto room_templates = level_gen->data->room_templates;
     room_templates["empty_backlayer"] = {9};
     room_templates["boss_arena"] = {22};
     room_templates["shop_jail_backlayer"] = {44};
@@ -1759,7 +1765,7 @@ void register_usertypes(sol::state& lua)
                            //, "ARROWTRAP_CHANCE", 0
                            //, "", ...check__[spawn_chances.txt]\[game_data/spawn_chances.txt\]...
     );
-    for (auto* chances : {&main_state->level_gen->data->monster_chances, &main_state->level_gen->data->trap_chances})
+    for (auto* chances : {&level_gen->data->monster_chances, &level_gen->data->trap_chances})
     {
         for (const auto& [chance_name, chance] : *chances)
         {

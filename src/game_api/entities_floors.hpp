@@ -88,7 +88,7 @@ class Door : public Floor
     // can't be bother to look into the functions
     virtual void on_enter_attempt(Entity* who) = 0;
 
-    // check if it's CHAR_*, then sets State.level_flags -> 21 (Hide hud, transition)
+    // check if it's CHAR_*, then sets state.level_flags -> 21 (Hide hud, transition)
     virtual void hide_ui(Entity* who) = 0;
 
     /// Returns the entity state / behavior id to set the entity to after the entering animation.

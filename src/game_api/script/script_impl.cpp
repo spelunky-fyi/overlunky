@@ -18,12 +18,12 @@
 #include <unordered_map> // for unordered_map
 #include <utility>       // for max, min
 
+#include "heap_base.hpp"                  // for HeapBase
 #include "logger.h"                       // for DEBUG
 #include "lua_vm.hpp"                     // for execute_lua, get_lua_vm
 #include "script/handle_lua_function.hpp" // for handle_function
 #include "script/lua_backend.hpp"         // for LuaBackend, ON, ON::SCRIPT_DISABLE
 #include "script_util.hpp"                // for sanitize
-#include "state.hpp"                      // for State
 
 class LuaConsole;
 class SoundManager;
@@ -149,7 +149,7 @@ void ScriptImpl::set_enabled(bool enbl)
     if (enbl != enabled)
     {
         auto cb_type = enbl ? ON::SCRIPT_ENABLE : ON::SCRIPT_DISABLE;
-        auto now = State::get().get_frame_count();
+        auto now = HeapBase::get().frame_count();
         for (auto& [id, callback] : callbacks)
         {
             if (callback.screen == cb_type)

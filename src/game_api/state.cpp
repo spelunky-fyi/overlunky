@@ -14,7 +14,7 @@
 #include "entities_chars.hpp"                    // for Player
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
 #include "entity_hooks_info.hpp"                 // for Player
-#include "game_api.hpp"                          //
+#include "game_api.hpp"                          // for GameAPI
 #include "game_manager.hpp"                      // for get_game_manager, GameManager, SaveR...
 #include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
@@ -24,57 +24,61 @@
 #include "movable.hpp"                           // for Movable
 #include "movable_behavior.hpp"                  // for init_behavior_hooks
 #include "render_api.hpp"                        // for init_render_api_hooks
+#include "rpc.hpp"                               // for lowbias32
 #include "savedata.hpp"                          // for SaveData
 #include "screen.hpp"                            // for Screen
 #include "script/events.hpp"                     // for pre_entity_instagib
 #include "script/lua_vm.hpp"                     // for get_lua_vm
 #include "script/usertypes/theme_vtable_lua.hpp" // for NThemeVTables
 #include "search.hpp"                            // for get_address
-#include "sound_manager.hpp"                     //
+#include "sound_manager.hpp"                     // for SoundManager
 #include "spawn_api.hpp"                         // for init_spawn_hooks
 #include "steam_api.hpp"                         // for init_achievement_hooks
 #include "strings.hpp"                           // for strings_init
-#include "thread_utils.hpp"                      // for OnHeapPointer
 #include "virtual_table.hpp"                     // for get_virtual_function_address, VTABLE...
 #include "vtable_hook.hpp"                       // for hook_vtable
 
-static int64_t global_frame_count{0};
-static int64_t global_update_count{0};
+static uint64_t global_frame_count{0};
+static uint64_t global_update_count{0};
 static bool g_forward_blocked_events{false};
 
-bool get_forward_events()
+bool API::get_forward_events()
 {
     return g_forward_blocked_events;
 }
+uint64_t API::get_global_frame_count()
+{
+    return global_frame_count;
+};
+uint64_t API::get_global_update_count()
+{
+    return global_update_count;
+};
 
 StateMemory* get_state_ptr()
 {
-    return State::get().ptr();
+    return HeapBase::get().state();
 }
-void fix_liquid_out_of_bounds()
+void LiquidPhysics::remove_liquid_oob()
 {
-    auto state = State::get().ptr();
-    if (!state || !state->liquid_physics)
-        return;
-
-    for (const auto& it : state->liquid_physics->pools)
+    for (const auto& it : pools)
     {
-        if (it.physics_engine && !it.physics_engine->pause_physics)
-        {
-            for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
-            {
-                auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
-                if (liquid_coordinates->y < 0                      // y < 0
-                    || liquid_coordinates->x < 0                   // x < 0
-                    || liquid_coordinates->x > g_level_max_x       // x > g_level_max_x
-                    || liquid_coordinates->y > g_level_max_y + 16) // y > g_level_max_y
-                {
-                    if (!*(it.physics_engine->unknown61 + i)) // just some bs
-                        continue;
+        if (it.physics_engine == nullptr || it.physics_engine->pause_physics)
+            continue;
 
-                    const auto ent = **(it.physics_engine->unknown61 + i);
-                    ent->kill(true, nullptr);
-                }
+        for (uint32_t i = 0; i < it.physics_engine->entity_count; ++i)
+        {
+            auto liquid_coordinates = it.physics_engine->entity_coordinates + i;
+            if (liquid_coordinates->y < 0                      // y < 0
+                || liquid_coordinates->x < 0                   // x < 0
+                || liquid_coordinates->x > g_level_max_x       // x > g_level_max_x
+                || liquid_coordinates->y > g_level_max_y + 16) // y > g_level_max_y
+            {
+                if (!*(it.physics_engine->unknown61 + i)) // just some bs
+                    continue;
+
+                const auto ent = **(it.physics_engine->unknown61 + i);
+                ent->kill(true, nullptr);
             }
         }
     }
@@ -91,7 +95,7 @@ inline bool& get_do_hooks()
     static bool do_hooks{true};
     return do_hooks;
 }
-void State::set_do_hooks(bool do_hooks)
+void API::set_do_hooks(bool do_hooks)
 {
     if (get_is_init())
     {
@@ -112,7 +116,7 @@ bool& get_write_load_opt()
     static bool allowed{true};
     return allowed;
 }
-void State::set_write_load_opt(bool write_load_opt)
+void API::set_write_load_opt(bool write_load_opt)
 {
     if (get_is_init())
     {
@@ -134,12 +138,22 @@ void State::set_write_load_opt(bool write_load_opt)
 static bool g_godmode_player_active = false;
 static bool g_godmode_companions_active = false;
 
-bool is_active_player(Entity* e)
+void API::godmode(bool g)
 {
-    auto state = State::get().ptr();
+    g_godmode_player_active = g;
+}
+
+void API::godmode_companions(bool g)
+{
+    g_godmode_companions_active = g;
+}
+
+static bool is_active_player(Entity* e)
+{
+    auto items = HeapBase::get().state()->items;
     for (uint8_t i = 0; i < MAX_PLAYERS; i++)
     {
-        auto player = state->items->player(i);
+        auto player = items->players[i];
         if (player && player == e)
         {
             return true;
@@ -213,16 +227,6 @@ void hook_godmode_functions()
     }
 }
 
-void State::godmode(bool g)
-{
-    g_godmode_player_active = g;
-}
-
-void State::godmode_companions(bool g)
-{
-    g_godmode_companions_active = g;
-}
-
 struct ThemeHookImpl
 {
     template <class FunT, class HookFunT>
@@ -258,118 +262,33 @@ struct ThemeHookImpl
     }
 };
 
-void State::init(class SoundManager* sound_manager)
-{
-    State::get();
-    if (sound_manager)
-        get_lua_vm(sound_manager);
-}
-void State::post_init()
-{
-    if (get_is_init())
-    {
-        StateMemory& state{*State::get().ptr_main()};
-        state.level_gen->hook_themes(ThemeHookImpl{});
-    }
-}
-
-State& State::get()
-{
-    static State STATE{0x4A0};
-    if (!get_is_init())
-    {
-        if (get_write_load_opt())
-        {
-            do_write_load_opt();
-        }
-        if (auto addr_location = get_address("state_location"); addr_location != 0)
-            STATE.location = addr_location;
-
-        get_is_init() = true;
-
-        if (get_do_hooks())
-        {
-            STATE.ptr_main()->level_gen->init();
-            init_spawn_hooks();
-            init_behavior_hooks();
-            init_render_api_hooks();
-            init_achievement_hooks();
-            hook_godmode_functions();
-            strings_init();
-            init_state_update_hook();
-            init_process_input_hook();
-            init_game_loop_hook();
-            init_state_clone_hook();
-
-            auto bucket = Bucket::get();
-            bucket->count++;
-            if (!bucket->patches_applied)
-            {
-                DEBUG("Applying patches");
-                patch_tiamat_kill_crash();
-                patch_orbs_limit();
-                patch_olmec_kill_crash();
-                patch_liquid_OOB();
-                patch_ushabti_error();
-                patch_entering_closed_door_crash();
-                bucket->patches_applied = true;
-                bucket->forward_blocked_events = true;
-            }
-            else
-            {
-                DEBUG("Not applying patches, someone has already done it");
-                if (bucket->forward_blocked_events)
-                    g_forward_blocked_events = true;
-            }
-        }
-    }
-    return STATE;
-}
-
-StateMemory* State::ptr_main() const
-{
-    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
-    return p.decode();
-}
-
-StateMemory* State::ptr() const
-{
-    return ptr_local();
-}
-
-StateMemory* State::ptr_local() const
-{
-    OnHeapPointer<StateMemory> p(memory_read<uint64_t>(location));
-    return p.decode_local();
-}
-
-float get_zoom_level()
+static float get_zoom_level()
 {
     auto game_api = GameAPI::get();
     return game_api->get_current_zoom();
 }
 
-Vec2 State::click_position(float x, float y)
+Vec2 API::click_position(float x, float y)
 {
     float cz = get_zoom_level();
-    auto [cx, cy] = get_camera_position();
+    auto [cx, cy] = Camera::get_position();
     float rx = cx + ZF * cz * x;
     float ry = cy + (ZF / 16.0f * 9.0f) * cz * y;
     return {rx, ry};
 }
 
-Vec2 State::screen_position(float x, float y)
+Vec2 API::screen_position(float x, float y)
 {
     float cz = get_zoom_level();
-    auto [cx, cy] = get_camera_position();
+    auto [cx, cy] = Camera::get_position();
     float rx = (x - cx) / cz / ZF;
     float ry = (y - cy) / cz / (ZF / 16.0f * 9.0f);
     return {rx, ry};
 }
 
-void State::zoom(float level) const
+void API::zoom(float level)
 {
-    auto roomx = ptr()->w;
+    auto roomx = HeapBase::get().state()->w;
     if (level == 0.0)
     {
         switch (roomx)
@@ -419,7 +338,7 @@ void State::zoom(float level) const
     game_api->set_zoom(std::nullopt, level);
 }
 
-void State::zoom_reset()
+void API::zoom_reset()
 {
     recover_mem("zoom");
     auto game_api = GameAPI::get();
@@ -430,14 +349,14 @@ void StateMemory::force_current_theme(THEME t)
 {
     if (t > 0 && t < 19)
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         if (t == 10 && !state->level_gen->theme_cosmicocean->sub_theme)
             state->level_gen->theme_cosmicocean->sub_theme = state->level_gen->theme_dwelling; // just set it to something, can't edit this atm
         state->current_theme = state->level_gen->themes[t - 1];
     }
 }
 
-void State::darkmode(bool g)
+void API::darkmode(bool g)
 {
     static const size_t addr_dark = get_address("force_dark_level");
 
@@ -451,61 +370,72 @@ void State::darkmode(bool g)
     }
 }
 
-Vec2 State::get_camera_position()
+Vec2 Camera::get_position()
 {
+    // = adjusted_focus_x/y - (adjusted_focus_x/y - calculated_focus_x/y) * (render frame-game frame difference)
     static const auto addr = (float*)get_address("camera_position");
     auto cx = *addr;
     auto cy = *(addr + 1);
     return {cx, cy};
 }
 
-void State::set_camera_position(float cx, float cy)
+void Camera::set_position(float cx, float cy)
 {
     static const auto addr = (float*)get_address("camera_position");
-    auto* camera = ptr()->camera;
-    camera->focus_x = cx;
-    camera->focus_y = cy;
-    camera->adjusted_focus_x = cx;
-    camera->adjusted_focus_y = cy;
-    camera->calculated_focus_x = cx;
-    camera->calculated_focus_y = cy;
+    focus_x = cx;
+    focus_y = cy;
+    adjusted_focus_x = cx;
+    adjusted_focus_y = cy;
+    calculated_focus_x = cx;
+    calculated_focus_y = cy;
     *addr = cx;
     *(addr + 1) = cy;
 }
 
-void State::warp(uint8_t w, uint8_t l, uint8_t t)
+void Camera::update_position()
 {
-    // if (ptr()->screen < 11 || ptr()->screen > 20)
+    static const size_t offset = get_address("update_camera_position");
+    typedef void update_camera_func(Camera*);
+    static update_camera_func* ucf = (update_camera_func*)(offset);
+    ucf(this);
+    calculated_focus_x = adjusted_focus_x;
+    calculated_focus_y = adjusted_focus_y;
+}
+
+void StateMemory::warp(uint8_t set_world, uint8_t set_level, uint8_t set_theme)
+{
+    // if (screen < 11 || screen > 20)
     //     return;
-    if (ptr()->items->player_count < 1)
+    auto gm = get_game_manager();
+    if (items->player_count < 1)
     {
-        ptr()->items->player_select_slots[0].activated = true;
-        ptr()->items->player_select_slots[0].character = savedata()->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
-        ptr()->items->player_select_slots[0].texture_id = savedata()->players[0] + 285; // TODO: magic numbers
-        ptr()->items->player_count = 1;
+        auto savedata = gm->save_related->savedata.decode();
+        items->player_select_slots[0].activated = true;
+        items->player_select_slots[0].character = savedata->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
+        items->player_select_slots[0].texture_id = savedata->players[0] + 285; // TODO: magic numbers
+        items->player_count = 1;
     }
-    ptr()->world_next = w;
-    ptr()->level_next = l;
-    ptr()->theme_next = t;
-    if (ptr()->world_start < 1 || ptr()->level_start < 1 || ptr()->theme_start < 1 || ptr()->theme == 17)
+    world_next = set_world;
+    level_next = set_level;
+    theme_next = set_theme;
+    if (world_start < 1 || level_start < 1 || theme_start < 1 || theme == 17)
     {
-        ptr()->world_start = w;
-        ptr()->level_start = l;
-        ptr()->theme_start = t;
-        ptr()->quest_flags = 1;
+        world_start = set_world;
+        level_start = set_level;
+        theme_start = set_theme;
+        quest_flags = 1;
     }
-    if (t != 17)
+    if (set_theme != 17)
     {
-        ptr()->screen_next = 12;
+        screen_next = 12;
     }
     else
     {
-        ptr()->screen_next = 11;
+        screen_next = 11;
     }
-    ptr()->win_state = 0;
-    ptr()->loading = 1;
+    win_state = 0;
+    loading = 1;
 
-    static auto gm = get_game_manager();
     if (gm->main_menu_music)
     {
         gm->main_menu_music->kill(false);
@@ -513,46 +443,23 @@ void State::warp(uint8_t w, uint8_t l, uint8_t t)
     }
 }
 
-void State::set_seed(uint32_t seed)
+void StateMemory::set_seed(uint32_t set_seed)
 {
-    if (ptr()->screen < 11 || ptr()->screen > 20)
+    if (screen < 11 || screen > 20)
         return;
-    ptr()->seed = seed;
-    ptr()->world_start = 1;
-    ptr()->level_start = 1;
-    ptr()->theme_start = 1;
-    ptr()->world_next = 1;
-    ptr()->level_next = 1;
-    ptr()->theme_next = 1;
-    ptr()->quest_flags = 0x1e | 0x41;
-    ptr()->screen_next = 12;
-    ptr()->loading = 1;
+    seed = set_seed;
+    world_start = 1;
+    level_start = 1;
+    theme_start = 1;
+    world_next = 1;
+    level_next = 1;
+    theme_next = 1;
+    quest_flags = 0x1e | 0x41;
+    screen_next = 12;
+    loading = 1;
 }
 
-SaveData* State::savedata()
-{
-    auto gm = get_game_manager();
-    return gm->save_related->savedata.decode(); // wondering if it matters if it's local or not?
-}
-uint32_t lowbias32(uint32_t x)
-{
-    x ^= x >> 16;
-    x *= 0x7feb352d;
-    x ^= x >> 15;
-    x *= 0x846ca68b;
-    x ^= x >> 16;
-    return x;
-}
-uint32_t lowbias32_r(uint32_t x)
-{
-    x ^= x >> 16;
-    x *= 0x43021123U;
-    x ^= x >> 15 ^ x >> 30;
-    x *= 0x1d69e2a5U;
-    x ^= x >> 16;
-    return x;
-}
-Entity* State::find(StateMemory* state, uint32_t uid)
+Entity* StateMemory::get_entity(uint32_t uid) const
 {
     // Ported from MauveAlert's python code in the CAT tracker
 
@@ -562,12 +469,12 @@ Entity* State::find(StateMemory* state, uint32_t uid)
         return nullptr;
     }
 
-    const uint32_t mask = state->uid_to_entity_mask;
+    const uint32_t mask = uid_to_entity_mask;
     const uint32_t target_uid_plus_one = lowbias32(uid + 1);
     uint32_t cur_index = target_uid_plus_one & mask;
     while (true)
     {
-        auto entry = state->uid_to_entity_data[cur_index];
+        auto entry = uid_to_entity_data[cur_index];
         if (entry.uid_plus_one == target_uid_plus_one)
         {
             return entry.entity;
@@ -587,9 +494,8 @@ Entity* State::find(StateMemory* state, uint32_t uid)
     }
 }
 
-LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type) const
+LiquidPhysicsEngine* LiquidPhysics::get_correct_liquid_engine(ENT_TYPE liquid_type) const
 {
-    const auto state = ptr();
     static const ENT_TYPE LIQUID_WATER = to_id("ENT_TYPE_LIQUID_WATER"sv);
     static const ENT_TYPE LIQUID_COARSE_WATER = to_id("ENT_TYPE_LIQUID_COARSE_WATER"sv);
     static const ENT_TYPE LIQUID_LAVA = to_id("ENT_TYPE_LIQUID_LAVA"sv);
@@ -597,56 +503,25 @@ LiquidPhysicsEngine* State::get_correct_liquid_engine(ENT_TYPE liquid_type) cons
     static const ENT_TYPE LIQUID_COARSE_LAVA = to_id("ENT_TYPE_LIQUID_COARSE_LAVA"sv);
     if (liquid_type == LIQUID_WATER)
     {
-        return state->liquid_physics->water_physics_engine;
+        return water_physics_engine;
     }
     else if (liquid_type == LIQUID_COARSE_WATER)
     {
-        return state->liquid_physics->coarse_water_physics_engine;
+        return coarse_water_physics_engine;
     }
     else if (liquid_type == LIQUID_LAVA)
     {
-        return state->liquid_physics->lava_physics_engine;
+        return lava_physics_engine;
     }
     else if (liquid_type == LIQUID_STAGNANT_LAVA)
     {
-        return state->liquid_physics->stagnant_lava_physics_engine;
+        return stagnant_lava_physics_engine;
     }
     else if (liquid_type == LIQUID_COARSE_LAVA)
     {
-        return state->liquid_physics->coarse_lava_physics_engine;
+        return coarse_lava_physics_engine;
     }
     return nullptr;
-}
-
-uint32_t State::get_frame_count_main() const
-{
-    return memory_read<uint32_t>((size_t)ptr_main() - 0xd0);
-}
-uint32_t State::get_frame_count() const
-{
-    return memory_read<uint32_t>((size_t)ptr() - 0xd0);
-}
-uint32_t State::get_frame_count(StateMemory* state)
-{
-    return memory_read<uint32_t>((size_t)state - 0xd0);
-}
-int64_t get_global_frame_count()
-{
-    return global_frame_count;
-};
-int64_t get_global_update_count()
-{
-    return global_update_count;
-};
-
-std::vector<int64_t> State::read_prng() const
-{
-    std::vector<int64_t> prng;
-    for (int i = 0; i < 20; ++i)
-    {
-        prng.push_back(memory_read<int64_t>((size_t)ptr() - 0xb0 + 8 * static_cast<size_t>(i)));
-    }
-    return prng;
 }
 
 using OnStateUpdate = void(StateMemory*);
@@ -695,42 +570,6 @@ void init_state_update_hook()
     {
         DEBUG("Failed hooking state_refresh stuff: {}\n", error);
     }
-}
-
-void HeapClone(uint64_t heap_to, uint64_t heap_container_from)
-{
-    uint64_t location = State::get().get_offset();
-    StateMemory* state_from = reinterpret_cast<StateMemory*>(memory_read<uint64_t>(heap_container_from + 0x88) + location);
-    StateMemory* state_to = reinterpret_cast<StateMemory*>(heap_to + location);
-    pre_copy_state_event(state_from, state_to);
-}
-
-// Original function params: clone_heap(ThreadStorageContainer to, ThreadStorageContainer from)
-// HeapContainer has heap1 and heap2 variables, and some sort of timer, that just increases constantly, I guess to handle the rollback and multi-threaded stuff
-// The rest of what HeapContainer has is unknown for now
-// After writing to a chosen storage from the content of `from->heap1`, sets `to->heap2` to the newly copied thread storage
-void init_state_clone_hook()
-{
-    auto heap_clone = get_address("heap_clone");
-    // Hook the function after it has chosen a thread storage to write to, and pass it to the hook
-    size_t heap_clone_redirect_from_addr = heap_clone + 0x65;
-    const std::string redirect_code = fmt::format(
-        "\x51"             // PUSH       RCX
-        "\x52"             // PUSH       RDX
-        "\x41\x50"         // PUSH       R8
-        "\x41\x51"         // PUSH       R9
-        "\x48\x83\xEC\x28" // SUB        RSP, 28 // Shadow space + Stack alignment
-        "\x4C\x89\xC9"     // MOV        RCX, R9 == heap_to
-        "\x48\xb8{}"       // MOV        RAX, &HeapClone
-        "\xff\xd0"         // CALL       RAX
-        "\x48\x83\xC4\x28" // ADD        RSP, 28
-        "\x41\x59"         // POP        R9
-        "\x41\x58"         // POP        R8
-        "\x5A"             // POP        RDX
-        "\x59"sv,          // POP        RCX
-        to_le_bytes(&HeapClone));
-
-    patch_and_redirect(heap_clone_redirect_from_addr, 7, redirect_code, false, 0, false);
 }
 
 using OnProcessInput = void(void*);
@@ -792,10 +631,10 @@ void GameLoop(void* a, float b, void* c)
 {
     static const auto bucket = Bucket::get();
     static const auto pa = bucket->pause_api;
-    auto& state = State::get();
+    auto frame_main = HeapBase::get_main().frame_count();
 
-    if (global_frame_count < state.get_frame_count_main())
-        global_frame_count = state.get_frame_count_main();
+    if (global_frame_count < frame_main)
+        global_frame_count = frame_main;
     else
         global_frame_count++;
 
@@ -860,7 +699,7 @@ uint8_t enum_to_layer(const LAYER layer, Vec2& player_position)
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
@@ -881,7 +720,7 @@ uint8_t enum_to_layer(const LAYER layer)
         return 0;
     else if (layer < LAYER::FRONT)
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         auto player = state->items->player(static_cast<uint8_t>(std::abs((int)layer) - 1));
         if (player != nullptr)
         {
@@ -1128,13 +967,73 @@ void LogicMagmamanSpawn::remove_spawn(uint32_t x, uint32_t y)
                   { return (m_pos.x == x && m_pos.y == y); });
 }
 
-void update_camera_position()
+void API::init(SoundManager* sound_manager)
 {
-    auto camera = State::get().ptr()->camera;
-    static const size_t offset = get_address("update_camera_position");
-    typedef void update_camera_func(Camera*);
-    static update_camera_func* ucf = (update_camera_func*)(offset);
-    ucf(camera);
-    camera->calculated_focus_x = camera->adjusted_focus_x;
-    camera->calculated_focus_y = camera->adjusted_focus_y;
+    if (!get_is_init())
+    {
+        get_is_init() = true;
+        if (get_write_load_opt())
+        {
+            do_write_load_opt();
+        }
+
+        if (get_do_hooks())
+        {
+            HeapBase::get_main().level_gen()->init();
+            init_spawn_hooks();
+            init_behavior_hooks();
+            init_render_api_hooks();
+            init_achievement_hooks();
+            hook_godmode_functions();
+            strings_init();
+            init_state_update_hook();
+            init_process_input_hook();
+            init_game_loop_hook();
+            init_heap_clone_hook();
+
+            auto bucket = Bucket::get();
+            bucket->count++;
+            if (!bucket->patches_applied)
+            {
+                bucket->patches_applied = true;
+                bucket->forward_blocked_events = true;
+                DEBUG("Applying patches");
+                patch_tiamat_kill_crash();
+                patch_orbs_limit();
+                patch_olmec_kill_crash();
+                patch_liquid_OOB();
+                patch_ushabti_error();
+                patch_entering_closed_door_crash();
+            }
+            else
+            {
+                DEBUG("Not applying patches, someone has already done it");
+                if (bucket->forward_blocked_events)
+                    g_forward_blocked_events = true;
+            }
+        }
+    }
+
+    if (sound_manager)
+        get_lua_vm(sound_manager);
+}
+void API::post_init()
+{
+    if (get_is_init())
+    {
+        HeapBase::get().level_gen()->hook_themes(ThemeHookImpl{});
+    }
+}
+
+std::vector<Player*> StateMemory::get_players()
+{
+    std::vector<Player*> found;
+    found.reserve(4);
+    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
+    {
+        auto player = items->players[i];
+        if (player)
+            found.push_back(player);
+    }
+    return found;
 }

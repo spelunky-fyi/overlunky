@@ -79,6 +79,7 @@ struct OnlineLobby
 
 class Online
 {
+    // check x64dbg plugin for the current reverse engineer progress
   public:
     uint32_t unknown1;
     uint32_t unknown2;
@@ -122,7 +123,11 @@ class Online
     OnlinePlayer local_player;
     OnlineLobby lobby;
     OnlineLobby lobby_dupe;
-    // some more stuff
+
+    bool is_active() const
+    {
+        return lobby.code != 0;
+    }
 
     virtual ~Online() = 0;
     // 27 virtuals, destructor probably at index 7
