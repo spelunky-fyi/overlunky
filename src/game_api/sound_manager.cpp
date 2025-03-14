@@ -375,18 +375,6 @@ CustomEventDescription::CustomEventDescription(FMODStudio::EventDescription* fmo
     : m_FmodHandle{fmod_event}, m_SoundManager{sound_manager}
 {
 }
-CustomEventDescription::~CustomEventDescription()
-{
-    if (m_SoundManager != nullptr)
-    {
-        std::visit(
-            overloaded{
-                [](FMODStudio::EventDescription*) {},
-                [](std::monostate) {},
-            },
-            m_FmodHandle);
-    }
-}
 CustomEventInstance CustomEventDescription::createInstance()
 {
     return std::visit(
@@ -552,8 +540,6 @@ FMODpathGUIDmap::FMODpathGUIDmap(std::unordered_map<std::string, FMOD::FMOD_GUID
     : m_PathGUIDmap{m_PathGUIDmap}, m_SoundManager{sound_manager}
 {
 }
-
-FMODpathGUIDmap::~FMODpathGUIDmap() = default;
 
 CustomEventDescription FMODpathGUIDmap::get_event_desc_from_path(std::string path)
 {

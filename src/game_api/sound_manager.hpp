@@ -154,7 +154,7 @@ class CustomEventDescription
     CustomEventDescription(CustomEventDescription&& rhs) noexcept;
     CustomEventDescription& operator=(const CustomEventDescription& rhs) = delete;
     CustomEventDescription& operator=(CustomEventDescription&& rhs) = delete;
-    ~CustomEventDescription();
+    ~CustomEventDescription() = default;
 
     operator bool()
     {
@@ -245,7 +245,7 @@ class FMODpathGUIDmap
     FMODpathGUIDmap(FMODpathGUIDmap&& rhs) noexcept;
     FMODpathGUIDmap& operator=(const FMODpathGUIDmap& rhs) = delete;
     FMODpathGUIDmap& operator=(FMODpathGUIDmap&& rhs) = delete;
-    ~FMODpathGUIDmap();
+    ~FMODpathGUIDmap() = default;
 
     operator bool()
     {
