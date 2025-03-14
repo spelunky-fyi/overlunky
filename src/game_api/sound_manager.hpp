@@ -229,7 +229,6 @@ class CustomEventInstance
     CustomEventInstance(std::nullptr_t, std::nullptr_t)
     {
     }
-    CustomEventInstance(FMOD::Channel* fmod_channel, SoundManager* sound_manager);
     CustomEventInstance(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager);
 
     CustomEventInstanceHandle m_FmodHandle{};
