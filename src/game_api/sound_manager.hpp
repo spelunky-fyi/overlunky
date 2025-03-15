@@ -187,7 +187,6 @@ class CustomEventInstance
 {
     friend class SoundManager;
     friend class CustomEventDescription;
-    friend FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType, FMODStudio::EventInstance*, void*);
 
   public:
     CustomEventInstance(const CustomEventInstance& rhs) = default;
