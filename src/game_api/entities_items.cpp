@@ -4,10 +4,9 @@
 #include <type_traits> // for move
 #include <vector>      // for vector, _Vector_iterator, _Vector_cons...
 
-#include "entities_chars.hpp"    // for PowerupCapable
-#include "entity.hpp"            // for to_id, SHAPE
-#include "entity_hooks_info.hpp" // for HookWithId, EntityHooksInfo
-#include "vtable_hook.hpp"       // for hook_vtable
+#include "entities_chars.hpp" // for PowerupCapable
+#include "entity.hpp"         // SHAPE
+#include "entity_db.hpp"      // to_id
 
 void ParachutePowerup::deploy()
 {
