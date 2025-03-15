@@ -58,13 +58,15 @@ class Entity
     /// Don't edit this directly, use `set_draw_depth` function
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
-    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
     float x;
-    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
     float y;
-    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    /// Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.
+    /// Use `get_absolute_position` for precise. Read only.
     float abs_x;
-    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    /// Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.
+    /// Use `get_absolute_position` for precise. Read only.
     float abs_y;
     /// Width of the sprite
     float w;
@@ -115,7 +117,7 @@ class Entity
     {
         return Vec2{x, y};
     }
-    // get the absolute position
+    /// Get the absolute position of an entity in the game world
     Vec2 abs_position() const;
     /// Get's the velocity relative to the game world, only for movable or liquid entities
     Vec2 get_absolute_velocity() const;

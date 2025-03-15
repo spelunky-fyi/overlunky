@@ -869,6 +869,7 @@ Poisons entity, to cure poison set [Movable](#Movable).`poison_tick_timer` to -1
 
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop([DROP](#DROP).VAN_HORSING_DIAMOND, [ENT_TYPE](#ENT_TYPE).ITEM_PLASMACANNON))
 Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
+Check all the available drops [here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp)
 
 ### set_boss_door_control_enabled
 
@@ -2274,6 +2275,7 @@ Current mouse cursor position in screen coordinates.
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, int uid)
 
 Creates a new [Illumination](#Illumination). Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+Warning: this is only valid for current level!
 
 ### refresh_illumination
 
@@ -3874,8 +3876,7 @@ Set level flag 18 on post room generation instead, to properly force every level
 
 > Search script examples for [get_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 
-#### vector&lt;int&gt; get_entities()
-
+`vector&lt;int&gt; get_entities()`<br/>
 Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 ### get_entities_by_mask
@@ -3883,8 +3884,7 @@ Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
 
-#### vector&lt;int&gt; get_entities_by_mask(int mask)
-
+`vector&lt;int&gt; get_entities_by_mask(int mask)`<br/>
 Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 ### get_entities_by_layer
@@ -3892,8 +3892,7 @@ Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
 
-#### vector&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)
-
+`vector&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)`<br/>
 Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 ### get_entities_overlapping
@@ -3901,10 +3900,8 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
-
-#### vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
-
+`vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)`<br/>
+`vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)`<br/>
 Use `get_entities_overlapping_hitbox` instead
 
 ### get_entity_ai_state
@@ -3912,8 +3909,7 @@ Use `get_entities_overlapping_hitbox` instead
 
 > Search script examples for [get_entity_ai_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entity_ai_state)
 
-#### int get_entity_ai_state(int uid)
-
+`int get_entity_ai_state(int uid)`<br/>
 As the name is misleading. use [Movable](#Movable).`move_state` field instead
 
 ### set_arrowtrap_projectile
@@ -3921,8 +3917,7 @@ As the name is misleading. use [Movable](#Movable).`move_state` field instead
 
 > Search script examples for [set_arrowtrap_projectile](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_arrowtrap_projectile)
 
-#### nil set_arrowtrap_projectile([ENT_TYPE](#ENT_TYPE) regular_entity_type, [ENT_TYPE](#ENT_TYPE) poison_entity_type)
-
+`nil set_arrowtrap_projectile([ENT_TYPE](#ENT_TYPE) regular_entity_type, [ENT_TYPE](#ENT_TYPE) poison_entity_type)`<br/>
 Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow_type) and [replace_drop](#replace_drop)([DROP](#DROP).POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead
 
 ### set_blood_multiplication
@@ -3930,8 +3925,7 @@ Use [replace_drop](#replace_drop)([DROP](#DROP).ARROWTRAP_WOODENARROW, new_arrow
 
 > Search script examples for [set_blood_multiplication](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_blood_multiplication)
 
-#### nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)
-
+`nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)`<br/>
 This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 `default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
 
@@ -4200,8 +4194,7 @@ Use this only when no other approach works, this call can be expensive if overus
 
 > Search script examples for [generate_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
-
+`[ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)`<br/>
 Use `generate_world_particles`
 
 ### draw_line

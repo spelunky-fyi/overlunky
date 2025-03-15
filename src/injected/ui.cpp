@@ -1789,22 +1789,13 @@ void force_lights()
     if (options["lights"])
     {
         if (!g_state->illumination && g_state->screen == 12)
-        {
             g_state->illumination = UI::create_illumination(Color::white(), 20000.0f, 172, 252);
-        }
+
         if (g_state->illumination)
         {
             g_state->illumination->enabled = true;
-            if (g_state->camera_layer == 1)
-                g_state->illumination->flags |= 1U << 16;
-            else
-                g_state->illumination->flags &= ~(1U << 16);
+            g_state->illumination->layer = g_state->camera_layer;
         }
-    }
-    else
-    {
-        if (g_state->illumination && test_flag(g_state->level_flags, 18))
-            g_state->illumination->enabled = false;
     }
 }
 
@@ -2019,6 +2010,8 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
         g_game_manager->game_props->input_index[0] = 0;
     if (g_game_manager->game_props->input_index[4] == -1)
         g_game_manager->game_props->input_index[4] = 0;
+
+    g_game_manager->screen_menu->loaded_once = true;
 }
 
 void restart_adventure()
@@ -2797,13 +2790,13 @@ void toggle_lights()
 {
     if (options["lights"] && g_state->illumination)
     {
-        g_state->illumination->flags |= (1U << 24);
+        g_state->illumination->enabled = true;
     }
     else if (!options["lights"] && g_state->illumination)
     {
-        g_state->illumination->flags &= ~(1U << 16);
-        if ((g_state->level_flags & (1U << 17)) > 0)
-            g_state->illumination->flags &= ~(1U << 24);
+        g_state->illumination->layer = 0;
+        if (test_flag(g_state->level_flags, 18)) // dark level
+            g_state->illumination->enabled = false;
     }
 }
 
@@ -5989,7 +5982,9 @@ void render_options()
         tooltip("Fly through walls and ignored by enemies.", "toggle_noclip");
         ImGui::Checkbox("Fly mode##FlyMode", &options["fly_mode"]);
         tooltip("Fly while holding the jump button.", "toggle_flymode");
-        ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
+        if (ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]))
+            toggle_lights();
+
         tooltip("Enables the default level lighting everywhere.", "toggle_lights");
         if (ImGui::CheckboxFlags("Force dark levels", &g_dark_mode, 1))
         {
