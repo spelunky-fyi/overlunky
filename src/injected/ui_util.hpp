@@ -102,4 +102,6 @@ class UI
     static StateMemory* get_save_state(int slot);
     static void set_camera_layer_control_enabled(bool enable);
     static void teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy);
+    static const std::string& get_texture_enum_name(TEXTURE id);
+    static std::vector<std::pair<const std::string&, TEXTURE>> get_texture_suggestions(const std::string& text);
 };
