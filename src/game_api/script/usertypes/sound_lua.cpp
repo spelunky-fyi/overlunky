@@ -179,26 +179,26 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     lua.new_usertype<FMODStudio::ParameterId>(
         "ParameterId",
         "data1",
-        &FMODStudio::ParameterId::data1,
+        sol::readonly(&FMODStudio::ParameterId::data1),
         "data2",
-        &FMODStudio::ParameterId::data2);
+        sol::readonly(&FMODStudio::ParameterId::data2));
 
     lua.new_usertype<FMODStudio::ParameterDescription>(
         "ParameterDescription",
         "name",
-        &FMODStudio::ParameterDescription::name,
+        sol::readonly(&FMODStudio::ParameterDescription::name),
         "id",
-        &FMODStudio::ParameterDescription::id,
+        sol::readonly(&FMODStudio::ParameterDescription::id),
         "minimum",
-        &FMODStudio::ParameterDescription::minimum,
+        sol::readonly(&FMODStudio::ParameterDescription::minimum),
         "maximum",
-        &FMODStudio::ParameterDescription::maximum,
+        sol::readonly(&FMODStudio::ParameterDescription::maximum),
         "defaultvalue",
-        &FMODStudio::ParameterDescription::defaultvalue,
+        sol::readonly(&FMODStudio::ParameterDescription::defaultvalue),
         "type",
-        &FMODStudio::ParameterDescription::type,
+        sol::readonly(&FMODStudio::ParameterDescription::type),
         "flags",
-        &FMODStudio::ParameterDescription::flags);
+        sol::readonly(&FMODStudio::ParameterDescription::flags));
 
     /// Handle to an FMOD event description, can be used to create a `CustomEventInstance` with
     /// `CustomEventDescription:createInstance()`. Also can be used to load and unload non-streaming
