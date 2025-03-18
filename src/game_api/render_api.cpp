@@ -464,7 +464,7 @@ void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Col
             unknown};
 
         // TODO: his feels suspicious that it takes pointer to pointer to Resource
-        typedef void render_func(Renderer*, WorldShader, Resource * *texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
+        using render_func = void(Renderer*, WorldShader, Resource**, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
         auto texture_name = texture->default_texture;
         rf(GameAPI::get()->renderer, shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);
@@ -645,11 +645,6 @@ void init_render_api_hooks()
     {
         DEBUG("Failed hooking render_api: {}\n", error);
     }
-}
-
-Entity* RenderInfo::get_entity() const
-{
-    return entity_offset.decode_local();
 }
 
 uint32_t RenderInfo::get_aux_id() const

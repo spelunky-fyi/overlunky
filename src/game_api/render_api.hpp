@@ -341,7 +341,10 @@ struct RenderInfo
     virtual bool set_entity(Texture* texture, Entity* entity) = 0;
 
     // gets the entity owning this RenderInfo
-    Entity* get_entity() const;
+    Entity* get_entity() const
+    {
+        return entity_offset.decode_local();
+    }
 
     // for supporting HookableVTable
     uint32_t get_aux_id() const;

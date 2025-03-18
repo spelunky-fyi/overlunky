@@ -175,7 +175,7 @@ struct Renderer
 
     OnHeapPointer<Camera> camera;
 
-    size_t unknown87d; 
+    size_t unknown87d;
     IDXGIAdapter4* unknown88;
     IDXGISwapChain4* swap_chain;
     void* unknown89; // CID3D11Forwarder ?
