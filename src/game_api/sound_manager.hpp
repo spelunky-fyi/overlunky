@@ -169,6 +169,7 @@ class CustomEventDescription
     std::optional<FMODStudio::LoadingState> getSampleLoadingState();
 
     std::optional<FMODStudio::ParameterDescription> getParameterDescriptionByName(std::string name);
+    std::optional<FMODStudio::ParameterId> getParameterIdByName(std::string name);
 
     bool isValid();
 
@@ -303,6 +304,7 @@ class SoundManager
     bool unload_event_sample_data(CustomEventDescription fmod_event);
     bool event_description_is_valid(CustomEventDescription fmod_event);
     std::optional<FMODStudio::ParameterDescription> event_get_parameter_description_by_name(CustomEventDescription fmod_event, std::string name);
+    std::optional<FMODStudio::ParameterId> event_get_parameter_id_by_name(CustomEventDescription fmod_event, std::string name);
 
     bool start(CustomEventInstance fmod_event_instance);
     bool stop(CustomEventInstance fmod_event_instance, FMODStudio::StopMode mode);
