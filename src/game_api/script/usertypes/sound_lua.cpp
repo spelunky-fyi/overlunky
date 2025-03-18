@@ -218,7 +218,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         &CustomEventDescription::getSampleLoadingState,
         "getParameterDescriptionByName",
         &CustomEventDescription::getParameterDescriptionByName,
-        "getParameterIDbyName",
+        "getParameterIdByName",
         &CustomEventDescription::getParameterIdByName,
         "isValid",
         &CustomEventDescription::isValid);
