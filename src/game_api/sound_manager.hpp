@@ -251,7 +251,7 @@ class FMODpathGUIDmap
         return m_SoundManager != nullptr;
     }
 
-    CustomEventDescription get_event_desc_from_path(std::string path);
+    CustomEventDescription get_event(std::string path);
 
   private:
     FMODpathGUIDmap(std::nullptr_t, std::nullptr_t)
@@ -292,10 +292,10 @@ class SoundManager
     bool bank_is_valid(CustomBank custom_bank);
 
     FMODpathGUIDmap create_fmod_path_guid_map(std::string_view path);
-    CustomEventDescription pathguidmap_lookup_event_id_by_path(FMODpathGUIDmap map, std::string path);
+    CustomEventDescription pathguidmap_lookup_id(FMODpathGUIDmap map, std::string path);
 
-    CustomEventDescription get_event_description_by_id_string(std::string guid_string);
-    CustomEventDescription get_event_description_by_id(FMOD::FMOD_GUID* guid);
+    CustomEventDescription get_event_by_id_string(std::string guid_string);
+    CustomEventDescription get_event_by_id(FMOD::FMOD_GUID* guid);
 
     CustomEventInstance create_event_instance(FMODStudio::EventDescription* fmod_event);
     bool release_all_event_instances(FMODStudio::EventDescription* fmod_event);
