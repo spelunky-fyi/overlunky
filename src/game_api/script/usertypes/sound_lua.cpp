@@ -47,6 +47,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         return;
     }
 
+    /// Parameter to `load_bank()`, used to control bank loading.
     lua.new_enum("FMOD_LOAD_BANK_FLAGS",
         "NORMAL",
         FMODStudio::LoadBankFlags::Normal,
@@ -56,10 +57,21 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         FMODStudio::LoadBankFlags::DecompressSamples,
         "UNENCRYPTED",
         FMODStudio::LoadBankFlags::Unencrypted);
+    /* FMOD_LOAD_BANK_FLAGS
+        // NORMAL
+        // Standard behavior. The function will not return until the bank has finished loading.
+        // NONBLOCKING
+        // Loading occurs asychronously rather than immediately. Minimal performace impact. Probably the flag you should use in most cases.
+        // DECOMPRESS_SAMPLES
+        // Force samples to decompress into memory when loaded, instead of staying compressed. Use NORMAL or NONBLOCKING instead.
+        // UNENCRYPTED
+        // Ignore the encryption key specified by Studio::System::setAdvancedSettings when loading this bank. Use NORMAL or NONBLOCKING instead.
+        */
 
-    /// Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if the file can't be found.
-    /// Loading a bank file will load the banks metadata, but not non-streaming sample data. Once a bank has finished loading, all metadata can be accessed meaning that
-    /// event descriptions can be found with `get_event_desc_by_id` or using `create_fmod_path_guid_map` and calling `FMODpathGUIDmap:getEventDescriptionByPath()`.
+    /// Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
+    /// Returns nil if the file can't be found. Loading a bank file will load the banks metadata, but not non-streaming
+    /// sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
+    /// be found with `get_event_desc_by_id` or using `create_fmod_path_guid_map` and calling `FMODpathGUIDmap:getEventDescriptionByPath()`.
     /// The banks loading state can be queried using `CustomBank:getLoadingState()` which will return an `FMOD_LOADING_STATE`.
     lua["load_bank"] = [](std::string path, FMODStudio::LoadBankFlags flags) -> sol::optional<CustomBank>
     {
@@ -120,6 +132,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         return sol::nullopt;
     };
 
+    /// The loading state of various FMOD Studio objects, such as banks and non-streaming sample data.
     lua.new_enum("FMOD_LOADING_STATE",
         "UNLOADING",
         FMODStudio::LoadingState::Unloading,
@@ -132,6 +145,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "ERROR",
         FMODStudio::LoadingState::Error);
 
+    /// The playback state of various FMOD Studio objects, used for `CustomEventInstance:get_playback_state`.
     lua.new_enum("FMOD_PLAYBACK_STATE",
         "PLAYING",
         FMODStudio::PlaybackState::Playing,
@@ -144,12 +158,20 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "SUSTAINING",
         FMODStudio::PlaybackState::Sustaining);
 
+    /// Stop modes for an event instance.
     lua.new_enum("FMOD_STOP_MODE",
         "ALLOW_FADE_OUT",
         FMODStudio::StopMode::AllowFadeOut,
         "IMMEDIATE",
         FMODStudio::StopMode::Immediate);
+    /* FMOD_STOP_MODE
+        // ALLOW_FADE_OUT
+        // Allow the events ADHSR modulators to complete their release, and DSP effect tails to play out.
+        // IMMEDIATE
+        // Stops the event instance immediately.
+        */
 
+    /// FMOD Studio event parameter types.
     lua.new_enum("FMOD_PARAMETER_TYPE",
         "GAME_CONTROLLED",
         FMODStudio::ParameterType::GameControlled,
@@ -168,6 +190,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "AUTOMATIC_SPEED",
         FMODStudio::ParameterType::AutomaticSpeed);
 
+    /// FMOD Studio flags describing the behavior of a parameter.
     lua.new_enum("FMOD_PARAMETER_FLAGS",
         "READ_ONLY",
         FMODStudio::ParameterFlags::ReadOnly,
@@ -176,6 +199,16 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "GLOBAL",
         FMODStudio::ParameterFlags::Global);
 
+    /// FMOD Studio event parameter identifier. Can be retrieved with
+    /// `CustomEventDescription:getParameterDescriptionByName().id`, or
+    /// directly by using `CustomEventDescription:getParameterIdByName()`.
+    /// Can be used with `CustomEventInstance:set_parameter_by_id()`,
+    /// `CustomEventInstance:set_parameter_by_id_with_label()`, and
+    /// `CustomEventInstance:get_parameter_by_id()`. This is useful
+    /// if you need to get or update an event parameter at a high
+    /// frequency, since setting and getting parameters by ID do
+    /// not require FMOD to perform a name to ID lookup internally
+    /// like FMOD does when setting or getting parameters by name.
     lua.new_usertype<FMODStudio::ParameterId>(
         "ParameterId",
         "data1",
@@ -183,6 +216,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "data2",
         sol::readonly(&FMODStudio::ParameterId::data2));
 
+    /// FMOD Studio descriptor for an event parameter.
     lua.new_usertype<FMODStudio::ParameterDescription>(
         "ParameterDescription",
         "name",
