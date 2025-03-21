@@ -56,6 +56,9 @@ void SaveState::load()
     if (base.is_null())
         return;
 
+    if (slot != -1 && base.state()->screen == 0)
+        return;
+
     auto state = base.state();
     if (pre_load_state(-1, state))
         return;
