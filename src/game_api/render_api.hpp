@@ -351,7 +351,7 @@ struct RenderInfo
 
     bool set_second_texture(TEXTURE texture_id);
     bool set_third_texture(TEXTURE texture_id);
-    /// Set the number of textures that may be used, need to have them set before for it to work
+    /// Set the number of textures that may be used, default 1
     bool set_texture_num(uint32_t num);
     /// Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
     bool set_normal_map_texture(TEXTURE texture_id);

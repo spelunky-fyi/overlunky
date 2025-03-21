@@ -201,7 +201,7 @@ std::optional<TEXTURE> get_texture(TextureDefinition data)
 }
 std::optional<TEXTURE> get_texture(std::string_view texture_name)
 {
-    // TODO: shouldn't this return multiple? since there is bunch of "textures that are "Textures" that share the same image resource, which this search relays on
+    // TODO: shouldn't this return multiple? since multiple "Textures" share the same image resource, which this search relays on
     auto* textures = get_textures();
     auto& render = RenderAPI::get();
 

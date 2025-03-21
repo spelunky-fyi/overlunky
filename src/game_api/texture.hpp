@@ -64,6 +64,7 @@ TextureDefinition get_texture_definition(TEXTURE texture_id);
 Texture* get_texture(TEXTURE texture_id);
 TEXTURE define_texture(TextureDefinition data);
 std::optional<TEXTURE> get_texture(TextureDefinition data);
+// returns first texture matching the texture name
 std::optional<TEXTURE> get_texture(std::string_view texture_name);
 void reload_texture(const char* texture_name); // Does a lookup for the right texture to reload
 void reload_texture(Resource* texture_name);   // Reloads the texture directly
