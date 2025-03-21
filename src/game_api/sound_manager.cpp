@@ -1129,7 +1129,7 @@ CustomEventDescription SoundManager::guidmap_lookup_id(FMODguidMap map, std::str
     {
         return get_event_by_id(&it->second);
     }
-    DEBUG("Could not find path \"{}\" in FMODpathGUIDmap", path);
+    DEBUG("Could not find path \"{}\" in FMODguidMap", path);
     return CustomEventDescription{nullptr, nullptr};
 }
 
