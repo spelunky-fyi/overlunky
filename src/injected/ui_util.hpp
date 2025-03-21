@@ -98,7 +98,8 @@ class UI
     static void init_seeded(uint32_t seed);
     static std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start);
     static void set_adventure_seed(int64_t first, int64_t second);
-    static void copy_state(int from, int to);
+    static void load_state_as_main(int from);
+    static void save_main_state(int to);
     static StateMemory* get_save_state(int slot);
     static void set_camera_layer_control_enabled(bool enable);
     static void teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy);

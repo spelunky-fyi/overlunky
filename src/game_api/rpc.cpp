@@ -33,6 +33,7 @@
 #include "entity_lookup.hpp"            //
 #include "game_manager.hpp"             //
 #include "game_patches.hpp"             //
+#include "heap_base.hpp"                // for OnHeapPointer, HeapBase
 #include "illumination.hpp"             //
 #include "items.hpp"                    // for Items
 #include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
@@ -42,11 +43,11 @@
 #include "movable.hpp"                  // for Movable
 #include "online.hpp"                   // for Online
 #include "particles.hpp"                // for ParticleEmitterInfo
+#include "prng.hpp"                     // for PRNG
 #include "screen.hpp"                   //
 #include "search.hpp"                   // for get_address, find_inst
-#include "state.hpp"                    // for State, get_state_ptr, enum_to_layer
+#include "state.hpp"                    // for get_state_ptr, enum_to_layer
 #include "state_structs.hpp"            // for ShopRestrictedItem, Illumination
-#include "thread_utils.hpp"             // for OnHeapPointer
 #include "virtual_table.hpp"            // for get_virtual_function_address, VIRT_FUNC
 
 uint32_t setflag(uint32_t flags, int bit)
@@ -105,7 +106,7 @@ int32_t attach_ball_and_chain(uint32_t uid, float off_x, float off_y)
         static const auto chain_entity_type = to_id("ENT_TYPE_ITEM_PUNISHCHAIN");
 
         auto pos = entity->abs_position();
-        auto* layer_ptr = State::get().layer(entity->layer);
+        auto* layer_ptr = HeapBase::get().state()->layer(entity->layer);
 
         PunishBall* ball = (PunishBall*)layer_ptr->spawn_entity(ball_entity_type, pos.x + off_x, pos.y + off_y, false, 0.0f, 0.0f, false);
 
@@ -202,7 +203,7 @@ void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
     auto entity = get_entity_ptr(uid)->as<Liquid>();
     if (entity)
     {
-        auto liquid_engine = State::get().get_correct_liquid_engine(entity->type->id);
+        auto liquid_engine = HeapBase::get().liquid_physics()->get_correct_liquid_engine(entity->type->id);
         if (liquid_engine)
         {
             liquid_engine->entity_coordinates[*entity->liquid_id] = {x, y};
@@ -251,14 +252,12 @@ int get_entity_ai_state(uint32_t uid)
 
 uint32_t get_level_flags()
 {
-    auto& state = State::get();
-    return state.flags();
+    return HeapBase::get().state()->level_flags;
 }
 
 void set_level_flags(uint32_t flags)
 {
-    auto& state = State::get();
-    state.set_flags(flags);
+    HeapBase::get().state()->level_flags = flags;
 }
 
 ENT_TYPE get_entity_type(uint32_t uid)
@@ -270,33 +269,17 @@ ENT_TYPE get_entity_type(uint32_t uid)
     return UINT32_MAX; // TODO: shouldn't this be 0?
 }
 
-std::vector<Player*> get_players(StateMemory* state)
-{
-    state = state != nullptr
-                ? state
-                : State::get().ptr();
-
-    std::vector<Player*> found;
-    for (uint8_t i = 0; i < MAX_PLAYERS; i++)
-    {
-        auto player = state->items->player(i);
-        if (player)
-            found.push_back((Player*)player);
-    }
-    return found;
-}
-
 std::tuple<float, float, float, float> screen_aabb(float left, float top, float right, float bottom)
 {
-    auto [sx1, sy1] = State::screen_position(left, top);
-    auto [sx2, sy2] = State::screen_position(right, bottom);
+    auto [sx1, sy1] = API::screen_position(left, top);
+    auto [sx2, sy2] = API::screen_position(right, bottom);
     return std::tuple{sx1, sy1, sx2, sy2};
 }
 
 float screen_distance(float x)
 {
-    auto a = State::screen_position(0, 0);
-    auto b = State::screen_position(x, 0);
+    auto a = API::screen_position(0, 0);
+    auto b = API::screen_position(x, 0);
     return b.x - a.x;
 }
 
@@ -407,17 +390,6 @@ void unlock_door_at(float x, float y)
     }
 }
 
-uint32_t get_frame_count_main()
-{
-    auto& state = State::get();
-    return state.get_frame_count_main();
-}
-uint32_t get_frame_count()
-{
-    auto& state = State::get();
-    return state.get_frame_count();
-}
-
 void carry(uint32_t mount_uid, uint32_t rider_uid)
 {
     auto mount = get_entity_ptr(mount_uid)->as<Mount>();
@@ -461,24 +433,6 @@ void flip_entity(uint32_t uid)
             item->flags = flipflag(item->flags, 17);
         }
     }
-}
-
-void set_camera_position(float cx, float cy)
-{
-    auto& state = State::get();
-    state.set_camera_position(cx, cy);
-}
-
-void warp(uint8_t world, uint8_t level, uint8_t theme)
-{
-    auto& state = State::get();
-    state.warp(world, level, theme);
-}
-
-void set_seed(uint32_t seed)
-{
-    auto& state = State::get();
-    state.set_seed(seed);
 }
 
 void set_arrowtrap_projectile(ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
@@ -580,8 +534,11 @@ void set_blood_multiplication(uint32_t /*default_multiplier*/, uint32_t vladscap
 
 std::vector<int64_t> read_prng()
 {
-    auto& state = State::get();
-    return state.read_prng();
+    std::vector<int64_t> prng_raw;
+    prng_raw.resize(20);
+    auto prng = reinterpret_cast<int64_t*>(HeapBase::get().prng());
+    std::memcpy(prng_raw.data(), prng, sizeof(int64_t) * 20);
+    return prng_raw;
 }
 
 void pick_up(uint32_t who_uid, uint32_t what_uid)
@@ -714,7 +671,7 @@ void force_olmec_phase_0(bool b)
     static const size_t offset = get_address("olmec_transition_phase_1");
 
     if (b)
-        write_mem_recoverable("force_olmec_phase_0", offset, "\xEB\x2E"s, true); // jbe -> jmp
+        write_mem_recoverable("force_olmec_phase_0", offset, "\xEB\x2E"sv, true); // jbe -> jmp
     else
         recover_mem("force_olmec_phase_0");
 }
@@ -750,8 +707,8 @@ void set_time_ghost_enabled(bool b)
     }
     else
     {
-        write_mem_recoverable("set_time_ghost_enabled", offset_trigger, "\xC3\x90\x90\x90"s, true);
-        write_mem_recoverable("set_time_ghost_enabled", offset_toast_trigger, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_trigger, "\xC3\x90\x90\x90"sv, true);
+        write_mem_recoverable("set_time_ghost_enabled", offset_toast_trigger, "\xC3\x90\x90\x90"sv, true);
     }
 }
 
@@ -762,7 +719,7 @@ void set_time_jelly_enabled(bool b)
     if (b)
         recover_mem("set_time_jelly_enabled");
     else
-        write_mem_recoverable("set_time_jelly_enabled", offset, "\xC3\x90\x90\x90"s, true);
+        write_mem_recoverable("set_time_jelly_enabled", offset, "\xC3\x90\x90\x90"sv, true);
 }
 
 bool is_inside_active_shop_room(float x, float y, LAYER layer)
@@ -785,10 +742,10 @@ bool is_inside_shop_zone(float x, float y, LAYER layer)
     // if it doesn't jump there is a bunch of coordinate checks but also state.presence_flags, flipped rooms ...
 
     static const size_t offset = get_address("coord_inside_shop_zone");
-    auto state = State::get().ptr(); // the game gets level gen from heap pointer and we always get it from state, not sure if it matters
+    auto level_gen = HeapBase::get().level_gen();
     typedef bool coord_inside_shop_zone_func(LevelGenSystem*, uint32_t layer, float x, float y);
     coord_inside_shop_zone_func* ciszf = (coord_inside_shop_zone_func*)(offset);
-    return ciszf(state->level_gen, enum_to_layer(layer), x, y);
+    return ciszf(level_gen, enum_to_layer(layer), x, y);
 }
 
 void set_journal_enabled(bool b)
@@ -802,7 +759,7 @@ void set_camp_camera_bounds_enabled(bool b)
     if (b)
         recover_mem("camp_camera_bounds");
     else
-        write_mem_recoverable("camp_camera_bounds", offset, "\xC3\x90\x90"s, true);
+        write_mem_recoverable("camp_camera_bounds", offset, "\xC3\x90\x90"sv, true);
 }
 
 void set_explosion_mask(int32_t mask)
@@ -1232,10 +1189,10 @@ void move_grid_entity(int32_t uid, float x, float y, LAYER layer)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto& state = State::get();
+        auto state = HeapBase::get().state();
         Vec2 offset;
         const auto actual_layer = enum_to_layer(layer, offset);
-        state.layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state.layer(actual_layer));
+        state->layer(entity->layer)->move_grid_entity(entity, offset.x + x, offset.y + y, state->layers[actual_layer]);
 
         entity->detach(false);
         entity->x = offset.x + x;
@@ -1248,19 +1205,18 @@ void destroy_grid(int32_t uid)
 {
     if (auto entity = get_entity_ptr(uid))
     {
-        auto& state = State::get();
-        state.layer(entity->layer)->destroy_grid_entity(entity);
+        HeapBase::get().state()->layer(entity->layer)->destroy_grid_entity(entity);
     }
 }
 
 void destroy_grid(float x, float y, LAYER layer)
 {
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     uint8_t actual_layer = enum_to_layer(layer);
 
-    if (Entity* entity = state.layer(actual_layer)->get_grid_entity_at(x, y))
+    if (Entity* entity = state->layers[actual_layer]->get_grid_entity_at(x, y))
     {
-        state.layer(entity->layer)->destroy_grid_entity(entity);
+        state->layer(entity->layer)->destroy_grid_entity(entity);
     }
 }
 
@@ -1283,7 +1239,7 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
         {
             if (owner->type->id == it) // TODO: check what happens if it's not room owner/shopkeeper
             {
-                auto state = State::get().ptr();
+                auto state = HeapBase::get().state();
                 item->flags = setflag(item->flags, 23); // shop item
                 item->flags = setflag(item->flags, 20); // Enable button prompt (flag is probably: show dialogs and other fx)
                 state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
@@ -1327,7 +1283,7 @@ std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start)
         auto bucket = Bucket::get();
         if (bucket->adventure_seed.first != 0)
             return bucket->adventure_seed;
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         auto current = get_adventure_seed(false);
         for (uint8_t i = 0; i < state->level_count + (state->screen == 12 || state->screen == 14 ? 1 : 0); ++i)
             current.second -= current.first;
@@ -1388,7 +1344,7 @@ void add_entity_to_liquid_collision(uint32_t uid, bool add)
 std::pair<uint8_t, uint8_t> get_liquids_at(float x, float y, LAYER layer)
 {
     uint8_t actual_layer = enum_to_layer(layer);
-    LiquidPhysics* liquid_physics = State::get().ptr()->liquid_physics;
+    LiquidPhysics* liquid_physics = HeapBase::get().liquid_physics();
     // if (y > 125.5f || y < .0f || x > 85.5f || x < .0f) // Original check by the game, can result is accesing the array out of bounds
     //     return 0;
     if (actual_layer != get_liquid_layer() || y < .0f || x < .0f)
@@ -1433,8 +1389,7 @@ void game_log(std::string message)
 
 void load_death_screen()
 {
-    auto state = State::get().ptr();
-    state->screen_death->init();
+    HeapBase::get().state()->screen_death->init();
 }
 
 void save_progress()
@@ -1701,7 +1656,7 @@ void set_boss_door_control_enabled(bool enable)
 void update_state()
 {
     static const size_t offset = get_address("state_refresh");
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     typedef void refresh_func(StateMemory*);
     static refresh_func* rf = (refresh_func*)(offset);
     rf(state);
@@ -1749,7 +1704,7 @@ ENT_TYPE add_custom_type()
 
 int32_t get_current_money()
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     int32_t money = state->money_shop_total;
     for (auto& inventory : state->items->player_inventories)
     {
@@ -1761,7 +1716,7 @@ int32_t get_current_money()
 
 int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     auto hud = get_hud();
     state->money_shop_total += amount;
     hud->money.counter += amount;
@@ -1771,7 +1726,7 @@ int32_t add_money(int32_t amount, std::optional<uint8_t> display_time)
 
 int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_t> display_time)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     auto hud = get_hud();
     uint8_t slot = player_slot - 1;
     if (slot > 3)
@@ -1786,13 +1741,13 @@ int32_t add_money_slot(int32_t amount, uint8_t player_slot, std::optional<uint8_
 void destroy_layer(uint8_t layer)
 {
     static const size_t offset = get_address("unload_layer");
-    auto state = State::get().ptr();
+    auto items = HeapBase::get().state()->items;
     for (auto i = 0; i < MAX_PLAYERS; ++i)
     {
-        if (state->items->players[i] && state->items->players[i]->layer == layer)
-            state->items->players[i] = nullptr;
+        if (items->players[i] && items->players[i]->layer == layer)
+            items->players[i] = nullptr;
     }
-    auto* layer_ptr = State::get().layer(layer);
+    auto* layer_ptr = HeapBase::get().state()->layer(layer);
     typedef void destroy_func(Layer*);
     static destroy_func* df = (destroy_func*)(offset);
     df(layer_ptr);
@@ -1807,7 +1762,7 @@ void destroy_level()
 void create_layer(uint8_t layer)
 {
     static const size_t offset = get_address("init_layer");
-    auto* layer_ptr = State::get().layer(layer);
+    auto* layer_ptr = HeapBase::get().state()->layer(layer);
     typedef void init_func(Layer*);
     static init_func* ilf = (init_func*)(offset);
     ilf(layer_ptr);
@@ -1821,7 +1776,7 @@ void create_level()
 
 void set_level_logic_enabled(bool enable)
 {
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     static const size_t offset = get_virtual_function_address(state->screen_level, 1);
 
     if (!enable)
@@ -1974,7 +1929,7 @@ void init_seeded(std::optional<uint32_t> seed)
     static const size_t offset = get_address("init_seeded");
     typedef void init_func(void*, uint32_t);
     static init_func* isf = (init_func*)(offset);
-    auto* state = State::get().ptr();
+    auto* state = HeapBase::get().state();
     isf(state, seed.value_or(state->seed));
 }
 
@@ -2105,4 +2060,23 @@ uint8_t get_liquid_layer()
 {
     static auto addr = get_address("check_if_collides_with_liquid_layer");
     return memory_read<uint8_t>(addr);
+}
+
+uint32_t lowbias32(uint32_t x)
+{
+    x ^= x >> 16;
+    x *= 0x7feb352d;
+    x ^= x >> 15;
+    x *= 0x846ca68b;
+    x ^= x >> 16;
+    return x;
+}
+uint32_t lowbias32_r(uint32_t x)
+{
+    x ^= x >> 16;
+    x *= 0x43021123U;
+    x ^= x >> 15 ^ x >> 30;
+    x *= 0x1d69e2a5U;
+    x ^= x >> 16;
+    return x;
 }

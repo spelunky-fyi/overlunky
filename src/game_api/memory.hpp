@@ -1,15 +1,10 @@
 #pragma once
 
-#include <Windows.h>   // for GetModuleHandleA, LPVOID
 #include <cstddef>     // for size_t, byte, NULL
 #include <cstdint>     // for int32_t, int64_t, uint32_t, uint64_t, uint8_t
 #include <memory>      // for unique_ptr
 #include <string>      // for string, string_literals
 #include <string_view> // for string_view
-
-#include "search.hpp" // for find_after_bundle
-
-using namespace std::string_literals;
 
 class ExecutableMemory
 {
@@ -81,7 +76,7 @@ struct Memory
     ~Memory(){};
 };
 
-[[nodiscard]] LPVOID alloc_mem_rel32(size_t addr, size_t size);
+[[nodiscard]] void* alloc_mem_rel32(size_t addr, size_t size);
 void write_mem_prot(size_t addr, std::string_view payload, bool prot);
 void write_mem_prot(size_t addr, std::string payload, bool prot);
 void write_mem(size_t addr, std::string payload);
