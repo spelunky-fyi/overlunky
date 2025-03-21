@@ -71,7 +71,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
     /// Returns nil if the file can't be found. Loading a bank file will load the banks metadata, but not non-streaming
     /// sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
-    /// be found with `get_event_by_id` or using `create_fmod_path_guid_map` and calling `FMODpathGUIDmap:getEvent()`.
+    /// be found with `get_event_by_id` or using `create_fmod_guid_map` and calling `FMODguidMap:getEvent()`.
     /// The banks loading state can be queried using `CustomBank:getLoadingState()` which will return an `FMOD_LOADING_STATE`.
     lua["load_bank"] = [](std::string path, FMODStudio::LoadBankFlags flags) -> sol::optional<CustomBank>
     {
@@ -341,31 +341,31 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "isValid",
         &CustomBank::isValid);
 
-    /// An `FMODpathGUIDmap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
+    /// An `FMODguidMap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
     /// from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
-    /// strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODpathGUIDmap` is a
-    /// workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODpathGUIDmap:getEvent()`.
-    /// `FMODpathGUIDmap:getEvent()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
-    lua.new_usertype<FMODpathGUIDmap>(
-        "FMODpathGUIDmap",
+    /// strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODguidMap` is a
+    /// workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:getEvent()`.
+    /// `FMODguidMap:getEvent()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+    lua.new_usertype<FMODguidMap>(
+        "FMODguidMap",
         "getEvent",
-        [](FMODpathGUIDmap& pgm, std::string path) -> std::optional<CustomEventDescription>
+        [](FMODguidMap& guidmap, std::string path) -> std::optional<CustomEventDescription>
         {
-            if (CustomEventDescription event_description = pgm.get_event(path))
+            if (CustomEventDescription event_description = guidmap.get_event(path))
             {
                 return event_description;
             }
-            DEBUG("Failed to get CustomEventDescription from FMODpathGUIDmap");
+            DEBUG("Failed to get CustomEventDescription from FMODguidMap");
             return sol::nullopt;
         }
     );
     
-    /// Creates an `FMODpathGUIDmap` by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
+    /// Creates an `FMODguidMap` by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
     /// if you want to use a human readable FMOD event path to create a `CustomEventDescription` instead of using an FMOD GUID string.
-    lua["create_fmod_path_guid_map"] = [](std::string path) -> sol::optional<FMODpathGUIDmap>
+    lua["create_fmod_guid_map"] = [](std::string path) -> sol::optional<FMODguidMap>
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (FMODpathGUIDmap map = backend->sound_manager->create_fmod_path_guid_map((backend->get_root_path() / path).string()))
+        if (FMODguidMap map = backend->sound_manager->create_fmod_guid_map((backend->get_root_path() / path).string()))
         {
             return map;
         }

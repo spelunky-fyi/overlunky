@@ -235,16 +235,16 @@ class CustomEventInstance
     SoundManager* m_SoundManager{nullptr};
 };
 
-class FMODpathGUIDmap
+class FMODguidMap
 {
     friend class SoundManager;
 
   public:
-    FMODpathGUIDmap(const FMODpathGUIDmap& rhs);
-    FMODpathGUIDmap(FMODpathGUIDmap&& rhs) noexcept;
-    FMODpathGUIDmap& operator=(const FMODpathGUIDmap& rhs) = delete;
-    FMODpathGUIDmap& operator=(FMODpathGUIDmap&& rhs) = delete;
-    ~FMODpathGUIDmap() = default;
+    FMODguidMap(const FMODguidMap& rhs);
+    FMODguidMap(FMODguidMap&& rhs) noexcept;
+    FMODguidMap& operator=(const FMODguidMap& rhs) = delete;
+    FMODguidMap& operator=(FMODguidMap&& rhs) = delete;
+    ~FMODguidMap() = default;
 
     operator bool()
     {
@@ -254,12 +254,12 @@ class FMODpathGUIDmap
     CustomEventDescription get_event(std::string path);
 
   private:
-    FMODpathGUIDmap(std::nullptr_t, std::nullptr_t)
+    FMODguidMap(std::nullptr_t, std::nullptr_t)
     {
     }
-    FMODpathGUIDmap(std::unordered_map<std::string, FMOD::FMOD_GUID> m_PathGUIDmap, SoundManager* sound_manager);
+    FMODguidMap(std::unordered_map<std::string, FMOD::FMOD_GUID> m_GUIDmap, SoundManager* sound_manager);
 
-    std::unordered_map<std::string, FMOD::FMOD_GUID> m_PathGUIDmap;
+    std::unordered_map<std::string, FMOD::FMOD_GUID> m_GUIDmap;
     SoundManager* m_SoundManager{nullptr};
 };
 
@@ -291,8 +291,8 @@ class SoundManager
     bool unload_bank(FMOD::Bank* fmod_bank);
     bool bank_is_valid(CustomBank custom_bank);
 
-    FMODpathGUIDmap create_fmod_path_guid_map(std::string_view path);
-    CustomEventDescription pathguidmap_lookup_id(FMODpathGUIDmap map, std::string path);
+    FMODguidMap create_fmod_guid_map(std::string_view path);
+    CustomEventDescription guidmap_lookup_id(FMODguidMap map, std::string path);
 
     CustomEventDescription get_event_by_id_string(std::string guid_string);
     CustomEventDescription get_event_by_id(FMOD::FMOD_GUID* guid);
@@ -400,6 +400,7 @@ class SoundManager
     FMOD::ChannelGetUserData* m_ChannelGetUserData{nullptr};
 
     FMODStudio::System* m_FmodStudioSystem{nullptr};
+
     FMODStudio::SystemLoadBankFile* m_SystemLoadBankFile{nullptr};
     FMODStudio::SystemGetBank* m_SystemGetBank{nullptr};
     FMODStudio::SystemGetEventByID* m_SystemGetEventByID{nullptr};
