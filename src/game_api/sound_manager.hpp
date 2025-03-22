@@ -169,7 +169,7 @@ class CustomEventDescription
     std::optional<FMODStudio::LoadingState> getSampleLoadingState();
 
     std::optional<FMODStudio::ParameterDescription> getParameterDescriptionByName(std::string name);
-    std::optional<FMODStudio::ParameterId> getParameterIdByName(std::string name);
+    std::optional<FMODStudio::ParameterId> getParameterIDByName(std::string name);
 
     bool isValid();
 

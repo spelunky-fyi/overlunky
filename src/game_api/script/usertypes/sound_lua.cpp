@@ -201,7 +201,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
     /// FMOD Studio event parameter identifier. Can be retrieved with
     /// `CustomEventDescription:getParameterDescriptionByName().id`, or
-    /// directly by using `CustomEventDescription:getParameterIdByName()`.
+    /// directly by using `CustomEventDescription:getParameterIDByName()`.
     /// Can be used with `CustomEventInstance:set_parameter_by_id()`,
     /// `CustomEventInstance:set_parameter_by_id_with_label()`, and
     /// `CustomEventInstance:get_parameter_by_id()`. This is useful
@@ -252,8 +252,8 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         &CustomEventDescription::getSampleLoadingState,
         "getParameterDescriptionByName",
         &CustomEventDescription::getParameterDescriptionByName,
-        "getParameterIdByName",
-        &CustomEventDescription::getParameterIdByName,
+        "getParameterIDByName",
+        &CustomEventDescription::getParameterIDByName,
         "isValid",
         &CustomEventDescription::isValid);
 

@@ -417,7 +417,7 @@ std::optional<FMODStudio::ParameterDescription> CustomEventDescription::getParam
 {
     return m_SoundManager->event_get_parameter_description_by_name(*this, name);
 }
-std::optional<FMODStudio::ParameterId> CustomEventDescription::getParameterIdByName(std::string name)
+std::optional<FMODStudio::ParameterId> CustomEventDescription::getParameterIDByName(std::string name)
 {
     return m_SoundManager->event_get_parameter_id_by_name(*this, name);
 }
