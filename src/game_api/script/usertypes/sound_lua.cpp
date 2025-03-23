@@ -164,7 +164,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
     /// Returns nil if the file can't be found. Loading a bank file will load the banks metadata, but not non-streaming
     /// sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
-    /// be found with `get_event_by_id` or using `create_fmod_guid_map` and calling `FMODguidMap:getEvent()`.
+    /// be found with `get_event_by_id()` or using `create_fmod_guid_map()` and calling `FMODguidMap:getEvent()`.
     /// The banks loading state can be queried using `CustomBank:getLoadingState()` which will return an `FMOD_LOADING_STATE`.
     lua["load_bank"] = [](std::string path, FMODStudio::LoadBankFlags flags) -> sol::optional<CustomBank>
     {
