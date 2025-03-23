@@ -6,7 +6,7 @@
 #include <exception> // for exception
 #include <memory>    // for remove_if, unique_ptr
 #include <mutex>     // for lock_guard, mutex
-#include <regex>     // for regex, regex_replace, regex_search
+#include <regex>     // for regex, regex_constants, regex_search
 
 #include "aliases.hpp"    //
 #include "entity.hpp"     //
