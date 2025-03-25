@@ -193,6 +193,8 @@ cpp_type_exceptions = [
     "Players",
     "CutsceneBehavior",
     "CustomCutsceneBehavior",
+    "FMODStudio::ParameterDescription",
+    "FMODStudio::ParameterId",
 ]
 not_functions = [
     "players",
