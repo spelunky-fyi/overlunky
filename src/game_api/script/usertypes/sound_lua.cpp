@@ -102,7 +102,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         FMODStudio::StopMode::Immediate);
     /* FMOD_STOP_MODE
         // ALLOW_FADE_OUT
-        // Allow the events ADHSR modulators to complete their release, and DSP effect tails to play out.
+        // Allow the events AHDSR modulators to complete their release, and DSP effect tails to play out.
         // IMMEDIATE
         // Stops the event instance immediately.
         */
