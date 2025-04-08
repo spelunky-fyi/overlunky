@@ -1088,7 +1088,7 @@ FMODguidMap SoundManager::create_fmod_guid_map(std::string_view path)
                 std::string FMOD_guid_str = matches[1].str().substr(0, 38);
                 std::string FMOD_path = matches[2].str();
 
-                if (!FMOD_path.empty())
+                if (FMOD_path.length() > 7)
                 {
                     FMOD::FMOD_GUID guid;
                     if (FMOD_CHECK_CALL(m_StudioParseID(FMOD_guid_str.c_str(), &guid)))
