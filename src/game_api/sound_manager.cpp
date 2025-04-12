@@ -601,7 +601,7 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
             auto lock_channel_group = reinterpret_cast<FMODStudio::LockChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_LockChannelGroup"));
             auto get_channel_group = reinterpret_cast<FMODStudio::GetChannelGroup*>(GetProcAddress(fmod_studio, "FMOD_Studio_Bus_GetChannelGroup"));
 
-            auto get_channel_group_from_bus_name = [=](const char* bus_name, FMOD::ChannelGroup** channel_group)
+            auto get_channel_group_from_bus_name = [=, this](const char* bus_name, FMOD::ChannelGroup** channel_group)
             {
                 FMODStudio::Bus* bus{nullptr};
                 auto err = get_bus(m_FmodStudioSystem, bus_name, &bus);
