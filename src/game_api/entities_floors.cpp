@@ -5,11 +5,11 @@
 #include <cstdlib>  // for rand, abs, size_t
 
 #include "entity_lookup.hpp" // for get_entities_at
-#include "layer.hpp"     // for EntityList, EntityList::Range, Layer, Entit...
-#include "movable.hpp"   // for Movable
-#include "spawn_api.hpp" // for spawn_entity_over
-#include "state.hpp"     // for StateMemory
-#include "texture.hpp"   // for Texture
+#include "layer.hpp"         // for EntityList, EntityList::Range, Layer, Entit...
+#include "movable.hpp"       // for Movable
+#include "spawn_api.hpp"     // for spawn_entity_over
+#include "state.hpp"         // for StateMemory
+#include "texture.hpp"       // for Texture
 
 void Floor::fix_border_tile_animation()
 {
@@ -762,7 +762,7 @@ void Door::unlock(bool unlock)
         else
             this->flags &= ~0x80000; // clr flag 20 (Enable button prompt)
 
-        auto& state = get_state_ptr();
+        auto state = get_state_ptr();
         // entrance, exit, starting exit
         if (ent_type == entrance_door || ent_type == entrance_door + 1 || ent_type == entrance_door + 3)
         {
