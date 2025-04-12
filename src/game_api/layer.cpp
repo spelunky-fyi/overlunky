@@ -119,9 +119,9 @@ Entity* Layer::get_grid_entity_at(float x, float y) const
     return nullptr;
 }
 
-Entity* Layer::get_entity_at(float x, float y, uint32_t search_flags, uint32_t include_flags, uint32_t exclude_flags, uint32_t one_of_flags)
+Entity* Layer::get_entity_at(float x, float y, ENTITY_MASK search_flags, uint32_t include_flags, uint32_t exclude_flags, uint32_t one_of_flags)
 {
-    using get_entity_at_impl_fun = Entity*(Layer*, float, float, size_t, size_t, size_t, size_t);
+    using get_entity_at_impl_fun = Entity*(Layer*, float, float, ENTITY_MASK, size_t, size_t, size_t);
     static auto get_entity_at_impl = (get_entity_at_impl_fun*)get_address("layer_get_entity_at"sv);
     return get_entity_at_impl(this, x, y, search_flags, include_flags, exclude_flags, one_of_flags);
 }

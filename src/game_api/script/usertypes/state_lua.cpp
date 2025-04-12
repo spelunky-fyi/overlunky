@@ -629,7 +629,7 @@ void register_usertypes(sol::state& lua)
             return sol::nil;
 
         // this actually calls destructor, since it's copied to the lua stack
-        // which calls the clear function, thought it should be fine since the slot member should be set, das preventing the free from being called
+        // which calls the clear function, thought it should be fine since the `slot` member should be set, das preventing the free from being called
         return sol::make_object(lua, SaveState::get(slot));
     };
 
@@ -649,7 +649,7 @@ void register_usertypes(sol::state& lua)
         "get_prng",
         &SaveState::get_prng,
         "get",
-        &SaveState::get);
+        get);
 
     /// Get the thread-local version of state
     lua["get_local_state"] = []() -> StateMemory*
@@ -691,6 +691,6 @@ void register_usertypes(sol::state& lua)
     /// The patch however does not destroy the liquids that fall pass the level bounds,
     /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
     lua["fix_liquid_out_of_bounds"] = []()
-    { HeapBase::get().liquid_physics()->remove_liquid_oob()/**/; };
+    { HeapBase::get().liquid_physics()->remove_liquid_oob() /**/; };
 }
 }; // namespace NState

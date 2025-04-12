@@ -529,7 +529,7 @@ struct CommunityChance;
 using ChanceFunc = void(const CommunityChance& self, float x, float y, Layer* layer);
 using ChanceValidPlacementFunc = bool(const CommunityChance& self, float x, float y, Layer* layer);
 
-auto g_MaskTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
+auto g_MaskTestFunc = [](float x, float y, Layer* layer, ENTITY_MASK flags)
 {
     if (!layer->get_grid_entity_at(x, y))
     {
@@ -562,94 +562,95 @@ auto g_SafeTestFunc = [](float x, float y, Layer* layer)
     }
     return true;
 };
+ENUM_CLASS_FLAGS(POS_TYPE);
 
-auto g_PositionTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
+auto g_PositionTestFunc = [](float x, float y, Layer* layer, POS_TYPE flags)
 {
-    uint32_t default_mask = 0x6180;
+    ENTITY_MASK default_mask = ENTITY_MASK::LIQUID | ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR;
     ENTITY_MASK empty_mask = ENTITY_MASK::LIQUID | ENTITY_MASK::FLOOR | ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER |
                              ENTITY_MASK::ITEM | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::ROPE | ENTITY_MASK::EXPLOSION;
 
-    if (flags & (uint32_t)POS_TYPE::DEFAULT)
-        flags = (uint32_t)POS_TYPE::FLOOR | (uint32_t)POS_TYPE::SAFE | (uint32_t)POS_TYPE::EMPTY;
+    if ((flags & POS_TYPE::DEFAULT) == POS_TYPE::DEFAULT)
+        flags = POS_TYPE::FLOOR | POS_TYPE::SAFE | POS_TYPE::EMPTY;
 
-    if (flags & (uint32_t)POS_TYPE::WATER || flags & (uint32_t)POS_TYPE::LAVA)
+    if ((flags & POS_TYPE::WATER) == POS_TYPE::WATER || (flags & POS_TYPE::LAVA) == POS_TYPE::LAVA)
     {
-        default_mask -= 0x6000;
+        default_mask = default_mask ^ ENTITY_MASK::LIQUID;
         empty_mask = empty_mask ^ ENTITY_MASK::LIQUID;
     }
 
-    if (flags & (uint32_t)POS_TYPE::FLOOR)
+    if ((flags & POS_TYPE::FLOOR) == POS_TYPE::FLOOR)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y - 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::CEILING)
+    if ((flags & POS_TYPE::CEILING) == POS_TYPE::CEILING)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y + 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::AIR)
+    if ((flags & POS_TYPE::AIR) == POS_TYPE::AIR)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WALL)
+    if ((flags & POS_TYPE::WALL) == POS_TYPE::WALL)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || (!g_SolidTestFunc(x + 1.0f, y, layer) && !g_SolidTestFunc(x - 1.0f, y, layer)))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WALL_LEFT)
+    if ((flags & POS_TYPE::WALL_LEFT) == POS_TYPE::WALL_LEFT)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WALL_RIGHT)
+    if ((flags & POS_TYPE::WALL_RIGHT) == POS_TYPE::WALL_RIGHT)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x + 1.0f, y, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::ALCOVE)
+    if ((flags & POS_TYPE::ALCOVE) == POS_TYPE::ALCOVE)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y + 1.0f, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || (g_SolidTestFunc(x + 1.0f, y, layer) == g_SolidTestFunc(x - 1.0f, y, layer)))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::PIT)
+    if ((flags & POS_TYPE::PIT) == POS_TYPE::PIT)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer) || !g_SolidTestFunc(x + 1.0f, y, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || g_SolidTestFunc(x, y + 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::HOLE)
+    if ((flags & POS_TYPE::HOLE) == POS_TYPE::HOLE)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer) || !g_SolidTestFunc(x + 1.0f, y, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || !g_SolidTestFunc(x, y + 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WATER)
+    if ((flags & POS_TYPE::WATER) == POS_TYPE::WATER)
     {
-        if (!g_MaskTestFunc(x, y, layer, 0x180) || g_MaskTestFunc(x, y, layer, 0x2000))
+        if (!g_MaskTestFunc(x, y, layer, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR) || g_MaskTestFunc(x, y, layer, ENTITY_MASK::WATER))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::LAVA)
+    if ((flags & POS_TYPE::LAVA) == POS_TYPE::LAVA)
     {
-        if (!g_MaskTestFunc(x, y, layer, 0x180) || g_MaskTestFunc(x, y, layer, 0x4000))
+        if (!g_MaskTestFunc(x, y, layer, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR) || g_MaskTestFunc(x, y, layer, ENTITY_MASK::LAVA))
             return false;
     }
     auto box = AABB(x - 0.49f, y + 0.49f, x + 0.49f, y - 0.49f);
     auto layer_num = (LAYER)(layer->is_back_layer ? 1 : 0);
-    if (flags & (uint32_t)POS_TYPE::SAFE)
+    if ((flags & POS_TYPE::SAFE) == POS_TYPE::SAFE)
     {
-        if (!g_MaskTestFunc(x, y, layer, 0x2180) || !g_SafeTestFunc(x - 1.0f, y, layer) || !g_SafeTestFunc(x + 1.0f, y, layer) || !g_SafeTestFunc(x, y - 1.0f, layer) || !g_SafeTestFunc(x, y + 1.0f, layer))
+        if (!g_MaskTestFunc(x, y, layer, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::WATER) || !g_SafeTestFunc(x - 1.0f, y, layer) || !g_SafeTestFunc(x + 1.0f, y, layer) || !g_SafeTestFunc(x, y - 1.0f, layer) || !g_SafeTestFunc(x, y + 1.0f, layer))
             return false;
         if (is_inside_active_shop_room(x, y, layer_num))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::EMPTY)
+    if ((flags & POS_TYPE::EMPTY) == POS_TYPE::EMPTY)
     {
         if (get_entities_overlapping_hitbox(0, empty_mask, box, layer_num).size() > 0)
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::SOLID)
+    if ((flags & POS_TYPE::SOLID) == POS_TYPE::SOLID)
     {
-        if (!layer->get_entity_at(x, y, 0x180, 0, 0, 0))
+        if (!layer->get_entity_at(x, y, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR, 0, 0, 0))
             return false;
         if (Entity* floor = layer->get_grid_entity_at(x, y))
             return (floor->flags & (1 << 2)) != 0;
@@ -659,7 +660,7 @@ auto g_PositionTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
 
 auto g_DefaultTestFunc = [](float x, float y, Layer* layer)
 {
-    return g_PositionTestFunc(x, y, layer, (uint32_t)POS_TYPE::FLOOR | (uint32_t)POS_TYPE::SAFE | (uint32_t)POS_TYPE::EMPTY);
+    return g_PositionTestFunc(x, y, layer, POS_TYPE::FLOOR | POS_TYPE::SAFE | POS_TYPE::EMPTY);
 };
 
 struct CommunityChance
@@ -2040,7 +2041,7 @@ bool default_spawn_is_valid(float x, float y, LAYER layer)
 
 bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags)
 {
-    return g_PositionTestFunc(x, y, HeapBase::get().state()->layer(layer), (uint32_t)flags);
+    return g_PositionTestFunc(x, y, HeapBase::get().state()->layer(layer), flags);
 }
 
 void override_next_levels(std::vector<std::string> next_levels)

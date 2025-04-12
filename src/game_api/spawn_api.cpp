@@ -437,7 +437,7 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
     auto has_solid_ent = [=](float gx, float gy) -> bool
     {
         {
-            Movable* ent = static_cast<Movable*>(layer_ptr->get_entity_at(gx, gy, 0x180, 0x4, 0x8, 0));
+            Movable* ent = static_cast<Movable*>(layer_ptr->get_entity_at(gx, gy, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR, 0x4, 0x8, 0));
             if (ent)
             {
                 return (ent->type->search_flags & ENTITY_MASK::FLOOR) == ENTITY_MASK::FLOOR || (ent->velocityx == 0.0 && ent->velocityy == 0.0); // see 0x2299c90f
