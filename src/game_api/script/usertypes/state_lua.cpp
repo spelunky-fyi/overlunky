@@ -18,12 +18,13 @@
 #include "items.hpp"              // for Items, SelectPlayerSlot, Items::is...
 #include "level_api.hpp"          // IWYU pragma: keep
 #include "online.hpp"             // for OnlinePlayer, OnlineLobby, Online
+#include "prng.hpp"               // IWYU pragma: keep
 #include "savestate.hpp"          // for SaveState
 #include "screen.hpp"             // IWYU pragma: keep
 #include "screen_arena.hpp"       // IWYU pragma: keep
 #include "script/events.hpp"      // for pre_load_state
 #include "script/lua_backend.hpp" // for LuaBackend
-#include "state.hpp"              // for StateMemory, State, StateMemory::a...
+#include "state.hpp"              // for StateMemory, StateMemory::a...
 #include "state_structs.hpp"      // for ArenaConfigArenas, ArenaConfigItems
 
 namespace NState
@@ -532,7 +533,9 @@ void register_usertypes(sol::state& lua)
         "local_player",
         &Online::local_player,
         "lobby",
-        &Online::lobby);
+        &Online::lobby,
+        "is_active",
+        &Online::is_active);
     /// Used in Online
     lua.new_usertype<OnlinePlayer>(
         "OnlinePlayer",
@@ -578,39 +581,29 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 
     lua["toast_visible"] = []() -> bool
-    {
-        return State::get().ptr()->toast != 0;
-    };
+    { return HeapBase::get().state()->toast != 0; };
 
     lua["speechbubble_visible"] = []() -> bool
-    {
-        return State::get().ptr()->speechbubble != 0;
-    };
+    { return HeapBase::get().state()->speechbubble != 0; };
 
     lua["cancel_toast"] = []()
-    {
-        State::get().ptr()->toast_timer = 1000;
-    };
+    { HeapBase::get().state()->toast_timer = 1000; };
 
     lua["cancel_speechbubble"] = []()
-    {
-        State::get().ptr()->speechbubble_timer = 1000;
-    };
+    { HeapBase::get().state()->speechbubble_timer = 1000; };
 
     /// Save current level state to slot 1..4. These save states are invalid and cleared after you exit the current level, but can be used to rollback to an earlier state in the same level. You probably definitely shouldn't use save state functions during an update, and sync them to the same event outside an update (i.e. GUIFRAME, POST_UPDATE). These slots are already allocated by the game, actually used for online rollback, and use no additional memory. Also see SaveState if you need more.
     lua["save_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4)
-        {
-            copy_save_slot(5, slot);
-        }
+            SaveState::backup_main(slot);
     };
 
     /// Load level state from slot 1..4, if a save_state was made in this level.
     lua["load_state"] = [](int slot)
     {
         if (slot >= 1 && slot <= 4 && get_save_state(slot))
-            copy_save_slot(slot, 5);
+            SaveState::restore_main(slot);
     };
 
     /// Clear save state from slot 1..4.
@@ -628,6 +621,32 @@ void register_usertypes(sol::state& lua)
         return nullptr;
     };
 
-    lua.new_usertype<SaveState>("SaveState", sol::constructors<SaveState()>(), "load", &SaveState::load, "save", &SaveState::save, "clear", &SaveState::clear, "get_state", &SaveState::get_state);
+    auto get = [&lua](int slot) -> sol::object
+    {
+        if (slot < 1 || slot > 4)
+            return sol::nil;
+
+        // this actually calls destructor, since it's copied to the lua stack
+        // which calls the clear function, thought it should be fine since the slot member should be set, das preventing the free from being called
+        return sol::make_object(lua, SaveState::get(slot));
+    };
+
+    lua.new_usertype<SaveState>(
+        "SaveState",
+        sol::constructors<SaveState()>(),
+        "load",
+        &SaveState::load,
+        "save",
+        &SaveState::save,
+        "clear",
+        &SaveState::clear,
+        "get_state",
+        &SaveState::get_state,
+        "get_frame",
+        &SaveState::get_frame,
+        "get_prng",
+        &SaveState::get_prng,
+        "get",
+        get);
 }
 }; // namespace NState

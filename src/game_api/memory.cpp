@@ -3,12 +3,16 @@
 #include <cstdlib>       // for exit
 #include <cstring>       // for memcpy
 #include <functional>    // for equal_to
+#include <minwindef.h>   // for LPVOID
 #include <new>           // for operator new
 #include <unordered_map> // for unordered_map, _Umap_traits<>::allocator_type
 #include <utility>       // for min, max
 #include <vector>        // for vector, _Vector_iterator, _Vector_const_ite...
 
-#include "bucket.hpp"
+#include "bucket.hpp" // for Bucket
+#include "search.hpp" // for find_after_bundle
+
+using namespace std::string_literals;
 
 ExecutableMemory::ExecutableMemory(std::string_view raw_code)
 {
@@ -94,7 +98,7 @@ size_t function_start(size_t off, uint8_t outside_byte)
     return off;
 }
 
-LPVOID alloc_mem_rel32(size_t addr, size_t size)
+void* alloc_mem_rel32(size_t addr, size_t size)
 {
     const size_t limit_addr = Memory::get().exe_address();
     LPVOID new_array = nullptr;

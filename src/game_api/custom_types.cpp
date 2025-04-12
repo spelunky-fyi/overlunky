@@ -7,7 +7,7 @@
 #include <utility>     // for min, find
 #include <vector>      // for vector, allocator, vector<>::iterator
 
-#include "entity.hpp" // for to_id
+#include "entity_db.hpp" // for to_id
 
 const std::vector<std::pair<CUSTOM_TYPE, std::string_view>> custom_type_names = {
     {CUSTOM_TYPE::ACIDBUBBLE, "ACIDBUBBLE"},

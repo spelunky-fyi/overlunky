@@ -3,8 +3,7 @@
 #include "entity.hpp"        // for Entity, to_id, EntityDB
 #include "items.hpp"         // IWYU pragma: keep
 #include "layer.hpp"         // for EntityList::Range, EntityList, EntityList::Ent...
-#include "search.hpp"        // for get_address
-#include "sound_manager.hpp" //
+#include "sound_manager.hpp" // for construct_soundmeta
 
 uint8_t Olmec::broken_floaters()
 {

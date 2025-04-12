@@ -25,6 +25,7 @@
 #include <vector>        // for vector
 
 #include "aliases.hpp"                      // for IMAGE, JournalPageType, SPAWN_TYPE
+#include "heap_base.hpp"                    // for HeapBase
 #include "hook_handler.hpp"                 // for HookHandler
 #include "level_api.hpp"                    // IWYU pragma: keep
 #include "logger.h"                         // for DEBUG
@@ -200,7 +201,7 @@ struct ScreenCallback
 {
     sol::function func;
     ON screen;
-    int lastRan;
+    int lastRan; // TODO should probably be uint32_t ?
 };
 
 struct LevelGenCallback
@@ -340,7 +341,7 @@ class LuaBackend
     std::unordered_set<std::string> console_commands;
     std::unordered_map<StateMemory*, LocalStateData> local_state_datas;
     bool manual_save{false};
-    uint32_t last_save{0};
+    uint64_t last_save{0};
 
     ImDrawList* draw_list{nullptr};
 
@@ -473,7 +474,7 @@ class LuaBackend
     void load_user_data();
     bool on_pre(ON event);
     void on_post(ON event);
-    void pre_copy_state(StateMemory* from, StateMemory* to);
+    void pre_copy_state(HeapBase from, HeapBase to);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);

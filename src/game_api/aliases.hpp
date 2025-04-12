@@ -221,3 +221,8 @@ bool test_mask(T flags, T mask)
 {
     return static_cast<std::underlying_type_t<T>>(flags & mask) != 0;
 }
+
+// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
+uint8_t enum_to_layer(const LAYER layer, struct Vec2& player_position);
+// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
+uint8_t enum_to_layer(const LAYER layer);

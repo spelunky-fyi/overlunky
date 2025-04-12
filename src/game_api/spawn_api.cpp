@@ -17,8 +17,8 @@
 #include "entities_items.hpp"           // for ClimbableRope
 #include "entities_liquids.hpp"         // for Lava
 #include "entities_monsters.hpp"        // for Shopkeeper, RoomOwner
-#include "entity.hpp"                   // for to_id, Entity, get_entity_ptr, Enti...
-#include "entity_db.hpp"                // for EntityFactory
+#include "entity.hpp"                   // for Entity, get_entity_ptr, Enti...
+#include "entity_db.hpp"                // for EntityFactory, to_id
 #include "illumination.hpp"             //
 #include "items.hpp"                    //
 #include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x
@@ -29,7 +29,7 @@
 #include "prng.hpp"                     // for PRNG, PRNG::PRNG_CLASS, PRNG::ENTIT...
 #include "script/events.hpp"            // for post_entity_spawn, pre_entity_spawn
 #include "search.hpp"                   // for get_address
-#include "state.hpp"                    // for enum_to_layer, State, StateMemory
+#include "state.hpp"                    // for StateMemory
 #include "state_structs.hpp"            // for LiquidTileSpawnData, LiquidPhysics
 #include "util.hpp"                     // for OnScopeExit
 
@@ -175,7 +175,7 @@ int32_t spawn_entity_abs(ENT_TYPE entity_type, float x, float y, LAYER layer, fl
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, vx, vy, false)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, vx, vy, false)->uid;
 }
 
 int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -187,7 +187,7 @@ int32_t spawn_entity_snap_to_floor(ENT_TYPE entity_type, float x, float y, LAYER
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity_snap_to_floor(entity_type, x + offset_position.x, y + offset_position.y)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_entity_snap_to_floor(entity_type, x + offset_position.x, y + offset_position.y)->uid;
 }
 
 int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER layer)
@@ -199,7 +199,7 @@ int32_t spawn_entity_snap_to_grid(ENT_TYPE entity_type, float x, float y, LAYER 
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, 0.0f, 0.0f, true)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_entity(entity_type, x + offset_position.x, y + offset_position.y, false, 0.0f, 0.0f, true)->uid;
 }
 
 int32_t spawn_entity_abs_nonreplaceable(ENT_TYPE entity_type, float x, float y, LAYER layer, float vx, float vy)
@@ -216,7 +216,6 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto& state = State::get();
     Entity* overlay = get_entity_ptr(over_uid);
     if (overlay == nullptr)
         return -1;
@@ -224,7 +223,7 @@ int32_t spawn_entity_over(ENT_TYPE entity_type, uint32_t over_uid, float x, floa
     if (layer > 1)
         return -1;
 
-    return state.layer(layer)->spawn_entity_over(entity_type, overlay, x, y)->uid;
+    return HeapBase::get().state()->layers[layer]->spawn_entity_over(entity_type, overlay, x, y)->uid;
 }
 
 int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint8_t t)
@@ -236,7 +235,7 @@ int32_t spawn_door_abs(float x, float y, LAYER layer, uint8_t w, uint8_t l, uint
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_door(x + offset_position.x, y + offset_position.y, w, l, t)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_door(x + offset_position.x, y + offset_position.y, w, l, t)->uid;
 }
 
 void spawn_backdoor_abs(float x, float y)
@@ -245,10 +244,10 @@ void spawn_backdoor_abs(float x, float y)
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    auto& state = State::get();
+    auto state = HeapBase::get().state();
     DEBUG("Spawning backdoor on {}, {}", x, y);
-    Layer* front_layer = state.layer(0);
-    Layer* back_layer = state.layer(1);
+    Layer* front_layer = state->layers[0];
+    Layer* back_layer = state->layers[1];
     front_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     back_layer->spawn_entity(to_id("ENT_TYPE_FLOOR_DOOR_LAYER"), x, y, false, 0.0, 0.0, true);
     front_layer->spawn_entity(to_id("ENT_TYPE_LOGICAL_PLATFORM_SPAWNER"), x, y - 1.0f, false, 0.0, 0.0, true);
@@ -264,7 +263,7 @@ int32_t spawn_apep(float x, float y, LAYER layer, bool right)
     Vec2 offset_position;
     uint8_t actual_layer = enum_to_layer(layer, offset_position);
 
-    return State::get().layer(actual_layer)->spawn_apep(x + offset_position.x, y + offset_position.y, right)->uid;
+    return HeapBase::get().state()->layers[actual_layer]->spawn_apep(x + offset_position.x, y + offset_position.y, right)->uid;
 }
 
 int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
@@ -279,7 +278,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     x = std::roundf(x + offset_position.x);
     y = std::roundf(y + offset_position.y);
 
-    Layer* layer_ptr = State::get().layer(actual_layer);
+    Layer* layer_ptr = HeapBase::get().state()->layers[actual_layer];
 
     // Needs some space on top
     if (x < 0 || static_cast<int>(x) >= g_level_max_x || y < 1 || static_cast<int>(y) + 2 >= g_level_max_y || height == 1 ||
@@ -294,7 +293,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
     static const auto tree_branch = to_id("ENT_TYPE_FLOOR_TREE_BRANCH");
     static const auto tree_deco = to_id("ENT_TYPE_DECORATION_TREE");
 
-    PRNG& prng = PRNG::get_local();
+    PRNG* prng = HeapBase::get().prng();
 
     // spawn the base
     Entity* current_piece = layer_ptr->spawn_entity(tree_base, x, y, false, 0.0f, 0.0f, true);
@@ -312,7 +311,7 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
                 break;
             }
             current_piece = layer_ptr->spawn_entity_over(tree_trunk, current_piece, 0.0f, 1.0f);
-            if (height == 0 && prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            if (height == 0 && prng->random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
             {
                 break;
             }
@@ -326,20 +325,20 @@ int32_t spawn_tree(float x, float y, LAYER layer, uint16_t height)
         auto spawn_deco = [&](Entity* branch, bool left)
         {
             Entity* deco = layer_ptr->spawn_entity_over(tree_deco, branch, 0.0f, 0.49f);
-            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng.random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION)) * 12;
+            deco->animation_frame = 7 * 12 + 3 + static_cast<uint16_t>(prng->random_int(0, 2, PRNG::PRNG_CLASS::ENTITY_VARIATION)) * 12;
             if (left)
                 deco->flags |= 1U << 16; // flag 17: facing left
         };
         auto test_pos = current_piece->abs_position();
 
         if (static_cast<int>(test_pos.x) + 1 < g_level_max_x && layer_ptr->get_grid_entity_at(test_pos.x + 1, test_pos.y) == nullptr &&
-            prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            prng->random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
             Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, 1.02f, 0.0f);
             spawn_deco(branch, false);
         }
         if (static_cast<int>(test_pos.x) - 1 > 0 && layer_ptr->get_grid_entity_at(test_pos.x - 1, test_pos.y) == nullptr &&
-            prng.random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
+            prng->random_chance(2, PRNG::PRNG_CLASS::ENTITY_VARIATION))
         {
             Entity* branch = layer_ptr->spawn_entity_over(tree_branch, current_piece, -1.02f, 0.0f);
             branch->flags |= 1U << 16; // flag 17: facing left
@@ -359,7 +358,7 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
 
     Vec2 offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(l, offset);
-    const auto layer_ptr = State::get().layer(actual_layer);
+    const auto layer_ptr = HeapBase::get().state()->layers[actual_layer];
     const uint32_t i_x = static_cast<uint32_t>(x + offset.x + 0.5f);
     uint32_t i_y = static_cast<uint32_t>(y + offset.y + 0.5f);
     static const auto base = to_id("ENT_TYPE_FLOOR_MUSHROOM_BASE");
@@ -384,8 +383,8 @@ int32_t spawn_mushroom(float x, float y, LAYER l, uint16_t height) // height rel
         }
         else
         {
-            auto& prng = PRNG::get_local();
-            height = static_cast<uint16_t>(prng.random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
+            auto prng = HeapBase::get().prng();
+            height = static_cast<uint16_t>(prng->random_int(1, 3, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
         }
 
         i_y += 3;
@@ -428,7 +427,7 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
 
     Vec2 offset(0.0f, 0.0f);
     const auto actual_layer = enum_to_layer(layer, offset);
-    const auto layer_ptr = State::get().layer(actual_layer);
+    const auto layer_ptr = HeapBase::get().state()->layers[actual_layer];
     const uint32_t i_x = static_cast<uint32_t>(x + offset.x + 0.5f);
     const uint32_t i_y = static_cast<uint32_t>(y + offset.y + 0.5f);
     const float g_x = static_cast<float>(i_x);
@@ -612,9 +611,9 @@ SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
 Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
     // TODO: This still might not work very well and corner fill isn't actually floor spreading per level config definition, and should have a different SPAWN_TYPE (corner fill still happens when floor spreading chance is set to 0)
-    // const auto theme_floor = State::get().ptr_local()->current_theme->get_floor_spreading_type();
-    // const auto theme_floor2 = State::get().ptr_local()->current_theme->get_floor_spreading_type2();
-    auto state = State::get().ptr();
+    // const auto theme_floor = HeapBase::get().state()->current_theme->get_floor_spreading_type();
+    // const auto theme_floor2 = HeapBase::get().state()->current_theme->get_floor_spreading_type2();
+    auto state = HeapBase::get().state();
     auto [ax, ay, bx, by] = std::make_tuple(2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f);
     static const auto border_octo = to_id("ENT_TYPE_FLOOR_BORDERTILE_OCTOPUS");
     static const auto border_dust = to_id("ENT_TYPE_FLOOR_DUSTWALL");
@@ -683,7 +682,7 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
 {
     if (player_slot < 1 || player_slot > 4)
         return -1;
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     auto& slot = state->items->player_select_slots[player_slot - 1];
     if (slot.character < to_id("ENT_TYPE_CHAR_ANA_SPELUNKY") || slot.character > to_id("ENT_TYPE_CHAR_CLASSIC_GUY"))
         return -1;
@@ -703,10 +702,10 @@ int32_t spawn_player(int8_t player_slot, std::optional<float> x, std::optional<f
     static auto spawn_player = (spawn_player_fun*)get_address("spawn_player");
     // move the back layer to front layer offset if spawning in back layer
     if (layer.has_value() && layer.value() == LAYER::BACK)
-        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
+        std::swap(state->layers[0], state->layers[1]);
     spawn_player(get_state_ptr()->items, player_slot - 1);
     if (layer.has_value() && layer.value() == LAYER::BACK)
-        std::swap(State::get().ptr()->layers[0], State::get().ptr()->layers[1]);
+        std::swap(state->layers[0], state->layers[1]);
     state->level_gen->spawn_x = old_x;
     state->level_gen->spawn_y = old_y;
     auto player = state->items->player(player_slot - 1);
@@ -740,10 +739,10 @@ int32_t spawn_companion(ENT_TYPE companion_type, float x, float y, LAYER layer)
 int32_t spawn_shopkeeper(float x, float y, LAYER layer, ROOM_TEMPLATE room_template)
 {
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    StateMemory* state_ptr = State::get().ptr();
-    auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
+    auto level_gen = HeapBase::get().level_gen();
+    auto [ix, iy] = level_gen->get_room_index(x, y);
     uint32_t room_index = ix + iy * 8;
-    state_ptr->level_gen->set_room_template(ix, iy, real_layer, room_template);
+    level_gen->set_room_template(ix, iy, real_layer, room_template);
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(to_id("ENT_TYPE_MONS_SHOPKEEPER"), x, y, layer, 0, 0);
     auto keeper = get_entity_ptr(keeper_uid)->as<Shopkeeper>();
     keeper->shop_owner = true;
@@ -761,11 +760,11 @@ int32_t spawn_roomowner(ENT_TYPE owner_type, float x, float y, LAYER layer, int1
     static const auto tun_id = to_id("ENT_TYPE_MONS_MERCHANT");
 
     const uint8_t real_layer = static_cast<int32_t>(layer) < 0 ? 0 : static_cast<uint8_t>(layer);
-    StateMemory* state_ptr = State::get().ptr();
-    auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
+    auto level_gen = HeapBase::get().level_gen();
+    auto [ix, iy] = level_gen->get_room_index(x, y);
     uint32_t room_index = ix + iy * 8;
     if (room_template >= 0)
-        state_ptr->level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
+        level_gen->set_room_template(ix, iy, real_layer, (uint16_t)room_template);
     uint32_t keeper_uid = spawn_entity_abs_nonreplaceable(owner_type, x, y, layer, 0, 0);
     if (owner_type == waddler_id || owner_type == yang_id || owner_type == tun_id)
     {
@@ -789,10 +788,6 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     OnScopeExit pop{[]
                     { pop_spawn_type_flags(SPAWN_TYPE_SCRIPT); }};
 
-    Vec2 offset;
-    const auto l = enum_to_layer(layer, offset);
-    auto level_layer = State::get().layer(l);
-
     static const auto player_ghost = to_id("ENT_TYPE_ITEM_PLAYERGHOST");
     static const auto ana = to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
     static const auto egg_child = to_id("ENT_TYPE_CHAR_EGGPLANT_CHILD");
@@ -802,6 +797,9 @@ int32_t spawn_playerghost(ENT_TYPE char_type, float x, float y, LAYER layer)
     if (char_type < ana || char_type > egg_child)
         return -1;
 
+    Vec2 offset;
+    const auto l = enum_to_layer(layer, offset);
+    auto level_layer = HeapBase::get().state()->layers[l];
     auto player_ghost_entity = level_layer->spawn_entity(player_ghost, x + offset.x, y + offset.y, false, 0, 0, false)->as<PlayerGhost>();
     if (player_ghost_entity)
     {
@@ -816,5 +814,5 @@ MagmamanSpawnPosition::MagmamanSpawnPosition(uint32_t x_, uint32_t y_)
 {
     x = x_;
     y = y_;
-    timer = static_cast<uint32_t>(PRNG::get_local().random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
+    timer = static_cast<uint32_t>(HeapBase::get().prng()->random_int(2700, 27000, PRNG::PRNG_CLASS::PROCEDURAL_SPAWNS));
 }
