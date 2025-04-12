@@ -6,9 +6,9 @@
 #include "aliases.hpp"                       // for MAX_PLAYERS
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/identity_hasher.hpp"    // for identity_hasher
+#include "heap_base.hpp"                     // for OnHeapPointer
 #include "render_api.hpp"                    // for TextureRenderingInfo
 #include "sound_manager.hpp"                 // for BackgroundSound
-#include "thread_utils.hpp"                  // for OnHeapPointer
 
 struct SaveData;
 class ScreenCamp;
@@ -112,7 +112,7 @@ struct SaveRelated
     /// Gets local version of the SaveData
     SaveData* get_savegame()
     {
-        return savedata.decode_local();
+        return savedata.decode();
     }
 };
 

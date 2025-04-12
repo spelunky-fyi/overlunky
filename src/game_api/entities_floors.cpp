@@ -5,11 +5,11 @@
 #include <cstdlib>  // for rand, abs, size_t
 
 #include "entity_lookup.hpp" // for get_entities_at
-#include "layer.hpp"         // for EntityList, EntityList::Range, Layer, Entit...
-#include "movable.hpp"       // for Movable
-#include "spawn_api.hpp"     // for spawn_entity_over
-#include "state.hpp"         // for State
-#include "texture.hpp"       // for Texture
+#include "layer.hpp"     // for EntityList, EntityList::Range, Layer, Entit...
+#include "movable.hpp"   // for Movable
+#include "spawn_api.hpp" // for spawn_entity_over
+#include "state.hpp"     // for StateMemory
+#include "texture.hpp"   // for Texture
 
 void Floor::fix_border_tile_animation()
 {
@@ -89,8 +89,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
     Floor* neighbours[4]{};
     bool neighbours_same[4]{};
 
-    auto& state = State::get();
-    auto layer_ptr = state.layer(layer);
+    auto layer_ptr = get_state_ptr()->layer(layer);
 
     for (size_t i = 0; i < 4; i++)
     {
@@ -189,8 +188,7 @@ void Floor::add_decoration(FLOOR_SIDE side)
         return;
     }
 
-    auto& state = State::get();
-    auto layer_ptr = state.layer(layer);
+    auto layer_ptr = get_state_ptr()->layer(layer);
     add_decoration_opt(side, decoration_entity_type, layer_ptr);
 }
 void Floor::remove_decoration(FLOOR_SIDE side)
@@ -764,12 +762,12 @@ void Door::unlock(bool unlock)
         else
             this->flags &= ~0x80000; // clr flag 20 (Enable button prompt)
 
-        auto& state = State::get();
+        auto& state = get_state_ptr();
         // entrance, exit, starting exit
         if (ent_type == entrance_door || ent_type == entrance_door + 1 || ent_type == entrance_door + 3)
         {
             static const ENT_TYPE door_bg = to_id("ENT_TYPE_BG_DOOR");
-            const auto entities = state.layer(this->layer)->get_entities_overlapping_grid_at(x, y);
+            const auto entities = state->layer(this->layer)->get_entities_overlapping_grid_at(x, y);
             if (entities == nullptr)
                 return;
             for (const auto& item : entities->entities())
@@ -813,7 +811,7 @@ void Door::unlock(bool unlock)
             {
                 if (!main_door->door_blocker)
                 {
-                    main_door->door_blocker = state.layer(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
+                    main_door->door_blocker = state->layer(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
                     main_door->door_blocker->animation_frame = 1;
                 }
             }

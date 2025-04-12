@@ -39,6 +39,7 @@
 #include "game_api.hpp"                            //
 #include "game_manager.hpp"                        // for get_game_manager
 #include "handle_lua_function.hpp"                 // for handle_function
+#include "heap_base.hpp"                           // for OnHeapPointer, HeapBase
 #include "illumination.hpp"                        //
 #include "items.hpp"                               // for Inventory
 #include "layer.hpp"                               // for g_level_max_x
@@ -60,9 +61,8 @@
 #include "search.hpp"                              // for get_address
 #include "settings_api.hpp"                        // for get_settings_name...
 #include "spawn_api.hpp"                           // for spawn_roomowner
-#include "state.hpp"                               // for State, StateMemory
+#include "state.hpp"                               // for StateMemory
 #include "strings.hpp"                             // for change_string
-#include "thread_utils.hpp"                        // for OnHeapPointer
 #include "usertypes/behavior_lua.hpp"              // for register_usertypes
 #include "usertypes/bucket_lua.hpp"                // for register_usertypes
 #include "usertypes/char_state_lua.hpp"            // for register_usertypes
@@ -144,16 +144,7 @@ struct Players
 
     void update()
     {
-        StateMemory* local_state = State::get().ptr_local();
-        if (local_state == nullptr)
-        {
-            StateMemory* main_state = State::get().ptr_main();
-            p = get_players(main_state);
-        }
-        else
-        {
-            p = get_players(local_state);
-        }
+        p = HeapBase::get().state()->get_players();
     }
     struct lua_iterator_state
     {
@@ -300,8 +291,6 @@ end
     NBucket::register_usertypes(lua);
     NColor::register_usertypes(lua);
 
-    StateMemory* main_state = State::get().ptr_main();
-
     /// NoDoc
     lua.new_usertype<Players>(
         "Players", sol::no_constructor, sol::meta_function::index, [](Players* p, const int index)
@@ -311,7 +300,7 @@ end
     Players players;
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
-    lua["state"] = main_state;
+    lua["state"] = HeapBase::get_main().state();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
@@ -322,7 +311,7 @@ end
     auto get_player = sol::overload(
         [&lua](int8_t slot) -> sol::object // -> Player
         {
-            for (auto player : get_players(State::get().ptr()))
+            for (auto player : HeapBase::get().state()->get_players())
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -331,7 +320,7 @@ end
         },
         [&lua](int8_t slot, bool or_ghost) -> sol::object
         {
-            for (auto player : get_players(State::get().ptr()))
+            for (auto player : HeapBase::get().state()->get_players())
             {
                 if (player->inventory_ptr->player_slot == slot - 1)
                     return sol::make_object_userdata(lua, player);
@@ -364,7 +353,7 @@ end
         return nullptr;
     };
     /// Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
-    lua["savegame"] = State::get().savedata();
+    lua["savegame"] = get_game_manager()->save_related->savedata.decode_main();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
@@ -465,8 +454,8 @@ end
     lua["set_interval"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        auto state = State::get().ptr_main();
-        auto luaCb = IntervalCallback{cb, frames, (int)state->time_level};
+        int now = HeapBase::get().state()->time_level;
+        auto luaCb = IntervalCallback{cb, frames, now};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
     };
@@ -494,7 +483,7 @@ end
     lua["set_global_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        int now = get_frame_count();
+        int now = HeapBase::get().frame_count();
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->global_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -964,25 +953,27 @@ end
     };
 
     /// Warp to a level immediately.
-    lua["warp"] = warp;
+    lua["warp"] = [](uint8_t world, uint8_t level, uint8_t theme)
+    { HeapBase::get().state()->warp(world, level, theme); };
     /// Set seed and reset run.
-    lua["set_seed"] = set_seed;
+    lua["set_seed"] = [](uint32_t seed)
+    { HeapBase::get().state()->set_seed(seed); };
     /// Enable/disable godmode for players.
     lua["god"] = [](bool g)
-    { State::get().godmode(g); };
+    { API::godmode(g); };
     /// Enable/disable godmode for companions.
     lua["god_companions"] = [](bool g)
-    { State::get().godmode_companions(g); };
+    { API::godmode_companions(g); };
     /// Deprecated
     /// Set level flag 18 on post room generation instead, to properly force every level to dark
     lua["force_dark_level"] = [](bool g)
-    { State::get().darkmode(g); };
+    { API::darkmode(g); };
     /// Set the zoom level used in levels and shops. 13.5 is the default, or 12.5 for shops. See zoom_reset.
     lua["zoom"] = [](float level)
-    { State::get().zoom(level); };
+    { API::zoom(level); };
     /// Reset the default zoom levels for all areas and sets current zoom level to 13.5.
     lua["zoom_reset"] = []()
-    { State::get().zoom_reset(); };
+    { API::zoom_reset(); };
     auto move_entity_abs = sol::overload(
         static_cast<void (*)(uint32_t, float, float, float, float)>(::move_entity_abs),
         static_cast<void (*)(uint32_t, float, float, float, float, LAYER)>(::move_entity_abs));
@@ -1132,10 +1123,10 @@ end
     };
     /// Get the game coordinates at the screen position (`x`, `y`)
     lua["game_position"] = [](float x, float y) -> std::pair<float, float>
-    { return State::click_position(x, y); };
+    { return API::click_position(x, y); };
     /// Translate an entity position to screen position to be used in drawing functions
     lua["screen_position"] = [](float x, float y) -> std::pair<float, float>
-    { return State::screen_position(x, y); };
+    { return API::screen_position(x, y); };
     /// Translate a distance of `x` tiles to screen distance to be be used in drawing functions
     lua["screen_distance"] = screen_distance;
     /// Get position `x, y, layer` of entity by uid. Use this, don't use `Entity.x/y` because those are sometimes just the offset to the entity
@@ -1213,10 +1204,13 @@ end
     lua["lock_door_at"] = lock_door_at;
     /// Try to unlock the exit at coordinates
     lua["unlock_door_at"] = unlock_door_at;
-    /// Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn't increment during some loading screens, even though state update still runs.
-    lua["get_frame"] = get_frame_count;
-    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
-    lua["get_global_frame"] = get_global_frame_count;
+    /// Get the frame count from the main game state. You can use this to make some timers yourself, the engine runs at 60fps.
+    /// This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH. Rolls back with online rollback etc.
+    lua["get_frame"] = []() -> uint32_t
+    { return HeapBase::get().frame_count(); };
+    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
+    // lua["get_global_frame"] = []() -> int
+    lua["get_global_frame"] = API::get_global_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.
     lua["get_ms"] = []()
     { return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(); };
@@ -1299,24 +1293,24 @@ end
     /// inside these boundaries. The order is: left x, top y, right x, bottom y
     lua["get_bounds"] = []() -> std::tuple<float, float, float, float>
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         return std::make_tuple(2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f);
     };
     /// Same as [get_bounds](#get_bounds) but returns AABB struct instead of loose floats
     lua["get_aabb_bounds"] = []() -> AABB
     {
-        auto state = State::get().ptr();
+        auto state = HeapBase::get().state();
         return {2.5f, 122.5f, state->w * 10.0f + 2.5f, 122.5f - state->h * 8.0f};
     };
     /// Gets the current camera position in the level
     lua["get_camera_position"] = []() -> std::pair<float, float>
-    {
-        return State::get_camera_position();
-    };
+    { return Camera::get_position(); };
     /// Sets the absolute current camera position without rubberbanding animation. Ignores camera bounds or currently focused uid, but doesn't clear them. Best used in ON.RENDER_PRE_GAME or similar. See Camera for proper camera handling with bounds and rubberbanding.
-    lua["set_camera_position"] = set_camera_position;
+    lua["set_camera_position"] = [](float cx, float cy)
+    { HeapBase::get().state()->camera->set_position(cx, cy); };
     /// Updates the camera focus according to the params set in Camera, i.e. to apply normal camera movement when paused etc.
-    lua["update_camera_position"] = update_camera_position;
+    lua["update_camera_position"] = []()
+    { HeapBase::get().state()->camera->update_position(); };
 
     /// Set the nth bit in a number. This doesn't actually change the variable you pass, it just returns the new value you can use.
     lua["set_flag"] = [](Flags flags, int bit) -> Flags
@@ -1778,9 +1772,7 @@ end
     /// Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first)
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
     lua["change_string"] = [](STRINGID id, std::u16string str)
-    {
-        return change_string(id, str);
-    };
+    { return change_string(id, str); };
 
     /// Add custom string, currently can only be used for names of shop items (EntityDB->description)
     /// Returns STRINGID of the new string
@@ -1789,9 +1781,7 @@ end
     /// Get localized name of an entity from the journal, pass `fallback_strategy` as `true` to fall back to the `ENT_TYPE.*` enum name
     /// if the entity has no localized name
     lua["get_entity_name"] = [](ENT_TYPE type, sol::optional<bool> fallback_strategy) -> std::u16string
-    {
-        return get_entity_name(type, fallback_strategy.value_or(false));
-    };
+    { return get_entity_name(type, fallback_strategy.value_or(false)); };
 
     /// Adds custom name to the item by uid used in the shops
     /// This is better alternative to `add_string` but instead of changing the name for entity type, it changes it for this particular entity
@@ -1849,14 +1839,16 @@ end
         static_cast<Illumination* (*)(Color, float, int32_t)>(::create_illumination),
         static_cast<Illumination* (*)(Vec2, Color, LIGHT_TYPE, float, uint8_t, int32_t, LAYER)>(::create_illumination));
     /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+    /// Warning: this is only valid for current level!
     lua["create_illumination"] = create_illumination;
-    /// Refreshes an Illumination, keeps it from fading out (updates the timer, keeping it in sync with the game render)
+    /// Refreshes an Illumination, keeps it from fading out, short for `illumination.timer = get_frame()`
     lua["refresh_illumination"] = refresh_illumination;
 
     /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
     /// The patch however does not destroy the liquids that fall pass the level bounds,
     /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
-    lua["fix_liquid_out_of_bounds"] = fix_liquid_out_of_bounds;
+    lua["fix_liquid_out_of_bounds"] = []()
+    { HeapBase::get().liquid_physics()->remove_liquid_oob(); };
 
     /// Return the name of the first matching number in an enum table
     // lua["enum_get_name"] = [](table enum, int value) -> string
@@ -1966,21 +1958,15 @@ end
 
     /// Get the rva for a pattern name, used for debugging.
     lua["get_rva"] = [](std::string_view address_name) -> std::string
-    {
-        return fmt::format("{:X}", get_address(address_name) - Memory::get().at_exe(0));
-    };
+    { return fmt::format("{:X}", get_address(address_name) - Memory::get().at_exe(0)); };
 
     /// Get the rva for a vtable offset and index, used for debugging.
     lua["get_virtual_rva"] = [](VTABLE_OFFSET offset, uint32_t index) -> std::string
-    {
-        return fmt::format("{:X}", get_virtual_function_address(offset, index));
-    };
+    { return fmt::format("{:X}", get_virtual_function_address(offset, index)); };
 
     /// Get memory address from a lua object
     lua["get_address"] = [&lua]([[maybe_unused]] sol::object o)
-    {
-        return fmt::format("{:X}", *(size_t*)lua_touserdata(lua, 1));
-    };
+    { return fmt::format("{:X}", *(size_t*)lua_touserdata(lua, 1)); };
 
     /// Log to spelunky.log
     lua["log_print"] = game_log;
@@ -1992,7 +1978,7 @@ end
     lua["save_progress"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= State::get().ptr()->time_startup - 120)
+        if (backend->last_save <= API::get_global_frame_count() - 120)
         {
             backend->manual_save = true;
             save_progress();
@@ -2005,7 +1991,7 @@ end
     lua["save_script"] = []() -> bool
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (backend->last_save <= get_frame_count() - 120)
+        if (backend->last_save <= API::get_global_frame_count() - 120)
         {
             backend->manual_save = true;
             return true;
@@ -2016,24 +2002,18 @@ end
     /// Set the level number shown in the hud and journal to any string. This is reset to the default "%d-%d" automatically just before PRE_LOAD_SCREEN to a level or main menu, so use in PRE_LOAD_SCREEN, POST_LEVEL_GENERATION or similar for each level.
     /// Use "%d-%d" to reset to default manually. Does not affect the "...COMPLETED!" message in transitions or lines in "Dear Journal", you need to edit them separately with [change_string](#change_string).
     lua["set_level_string"] = [](std::u16string str)
-    {
-        return set_level_string(str);
-    };
+    { return set_level_string(str); };
 
     /// Force the character unlocked in either ending to ENT_TYPE. Set to 0 to reset to the default guys. Does not affect the texture of the actual savior. (See example)
     lua["set_ending_unlock"] = set_ending_unlock;
 
     /// Get the thread-local version of state
     lua["get_local_state"] = []() -> StateMemory*
-    {
-        return State::get().ptr_local();
-    };
+    { return HeapBase::get().state(); };
 
     /// Get the thread-local version of players
     lua["get_local_players"] = []() -> std::vector<Player*>
-    {
-        return get_players(State::get().ptr_local());
-    };
+    { return HeapBase::get().state()->get_players(); };
 
     /// List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
     lua["list_dir"] = [&lua](std::optional<std::string> dir)
@@ -2123,9 +2103,10 @@ end
         float ax = -0.98f;
         float f = 1.0f;
         uint32_t hs = get_setting(GAME_SETTING::HUD_SIZE).value_or(0);
-        if (hs == 0 || State::get().ptr()->items->player_count > 3)
+        auto state = HeapBase::get().state();
+        if (hs == 0 || state->items->player_count > 3)
             f = 1.0f;
-        else if (hs == 1 || State::get().ptr()->items->player_count > 2)
+        else if (hs == 1 || state->items->player_count > 2)
             f = 1.15f;
         else
             f = 1.3f;

@@ -12,7 +12,6 @@
 #include "script/usertypes/theme_vtable_lua.hpp"   // for NThemeVTables
 #include "script/usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
 #include "sound_manager.hpp"                       // for SoundMeta
-#include "state.hpp"                               // for State
 
 template <auto fun>
 using MemFun = MemberFun<fun>::BaseLessType;

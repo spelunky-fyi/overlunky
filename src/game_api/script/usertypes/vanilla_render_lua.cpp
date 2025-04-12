@@ -675,8 +675,7 @@ void register_usertypes(sol::state& lua)
 
     auto render_draw_depth_lua = [](VanillaRenderContext&, LAYER layer, uint8_t draw_depth, AABB bbox)
     {
-        const uint8_t real_layer = enum_to_layer(layer);
-        auto layer_ptr = State::get().layer(real_layer);
+        auto layer_ptr = HeapBase::get().state()->layer(layer);
         render_draw_depth(layer_ptr, draw_depth, bbox.left, bbox.bottom, bbox.right, bbox.top);
     };
 
