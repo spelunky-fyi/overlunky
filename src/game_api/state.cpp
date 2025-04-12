@@ -62,11 +62,7 @@ StateMemory* get_state_ptr()
 }
 void LiquidPhysics::remove_liquid_oob()
 {
-    auto state = HeapBase::get().state();
-    if (!state->liquid_physics)
-        return;
-
-    for (const auto& it : state->liquid_physics->pools)
+    for (const auto& it : pools)
     {
         if (it.physics_engine == nullptr || it.physics_engine->pause_physics)
             continue;
@@ -372,7 +368,7 @@ Vec2 Camera::get_position()
 
 void Camera::set_position(float cx, float cy)
 {
-    static const auto addr = (float*)get_address("camera_position"); // probably not needed
+    static const auto addr = (float*)get_address("camera_position");
     focus_x = cx;
     focus_y = cy;
     adjusted_focus_x = cx;
@@ -400,7 +396,7 @@ void StateMemory::warp(uint8_t set_world, uint8_t set_level, uint8_t set_theme)
     auto gm = get_game_manager();
     if (items->player_count < 1)
     {
-        auto savedata = gm->save_related->savedata.decode_local();
+        auto savedata = gm->save_related->savedata.decode();
         items->player_select_slots[0].activated = true;
         items->player_select_slots[0].character = savedata->players[0] + to_id("ENT_TYPE_CHAR_ANA_SPELUNKY");
         items->player_select_slots[0].texture_id = savedata->players[0] + 285; // TODO: magic numbers

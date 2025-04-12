@@ -90,13 +90,15 @@ HeapBase HeapBase::get(uint8_t slot)
     static HeapBase* save_slots = reinterpret_cast<HeapBase*>(get_address("save_states"));
     return *(save_slots + slot);
 }
-
-void HeapClone(HeapBase heap_to, uint64_t heap_container_from)
+struct HeapClone
 {
-    auto heap_from = memory_read<uint64_t>(heap_container_from + 0x88);
-    HeapBase heap_base_from = reinterpret_cast<HeapBase&>(heap_from);
-    pre_copy_state_event(heap_base_from, heap_to);
-}
+    static void clone(HeapBase heap_to, size_t* heap_container_from)
+    {
+        auto address = *(heap_container_from + 0x11); // original absolute offset: 0x88
+        HeapBase heap_base_from{address};
+        pre_copy_state_event(heap_base_from, heap_to);
+    }
+};
 
 // Original function params: clone_heap(ThreadStorageContainer to, ThreadStorageContainer from)
 // HeapContainer has heap1 and heap2 variables, and some sort of timer, that just increases constantly, I guess to handle the rollback and multi-threaded stuff
@@ -121,7 +123,7 @@ void init_heap_clone_hook()
         "\x41\x58"         // POP        R8
         "\x5A"             // POP        RDX
         "\x59"sv,          // POP        RCX
-        to_le_bytes(&HeapClone));
+        to_le_bytes(&HeapClone::clone));
 
     patch_and_redirect(heap_clone_redirect_from_addr, 7, redirect_code, false, 0, false);
 }

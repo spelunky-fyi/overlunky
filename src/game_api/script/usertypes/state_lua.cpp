@@ -623,6 +623,16 @@ void register_usertypes(sol::state& lua)
         return nullptr;
     };
 
+    auto get = [&lua](int slot) -> sol::object
+    {
+        if (slot < 1 || slot > 4)
+            return sol::nil;
+
+        // this actually calls destructor, since it's copied to the lua stack
+        // which calls the clear function, thought it should be fine since the slot member should be set, das preventing the free from being called
+        return sol::make_object(lua, SaveState::get(slot));
+    };
+
     lua.new_usertype<SaveState>(
         "SaveState",
         sol::constructors<SaveState()>(),

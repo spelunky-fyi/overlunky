@@ -112,7 +112,7 @@ struct SaveRelated
     /// Gets local version of the SaveData
     SaveData* get_savegame()
     {
-        return savedata.decode_local();
+        return savedata.decode();
     }
 };
 

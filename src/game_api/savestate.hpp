@@ -16,19 +16,18 @@ class SaveState
     {
         save();
     }
+    /// NoDoc
+    SaveState(uint8_t index)
+        : base(HeapBase::get(index)){};
     ~SaveState()
     {
         clear();
     }
-    /// Get the pre-allocated by the game save slot 1-4
+    /// Get the pre-allocated by the game save slot 1-4. Call as `SaveState.get(slot)`
     static SaveState get(int save_slot)
     {
-        if (save_slot >= 1 && save_slot <= 4)
-            return {};
-
         int8_t index = static_cast<int8_t>(save_slot - 1);
-        SaveState save_from_slot;
-        save_from_slot.base = HeapBase::get(index);
+        SaveState save_from_slot(index);
         save_from_slot.slot = index;
         return save_from_slot;
     }
@@ -36,22 +35,16 @@ class SaveState
     /// Access the StateMemory inside a SaveState
     StateMemory* get_state() const
     {
-        if (base.is_null())
-            return nullptr;
         return base.state();
     }
     /// Get the current frame from the SaveState, equivelent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
     uint32_t get_frame() const
     {
-        if (base.is_null())
-            return 0;
         return base.frame_count();
     }
     /// Access the PRNG inside a SaveState
     PRNG* get_prng() const
     {
-        if (base.is_null())
-            return nullptr;
         return base.prng();
     }
 
@@ -64,7 +57,7 @@ class SaveState
     /// Delete the SaveState and free the memory. The SaveState can't be used after this.
     void clear()
     {
-        if (slot == -1)
+        if (slot != -1)
             return;
 
         base.free();

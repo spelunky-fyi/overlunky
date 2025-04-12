@@ -92,6 +92,7 @@ struct HeapBase
     };
     static const uint8_t MAX_SAVE_SLOTS = 5;
     friend class SaveState;
+    friend struct HeapClone;
 };
 
 // Used for objects that are allocated with the game's custom allocator
@@ -102,15 +103,14 @@ class OnHeapPointer
     explicit OnHeapPointer(size_t ptr)
         : ptr_(ptr){};
 
-    T* decode() const // TODO: change to decode_main and decode
+    T* decode_main() const
     {
         return reinterpret_cast<T*>(ptr_ + HeapBase::get_main().address());
     }
 
-    T* decode_local() const
+    T* decode() const
     {
-        auto lhb = HeapBase::get();
-        return reinterpret_cast<T*>(ptr_ + lhb.address());
+        return reinterpret_cast<T*>(ptr_ + HeapBase::get().address());
     }
 
   private:

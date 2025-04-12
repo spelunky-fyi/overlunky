@@ -35,7 +35,7 @@ Illumination* create_illumination(Color color, float size, int32_t uid)
     auto entity = get_entity_ptr(uid);
     if (entity != nullptr)
     {
-        return create_illumination(Vec2{entity->abs_x, entity->abs_y}, std::move(color), LIGHT_TYPE::FOLLOW_ENTITY, size, 0x20, uid, (LAYER)entity->layer);
+        return create_illumination(entity->abs_position(), std::move(color), LIGHT_TYPE::FOLLOW_ENTITY, size, 0x20, uid, (LAYER)entity->layer);
     }
     return nullptr;
 }

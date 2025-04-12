@@ -37,6 +37,7 @@
 #include "search.hpp"                        // for get_address
 #include "settings_api.hpp"                  // for get_settings_names_and_...
 #include "sound_manager.hpp"                 // for SoundManager, SoundMana...
+#include "state.hpp"                         // for API::init
 #include "texture.hpp"                       // for Texture, get_textures
 #include "virtual_table.hpp"                 // for VTABLE_OFFSET, VTABLE_O...
 
@@ -1100,6 +1101,7 @@ void run()
         std::this_thread::sleep_for(100ms);
     }
 
+    API::init();
     auto items = list_entities();
     std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
               { return a.id < b.id; });

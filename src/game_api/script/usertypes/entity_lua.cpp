@@ -213,6 +213,7 @@ void register_usertypes(sol::state& lua)
     entity_type["remove_item"] = &Entity::remove_item;
     entity_type["apply_db"] = &Entity::apply_db;
     entity_type["get_absolute_velocity"] = &Entity::get_absolute_velocity;
+    entity_type["get_absolute_position"] = &Entity::abs_position;
     entity_type["get_hitbox"] = &Entity::get_hitbox;
     entity_type["attach"] = &Entity::attach;
     entity_type["detach"] = &Entity::detach;
@@ -621,7 +622,7 @@ void register_usertypes(sol::state& lua)
     // Various types, all `Entity`
     // BG
     // All MIDBG* entities and most of the BG_* entities
-    // does not include: a lot .. check [default_flags_more_flags.txt](internal/entity.type.default_flags_more_flags.txt) for full list
+    // does not include: a lot .. check `1024` in [search_flags](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/search_flags.json) for full list of included entities
     // Also includes: DECORATION_PALACE_PORTRAIT
     // Various types, all `Entity`
     // SHADOW

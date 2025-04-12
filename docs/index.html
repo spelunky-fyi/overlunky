@@ -4819,7 +4819,8 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 </blockquote>
 <h4 id='nil-replace_drop-int-drop_id-ENT_TYPE-new_drop_entity_type'>nil replace_drop(int drop_id, <a href="#ENT_TYPE">ENT_TYPE</a> new_drop_entity_type)</h4>
 <p>Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(<a href="#DROP">DROP</a>.VAN_HORSING_DIAMOND, <a href="#ENT_TYPE">ENT_TYPE</a>.ITEM_PLASMACANNON))
-Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as drop_id to reset all to default</p>
+Use <code>0</code> as type to reset this drop to default, use <code>-1</code> as drop_id to reset all to default
+Check all the available drops <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">here</a></p>
 <h3 id='set_boss_door_control_enabled'>set_boss_door_control_enabled</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_boss_door_control_enabled">set_boss_door_control_enabled</a></p>
@@ -5218,7 +5219,8 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame</a></p>
 </blockquote>
 <h4 id='int-get_frame'>int get_frame()</h4>
-<p>Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn&#39;t increment during some loading screens, even though state update still runs.</p>
+<p>Get the frame count from the main game state. You can use this to make some timers yourself, the engine runs at 60fps.
+This counter is paused if the pause is set with flags <a href="#PAUSE">PAUSE</a>.<a href="#FADE">FADE</a> or <a href="#PAUSE">PAUSE</a>.ANKH. Rolls back with online rollback etc.</p>
 <h3 id='get_frametime'>get_frametime</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime">get_frametime</a></p>
@@ -5236,7 +5238,7 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_global_frame">get_global_frame</a></p>
 </blockquote>
 <h4 id='int-get_global_frame'>int get_global_frame()</h4>
-<p>Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.</p>
+<p>Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.</p>
 <h3 id='get_hud'>get_hud</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_hud">get_hud</a></p>
@@ -5732,7 +5734,7 @@ optional <code>layer</code> parameter to be used when liquid was moved to back l
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=warp">warp</a></p>
 </blockquote>
-<h4 id='nil-warp-int-w-int-l-int-t'>nil warp(int w, int l, int t)</h4>
+<h4 id='nil-warp-int-world-int-level-int-theme'>nil warp(int world, int level, int theme)</h4>
 <p>Warp to a level immediately.</p>
 <h2 id='Input-functions'>Input functions</h2><h3 id='buttons_to_inputs'>buttons_to_inputs</h3>
 <blockquote>
@@ -5763,13 +5765,14 @@ optional <code>layer</code> parameter to be used when liquid was moved to back l
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_illumination">create_illumination</a></p>
 </blockquote>
 <h4 id='Illumination-create_illumination-Vec2-pos-Color-color-LIGHT_TYPE-type-float-size-int-flags-int-uid-LAYER-layer'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Vec2">Vec2</a> pos, <a href="#Color">Color</a> color, <a href="#LIGHT_TYPE">LIGHT_TYPE</a> type, float size, int flags, int uid, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='Illumination-create_illumination-Color-color-float-size-float-x-float-y'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, float x, float y)</h4><h4 id='Illumination-create_illumination-Color-color-float-size-int-uid'><a href="#Illumination">Illumination</a> create_illumination(<a href="#Color">Color</a> color, float size, int uid)</h4>
-<p>Creates a new <a href="#Illumination">Illumination</a>. Don&#39;t forget to continuously call <a href="#refresh_illumination">refresh_illumination</a>, otherwise your light emitter fades out! Check out the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua">illumination.lua</a> script for an example.</p>
+<p>Creates a new <a href="#Illumination">Illumination</a>. Don&#39;t forget to continuously call <a href="#refresh_illumination">refresh_illumination</a>, otherwise your light emitter fades out! Check out the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua">illumination.lua</a> script for an example.
+Warning: this is only valid for current level!</p>
 <h3 id='refresh_illumination'>refresh_illumination</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=refresh_illumination">refresh_illumination</a></p>
 </blockquote>
 <h4 id='nil-refresh_illumination-Illumination-illumination'>nil refresh_illumination(<a href="#Illumination">Illumination</a> illumination)</h4>
-<p>Refreshes an <a href="#Illumination">Illumination</a>, keeps it from fading out (updates the timer, keeping it in sync with the game render)</p>
+<p>Refreshes an <a href="#Illumination">Illumination</a>, keeps it from fading out, short for <code>illumination.timer = get_frame()</code></p>
 <h2 id='Message-functions'>Message functions</h2><h3 id='cancel_speechbubble'>cancel_speechbubble</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=cancel_speechbubble">cancel_speechbubble</a></p>
@@ -6815,44 +6818,52 @@ Set level flag 18 on post room generation instead, to properly force every level
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities">get_entities</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities'>vector&lt;int&gt; get_entities()</h4>
-<p>Use <code>get_entities_by(0, MASK.ANY, LAYER.BOTH)</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities()</code><br/>
+Use <code>get_entities_by(0, MASK.ANY, LAYER.BOTH)</code> instead</p>
 <h3 id='get_entities_by_mask'>get_entities_by_mask</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_mask">get_entities_by_mask</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities_by_mask-int-mask'>vector&lt;int&gt; get_entities_by_mask(int mask)</h4>
-<p>Use <code>get_entities_by(0, mask, LAYER.BOTH)</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities_by_mask(int mask)</code><br/>
+Use <code>get_entities_by(0, mask, LAYER.BOTH)</code> instead</p>
 <h3 id='get_entities_by_layer'>get_entities_by_layer</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_by_layer">get_entities_by_layer</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities_by_layer-LAYER-layer'>vector&lt;int&gt; get_entities_by_layer(<a href="#LAYER">LAYER</a> layer)</h4>
-<p>Use <code>get_entities_by(0, MASK.ANY, layer)</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities_by_layer([LAYER](#LAYER) layer)</code><br/>
+Use <code>get_entities_by(0, MASK.ANY, layer)</code> instead</p>
 <h3 id='get_entities_overlapping'>get_entities_overlapping</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entities_overlapping">get_entities_overlapping</a></p>
 </blockquote>
-<h4 id='vector-lt-int-gt-get_entities_overlapping-array-lt-ENT_TYPE-gt-entity_types-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping(array&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt; entity_types, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4><h4 id='vector-lt-int-gt-get_entities_overlapping-ENT_TYPE-entity_type-int-mask-float-sx-float-sy-float-sx2-float-sy2-LAYER-layer'>vector&lt;int&gt; get_entities_overlapping(<a href="#ENT_TYPE">ENT_TYPE</a> entity_type, int mask, float sx, float sy, float sx2, float sy2, <a href="#LAYER">LAYER</a> layer)</h4>
-<p>Use <code>get_entities_overlapping_hitbox</code> instead</p>
+
+<p><code>vector&amp;lt;int&amp;gt; get_entities_overlapping(array&lt;[ENT_TYPE](#ENT_TYPE)&gt; entity_types, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)</code><br/>
+<code>vector&amp;lt;int&amp;gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, int mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)</code><br/>
+Use <code>get_entities_overlapping_hitbox</code> instead</p>
 <h3 id='get_entity_ai_state'>get_entity_ai_state</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_entity_ai_state">get_entity_ai_state</a></p>
 </blockquote>
-<h4 id='int-get_entity_ai_state-int-uid'>int get_entity_ai_state(int uid)</h4>
-<p>As the name is misleading. use <a href="#Movable">Movable</a>.<code>move_state</code> field instead</p>
+
+<p><code>int get_entity_ai_state(int uid)</code><br/>
+As the name is misleading. use <a href="#Movable">Movable</a>.<code>move_state</code> field instead</p>
 <h3 id='set_arrowtrap_projectile'>set_arrowtrap_projectile</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_arrowtrap_projectile">set_arrowtrap_projectile</a></p>
 </blockquote>
-<h4 id='nil-set_arrowtrap_projectile-ENT_TYPE-regular_entity_type-ENT_TYPE-poison_entity_type'>nil set_arrowtrap_projectile(<a href="#ENT_TYPE">ENT_TYPE</a> regular_entity_type, <a href="#ENT_TYPE">ENT_TYPE</a> poison_entity_type)</h4>
-<p>Use <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.ARROWTRAP_WOODENARROW, new_arrow_type) and <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead</p>
+
+<p><code>nil set_arrowtrap_projectile([ENT_TYPE](#ENT_TYPE) regular_entity_type, [ENT_TYPE](#ENT_TYPE) poison_entity_type)</code><br/>
+Use <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.ARROWTRAP_WOODENARROW, new_arrow_type) and <a href="#replace_drop">replace_drop</a>(<a href="#DROP">DROP</a>.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead</p>
 <h3 id='set_blood_multiplication'>set_blood_multiplication</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_blood_multiplication">set_blood_multiplication</a></p>
 </blockquote>
-<h4 id='nil-set_blood_multiplication-int-default_multiplier-int-vladscape_multiplier'>nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)</h4>
-<p>This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
+
+<p><code>nil set_blood_multiplication(int default_multiplier, int vladscape_multiplier)</code><br/>
+This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
 <code>default_multiplier</code> doesn&#39;t do anything due to some changes in last game updates, <code>vladscape_multiplier</code> only changes the multiplier to some entities death&#39;s blood spit</p>
 <h3 id='setflag'>setflag</h3>
 <blockquote>
@@ -7093,8 +7104,9 @@ Use this only when no other approach works, this call can be expensive if overus
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=generate_particles">generate_particles</a></p>
 </blockquote>
-<h4 id='ParticleEmitterInfo-generate_particles-PARTICLEEMITTER-particle_emitter_id-int-uid'><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a> generate_particles(<a href="#PARTICLEEMITTER">PARTICLEEMITTER</a> particle_emitter_id, int uid)</h4>
-<p>Use <code>generate_world_particles</code></p>
+
+<p><code>[ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)</code><br/>
+Use <code>generate_world_particles</code></p>
 <h3 id='draw_line'>draw_line</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=draw_line">draw_line</a></p>
@@ -10722,6 +10734,21 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_state">get_state()</a></td>
 <td>Access the <a href="#StateMemory">StateMemory</a> inside a <a href="#SaveState">SaveState</a></td>
 </tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame()</a></td>
+<td>Get the current frame from the <a href="#SaveState">SaveState</a>, equivelent to the <a href="#Get_frame">get_frame</a> global function that returns the frame from the &quot;loaded in state&quot;</td>
+</tr>
+<tr>
+<td><a href="#PRNG">PRNG</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_prng">get_prng()</a></td>
+<td>Access the <a href="#PRNG">PRNG</a> inside a <a href="#SaveState">SaveState</a></td>
+</tr>
+<tr>
+<td><a href="#SaveState">SaveState</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get">get(int save_slot)</a></td>
+<td>Get the pre-allocated by the game save slot 1-4. Call as <code>SaveState.get(slot)</code></td>
+</tr>
 </tbody></table>
 <h3 id='SharedIO'>SharedIO</h3>
 <table><thead>
@@ -12986,6 +13013,11 @@ Derived from <a href="#Logic">Logic</a></p>
 <tr>
 <td><a href="#OnlineLobby">OnlineLobby</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lobby">lobby</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_active">is_active()</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -21234,22 +21266,22 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=x">x</a></td>
-<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <code>get_absolute_position</code> to get real position of anything in the game world.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=y">y</a></td>
-<td>Position of the entity in the world, or relative to overlay if attached to something. Use <a href="#get_position">get_position</a> to get real position of anything in the game world.</td>
+<td>Position of the entity in the world, or relative to overlay if attached to something. Use <code>get_absolute_position</code> to get real position of anything in the game world.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_x">abs_x</a></td>
-<td>Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.</td>
+<td>Absolute position in the world, even if overlaid. Might be a frame off since it&#39;s updated with <code>apply_movement</code> function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use <code>get_absolute_position</code> for precise. Read only.</td>
 </tr>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=abs_y">abs_y</a></td>
-<td>Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.</td>
+<td>Absolute position in the world, even if overlaid. Might be a frame off since it&#39;s updated with <code>apply_movement</code> function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use <code>get_absolute_position</code> for precise. Read only.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -21520,6 +21552,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td><a href="#Vec2">Vec2</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_absolute_velocity">get_absolute_velocity()</a></td>
 <td>Get&#39;s the velocity relative to the game world, only for movable or liquid entities</td>
+</tr>
+<tr>
+<td><a href="#Vec2">Vec2</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_absolute_position">get_absolute_position()</a></td>
+<td>Get the absolute position of an entity in the game world</td>
 </tr>
 <tr>
 <td><a href="#AABB">AABB</a></td>
@@ -31337,7 +31374,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td>...see <a href="https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible drops...</td>
+<td>...see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible drops...</td>
 <td></td>
 <td></td>
 </tr>
@@ -31365,7 +31402,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
-<td>...see <a href="https:github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible dropchances...</td>
+<td>...see <a href="https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp">drops.cpp</a> for a list of possible dropchances...</td>
 <td></td>
 <td></td>
 </tr>
@@ -33510,7 +33547,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.BG">BG</a></td>
 <td>0x400</td>
-<td>All MIDBG* entities and most of the BG_* entities<br/>does not include: a lot .. check <a href="internal/entity.type.default_flags_more_flags.txt">default_flags_more_flags.txt</a> for full list<br/>Also includes: DECORATION_PALACE_PORTRAIT<br/>Various types, all <code>Entity</code><br/></td>
+<td>All MIDBG* entities and most of the BG_* entities<br/>does not include: a lot .. check <code>1024</code> in <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/search_flags.json">search_flags</a> for full list of included entities<br/>Also includes: DECORATION_PALACE_PORTRAIT<br/>Various types, all <code>Entity</code><br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=MASK.SHADOW">SHADOW</a></td>

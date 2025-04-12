@@ -256,7 +256,7 @@ end
         return nullptr;
     };
     /// Provides access to the save data, updated as soon as something changes (i.e. before it's written to savegame.sav.) Use [save_progress](#save_progress) to save to savegame.sav.
-    lua["savegame"] = get_game_manager()->save_related->savedata.decode();
+    lua["savegame"] = get_game_manager()->save_related->savedata.decode_main();
 
     /// Standard lua print function, prints directly to the terminal but not to the game
     lua["lua_print"] = lua["print"];
@@ -670,7 +670,7 @@ end
     /// Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH.
     lua["get_frame"] = []() -> uint32_t
     { return HeapBase::get().frame_count(); };
-    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+    /// Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
     // lua["get_global_frame"] = []() -> int
     lua["get_global_frame"] = API::get_global_frame_count;
     /// Get the current timestamp in milliseconds since the Unix Epoch.
@@ -843,6 +843,7 @@ end
         static_cast<Illumination* (*)(Color, float, int32_t)>(::create_illumination),
         static_cast<Illumination* (*)(Vec2, Color, LIGHT_TYPE, float, uint8_t, int32_t, LAYER)>(::create_illumination));
     /// Creates a new Illumination. Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+    /// Warning: this is only valid for current level!
     lua["create_illumination"] = create_illumination;
     /// Refreshes an Illumination, keeps it from fading out, short for `illumination.timer = get_frame()`
     lua["refresh_illumination"] = refresh_illumination;

@@ -297,7 +297,7 @@ function screen_distance(x) end
 ---Get the current frame count since the game was started*. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if the pause is set with flags PAUSE.FADE or PAUSE.ANKH.
 ---@return integer
 function get_frame() end
----Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+---Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
 ---@return integer
 function get_global_frame() end
 ---Get the current timestamp in milliseconds since the Unix Epoch.
@@ -450,6 +450,7 @@ function clear_custom_name(uid) end
 ---@return nil
 function add_item_to_shop(item_uid, shop_owner_uid) end
 ---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---Warning: this is only valid for current level!
 ---@param pos Vec2
 ---@param color Color
 ---@param type LIGHT_TYPE
@@ -460,6 +461,7 @@ function add_item_to_shop(item_uid, shop_owner_uid) end
 ---@return Illumination
 function create_illumination(pos, color, type, size, flags, uid, layer) end
 ---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---Warning: this is only valid for current level!
 ---@param color Color
 ---@param size number
 ---@param x number
@@ -467,6 +469,7 @@ function create_illumination(pos, color, type, size, flags, uid, layer) end
 ---@return Illumination
 function create_illumination(color, size, x, y) end
 ---Creates a new Illumination. Don't forget to continuously call [refresh_illumination](https://spelunky-fyi.github.io/overlunky/#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+---Warning: this is only valid for current level!
 ---@param color Color
 ---@param size number
 ---@param uid integer
@@ -1309,6 +1312,7 @@ function get_hud() end
 function set_drop_chance(dropchance_id, new_drop_chance) end
 ---Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
 ---Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
+---Check all the available drops [here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp)
 ---@param drop_id DROP
 ---@param new_drop_entity_type ENT_TYPE
 ---@return nil
@@ -2523,10 +2527,10 @@ function PRNG:random(min, max) end
     ---@field uid integer @Unique id of the entity, save it to variable to check this entity later (don't use the whole Entity type as it will be replaced with a different one when this is destroyed)
     ---@field animation_frame integer @Number (id) of the sprite in the texture
     ---@field draw_depth integer @Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
-    ---@field x number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-    ---@field y number @Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-    ---@field abs_x number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
-    ---@field abs_y number @Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    ---@field x number @Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+    ---@field y number @Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+    ---@field abs_x number @Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
+    ---@field abs_y number @Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
     ---@field layer integer @Use `set_layer` to change
     ---@field width number @Width of the sprite
     ---@field height number @Height of the sprite
@@ -2574,6 +2578,7 @@ function PRNG:random(min, max) end
     ---@field remove_item fun(self, entity: Entity, autokill_check: boolean): nil @Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
     ---@field apply_db fun(self): nil @Applies changes made in `entity.type`
     ---@field get_absolute_velocity fun(self): Vec2 @Get's the velocity relative to the game world, only for movable or liquid entities
+    ---@field get_absolute_position fun(self): Vec2 @Get the absolute position of an entity in the game world
     ---@field get_hitbox fun(self, use_render_pos: boolean?): AABB @`use_render_pos` default is `false`
     ---@field attach fun(self, new_overlay: Entity): nil @Attach to other entity (at the current relative position to it)
     ---@field detach fun(self, check_autokill: boolean?): nil @Detach from overlay
@@ -6765,7 +6770,7 @@ end
 --## Static class functions
 
 SaveState = nil
----Get the pre-allocated by the game save slot 1-4
+---Get the pre-allocated by the game save slot 1-4. Call as `SaveState.get(slot)`
 ---@param save_slot integer
 ---@return SaveState
 function SaveState:get(save_slot) end

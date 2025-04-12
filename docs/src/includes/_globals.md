@@ -1225,6 +1225,7 @@ Distance from center: if you go above 3.0 the game might crash because a spark m
 
 Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop([DROP](#DROP).VAN_HORSING_DIAMOND, [ENT_TYPE](#ENT_TYPE).ITEM_PLASMACANNON))
 Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
+Check all the available drops [here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp)
 
 ### set_boss_door_control_enabled
 
@@ -1713,7 +1714,7 @@ Get engine target frametime when game is unfocused (1/framerate, default 1/33).
 
 #### int get_global_frame()
 
-Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.
+Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.
 
 ### get_hud
 
@@ -2330,6 +2331,7 @@ Current mouse cursor position in screen coordinates.
 #### [Illumination](#Illumination) create_illumination([Color](#Color) color, float size, int uid)
 
 Creates a new [Illumination](#Illumination). Don't forget to continuously call [refresh_illumination](#refresh_illumination), otherwise your light emitter fades out! Check out the [illumination.lua](https://github.com/spelunky-fyi/overlunky/blob/main/examples/illumination.lua) script for an example.
+Warning: this is only valid for current level!
 
 ### refresh_illumination
 
@@ -3846,8 +3848,7 @@ Same as import().
 
 > Search script examples for [generate_particles](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=generate_particles)
 
-#### [ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)
-
+`[ParticleEmitterInfo](#ParticleEmitterInfo) generate_particles([PARTICLEEMITTER](#PARTICLEEMITTER) particle_emitter_id, int uid)`<br/>
 Use `generate_world_particles`
 
 ### draw_line
@@ -4088,8 +4089,7 @@ Set level flag 18 on post room generation instead, to properly force every level
 
 > Search script examples for [get_entities](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities)
 
-#### vector&lt;int&gt; get_entities()
-
+`vector&lt;int&gt; get_entities()`<br/>
 Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 ### get_entities_by_mask
@@ -4097,8 +4097,7 @@ Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_mask](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_mask)
 
-#### vector&lt;int&gt; get_entities_by_mask([MASK](#MASK) mask)
-
+`vector&lt;int&gt; get_entities_by_mask([MASK](#MASK) mask)`<br/>
 Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 ### get_entities_by_layer
@@ -4106,8 +4105,7 @@ Use `get_entities_by(0, mask, LAYER.BOTH)` instead
 
 > Search script examples for [get_entities_by_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_by_layer)
 
-#### vector&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)
-
+`vector&lt;int&gt; get_entities_by_layer([LAYER](#LAYER) layer)`<br/>
 Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 ### get_entities_overlapping
@@ -4115,10 +4113,8 @@ Use `get_entities_by(0, MASK.ANY, layer)` instead
 
 > Search script examples for [get_entities_overlapping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_entities_overlapping)
 
-#### vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, [MASK](#MASK) mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
-
-#### vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, [MASK](#MASK) mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)
-
+`vector&lt;int&gt; get_entities_overlapping(array<[ENT_TYPE](#ENT_TYPE)> entity_types, [MASK](#MASK) mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)`<br/>
+`vector&lt;int&gt; get_entities_overlapping([ENT_TYPE](#ENT_TYPE) entity_type, [MASK](#MASK) mask, float sx, float sy, float sx2, float sy2, [LAYER](#LAYER) layer)`<br/>
 Use `get_entities_overlapping_hitbox` instead
 
 ### get_entity_ai_state
