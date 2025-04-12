@@ -5219,7 +5219,8 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame</a></p>
 </blockquote>
 <h4 id='int-get_frame'>int get_frame()</h4>
-<p>Get the current frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter is paused if you block PRE_UPDATE from running, and also doesn&#39;t increment during some loading screens, even though state update still runs.</p>
+<p>Get the frame count from the main game state. You can use this to make some timers yourself, the engine runs at 60fps.
+This counter is paused if the pause is set with flags <a href="#PAUSE">PAUSE</a>.<a href="#FADE">FADE</a> or <a href="#PAUSE">PAUSE</a>.ANKH. Rolls back with online rollback etc.</p>
 <h3 id='get_frametime'>get_frametime</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frametime">get_frametime</a></p>
@@ -5237,7 +5238,7 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_global_frame">get_global_frame</a></p>
 </blockquote>
 <h4 id='int-get_global_frame'>int get_global_frame()</h4>
-<p>Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing when state is updated, even during loading screens.</p>
+<p>Get the current global frame count since the game was started. You can use this to make some timers yourself, the engine runs at 60fps. This counter keeps incrementing with game loop. Never stops.</p>
 <h3 id='get_hud'>get_hud</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_hud">get_hud</a></p>
@@ -5733,7 +5734,7 @@ optional <code>layer</code> parameter to be used when liquid was moved to back l
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=warp">warp</a></p>
 </blockquote>
-<h4 id='nil-warp-int-w-int-l-int-t'>nil warp(int w, int l, int t)</h4>
+<h4 id='nil-warp-int-world-int-level-int-theme'>nil warp(int world, int level, int theme)</h4>
 <p>Warp to a level immediately.</p>
 <h2 id='Input-functions'>Input functions</h2><h3 id='buttons_to_inputs'>buttons_to_inputs</h3>
 <blockquote>
@@ -5771,7 +5772,7 @@ Warning: this is only valid for current level!</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=refresh_illumination">refresh_illumination</a></p>
 </blockquote>
 <h4 id='nil-refresh_illumination-Illumination-illumination'>nil refresh_illumination(<a href="#Illumination">Illumination</a> illumination)</h4>
-<p>Refreshes an <a href="#Illumination">Illumination</a>, keeps it from fading out (updates the timer, keeping it in sync with the game render)</p>
+<p>Refreshes an <a href="#Illumination">Illumination</a>, keeps it from fading out, short for <code>illumination.timer = get_frame()</code></p>
 <h2 id='Message-functions'>Message functions</h2><h3 id='cancel_speechbubble'>cancel_speechbubble</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=cancel_speechbubble">cancel_speechbubble</a></p>
@@ -10733,6 +10734,21 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_state">get_state()</a></td>
 <td>Access the <a href="#StateMemory">StateMemory</a> inside a <a href="#SaveState">SaveState</a></td>
 </tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame()</a></td>
+<td>Get the current frame from the <a href="#SaveState">SaveState</a>, equivelent to the <a href="#Get_frame">get_frame</a> global function that returns the frame from the &quot;loaded in state&quot;</td>
+</tr>
+<tr>
+<td><a href="#PRNG">PRNG</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_prng">get_prng()</a></td>
+<td>Access the <a href="#PRNG">PRNG</a> inside a <a href="#SaveState">SaveState</a></td>
+</tr>
+<tr>
+<td><a href="#SaveState">SaveState</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get">get(int save_slot)</a></td>
+<td>Get the pre-allocated by the game save slot 1-4. Call as <code>SaveState.get(slot)</code></td>
+</tr>
 </tbody></table>
 <h3 id='SharedIO'>SharedIO</h3>
 <table><thead>
@@ -12997,6 +13013,11 @@ Derived from <a href="#Logic">Logic</a></p>
 <tr>
 <td><a href="#OnlineLobby">OnlineLobby</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=lobby">lobby</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_active">is_active()</a></td>
 <td></td>
 </tr>
 </tbody></table>

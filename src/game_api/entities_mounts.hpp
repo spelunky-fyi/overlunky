@@ -4,7 +4,7 @@
 #include <utility> // for pair
 
 #include "entities_chars.hpp" // for PowerupCapable
-#include "math.h"             // for Vec2
+#include "math.hpp"           // for Vec2
 
 class Movable;
 struct SoundMeta;

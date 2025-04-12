@@ -52,5 +52,5 @@ const int OL_WHEEL_UP = 0x12;
 struct EntityItem;
 
 void create_box(std::vector<EntityItem> items);
-void init_ui();
+void init_ui(struct ImGuiContext* ctx);
 void reload_enabled_scripts();

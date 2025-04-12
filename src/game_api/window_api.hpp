@@ -1,8 +1,7 @@
 #pragma once
 
 #include <cstdint>
-
-#include <Windows.h>
+#include <minwindef.h> // for UINT, WPARAM, LPARAM
 
 bool detect_wine();
 

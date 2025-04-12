@@ -436,9 +436,9 @@ void render_version_warning()
     if (version_check_messages[(int)version_check_status.state].fade > 0)
     {
         if (version_check_status.start == 0)
-            version_check_status.start = get_global_frame_count();
+            version_check_status.start = API::get_global_frame_count();
 
-        auto duration = get_global_frame_count() - version_check_status.start;
+        auto duration = API::get_global_frame_count() - version_check_status.start;
         version_check_status.opacity = 1.0f - duration / version_check_messages[(int)version_check_status.state].fade;
         if (version_check_status.opacity <= 0.0f)
         {
@@ -1495,7 +1495,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                 }
                 uint32_t i_x = static_cast<uint32_t>(floor->x + 0.5f);
                 uint32_t i_y = static_cast<uint32_t>(floor->y + 0.5f);
-                State::get().layer(floor->layer)->grid_entities[i_y][i_x] = floor;
+                HeapBase::get().state()->layer(floor->layer)->grid_entities[i_y][i_x] = floor;
                 fix_decorations_at(floor->x, floor->y, (LAYER)floor->layer);
             }
         }
@@ -2814,7 +2814,7 @@ void load_state(int slot)
         g_state->camera->focus_offset_y = 0;
         set_camera_bounds(true);
     }
-    UI::copy_state(slot, 5);
+    UI::load_state_as_main(slot);
 }
 
 void clear_script_messages()
@@ -3549,19 +3549,19 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("save_state_1", wParam))
     {
-        UI::copy_state(5, 1);
+        UI::save_main_state(1);
     }
     else if (pressed("save_state_2", wParam))
     {
-        UI::copy_state(5, 2);
+        UI::save_main_state(2);
     }
     else if (pressed("save_state_3", wParam))
     {
-        UI::copy_state(5, 3);
+        UI::save_main_state(3);
     }
     else if (pressed("save_state_4", wParam))
     {
-        UI::copy_state(5, 4);
+        UI::save_main_state(4);
     }
     else if (pressed("load_state_1", wParam))
     {
@@ -4212,15 +4212,15 @@ void render_camera()
             tooltip("Focus the selected entity");
         }
 
-        auto [cx, cy] = State::get_camera_position();
+        auto [cx, cy] = Camera::get_position();
         ImGui::PushItemWidth(120.0f);
         ImGui::InputFloat("##CameraPosX", &cx, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            HeapBase::get().state()->camera->set_position(cx, cy);
         ImGui::SameLine(0, 4.0f);
         ImGui::InputFloat("Position##CameraPosY", &cy, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            HeapBase::get().state()->camera->set_position(cx, cy);
 
         ImGui::InputFloat("##CameraFocusX", &g_state->camera->focus_x, 0.1f, 1.0f);
         ImGui::SameLine(0, 4.0f);
@@ -5639,7 +5639,7 @@ void render_clickhandler()
                 g_state->camera->focus_x -= (current_pos.first - oryginal_pos.first) * g_camera_speed;
                 g_state->camera->focus_y -= (current_pos.second - oryginal_pos.second) * g_camera_speed;
                 if (g_state->pause != 0 || g_bucket->pause_api->paused() || !options["smooth_camera"])
-                    State::get().set_camera_position(g_state->camera->focus_x, g_state->camera->focus_y);
+                    HeapBase::get().state()->camera->set_position(g_state->camera->focus_x, g_state->camera->focus_y);
                 startpos = normalize(mouse_pos());
                 enable_camera_bounds = false;
                 set_camera_bounds(enable_camera_bounds);
@@ -8515,7 +8515,7 @@ void render_game_props()
         for (int i = 1; i <= 4; ++i)
         {
             if (ImGui::Button(fmt::format(" {} ##SaveState{}", i, i).c_str()))
-                UI::copy_state(5, i);
+                UI::save_main_state(i);
             tooltip("Save current level state", fmt::format("save_state_{}", i).c_str());
             ImGui::SameLine();
         }
@@ -9364,7 +9364,7 @@ void render_prohud()
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("TIMER:{}/{} GLOBAL:{:#06} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), get_global_frame_count(), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
+    std::string buf = fmt::format("TIMER:{}/{} GLOBAL:{:#06} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), API::get_global_frame_count(), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -10006,14 +10006,14 @@ std::string make_save_path(std::string_view script_path, std::string_view script
     return save_path;
 }
 
-void init_ui()
+void init_ui(ImGuiContext* ctx)
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    State::init(g_SoundManager.get());
-    State::post_init();
+    API::init(g_SoundManager.get());
+    API::post_init();
 
-    g_state = State::get().ptr_main();
+    g_state = HeapBase::get_main().state();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();
     g_bucket = Bucket::get();
@@ -10024,7 +10024,7 @@ void init_ui()
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
-    register_imgui_pre_init(&imgui_pre_init);
+    imgui_pre_init(ctx);
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);
