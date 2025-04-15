@@ -163,7 +163,7 @@ class CustomEventDescription
 
     CustomEventInstance createInstance();
     bool releaseAllInstances();
-    
+
     bool loadSampleData();
     bool unloadSampleData();
     std::optional<FMODStudio::LoadingState> getSampleLoadingState();
@@ -210,7 +210,7 @@ class CustomEventInstance
     std::optional<int> get_timeline_position();
     bool set_volume(float volume);
     std::optional<float> get_volume();
-    
+
     std::optional<float> get_parameter_by_name(std::string name);
     bool set_parameter_by_name(std::string name, float value);
     bool set_parameter_by_name(std::string name, float value, bool ignoreseekspeed);
@@ -284,7 +284,7 @@ class SoundManager
     CustomBank get_existing_bank(std::string_view path);
     void acquire_bank(FMOD::Bank* fmod_bank);
     void destroy_bank(FMOD::Bank* fmod_bank);
-    std::optional <FMODStudio::LoadingState> get_bank_loading_state(CustomBank custom_bank);
+    std::optional<FMODStudio::LoadingState> get_bank_loading_state(CustomBank custom_bank);
     bool load_bank_sample_data(CustomBank custom_bank);
     bool unload_bank_sample_data(CustomBank custom_bank);
     std::optional<FMODStudio::LoadingState> get_bank_sample_loading_state(CustomBank custom_bank);

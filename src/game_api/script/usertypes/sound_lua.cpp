@@ -48,15 +48,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     }
 
     /// Parameter to `load_bank()`, used to control bank loading.
-    lua.new_enum("FMOD_LOAD_BANK_FLAGS",
-        "NORMAL",
-        FMODStudio::LoadBankFlags::Normal,
-        "NONBLOCKING",
-        FMODStudio::LoadBankFlags::Nonblocking,
-        "DECOMPRESS_SAMPLES",
-        FMODStudio::LoadBankFlags::DecompressSamples,
-        "UNENCRYPTED",
-        FMODStudio::LoadBankFlags::Unencrypted);
+    lua.new_enum("FMOD_LOAD_BANK_FLAGS", "NORMAL", FMODStudio::LoadBankFlags::Normal, "NONBLOCKING", FMODStudio::LoadBankFlags::Nonblocking, "DECOMPRESS_SAMPLES", FMODStudio::LoadBankFlags::DecompressSamples, "UNENCRYPTED", FMODStudio::LoadBankFlags::Unencrypted);
     /* FMOD_LOAD_BANK_FLAGS
         // NORMAL
         // Standard behavior. The function will not return until the bank has finished loading.
@@ -69,37 +61,13 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         */
 
     /// The loading state of various FMOD Studio objects, such as banks and non-streaming sample data.
-    lua.new_enum("FMOD_LOADING_STATE",
-        "UNLOADING",
-        FMODStudio::LoadingState::Unloading,
-        "UNLOADED",
-        FMODStudio::LoadingState::Unloaded,
-        "LOADING",
-        FMODStudio::LoadingState::Loading,
-        "LOADED",
-        FMODStudio::LoadingState::Loaded,
-        "ERROR",
-        FMODStudio::LoadingState::Error);
+    lua.new_enum("FMOD_LOADING_STATE", "UNLOADING", FMODStudio::LoadingState::Unloading, "UNLOADED", FMODStudio::LoadingState::Unloaded, "LOADING", FMODStudio::LoadingState::Loading, "LOADED", FMODStudio::LoadingState::Loaded, "ERROR", FMODStudio::LoadingState::Error);
 
     /// The playback state of various FMOD Studio objects, used for `CustomEventInstance:get_playback_state()`.
-    lua.new_enum("FMOD_PLAYBACK_STATE",
-        "PLAYING",
-        FMODStudio::PlaybackState::Playing,
-        "STARTING",
-        FMODStudio::PlaybackState::Starting,
-        "STOPPED",
-        FMODStudio::PlaybackState::Stopped,
-        "STOPPING",
-        FMODStudio::PlaybackState::Stopping,
-        "SUSTAINING",
-        FMODStudio::PlaybackState::Sustaining);
+    lua.new_enum("FMOD_PLAYBACK_STATE", "PLAYING", FMODStudio::PlaybackState::Playing, "STARTING", FMODStudio::PlaybackState::Starting, "STOPPED", FMODStudio::PlaybackState::Stopped, "STOPPING", FMODStudio::PlaybackState::Stopping, "SUSTAINING", FMODStudio::PlaybackState::Sustaining);
 
     /// Stop modes for an event instance.
-    lua.new_enum("FMOD_STOP_MODE",
-        "ALLOW_FADE_OUT",
-        FMODStudio::StopMode::AllowFadeOut,
-        "IMMEDIATE",
-        FMODStudio::StopMode::Immediate);
+    lua.new_enum("FMOD_STOP_MODE", "ALLOW_FADE_OUT", FMODStudio::StopMode::AllowFadeOut, "IMMEDIATE", FMODStudio::StopMode::Immediate);
     /* FMOD_STOP_MODE
         // ALLOW_FADE_OUT
         // Allow the events AHDSR modulators to complete their release, and DSP effect tails to play out.
@@ -108,32 +76,10 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         */
 
     /// FMOD Studio flags describing the behavior of a parameter.
-    lua.new_enum("FMOD_PARAMETER_FLAGS",
-        "READ_ONLY",
-        FMODStudio::ParameterFlags::ReadOnly,
-        "AUTOMATIC",
-        FMODStudio::ParameterFlags::Automatic,
-        "GLOBAL",
-        FMODStudio::ParameterFlags::Global);
+    lua.new_enum("FMOD_PARAMETER_FLAGS", "READ_ONLY", FMODStudio::ParameterFlags::ReadOnly, "AUTOMATIC", FMODStudio::ParameterFlags::Automatic, "GLOBAL", FMODStudio::ParameterFlags::Global);
 
     /// FMOD Studio event parameter types.
-    lua.new_enum("FMOD_PARAMETER_TYPE",
-        "GAME_CONTROLLED",
-        FMODStudio::ParameterType::GameControlled,
-        "AUTOMATIC_DISTANCE",
-        FMODStudio::ParameterType::AutomaticDistance,
-        "AUTOMATIC_EVENT_CONE_ANGLE",
-        FMODStudio::ParameterType::AutomaticEventConeAngle,
-        "AUTOMATIC_EVENT_ORIENTATION",
-        FMODStudio::ParameterType::AutomaticEventOrientation,
-        "AUTOMATIC_DIRECTION",
-        FMODStudio::ParameterType::AutomaticDirection,
-        "AUTOMATIC_ELEVATION",
-        FMODStudio::ParameterType::AutomaticElevation,
-        "AUTOMATIC_LISTENER_ORIENTATION",
-        FMODStudio::ParameterType::AutomaticListenerOrientation,
-        "AUTOMATIC_SPEED",
-        FMODStudio::ParameterType::AutomaticSpeed);
+    lua.new_enum("FMOD_PARAMETER_TYPE", "GAME_CONTROLLED", FMODStudio::ParameterType::GameControlled, "AUTOMATIC_DISTANCE", FMODStudio::ParameterType::AutomaticDistance, "AUTOMATIC_EVENT_CONE_ANGLE", FMODStudio::ParameterType::AutomaticEventConeAngle, "AUTOMATIC_EVENT_ORIENTATION", FMODStudio::ParameterType::AutomaticEventOrientation, "AUTOMATIC_DIRECTION", FMODStudio::ParameterType::AutomaticDirection, "AUTOMATIC_ELEVATION", FMODStudio::ParameterType::AutomaticElevation, "AUTOMATIC_LISTENER_ORIENTATION", FMODStudio::ParameterType::AutomaticListenerOrientation, "AUTOMATIC_SPEED", FMODStudio::ParameterType::AutomaticSpeed);
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
@@ -222,7 +168,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         sol::readonly(&FMODStudio::ParameterDescription::type),
         "flags",
         sol::readonly(&FMODStudio::ParameterDescription::flags));
-    
+
     /// Handle to a loaded FMOD Bank. Unloading a bank will destroy all objects loaded from it, and unload all sample data.
     /// Can be used to load and unload the non-streaming sample data of all events in the bank. However you can also
     /// control the loading state of non-streaming sample data for individual events with a `CustomEventDescription`.
@@ -346,8 +292,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
             }
             DEBUG("Failed to get CustomEventDescription from FMODguidMap");
             return sol::nullopt;
-        }
-    );
+        });
     /// Creates an `FMODguidMap` by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
     /// if you want to use a human readable FMOD event path to create a `CustomEventDescription` instead of using an FMOD GUID string.
     lua["create_fmod_guid_map"] = [](std::string path) -> sol::optional<FMODguidMap>

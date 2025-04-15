@@ -924,11 +924,11 @@ CustomBank SoundManager::get_bank(std::string path, FMODStudio::LoadBankFlags fl
 {
     DEBUG("Loading bank file from path {}", path);
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [&path](const Bank& bank)
-        { return bank.path == path; });
+                           { return bank.path == path; });
     if (it != m_BankStorage.end())
     {
         it->ref_count++;
-        return CustomBank{ it->fmod_bank, this };
+        return CustomBank{it->fmod_bank, this};
     }
 
     Bank new_bank;
@@ -939,32 +939,32 @@ CustomBank SoundManager::get_bank(std::string path, FMODStudio::LoadBankFlags fl
     if (err != FMOD::FMOD_RESULT::OK)
     {
         DEBUG("Failed loading bank file {}\nFMOD result: {}", new_bank.path, FMOD::ErrStr(err));
-        return CustomBank{ nullptr, nullptr };
+        return CustomBank{nullptr, nullptr};
     }
 
     DEBUG("Successfully loaded bank file {}", new_bank.path);
     m_BankStorage.push_back(std::move(new_bank));
-    return CustomBank{ m_BankStorage.back().fmod_bank, this };
+    return CustomBank{m_BankStorage.back().fmod_bank, this};
 }
 CustomBank SoundManager::get_bank(const char* path, FMODStudio::LoadBankFlags flags)
 {
-    return get_bank(std::string{ path }, flags);
+    return get_bank(std::string{path}, flags);
 }
 CustomBank SoundManager::get_existing_bank(std::string_view path)
 {
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [&path](const Bank& bank)
-        { return bank.path == path; });
+                           { return bank.path == path; });
     if (it != m_BankStorage.end())
     {
         it->ref_count++;
-        return CustomBank{ it->fmod_bank, this };
+        return CustomBank{it->fmod_bank, this};
     }
-    return CustomBank{ nullptr, nullptr };
+    return CustomBank{nullptr, nullptr};
 }
 void SoundManager::acquire_bank(FMOD::Bank* fmod_bank)
 {
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [fmod_bank](const Bank& bank)
-        { return bank.fmod_bank == fmod_bank; });
+                           { return bank.fmod_bank == fmod_bank; });
     if (it == m_BankStorage.end())
     {
         DEBUG("Trying to acquire bank that does not exist...");
@@ -989,26 +989,26 @@ std::optional<FMODStudio::LoadingState> SoundManager::get_bank_loading_state(Cus
 {
     return std::visit(
         overloaded{
-                   [this](FMODStudio::Bank* bank)
-                   {
-                        FMODStudio::LoadingState value;
-                        if (FMOD_CHECK_CALL(m_BankGetLoadingState(bank, &value)))
-                        {
-                            return std::optional<FMODStudio::LoadingState>{value};
-                        }
-                        return std::optional<FMODStudio::LoadingState>{};
-                   },
-                   [](std::monostate)
-                   { return std::optional<FMODStudio::LoadingState>{}; } },
+            [this](FMODStudio::Bank* bank)
+            {
+                FMODStudio::LoadingState value;
+                if (FMOD_CHECK_CALL(m_BankGetLoadingState(bank, &value)))
+                {
+                    return std::optional<FMODStudio::LoadingState>{value};
+                }
+                return std::optional<FMODStudio::LoadingState>{};
+            },
+            [](std::monostate)
+            { return std::optional<FMODStudio::LoadingState>{}; }},
         custom_bank.m_FmodHandle);
 }
 bool SoundManager::load_bank_sample_data(CustomBank custom_bank)
 {
     return std::visit(
-        overloaded{ [this](FMODStudio::Bank* bank)
+        overloaded{[this](FMODStudio::Bank* bank)
                    { return FMOD_CHECK_CALL(m_BankLoadSampleData(bank)); },
                    [](std::monostate)
-                   { return false; } },
+                   { return false; }},
         custom_bank.m_FmodHandle);
 }
 bool SoundManager::unload_bank_sample_data(CustomBank custom_bank)
@@ -1017,7 +1017,7 @@ bool SoundManager::unload_bank_sample_data(CustomBank custom_bank)
         overloaded{[this](FMODStudio::Bank* bank)
                    { return FMOD_CHECK_CALL(m_BankUnloadSampleData(bank)); },
                    [](std::monostate)
-                   { return false; } },
+                   { return false; }},
         custom_bank.m_FmodHandle);
 }
 std::optional<FMODStudio::LoadingState> SoundManager::get_bank_sample_loading_state(CustomBank custom_bank)
@@ -1160,18 +1160,7 @@ CustomEventDescription SoundManager::get_event_by_id(FMODStudio::FMOD_GUID* guid
     {
         return CustomEventDescription{fmod_event, this};
     }
-    DEBUG("Could not get event or snapshot for GUID {{{:08X}-{:04X}-{:04X}-{:02X}{:02X}-{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}}}",
-        guid->Data1,
-        guid->Data2,
-        guid->Data3,
-        guid->Data4[0],
-        guid->Data4[1],
-        guid->Data4[2],
-        guid->Data4[3],
-        guid->Data4[4],
-        guid->Data4[5],
-        guid->Data4[6],
-        guid->Data4[7]);
+    DEBUG("Could not get event or snapshot for GUID {{{:08X}-{:04X}-{:04X}-{:02X}{:02X}-{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}}}", guid->Data1, guid->Data2, guid->Data3, guid->Data4[0], guid->Data4[1], guid->Data4[2], guid->Data4[3], guid->Data4[4], guid->Data4[5], guid->Data4[6], guid->Data4[7]);
     return CustomEventDescription{nullptr, nullptr};
 }
 
