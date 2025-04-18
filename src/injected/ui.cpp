@@ -1934,10 +1934,12 @@ void force_cheats()
             ent->poison_tick_timer = -1;
             ent->onfire_effect_timer = 0;
             ent->wet_effect_timer = 0;
-            ent->lock_input_timer = 0;
             ent->set_cursed(false, false);
             ent->more_flags &= ~(1U << 16);
             UI::destroy_entity_item_type(ent, ink);
+            static auto spikes_item = to_id("ENT_TYPE_ITEM_SPIKES");
+            if (ent->overlay && ent->overlay->type->id == spikes_item)
+                ent->detach(false);
         }
     }
     if (options["fly_mode"])
@@ -3082,6 +3084,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["god_mode"] = !options["god_mode"];
         UI::godmode(options["god_mode"]);
+        if (options["god_mode"])
+        {
+            for (auto ent : g_players)
+                ent->lock_input_timer = 0;
+        }
     }
     else if (pressed("toggle_noclip", wParam))
     {
