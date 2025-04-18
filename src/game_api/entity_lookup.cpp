@@ -63,9 +63,9 @@ std::vector<uint32_t> get_entities_overlapping_grid(float x, float y, LAYER laye
 
 template <class FunT>
 requires std::is_invocable_v<FunT, const EntityList&>
-void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
+void foreach_mask(ENTITY_MASK mask, Layer* l, FunT&& fun)
 {
-    if (mask == 0)
+    if (mask == ENTITY_MASK::ANY)
     {
         fun(l->all_entities);
     }
@@ -73,19 +73,19 @@ void foreach_mask(uint32_t mask, Layer* l, FunT&& fun)
     {
         for (uint32_t test_flag = 1U; test_flag < 0x8000; test_flag <<= 1U)
         {
-            if (mask & test_flag)
+            if (!(mask & static_cast<ENTITY_MASK>(test_flag)))
+                continue;
+
+            const auto& it = l->entities_by_mask.find(test_flag);
+            if (it != l->entities_by_mask.end())
             {
-                const auto& it = l->entities_by_mask.find(test_flag);
-                if (it != l->entities_by_mask.end())
-                {
-                    fun(it->second);
-                }
+                fun(it->second);
             }
         }
     }
 }
 
-std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
+std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask, LAYER layer)
 {
     auto state = get_state_ptr();
     std::vector<uint32_t> found;
@@ -113,7 +113,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
         auto layer_back = state->layers[1];
         if (proper_types.empty() || proper_types[0] == 0)
         {
-            if (mask == 0) // all entities
+            if (mask == ENTITY_MASK::ANY) // all entities
             {
                 // this exception for small improvements with calling reserve once
                 found.reserve(found.size() + (size_t)layer_front->all_entities.size + (size_t)layer_back->all_entities.size);
@@ -146,7 +146,7 @@ std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32
     return found;
 }
 
-std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32_t mask, float x, float y, LAYER layer, float radius)
+std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask, float x, float y, LAYER layer, float radius)
 {
     // TODO: use entity regions?
     auto state = get_state_ptr();
@@ -173,7 +173,7 @@ std::vector<uint32_t> get_entities_at(std::vector<ENT_TYPE> entity_types, uint32
     return found;
 }
 
-std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, uint32_t mask, AABB hitbox, LAYER layer)
+std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask, AABB hitbox, LAYER layer)
 {
     // TODO: use entity regions?
     auto state = get_state_ptr();
@@ -191,7 +191,7 @@ std::vector<uint32_t> get_entities_overlapping_hitbox(std::vector<ENT_TYPE> enti
     return result;
 }
 
-std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, uint32_t mask, float sx, float sy, float sx2, float sy2, Layer* layer)
+std::vector<uint32_t> get_entities_overlapping_by_pointer(std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask, float sx, float sy, float sx2, float sy2, Layer* layer)
 {
     std::vector<uint32_t> found;
     foreach_mask(mask, layer, [&entity_types, &found, &sx, &sy, &sx2, &sy2](const EntityList& entities)
@@ -233,7 +233,7 @@ bool entity_has_item_type(uint32_t uid, std::vector<ENT_TYPE> entity_types)
     return false;
 }
 
-std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, uint32_t mask)
+std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask)
 {
     std::vector<uint32_t> found;
     Entity* entity = get_entity_ptr(uid);
@@ -242,7 +242,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
     if (entity->items.size > 0)
     {
         const std::vector<ENT_TYPE> proper_types = get_proper_types(std::move(entity_types));
-        if ((!proper_types.size() || !proper_types[0]) && !mask) // all items
+        if ((!proper_types.size() || !proper_types[0]) && mask == ENTITY_MASK::ANY) // all items
         {
             const auto uids = entity->items.uids();
             found.insert(found.end(), uids.begin(), uids.end());
@@ -251,7 +251,7 @@ std::vector<uint32_t> entity_get_items_by(uint32_t uid, std::vector<ENT_TYPE> en
         {
             for (auto item : entity->items.entities())
             {
-                if ((mask == 0 || (item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
+                if ((mask == ENTITY_MASK::ANY || !!(item->type->search_flags & mask)) && entity_type_check(proper_types, item->type->id))
                 {
                     found.push_back(item->uid);
                 }

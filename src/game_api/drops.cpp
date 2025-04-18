@@ -9,6 +9,9 @@
 #include "memory.hpp"    // for Memory, recover_mem, write_mem_recoverable
 #include "search.hpp"    // for find_inst
 
+///
+///  DROP
+///
 std::vector<DropEntry> drop_entries{
     {"ALTAR_DICE_CLIMBINGGLOVES", "\xBA\x0D\x02\x00\x00\xEB\x05"sv, VTABLE_OFFSET::NONE, 0, 1}, // VTABLE_OFFSET::FLOOR_ALTAR, 26
     {"ALTAR_DICE_COOKEDTURKEY", "\xBA\x06\x02\x00\x00\xEB\x0C"sv, VTABLE_OFFSET::NONE, 0, 1},
@@ -316,6 +319,9 @@ std::vector<DropEntry> drop_entries{
     /// maybe TODO: if someone wants all the explosions (from damage/death/crush), could also be added
 };
 
+///
+///  DROPCHANCE
+///
 std::vector<DropChanceEntry> dropchance_entries{
     {"BONEBLOCK_SKELETONKEY", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 3},
     {"CROCMAN_TELEPACK", "\x64"sv, VTABLE_OFFSET::MONS_CROCMAN, 3, 1},
@@ -330,7 +336,7 @@ std::vector<DropChanceEntry> dropchance_entries{
     {"YETI_PITCHERSMITT", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_YETI, 3},
 };
 
-void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
+void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance)
 {
     if (dropchance_id < (int32_t)dropchance_entries.size())
     {
@@ -366,7 +372,7 @@ void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance)
     }
 }
 
-void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type)
+void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type)
 {
     const static auto nof_ent_types = to_id("ENT_TYPE_LIQUID_COARSE_LAVA") + 1;
     if (drop_id < (int32_t)drop_entries.size() && new_drop_entity_type < nof_ent_types)
