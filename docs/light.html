@@ -9410,6 +9410,11 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=count">count</a></td>
 <td>Number of API instances present</td>
 </tr>
+<tr>
+<td>map&lt;<a href="#Aliases">STRINGID</a>, string&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=custom_strings">custom_strings</a></td>
+<td>Holds all the custom strings added thru <a href="#add_string">add_string</a>, read only</td>
+</tr>
 </tbody></table>
 <h3 id='Color'>Color</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="c1">-- make a semi transparent red color and print it in different formats</span>
 <span class="kd">local</span> <span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="p">:</span><span class="n">red</span><span class="p">()</span>
@@ -15534,7 +15539,8 @@ Used in <a href="#ScreenCharacterSelect">ScreenCharacterSelect</a>, <a href="#Sc
 </tr>
 </tbody></table>
 <h3 id='ScreenDeath'>ScreenDeath</h3>
-<p>Derived from <a href="#Screen">Screen</a></p>
+<p>The POST render call will only be visible in the polaroid area on the left of the book. The Journal is drawn on top of that.
+Derived from <a href="#Screen">Screen</a></p>
 
 <table><thead>
 <tr>
@@ -24796,11 +24802,6 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>0-25 alphabetical index of hired hand names.</td>
 </tr>
 <tr>
-<td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_jetpack_fuel">set_jetpack_fuel(int fuel)</a></td>
-<td></td>
-</tr>
-<tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=kapala_blood_amount">kapala_blood_amount()</a></td>
 <td></td>
@@ -24875,6 +24876,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=worn_backitem">worn_backitem()</a></td>
 <td>Returns the uid of the currently worn backitem, or -1 if wearing nothing</td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_jetpack_fuel">set_jetpack_fuel(int fuel)</a></td>
+<td></td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
