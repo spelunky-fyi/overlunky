@@ -670,11 +670,93 @@ Type | Name | Description
 bool | [down](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=down) | [Button](#Button) is being held
 bool | [pressed](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pressed) | [Button](#Button) was just pressed down this frame
 
+### CustomBank
+
+Handle to a loaded FMOD Bank. Unloading a bank will destroy all objects loaded from it, and unload all sample data.
+Can be used to load and unload the non-streaming sample data of all events in the bank. However you can also
+control the loading state of non-streaming sample data for individual events with a `CustomEventDescription`.
+
+Type | Name | Description
+---- | ---- | -----------
+optional&lt;FMODStudio::LoadingState&gt; | [getLoadingState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getLoadingState) | 
+bool | [loadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loadSampleData) | 
+bool | [unloadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unloadSampleData) | 
+optional&lt;FMODStudio::LoadingState&gt; | [getSampleLoadingState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getSampleLoadingState) | 
+bool | [unload()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unload) | 
+bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
+
+### CustomEventDescription
+
+Handle to an FMOD event description, can be used to create a `CustomEventInstance` with
+`CustomEventDescription:createInstance()`. Also can be used to load and unload non-streaming
+sample data for the Event, and release all instances of the event. You can also get parameter
+IDs using `CustomEventDescription:getParameterDescriptionByName()`.
+
+Type | Name | Description
+---- | ---- | -----------
+[CustomEventInstance](#CustomEventInstance) | [createInstance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=createInstance) | 
+bool | [releaseAllInstances()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=releaseAllInstances) | 
+bool | [loadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loadSampleData) | 
+bool | [unloadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unloadSampleData) | 
+optional&lt;FMODStudio::LoadingState&gt; | [getSampleLoadingState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getSampleLoadingState) | 
+optional&lt;FMODStudio::[ParameterDescription](#ParameterDescription)&gt; | [getParameterDescriptionByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterDescriptionByName) | 
+optional&lt;FMODStudio::[ParameterId](#ParameterId)&gt; | [getParameterIDByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterIDByName) | 
+bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
+
+### CustomEventInstance
+
+Handle to an FMOD event instance. Can be used to start and stop an event, or set the events parameters. Once you
+are done with an event instance and no longer need to change its playback state or parameters, you should call
+`CustomEventInstance:release` so the event is marked for release and released when it stops playing to free resources.
+Generally though, it is best practice to call `CustomEventInstance:release` immediately after `CustomEventInstance:start`
+unless you want to play the event instance multiple times or explicitly start and stop it later.
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [start()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start) | 
+bool | [stop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop) | 
+bool | [stop(FMODStudio::StopMode mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop) | 
+optional&lt;FMODStudio::PlaybackState&gt; | [getPlaybackState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getPlaybackState) | 
+bool | [setPause(bool pause)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setPause) | 
+optional&lt;bool&gt; | [getPause()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getPause) | 
+bool | [keyOff()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyOff) | 
+bool | [setPitch(float pitch)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setPitch) | 
+optional&lt;float&gt; | [getPitch()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getPitch) | 
+bool | [setTimelinePosition(int position)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setTimelinePosition) | 
+optional&lt;int&gt; | [getTimelinePosition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getTimelinePosition) | 
+bool | [setVolume(float volume)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setVolume) | 
+optional&lt;float&gt; | [getVolume()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getVolume) | 
+bool | [release()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=release) | 
+bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
+optional&lt;float&gt; | [getParameterByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterByName) | 
+bool | [setParameterByName(string name, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByName) | 
+bool | [setParameterByName(string name, float value, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByName) | 
+bool | [setParameterByNameWithLabel(string name, string label)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByNameWithLabel) | 
+bool | [setParameterByNameWithLabel(string name, string label, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByNameWithLabel) | 
+bool | [setParameterByID(FMODStudio::ParameterId id, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByID) | 
+bool | [setParameterByID(FMODStudio::ParameterId id, float value, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByID) | 
+bool | [setParameterByIDWithLabel(FMODStudio::ParameterId id, string label)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByIDWithLabel) | 
+bool | [setParameterByIDWithLabel(FMODStudio::ParameterId id, string label, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByIDWithLabel) | 
+bool | [release()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=release) | 
+bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
+
 ### CutsceneBehavior
 
 
 Type | Name | Description
 ---- | ---- | -----------
+
+### FMODguidMap
+
+An `FMODguidMap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
+from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
+strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODguidMap` is a
+workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:getEvent()`.
+`FMODguidMap:getEvent()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+
+Type | Name | Description
+---- | ---- | -----------
+optional&lt;[CustomEventDescription](#CustomEventDescription)&gt; | [getEvent(string path)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getEvent) | 
 
 ### Hud
 
@@ -874,6 +956,27 @@ optional&lt;int&gt; | [random(int i)](https://github.com/spelunky-fyi/overlunky/
 int | [random(int min, int max)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=random) | Drop-in replacement for `math.random(min, max)`
 tuple&lt;int, int&gt; | [get_pair(PRNG_CLASS type)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pair) | 
 nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pair) | 
+
+### ParameterDescription
+
+
+Type | Name | Description
+---- | ---- | -----------
+ | [name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=name) | 
+ | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
+ | [minimum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=minimum) | 
+ | [maximum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maximum) | 
+ | [defaultvalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defaultvalue) | 
+ | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | 
+ | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
+
+### ParameterId
+
+
+Type | Name | Description
+---- | ---- | -----------
+ | [data1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data1) | 
+ | [data2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data2) | 
 
 ### PauseAPI
 

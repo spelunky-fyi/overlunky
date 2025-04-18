@@ -1334,6 +1334,21 @@ Clear cache for a file path or the whole directory
 
 Clear save state from slot 1..4.
 
+### create_fmod_guid_map
+
+
+> Search script examples for [create_fmod_guid_map](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_fmod_guid_map)
+
+#### optional&lt;[FMODguidMap](#FMODguidMap)&gt; create_fmod_guid_map(string path)
+
+An `FMODguidMap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
+from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
+strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODguidMap` is a
+workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:getEvent()`.
+`FMODguidMap:getEvent()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+Creates an `FMODguidMap` by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
+if you want to use a human readable FMOD event path to create a `CustomEventDescription` instead of using an FMOD GUID string.
+
 ### create_image
 
 
@@ -1429,6 +1444,15 @@ Force the journal to open on a chapter and entry# when pressing the journal butt
 
 Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.
 
+### get_bank
+
+
+> Search script examples for [get_bank](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_bank)
+
+#### optional&lt;[CustomBank](#CustomBank)&gt; get_bank(string path)
+
+Gets an existing loaded bank if a file at the same path was already loaded
+
 ### get_bucket
 
 
@@ -1466,6 +1490,16 @@ Convert a string to a color, you can use the HTML color names, or even HTML colo
 
 Just convenient way of getting the current amount of money
 short for state->money_shop_total + loop[inventory.money + inventory.collected_money_total]
+
+### get_event_by_id
+
+
+> Search script examples for [get_event_by_id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_event_by_id)
+
+#### optional&lt;[CustomEventDescription](#CustomEventDescription)&gt; get_event_by_id(string guid_string)
+
+Gets a `CustomEventDescription` if the event description is loaded using an FMOD GUID string. The string representation
+must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
 
 ### get_frame
 
@@ -1752,6 +1786,19 @@ List files in directory relative to the mods data directory (Mods/Data/...). Ret
 #### nil list_dir(optional<string> dir)
 
 List files in directory relative to the script root. Returns table of file/directory names or nil if not found.
+
+### load_bank
+
+
+> Search script examples for [load_bank](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_bank)
+
+#### optional&lt;[CustomBank](#CustomBank)&gt; load_bank(string path, FMODStudio::LoadBankFlags flags)
+
+Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
+Returns nil if the file can't be found. Loading a bank file will load the banks metadata, but not non-streaming
+sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
+be found with `get_event_by_id()` or using `create_fmod_guid_map()` and calling `FMODguidMap:getEvent()`.
+The banks loading state can be queried using `CustomBank:getLoadingState()` which will return an `FMOD_LOADING_STATE`.
 
 ### load_death_screen
 
