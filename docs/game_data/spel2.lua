@@ -2914,6 +2914,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field get_powerups fun(self): ENT_TYPE[] @Return all powerups that the entity has
     ---@field unequip_backitem fun(self): nil @Unequips the currently worn backitem
     ---@field worn_backitem fun(self): integer @Returns the uid of the currently worn backitem, or -1 if wearing nothing
+    ---@field set_jetpack_fuel fun(self, fuel: integer): nil
     ---@field set_pre_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks before the virtual function at index `entry`.
     ---@field set_post_virtual fun(self, entry: ENTITY_OVERRIDE, fun: function): CallbackId @Hooks after the virtual function at index `entry`.
     ---@field clear_virtual fun(self, callback_id: CallbackId): nil @Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -2976,7 +2977,6 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field coyote_timer integer @can jump while airborne if greater than 0
     ---@field swim_timer integer @Timer between strokes when holding jump button in water.
     ---@field hired_hand_name integer @0-25 alphabetical index of hired hand names.
-    ---@field set_jetpack_fuel fun(self, fuel: integer): nil
     ---@field kapala_blood_amount fun(self): integer
     ---@field get_name fun(self): string @Get the full name of the character, this will be the modded name not only the vanilla name.
     ---@field get_short_name fun(self): string @Get the short name of the character, this will be the modded name not only the vanilla name.
@@ -6769,6 +6769,7 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     ---@field count integer @Number of API instances present
+    ---@field custom_strings table<STRINGID, string> @Holds all the custom strings added thru [add_string](#add_string), read only 
 
 ---@class Color
     ---@field r number

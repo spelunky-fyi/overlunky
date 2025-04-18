@@ -612,6 +612,7 @@ map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search
 [PauseAPI](#PauseAPI) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | [PauseAPI](#PauseAPI) is used by [Overlunky](#Overlunky) and can be used to control the [Overlunky](#Overlunky) pause options from scripts. Can be accessed from the global `pause` more easily.
 [SharedIO](#SharedIO) | [io](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=io) | Shared part of [ImGuiIO](#ImGuiIO) to block keyboard/mouse input across API instances.
 int | [count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) | Number of API instances present
+map&lt;[STRINGID](#Aliases), string&gt; | [custom_strings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=custom_strings) | Holds all the custom strings added thru [add_string](#add_string), read only 
 
 ### Color
 
@@ -2517,6 +2518,7 @@ float | [credits_progression](https://github.com/spelunky-fyi/overlunky/search?l
 
 ### ScreenDeath
 
+The POST render call will only be visible in the polaroid area on the left of the book. The Journal is drawn on top of that.
 Derived from [Screen](#Screen)
 
 
@@ -5584,7 +5586,6 @@ int | [jump_lock_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 int | [coyote_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coyote_timer) | can jump while airborne if greater than 0
 int | [swim_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swim_timer) | Timer between strokes when holding jump button in water.
 int | [hired_hand_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hired_hand_name) | 0-25 alphabetical index of hired hand names.
-nil | [set_jetpack_fuel(int fuel)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) | 
 int | [kapala_blood_amount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) | 
 string | [get_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_name) | Get the full name of the character, this will be the modded name not only the vanilla name.
 string | [get_short_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_name) | Get the short name of the character, this will be the modded name not only the vanilla name.
@@ -5606,6 +5607,7 @@ bool | [has_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/over
 vector&lt;[ENT_TYPE](#ENT_TYPE)&gt; | [get_powerups()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) | Return all powerups that the entity has
 nil | [unequip_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem) | Unequips the currently worn backitem
 int | [worn_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem) | Returns the uid of the currently worn backitem, or -1 if wearing nothing
+nil | [set_jetpack_fuel(int fuel)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) | 
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.

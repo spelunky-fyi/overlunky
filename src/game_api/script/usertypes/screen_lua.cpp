@@ -478,6 +478,7 @@ void register_usertypes(sol::state& lua)
     screentransition_type["this_level_money_color"] = &ScreenTransition::this_level_money_color;
     screentransition_type["buttons"] = &ScreenTransition::buttons;
 
+    /// The POST render call will only be visible in the polaroid area on the left of the book. The Journal is drawn on top of that.
     lua.new_usertype<ScreenDeath>(
         "ScreenDeath",
         sol::base_classes,
