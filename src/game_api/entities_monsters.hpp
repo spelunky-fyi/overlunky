@@ -807,12 +807,10 @@ class GiantFrog : public Monster
     Entity* platform;
     uint16_t attack_timer;
     uint8_t frogs_ejected_in_cycle; // ejects thee frogs in quick succession, then waits a longer time
-    uint16_t invincibility_timer;
+    uint8_t invincibility_timer;
     uint8_t mouth_close_timer;
     /// opens the mouth and starts mouth_close_timer, used when detecting grub in the mouth area
     bool mouth_open_trigger;
-    uint8_t padding1;
-    uint8_t padding2;
 };
 
 class Frog : public Monster
