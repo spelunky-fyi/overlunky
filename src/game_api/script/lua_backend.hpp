@@ -5,6 +5,7 @@
 #include <cstdint>       // for uint32_t, uint16_t, uint8_t, int32_t
 #include <deque>         // for deque
 #include <filesystem>    // for path
+#include <forward_list>  // for forward_list
 #include <functional>    // for equal_to, function, less
 #include <imgui.h>       // for ImDrawList (ptr only), ImVec4
 #include <locale>        // for num_get, num_put
@@ -311,7 +312,7 @@ class LuaBackend
     std::string result;
 
     int cbcount = 0;
-    CurrentCallback current_cb = {0, 0, CallbackType::None};
+    std::forward_list<CurrentCallback> current_cb;
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
