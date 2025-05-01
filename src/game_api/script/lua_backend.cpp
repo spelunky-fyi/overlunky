@@ -1663,17 +1663,17 @@ CurrentCallback LuaBackend::get_current_callback() const
     if (current_cb.empty())
         return {0, 0, CallbackType::None};
 
-    return current_cb.front();
+    return current_cb.top();
 }
 
 void LuaBackend::set_current_callback(int32_t aux_id, int32_t id, CallbackType type)
 {
-    current_cb.emplace_front(aux_id, id, type);
+    current_cb.emplace(aux_id, id, type);
 }
 
 void LuaBackend::clear_current_callback()
 {
-    current_cb.pop_front();
+    current_cb.pop();
 }
 
 void LuaBackend::set_error(std::string err)

@@ -5,7 +5,6 @@
 #include <cstdint>       // for uint32_t, uint16_t, uint8_t, int32_t
 #include <deque>         // for deque
 #include <filesystem>    // for path
-#include <forward_list>  // for forward_list
 #include <functional>    // for equal_to, function, less
 #include <imgui.h>       // for ImDrawList (ptr only), ImVec4
 #include <locale>        // for num_get, num_put
@@ -16,6 +15,7 @@
 #include <optional>      // for operator==, optional, nullopt
 #include <sol/sol.hpp>   // for object, basic_object, basic_protected_function
 #include <sstream>       // for basic_istringstream, istringstream, basic_s...
+#include <stack>         // for stack
 #include <string>        // for string, hash, getline, u16string, basic_string
 #include <string_view>   // for string_view
 #include <type_traits>   // for move, hash, declval, forward
@@ -312,7 +312,7 @@ class LuaBackend
     std::string result;
 
     int cbcount = 0;
-    std::forward_list<CurrentCallback> current_cb;
+    std::stack<CurrentCallback, std::vector<CurrentCallback>> current_cb;
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
