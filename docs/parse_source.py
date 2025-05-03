@@ -696,7 +696,7 @@ def run_parse():
                     if var[0].startswith("/// NoDoc"):
                         continue
                     if var[0]:
-                        extra_comments[var[1].replace('"', '')] = var[0][4:]
+                        extra_comments[var[1].replace('"', '')] = var[0][4:].strip()
                     extra.append(",".join(var[1:3]))
                 extra = ",".join(extra)
                 if attr:
@@ -789,8 +789,8 @@ def run_parse():
                                 "comment": fun["comment"],
                             }
                         )
-                elif cpp.startswith("[]("): # lambdas
-                    param_match = re.match(r"\[\]\(([\w <>\?&*:,]+)?\) -> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp)
+                elif cpp.startswith("["): # lambdas
+                    param_match = re.match(r"\[(?:[\w&]+)?\]\(([\w <>\?&*:,]+)?\) (?:// )?-> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp)
                     if param_match:
                         ret = param_match.group(2)
                         if ret is None:
