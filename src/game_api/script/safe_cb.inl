@@ -138,8 +138,7 @@ struct make_safe_cb_impl<RetT(ArgsT...)>
             {
                 if constexpr (std::is_invocable_v<SetCurrentCb, LuaBackend&>)
                 {
-                    set_current_cb(*backend);
-                    ON_SCOPE_EXIT(backend->clear_current_callback());
+                    auto c = set_current_cb(*backend);
                     return invoke<RetT>(cb, *backend, front_binder, back_binder, std::forward<ArgsT>(args)...);
                 }
                 else
@@ -199,7 +198,7 @@ static auto make_safe_clearable_cb(
 {
     auto set_current_cb = [=](LuaBackend& backend)
     {
-        backend.set_current_callback(aux_id, id, CbType);
+        return backend.set_current_callback(aux_id, id, CbType);
     };
 
 #define COMMON_ARGS std::forward<CallableT>(cb), \

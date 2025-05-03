@@ -455,9 +455,20 @@ class LuaBackend
     bool pre_load_journal_chapter(uint8_t chapter);
     std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages);
 
-    CurrentCallback get_current_callback() const;
-    void set_current_callback(int32_t aux_id, int32_t id, CallbackType type);
-    void clear_current_callback();
+    CurrentCallback get_current_callback() const
+    {
+        if (current_cb.empty())
+            return {0, 0, CallbackType::None};
+
+        return current_cb.top();
+    }
+    [[nodiscard]] auto set_current_callback(int32_t aux_id, int32_t id, CallbackType type)
+    {
+        current_cb.emplace(aux_id, id, type);
+
+        return OnScopeExit([&]()
+                           { if (!current_cb.empty()) current_cb.pop(); });
+    }
 
     void set_error(std::string err);
 
