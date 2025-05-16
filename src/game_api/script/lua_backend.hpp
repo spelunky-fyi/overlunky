@@ -467,7 +467,7 @@ class LuaBackend
         current_cb.emplace(aux_id, id, type);
 
         return OnScopeExit([&]()
-                           { if (!current_cb.empty()) current_cb.pop(); });
+                           { if (!current_cb.empty()) current_cb.pop(); else DEBUG("Trying to pop empty current_callback stack (aux: {} id: {} type: {})\n", aux_id, id, (int)type); });
     }
 
     void set_error(std::string err);
