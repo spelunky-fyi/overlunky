@@ -76,16 +76,16 @@ class Movable : public Entity
     uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
     uint8_t invincibility_frames_timer; // blinks the entity
     uint8_t frozen_timer;
-    uint8_t unknown_damage_counter_a;
-    uint8_t unknown_damage_counter_b;
-    uint8_t i120a; // timer, damage related
+    uint8_t dont_damage_owner_timer; // When > 0, will not deal damage to the owner_uid, so that throwing an object does not harm yourself.
+    uint8_t knockback_invincibility_timer;
+    uint8_t damage_ownership_timer; // Timer for resetting owner_uid.
     uint8_t i120b; // timer
     /// Makes you immune to the item you just thrown for short time
     uint8_t throw_damage_immunity_timer;
     uint8_t i120d;
     uint8_t b124;
     uint8_t falling_timer;
-    uint8_t b126; // timer, after layer change?
+    uint8_t exit_gold_invincibility_timer; // When > 0, money intersecting a door or at a pipe entrance will not be collected.
     uint8_t b127;
 
     /// NoDoc

@@ -881,3 +881,9 @@ class Web : public Movable
     /// Entity automatically dies when the alpha is less than 0.1
     float decay_rate;
 };
+
+class Whip : public Movable
+{
+  public:
+    bool flaming;
+};

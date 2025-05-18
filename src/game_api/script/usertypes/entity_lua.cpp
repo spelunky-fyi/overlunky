@@ -303,7 +303,7 @@ void register_usertypes(sol::state& lua)
         &Movable::light_on_fire);
     auto add_money = sol::overload(
         [](Movable& ent, int amount) // for backwards compatibility
-        {static const auto coin = to_id("ENT_TYPE_ITEM_GOLDCOIN"); 
+        {static const auto coin = to_id("ENT_TYPE_ITEM_GOLDCOIN");
         ent.collect_treasure(amount, coin); },                         // adds a coin to the table cause the collected_money_count is expected to increase
         &Movable::collect_treasure);
 
@@ -342,6 +342,10 @@ void register_usertypes(sol::state& lua)
     movable_type["exit_invincibility_timer"] = &Movable::exit_invincibility_timer;
     movable_type["invincibility_frames_timer"] = &Movable::invincibility_frames_timer;
     movable_type["frozen_timer"] = &Movable::frozen_timer;
+    movable_type["dont_damage_owner_timer"] = &Movable::dont_damage_owner_timer;
+    movable_type["knockback_invincibility_timer"] = &Movable::knockback_invincibility_timer;
+    movable_type["damage_ownership_timer"] = &Movable::damage_ownership_timer;
+    movable_type["exit_gold_invincibility_timer"] = &Movable::exit_gold_invincibility_timer;
     movable_type["is_poisoned"] = &Movable::is_poisoned;
     movable_type["poison"] = &Movable::poison;
     movable_type["is_button_pressed"] = &Movable::is_button_pressed;

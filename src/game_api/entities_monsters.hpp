@@ -277,8 +277,10 @@ class Pet : public Monster
     int32_t petting_by_uid;
     /// counts up to 400 (6.6 sec), when 0 the pet yells out
     int16_t yell_counter;
-    uint16_t unknown1;
-    uint16_t unknown2;
+    /// When sitting after colliding with a player in the camp.
+    uint16_t sit_timer;
+    /// Cooldown before sitting again when colliding with a player in the camp.
+    uint16_t sit_cooldown_timer;
     /// used when free running in the camp
     int16_t func_timer;
     /// -1 = sitting and yelling, 0 = either running, dead or picked up
@@ -413,7 +415,8 @@ class Quillback : public WalkingMonster
   public:
     SoundMeta* sound;
     ParticleEmitterInfo* particle;
-    int16_t unknown_state; // accessed as byte and word, so, flags?, changed mostly when breaking floors
+    int8_t unknown_state; // accessed as byte and word, so, flags?, changed mostly when breaking floors
+    int8_t hit_wall_direction; // Set when in apply_movement to 1 when colliding with a hard wall to the left, -1 if to the right, 0 if no collision.
     uint8_t unknown_timer;
     bool seen_player;
 };
@@ -427,7 +430,7 @@ class Leprechaun : public WalkingMonster
     /// amount of gold he picked up, will be drooped on death
     uint16_t gold;
     uint8_t timer_after_humping;
-    uint8_t unknown;
+    bool jump_trigger; // Triggers a jump on the next frame.
     custom_vector<ENT_TYPE> collected_treasure;
 };
 
@@ -595,7 +598,7 @@ class Cobra : public Monster
 class CatMummy : public Monster
 {
   public:
-    uint8_t ai_state;
+    uint8_t jump_height_multiplier; // Set in process_input when jump is triggered to be used when applying velocity for the jump.
     uint8_t attack_timer;
 };
 
@@ -677,7 +680,7 @@ class OsirisHead : public Monster
     int32_t right_hand_uid;
     int32_t left_hand_uid;
     bool moving_left;
-    uint8_t targeting_timer;
+    uint8_t oscillation_phase;
     uint8_t invincibility_timer;
 };
 
@@ -691,8 +694,8 @@ class Alien : public Monster
 {
   public:
     uint16_t jump_timer; // when 0 it jumps
-    uint8_t unknown1;
-    uint8_t unknown2; // seen timer here once maybe? it's accessed right as he jumps from the ufo
+    uint8_t shudder_timer; // Will make sound and shudder during the duration of this timer while falling.
+    uint8_t leg_shake_timer; // Will make a leg shake animation for the duration of this timer while falling.
 };
 
 class UFO : public Monster
@@ -701,7 +704,7 @@ class UFO : public Monster
     SoundMeta* sound;
     int16_t patrol_distance; // pos = right, neg = left
     uint8_t attack_cooldown_timer;
-    bool is_falling; // read only, manually setting this true has no effect
+    bool is_rising;
 };
 
 class Lahamu : public Monster
@@ -710,7 +713,7 @@ class Lahamu : public Monster
     SoundMeta* sound;
     Entity* eyeball;
     uint16_t attack_cooldown_timer;
-    bool unknown_proximity_related; // gets set to true when you get close to Lahamu
+    bool has_logged_to_journal;
 };
 
 class YetiQueen : public Monster
@@ -757,7 +760,7 @@ class Lamassu : public Monster
     uint32_t flight_timer;     // when 0 it starts flying; only counts down when it's walking
     int32_t attack_timer;      // greater than 0 = charging up; 0 = fire ; less than 0 = cooldown
     float attack_angle;
-    uint8_t unknown_state;
+    bool was_flying;        // Used to return to the correct state after an attack.
 };
 
 class Olmite : public WalkingMonster
@@ -833,11 +836,11 @@ class Grub : public Monster
   public:
     float rotation_delta; // is it? i seen it in the code compared as a bit with 1, but not sure when it happens
     bool drop;
-    bool unknown3;
-    /// used when he touches floor/wall/ceiling
-    uint8_t looking_for_new_direction_timer;
+    bool rotation_direction; // Counter-clockwise if true.
+    /// Delay after colliding into a wall before it will change its movement direction again.
+    uint8_t wall_collision_cooldown;
     uint8_t padding1;
-    uint16_t unknown6_timer;   // paused when not moving
+    uint16_t rotation_timer;   // Will randomly pick a new direction and angle when this timer elapses.
     uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
     int16_t turn_into_fly_timer;
     uint16_t padding2;
@@ -980,7 +983,7 @@ class Hermitcrab : public Monster
     bool is_inactive; // must be something else, since we already have is_active (or vice versa), gets triggered about half a second after is_active, maybe something like, can attack
     /// defaults to true, when toggled to false, a new carried item spawns
     bool spawn_new_carried_item;
-    uint8_t unknown; // sometimes i see 1 here, didn't get anything with breakpoint
+    bool going_up; // Whether the hermit crab is moving up when climbing a pole.
 };
 
 class Necromancer : public WalkingMonster
@@ -990,7 +993,7 @@ class Necromancer : public WalkingMonster
     float red_skeleton_spawn_x;
     float red_skeleton_spawn_y;
     int32_t resurrection_uid;
-    uint8_t unknown2;
+    uint8_t target_layer;
     uint8_t resurrection_timer;
 };
 
