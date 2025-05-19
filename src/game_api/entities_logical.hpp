@@ -174,17 +174,17 @@ class LimbAnchor : public Entity
     float y_pos;
     float hand_feet_x_offset;
     float hand_feet_y_offset;
-    float anchor_x; // Current position of this limb anchor.
-    float anchor_y; // Current position of this limb anchor.
-    float move_origin_x; // Position of this limb anchor at the beginning of a movement.
-    float move_origin_y; // Position of this limb anchor at the beginning of a movement.
+    float anchor_x;           // Current position of this limb anchor.
+    float anchor_y;           // Current position of this limb anchor.
+    float move_origin_x;      // Position of this limb anchor at the beginning of a movement.
+    float move_origin_y;      // Position of this limb anchor at the beginning of a movement.
     float move_destination_x; // Position of this limb anchor at the end of a movement.
     float move_destination_y; // Position of this limb anchor at the end of a movement.
     float unk11;
     float unk12;
     float unk13;
     uint8_t elapsed_move_time; // Number of frames the limb has been moving from move_origin to move_destination.
-    uint8_t move_duration; // Number of frames the limb should take to move from move_origin to move_destination.
+    uint8_t move_duration;     // Number of frames the limb should take to move from move_origin to move_destination.
     bool flip_vertical;
 };
 

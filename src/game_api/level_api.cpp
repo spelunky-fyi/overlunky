@@ -1433,7 +1433,7 @@ void LevelGenData::init()
             const size_t get_room_size_first_jump = get_address("get_room_size_first_jump");
             const size_t get_room_size_second_jump = get_address("get_room_size_second_jump");
 
-            const size_t get_room_size_addr = (size_t) static_cast<void (*)(const char*, uint32_t&, uint32_t&)>(&get_room_size);
+            const size_t get_room_size_addr = (size_t)static_cast<void (*)(const char*, uint32_t&, uint32_t&)>(&get_room_size);
 
             const std::string redirect_code = fmt::format(
                 "\x50"                         // PUSH       RAX

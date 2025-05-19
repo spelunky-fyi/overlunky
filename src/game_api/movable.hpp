@@ -12,7 +12,7 @@ struct MovableBehavior;
 class CutsceneBehavior
 {
   public:
-    virtual ~CutsceneBehavior(){};
+    virtual ~CutsceneBehavior() {};
     virtual void update(Movable* e) = 0;
     // no more virtuals, it's possible that different sub classes have some extra variables as well
 };
@@ -76,10 +76,10 @@ class Movable : public Entity
     uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
     uint8_t invincibility_frames_timer; // blinks the entity
     uint8_t frozen_timer;
-    uint8_t dont_damage_owner_timer; // When > 0, will not deal damage to the owner_uid, so that throwing an object does not harm yourself.
-    uint8_t knockback_invincibility_timer;
-    uint8_t damage_ownership_timer; // Timer for resetting owner_uid.
-    uint8_t i120b; // timer
+    uint8_t dont_damage_owner_timer;       // When > 0, will not deal damage to the owner_uid, so that throwing an object does not harm yourself.
+    uint8_t knockback_invincibility_timer; // Can be overridden in damage flags.
+    uint8_t reset_owner_timer;             // Timer for resetting owner_uid.
+    uint8_t i120b;                         // timer
     /// Makes you immune to the item you just thrown for short time
     uint8_t throw_damage_immunity_timer;
     uint8_t i120d;

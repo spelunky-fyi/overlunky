@@ -344,7 +344,7 @@ void register_usertypes(sol::state& lua)
     movable_type["frozen_timer"] = &Movable::frozen_timer;
     movable_type["dont_damage_owner_timer"] = &Movable::dont_damage_owner_timer;
     movable_type["knockback_invincibility_timer"] = &Movable::knockback_invincibility_timer;
-    movable_type["damage_ownership_timer"] = &Movable::damage_ownership_timer;
+    movable_type["reset_owner_timer"] = &Movable::reset_owner_timer;
     movable_type["exit_gold_invincibility_timer"] = &Movable::exit_gold_invincibility_timer;
     movable_type["is_poisoned"] = &Movable::is_poisoned;
     movable_type["poison"] = &Movable::poison;
