@@ -415,7 +415,7 @@ class Quillback : public WalkingMonster
   public:
     SoundMeta* sound;
     ParticleEmitterInfo* particle;
-    int8_t unknown_state; // accessed as byte and word, so, flags?, changed mostly when breaking floors
+    int8_t unknown_state;      // accessed as byte and word, so, flags?, changed mostly when breaking floors
     int8_t hit_wall_direction; // Set when in apply_movement to 1 when colliding with a hard wall to the left, -1 if to the right, 0 if no collision.
     uint8_t unknown_timer;
     bool seen_player;
@@ -693,8 +693,8 @@ class OsirisHand : public Monster
 class Alien : public Monster
 {
   public:
-    uint16_t jump_timer; // when 0 it jumps
-    uint8_t shudder_timer; // Will make sound and shudder during the duration of this timer while falling.
+    uint16_t jump_timer;     // when 0 it jumps
+    uint8_t shudder_timer;   // Will make sound and shudder during the duration of this timer while falling.
     uint8_t leg_shake_timer; // Will make a leg shake animation for the duration of this timer while falling.
 };
 
@@ -760,7 +760,7 @@ class Lamassu : public Monster
     uint32_t flight_timer;     // when 0 it starts flying; only counts down when it's walking
     int32_t attack_timer;      // greater than 0 = charging up; 0 = fire ; less than 0 = cooldown
     float attack_angle;
-    bool was_flying;        // Used to return to the correct state after an attack.
+    bool was_flying; // Used to return to the correct state after an attack.
 };
 
 class Olmite : public WalkingMonster

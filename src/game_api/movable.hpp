@@ -12,7 +12,7 @@ struct MovableBehavior;
 class CutsceneBehavior
 {
   public:
-    virtual ~CutsceneBehavior() {};
+    virtual ~CutsceneBehavior(){};
     virtual void update(Movable* e) = 0;
     // no more virtuals, it's possible that different sub classes have some extra variables as well
 };
