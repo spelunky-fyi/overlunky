@@ -1,17 +1,16 @@
 #include "entity.hpp"
 
-#include <Windows.h> // for IsBadWritePtr
-#include <chrono>    // for operator<=>, operator-, operator+
-#include <cmath>     // for round
-#include <compare>   // for operator<, operator<=, operator>
-#include <cstdint>   // for uint32_t, uint16_t, uint8_t
-#include <cstdlib>   // for abs, NULL, size_t
-#include <list>      // for _List_const_iterator
-#include <map>       // for _Tree_iterator, map, _Tree_cons...
-#include <new>       // for operator new
-#include <string>    // for allocator, string, operator""sv
-#include <thread>    // for sleep_for
-#include <vector>    // for vector, _Vector_iterator, erase_if
+#include <chrono>  // for operator<=>, operator-, operator+
+#include <cmath>   // for round
+#include <compare> // for operator<, operator<=, operator>
+#include <cstdint> // for uint32_t, uint16_t, uint8_t
+#include <cstdlib> // for abs, NULL, size_t
+#include <list>    // for _List_const_iterator
+#include <map>     // for _Tree_iterator, map, _Tree_cons...
+#include <new>     // for operator new
+#include <string>  // for allocator, string, operator""sv
+#include <thread>  // for sleep_for
+#include <vector>  // for vector, _Vector_iterator, erase_if
 
 #include "containers/custom_map.hpp" // for custom_map
 #include "entities_chars.hpp"        // for Player
@@ -19,13 +18,13 @@
 #include "entity_hooks_info.hpp"     // for EntityHooksInfo
 #include "entity_lookup.hpp"         // for get_proper_types
 #include "heap_base.hpp"             // for HeapBase
+#include "liquid_engine.hpp"         // for LiquidPhysicsEngine
 #include "memory.hpp"                // for write_mem_prot
 #include "movable.hpp"               // for Movable
 #include "movable_behavior.hpp"      // for MovableBehavior
 #include "render_api.hpp"            // for RenderInfo
 #include "search.hpp"                // for get_address
 #include "state.hpp"                 // for StateMemory
-#include "state_structs.hpp"         // for LiquidPhysicsEngine
 #include "texture.hpp"               // for get_texture, Texture
 #include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...
 
@@ -82,7 +81,7 @@ void Entity::remove()
     {
         auto state = HeapBase::get().state();
         auto ptr_from = state->layers[layer];
-        if ((this->type->search_flags & 1) == 0 || ((Player*)this)->ai != 0)
+        if (!(this->type->search_flags & ENTITY_MASK::PLAYER) || this->as<Player>()->ai != nullptr)
         {
             using RemoveFromLayer = void(Layer*, Entity*);
             static RemoveFromLayer* remove_from_layer = (RemoveFromLayer*)get_address("remove_from_layer");
@@ -196,24 +195,27 @@ bool Entity::set_texture(TEXTURE texture_id)
 
 bool Entity::is_player() const
 {
-    if (type->search_flags & 1)
-    {
-        auto pl = static_cast<const Player*>(this);
-        return pl->ai == nullptr;
-    }
-    return false;
+    if (!(type->search_flags & ENTITY_MASK::PLAYER))
+        return false;
+
+    auto pl = static_cast<const Player*>(this);
+    return pl->ai == nullptr;
 }
 
 bool Entity::is_movable() const
 {
     static const ENT_TYPE first_logical = to_id("ENT_TYPE_LOGICAL_CONSTELLATION");
-    if (type->search_flags & 0b11111111) // PLAYER | MOUNT | MONSTER | ITEM | ROPE | EXPLOSION | FX | ACTIVEFLOOR
-        return true;
-    else if (type->search_flags & 0x1000) // LOGICAL - as it has some movable entities
-        if (type->id < first_logical)     // actually check if it's not logical
+    constexpr auto test_mask = ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER | ENTITY_MASK::ITEM | ENTITY_MASK::ROPE | ENTITY_MASK::EXPLOSION | ENTITY_MASK::FX | ENTITY_MASK::ACTIVEFLOOR;
+    if (!(type->search_flags & test_mask))
+    {
+        if (!(type->search_flags & ENTITY_MASK::LOGICAL)) // LOGICAL - as it has some movable entities
+            return false;
+        else if (type->id < first_logical) // actually check if it's not logical
             return true;
 
-    return false;
+        return false;
+    }
+    return true;
 }
 
 bool Entity::is_liquid() const
@@ -325,14 +327,14 @@ void Movable::set_position(float to_x, float to_y)
 }
 
 template <typename F>
-bool recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode, F func)
+bool recursive(Entity* ent, std::optional<ENTITY_MASK> mask, std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode, F func)
 {
-    auto acutal_mask = [](uint32_t m) -> uint32_t // for the MASK.ANY
-    { return m == 0 ? 0xFFFF : m; };
+    auto actual_mask = [](ENTITY_MASK m) -> ENTITY_MASK // for the MASK.ANY
+    { return m == ENTITY_MASK::ANY ? (ENTITY_MASK)0xFFFF : m; };
 
     if (rec_mode == RECURSIVE_MODE::EXCLUSIVE)
     {
-        if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) != 0)
+        if (mask.has_value() && !!(actual_mask(mask.value()) & ent->type->search_flags))
             return false;
 
         if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) != ent_types.end())
@@ -340,7 +342,7 @@ bool recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> 
     }
     else if (rec_mode == RECURSIVE_MODE::INCLUSIVE)
     {
-        if (mask.has_value() && (acutal_mask(mask.value()) & ent->type->search_flags) == 0)
+        if (mask.has_value() && !(actual_mask(mask.value()) & ent->type->search_flags))
         {
             if (std::find(ent_types.begin(), ent_types.end(), ent->type->id) == ent_types.end())
                 return false;
@@ -382,7 +384,7 @@ bool recursive(Entity* ent, std::optional<uint32_t> mask, std::vector<ENT_TYPE> 
     return true;
 }
 
-void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
+void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<ENTITY_MASK> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
 {
     auto kill_func = [destroy_corpse, &responsible](Entity* ent) -> void
     {
@@ -392,7 +394,7 @@ void Entity::kill_recursive(bool destroy_corpse, Entity* responsible, std::optio
         kill(destroy_corpse, responsible);
 }
 
-void Entity::destroy_recursive(std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
+void Entity::destroy_recursive(std::optional<ENTITY_MASK> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)
 {
     auto destroy_func = [](Entity* ent) -> void
     {

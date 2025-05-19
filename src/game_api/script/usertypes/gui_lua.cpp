@@ -1208,6 +1208,16 @@ void register_usertypes(sol::state& lua)
         auto luaCb = HotKeyCallback{cb, key, -1, false, 0};
         return backend->register_hotkey(luaCb, HOTKEY_TYPE::NORMAL) /**/; });
 
+    lua.create_named_table("HOTKEY_TYPE", "NORMAL", HOTKEY_TYPE::NORMAL, "GLOBAL", HOTKEY_TYPE::GLOBAL, "INPUT", HOTKEY_TYPE::INPUT);
+    /* HOTKEY_TYPE
+    // NORMAL
+    // Suppressed when the game window is inactive or inputting text in this tool instance (get_io().wantkeyboard == true). Can't detect if OL is in a text input and script is running in PL though. Use ImGuiIO if you need to do that.
+    // GLOBAL
+    // Enabled even when the game window is inactive and will capture keys even from other programs.
+    // INPUT
+    // Enabled even when inputting text and will override normal text input keys.
+    */
+
     lua.create_named_table("DRAW_LAYER", "BACKGROUND", DRAW_LAYER::BACKGROUND, "FOREGROUND", DRAW_LAYER::FOREGROUND, "WINDOW", DRAW_LAYER::WINDOW);
 
     /// Deprecated

@@ -17,8 +17,10 @@
 #include "illumination.hpp"       // IWYU pragma: keep
 #include "items.hpp"              // for Items, SelectPlayerSlot, Items::is...
 #include "level_api.hpp"          // IWYU pragma: keep
+#include "liquid_engine.hpp"      // for LiquidPhysicsEngine
 #include "online.hpp"             // for OnlinePlayer, OnlineLobby, Online
 #include "prng.hpp"               // IWYU pragma: keep
+#include "rpc.hpp"                // for waddler_count_entity ...
 #include "savestate.hpp"          // for SaveState
 #include "screen.hpp"             // IWYU pragma: keep
 #include "screen_arena.hpp"       // IWYU pragma: keep
@@ -627,7 +629,7 @@ void register_usertypes(sol::state& lua)
             return sol::nil;
 
         // this actually calls destructor, since it's copied to the lua stack
-        // which calls the clear function, thought it should be fine since the slot member should be set, das preventing the free from being called
+        // which calls the clear function, thought it should be fine since the `slot` member should be set, das preventing the free from being called
         return sol::make_object(lua, SaveState::get(slot));
     };
 
@@ -648,5 +650,47 @@ void register_usertypes(sol::state& lua)
         &SaveState::get_prng,
         "get",
         get);
+
+    /// Get the thread-local version of state
+    lua["get_local_state"] = []() -> StateMemory*
+    { return HeapBase::get().state(); };
+    /// Get the thread-local version of players
+    lua["get_local_players"] = []() -> std::vector<Player*>
+    { return HeapBase::get().state()->get_players(); };
+    /// Warp to a level immediately.
+    lua["warp"] = [](uint8_t world, uint8_t level, uint8_t theme)
+    { HeapBase::get().state()->warp(world, level, theme); };
+    /// Set seed and reset run.
+    lua["set_seed"] = [](uint32_t seed)
+    { HeapBase::get().state()->set_seed(seed); };
+    /// Get `state.level_flags`
+    lua["get_level_flags"] = []() -> uint32_t
+    {
+        return HeapBase::get().state()->level_flags;
+    };
+    /// Set `state.level_flags`
+    lua["set_level_flags"] = [](uint32_t flags)
+    {
+        HeapBase::get().state()->level_flags = flags;
+    };
+    /// Returns how many of a specific entity type Waddler has stored
+    lua["waddler_count_entity"] = waddler_count_entity;
+    /// Store an entity type in Waddler's storage. Returns the slot number the item was stored in or -1 when storage is full and the item couldn't be stored.
+    lua["waddler_store_entity"] = waddler_store_entity;
+    /// Removes an entity type from Waddler's storage. Second param determines how many of the item to remove (default = remove all)
+    lua["waddler_remove_entity"] = waddler_remove_entity;
+    /// Gets the 16-bit meta-value associated with the entity type in the associated slot
+    lua["waddler_get_entity_meta"] = waddler_get_entity_meta;
+    /// Sets the 16-bit meta-value associated with the entity type in the associated slot
+    lua["waddler_set_entity_meta"] = waddler_set_entity_meta;
+    /// Gets the entity type of the item in the provided slot
+    lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
+    /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
+    lua["update_state"] = update_state;
+    /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+    /// The patch however does not destroy the liquids that fall pass the level bounds,
+    /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
+    lua["fix_liquid_out_of_bounds"] = []()
+    { HeapBase::get().liquid_physics()->remove_liquid_oob() /**/; };
 }
 }; // namespace NState

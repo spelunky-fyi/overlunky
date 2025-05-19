@@ -28,9 +28,10 @@ struct DropChanceEntry
     uint8_t chance_sizeof = 4;
     size_t offset = 0;
 };
-
-void set_drop_chance(int32_t dropchance_id, uint32_t new_drop_chance);
-void replace_drop(int32_t drop_id, ENT_TYPE new_drop_entity_type);
+using DROPCHANCE = int32_t;
+void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance);
+using DROP = int32_t;
+void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type);
 
 extern std::vector<DropEntry> drop_entries;
 
