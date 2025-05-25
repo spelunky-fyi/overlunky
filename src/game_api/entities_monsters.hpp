@@ -415,8 +415,8 @@ class Quillback : public WalkingMonster
   public:
     SoundMeta* sound;
     ParticleEmitterInfo* particle;
-    int8_t unknown_state;      // accessed as byte and word, so, flags?, changed mostly when breaking floors
-    int8_t hit_wall_direction; // Set when in apply_movement to 1 when colliding with a hard wall to the left, -1 if to the right, 0 if no collision.
+    bool broke_block;      // Set to true in break_block, then set back to false in apply_movement after running some logic (eg, playing a sound).
+    int8_t post_hit_wall_direction; // Set in can_break_block during apply_movement to 1 when colliding with an indesctructible wall to the left, -1 if to the right, 0 if no collision. Used later in apply_movement to change Quillback's facing direction.
     uint8_t unknown_timer;
     bool seen_player;
 };
