@@ -15,6 +15,7 @@
 #include <optional>      // for operator==, optional, nullopt
 #include <sol/sol.hpp>   // for object, basic_object, basic_protected_function
 #include <sstream>       // for basic_istringstream, istringstream, basic_s...
+#include <stack>         // for stack
 #include <string>        // for string, hash, getline, u16string, basic_string
 #include <string_view>   // for string_view
 #include <type_traits>   // for move, hash, declval, forward
@@ -311,7 +312,7 @@ class LuaBackend
     std::string result;
 
     int cbcount = 0;
-    CurrentCallback current_cb = {0, 0, CallbackType::None};
+    std::stack<CurrentCallback, std::vector<CurrentCallback>> current_cb;
 
     std::map<std::string, ScriptOption> options;
     std::deque<ScriptMessage> messages;
@@ -454,9 +455,20 @@ class LuaBackend
     bool pre_load_journal_chapter(uint8_t chapter);
     std::vector<uint32_t> post_load_journal_chapter(uint8_t chapter, const std::vector<uint32_t>& pages);
 
-    CurrentCallback get_current_callback() const;
-    void set_current_callback(int32_t aux_id, int32_t id, CallbackType type);
-    void clear_current_callback();
+    CurrentCallback get_current_callback() const
+    {
+        if (current_cb.empty())
+            return {0, 0, CallbackType::None};
+
+        return current_cb.top();
+    }
+    [[nodiscard]] auto set_current_callback(int32_t aux_id, int32_t id, CallbackType type)
+    {
+        current_cb.emplace(aux_id, id, type);
+
+        return OnScopeExit([this, aux_id, id, type]()
+                           { if (!current_cb.empty()) current_cb.pop(); else DEBUG("Trying to pop empty current_callback stack (aux: {} id: {} type: {})\n", aux_id, id, (int)type); });
+    }
 
     void set_error(std::string err);
 
