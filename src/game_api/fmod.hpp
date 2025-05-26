@@ -509,8 +509,10 @@ using EventDescriptionReleaseAllInstances = FMOD_RESULT(EventDescription*);
 using EventDescriptionLoadSampleData = FMOD_RESULT(EventDescription*);
 using EventDescriptionUnloadSampleData = FMOD_RESULT(EventDescription*);
 using EventDescriptionGetSampleLoadingState = FMOD_RESULT(EventDescription*, LoadingState*);
-using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription*, ParameterId, ParameterDescription*);
+using EventDescriptionGetParameterDescriptionCount = FMOD_RESULT(EventDescription*, int*);
 using EventDescriptionGetParameterDescriptionByName = FMOD_RESULT(EventDescription*, const char*, ParameterDescription*);
+using EventDescriptionGetParameterDescriptionByIndex = FMOD_RESULT(EventDescription*, int, ParameterDescription*);
+using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription*, ParameterId, ParameterDescription*);
 using EventDescriptionSetCallback = FMOD_RESULT(EventDescription*, EventInstanceCallback*, EventCallbackType);
 using EventDescriptionIsValid = bool(EventDescription*);
 

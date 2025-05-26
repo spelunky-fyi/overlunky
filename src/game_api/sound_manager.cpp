@@ -413,9 +413,17 @@ std::optional<FMODStudio::LoadingState> CustomEventDescription::getSampleLoading
 {
     return m_SoundManager->get_event_sample_loading_state(*this);
 }
+std::optional<int> CustomEventDescription::getParameterDescriptionCount()
+{
+    return m_SoundManager->event_get_parameter_description_count(*this);
+}
 std::optional<FMODStudio::ParameterDescription> CustomEventDescription::getParameterDescriptionByName(std::string name)
 {
     return m_SoundManager->event_get_parameter_description_by_name(*this, name);
+}
+std::optional<FMODStudio::ParameterDescription> CustomEventDescription::getParameterDescriptionByIndex(int index)
+{
+    return m_SoundManager->event_get_parameter_description_by_index(*this, index);
 }
 std::optional<FMODStudio::ParameterId> CustomEventDescription::getParameterIDByName(std::string name)
 {
@@ -675,8 +683,12 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
                 GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_UnloadSampleData"));
             m_EventDescriptionGetSampleLoadingState = reinterpret_cast<FMODStudio::EventDescriptionGetSampleLoadingState*>(
                 GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetSampleLoadingState"));
+            m_EventDescriptionGetParameterDescriptionCount = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionCount*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionCount"));
             m_EventDescriptionGetParameterDescriptionByName = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByName*>(
                 GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByName"));
+            m_EventDescriptionGetParameterDescriptionByIndex = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByIndex*>(
+                GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByIndex"));
             m_EventDescriptionGetParameterDescriptionByID = reinterpret_cast<FMODStudio::EventDescriptionGetParameterDescriptionByID*>(
                 GetProcAddress(fmod_studio, "FMOD_Studio_EventDescription_GetParameterDescriptionByID"));
             m_EventDescriptionSetCallback =
@@ -1209,6 +1221,23 @@ std::optional<FMODStudio::LoadingState> SoundManager::get_event_sample_loading_s
             { return std::optional<FMODStudio::LoadingState>{}; }},
         fmod_event.m_FmodHandle);
 }
+std::optional<int> SoundManager::event_get_parameter_description_count(CustomEventDescription fmod_event)
+{
+    return std::visit(
+        overloaded{
+            [this](FMODStudio::EventDescription* event_desc)
+            {
+                int parameter_description_count;
+                if (FMOD_CHECK_CALL(m_EventDescriptionGetParameterDescriptionCount(event_desc, &parameter_description_count)))
+                {
+                    return std::optional<int>{parameter_description_count};
+                }
+                return std::optional<int>{};
+            },
+            [](std::monostate)
+            { return std::optional<int>{}; }},
+        fmod_event.m_FmodHandle);
+}
 std::optional<FMODStudio::ParameterDescription> SoundManager::event_get_parameter_description_by_name(CustomEventDescription fmod_event, std::string name)
 {
     return std::visit(
@@ -1217,6 +1246,23 @@ std::optional<FMODStudio::ParameterDescription> SoundManager::event_get_paramete
             {
                 FMODStudio::ParameterDescription param_desc;
                 if (FMOD_CHECK_CALL(m_EventDescriptionGetParameterDescriptionByName(event_desc, name.c_str(), &param_desc)))
+                {
+                    return std::optional<FMODStudio::ParameterDescription>{param_desc};
+                }
+                return std::optional<FMODStudio::ParameterDescription>{};
+            },
+            [](std::monostate)
+            { return std::optional<FMODStudio::ParameterDescription>{}; }},
+        fmod_event.m_FmodHandle);
+}
+std::optional<FMODStudio::ParameterDescription> SoundManager::event_get_parameter_description_by_index(CustomEventDescription fmod_event, int index)
+{
+    return std::visit(
+        overloaded{
+            [this, index](FMODStudio::EventDescription* event_desc)
+            {
+                FMODStudio::ParameterDescription param_desc;
+                if (FMOD_CHECK_CALL(m_EventDescriptionGetParameterDescriptionByIndex(event_desc, index, &param_desc)))
                 {
                     return std::optional<FMODStudio::ParameterDescription>{param_desc};
                 }

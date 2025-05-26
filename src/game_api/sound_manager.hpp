@@ -168,7 +168,9 @@ class CustomEventDescription
     bool unloadSampleData();
     std::optional<FMODStudio::LoadingState> getSampleLoadingState();
 
+    std::optional<int> getParameterDescriptionCount();
     std::optional<FMODStudio::ParameterDescription> getParameterDescriptionByName(std::string name);
+    std::optional<FMODStudio::ParameterDescription> getParameterDescriptionByIndex(int index);
     std::optional<FMODStudio::ParameterId> getParameterIDByName(std::string name);
 
     bool isValid();
@@ -303,7 +305,9 @@ class SoundManager
     bool load_event_sample_data(CustomEventDescription fmod_event);
     bool unload_event_sample_data(CustomEventDescription fmod_event);
     bool event_description_is_valid(CustomEventDescription fmod_event);
+    std::optional<int> event_get_parameter_description_count(CustomEventDescription fmod_event);
     std::optional<FMODStudio::ParameterDescription> event_get_parameter_description_by_name(CustomEventDescription fmod_event, std::string name);
+    std::optional<FMODStudio::ParameterDescription> event_get_parameter_description_by_index(CustomEventDescription fmod_event, int index);
     std::optional<FMODStudio::ParameterId> event_get_parameter_id_by_name(CustomEventDescription fmod_event, std::string name);
 
     bool start(CustomEventInstance fmod_event_instance);
@@ -419,8 +423,10 @@ class SoundManager
     FMODStudio::EventDescriptionLoadSampleData* m_EventDescriptionLoadSampleData{nullptr};
     FMODStudio::EventDescriptionUnloadSampleData* m_EventDescriptionUnloadSampleData{nullptr};
     FMODStudio::EventDescriptionGetSampleLoadingState* m_EventDescriptionGetSampleLoadingState{nullptr};
-    FMODStudio::EventDescriptionGetParameterDescriptionByID* m_EventDescriptionGetParameterDescriptionByID{nullptr};
+    FMODStudio::EventDescriptionGetParameterDescriptionCount* m_EventDescriptionGetParameterDescriptionCount{nullptr};
     FMODStudio::EventDescriptionGetParameterDescriptionByName* m_EventDescriptionGetParameterDescriptionByName{nullptr};
+    FMODStudio::EventDescriptionGetParameterDescriptionByIndex* m_EventDescriptionGetParameterDescriptionByIndex{nullptr};
+    FMODStudio::EventDescriptionGetParameterDescriptionByID* m_EventDescriptionGetParameterDescriptionByID{nullptr};
     FMODStudio::EventDescriptionSetCallback* m_EventDescriptionSetCallback{nullptr};
     FMODStudio::EventDescriptionIsValid* m_EventDescriptionIsValid{nullptr};
 
