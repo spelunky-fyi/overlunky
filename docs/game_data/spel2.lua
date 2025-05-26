@@ -5219,7 +5219,9 @@ function CustomTheme:override(index, func_) end
     ---@field loadSampleData fun(self): boolean
     ---@field unloadSampleData fun(self): boolean
     ---@field getSampleLoadingState fun(self): FMODStudio::LoadingState?
+    ---@field getParameterDescriptionCount fun(self): integer?
     ---@field getParameterDescriptionByName fun(self, name: string): FMODStudio::ParameterDescription?
+    ---@field getParameterDescriptionByIndex fun(self, index: integer): FMODStudio::ParameterDescription?
     ---@field getParameterIDByName fun(self, name: string): FMODStudio::ParameterId?
     ---@field isValid fun(self): boolean
 

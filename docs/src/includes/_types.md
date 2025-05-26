@@ -700,7 +700,9 @@ bool | [releaseAllInstances()](https://github.com/spelunky-fyi/overlunky/search?
 bool | [loadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loadSampleData) | 
 bool | [unloadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unloadSampleData) | 
 optional&lt;FMODStudio::LoadingState&gt; | [getSampleLoadingState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getSampleLoadingState) | 
+optional&lt;int&gt; | [getParameterDescriptionCount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterDescriptionCount) | 
 optional&lt;FMODStudio::[ParameterDescription](#ParameterDescription)&gt; | [getParameterDescriptionByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterDescriptionByName) | 
+optional&lt;FMODStudio::[ParameterDescription](#ParameterDescription)&gt; | [getParameterDescriptionByIndex(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterDescriptionByIndex) | 
 optional&lt;FMODStudio::[ParameterId](#ParameterId)&gt; | [getParameterIDByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterIDByName) | 
 bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
 
