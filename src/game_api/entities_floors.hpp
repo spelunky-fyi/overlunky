@@ -119,6 +119,16 @@ class ExitDoor : public Door
     uint8_t world;
     uint8_t theme;
     uint16_t padding;
+
+    void set_target(uint8_t ww, uint8_t l, uint8_t t)
+    {
+        world = ww;
+        level = l;
+        theme = t;
+        special_door = true;
+    }
+    /// Get target world, level, theme of this door. If the `special_door` is false, it returns the StateMemory world_next, level_next, theme_next
+    std::tuple<uint8_t, uint8_t, uint8_t> get_target() const;
 };
 
 class DecoratedDoor : public ExitDoor

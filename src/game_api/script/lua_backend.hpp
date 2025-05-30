@@ -215,7 +215,7 @@ struct LevelGenCallback
 struct EntitySpawnCallback
 {
     int id;
-    int entity_mask;
+    ENTITY_MASK entity_mask;
     std::vector<uint32_t> entity_types;
     SPAWN_TYPE spawn_type_flags;
     sol::function func;

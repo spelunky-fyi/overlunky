@@ -36,7 +36,7 @@ struct EntityDB
     int32_t field_10;
     ENT_TYPE id;
     /// MASK
-    uint32_t search_flags;
+    ENTITY_MASK search_flags;
     float width;
     float height;
     uint8_t draw_depth;

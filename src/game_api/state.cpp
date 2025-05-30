@@ -19,6 +19,7 @@
 #include "game_patches.hpp"                      //
 #include "items.hpp"                             // for Items, SelectPlayerSlot
 #include "level_api.hpp"                         // for LevelGenSystem, LevelGenSystem::(ano...
+#include "liquid_engine.hpp"                     // for LiquidPhysicsEngine
 #include "logger.h"                              // for DEBUG
 #include "memory.hpp"                            // for write_mem_prot, memory_read
 #include "movable.hpp"                           // for Movable
@@ -170,7 +171,7 @@ bool on_damage(Entity* victim, Entity* damage_dealer, int8_t damage_amount, uint
     {
         return false;
     }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER)
     {
         return false;
     }
@@ -186,7 +187,7 @@ void on_instagib(Entity* victim, bool destroy_corpse, size_t param_3)
     {
         return;
     }
-    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & 1) == 1)
+    if (g_godmode_companions_active && !is_active_player(victim) && (victim->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER)
     {
         return;
     }
@@ -356,20 +357,6 @@ void StateMemory::force_current_theme(THEME t)
     }
 }
 
-void API::darkmode(bool g)
-{
-    static const size_t addr_dark = get_address("force_dark_level");
-
-    if (g)
-    {
-        write_mem_recoverable("darkmode", addr_dark, "\x90\x90"sv, true);
-    }
-    else
-    {
-        recover_mem("darkmode");
-    }
-}
-
 Vec2 Camera::get_position()
 {
     // = adjusted_focus_x/y - (adjusted_focus_x/y - calculated_focus_x/y) * (render frame-game frame difference)
@@ -522,6 +509,15 @@ LiquidPhysicsEngine* LiquidPhysics::get_correct_liquid_engine(ENT_TYPE liquid_ty
         return coarse_lava_physics_engine;
     }
     return nullptr;
+}
+
+void update_state()
+{
+    static const size_t offset = get_address("state_refresh");
+    auto state = HeapBase::get().state();
+    typedef void refresh_func(StateMemory*);
+    static refresh_func* rf = (refresh_func*)(offset);
+    rf(state);
 }
 
 using OnStateUpdate = void(StateMemory*);

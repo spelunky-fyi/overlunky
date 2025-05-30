@@ -1,18 +1,17 @@
 #include "entity_db.hpp"
 #include "entity.hpp"
 
-#include <Windows.h> // for IsBadWritePtr
-#include <chrono>    // for operator<=>, operator-, operator+
-#include <cmath>     // for round
-#include <compare>   // for operator<, operator<=, operator>
-#include <cstdint>   // for uint32_t, uint16_t, uint8_t
-#include <cstdlib>   // for abs, NULL, size_t
-#include <list>      // for _List_const_iterator
-#include <map>       // for _Tree_iterator, map, _Tree_cons...
-#include <new>       // for operator new
-#include <string>    // for allocator, string, operator""sv
-#include <thread>    // for sleep_for
-#include <vector>    // for vector, _Vector_iterator, erase_if
+#include <chrono>  // for operator<=>, operator-, operator+
+#include <cmath>   // for round
+#include <compare> // for operator<, operator<=, operator>
+#include <cstdint> // for uint32_t, uint16_t, uint8_t
+#include <cstdlib> // for abs, NULL, size_t
+#include <list>    // for _List_const_iterator
+#include <map>     // for _Tree_iterator, map, _Tree_cons...
+#include <new>     // for operator new
+#include <string>  // for allocator, string, operator""sv
+#include <thread>  // for sleep_for
+#include <vector>  // for vector, _Vector_iterator, erase_if
 
 #include "entities_chars.hpp"    // for Player
 #include "entity_hooks_info.hpp" // for EntityHooksInfo
