@@ -1096,6 +1096,11 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://git
 
 Type | Name | Description
 ---- | ---- | -----------
+nil | [close()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=close) | Closes the server.
+bool | [open()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=open) | Returns true if the port was opened successfully and the server hasn't been closed yet.
+string | [error()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=error) | Returns a string explaining the last error, at least if open() returned false.
+string | [host](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=host) | 
+int | [port](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=port) | 
 
 ### Vec2
 
