@@ -679,12 +679,12 @@ control the loading state of non-streaming sample data for individual events wit
 
 Type | Name | Description
 ---- | ---- | -----------
-optional&lt;FMODStudio::LoadingState&gt; | [getLoadingState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getLoadingState) | 
-bool | [loadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loadSampleData) | 
-bool | [unloadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unloadSampleData) | 
-optional&lt;FMODStudio::LoadingState&gt; | [getSampleLoadingState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getSampleLoadingState) | 
+optional&lt;FMODStudio::LoadingState&gt; | [get_loading_state()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_loading_state) | 
+bool | [load_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_sample_data) | 
+bool | [unload_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unload_sample_data) | 
+optional&lt;FMODStudio::LoadingState&gt; | [get_sample_loading_state()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_sample_loading_state) | 
 bool | [unload()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unload) | 
-bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
+bool | [is_valid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_valid) | 
 
 ### CustomEventDescription
 
@@ -695,16 +695,16 @@ IDs using `CustomEventDescription:getParameterDescriptionByName()`.
 
 Type | Name | Description
 ---- | ---- | -----------
-[CustomEventInstance](#CustomEventInstance) | [createInstance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=createInstance) | 
-bool | [releaseAllInstances()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=releaseAllInstances) | 
-bool | [loadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=loadSampleData) | 
-bool | [unloadSampleData()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unloadSampleData) | 
-optional&lt;FMODStudio::LoadingState&gt; | [getSampleLoadingState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getSampleLoadingState) | 
-optional&lt;int&gt; | [getParameterDescriptionCount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterDescriptionCount) | 
-optional&lt;FMODStudio::[ParameterDescription](#ParameterDescription)&gt; | [getParameterDescriptionByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterDescriptionByName) | 
-optional&lt;FMODStudio::[ParameterDescription](#ParameterDescription)&gt; | [getParameterDescriptionByIndex(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterDescriptionByIndex) | 
-optional&lt;FMODStudio::[ParameterId](#ParameterId)&gt; | [getParameterIDByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterIDByName) | 
-bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
+[CustomEventInstance](#CustomEventInstance) | [create_instance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_instance) | 
+bool | [release_all_instances()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=release_all_instances) | 
+bool | [load_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_sample_data) | 
+bool | [unload_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unload_sample_data) | 
+optional&lt;FMODStudio::LoadingState&gt; | [get_sample_loading_state()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_sample_loading_state) | 
+optional&lt;int&gt; | [get_parameter_description_count()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter_description_count) | 
+optional&lt;FMODStudio::[ParameterDescription](#ParameterDescription)&gt; | [get_parameter_description_by_name(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter_description_by_name) | 
+optional&lt;FMODStudio::[ParameterDescription](#ParameterDescription)&gt; | [get_parameter_description_by_index(int index)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter_description_by_index) | 
+optional&lt;FMODStudio::[ParameterId](#ParameterId)&gt; | [get_parameter_id_by_name(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter_id_by_name) | 
+bool | [is_valid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_valid) | 
 
 ### CustomEventInstance
 
@@ -719,29 +719,28 @@ Type | Name | Description
 bool | [start()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=start) | 
 bool | [stop()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop) | 
 bool | [stop(FMODStudio::StopMode mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=stop) | 
-optional&lt;FMODStudio::PlaybackState&gt; | [getPlaybackState()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getPlaybackState) | 
-bool | [setPause(bool pause)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setPause) | 
-optional&lt;bool&gt; | [getPause()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getPause) | 
-bool | [keyOff()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=keyOff) | 
-bool | [setPitch(float pitch)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setPitch) | 
-optional&lt;float&gt; | [getPitch()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getPitch) | 
-bool | [setTimelinePosition(int position)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setTimelinePosition) | 
-optional&lt;int&gt; | [getTimelinePosition()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getTimelinePosition) | 
-bool | [setVolume(float volume)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setVolume) | 
-optional&lt;float&gt; | [getVolume()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getVolume) | 
+optional&lt;FMODStudio::PlaybackState&gt; | [get_playback_state()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_playback_state) | 
+bool | [set_pause(bool pause)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pause) | 
+optional&lt;bool&gt; | [get_pause()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pause) | 
+bool | [key_off()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=key_off) | 
+bool | [set_pitch(float pitch)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pitch) | 
+optional&lt;float&gt; | [get_pitch()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_pitch) | 
+bool | [set_timeline_position(int position)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_timeline_position) | 
+optional&lt;int&gt; | [get_timeline_position()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_timeline_position) | 
+bool | [set_volume(float volume)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_volume) | 
+optional&lt;float&gt; | [get_volume()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_volume) | 
+optional&lt;float&gt; | [get_parameter_by_name(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter_by_name) | 
+bool | [set_parameter_by_name(string name, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_name) | 
+bool | [set_parameter_by_name(string name, float value, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_name) | 
+bool | [set_parameter_by_name_with_label(string name, string label)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_name_with_label) | 
+bool | [set_parameter_by_name_with_label(string name, string label, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_name_with_label) | 
+optional&lt;float&gt; | [get_parameter_by_id(FMODStudio::ParameterId id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_parameter_by_id) | 
+bool | [set_parameter_by_id(FMODStudio::ParameterId id, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_id) | 
+bool | [set_parameter_by_id(FMODStudio::ParameterId id, float value, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_id) | 
+bool | [set_parameter_by_id_with_label(FMODStudio::ParameterId id, string label)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_id_with_label) | 
+bool | [set_parameter_by_id_with_label(FMODStudio::ParameterId id, string label, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_parameter_by_id_with_label) | 
 bool | [release()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=release) | 
-bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
-optional&lt;float&gt; | [getParameterByName(string name)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getParameterByName) | 
-bool | [setParameterByName(string name, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByName) | 
-bool | [setParameterByName(string name, float value, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByName) | 
-bool | [setParameterByNameWithLabel(string name, string label)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByNameWithLabel) | 
-bool | [setParameterByNameWithLabel(string name, string label, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByNameWithLabel) | 
-bool | [setParameterByID(FMODStudio::ParameterId id, float value)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByID) | 
-bool | [setParameterByID(FMODStudio::ParameterId id, float value, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByID) | 
-bool | [setParameterByIDWithLabel(FMODStudio::ParameterId id, string label)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByIDWithLabel) | 
-bool | [setParameterByIDWithLabel(FMODStudio::ParameterId id, string label, bool ignoreseekspeed)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=setParameterByIDWithLabel) | 
-bool | [release()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=release) | 
-bool | [isValid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=isValid) | 
+bool | [is_valid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_valid) | 
 
 ### CutsceneBehavior
 
@@ -759,7 +758,7 @@ workaround for this, and allows you to get a `CustomEventDescription` from a pat
 
 Type | Name | Description
 ---- | ---- | -----------
-optional&lt;[CustomEventDescription](#CustomEventDescription)&gt; | [getEvent(string path)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=getEvent) | 
+optional&lt;[CustomEventDescription](#CustomEventDescription)&gt; | [get_event(string path)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_event) | 
 
 ### Hud
 

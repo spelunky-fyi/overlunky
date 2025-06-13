@@ -5206,42 +5206,41 @@ function CustomTheme:override(index, func_) end
     ---@field flags any @FMODStudio::ParameterDescription::flags
 
 ---@class CustomBank
-    ---@field getLoadingState fun(self): FMODStudio::LoadingState?
-    ---@field loadSampleData fun(self): boolean
-    ---@field unloadSampleData fun(self): boolean
-    ---@field getSampleLoadingState fun(self): FMODStudio::LoadingState?
+    ---@field get_loading_state fun(self): FMODStudio::LoadingState?
+    ---@field load_sample_data fun(self): boolean
+    ---@field unload_sample_data fun(self): boolean
+    ---@field get_sample_loading_state fun(self): FMODStudio::LoadingState?
     ---@field unload fun(self): boolean
-    ---@field isValid fun(self): boolean
+    ---@field is_valid fun(self): boolean
 
 ---@class CustomEventDescription
-    ---@field createInstance fun(self): CustomEventInstance
-    ---@field releaseAllInstances fun(self): boolean
-    ---@field loadSampleData fun(self): boolean
-    ---@field unloadSampleData fun(self): boolean
-    ---@field getSampleLoadingState fun(self): FMODStudio::LoadingState?
-    ---@field getParameterDescriptionCount fun(self): integer?
-    ---@field getParameterDescriptionByName fun(self, name: string): FMODStudio::ParameterDescription?
-    ---@field getParameterDescriptionByIndex fun(self, index: integer): FMODStudio::ParameterDescription?
-    ---@field getParameterIDByName fun(self, name: string): FMODStudio::ParameterId?
-    ---@field isValid fun(self): boolean
+    ---@field create_instance fun(self): CustomEventInstance
+    ---@field release_all_instances fun(self): boolean
+    ---@field load_sample_data fun(self): boolean
+    ---@field unload_sample_data fun(self): boolean
+    ---@field get_sample_loading_state fun(self): FMODStudio::LoadingState?
+    ---@field get_parameter_description_count fun(self): integer?
+    ---@field get_parameter_description_by_name fun(self, name: string): FMODStudio::ParameterDescription?
+    ---@field get_parameter_description_by_index fun(self, index: integer): FMODStudio::ParameterDescription?
+    ---@field get_parameter_id_by_name fun(self, name: string): FMODStudio::ParameterId?
+    ---@field is_valid fun(self): boolean
 
 ---@class CustomEventInstance
     ---@field start fun(self): boolean
-    ---@field getPlaybackState fun(self): FMODStudio::PlaybackState?
-    ---@field setPause fun(self, pause: boolean): boolean
-    ---@field getPause fun(self): boolean?
-    ---@field keyOff fun(self): boolean
-    ---@field setPitch fun(self, pitch: number): boolean
-    ---@field getPitch fun(self): number?
-    ---@field setTimelinePosition fun(self, position: integer): boolean
-    ---@field getTimelinePosition fun(self): integer?
-    ---@field setVolume fun(self, volume: number): boolean
-    ---@field getVolume fun(self): number?
+    ---@field get_playback_state fun(self): FMODStudio::PlaybackState?
+    ---@field set_pause fun(self, pause: boolean): boolean
+    ---@field get_pause fun(self): boolean?
+    ---@field key_off fun(self): boolean
+    ---@field set_pitch fun(self, pitch: number): boolean
+    ---@field get_pitch fun(self): number?
+    ---@field set_timeline_position fun(self, position: integer): boolean
+    ---@field get_timeline_position fun(self): integer?
+    ---@field set_volume fun(self, volume: number): boolean
+    ---@field get_volume fun(self): number?
+    ---@field get_parameter_by_name fun(self, name: string): number?
+    ---@field get_parameter_by_id fun(self, id: FMODStudio::ParameterId): number?
     ---@field release fun(self): boolean
-    ---@field isValid fun(self): boolean
-    ---@field getParameterByName fun(self, name: string): number?
-    ---@field release fun(self): boolean
-    ---@field isValid fun(self): boolean
+    ---@field is_valid fun(self): boolean
 local CustomEventInstance = nil
 ---@return boolean
 function CustomEventInstance:stop() end
@@ -5251,42 +5250,42 @@ function CustomEventInstance:stop(mode) end
 ---@param name string
 ---@param value number
 ---@return boolean
-function CustomEventInstance:setParameterByName(name, value) end
+function CustomEventInstance:set_parameter_by_name(name, value) end
 ---@param name string
 ---@param value number
 ---@param ignoreseekspeed boolean
 ---@return boolean
-function CustomEventInstance:setParameterByName(name, value, ignoreseekspeed) end
+function CustomEventInstance:set_parameter_by_name(name, value, ignoreseekspeed) end
 ---@param name string
 ---@param label string
 ---@return boolean
-function CustomEventInstance:setParameterByNameWithLabel(name, label) end
+function CustomEventInstance:set_parameter_by_name_with_label(name, label) end
 ---@param name string
 ---@param label string
 ---@param ignoreseekspeed boolean
 ---@return boolean
-function CustomEventInstance:setParameterByNameWithLabel(name, label, ignoreseekspeed) end
+function CustomEventInstance:set_parameter_by_name_with_label(name, label, ignoreseekspeed) end
 ---@param id FMODStudio::ParameterId
 ---@param value number
 ---@return boolean
-function CustomEventInstance:setParameterByID(id, value) end
+function CustomEventInstance:set_parameter_by_id(id, value) end
 ---@param id FMODStudio::ParameterId
 ---@param value number
 ---@param ignoreseekspeed boolean
 ---@return boolean
-function CustomEventInstance:setParameterByID(id, value, ignoreseekspeed) end
+function CustomEventInstance:set_parameter_by_id(id, value, ignoreseekspeed) end
 ---@param id FMODStudio::ParameterId
 ---@param label string
 ---@return boolean
-function CustomEventInstance:setParameterByIDWithLabel(id, label) end
+function CustomEventInstance:set_parameter_by_id_with_label(id, label) end
 ---@param id FMODStudio::ParameterId
 ---@param label string
 ---@param ignoreseekspeed boolean
 ---@return boolean
-function CustomEventInstance:setParameterByIDWithLabel(id, label, ignoreseekspeed) end
+function CustomEventInstance:set_parameter_by_id_with_label(id, label, ignoreseekspeed) end
 
 ---@class FMODguidMap
-    ---@field getEvent fun(self, path: string): CustomEventDescription?
+    ---@field get_event fun(self, path: string): CustomEventDescription?
 
 ---@class CustomSound
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
