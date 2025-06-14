@@ -490,7 +490,6 @@ using LockChannelGroup = FMOD_RESULT(Bus*);
 using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
 
 using SystemLoadBankFile = FMOD_RESULT(System*, const char*, LoadBankFlags, Bank**);
-using SystemGetBank = FMOD_RESULT(System*, const char*, Bank**);
 using SystemGetEventByID = FMOD_RESULT(System*, FMOD_GUID*, EventDescription**);
 
 using ParseID = FMOD_RESULT(const char*, FMOD_GUID*);

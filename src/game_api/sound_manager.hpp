@@ -406,7 +406,6 @@ class SoundManager
     FMODStudio::System* m_FmodStudioSystem{nullptr};
 
     FMODStudio::SystemLoadBankFile* m_SystemLoadBankFile{nullptr};
-    FMODStudio::SystemGetBank* m_SystemGetBank{nullptr};
     FMODStudio::SystemGetEventByID* m_SystemGetEventByID{nullptr};
 
     FMODStudio::ParseID* m_StudioParseID{nullptr};

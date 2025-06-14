@@ -655,8 +655,6 @@ SoundManager::SoundManager(DecodeAudioFile* decode_function)
 
             m_SystemLoadBankFile =
                 reinterpret_cast<FMODStudio::SystemLoadBankFile*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_LoadBankFile"));
-            m_SystemGetBank =
-                reinterpret_cast<FMODStudio::SystemGetBank*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetBank"));
             m_SystemGetEventByID =
                 reinterpret_cast<FMODStudio::SystemGetEventByID*>(GetProcAddress(fmod_studio, "FMOD_Studio_System_GetEventByID"));
 
