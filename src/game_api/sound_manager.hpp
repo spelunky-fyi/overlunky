@@ -161,7 +161,7 @@ class CustomEventDescription
         return m_SoundManager != nullptr;
     }
 
-    CustomEventInstance create_instance();
+    std::shared_ptr<CustomEventInstance> create_instance();
     bool release_all_instances();
 
     bool load_sample_data();
@@ -192,11 +192,15 @@ class CustomEventInstance
     friend class CustomEventDescription;
 
   public:
+    CustomEventInstance(std::nullptr_t, std::nullptr_t)
+    {
+    }
+    CustomEventInstance(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager);
     CustomEventInstance(const CustomEventInstance& rhs) = default;
     CustomEventInstance(CustomEventInstance&& rhs) noexcept = default;
     CustomEventInstance& operator=(const CustomEventInstance& rhs) = default;
     CustomEventInstance& operator=(CustomEventInstance&& rhs) noexcept = default;
-    ~CustomEventInstance() = default;
+    ~CustomEventInstance();
 
     bool start();
     bool stop();
@@ -228,11 +232,6 @@ class CustomEventInstance
     bool is_valid();
 
   private:
-    CustomEventInstance(std::nullptr_t, std::nullptr_t)
-    {
-    }
-    CustomEventInstance(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager);
-
     CustomEventInstanceHandle m_FmodHandle{};
     SoundManager* m_SoundManager{nullptr};
 };
@@ -299,7 +298,7 @@ class SoundManager
     CustomEventDescription get_event_by_id_string(std::string guid_string);
     CustomEventDescription get_event_by_id(FMOD::FMOD_GUID* guid);
 
-    CustomEventInstance event_description_create_instance(FMODStudio::EventDescription* fmod_event);
+    std::shared_ptr<CustomEventInstance> event_description_create_instance(FMODStudio::EventDescription* fmod_event);
     bool event_description_release_all_instances(FMODStudio::EventDescription* fmod_event);
     std::optional<FMODStudio::LoadingState> event_description_get_sample_loading_state(CustomEventDescription fmod_event);
     bool event_description_load_sample_data(CustomEventDescription fmod_event);
@@ -310,26 +309,26 @@ class SoundManager
     std::optional<FMODStudio::ParameterDescription> event_description_get_parameter_description_by_index(CustomEventDescription fmod_event, int index);
     std::optional<FMODStudio::ParameterId> event_description_get_parameter_id_by_name(CustomEventDescription fmod_event, std::string name);
 
-    bool start(CustomEventInstance fmod_event_instance);
-    bool stop(CustomEventInstance fmod_event_instance, FMODStudio::StopMode mode);
-    std::optional<FMODStudio::PlaybackState> get_playback_state(CustomEventInstance fmod_event_instance);
-    bool set_pause(CustomEventInstance fmod_event_instance, bool pause);
-    std::optional<bool> get_pause(CustomEventInstance fmod_event_instance);
-    bool key_off(CustomEventInstance fmod_event_instance);
-    bool set_pitch(CustomEventInstance fmod_event_instance, float pitch);
-    std::optional<float> get_pitch(CustomEventInstance fmod_event_instance);
-    bool set_timeline_position(CustomEventInstance fmod_event_instance, int position);
-    std::optional<int> get_timeline_position(CustomEventInstance fmod_event_instance);
-    bool set_volume(CustomEventInstance fmod_event_instance, float volume);
-    std::optional<float> get_volume(CustomEventInstance fmod_event_instance);
-    std::optional<float> get_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name);
-    bool set_parameter_by_name(CustomEventInstance fmod_event_instance, std::string name, float value, bool ignoreseekspeed);
-    bool set_parameter_by_name_with_label(CustomEventInstance fmod_event_instance, std::string name, std::string label, bool ignoreseekspeed);
-    std::optional<float> get_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id);
-    bool set_parameter_by_id(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, float value, bool ignoreseekspeed);
-    bool set_parameter_by_id_with_label(CustomEventInstance fmod_event_instance, FMODStudio::ParameterId id, std::string label, bool ignoreseekspeed);
-    bool release(CustomEventInstance fmod_event_instance);
-    bool event_instance_is_valid(CustomEventInstance fmod_event_instance);
+    bool start(FMODStudio::EventInstance* fmod_event_instance);
+    bool stop(FMODStudio::EventInstance* fmod_event_instance, FMODStudio::StopMode mode);
+    std::optional<FMODStudio::PlaybackState> get_playback_state(FMODStudio::EventInstance* fmod_event_instance);
+    bool set_pause(FMODStudio::EventInstance* fmod_event_instance, bool pause);
+    std::optional<bool> get_pause(FMODStudio::EventInstance* fmod_event_instance);
+    bool key_off(FMODStudio::EventInstance* fmod_event_instance);
+    bool set_pitch(FMODStudio::EventInstance* fmod_event_instance, float pitch);
+    std::optional<float> get_pitch(FMODStudio::EventInstance* fmod_event_instance);
+    bool set_timeline_position(FMODStudio::EventInstance* fmod_event_instance, int position);
+    std::optional<int> get_timeline_position(FMODStudio::EventInstance* fmod_event_instance);
+    bool set_volume(FMODStudio::EventInstance* fmod_event_instance, float volume);
+    std::optional<float> get_volume(FMODStudio::EventInstance* fmod_event_instance);
+    std::optional<float> get_parameter_by_name(FMODStudio::EventInstance* fmod_event_instance, std::string name);
+    bool set_parameter_by_name(FMODStudio::EventInstance* fmod_event_instance, std::string name, float value, bool ignoreseekspeed);
+    bool set_parameter_by_name_with_label(FMODStudio::EventInstance* fmod_event_instance, std::string name, std::string label, bool ignoreseekspeed);
+    std::optional<float> get_parameter_by_id(FMODStudio::EventInstance* fmod_event_instance, FMODStudio::ParameterId id);
+    bool set_parameter_by_id(FMODStudio::EventInstance* fmod_event_instance, FMODStudio::ParameterId id, float value, bool ignoreseekspeed);
+    bool set_parameter_by_id_with_label(FMODStudio::EventInstance* fmod_event_instance, FMODStudio::ParameterId id, std::string label, bool ignoreseekspeed);
+    bool release(FMODStudio::EventInstance* fmod_event_instance);
+    bool event_instance_is_valid(FMODStudio::EventInstance* fmod_event_instance);
 
     CustomSound get_sound(std::string path);
     CustomSound get_sound(const char* path);
