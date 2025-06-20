@@ -357,14 +357,6 @@ bool CustomBank::is_valid()
 CustomEventDescription::CustomEventDescription(const CustomEventDescription& rhs)
     : m_FmodHandle{rhs.m_FmodHandle}, m_SoundManager{rhs.m_SoundManager}
 {
-    if (m_SoundManager != nullptr)
-    {
-        std::visit(
-            overloaded{
-                [](FMODStudio::EventDescription*) {},
-                [](std::monostate) {}},
-            rhs.m_FmodHandle);
-    }
 }
 CustomEventDescription::CustomEventDescription(CustomEventDescription&& rhs) noexcept
 {
