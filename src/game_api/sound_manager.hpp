@@ -280,8 +280,8 @@ class SoundManager
         return m_IsInit;
     }
 
-    CustomBank get_bank(std::string path, FMODStudio::LoadBankFlags flags);
-    CustomBank get_bank(const char* path, FMODStudio::LoadBankFlags flags);
+    CustomBank load_bank(std::string path, FMODStudio::LoadBankFlags flags);
+    CustomBank load_bank(const char* path, FMODStudio::LoadBankFlags flags);
     CustomBank get_existing_bank(std::string_view path);
     void acquire_bank(FMOD::Bank* fmod_bank);
     void destroy_bank(FMOD::Bank* fmod_bank);

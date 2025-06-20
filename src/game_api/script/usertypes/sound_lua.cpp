@@ -115,7 +115,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     lua["load_bank"] = [](std::string path, FMODStudio::LoadBankFlags flags) -> sol::optional<CustomBank>
     {
         auto backend = LuaBackend::get_calling_backend();
-        if (CustomBank bank = backend->sound_manager->get_bank((backend->get_root_path() / path).string(), flags))
+        if (CustomBank bank = backend->sound_manager->load_bank((backend->get_root_path() / path).string(), flags))
         {
             return bank;
         }

@@ -1167,9 +1167,8 @@ PlayingSound SoundManager::play_event(FMODStudio::EventDescription* fmod_event, 
     return PlayingSound{instance, this};
 }
 
-CustomBank SoundManager::get_bank(std::string path, FMODStudio::LoadBankFlags flags)
+CustomBank SoundManager::load_bank(std::string path, FMODStudio::LoadBankFlags flags)
 {
-    DEBUG("Loading bank file from path {}", path);
     auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [&path](const Bank& bank)
                            { return bank.path == path; });
     if (it != m_BankStorage.end())
@@ -1189,13 +1188,12 @@ CustomBank SoundManager::get_bank(std::string path, FMODStudio::LoadBankFlags fl
         return CustomBank{nullptr, nullptr};
     }
 
-    DEBUG("Successfully loaded bank file {}", new_bank.path);
     m_BankStorage.push_back(std::move(new_bank));
     return CustomBank{m_BankStorage.back().fmod_bank, this};
 }
-CustomBank SoundManager::get_bank(const char* path, FMODStudio::LoadBankFlags flags)
+CustomBank SoundManager::load_bank(const char* path, FMODStudio::LoadBankFlags flags)
 {
-    return get_bank(std::string{path}, flags);
+    return load_bank(std::string{path}, flags);
 }
 CustomBank SoundManager::get_existing_bank(std::string_view path)
 {
