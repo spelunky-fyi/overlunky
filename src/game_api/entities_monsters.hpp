@@ -430,7 +430,8 @@ class Leprechaun : public WalkingMonster
     /// amount of gold he picked up, will be drooped on death
     uint16_t gold;
     uint8_t timer_after_humping;
-    bool jump_trigger; // Triggers a jump on the next frame.
+    /// Triggers a jump on the next frame.
+    bool jump_trigger;
     custom_vector<ENT_TYPE> collected_treasure;
 };
 
@@ -598,7 +599,8 @@ class Cobra : public Monster
 class CatMummy : public Monster
 {
   public:
-    uint8_t jump_height_multiplier; // Set in process_input when jump is triggered to be used when applying velocity for the jump.
+    /// Set in process_input when jump is triggered to be used when applying velocity for the jump.
+    uint8_t jump_height_multiplier;
     uint8_t attack_timer;
 };
 
@@ -836,12 +838,15 @@ class Grub : public Monster
   public:
     float rotation_delta; // is it? i seen it in the code compared as a bit with 1, but not sure when it happens
     bool drop;
-    bool rotation_direction; // Counter-clockwise if true.
+    /// Counter-clockwise if true.
+    bool rotation_direction;
     /// Delay after colliding into a wall before it will change its movement direction again.
     uint8_t wall_collision_cooldown;
     uint8_t padding1;
-    uint16_t rotation_timer;   // Will randomly pick a new direction and angle when this timer elapses.
-    uint16_t walk_pause_timer; // alternates between walking and pausing every time it reaches zero
+    /// Will randomly pick a new direction and angle when this timer elapses.
+    uint16_t rotation_timer;
+    /// alternates between walking and pausing every time it reaches zero.
+    uint16_t walk_pause_timer;
     int16_t turn_into_fly_timer;
     uint16_t padding2;
     ParticleEmitterInfo* particle;
@@ -983,7 +988,8 @@ class Hermitcrab : public Monster
     bool is_inactive; // must be something else, since we already have is_active (or vice versa), gets triggered about half a second after is_active, maybe something like, can attack
     /// defaults to true, when toggled to false, a new carried item spawns
     bool spawn_new_carried_item;
-    bool going_up; // Whether the hermit crab is moving up when climbing a pole.
+    /// Whether the hermit crab is moving up when climbing a pole.
+    bool going_up;
 };
 
 class Necromancer : public WalkingMonster

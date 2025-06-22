@@ -174,17 +174,25 @@ class LimbAnchor : public Entity
     float y_pos;
     float hand_feet_x_offset;
     float hand_feet_y_offset;
-    float anchor_x;           // Current position of this limb anchor.
-    float anchor_y;           // Current position of this limb anchor.
-    float move_origin_x;      // Position of this limb anchor at the beginning of a movement.
-    float move_origin_y;      // Position of this limb anchor at the beginning of a movement.
-    float move_destination_x; // Position of this limb anchor at the end of a movement.
-    float move_destination_y; // Position of this limb anchor at the end of a movement.
+    /// Current position of the ankle/wrist of this limb anchor.
+    float anchor_x;
+    /// Current position of the ankle/wrist of this limb anchor.
+    float anchor_y;
+    /// Position of this limb anchor at the beginning of a movement.
+    float move_origin_x;
+    /// Position of this limb anchor at the beginning of a movement.
+    float move_origin_y;
+    /// Position of this limb anchor at the end of a movement.
+    float move_destination_x;
+    /// Position of this limb anchor at the end of a movement.
+    float move_destination_y;
     float unk11;
     float unk12;
     float unk13;
-    uint8_t elapsed_move_time; // Number of frames the limb has been moving from move_origin to move_destination.
-    uint8_t move_duration;     // Number of frames the limb should take to move from move_origin to move_destination.
+    /// Number of frames the limb has been moving from move_origin to move_destination.
+    uint8_t elapsed_move_time;
+    /// Number of frames the limb should take to move from move_origin to move_destination.
+    uint8_t move_duration;
     bool flip_vertical;
 };
 
@@ -237,7 +245,8 @@ class BoulderSpawner : public Entity
   public:
     /// Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
     int32_t timer;
-    int32_t owner_uid; // UID of entity that triggered the trap.
+    /// UID of entity that triggered the trap.
+    int32_t owner_uid;
     SoundMeta* sound;
 };
 
