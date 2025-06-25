@@ -1344,8 +1344,8 @@ Clear save state from slot 1..4.
 An `FMODguidMap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
 from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
 strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODguidMap` is a
-workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:getEvent()`.
-`FMODguidMap:getEvent()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:get_event()`.
+`FMODguidMap:get_event()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
 Creates an `FMODguidMap` by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
 if you want to use a human readable FMOD event path to create a `CustomEventDescription` instead of using an FMOD GUID string.
 
@@ -1797,8 +1797,8 @@ List files in directory relative to the script root. Returns table of file/direc
 Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
 Returns nil if the file can't be found. Loading a bank file will load the banks metadata, but not non-streaming
 sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
-be found with `get_event_by_id()` or using `create_fmod_guid_map()` and calling `FMODguidMap:getEvent()`.
-The banks loading state can be queried using `CustomBank:getLoadingState()` which will return an `FMOD_LOADING_STATE`.
+be found with `get_event_by_id()` or using `create_fmod_guid_map()` and calling `FMODguidMap:get_event()`.
+The banks loading state can be queried using `CustomBank:get_loading_state()` which will return an `FMOD_LOADING_STATE`.
 
 ### load_death_screen
 

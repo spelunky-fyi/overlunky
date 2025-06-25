@@ -689,13 +689,13 @@ bool | [is_valid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_
 ### CustomEventDescription
 
 Handle to an FMOD event description, can be used to create a `CustomEventInstance` with
-`CustomEventDescription:createInstance()`. Also can be used to load and unload non-streaming
+`CustomEventDescription:create_instance()`. Also can be used to load and unload non-streaming
 sample data for the Event, and release all instances of the event. You can also get parameter
-IDs using `CustomEventDescription:getParameterDescriptionByName()`.
+IDs using `CustomEventDescription:get_parameter_description_by_name()`.
 
 Type | Name | Description
 ---- | ---- | -----------
-[CustomEventInstance](#CustomEventInstance) | [create_instance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_instance) | 
+shared_ptr&lt;[CustomEventInstance](#CustomEventInstance)&gt; | [create_instance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_instance) | 
 bool | [release_all_instances()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=release_all_instances) | 
 bool | [load_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_sample_data) | 
 bool | [unload_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unload_sample_data) | 
@@ -711,7 +711,7 @@ bool | [is_valid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_
 Handle to an FMOD event instance. Can be used to start and stop an event, or set the events parameters. Once you
 are done with an event instance and no longer need to change its playback state or parameters, you should call
 `CustomEventInstance:release` so the event is marked for release and released when it stops playing to free resources.
-Generally though, it is best practice to call `CustomEventInstance:release` immediately after `CustomEventInstance:start`
+Generally though, it is best practice to call `CustomEventInstance:release()` immediately after `CustomEventInstance:start()`
 unless you want to play the event instance multiple times or explicitly start and stop it later.
 
 Type | Name | Description
@@ -753,8 +753,8 @@ Type | Name | Description
 An `FMODguidMap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
 from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
 strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODguidMap` is a
-workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:getEvent()`.
-`FMODguidMap:getEvent()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:get_event()`.
+`FMODguidMap:get_event()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
 
 Type | Name | Description
 ---- | ---- | -----------
