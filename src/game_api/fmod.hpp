@@ -475,6 +475,7 @@ struct ParameterDescription
     float defaultvalue;
     ParameterType type;
     ParameterFlags flags;
+    FMOD_GUID guid;
 };
 
 using System = tagged_void<struct system_tag>;
