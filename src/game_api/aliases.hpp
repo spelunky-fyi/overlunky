@@ -214,6 +214,11 @@ enum class ENTITY_MASK : uint32_t
 };
 ENUM_CLASS_FLAGS(ENTITY_MASK)
 
+inline bool operator!(ENTITY_MASK v)
+{
+    return v == static_cast<ENTITY_MASK>(0);
+}
+
 // Returns true if any of the set bits in `mask` are in `flags`
 template <class T>
 requires std::is_enum_v<T>

@@ -1,7 +1,7 @@
 #include "entities_liquids.hpp"
 
 #include "heap_base.hpp"     // for HeapBase
-#include "state_structs.hpp" // for LiquidPhysicsEngine
+#include "liquid_engine.hpp" // for LiquidPhysicsEngine
 
 uint32_t Liquid::get_liquid_flags()
 {
