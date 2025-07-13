@@ -49,7 +49,7 @@ class UI
     static void teleport(float x, float y, bool s, float vx, float vy, bool snap);
     static std::pair<float, float> screen_position(float x, float y);
     static float screen_distance(float x);
-    static Entity* get_entity_at(float x, float y, bool s, float radius, uint32_t mask);
+    static Entity* get_entity_at(float x, float y, bool s, float radius, ENTITY_MASK mask);
     static void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap);
     static SaveData* savedata();
     static int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap);
@@ -82,7 +82,7 @@ class UI
     static void update_floor_at(float x, float y, LAYER l);
     static void cleanup_at(float x, float y, LAYER l, ENT_TYPE type = 0);
     static void safe_destroy(Entity* ent, bool unsafe = false, bool recurse = true);
-    static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
+    static std::vector<uint32_t> get_entities_overlapping(ENTITY_MASK mask, AABB hitbox, LAYER layer);
     static bool get_focus();
     static float get_spark_distance(SparkTrap* ent);
     static void save_progress();

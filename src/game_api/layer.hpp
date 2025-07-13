@@ -141,7 +141,7 @@ struct Layer
     EntityList unknown_entities1;
     EntityRegions* unknown1; // players in motion?
 
-    std::map<uint32_t, EntityList> entities_by_mask; // key is the mask
+    std::map<ENTITY_MASK, EntityList> entities_by_mask;
 
     // 4x4 block areas (the edge ones extend to infinity?), each probably contains different mask entities
     EntityList entities_by_region1[31][21];

@@ -868,7 +868,7 @@ bool LuaBackend::pre_load_screen()
     {
         for (auto layer : HeapBase::get().state()->layers)
         {
-            auto it = layer->entities_by_mask.find(1);
+            auto it = layer->entities_by_mask.find(ENTITY_MASK::PLAYER);
             if (it == layer->entities_by_mask.end())
                 continue;
 
@@ -1012,7 +1012,7 @@ void LuaBackend::load_user_data()
 {
     for (auto layer : HeapBase::get().state()->layers)
     {
-        auto it = layer->entities_by_mask.find(1);
+        auto it = layer->entities_by_mask.find(ENTITY_MASK::PLAYER);
         if (it == layer->entities_by_mask.end())
             continue;
 
