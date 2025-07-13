@@ -58,7 +58,8 @@ class LogicalStaticSound : public LogicalSound
 class LogicalLiquidStreamSound : public LogicalStaticSound
 {
   public:
-    float unknown; // soundpositionpointer unknown10
+    /// Just the parameter for sound in LogicalSound
+    float liquid_intensity;
 };
 
 class LogicalTrapTrigger : public Entity
