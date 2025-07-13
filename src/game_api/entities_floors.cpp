@@ -854,7 +854,7 @@ void Door::unlock(bool unlock)
         {
             // there is no connection between the door and the ship, so we have to look for the entity
             // dunno if it's better to look for the ship or the door itself, ship should have the exact same position as the door thou
-            for (auto ent_uid : get_entities_at(eggship_fx_door, (uint32_t)ENTITY_MASK::FX, x, y, (LAYER)layer, 1.0f))
+            for (auto ent_uid : get_entities_at(eggship_fx_door, ENTITY_MASK::FX, x, y, (LAYER)layer, 1.0f))
             {
                 if (auto ent = get_entity_ptr(ent_uid))
                     ent->animation_frame = unlock ? 15 : 2;
