@@ -694,7 +694,7 @@ Get the thread-local version of players
 
 > Search script examples for [get_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player)
 
-#### object get_player(int slot, optional<bool> or_ghost)
+#### any get_player(int slot, optional<bool> or_ghost)
 
 Returns [Player](#Player) (or [PlayerGhost](#PlayerGhost) if `get_player(1, true)`) with this player slot
 

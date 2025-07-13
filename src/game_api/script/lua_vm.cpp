@@ -323,7 +323,7 @@ end
     { lua["prinspect"](objects); };
 
     /// Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
-    // lua["dump"] = [](object object, optional<int> depth) -> table
+    // lua["dump"] = [](sol::object object, optional<int> depth) -> table
 
     /// Adds a command that can be used in the console.
     lua["register_console_command"] = [](std::string name, sol::function cmd)
