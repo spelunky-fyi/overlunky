@@ -8,6 +8,7 @@
 #include "containers/custom_map.hpp" // for custom_map
 #include "entities_items.hpp"        // for Jetpack, KapalaPowerup
 #include "entity.hpp"                // for EntityDB, to_id, Entity
+#include "items.hpp"                 // for Inventory
 #include "layer.hpp"                 // for EntityList::Range, EntityList
 #include "rpc.hpp"                   // for unequip_backitem, worn_backitem
 #include "search.hpp"                // for get_address
@@ -149,4 +150,11 @@ void Player::let_go()
         if (anim != behaviors_map.end())
             current_behavior = anim->second;
     }
+}
+
+int8_t Player::get_slot() const
+{
+    if (inventory_ptr)
+        return inventory_ptr->player_slot;
+    return -1;
 }

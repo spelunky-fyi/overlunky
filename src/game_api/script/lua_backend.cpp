@@ -875,7 +875,7 @@ bool LuaBackend::pre_load_screen()
             for (auto entity : it->second.entities())
             {
                 auto ent = entity->as<Player>();
-                int slot = ent->inventory_ptr->player_slot;
+                int slot = ent->get_slot();
                 if (slot == -1 && ent->linked_companion_parent == -1)
                     continue;
                 if (slot == -1 && ent->linked_companion_parent != -1)
@@ -887,7 +887,10 @@ bool LuaBackend::pre_load_screen()
                         slot++;
                         if (parent->linked_companion_parent == -1)
                         {
-                            slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                            if (parent->inventory_ptr)
+                                slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                            else
+                                slot = -1;
                             break;
                         }
                     }
@@ -1016,7 +1019,7 @@ void LuaBackend::load_user_data()
         for (auto entity : it->second.entities())
         {
             auto ent = entity->as<Player>();
-            int slot = ent->inventory_ptr->player_slot;
+            int slot = ent->get_slot();
             if (slot == -1 && ent->linked_companion_parent == -1)
                 continue;
             if (slot == -1 && ent->linked_companion_parent != -1)
@@ -1028,7 +1031,10 @@ void LuaBackend::load_user_data()
                     slot++;
                     if (parent->linked_companion_parent == -1)
                     {
-                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        if (parent->inventory_ptr)
+                            slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        else
+                            slot = -1;
                         break;
                     }
                 }
