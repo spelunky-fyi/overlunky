@@ -1188,11 +1188,11 @@ void run()
     if (std::ofstream file = std::ofstream("game_data/textures.txt"))
     {
         std::unordered_map<std::string, uint32_t> counts;
-        for (auto* tex : get_textures()->texture_map)
+        for (auto& tex : get_textures()->textures)
         {
-            if (tex != nullptr && tex->name != nullptr)
+            if (tex.name != nullptr)
             {
-                std::string clean_tex_name = *tex->name;
+                std::string clean_tex_name = *tex.name;
                 std::transform(
                     clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
                     { return (unsigned char)std::toupper(c); });
@@ -1203,7 +1203,7 @@ void run()
                     clean_tex_name.erase(index, 4);
                 }
                 clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
-                file << "TEXTURE." << clean_tex_name << ": " << tex->id << std::endl;
+                file << "TEXTURE." << clean_tex_name << ": " << tex.id << std::endl;
             }
         }
     }
