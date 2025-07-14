@@ -115,6 +115,10 @@ void register_usertypes(sol::state& lua)
         &ExitDoor::world,
         "theme",
         &ExitDoor::theme,
+        "set_target",
+        &ExitDoor::set_target,
+        "get_target",
+        &ExitDoor::get_target,
         sol::base_classes,
         sol::bases<Entity, Floor, Door>());
 
@@ -407,5 +411,37 @@ void register_usertypes(sol::state& lua)
         &JungleSpearTrap::trigger,
         sol::base_classes,
         sol::bases<Entity, Floor>());
+
+    /// Make an ENT_TYPE.FLOOR_DOOR_EXIT go to world `w`, level `l`, theme `t`
+    lua["set_door_target"] = [](uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
+    {
+        if (auto door = get_entity_ptr(uid)->as<ExitDoor>())
+            door->set_target(w, l, t);
+    };
+    /// Short for [set_door_target](#set_door_target).
+    lua["set_door"] = [](uint32_t uid, uint8_t w, uint8_t l, uint8_t t)
+    {
+        if (auto door = get_entity_ptr(uid)->as<ExitDoor>())
+            door->set_target(w, l, t);
+    };
+    /// Get door target `world`, `level`, `theme`
+    lua["get_door_target"] = [](uint32_t uid) -> std::tuple<uint8_t, uint8_t, uint8_t>
+    {
+        auto door = get_entity_ptr(uid)->as<ExitDoor>();
+        if (door == nullptr || !door->special_door)
+            return {};
+
+        return std::make_tuple(door->world, door->level, door->theme);
+    };
+    /// Calls the enter door function, position doesn't matter, can also enter closed doors (like COG, EW) without unlocking them
+    lua["enter_door"] = [](int32_t player_uid, int32_t door_uid)
+    {
+        auto player = get_entity_ptr(player_uid);
+        auto door = get_entity_ptr(door_uid)->as<Door>();
+        if (player == nullptr || door == nullptr)
+            return;
+
+        door->enter(player);
+    };
 }
 } // namespace NEntitiesFloors

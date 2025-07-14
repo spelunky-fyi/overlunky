@@ -453,7 +453,7 @@ Type | Name | Description
 [EntityDB](#EntityDB) | [new(EntityDB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
 [EntityDB](#EntityDB) | [new(ENT_TYPE other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
 [ENT_TYPE](#ENT_TYPE) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
-int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | [MASK](#MASK)
+[MASK](#MASK) | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | [MASK](#MASK)
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
@@ -4053,6 +4053,8 @@ int | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) |
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [world](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) | 
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
+nil | [set_target(int ww, int l, int t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_target) | 
+tuple&lt;int, int, int&gt; | [get_target()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_target) | Get target world, level, theme of this door. If the `special_door` is false, it returns the StateMemory world_next, level_next, theme_next
 
 ### Floor
 
@@ -4464,9 +4466,9 @@ bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 bool | [is_cursed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_cursed) | 
 bool | [is_movable()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_movable) | 
 bool | [can_be_pushed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_be_pushed) | 
-nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s<br/>destroy_corpse and responsible are the standard parameters for the kill function
+nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<MASK> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s<br/>destroy_corpse and responsible are the standard parameters for the kill function
 nil | [kill_recursive(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
-nil | [destroy_recursive(optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
+nil | [destroy_recursive(optional<MASK> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
 nil | [destroy_recursive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
 nil | [update()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update) | 
 nil | [flip(bool left)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip) | 

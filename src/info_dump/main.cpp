@@ -1220,7 +1220,7 @@ void run()
                 EntityDB* db = get_type(ent.id);
                 if (!db)
                     break;
-                if ((db->search_flags & search_flag) != 0)
+                if ((std::uint32_t)db->search_flags & search_flag)
                 {
                     entities.push_back(ent.name);
                 }

@@ -23,6 +23,7 @@
 #include "items.hpp"                    //
 #include "layer.hpp"                    // for Layer, g_level_max_y, g_level_max_x
 #include "level_api.hpp"                // for LevelGenSystem, ThemeInfo
+#include "liquid_engine.hpp"            // for LiquidPhysicsEngine
 #include "logger.h"                     // for DEBUG
 #include "math.hpp"                     // for AABB
 #include "memory.hpp"                   // for write_mem_prot, memory_read
@@ -436,10 +437,10 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
     auto has_solid_ent = [=](float gx, float gy) -> bool
     {
         {
-            Movable* ent = static_cast<Movable*>(layer_ptr->get_entity_at(gx, gy, 0x180, 0x4, 0x8, 0));
+            Movable* ent = static_cast<Movable*>(layer_ptr->get_entity_at(gx, gy, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR, 0x4, 0x8, 0));
             if (ent)
             {
-                return ent->type->search_flags == 0x100 || (ent->velocityx == 0.0 && ent->velocityy == 0.0); // see 0x2299c90f
+                return (ent->type->search_flags & ENTITY_MASK::FLOOR) == ENTITY_MASK::FLOOR || (ent->velocityx == 0.0 && ent->velocityy == 0.0); // see 0x2299c90f
             }
         }
 
@@ -464,7 +465,7 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
     constexpr uint16_t anim_frame_middle = 192;
     constexpr uint16_t anim_frame_bottom = 197;
 
-    ClimbableRope* top_part = static_cast<ClimbableRope*>(layer_ptr->spawn_entity(rope_ent, g_x, g_y, false, 0, 0, true));
+    ClimbableRope* top_part = layer_ptr->spawn_entity(rope_ent, g_x, g_y, false, 0, 0, true)->as<ClimbableRope>();
     top_part->set_texture(texture);
     top_part->animation_frame = anim_frame_single;
     top_part->idle_counter = 5;
@@ -474,19 +475,19 @@ int32_t spawn_unrolled_player_rope(float x, float y, LAYER layer, TEXTURE textur
     setup_top_rope_rendering_info_two(top_part->rendering_info, 7, 2);
 
     ClimbableRope* above_part = top_part;
-    for (size_t i = 1; i <= max_length; i++)
+    for (uint32_t i = 1; i <= max_length; ++i)
     {
         if (has_solid_ent(g_x, g_y - static_cast<float>(i)))
         {
             break;
         }
 
-        ClimbableRope* next_part = static_cast<ClimbableRope*>(layer_ptr->spawn_entity_over(rope_ent, above_part, 0, -1));
+        ClimbableRope* next_part = layer_ptr->spawn_entity_over(rope_ent, above_part, 0, -1)->as<ClimbableRope>();
         next_part->set_texture(texture);
         next_part->animation_frame = anim_frame_bottom;
         next_part->idle_counter = 5;
-        next_part->segment_nr = static_cast<uint32_t>(i);
-        next_part->segment_nr_inverse = max_length - static_cast<uint32_t>(i);
+        next_part->segment_nr = i;
+        next_part->segment_nr_inverse = max_length - i;
         next_part->above_part = above_part;
         setup_top_rope_rendering_info_one(next_part->rendering_info);
 
