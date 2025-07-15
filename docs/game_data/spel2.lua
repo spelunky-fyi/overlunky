@@ -2764,6 +2764,10 @@ function Entity:destroy_recursive() end
     ---@field exit_invincibility_timer integer
     ---@field invincibility_frames_timer integer
     ---@field frozen_timer integer
+    ---@field dont_damage_owner_timer integer @When > 0, will not deal damage to the owner_uid, so that throwing an object does not harm yourself.
+    ---@field knockback_invincibility_timer integer @Will not apply velocity from various sources when >0. Can be ignored by certain damage flags, so will not be invincible from knockback<br/>of all damage types.
+    ---@field reset_owner_timer integer @Timer for resetting owner_uid.
+    ---@field exit_gold_invincibility_timer integer @When > 0, money intersecting a door or at a pipe entrance will not be collected. Also gives iframes from monster collision.
     ---@field is_poisoned fun(self): boolean
     ---@field is_button_pressed fun(self, button: BUTTON): boolean
     ---@field is_button_held fun(self, button: BUTTON): boolean
@@ -3402,6 +3406,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field fx_button Entity
     ---@field petting_by_uid integer @person whos petting it, only in the camp
     ---@field yell_counter integer @counts up to 400 (6.6 sec), when 0 the pet yells out
+    ---@field sit_timer integer @When sitting after colliding with a player in the camp.
+    ---@field sit_cooldown_timer integer @Cooldown before sitting again when colliding with a player in the camp.
     ---@field func_timer integer @used when free running in the camp
     ---@field active_state integer @-1 = sitting and yelling, 0 = either running, dead or picked up
     ---@field petted_counter integer @number of times petted in the camp
@@ -3474,6 +3480,8 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Quillback : WalkingMonster
     ---@field sound SoundMeta
     ---@field particle ParticleEmitterInfo
+    ---@field broke_block boolean
+    ---@field post_hit_wall_direction integer
     ---@field seen_player boolean
 
 ---@class Leprechaun : WalkingMonster
@@ -3482,6 +3490,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field target_in_sight_timer integer
     ---@field gold integer @amount of gold he picked up, will be drooped on death
     ---@field timer_after_humping integer
+    ---@field jump_trigger boolean @Triggers a jump on the next frame.
     ---@field collected_treasure ENT_TYPE[]
 
 ---@class Crocman : WalkingMonster
@@ -3569,7 +3578,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field spit_timer integer
 
 ---@class CatMummy : Monster
-    ---@field ai_state integer
+    ---@field jump_height_multiplier integer @Set in process_input when jump is triggered to be used when applying velocity for the jump.
     ---@field attack_timer integer
 
 ---@class Sorceress : WalkingMonster
@@ -3618,7 +3627,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field right_hand_uid integer @right from his perspective
     ---@field left_hand_uid integer
     ---@field moving_left boolean
-    ---@field targeting_timer integer
+    ---@field oscillation_phase integer
     ---@field invincibility_timer integer
 
 ---@class OsirisHand : Monster
@@ -3626,17 +3635,20 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 
 ---@class Alien : Monster
     ---@field jump_timer integer
+    ---@field shudder_timer integer
+    ---@field leg_shake_timer integer
 
 ---@class UFO : Monster
     ---@field sound SoundMeta
     ---@field patrol_distance integer
     ---@field attack_cooldown_timer integer
-    ---@field is_falling boolean
+    ---@field is_rising boolean
 
 ---@class Lahamu : Monster
     ---@field sound SoundMeta
     ---@field eyeball Entity
     ---@field attack_cooldown_timer integer
+    ---@field has_logged_to_journal boolean
 
 ---@class YetiQueen : Monster
     ---@field walk_pause_timer integer
@@ -3657,6 +3669,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field flight_timer integer
     ---@field attack_timer integer
     ---@field attack_angle number
+    ---@field was_flying boolean
 
 ---@class Olmite : WalkingMonster
     ---@field armor_on boolean
@@ -3702,8 +3715,10 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Grub : Monster
     ---@field rotation_delta number
     ---@field drop boolean
-    ---@field looking_for_new_direction_timer integer @used when he touches floor/wall/ceiling
-    ---@field walk_pause_timer integer
+    ---@field rotation_direction boolean @Counter-clockwise if true.
+    ---@field wall_collision_cooldown integer @Delay after colliding into a wall before it will change its movement direction again.
+    ---@field rotation_timer integer @Will randomly pick a new direction and angle when this timer elapses.
+    ---@field walk_pause_timer integer @alternates between walking and pausing every time it reaches zero.
     ---@field turn_into_fly_timer integer
     ---@field particle ParticleEmitterInfo
     ---@field sound SoundMeta
@@ -3787,12 +3802,14 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field is_active boolean @whether it is hidden behind the carried block or not, if true you can damage him
     ---@field is_inactive boolean
     ---@field spawn_new_carried_item boolean @defaults to true, when toggled to false, a new carried item spawns
+    ---@field going_up boolean @Whether the hermit crab is moving up when climbing a pole.
 
 ---@class Necromancer : WalkingMonster
     ---@field sound SoundMeta
     ---@field red_skeleton_spawn_x number
     ---@field red_skeleton_spawn_y number
     ---@field resurrection_uid integer
+    ---@field target_layer integer
     ---@field resurrection_timer integer
 
 ---@class ProtoShopkeeper : Monster
@@ -4337,6 +4354,9 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class Scepter : Movable
     ---@field cooldown integer
 
+---@class Whip : Movable
+    ---@field flaming boolean
+
 ---@class LiquidSurface : Movable
     ---@field glow_radius number
     ---@field sine_pos number
@@ -4657,7 +4677,14 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field illumination Illumination
 
 ---@class LimbAnchor : Entity
-    ---@field move_timer integer
+    ---@field anchor_x number @Current position of the ankle/wrist of this limb anchor.
+    ---@field anchor_y number @Current position of the ankle/wrist of this limb anchor.
+    ---@field move_origin_x number @Position of this limb anchor at the beginning of a movement.
+    ---@field move_origin_y number @Position of this limb anchor at the beginning of a movement.
+    ---@field move_destination_x number @Position of this limb anchor at the end of a movement.
+    ---@field move_destination_y number @Position of this limb anchor at the end of a movement.
+    ---@field elapsed_move_time integer @Number of frames the limb has been moving from move_origin to move_destination.
+    ---@field move_duration integer @Number of frames the limb should take to move from move_origin to move_destination.
     ---@field flip_vertical boolean
 
 ---@class LogicalConveyorbeltSound : LogicalSound
@@ -4680,6 +4707,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 
 ---@class BoulderSpawner : Entity
     ---@field timer integer @Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
+    ---@field owner_uid integer @UID of entity that triggered the trap.
     ---@field sound SoundMeta
 
 ---@class PipeTravelerSound : LogicalSound
