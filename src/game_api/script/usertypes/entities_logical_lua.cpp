@@ -228,7 +228,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity>());
 
-    lua.new_usertype<LimbAnchor>(
+    auto limbanchor_type = lua.new_usertype<LimbAnchor>(
         "LimbAnchor",
         "anchor_x",
         &LimbAnchor::anchor_x,
@@ -242,9 +242,6 @@ void register_usertypes(sol::state& lua)
         &LimbAnchor::move_destination_x,
         "move_destination_y",
         &LimbAnchor::move_destination_y,
-        /// NoDoc
-        "move_timer",
-        &LimbAnchor::elapsed_move_time,
         "elapsed_move_time",
         &LimbAnchor::elapsed_move_time,
         "move_duration",
@@ -253,6 +250,9 @@ void register_usertypes(sol::state& lua)
         &LimbAnchor::flip_vertical,
         sol::base_classes,
         sol::bases<Entity>());
+
+    /// NoDoc
+    limbanchor_type["move_timer"] = &LimbAnchor::elapsed_move_time; // For backward compatibility.
 
     lua.new_usertype<LogicalConveyorbeltSound>(
         "LogicalConveyorbeltSound",

@@ -735,17 +735,17 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
-    lua.new_usertype<CatMummy>(
+    auto catmummy_type = lua.new_usertype<CatMummy>(
         "CatMummy",
-        /// NoDoc
-        "ai_state",
-        &CatMummy::jump_height_multiplier,
         "jump_height_multiplier",
         &CatMummy::jump_height_multiplier,
         "attack_timer",
         &CatMummy::attack_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    catmummy_type["ai_state"] = &CatMummy::jump_height_multiplier; // For backward compatibility.
 
     lua.new_usertype<Sorceress>(
         "Sorceress",
@@ -837,7 +837,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, ApepPart>());
 
-    lua.new_usertype<OsirisHead>(
+    auto osirishead_type = lua.new_usertype<OsirisHead>(
         "OsirisHead",
         "right_hand_uid",
         &OsirisHead::right_hand_uid,
@@ -845,15 +845,15 @@ void register_usertypes(sol::state& lua)
         &OsirisHead::left_hand_uid,
         "moving_left",
         &OsirisHead::moving_left,
-        /// NoDoc
-        "targeting_timer",
-        &OsirisHead::oscillation_phase,
         "oscillation_phase",
         &OsirisHead::oscillation_phase,
         "invincibility_timer",
         &OsirisHead::invincibility_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    osirishead_type["targeting_timer"] = &OsirisHead::oscillation_phase; // For backward compatibility.
 
     lua.new_usertype<OsirisHand>(
         "OsirisHand",
@@ -873,7 +873,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
-    lua.new_usertype<UFO>(
+    auto ufo_type = lua.new_usertype<UFO>(
         "UFO",
         "sound",
         &UFO::sound,
@@ -881,13 +881,13 @@ void register_usertypes(sol::state& lua)
         &UFO::patrol_distance,
         "attack_cooldown_timer",
         &UFO::attack_cooldown_timer,
-        /// NoDoc
-        "is_falling",
-        &UFO::is_rising,
         "is_rising",
         &UFO::is_rising,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    ufo_type["is_falling"] = &UFO::is_rising; // For backward compatibility.
 
     lua.new_usertype<Lahamu>(
         "Lahamu",
@@ -1034,7 +1034,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, Frog>());
 
-    lua.new_usertype<Grub>(
+    auto grub_type = lua.new_usertype<Grub>(
         "Grub",
         "rotation_delta",
         &Grub::rotation_delta,
@@ -1042,9 +1042,6 @@ void register_usertypes(sol::state& lua)
         &Grub::drop,
         "rotation_direction",
         &Grub::rotation_direction,
-        /// NoDoc
-        "looking_for_new_direction_timer",
-        &Grub::wall_collision_cooldown,
         "wall_collision_cooldown",
         &Grub::wall_collision_cooldown,
         "rotation_timer",
@@ -1059,6 +1056,9 @@ void register_usertypes(sol::state& lua)
         &Grub::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    grub_type["looking_for_new_direction_timer"] = &Grub::wall_collision_cooldown; // For backward compatibility.
 
     lua.new_usertype<Tadpole>(
         "Tadpole",
