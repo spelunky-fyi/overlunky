@@ -737,6 +737,7 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<CatMummy>(
         "CatMummy",
+        /// NoDoc
         "ai_state",
         &CatMummy::jump_height_multiplier,
         "jump_height_multiplier",
@@ -844,6 +845,7 @@ void register_usertypes(sol::state& lua)
         &OsirisHead::left_hand_uid,
         "moving_left",
         &OsirisHead::moving_left,
+        /// NoDoc
         "targeting_timer",
         &OsirisHead::oscillation_phase,
         "oscillation_phase",
@@ -879,6 +881,7 @@ void register_usertypes(sol::state& lua)
         &UFO::patrol_distance,
         "attack_cooldown_timer",
         &UFO::attack_cooldown_timer,
+        /// NoDoc
         "is_falling",
         &UFO::is_rising,
         "is_rising",
@@ -1039,6 +1042,7 @@ void register_usertypes(sol::state& lua)
         &Grub::drop,
         "rotation_direction",
         &Grub::rotation_direction,
+        /// NoDoc
         "looking_for_new_direction_timer",
         &Grub::wall_collision_cooldown,
         "wall_collision_cooldown",

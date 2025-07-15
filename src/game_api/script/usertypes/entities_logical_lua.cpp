@@ -242,6 +242,7 @@ void register_usertypes(sol::state& lua)
         &LimbAnchor::move_destination_x,
         "move_destination_y",
         &LimbAnchor::move_destination_y,
+        /// NoDoc
         "move_timer",
         &LimbAnchor::elapsed_move_time,
         "elapsed_move_time",
