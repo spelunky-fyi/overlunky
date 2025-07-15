@@ -5166,7 +5166,7 @@ function CustomTheme:override(index, func_) end
     ---@field is_valid fun(self): boolean
 
 ---@class CustomEventDescription
-    ---@field create_instance fun(self): shared_ptr<CustomEventInstance>
+    ---@field create_instance fun(self): <CustomEventInstance>
     ---@field release_all_instances fun(self): boolean
     ---@field load_sample_data fun(self): boolean
     ---@field unload_sample_data fun(self): boolean

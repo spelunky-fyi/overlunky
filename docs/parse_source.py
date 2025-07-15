@@ -53,6 +53,7 @@ replace_table = {
     "constexpr": "",
     "const ": "",
     "static": "",
+    "shared_ptr": "",
     "[[nodiscard]]": "",
     "[[maybe_unused]]": "",
     "inline ": "",

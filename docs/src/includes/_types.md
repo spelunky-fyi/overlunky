@@ -695,7 +695,7 @@ IDs using `CustomEventDescription:get_parameter_description_by_name()`.
 
 Type | Name | Description
 ---- | ---- | -----------
-shared_ptr&lt;[CustomEventInstance](#CustomEventInstance)&gt; | [create_instance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_instance) | 
+&lt;[CustomEventInstance](#CustomEventInstance)&gt; | [create_instance()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=create_instance) | 
 bool | [release_all_instances()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=release_all_instances) | 
 bool | [load_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load_sample_data) | 
 bool | [unload_sample_data()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unload_sample_data) | 
@@ -710,7 +710,7 @@ bool | [is_valid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_
 
 Handle to an FMOD event instance. Can be used to start and stop an event, or set the events parameters. Once you
 are done with an event instance and no longer need to change its playback state or parameters, you should call
-`CustomEventInstance:release` so the event is marked for release and released when it stops playing to free resources.
+`CustomEventInstance:release()` so the event is marked for release and released when it stops playing to free resources.
 Generally though, it is best practice to call `CustomEventInstance:release()` immediately after `CustomEventInstance:start()`
 unless you want to play the event instance multiple times or explicitly start and stop it later.
 
