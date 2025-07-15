@@ -347,6 +347,7 @@ For reference, the available `as_<typename>` functions are listed below:
 - as_webgun
 - as_webshot
 - as_weteffect
+- as_whip
 - as_witchdoctor
 - as_witchdoctorskull
 - as_woodenlogtrap
