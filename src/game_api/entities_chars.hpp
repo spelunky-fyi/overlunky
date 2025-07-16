@@ -147,6 +147,8 @@ class Player : public PowerupCapable
     void set_heart_color(Color hcolor);
     /// Drops from ladders, ropes and ledge grabs
     void let_go();
+
+    int8_t get_slot() const;
 };
 
 std::u16string get_character_name(ENT_TYPE type_id);

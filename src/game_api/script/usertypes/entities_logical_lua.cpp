@@ -104,6 +104,8 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<LogicalLiquidStreamSound>(
         "LogicalLiquidStreamSound",
+        "liquid_intensity",
+        &LogicalLiquidStreamSound::liquid_intensity,
         sol::base_classes,
         sol::bases<Entity, LogicalSound, LogicalStaticSound>());
 

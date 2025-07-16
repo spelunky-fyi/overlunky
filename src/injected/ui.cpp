@@ -268,7 +268,7 @@ float g_x = 0, g_y = 0, g_vx = 0, g_vy = 0, g_dx = 0, g_dy = 0, g_zoom = 13.5f, 
 ImVec2 startpos;
 int g_held_id = -1, g_last_id = -1, g_over_id = -1, g_current_item = 0, g_filtered_count = 0, g_last_frame = 0,
     g_last_gun = 0, g_last_time = -1, g_level_time = -1, g_total_time = -1,
-    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_hitbox_mask = 0x80BF, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
+    g_force_width = 0, g_force_height = 0, g_pause_at = -1, g_last_type = -1, g_force_level_width = 4, g_force_level_height = 4;
 unsigned int g_level_width = 0, grid_x = 0, grid_y = 0;
 uint8_t g_level = 1, g_world = 1, g_to = 0;
 uint32_t g_held_flags = 0, g_dark_mode = 0, g_last_kit_spawn = 0;
@@ -329,11 +329,12 @@ std::vector<float> fontsize = {14.0f, 32.0f, 72.0f};
 [[maybe_unused]] const float f32_zero = 0.f, f32_one = 1.f, f32_lo_a = -10000000000.0f, f32_hi_a = +10000000000.0f;
 [[maybe_unused]] const double f64_zero = 0., f64_one = 1., f64_lo_a = -1000000000000000.0, f64_hi_a = +1000000000000000.0;
 
-int safe_entity_mask = 0x18f;
-inline constexpr unsigned int unsafe_entity_mask = 0;
+inline constexpr ENTITY_MASK unsafe_entity_mask = ENTITY_MASK::ANY;
 
-inline constexpr int default_entity_mask = 0x18f;
-inline constexpr int default_hitbox_mask = 0x80bf;
+inline constexpr auto default_entity_mask = ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER | ENTITY_MASK::ITEM | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::FLOOR;
+ENTITY_MASK safe_entity_mask = default_entity_mask;
+inline constexpr auto default_hitbox_mask = ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER | ENTITY_MASK::ITEM | ENTITY_MASK::EXPLOSION | ENTITY_MASK::ROPE | ENTITY_MASK::ACTIVEFLOOR | (ENTITY_MASK)0x8000;
+ENTITY_MASK g_hitbox_mask = default_hitbox_mask;
 
 std::chrono::time_point<std::chrono::system_clock> last_focus_time;
 bool last_focus;
@@ -1473,7 +1474,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
             }
             else
             {
-                auto old_activefloor = UI::get_entity_at(std::round(cpos.first), std::round(cpos.second), false, 0.5f, 0x80);
+                auto old_activefloor = UI::get_entity_at(std::round(cpos.first), std::round(cpos.second), false, 0.5f, ENTITY_MASK::ACTIVEFLOOR);
                 if (old_activefloor)
                     smart_delete(old_activefloor);
             }
@@ -4792,7 +4793,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
     if (options["draw_entity_info"] && !cross && !filled)
         draw_list->AddText(fix_pos(ImVec2(sboxa.x, sboxb.y)), ImColor(1.0f, 1.0f, 1.0f, 0.8f), entity_tooltip(ent).c_str());
 
-    if ((g_hitbox_mask & 0x8000) == 0)
+    if (!(g_hitbox_mask & (ENTITY_MASK)0x8000))
         return;
 
     static const auto spark_trap = to_id("ENT_TYPE_FLOOR_SPARK_TRAP");
@@ -5091,7 +5092,7 @@ void render_clickhandler()
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, (ENTITY_MASK)g_hitbox_mask, (LAYER)g_state->camera_layer))
+        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -5109,7 +5110,7 @@ void render_clickhandler()
             if (!(ent->type->search_flags & ENTITY_MASK::PLAYER) || ent->as<Player>()->ai)
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
-        if ((g_hitbox_mask & 0x1) != 0)
+        if ((g_hitbox_mask & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER)
         {
             g_players = UI::get_players();
             for (auto player : g_players)
@@ -5118,7 +5119,7 @@ void render_clickhandler()
             }
         }
 
-        if ((g_hitbox_mask & 0x8000) != 0)
+        if ((static_cast<uint32_t>(g_hitbox_mask) & 0x8000) != 0)
         {
             static const auto additional_fixed_entities = {
                 to_id("ENT_TYPE_FLOOR_MOTHER_STATUE_PLATFORM"),
@@ -5180,7 +5181,7 @@ void render_clickhandler()
         ImVec2 mpos = normalize(mouse_pos());
         std::pair<float, float> cpos = UI::click_position(mpos.x, mpos.y);
         std::string coords = fmt::format("{:.2f}, {:.2f} ({:.2f}, {:.2f})", cpos.first, cpos.second, mpos.x, mpos.y);
-        unsigned int mask = safe_entity_mask;
+        auto mask = safe_entity_mask;
         if (ImGui::GetIO().KeyShift) // TODO: Get the right modifier from mouse_destroy_unsafe
         {
             mask = unsafe_entity_mask;
@@ -5430,7 +5431,7 @@ void render_clickhandler()
         {
             startpos = mouse_pos();
             set_pos(startpos);
-            unsigned int mask = safe_entity_mask;
+            auto mask = safe_entity_mask;
             if (held("mouse_grab_unsafe"))
             {
                 mask = unsafe_entity_mask;
@@ -5709,7 +5710,7 @@ void render_clickhandler()
         {
             ImVec2 pos = mouse_pos();
             set_pos(pos);
-            unsigned int mask = safe_entity_mask;
+            auto mask = safe_entity_mask;
             if (released("mouse_destroy_unsafe"))
             {
                 mask = unsafe_entity_mask;
@@ -6179,10 +6180,10 @@ void render_options()
         {
             if (i % 2)
                 ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
-            ImGui::CheckboxFlags(mask_names[i], &g_hitbox_mask, (int)std::pow(2, i));
+            ImGui::CheckboxFlags(mask_names[i], &reinterpret_cast<unsigned int&>(g_hitbox_mask), (int)std::pow(2, i));
         }
         ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
-        ImGui::CheckboxFlags("Traps & Misc", &g_hitbox_mask, (int)std::pow(2, 15));
+        ImGui::CheckboxFlags("Traps & Misc", &reinterpret_cast<unsigned int&>(g_hitbox_mask), (int)std::pow(2, 15));
         tooltip("Some cherry-picked entities like traps and invisible walls.");
         if (ImGui::Button("Defaults##RestoreDefaultHitboxMask"))
             g_hitbox_mask = default_hitbox_mask;
@@ -6197,10 +6198,10 @@ void render_options()
         {
             if (i % 2)
                 ImGui::SameLine(ImGui::GetContentRegionAvail().x * 0.5f);
-            ImGui::CheckboxFlags(mask_names[i], &safe_entity_mask, (int)std::pow(2, i));
+            ImGui::CheckboxFlags(mask_names[i], &reinterpret_cast<unsigned int&>(safe_entity_mask), (int)std::pow(2, i));
         }
         if (ImGui::Button("Any##AnyEntityMask"))
-            safe_entity_mask = 0;
+            safe_entity_mask = ENTITY_MASK::ANY;
         ImGui::SameLine();
         if (ImGui::Button("Defaults##RestoreDefaultEntityMask"))
             safe_entity_mask = default_entity_mask;
