@@ -3417,6 +3417,9 @@
                             <a href="#WebShot" class="toc-h3 toc-link" data-title="WebShot">WebShot</a>
                           </li>
                           <li>
+                            <a href="#Whip" class="toc-h3 toc-link" data-title="Whip">Whip</a>
+                          </li>
+                          <li>
                             <a href="#WoodenlogTrap" class="toc-h3 toc-link" data-title="WoodenlogTrap">WoodenlogTrap</a>
                           </li>
                           <li>
@@ -21062,6 +21065,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow</td>
 </tr>
 <tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=owner_uid">owner_uid</a></td>
+<td>UID of entity that triggered the trap.</td>
+</tr>
+<tr>
 <td><a href="#SoundMeta">SoundMeta</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sound">sound</a></td>
 <td></td>
@@ -21943,9 +21951,44 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 </thead><tbody>
 <tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=anchor_x">anchor_x</a></td>
+<td>Current position of the ankle/wrist of this limb anchor.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=anchor_y">anchor_y</a></td>
+<td>Current position of the ankle/wrist of this limb anchor.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move_origin_x">move_origin_x</a></td>
+<td>Position of this limb anchor at the beginning of a movement.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move_origin_y">move_origin_y</a></td>
+<td>Position of this limb anchor at the beginning of a movement.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move_destination_x">move_destination_x</a></td>
+<td>Position of this limb anchor at the end of a movement.</td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move_destination_y">move_destination_y</a></td>
+<td>Position of this limb anchor at the end of a movement.</td>
+</tr>
+<tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move_timer">move_timer</a></td>
-<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=elapsed_move_time">elapsed_move_time</a></td>
+<td>Number of frames the limb has been moving from move_origin to move_destination.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=move_duration">move_duration</a></td>
+<td>Number of frames the limb should take to move from move_origin to move_destination.</td>
 </tr>
 <tr>
 <td>bool</td>
@@ -22389,6 +22432,16 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=jump_timer">jump_timer</a></td>
 <td></td>
 </tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shudder_timer">shudder_timer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=leg_shake_timer">leg_shake_timer</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='Ammit'>Ammit</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a> <a href="#Monster">Monster</a></p>
@@ -22676,8 +22729,8 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </thead><tbody>
 <tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ai_state">ai_state</a></td>
-<td></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=jump_height_multiplier">jump_height_multiplier</a></td>
+<td>Set in process_input when jump is triggered to be used when applying velocity for the jump.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -23575,14 +23628,24 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td></td>
 </tr>
 <tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotation_direction">rotation_direction</a></td>
+<td>Counter-clockwise if true.</td>
+</tr>
+<tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=looking_for_new_direction_timer">looking_for_new_direction_timer</a></td>
-<td>used when he touches floor/wall/ceiling</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=wall_collision_cooldown">wall_collision_cooldown</a></td>
+<td>Delay after colliding into a wall before it will change its movement direction again.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=rotation_timer">rotation_timer</a></td>
+<td>Will randomly pick a new direction and angle when this timer elapses.</td>
 </tr>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=walk_pause_timer">walk_pause_timer</a></td>
-<td></td>
+<td>alternates between walking and pausing every time it reaches zero.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -23665,6 +23728,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_new_carried_item">spawn_new_carried_item</a></td>
 <td>defaults to true, when toggled to false, a new carried item spawns</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=going_up">going_up</a></td>
+<td>Whether the hermit crab is moving up when climbing a pole.</td>
 </tr>
 </tbody></table>
 <h3 id='HornedLizard'>HornedLizard</h3>
@@ -23984,6 +24052,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_cooldown_timer">attack_cooldown_timer</a></td>
 <td></td>
 </tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=has_logged_to_journal">has_logged_to_journal</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='Lamassu'>Lamassu</h3>
 <p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a> <a href="#PowerupCapable">PowerupCapable</a> <a href="#Monster">Monster</a></p>
@@ -24033,6 +24106,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=attack_angle">attack_angle</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=was_flying">was_flying</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -24111,6 +24189,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer_after_humping">timer_after_humping</a></td>
 <td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=jump_trigger">jump_trigger</a></td>
+<td>Triggers a jump on the next frame.</td>
 </tr>
 <tr>
 <td>vector&lt;<a href="#ENT_TYPE">ENT_TYPE</a>&gt;</td>
@@ -24601,6 +24684,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 <tr>
 <td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=target_layer">target_layer</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=resurrection_timer">resurrection_timer</a></td>
 <td></td>
 </tr>
@@ -24700,7 +24788,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 <tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=targeting_timer">targeting_timer</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=oscillation_phase">oscillation_phase</a></td>
 <td></td>
 </tr>
 <tr>
@@ -24733,6 +24821,16 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=yell_counter">yell_counter</a></td>
 <td>counts up to 400 (6.6 sec), when 0 the pet yells out</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sit_timer">sit_timer</a></td>
+<td>When sitting after colliding with a player in the camp.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=sit_cooldown_timer">sit_cooldown_timer</a></td>
+<td>Cooldown before sitting again when colliding with a player in the camp.</td>
 </tr>
 <tr>
 <td>int</td>
@@ -24992,6 +25090,16 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#ParticleEmitterInfo">ParticleEmitterInfo</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=particle">particle</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=broke_block">broke_block</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=post_hit_wall_direction">post_hit_wall_direction</a></td>
 <td></td>
 </tr>
 <tr>
@@ -25480,7 +25588,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 <tr>
 <td>bool</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_falling">is_falling</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_rising">is_rising</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -28301,6 +28409,26 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td></td>
 </tr>
 <tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dont_damage_owner_timer">dont_damage_owner_timer</a></td>
+<td>When &gt; 0, will not deal damage to the owner_uid, so that throwing an object does not harm yourself.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=knockback_invincibility_timer">knockback_invincibility_timer</a></td>
+<td>Will not apply velocity from various sources when &gt;0. Can be ignored by certain damage flags, so will not be invincible from knockback<br/>of all damage types.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=reset_owner_timer">reset_owner_timer</a></td>
+<td>Timer for resetting owner_uid.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=exit_gold_invincibility_timer">exit_gold_invincibility_timer</a></td>
+<td>When &gt; 0, money intersecting a door or at a pipe entrance will not be collected. Also gives iframes from monster collision.</td>
+</tr>
+<tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_poisoned">is_poisoned()</a></td>
 <td></td>
@@ -30250,6 +30378,22 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=shot">shot</a></td>
 <td>if false, it&#39;s attached to the gun</td>
+</tr>
+</tbody></table>
+<h3 id='Whip'>Whip</h3>
+<p>Derived from <a href="#Entity">Entity</a> <a href="#Movable">Movable</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flaming">flaming</a></td>
+<td></td>
 </tr>
 </tbody></table>
 <h3 id='WoodenlogTrap'>WoodenlogTrap</h3>
@@ -37089,6 +37233,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <li>as_webgun</li>
 <li>as_webshot</li>
 <li>as_weteffect</li>
+<li>as_whip</li>
 <li>as_witchdoctor</li>
 <li>as_witchdoctorskull</li>
 <li>as_woodenlogtrap</li>
