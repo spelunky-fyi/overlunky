@@ -34,6 +34,7 @@ replace_table = {
     "void": "",
     "constexpr": "",
     "inline ": "",
+    "shared_ptr": "",
     "[[nodiscard]]": "",
     "[[maybe_unused]]": "",
     "self_return<&": "",
