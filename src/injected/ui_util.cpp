@@ -167,24 +167,24 @@ float UI::screen_distance(float x)
     auto b = API::screen_position(x, 0);
     return b.x - a.x;
 }
-Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
+Entity* UI::get_entity_at(float x, float y, bool s, float radius, ENTITY_MASK mask)
 {
     static const auto masks_order = {
-        0x1,    // Player
-        0x2,    // Mount
-        0x4,    // Monster
-        0x8,    // Item
-        0x80,   // Activefloor
-        0x100,  // Floor
-        0x200,  // Decoration
-        0x400,  // BG
-        0x800,  // Shadow
-        0x2000, // Water
-        0x4000, // Lava
-        0x40,   // FX
-        0x10,   // Explosion
-        0x20,   // Rope
-        0x1000, // Logical
+        ENTITY_MASK::PLAYER,
+        ENTITY_MASK::MOUNT,
+        ENTITY_MASK::MONSTER,
+        ENTITY_MASK::ITEM,
+        ENTITY_MASK::ACTIVEFLOOR,
+        ENTITY_MASK::FLOOR,
+        ENTITY_MASK::DECORATION,
+        ENTITY_MASK::BG,
+        ENTITY_MASK::SHADOW,
+        ENTITY_MASK::WATER,
+        ENTITY_MASK::LAVA,
+        ENTITY_MASK::FX,
+        ENTITY_MASK::EXPLOSION,
+        ENTITY_MASK::ROPE,
+        ENTITY_MASK::LOGICAL,
     };
     if (s)
     {
@@ -203,7 +203,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
         }
     };
     auto state = HeapBase::get().state();
-    if (mask == 0)
+    if (mask == ENTITY_MASK::ANY)
     {
         for (auto& item : state->layers[state->camera_layer]->all_entities.entities())
         {
@@ -214,7 +214,7 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     {
         for (auto current_mask : masks_order)
         {
-            if ((mask & current_mask) == 0)
+            if (!(mask & current_mask))
                 continue;
 
             const auto& entities = state->layers[state->camera_layer]->entities_by_mask.find(current_mask);
@@ -804,9 +804,9 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         ent->kill(true, ent);
     }
 }
-std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
+std::vector<uint32_t> UI::get_entities_overlapping(ENTITY_MASK mask, AABB hitbox, LAYER layer)
 {
-    return get_entities_overlapping_hitbox(0, (ENTITY_MASK)mask, hitbox, layer);
+    return get_entities_overlapping_hitbox(0, mask, hitbox, layer);
 }
 
 bool UI::get_focus()

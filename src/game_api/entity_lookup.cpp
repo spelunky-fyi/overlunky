@@ -76,11 +76,9 @@ void foreach_mask(ENTITY_MASK mask, Layer* l, FunT&& fun)
             if (!(mask & static_cast<ENTITY_MASK>(test_flag)))
                 continue;
 
-            const auto& it = l->entities_by_mask.find(test_flag);
+            const auto& it = l->entities_by_mask.find(static_cast<ENTITY_MASK>(test_flag));
             if (it != l->entities_by_mask.end())
-            {
                 fun(it->second);
-            }
         }
     }
 }
