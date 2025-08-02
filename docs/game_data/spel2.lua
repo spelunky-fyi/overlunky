@@ -65,7 +65,7 @@ function F(f_string) end
 ---Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
 ---@param slot integer
 ---@param or_ghost boolean?
----@return any
+---@return Player|PlayerGhost
 function get_player(slot, or_ghost) end
 ---Returns PlayerGhost with this player slot 1..4
 ---@param slot integer

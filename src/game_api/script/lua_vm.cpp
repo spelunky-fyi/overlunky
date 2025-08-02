@@ -212,6 +212,7 @@ end
     // lua["players"] = get_players();
 
     /// Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
+    // lua["get_player"] = [&lua](int8_t slot, std::optional<bool> or_ghost) -> Player|PlayerGhost
     lua["get_player"] = [&lua](int8_t slot, std::optional<bool> or_ghost) -> sol::object
     {
         auto state = HeapBase::get().state();
