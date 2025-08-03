@@ -1329,8 +1329,8 @@ void run()
         templates["waddler"] = {86};
         templates["ghistshop_backlayer"] = {87};
         templates["challange_entrance_backlayer"] = {90};
-        templates["blackmarket"] = {118};
-        templates["mothership_room"] = {125};
+        templates["blackmarket"] = {119};
+        templates["mothership_room"] = {126};
 
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
