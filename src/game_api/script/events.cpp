@@ -13,7 +13,7 @@
 #include "savestate.hpp"          // for invalidate_save_slots
 #include "script/lua_backend.hpp" // for LuaBackend, ON, LuaBackend::PreHan...
 #include "settings_api.hpp"       // for restore_original_settings
-#include "state.hpp"              // for StateMemory, State
+#include "state.hpp"              // for StateMemory
 
 class JournalPage;
 struct AABB;
@@ -32,7 +32,7 @@ void pre_load_level_files()
 bool pre_load_screen()
 {
     static int64_t prev_seed = 0;
-    auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
     if (state->screen_next == 12 && (state->quest_flags & 1) != 0)
     {
         if ((state->quest_flags & (1U << 6)) > 0)
@@ -491,7 +491,7 @@ bool pre_set_feat(FEAT feat)
     return block;
 }
 
-void pre_copy_state_event(StateMemory* from, StateMemory* to)
+void pre_copy_state_event(HeapBase from, HeapBase to)
 {
     LuaBackend::for_each_backend(
         [&](LuaBackend::LockedBackend backend)

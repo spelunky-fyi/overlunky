@@ -242,6 +242,7 @@ LuaConsole::LuaConsole(SoundManager* soundmanager)
             {"FlameSize", "as_flame"},
             {"Web", "as_movable"},
             {"WebShot", "as_projectile"},
+            {"Whip", "as_movable"},
             {"Lava", "as_liquid"},
             {"Liquid", "as_entity"},
             {"LogicalAnchovyFlock", "as_entity"},

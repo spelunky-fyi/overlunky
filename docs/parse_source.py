@@ -126,6 +126,8 @@ header_files = [
     "../src/game_api/bucket.hpp",
     "../src/game_api/socket.hpp",
     "../src/game_api/savestate.hpp",
+    "../src/game_api/game_patches.hpp",
+    "../src/game_api/liquid_engine.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -171,6 +173,10 @@ api_files = [
     "../src/game_api/script/usertypes/logic_lua.cpp",
     "../src/game_api/script/usertypes/bucket_lua.cpp",
     "../src/game_api/script/usertypes/color_lua.cpp",
+    "../src/game_api/script/usertypes/deprecated_func.cpp",
+    "../src/game_api/script/usertypes/spawn_lua.cpp",
+    "../src/game_api/script/usertypes/options_lua.cpp",
+    "../src/game_api/script/usertypes/game_patches_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
@@ -561,6 +567,7 @@ def run_parse():
                             "cpp": replace_fun(m.group(2)),
                             "comment": comment,
                             "cb_signature": cb_signature,
+                            "file": file,
                         }
                         if not comment or "NoDoc" not in comment[0]:
                             if comment and comment[0] == "Deprecated":
@@ -690,7 +697,7 @@ def run_parse():
             if container:
                 extra = []
                 n = re.findall(
-                    r'(/// [\w _\-+()<>.,`"\'=]*?)?' + container + r'\[([\w":]+)\] = ([^;]+);', data
+                    r'(/// [\w _#\[\]\-+()<>.,`"\'=]*?)?' + container + r'\[([\w":]+)\] = ([^;]+);', data
                 )
                 for var in n:
                     if var[0].startswith("/// NoDoc"):
@@ -1014,7 +1021,7 @@ def run_parse():
             if c:
                 comment.append(c.group(1))
 
-    print_collecting_info("enums")
+    print_collecting_info("enums") # TODO: should probably improve how this handles comments
     for file in api_files:
         data = open(file, "r").read()
         data = data.replace("\n", "")
@@ -1023,7 +1030,7 @@ def run_parse():
         for type in m:
             name = type[0]
             attr = type[1]
-            attr = attr.replace("//", "")
+            attr = attr.replace("//,", ",")
             attr = attr.replace('",', ",")
             attr = attr.split('"')
             vars = []
@@ -1067,7 +1074,8 @@ def run_parse():
             enum_to_mod = next((item for item in enums if item["name"] == enum), dict())
             current_var_to_mod = dict()
             if enum_to_mod:
-                sub_matches = extended_enum_info.strip().split("//")
+                sub_matches = extended_enum_info.strip()
+                sub_matches = re.split('(?<!:)\s*//\s*', sub_matches)
                 collected_docs = ""
                 for sub_match in sub_matches:
                     var_name = sub_match.strip()
@@ -1094,7 +1102,8 @@ def run_parse():
             type_to_mod = next((item for item in types if item["name"] == type), dict())
             current_var_to_mod = dict()
             if type_to_mod:
-                sub_matches = extended_type_info.strip().split("//")
+                sub_matches = extended_type_info.strip()
+                sub_matches = re.split('(?<!:)\s*//\s*', sub_matches)
                 collected_docs = ""
                 for sub_match in sub_matches:
                     var_name = sub_match.strip()

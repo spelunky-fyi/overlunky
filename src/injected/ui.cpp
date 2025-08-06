@@ -45,6 +45,7 @@
 #include "illumination.hpp"
 #include "items.hpp"
 #include "level_api.hpp"
+#include "liquid_engine.hpp"
 #include "logger.h"
 #include "math.hpp"
 #include "savedata.hpp"
@@ -54,6 +55,7 @@
 #include "socket.hpp"
 #include "sound_manager.hpp" // TODO: remove from here?
 #include "state.hpp"
+#include "state_structs.hpp"
 #include "steam_api.hpp"
 #include "version.hpp"
 #include "window_api.hpp"
@@ -436,9 +438,9 @@ void render_version_warning()
     if (version_check_messages[(int)version_check_status.state].fade > 0)
     {
         if (version_check_status.start == 0)
-            version_check_status.start = get_global_frame_count();
+            version_check_status.start = API::get_global_frame_count();
 
-        auto duration = get_global_frame_count() - version_check_status.start;
+        auto duration = API::get_global_frame_count() - version_check_status.start;
         version_check_status.opacity = 1.0f - duration / version_check_messages[(int)version_check_status.state].fade;
         if (version_check_status.opacity <= 0.0f)
         {
@@ -1323,7 +1325,7 @@ void smart_delete(Entity* ent, bool unsafe = false)
     static auto logical_door = to_id("ENT_TYPE_LOGICAL_DOOR");
     if (!ent->is_player())
         ent->flags = set_flag(ent->flags, 1);
-    if ((ent->type->search_flags & 0x80) == 0)
+    if (!(ent->type->search_flags & ENTITY_MASK::ACTIVEFLOOR))
     {
         for (auto item : ent->items.entities())
         {
@@ -1338,7 +1340,7 @@ void smart_delete(Entity* ent, bool unsafe = false)
         auto layer = (LAYER)ent->layer;
         UI::cleanup_at(pos.x, pos.y, layer, ent->type->id);
     }
-    if (ent->type->search_flags & 0x180)
+    if (!!(ent->type->search_flags & (ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::FLOOR)))
     {
         auto pos = ent->abs_position();
         auto layer = (LAYER)ent->layer;
@@ -1495,7 +1497,7 @@ int32_t spawn_entityitem(EntityItem to_spawn, bool s, bool set_last = true)
                 }
                 uint32_t i_x = static_cast<uint32_t>(floor->x + 0.5f);
                 uint32_t i_y = static_cast<uint32_t>(floor->y + 0.5f);
-                State::get().layer(floor->layer)->grid_entities[i_y][i_x] = floor;
+                HeapBase::get().state()->layer(floor->layer)->grid_entities[i_y][i_x] = floor;
                 fix_decorations_at(floor->x, floor->y, (LAYER)floor->layer);
             }
         }
@@ -1648,7 +1650,7 @@ void spawn_entity_over()
             auto who = overlay->as<PowerupCapable>();
             who->give_powerup(item.id);
         }
-        else if (item.name.find("ENT_TYPE_ITEM") != std::string::npos && overlay->type->search_flags & 0x100)
+        else if (item.name.find("ENT_TYPE_ITEM") != std::string::npos && (overlay->type->search_flags & ENTITY_MASK::FLOOR) == ENTITY_MASK::FLOOR)
         {
             int spawned = UI::spawn_entity_over(item.id, g_over_id, g_dx, g_dy);
             auto ent = get_entity_ptr(spawned);
@@ -1789,22 +1791,13 @@ void force_lights()
     if (options["lights"])
     {
         if (!g_state->illumination && g_state->screen == 12)
-        {
             g_state->illumination = UI::create_illumination(Color::white(), 20000.0f, 172, 252);
-        }
+
         if (g_state->illumination)
         {
             g_state->illumination->enabled = true;
-            if (g_state->camera_layer == 1)
-                g_state->illumination->flags |= 1U << 16;
-            else
-                g_state->illumination->flags &= ~(1U << 16);
+            g_state->illumination->layer = g_state->camera_layer;
         }
-    }
-    else
-    {
-        if (g_state->illumination && test_flag(g_state->level_flags, 18))
-            g_state->illumination->enabled = false;
     }
 }
 
@@ -1943,10 +1936,12 @@ void force_cheats()
             ent->poison_tick_timer = -1;
             ent->onfire_effect_timer = 0;
             ent->wet_effect_timer = 0;
-            ent->lock_input_timer = 0;
             ent->set_cursed(false, false);
             ent->more_flags &= ~(1U << 16);
             UI::destroy_entity_item_type(ent, ink);
+            static auto spikes_item = to_id("ENT_TYPE_ITEM_SPIKES");
+            if (ent->overlay && ent->overlay->type->id == spikes_item)
+                ent->detach(false);
         }
     }
     if (options["fly_mode"])
@@ -2019,6 +2014,8 @@ void quick_start(uint8_t screen, uint8_t world, uint8_t level, uint8_t theme, st
         g_game_manager->game_props->input_index[0] = 0;
     if (g_game_manager->game_props->input_index[4] == -1)
         g_game_manager->game_props->input_index[4] = 0;
+
+    g_game_manager->screen_menu->loaded_once = true;
 }
 
 void restart_adventure()
@@ -2100,7 +2097,8 @@ struct VoidEntity
 
 void clear_void()
 {
-    for (auto uid : UI::get_entities_by({}, 1422, LAYER::FRONT))
+    constexpr auto clear_mask = ENTITY_MASK::ITEM | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::BG | ENTITY_MASK::FLOOR;
+    for (auto uid : UI::get_entities_by({}, clear_mask, LAYER::FRONT))
     {
         auto ent = get_entity_ptr(uid);
         auto [x, y] = ent->abs_position();
@@ -2133,7 +2131,7 @@ void load_void(std::string data)
         {
             auto uid = UI::spawn_grid(e.id, (float)e.x, (float)e.y, 0);
             auto ent = get_entity_ptr(uid);
-            if (ent->type->search_flags & 0x100)
+            if ((ent->type->search_flags & ENTITY_MASK::FLOOR) == ENTITY_MASK::FLOOR)
             {
                 fix_decorations_at((float)e.x, (float)e.y, LAYER::FRONT);
                 Callback cb = {g_state->time_total + 2, [e]
@@ -2142,7 +2140,7 @@ void load_void(std::string data)
                                }};
                 callbacks.push_back(cb);
             }
-            else if (ent->type->search_flags & 0x8)
+            else if ((ent->type->search_flags & ENTITY_MASK::ITEM) == ENTITY_MASK::ITEM)
             {
                 ent->y = e.y - 0.5f + ent->hitboxy - ent->offsety;
             }
@@ -2189,7 +2187,7 @@ void import_void()
 
 std::string serialize_void()
 {
-    const int export_mask = 398;
+    constexpr auto export_mask = ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER | ENTITY_MASK::ITEM | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::FLOOR;
     auto [px, py] = g_players[0]->abs_position();
     std::string v = fmt::format("V1{:02X}{:02X}", (uint8_t)(px + 0.5f), (uint8_t)(py + 0.5f));
     auto uids = g_selected_ids;
@@ -2360,7 +2358,7 @@ void warp_next_level(size_t num)
         targets.emplace_back(target_world, target_level, target_theme);
     }
 
-    for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
+    for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, ENTITY_MASK::FLOOR, LAYER::BOTH))
     {
         ExitDoor* doorent = get_entity_ptr(doorid)->as<ExitDoor>();
         if (!doorent->special_door)
@@ -2797,13 +2795,13 @@ void toggle_lights()
 {
     if (options["lights"] && g_state->illumination)
     {
-        g_state->illumination->flags |= (1U << 24);
+        g_state->illumination->enabled = true;
     }
     else if (!options["lights"] && g_state->illumination)
     {
-        g_state->illumination->flags &= ~(1U << 16);
-        if ((g_state->level_flags & (1U << 17)) > 0)
-            g_state->illumination->flags &= ~(1U << 24);
+        g_state->illumination->layer = 0;
+        if (test_flag(g_state->level_flags, 18)) // dark level
+            g_state->illumination->enabled = false;
     }
 }
 
@@ -2821,7 +2819,7 @@ void load_state(int slot)
         g_state->camera->focus_offset_y = 0;
         set_camera_bounds(true);
     }
-    UI::copy_state(slot, 5);
+    UI::load_state_as_main(slot);
 }
 
 void clear_script_messages()
@@ -3089,6 +3087,11 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     {
         options["god_mode"] = !options["god_mode"];
         UI::godmode(options["god_mode"]);
+        if (options["god_mode"])
+        {
+            for (auto ent : g_players)
+                ent->lock_input_timer = 0;
+        }
     }
     else if (pressed("toggle_noclip", wParam))
     {
@@ -3556,19 +3559,19 @@ bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
     }
     else if (pressed("save_state_1", wParam))
     {
-        UI::copy_state(5, 1);
+        UI::save_main_state(1);
     }
     else if (pressed("save_state_2", wParam))
     {
-        UI::copy_state(5, 2);
+        UI::save_main_state(2);
     }
     else if (pressed("save_state_3", wParam))
     {
-        UI::copy_state(5, 3);
+        UI::save_main_state(3);
     }
     else if (pressed("save_state_4", wParam))
     {
-        UI::copy_state(5, 4);
+        UI::save_main_state(4);
     }
     else if (pressed("load_state_1", wParam))
     {
@@ -3958,7 +3961,7 @@ void render_narnia()
             n++;
         }
 
-        for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, 0x100, LAYER::BOTH))
+        for (auto doorid : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::EXITDOOR}, ENTITY_MASK::FLOOR, LAYER::BOTH))
         {
             ExitDoor* target = get_entity_ptr(doorid)->as<ExitDoor>();
             if (!target->special_door)
@@ -4219,15 +4222,15 @@ void render_camera()
             tooltip("Focus the selected entity");
         }
 
-        auto [cx, cy] = State::get_camera_position();
+        auto [cx, cy] = Camera::get_position();
         ImGui::PushItemWidth(120.0f);
         ImGui::InputFloat("##CameraPosX", &cx, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            HeapBase::get().state()->camera->set_position(cx, cy);
         ImGui::SameLine(0, 4.0f);
         ImGui::InputFloat("Position##CameraPosY", &cy, 0.1f, 1.0f);
         if (ImGui::IsItemEdited())
-            State::get().set_camera_position(cx, cy);
+            HeapBase::get().state()->camera->set_position(cx, cy);
 
         ImGui::InputFloat("##CameraFocusX", &g_state->camera->focus_x, 0.1f, 1.0f);
         ImGui::SameLine(0, 4.0f);
@@ -4720,7 +4723,7 @@ std::string entity_tooltip(Entity* hovered)
         auto bomb = hovered->as<Bomb>();
         coords += fmt::format(" ({} FUSE)", 150 - bomb->idle_counter);
     }
-    else if (hovered->type->search_flags & 7)
+    else if (!!(hovered->type->search_flags & (ENTITY_MASK::MOUNT | ENTITY_MASK::PLAYER | ENTITY_MASK::MONSTER)))
     {
         auto ent = hovered->as<Movable>();
         coords += fmt::format(" ({} HP)", ent->health);
@@ -4729,7 +4732,7 @@ std::string entity_tooltip(Entity* hovered)
     {
         coords += fmt::format("\nON: {}, {} ({:.2f}, {:.2f})", hovered->overlay->uid, entity_names[hovered->overlay->type->id], hovered->overlay->abs_x == -FLT_MAX ? hovered->overlay->x : hovered->overlay->abs_x, hovered->overlay->abs_y == -FLT_MAX ? hovered->overlay->y : hovered->overlay->abs_y);
     }
-    if (hovered->type->search_flags & 15 && hovered->as<Movable>()->last_owner_uid > -1)
+    if (!!(hovered->type->search_flags & (ENTITY_MASK::MOUNT | ENTITY_MASK::PLAYER | ENTITY_MASK::MONSTER | ENTITY_MASK::ITEM)) && hovered->as<Movable>()->last_owner_uid > -1)
     {
         auto ent = hovered->as<Movable>();
         auto owner = get_entity_ptr(ent->last_owner_uid);
@@ -4772,7 +4775,7 @@ void render_hitbox(Entity* ent, bool cross, ImColor color, bool filled = false, 
         if (ent_spark->size >= 1.0)
             color = ImColor(255, 0, 0, 150);
     }
-    else if (ent->type->search_flags == 0x10) // Explosion
+    else if ((ent->type->search_flags & ENTITY_MASK::EXPLOSION) == ENTITY_MASK::EXPLOSION)
     {
         color = ImColor(255, 0, 0, 150);
     }
@@ -5088,7 +5091,7 @@ void render_clickhandler()
     if (options["draw_hitboxes"] && g_state->screen != 5)
     {
         static const auto olmec = to_id("ENT_TYPE_ACTIVEFLOOR_OLMEC");
-        for (auto entity : UI::get_entities_by({}, g_hitbox_mask, (LAYER)g_state->camera_layer))
+        for (auto entity : UI::get_entities_by({}, (ENTITY_MASK)g_hitbox_mask, (LAYER)g_state->camera_layer))
         {
             auto ent = get_entity_ptr(entity);
             if (!ent)
@@ -5100,10 +5103,10 @@ void render_clickhandler()
                 continue;
             }
 
-            if (!UI::has_active_render(ent) && (ent->type->search_flags & 0x7000) == 0)
+            if (!UI::has_active_render(ent) && !(ent->type->search_flags & (ENTITY_MASK::LOGICAL | ENTITY_MASK::LIQUID)))
                 continue;
 
-            if ((ent->type->search_flags & 1) == 0 || ent->as<Player>()->ai)
+            if (!(ent->type->search_flags & ENTITY_MASK::PLAYER) || ent->as<Player>()->ai)
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
         }
         if ((g_hitbox_mask & 0x1) != 0)
@@ -5142,17 +5145,17 @@ void render_clickhandler()
                 to_id("ENT_TYPE_FLOOR_SHOPKEEPER_GENERATOR"),
                 to_id("ENT_TYPE_FLOOR_SUNCHALLENGE_GENERATOR"),
             };
-            for (auto entity : UI::get_entities_by(additional_fixed_entities, 0x180, (LAYER)g_state->camera_layer)) // FLOOR | ACTIVEFLOOR
+            for (auto entity : UI::get_entities_by(additional_fixed_entities, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR, (LAYER)g_state->camera_layer))
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(0, 255, 255, 150));
             }
-            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, 0x1000, (LAYER)g_state->camera_layer)) // LOGICAL
+            for (auto entity : UI::get_entities_by({(ENT_TYPE)CUSTOM_TYPE::TRIGGER}, ENTITY_MASK::LOGICAL, (LAYER)g_state->camera_layer))
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 0, 0, 150));
             }
-            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, 0x1000, (LAYER)g_state->camera_layer)) // DOOR
+            for (auto entity : UI::get_entities_by({to_id("ENT_TYPE_LOGICAL_DOOR")}, ENTITY_MASK::LOGICAL, (LAYER)g_state->camera_layer)) // DOOR
             {
                 auto ent = get_entity_ptr(entity);
                 render_hitbox(ent, false, ImColor(255, 180, 45, 150), false, true);
@@ -5646,7 +5649,7 @@ void render_clickhandler()
                 g_state->camera->focus_x -= (current_pos.first - oryginal_pos.first) * g_camera_speed;
                 g_state->camera->focus_y -= (current_pos.second - oryginal_pos.second) * g_camera_speed;
                 if (g_state->pause != 0 || g_bucket->pause_api->paused() || !options["smooth_camera"])
-                    State::get().set_camera_position(g_state->camera->focus_x, g_state->camera->focus_y);
+                    HeapBase::get().state()->camera->set_position(g_state->camera->focus_x, g_state->camera->focus_y);
                 startpos = normalize(mouse_pos());
                 enable_camera_bounds = false;
                 set_camera_bounds(enable_camera_bounds);
@@ -5989,7 +5992,9 @@ void render_options()
         tooltip("Fly through walls and ignored by enemies.", "toggle_noclip");
         ImGui::Checkbox("Fly mode##FlyMode", &options["fly_mode"]);
         tooltip("Fly while holding the jump button.", "toggle_flymode");
-        ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]);
+        if (ImGui::Checkbox("Light dark levels and layers##DrawLights", &options["lights"]))
+            toggle_lights();
+
         tooltip("Enables the default level lighting everywhere.", "toggle_lights");
         if (ImGui::CheckboxFlags("Force dark levels", &g_dark_mode, 1))
         {
@@ -7267,7 +7272,7 @@ void render_entity_finder()
     static bool extra_filter = false;
     if (ImGui::Button("Search##SearchEntities") || run_finder)
     {
-        g_selected_ids = UI::get_entities_by({search_entity_type}, search_entity_mask, (LAYER)search_entity_layer);
+        g_selected_ids = UI::get_entities_by({search_entity_type}, (ENTITY_MASK)search_entity_mask, (LAYER)search_entity_layer);
         run_filter = true;
         run_finder = false;
     }
@@ -7299,7 +7304,7 @@ void render_entity_finder()
                                                         auto ent = get_entity_ptr(filter_uid);
                                                         if (!ent)
                                                             return true;
-                                                        return (ent->type->search_flags & search_entity_mask) == 0; }),
+                                                        return ((int)ent->type->search_flags & search_entity_mask) == 0; }),
                                      g_selected_ids.end());
             }
             {
@@ -7543,7 +7548,7 @@ void render_entity_props(int uid, bool detached = false)
         auto overlay = entity->overlay;
         if (overlay)
         {
-            if (overlay->type->search_flags & 0x2) // MOUNT
+            if ((overlay->type->search_flags & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT)
             {
                 ImGui::Text("Riding:");
                 ImGui::SameLine();
@@ -7560,7 +7565,7 @@ void render_entity_props(int uid, bool detached = false)
                 ImGui::SameLine();
                 if (ImGui::Button("Detach"))
                 {
-                    if (entity->type->search_flags & 0x1) // PLAYER
+                    if ((entity->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER)
                         entity->as<Player>()->let_go();
                     else
                         entity->detach(true);
@@ -7699,7 +7704,7 @@ void render_entity_props(int uid, bool detached = false)
         auto movable = entity->as<Player>();
         ImGui::DragScalar("Health##EntityHealth", ImGuiDataType_U8, (char*)&movable->health, 0.5f, &u8_one, &u8_max);
         ImGui::DragScalar("Price##Price", ImGuiDataType_S32, (char*)&movable->price, 0.5f, &s32_min, &s32_max);
-        if ((entity->type->search_flags & 0x1) && movable->inventory_ptr != 0)
+        if ((entity->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER && movable->inventory_ptr != 0)
         {
             ImGui::DragScalar("Bombs##EntityBombs", ImGuiDataType_U8, (char*)&movable->inventory_ptr->bombs, 0.5f, &u8_one, &u8_max);
             ImGui::DragScalar("Ropes##EntityRopes", ImGuiDataType_U8, (char*)&movable->inventory_ptr->ropes, 0.5f, &u8_one, &u8_max);
@@ -7714,13 +7719,25 @@ void render_entity_props(int uid, bool detached = false)
         static bool fx = false;
         ImGui::Checkbox("Show annoying FX items", &fx);
         ImGui::SeparatorText("Items");
-        if (entity->type->search_flags & 0x7)
+        if (!(entity->type->search_flags & (ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER)))
+        {
+            int removed_uid = -1;
+            for (auto ent : entity->items.entities())
+            {
+                if (fx || !(ent->type->search_flags & ENTITY_MASK::FX))
+                    if (render_uid(ent->uid, "EntityItems", true))
+                        removed_uid = ent->uid;
+            }
+            if (auto removed = get_entity_ptr(removed_uid))
+                entity->remove_item(removed, true);
+        }
+        else
         {
             auto entity_pow = entity->as<PowerupCapable>();
             int removed_uid = -1;
             for (auto ent : entity->items.entities())
             {
-                if ((fx || (ent->type->search_flags & 0x40) == 0) && !entity_pow->has_powerup(ent->type->id))
+                if ((fx || !(ent->type->search_flags & ENTITY_MASK::FX)) && !entity_pow->has_powerup(ent->type->id))
                     if (render_uid(ent->uid, "EntityItems", true))
                         removed_uid = ent->uid;
             }
@@ -7796,18 +7813,6 @@ void render_entity_props(int uid, bool detached = false)
             }
             ImGui::PopItemWidth();
         }
-        else
-        {
-            int removed_uid = -1;
-            for (auto ent : entity->items.entities())
-            {
-                if ((fx || (ent->type->search_flags & 0x40) == 0))
-                    if (render_uid(ent->uid, "EntityItems", true))
-                        removed_uid = ent->uid;
-            }
-            if (auto removed = get_entity_ptr(removed_uid))
-                entity->remove_item(removed, true);
-        }
         endmenu();
     }
     if (submenu("Global attributes") && entity->type)
@@ -7823,7 +7828,7 @@ void render_entity_props(int uid, bool detached = false)
         ImGui::DragFloat("Jump power##GlobalJumpPower", &entity->type->jump, 0.01f, 0.0f, 10.0f, "%.5f");
         ImGui::InputScalar("Mask:##SearchFlags", ImGuiDataType_U32, &entity->type->search_flags, 0, 0, "%08X", ImGuiInputTextFlags_ReadOnly);
         ImGui::SameLine();
-        ImGui::TextUnformatted(mask_names[std::countr_zero(entity->type->search_flags)]);
+        ImGui::TextUnformatted(mask_names[std::countr_zero((uint32_t)entity->type->search_flags)]);
         if (submenu("Properties flags"))
         {
             render_flags(entity_type_properties_flags, &entity->type->properties_flags);
@@ -7903,10 +7908,10 @@ void render_entity_props(int uid, bool detached = false)
             ImGui::Checkbox("Door spawned##LogicalDoorSpawned", &door->not_hidden);
             ImGui::Checkbox("Platform spawned##LogicalDoorPlatformSpawned", &door->platform_spawned);
         }
-        else if (entity->type->search_flags & 0x7) // PLYAER, MOUNT, MONSTER
+        else if (!!(entity->type->search_flags & (ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER)))
         {
             auto entity_player = entity->as<Player>();
-            if ((entity->type->search_flags & 0x1) && entity_player->ai != 0)
+            if ((entity->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER && entity_player->ai != 0)
             {
                 ImGui::InputScalar("AI state##AiState", ImGuiDataType_S8, &entity_player->ai->state, &u8_min, &s8_max);
                 ImGui::InputScalar("Trust##AiTrust", ImGuiDataType_S8, &entity_player->ai->trust, &u8_min, &s8_max);
@@ -7991,7 +7996,7 @@ void render_entity_props(int uid, bool detached = false)
         }
         endmenu();
     }
-    if ((entity->type->search_flags & 0x1) && submenu("Illumination"))
+    if ((entity->type->search_flags & ENTITY_MASK::PLAYER) == ENTITY_MASK::PLAYER && submenu("Illumination"))
     {
         auto entity_player = entity->as<Player>();
         if (entity_player->emitted_light)
@@ -8520,7 +8525,7 @@ void render_game_props()
         for (int i = 1; i <= 4; ++i)
         {
             if (ImGui::Button(fmt::format(" {} ##SaveState{}", i, i).c_str()))
-                UI::copy_state(5, i);
+                UI::save_main_state(i);
             tooltip("Save current level state", fmt::format("save_state_{}", i).c_str());
             ImGui::SameLine();
         }
@@ -8785,7 +8790,7 @@ void render_game_props()
                     else if (player->input_ptr->player_slot >= 0)
                         active_players[player->input_ptr->player_slot] = true;
                 }
-                for (auto uid : UI::get_entities_by({to_id("ENT_TYPE_ITEM_PLAYERGHOST")}, 0x8, LAYER::BOTH))
+                for (auto uid : UI::get_entities_by({to_id("ENT_TYPE_ITEM_PLAYERGHOST")}, ENTITY_MASK::ITEM, LAYER::BOTH))
                 {
                     auto ghost = get_entity_ptr(uid)->as<PlayerGhost>();
                     if (ghost->player_inputs && ghost->player_inputs->player_slot == i && g_state->items->player_count < i + 1)
@@ -8947,7 +8952,7 @@ void render_game_props()
             }
             auto ai_entity = get_entity_ptr(ai_target.ai_uid);
             auto target = ai_target.target_uid;
-            if (ai_entity == nullptr || (ai_entity->type->search_flags & 1) != 1)
+            if (ai_entity == nullptr || (ai_entity->type->search_flags & ENTITY_MASK::PLAYER) != ENTITY_MASK::PLAYER)
             {
                 continue;
             }
@@ -9369,7 +9374,7 @@ void render_prohud()
     auto topmargin = 0.0f;
     if (options["menu_ui"] && !hide_ui)
         topmargin = ImGui::GetTextLineHeight();
-    std::string buf = fmt::format("TIMER:{}/{} GLOBAL:{:#06} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), get_global_frame_count(), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
+    std::string buf = fmt::format("TIMER:{}/{} GLOBAL:{:#06} FRAME:{:#06} START:{:#06} TOTAL:{:#06} LEVEL:{:#06} COUNT:{} SCREEN:{} SIZE:{}x{} PAUSE:{} FPS:{:.2f} ENGINE:{:.2f} TARGET:{:.2f}", format_time(g_state->time_level), format_time(g_state->time_total), API::get_global_frame_count(), UI::get_frame_count(), g_state->time_startup, g_state->time_total, g_state->time_level, g_state->level_count, g_state->screen, g_state->w, g_state->h, g_state->pause, io.Framerate, engine_fps, g_engine_fps);
     ImVec2 textsize = ImGui::CalcTextSize(buf.c_str());
     dl->AddText({base->Pos.x + base->Size.x / 2 - textsize.x / 2, base->Pos.y + 2 + topmargin}, ImColor(1.0f, 1.0f, 1.0f, .5f), buf.c_str());
 
@@ -10011,14 +10016,14 @@ std::string make_save_path(std::string_view script_path, std::string_view script
     return save_path;
 }
 
-void init_ui()
+void init_ui(ImGuiContext* ctx)
 {
     g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
 
-    State::init(g_SoundManager.get());
-    State::post_init();
+    API::init(g_SoundManager.get());
+    API::post_init();
 
-    g_state = State::get().ptr_main();
+    g_state = HeapBase::get_main().state();
     g_save = UI::savedata();
     g_game_manager = get_game_manager();
     g_bucket = Bucket::get();
@@ -10029,7 +10034,7 @@ void init_ui()
     g_Console->load_history("console_history.txt");
 
     register_on_input(&process_keys);
-    register_imgui_pre_init(&imgui_pre_init);
+    imgui_pre_init(ctx);
     register_imgui_init(&imgui_init);
     register_imgui_draw(&imgui_draw);
     register_post_draw(&post_draw);

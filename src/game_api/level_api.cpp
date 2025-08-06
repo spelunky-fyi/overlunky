@@ -22,8 +22,9 @@
 #include "entities_activefloors.hpp" //
 #include "entities_items.hpp"        //
 #include "entities_monsters.hpp"     // for GHOST_BEHAVIOR, GHOST_BEHAVIOR::MED...
-#include "entity.hpp"                // for to_id, Entity, get_entity_ptr, Enti...
-#include "entity_lookup.hpp"         //
+#include "entity.hpp"                // for Entity, get_entity_ptr, Enti...
+#include "entity_db.hpp"             // for to_id
+#include "entity_lookup.hpp"         // for get_entities_overlapping_by_pointer ...
 #include "layer.hpp"                 // for Layer, g_level_max_y, g_level_max_x
 #include "logger.h"                  // for DEBUG
 #include "memory.hpp"                // for to_le_bytes, write_mem_prot, Execut...
@@ -33,7 +34,7 @@
 #include "script/events.hpp"         // for post_load_screen, pre_load_screen
 #include "search.hpp"                // for get_address
 #include "spawn_api.hpp"             // for pop_spawn_type_flags, push_spawn_ty...
-#include "state.hpp"                 // for StateMemory, State, enum_to_layer
+#include "state.hpp"                 // for StateMemory
 #include "util.hpp"                  // for OnScopeExit, trim
 #include "vtable_hook.hpp"           // for hook_vtable
 
@@ -83,7 +84,7 @@ using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, Layer
 
 bool is_room_flipped(float x, float y, std::uint8_t layer)
 {
-    thread_local StateMemory* state_ptr = State::get().ptr_local();
+    thread_local StateMemory* state_ptr = HeapBase::get().state();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
     return state_ptr->level_gen->flipped_rooms[layer]->rooms[ix + iy * 8ull];
 }
@@ -179,7 +180,7 @@ void g_spawn_punishball_attach(const CommunityTileCode& self, float x, float y, 
     y += static_cast<float>(offset_y);
     auto do_spawn = [=]()
     {
-        std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
+        std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, ENTITY_MASK::ANY, x - 0.5f, y - 0.5f, x + 0.5f, y + 0.5f, layer);
         if (!entities_neighbour.empty())
         {
             get_entity_ptr(attach_ball_and_chain(entities_neighbour.front(), -static_cast<float>(offset_x), -static_cast<float>(offset_y)));
@@ -464,7 +465,7 @@ std::array g_community_tile_codes{
 
             Olmite* olmite = layer->spawn_entity_snap_to_floor(self.entity_id, x, y)->as<Olmite>();
 
-            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({}, 0x4, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
+            std::vector<uint32_t> entities_above = get_entities_overlapping_by_pointer({}, ENTITY_MASK::MONSTER, x - 0.1f, y + 0.9f, x + 0.1f, y + 1.1f, layer);
             for (uint32_t uid : entities_above)
             {
                 if (Entity* ent = get_entity_ptr(uid))
@@ -509,7 +510,7 @@ std::array g_community_tile_codes{
                       {
                           auto do_spawn = [=]()
                           {
-                              std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, 0, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
+                              std::vector<uint32_t> entities_neighbour = get_entities_overlapping_by_pointer({}, ENTITY_MASK::ANY, x - 0.5f, y - 1.5f, x + 0.5f, y - 0.5f, layer);
                               if (!entities_neighbour.empty())
                               {
                                   layer->spawn_entity_over(self.entity_id, get_entity_ptr(entities_neighbour.front()), 0.0f, 1.0f);
@@ -533,7 +534,7 @@ struct CommunityChance;
 using ChanceFunc = void(const CommunityChance& self, float x, float y, Layer* layer);
 using ChanceValidPlacementFunc = bool(const CommunityChance& self, float x, float y, Layer* layer);
 
-auto g_MaskTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
+auto g_MaskTestFunc = [](float x, float y, Layer* layer, ENTITY_MASK flags)
 {
     if (!layer->get_grid_entity_at(x, y))
     {
@@ -566,93 +567,95 @@ auto g_SafeTestFunc = [](float x, float y, Layer* layer)
     }
     return true;
 };
+ENUM_CLASS_FLAGS(POS_TYPE);
 
-auto g_PositionTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
+auto g_PositionTestFunc = [](float x, float y, Layer* layer, POS_TYPE flags)
 {
-    uint32_t default_mask = 0x6180;
-    uint32_t empty_mask = 0x61bf;
+    ENTITY_MASK default_mask = ENTITY_MASK::LIQUID | ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR;
+    ENTITY_MASK empty_mask = ENTITY_MASK::LIQUID | ENTITY_MASK::FLOOR | ENTITY_MASK::PLAYER | ENTITY_MASK::MOUNT | ENTITY_MASK::MONSTER |
+                             ENTITY_MASK::ITEM | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::ROPE | ENTITY_MASK::EXPLOSION;
 
-    if (flags & (uint32_t)POS_TYPE::DEFAULT)
-        flags = (uint32_t)POS_TYPE::FLOOR | (uint32_t)POS_TYPE::SAFE | (uint32_t)POS_TYPE::EMPTY;
+    if ((flags & POS_TYPE::DEFAULT) == POS_TYPE::DEFAULT)
+        flags = POS_TYPE::FLOOR | POS_TYPE::SAFE | POS_TYPE::EMPTY;
 
-    if (flags & (uint32_t)POS_TYPE::WATER || flags & (uint32_t)POS_TYPE::LAVA)
+    if ((flags & POS_TYPE::WATER) == POS_TYPE::WATER || (flags & POS_TYPE::LAVA) == POS_TYPE::LAVA)
     {
-        default_mask -= 0x6000;
-        empty_mask -= 0x6000;
+        default_mask = default_mask ^ ENTITY_MASK::LIQUID;
+        empty_mask = empty_mask ^ ENTITY_MASK::LIQUID;
     }
 
-    if (flags & (uint32_t)POS_TYPE::FLOOR)
+    if ((flags & POS_TYPE::FLOOR) == POS_TYPE::FLOOR)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y - 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::CEILING)
+    if ((flags & POS_TYPE::CEILING) == POS_TYPE::CEILING)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y + 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::AIR)
+    if ((flags & POS_TYPE::AIR) == POS_TYPE::AIR)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WALL)
+    if ((flags & POS_TYPE::WALL) == POS_TYPE::WALL)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || (!g_SolidTestFunc(x + 1.0f, y, layer) && !g_SolidTestFunc(x - 1.0f, y, layer)))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WALL_LEFT)
+    if ((flags & POS_TYPE::WALL_LEFT) == POS_TYPE::WALL_LEFT)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WALL_RIGHT)
+    if ((flags & POS_TYPE::WALL_RIGHT) == POS_TYPE::WALL_RIGHT)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x + 1.0f, y, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::ALCOVE)
+    if ((flags & POS_TYPE::ALCOVE) == POS_TYPE::ALCOVE)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x, y + 1.0f, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || (g_SolidTestFunc(x + 1.0f, y, layer) == g_SolidTestFunc(x - 1.0f, y, layer)))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::PIT)
+    if ((flags & POS_TYPE::PIT) == POS_TYPE::PIT)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer) || !g_SolidTestFunc(x + 1.0f, y, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || g_SolidTestFunc(x, y + 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::HOLE)
+    if ((flags & POS_TYPE::HOLE) == POS_TYPE::HOLE)
     {
         if (!g_MaskTestFunc(x, y, layer, default_mask) || !g_SolidTestFunc(x - 1.0f, y, layer) || !g_SolidTestFunc(x + 1.0f, y, layer) || !g_SolidTestFunc(x, y - 1.0f, layer) || !g_SolidTestFunc(x, y + 1.0f, layer))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::WATER)
+    if ((flags & POS_TYPE::WATER) == POS_TYPE::WATER)
     {
-        if (!g_MaskTestFunc(x, y, layer, 0x180) || g_MaskTestFunc(x, y, layer, 0x2000))
+        if (!g_MaskTestFunc(x, y, layer, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR) || g_MaskTestFunc(x, y, layer, ENTITY_MASK::WATER))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::LAVA)
+    if ((flags & POS_TYPE::LAVA) == POS_TYPE::LAVA)
     {
-        if (!g_MaskTestFunc(x, y, layer, 0x180) || g_MaskTestFunc(x, y, layer, 0x4000))
+        if (!g_MaskTestFunc(x, y, layer, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR) || g_MaskTestFunc(x, y, layer, ENTITY_MASK::LAVA))
             return false;
     }
     auto box = AABB(x - 0.49f, y + 0.49f, x + 0.49f, y - 0.49f);
     auto layer_num = (LAYER)(layer->is_back_layer ? 1 : 0);
-    if (flags & (uint32_t)POS_TYPE::SAFE)
+    if ((flags & POS_TYPE::SAFE) == POS_TYPE::SAFE)
     {
-        if (!g_MaskTestFunc(x, y, layer, 0x2180) || !g_SafeTestFunc(x - 1.0f, y, layer) || !g_SafeTestFunc(x + 1.0f, y, layer) || !g_SafeTestFunc(x, y - 1.0f, layer) || !g_SafeTestFunc(x, y + 1.0f, layer))
+        if (!g_MaskTestFunc(x, y, layer, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::WATER) || !g_SafeTestFunc(x - 1.0f, y, layer) || !g_SafeTestFunc(x + 1.0f, y, layer) || !g_SafeTestFunc(x, y - 1.0f, layer) || !g_SafeTestFunc(x, y + 1.0f, layer))
             return false;
         if (is_inside_active_shop_room(x, y, layer_num))
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::EMPTY)
+    if ((flags & POS_TYPE::EMPTY) == POS_TYPE::EMPTY)
     {
         if (get_entities_overlapping_hitbox(0, empty_mask, box, layer_num).size() > 0)
             return false;
     }
-    if (flags & (uint32_t)POS_TYPE::SOLID)
+    if ((flags & POS_TYPE::SOLID) == POS_TYPE::SOLID)
     {
-        if (!layer->get_entity_at(x, y, 0x180, 0, 0, 0))
+        if (!layer->get_entity_at(x, y, ENTITY_MASK::FLOOR | ENTITY_MASK::ACTIVEFLOOR, 0, 0, 0))
             return false;
         if (Entity* floor = layer->get_grid_entity_at(x, y))
             return (floor->flags & (1 << 2)) != 0;
@@ -662,7 +665,7 @@ auto g_PositionTestFunc = [](float x, float y, Layer* layer, uint32_t flags)
 
 auto g_DefaultTestFunc = [](float x, float y, Layer* layer)
 {
-    return g_PositionTestFunc(x, y, layer, (uint32_t)POS_TYPE::FLOOR | (uint32_t)POS_TYPE::SAFE | (uint32_t)POS_TYPE::EMPTY);
+    return g_PositionTestFunc(x, y, layer, POS_TYPE::FLOOR | POS_TYPE::SAFE | POS_TYPE::EMPTY);
 };
 
 struct CommunityChance
@@ -917,7 +920,7 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
 
     if (tile_code > g_last_tile_code_id && tile_code < g_last_community_tile_code_id)
     {
-        auto* layer_ptr = State::get().ptr_local()->layers[layer];
+        auto* layer_ptr = HeapBase::get().state()->layers[layer];
         const CommunityTileCode& community_tile_code = g_community_tile_codes[tile_code - g_last_tile_code_id - 1];
         community_tile_code.func(community_tile_code, x, y, layer_ptr);
     }
@@ -945,6 +948,7 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
     if (!g_floor_requiring_entities.empty())
     {
         Entity* floor{nullptr};
+        auto state = HeapBase::get().state();
         for (auto& pending_entity : g_floor_requiring_entities)
         {
             for (const auto& pos : pending_entity.pos)
@@ -955,8 +959,7 @@ void handle_tile_code(LevelGenSystem* self, std::uint32_t tile_code, std::uint16
                     {
                         if (floor == nullptr)
                         {
-                            auto* layer_ptr = State::get().ptr_local()->layers[layer];
-                            floor = layer_ptr->get_grid_entity_at(x, y);
+                            floor = state->layers[layer]->get_grid_entity_at(x, y);
                         }
 
                         if (floor != nullptr)
@@ -1057,7 +1060,7 @@ void get_room_size(uint16_t room_template, uint32_t& room_width, uint32_t& room_
 }
 void get_room_size(const char* room_template_name, uint32_t& room_width, uint32_t& room_height)
 {
-    const auto room_template = State::get().ptr_local()->level_gen->data->get_room_template(room_template_name);
+    const auto room_template = HeapBase::get().level_gen()->data->get_room_template(room_template_name);
     if (!room_template)
     {
         DEBUG("Unkown room_template name {}", room_template_name);
@@ -1093,8 +1096,6 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_size, std::uint32_t 
 {
     g_do_extra_spawns_trampoline(theme, border_size, level_width, level_height, layer);
 
-    PRNG& prng = PRNG::get_local();
-
     std::lock_guard lock{g_extra_spawn_logic_providers_lock};
     if (!g_extra_spawn_logic_providers.empty())
     {
@@ -1121,13 +1122,13 @@ void do_extra_spawns(ThemeInfo* theme, std::uint32_t border_size, std::uint32_t 
                 }
             }
         }
-
+        PRNG* prng = HeapBase::get().prng();
         for (ExtraSpawnLogicProviderImpl& provider : g_extra_spawn_logic_providers)
         {
             auto& valid_pos = provider.transient_valid_positions;
             while (!valid_pos.empty() && provider.transient_num_remaining_spawns[layer] > 0)
             {
-                const auto random_idx = static_cast<std::size_t>(prng.internal_random_index(valid_pos.size(), PRNG::EXTRA_SPAWNS));
+                const auto random_idx = static_cast<std::size_t>(prng->internal_random_index(valid_pos.size(), PRNG::EXTRA_SPAWNS));
                 const auto idx = random_idx < valid_pos.size() ? random_idx : 0;
                 const auto& [x, y] = valid_pos[idx];
                 provider.provider.do_spawn(x, y, layer);
@@ -1189,7 +1190,7 @@ using GatherRoomData = void(LevelGenData*, byte, int room_x, int, bool, uint8_t*
 GatherRoomData* g_gather_room_data_trampoline{nullptr};
 void gather_room_data(LevelGenData* tile_storage, byte param_2, int room_idx_x, int room_idx_y, bool hard_level, uint8_t* param_6, uint8_t* param_7, size_t param_8, uint8_t* param_9, uint8_t* param_10, uint8_t* out_room_width, uint8_t* out_room_height)
 {
-    const auto* level_gen = State::get().ptr()->level_gen;
+    const auto* level_gen = HeapBase::get().level_gen();
     for (size_t j = 0; j < 2; j++)
     {
         if (g_overridden_room_templates[j].has_value())
@@ -1235,7 +1236,7 @@ using SpawnRoomFromTileCodes = void(LevelGenData*, int, int, SingleRoomData*, Si
 SpawnRoomFromTileCodes* g_spawn_room_from_tile_codes_trampoline{nullptr};
 void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, int room_idx_y, SingleRoomData* front_room_data, SingleRoomData* back_room_data, uint16_t param_6, bool dual_room, uint16_t room_template)
 {
-    auto level_gen = State::get().ptr()->level_gen;
+    auto level_gen = HeapBase::get().level_gen();
 
     std::optional<SHOP_TYPE> before[2];
     for (size_t i = 0; i < 2; i++)
@@ -1298,11 +1299,11 @@ TestChance* g_test_chance{nullptr};
 
 bool handle_chance(SpawnInfo* spawn_info)
 {
-    auto level_gen_data = State::get().ptr()->level_gen->data;
 
-    uint8_t layer = 0;
-    auto* layer_ptr = State::get().layer(layer);
-    LevelGenSystem* level_gen = State::get().ptr()->level_gen;
+    const uint8_t layer = 0; // only handles the front layer, backlayer is hardcoded
+    auto* layer_ptr = HeapBase::get().state()->layer(layer);
+    LevelGenSystem* level_gen = HeapBase::get().level_gen();
+    auto level_gen_data = level_gen->data;
     for (const CommunityChance& community_chance : g_community_chances)
     {
         if (level_gen->get_procedural_spawn_chance(community_chance.chance_id) != 0 && community_chance.test_func(community_chance, spawn_info->x, spawn_info->y, layer_ptr))
@@ -1641,7 +1642,7 @@ std::uint32_t LevelGenData::register_chance_logic_provider(std::uint32_t chance_
     {
         provider.is_valid = [](float x, float y, uint8_t layer)
         {
-            return g_DefaultTestFunc(x, y, State::get().layer(layer));
+            return g_DefaultTestFunc(x, y, HeapBase::get().state()->layers[layer]);
         };
     }
 
@@ -1665,7 +1666,7 @@ std::uint32_t LevelGenData::define_extra_spawn(std::uint32_t num_spawns_front_la
     {
         provider.is_valid = [](float x, float y, uint8_t layer)
         {
-            return g_DefaultTestFunc(x, y, State::get().layer(layer));
+            return g_DefaultTestFunc(x, y, HeapBase::get().state()->layers[layer]);
         };
     }
 
@@ -1766,7 +1767,7 @@ uint16_t LevelGenData::get_pretend_room_template(std::uint16_t room_template) co
 
 uint32_t ThemeInfo::get_aux_id() const
 {
-    thread_local const LevelGenSystem* level_gen_system = State::get().ptr_local()->level_gen;
+    thread_local const LevelGenSystem* level_gen_system = HeapBase::get().level_gen();
     for (size_t i = 0; i < std::size(level_gen_system->themes); i++)
     {
         if (level_gen_system->themes[i] == this)
@@ -1850,7 +1851,7 @@ Vec2 LevelGenSystem::get_room_pos(uint32_t x, uint32_t y)
 }
 std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y, uint8_t l) const
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return std::nullopt;
@@ -1866,7 +1867,7 @@ std::optional<uint16_t> LevelGenSystem::get_room_template(uint32_t x, uint32_t y
 }
 bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1907,7 +1908,7 @@ bool LevelGenSystem::set_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y, 
 
 bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1916,7 +1917,7 @@ bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
 }
 bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y) const
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1925,7 +1926,7 @@ bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y) const
 }
 bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t /*l*/)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1936,7 +1937,7 @@ bool LevelGenSystem::mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t
 }
 bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is_set_room)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -1955,7 +1956,7 @@ bool LevelGenSystem::mark_as_set_room(uint32_t x, uint32_t y, uint8_t l, bool is
 
 bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE _shop_type)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
@@ -2009,7 +2010,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id) const
         LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_monster_chances, chance_id);
         if (!this_chances.chances.empty())
         {
-            auto* state = State::get().ptr();
+            auto* state = HeapBase::get().state();
             if (this_chances.chances.size() >= state->level && state->level > 0)
             {
                 return this_chances.chances[state->level - 1];
@@ -2030,7 +2031,7 @@ uint32_t LevelGenSystem::get_procedural_spawn_chance(uint32_t chance_id) const
         LevelChanceDef& this_chances = get_or_emplace_level_chance(data->level_trap_chances, chance_id);
         if (!this_chances.chances.empty())
         {
-            auto* state = State::get().ptr();
+            auto* state = HeapBase::get().state();
             if (this_chances.chances.size() >= state->level && state->level > 0)
             {
                 return this_chances.chances[state->level - 1];
@@ -2090,14 +2091,12 @@ void LevelGenSystem::set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TE
 
 bool default_spawn_is_valid(float x, float y, LAYER layer)
 {
-    uint8_t correct_layer = enum_to_layer(layer);
-    return g_DefaultTestFunc(x, y, State::get().layer(correct_layer));
+    return g_DefaultTestFunc(x, y, HeapBase::get().state()->layer(layer));
 }
 
 bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags)
 {
-    uint8_t correct_layer = enum_to_layer(layer);
-    return g_PositionTestFunc(x, y, State::get().layer(correct_layer), (uint32_t)flags);
+    return g_PositionTestFunc(x, y, HeapBase::get().state()->layer(layer), flags);
 }
 
 void override_next_levels(std::vector<std::string> next_levels)
@@ -2177,7 +2176,7 @@ void grow_vines(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 {
     area.abs();
 
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     const static auto grow_vine = to_id("ENT_TYPE_FLOOR_GROWABLE_VINE");
     const static auto tree_vine = to_id("ENT_TYPE_FLOOR_VINE_TREE_TOP");
     const static auto vine = to_id("ENT_TYPE_FLOOR_VINE");
@@ -2255,7 +2254,7 @@ void grow_poles(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 {
     area.abs();
 
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     const static auto grow_pole = to_id("ENT_TYPE_FLOOR_GROWABLE_CLIMBING_POLE");
     const static auto pole = to_id("ENT_TYPE_FLOOR_CLIMBING_POLE");
     const auto actual_layer = enum_to_layer(l);
@@ -2332,7 +2331,7 @@ void grow_poles(LAYER l, uint32_t max_length, AABB area, bool destroy_broken)
 
 bool grow_chain_and_blocks()
 {
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     return grow_chain_and_blocks(state->w * 10 + 6, state->h * 8 + 6);
 }
 
@@ -2346,7 +2345,7 @@ bool grow_chain_and_blocks(uint32_t x, uint32_t y)
 void do_load_screen()
 {
     static auto load_screen_fun = (LoadScreenFun*)get_address("load_screen_func");
-    const auto state = State::get().ptr();
+    const auto state = HeapBase::get().state();
     if (pre_load_screen())
         return;
     load_screen_fun(state, 0, 0);

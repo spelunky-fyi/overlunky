@@ -37,7 +37,7 @@
 #include "search.hpp"                        // for get_address
 #include "settings_api.hpp"                  // for get_settings_names_and_...
 #include "sound_manager.hpp"                 // for SoundManager, SoundMana...
-#include "state.hpp"                         // for StateMemory, State
+#include "state.hpp"                         // for API::init
 #include "texture.hpp"                       // for Texture, get_textures
 #include "virtual_table.hpp"                 // for VTABLE_OFFSET, VTABLE_O...
 
@@ -1101,6 +1101,7 @@ void run()
         std::this_thread::sleep_for(100ms);
     }
 
+    API::init();
     auto items = list_entities();
     std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
               { return a.id < b.id; });
@@ -1219,7 +1220,7 @@ void run()
                 EntityDB* db = get_type(ent.id);
                 if (!db)
                     break;
-                if ((db->search_flags & search_flag) != 0)
+                if ((std::uint32_t)db->search_flags & search_flag)
                 {
                     entities.push_back(ent.name);
                 }
@@ -1271,7 +1272,7 @@ void run()
 
     if (auto file = std::ofstream("game_data/particle_emitters.txt"))
     {
-        auto particles = list_particles();
+        auto& particles = list_particles();
         for (const auto& particle : particles)
         {
             file << particle.id << ": " << particle.name << "\n";
@@ -1285,11 +1286,11 @@ void run()
         // file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }
 
-    auto state = State::get().ptr_main();
+    auto level_gen = HeapBase::get_main().level_gen();
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {
-        for (const auto& tile_code : state->level_gen->data->tile_codes)
+        for (const auto& tile_code : level_gen->data->tile_codes)
         {
             std::string clean_tile_code_name = tile_code.first.c_str();
             std::transform(
@@ -1303,7 +1304,7 @@ void run()
     if (auto file = std::ofstream("game_data/spawn_chances.txt"))
     {
         std::multimap<std::uint32_t, std::string> ordered_chances;
-        for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
+        for (auto* chances : {&level_gen->data->monster_chances, &level_gen->data->trap_chances})
         {
             for (const auto& spawn_chanc : *chances)
             {
@@ -1321,7 +1322,7 @@ void run()
 
     if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
-        auto templates = state->level_gen->data->room_templates;
+        auto templates = level_gen->data->room_templates;
         templates["empty_backlayer"] = {9};
         templates["boss_arena"] = {22};
         templates["shop_jail_backlayer"] = {44};

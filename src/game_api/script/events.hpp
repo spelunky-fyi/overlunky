@@ -7,6 +7,7 @@
 
 #include "aliases.hpp"             // for JournalPageType
 #include "handle_lua_function.hpp" // for handle_function
+#include "heap_base.hpp"           // for HeapBase
 #include "lua_backend.hpp"         // for ON
 #include "rpc.hpp"                 // for get_frame_count
 
@@ -104,7 +105,7 @@ bool pre_unload_level();
 bool pre_unload_layer(LAYER layer);
 bool pre_save_state(int slot, StateMemory* saved);
 bool pre_load_state(int slot, StateMemory* loaded);
-void pre_copy_state_event(StateMemory* from, StateMemory* to);
+void pre_copy_state_event(HeapBase from, HeapBase to);
 bool pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
 void post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
 

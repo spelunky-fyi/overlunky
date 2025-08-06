@@ -9,6 +9,7 @@
 #include <tuple>       // for get
 #include <type_traits> // for move, declval
 
+#include "entity.hpp"             // for Entity
 #include "particles.hpp"          // for ParticleEmitterInfo
 #include "render_api.hpp"         // for TextureRenderingInfo, WorldShader, TextRen...
 #include "script/lua_backend.hpp" // for get_calling_backend
@@ -675,8 +676,7 @@ void register_usertypes(sol::state& lua)
 
     auto render_draw_depth_lua = [](VanillaRenderContext&, LAYER layer, uint8_t draw_depth, AABB bbox)
     {
-        const uint8_t real_layer = enum_to_layer(layer);
-        auto layer_ptr = State::get().layer(real_layer);
+        auto layer_ptr = HeapBase::get().state()->layer(layer);
         render_draw_depth(layer_ptr, draw_depth, bbox.left, bbox.bottom, bbox.right, bbox.top);
     };
 
@@ -898,6 +898,79 @@ void register_usertypes(sol::state& lua)
     // DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION
     // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color
     */
+
+    /// Some information used to render the entity, can not be changed, used in Entity
+    lua.new_usertype<RenderInfo>(
+        "RenderInfo",
+        "x",
+        &RenderInfo::x,
+        "y",
+        &RenderInfo::y,
+        "offset_x",
+        &RenderInfo::offset_x,
+        "offset_y",
+        &RenderInfo::offset_y,
+        "shader",
+        &RenderInfo::shader,
+        "source",
+        &RenderInfo::source,
+        "destination",
+        sol::property(
+            [](const RenderInfo& ri) -> Quad
+            { return Quad{
+                  ri.destination_bottom_left_x,
+                  ri.destination_bottom_left_y,
+                  ri.destination_bottom_right_x,
+                  ri.destination_bottom_right_y,
+                  ri.destination_top_right_x,
+                  ri.destination_top_right_y,
+                  ri.destination_top_left_x,
+                  ri.destination_top_left_y,
+              }; }),
+        "tilew",
+        &RenderInfo::tilew,
+        "tileh",
+        &RenderInfo::tileh,
+        "facing_left",
+        &RenderInfo::flip_horizontal,
+        "angle",
+        &RenderInfo::angle1,
+        "animation_frame",
+        &RenderInfo::animation_frame,
+        "render_inactive",
+        &RenderInfo::render_inactive,
+        "brightness",
+        &RenderInfo::brightness,
+        "texture_num",
+        sol::readonly(&RenderInfo::texture_num),
+        "get_entity",
+        &RenderInfo::get_entity,
+        "set_normal_map_texture",
+        &RenderInfo::set_normal_map_texture,
+        "get_second_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.texture_names[1] || ri.texture_num < 2)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.texture_names[1])) /**/;
+        },
+        "get_third_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.texture_names[2] || ri.texture_num < 3)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.texture_names[2])) /**/;
+        },
+        "set_second_texture",
+        &RenderInfo::set_second_texture,
+        "set_third_texture",
+        &RenderInfo::set_third_texture,
+        "set_texture_num",
+        &RenderInfo::set_texture_num);
 
     auto hudinventory_type = lua.new_usertype<HudInventory>("HudInventory");
     hudinventory_type["enabled"] = &HudInventory::enabled;

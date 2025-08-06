@@ -58,13 +58,15 @@ class Entity
     /// Don't edit this directly, use `set_draw_depth` function
     uint8_t draw_depth;
     uint8_t b3f; // depth related, changed when going thru doors etc.
-    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
     float x;
-    /// Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
+    /// Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
     float y;
-    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    /// Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.
+    /// Use `get_absolute_position` for precise. Read only.
     float abs_x;
-    /// Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+    /// Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.
+    /// Use `get_absolute_position` for precise. Read only.
     float abs_y;
     /// Width of the sprite
     float w;
@@ -115,7 +117,7 @@ class Entity
     {
         return Vec2{x, y};
     }
-    // get the absolute position
+    /// Get the absolute position of an entity in the game world
     Vec2 abs_position() const;
     /// Get's the velocity relative to the game world, only for movable or liquid entities
     Vec2 get_absolute_velocity() const;
@@ -150,12 +152,10 @@ class Entity
         auto topmost = this;
         while (auto cur = topmost->overlay)
         {
-            if (cur->type->search_flags <= 2)
-            {
-                topmost = cur;
-            }
-            else
+            if (!(cur->type->search_flags & (ENTITY_MASK::MOUNT | ENTITY_MASK::PLAYER)))
                 break;
+
+            topmost = cur;
         }
         return topmost;
     }
@@ -209,7 +209,7 @@ class Entity
     /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
     /// destroy_corpse and responsible are the standard parameters for the kill function
-    void kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
+    void kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<ENTITY_MASK> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
     /// Short for using RECURSIVE_MODE.NONE
     void kill_recursive(bool destroy_corpse, Entity* responsible)
     {
@@ -217,7 +217,7 @@ class Entity
     };
     /// Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
-    void destroy_recursive(std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
+    void destroy_recursive(std::optional<ENTITY_MASK> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
     /// Short for using RECURSIVE_MODE.NONE
     void destroy_recursive()
     {
@@ -288,7 +288,7 @@ class Entity
     virtual void generate_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool killing) = 0; // 8, contact dmg
     virtual float get_type_field_a8() = 0;                                                        // 9
     virtual bool can_be_pushed() = 0;                                                             // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
-    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons)
+    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons), theme procedural spawn uses this
     /// Returns true if entity is in water/lava
     virtual bool is_in_liquid() = 0;                                  // 12, drill always returns false
     virtual bool check_type_properties_flags_19() = 0;                // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger

@@ -453,7 +453,7 @@ Type | Name | Description
 [EntityDB](#EntityDB) | [new(EntityDB other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
 [EntityDB](#EntityDB) | [new(ENT_TYPE other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=EntityDB) | 
 [ENT_TYPE](#ENT_TYPE) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
-int | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | [MASK](#MASK)
+[MASK](#MASK) | [search_flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=search_flags) | [MASK](#MASK)
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | 
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | 
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | 
@@ -612,6 +612,7 @@ map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search
 [PauseAPI](#PauseAPI) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | [PauseAPI](#PauseAPI) is used by [Overlunky](#Overlunky) and can be used to control the [Overlunky](#Overlunky) pause options from scripts. Can be accessed from the global `pause` more easily.
 [SharedIO](#SharedIO) | [io](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=io) | Shared part of [ImGuiIO](#ImGuiIO) to block keyboard/mouse input across API instances.
 int | [count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) | Number of API instances present
+map&lt;[STRINGID](#Aliases), string&gt; | [custom_strings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=custom_strings) | Holds all the custom strings added thru [add_string](#add_string), read only 
 
 ### Color
 
@@ -1017,6 +1018,9 @@ nil | [load()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=load) | 
 nil | [save()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=save) | Save over a previously allocated [SaveState](#SaveState)
 nil | [clear()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear) | Delete the [SaveState](#SaveState) and free the memory. The [SaveState](#SaveState) can't be used after this.
 [StateMemory](#StateMemory) | [get_state()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_state) | Access the [StateMemory](#StateMemory) inside a [SaveState](#SaveState)
+int | [get_frame()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_frame) | Get the current frame from the [SaveState](#SaveState), equivelent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
+[PRNG](#PRNG) | [get_prng()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_prng) | Access the [PRNG](#PRNG) inside a [SaveState](#SaveState)
+[SaveState](#SaveState) | [get(int save_slot)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get) | Get the pre-allocated by the game save slot 1-4. Call as `SaveState.get(slot)`
 
 ### SharedIO
 
@@ -1830,6 +1834,7 @@ Type | Name | Description
 array&lt;[OnlinePlayer](#OnlinePlayer), 4&gt; | [online_players](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=online_players) | 
 [OnlinePlayer](#OnlinePlayer) | [local_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=local_player) | 
 [OnlineLobby](#OnlineLobby) | [lobby](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=lobby) | 
+bool | [is_active()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_active) | 
 
 ### OnlineLobby
 
@@ -2513,6 +2518,7 @@ float | [credits_progression](https://github.com/spelunky-fyi/overlunky/search?l
 
 ### ScreenDeath
 
+The POST render call will only be visible in the polaroid area on the left of the book. The Journal is drawn on top of that.
 Derived from [Screen](#Screen)
 
 
@@ -3943,6 +3949,8 @@ int | [level](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=level) |
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
 int | [world](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=world) | 
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
+nil | [set_target(int ww, int l, int t)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_target) | 
+tuple&lt;int, int, int&gt; | [get_target()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_target) | Get target world, level, theme of this door. If the `special_door` is false, it returns the StateMemory world_next, level_next, theme_next
 
 ### Floor
 
@@ -4209,6 +4217,7 @@ Derived from [Entity](#Entity)
 Type | Name | Description
 ---- | ---- | -----------
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
+int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | UID of entity that triggered the trap.
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 
 ### CameraFlash
@@ -4305,10 +4314,10 @@ Type | Name | Description
 int | [uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=uid) | Unique id of the entity, save it to variable to check this entity later (don't use the whole [Entity](#Entity) type as it will be replaced with a different one when this is destroyed)
 int | [animation_frame](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=animation_frame) | Number (id) of the sprite in the texture
 int | [draw_depth](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=draw_depth) | Depth level that this entity is drawn on.<br/>Don't edit this directly, use `set_draw_depth` function
-float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | Position of the entity in the world, or relative to overlay if attached to something. Use [get_position](#get_position) to get real position of anything in the game world.
-float | [abs_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_x) | Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
-float | [abs_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_y) | Absolute position in the world, even if overlaid. Should be the same as get_position. Read only.
+float | [x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=x) | Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+float | [y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=y) | Position of the entity in the world, or relative to overlay if attached to something. Use `get_absolute_position` to get real position of anything in the game world.
+float | [abs_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_x) | Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
+float | [abs_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=abs_y) | Absolute position in the world, even if overlaid. Might be a frame off since it's updated with `apply_movement` function and so it does not update if game moves the entity in different way after movement is processed.<br/>Use `get_absolute_position` for precise. Read only.
 int | [layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=layer) | Use `set_layer` to change
 float | [width](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=width) | Width of the sprite
 float | [height](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=height) | Height of the sprite
@@ -4354,15 +4363,16 @@ bool | [is_in_liquid()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 bool | [is_cursed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_cursed) | 
 bool | [is_movable()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_movable) | 
 bool | [can_be_pushed()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=can_be_pushed) | 
-nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s<br/>destroy_corpse and responsible are the standard parameters for the kill function
+nil | [kill_recursive(bool destroy_corpse, Entity responsible, optional<MASK> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s<br/>destroy_corpse and responsible are the standard parameters for the kill function
 nil | [kill_recursive(bool destroy_corpse, Entity responsible)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kill_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
-nil | [destroy_recursive(optional<int> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
+nil | [destroy_recursive(optional<MASK> mask, array<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.<br/>To avoid that, you can inclusively or exclusively limit certain [MASK](#MASK) and [ENT_TYPE](#ENT_TYPE). Note: the function will first check the mask, if the entity doesn't match, it will look in the provided [ENT_TYPE](#ENT_TYPE)'s
 nil | [destroy_recursive()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=destroy_recursive) | Short for using [RECURSIVE_MODE](#RECURSIVE_MODE).NONE
 nil | [update()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=update) | 
 nil | [flip(bool left)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip) | 
 nil | [remove_item(Entity entity, bool autokill_check)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=remove_item) | Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
 nil | [apply_db()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_db) | Applies changes made in `entity.type`
 [Vec2](#Vec2) | [get_absolute_velocity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_absolute_velocity) | Get's the velocity relative to the game world, only for movable or liquid entities
+[Vec2](#Vec2) | [get_absolute_position()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_absolute_position) | Get the absolute position of an entity in the game world
 [AABB](#AABB) | [get_hitbox(optional<bool> use_render_pos)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_hitbox) | `use_render_pos` default is `false`
 nil | [attach(Entity new_overlay)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attach) | Attach to other entity (at the current relative position to it)
 nil | [detach(optional<bool> check_autokill)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=detach) | Detach from overlay
@@ -4458,7 +4468,14 @@ Derived from [Entity](#Entity)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [move_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_timer) | 
+float | [anchor_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=anchor_x) | Current position of the ankle/wrist of this limb anchor.
+float | [anchor_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=anchor_y) | Current position of the ankle/wrist of this limb anchor.
+float | [move_origin_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_origin_x) | Position of this limb anchor at the beginning of a movement.
+float | [move_origin_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_origin_y) | Position of this limb anchor at the beginning of a movement.
+float | [move_destination_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_destination_x) | Position of this limb anchor at the end of a movement.
+float | [move_destination_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_destination_y) | Position of this limb anchor at the end of a movement.
+int | [elapsed_move_time](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=elapsed_move_time) | Number of frames the limb has been moving from move_origin to move_destination.
+int | [move_duration](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=move_duration) | Number of frames the limb should take to move from move_origin to move_destination.
 bool | [flip_vertical](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flip_vertical) | 
 
 ### Liquid
@@ -4681,6 +4698,8 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 Type | Name | Description
 ---- | ---- | -----------
 int | [jump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_timer) | 
+int | [shudder_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shudder_timer) | 
+int | [leg_shake_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=leg_shake_timer) | 
 
 ### Ammit
 
@@ -4796,7 +4815,7 @@ Derived from [Entity](#Entity) [Movable](#Movable) [PowerupCapable](#PowerupCapa
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [ai_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ai_state) | 
+int | [jump_height_multiplier](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_height_multiplier) | Set in process_input when jump is triggered to be used when applying velocity for the jump.
 int | [attack_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) | 
 
 ### Caveman
@@ -5150,8 +5169,10 @@ Type | Name | Description
 ---- | ---- | -----------
 float | [rotation_delta](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_delta) | 
 bool | [drop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=drop) | 
-int | [looking_for_new_direction_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=looking_for_new_direction_timer) | used when he touches floor/wall/ceiling
-int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | 
+bool | [rotation_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_direction) | Counter-clockwise if true.
+int | [wall_collision_cooldown](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=wall_collision_cooldown) | Delay after colliding into a wall before it will change its movement direction again.
+int | [rotation_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=rotation_timer) | Will randomly pick a new direction and angle when this timer elapses.
+int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=walk_pause_timer) | alternates between walking and pausing every time it reaches zero.
 int | [turn_into_fly_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=turn_into_fly_timer) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
@@ -5180,6 +5201,7 @@ int | [walk_spit_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 bool | [is_active](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_active) | whether it is hidden behind the carried block or not, if true you can damage him
 bool | [is_inactive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_inactive) | 
 bool | [spawn_new_carried_item](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=spawn_new_carried_item) | defaults to true, when toggled to false, a new carried item spawns
+bool | [going_up](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=going_up) | Whether the hermit crab is moving up when climbing a pole.
 
 ### HornedLizard
 
@@ -5290,6 +5312,7 @@ Type | Name | Description
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [Entity](#Entity) | [eyeball](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=eyeball) | 
 int | [attack_cooldown_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown_timer) | 
+bool | [has_logged_to_journal](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=has_logged_to_journal) | 
 
 ### Lamassu
 
@@ -5306,6 +5329,7 @@ int | [walk_pause_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&
 int | [flight_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flight_timer) | 
 int | [attack_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_timer) | 
 float | [attack_angle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_angle) | 
+bool | [was_flying](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=was_flying) | 
 
 ### Lavamander
 
@@ -5333,6 +5357,7 @@ int | [hump_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hump
 int | [target_in_sight_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_in_sight_timer) | 
 int | [gold](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=gold) | amount of gold he picked up, will be drooped on death
 int | [timer_after_humping](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer_after_humping) | 
+bool | [jump_trigger](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=jump_trigger) | Triggers a jump on the next frame.
 vector&lt;[ENT_TYPE](#ENT_TYPE)&gt; | [collected_treasure](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=collected_treasure) | 
 
 ### MagmaMan
@@ -5500,6 +5525,7 @@ Type | Name | Description
 float | [red_skeleton_spawn_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red_skeleton_spawn_x) | 
 float | [red_skeleton_spawn_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=red_skeleton_spawn_y) | 
 int | [resurrection_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=resurrection_uid) | 
+int | [target_layer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=target_layer) | 
 int | [resurrection_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=resurrection_timer) | 
 
 ### Octopus
@@ -5543,7 +5569,7 @@ Type | Name | Description
 int | [right_hand_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=right_hand_uid) | right from his perspective
 int | [left_hand_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=left_hand_uid) | 
 bool | [moving_left](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=moving_left) | 
-int | [targeting_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=targeting_timer) | 
+int | [oscillation_phase](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=oscillation_phase) | 
 int | [invincibility_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invincibility_timer) | 
 
 ### Pet
@@ -5556,6 +5582,8 @@ Type | Name | Description
 [Entity](#Entity) | [fx_button](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=fx_button) | 
 int | [petting_by_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=petting_by_uid) | person whos petting it, only in the camp
 int | [yell_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=yell_counter) | counts up to 400 (6.6 sec), when 0 the pet yells out
+int | [sit_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sit_timer) | When sitting after colliding with a player in the camp.
+int | [sit_cooldown_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sit_cooldown_timer) | Cooldown before sitting again when colliding with a player in the camp.
 int | [func_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=func_timer) | used when free running in the camp
 int | [active_state](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=active_state) | -1 = sitting and yelling, 0 = either running, dead or picked up
 int | [petted_counter](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=petted_counter) | number of times petted in the camp
@@ -5579,7 +5607,6 @@ int | [jump_lock_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q
 int | [coyote_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=coyote_timer) | can jump while airborne if greater than 0
 int | [swim_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=swim_timer) | Timer between strokes when holding jump button in water.
 int | [hired_hand_name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=hired_hand_name) | 0-25 alphabetical index of hired hand names.
-nil | [set_jetpack_fuel(int fuel)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) | 
 int | [kapala_blood_amount()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=kapala_blood_amount) | 
 string | [get_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_name) | Get the full name of the character, this will be the modded name not only the vanilla name.
 string | [get_short_name()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_short_name) | Get the short name of the character, this will be the modded name not only the vanilla name.
@@ -5601,6 +5628,7 @@ bool | [has_powerup(ENT_TYPE powerup_type)](https://github.com/spelunky-fyi/over
 vector&lt;[ENT_TYPE](#ENT_TYPE)&gt; | [get_powerups()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_powerups) | Return all powerups that the entity has
 nil | [unequip_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unequip_backitem) | Unequips the currently worn backitem
 int | [worn_backitem()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=worn_backitem) | Returns the uid of the currently worn backitem, or -1 if wearing nothing
+nil | [set_jetpack_fuel(int fuel)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_jetpack_fuel) | 
 [CallbackId](#Aliases) | [set_pre_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_virtual) | Hooks before the virtual function at index `entry`.
 [CallbackId](#Aliases) | [set_post_virtual(ENTITY_OVERRIDE entry, function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_virtual) | Hooks after the virtual function at index `entry`.
 nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=clear_virtual) | Clears the hook given by `callback_id`, alternatively use `clear_callback()` inside the hook.
@@ -5637,6 +5665,8 @@ Type | Name | Description
 ---- | ---- | -----------
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 [ParticleEmitterInfo](#ParticleEmitterInfo) | [particle](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=particle) | 
+bool | [broke_block](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=broke_block) | 
+int | [post_hit_wall_direction](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=post_hit_wall_direction) | 
 bool | [seen_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seen_player) | 
 
 ### Robot
@@ -5815,7 +5845,7 @@ Type | Name | Description
 [SoundMeta](#SoundMeta) | [sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=sound) | 
 int | [patrol_distance](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=patrol_distance) | 
 int | [attack_cooldown_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=attack_cooldown_timer) | 
-bool | [is_falling](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_falling) | 
+bool | [is_rising](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_rising) | 
 
 ### Vampire
 
@@ -7056,6 +7086,10 @@ int | [onfire_effect_timer](https://github.com/spelunky-fyi/overlunky/search?l=L
 int | [exit_invincibility_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_invincibility_timer) | 
 int | [invincibility_frames_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=invincibility_frames_timer) | 
 int | [frozen_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=frozen_timer) | 
+int | [dont_damage_owner_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=dont_damage_owner_timer) | When > 0, will not deal damage to the owner_uid, so that throwing an object does not harm yourself.
+int | [knockback_invincibility_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=knockback_invincibility_timer) | Will not apply velocity from various sources when >0. Can be ignored by certain damage flags, so will not be invincible from knockback<br/>of all damage types.
+int | [reset_owner_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_owner_timer) | Timer for resetting owner_uid.
+int | [exit_gold_invincibility_timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=exit_gold_invincibility_timer) | When > 0, money intersecting a door or at a pipe entrance will not be collected. Also gives iframes from monster collision.
 bool | [is_poisoned()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_poisoned) | 
 bool | [is_button_pressed(BUTTON button)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_pressed) | 
 bool | [is_button_held(BUTTON button)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_button_held) | 
@@ -7766,6 +7800,15 @@ Derived from [Entity](#Entity) [Movable](#Movable) [Projectile](#Projectile)
 Type | Name | Description
 ---- | ---- | -----------
 bool | [shot](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=shot) | if false, it's attached to the gun
+
+### Whip
+
+Derived from [Entity](#Entity) [Movable](#Movable)
+
+
+Type | Name | Description
+---- | ---- | -----------
+bool | [flaming](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flaming) | 
 
 ### WoodenlogTrap
 
