@@ -386,6 +386,11 @@ std::pair<float, float> UI::get_room_pos(uint32_t x, uint32_t y)
 }
 std::string_view UI::get_room_template_name(uint16_t room_template)
 {
+    auto templ = LevelGenData::get_missing_room_templates();
+    for (auto& [name, id] : templ)
+        if (id == room_template)
+            return name;
+
     return HeapBase::get().level_gen()->get_room_template_name(room_template);
 }
 std::optional<uint16_t> UI::get_room_template(uint32_t x, uint32_t y, uint8_t l)

@@ -1731,9 +1731,9 @@ void register_usertypes(sol::state& lua)
     {
         std::string clean_tile_code_name = tile_code_name.c_str();
         std::transform(
-            clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
-            { return (unsigned char)std::toupper(c); });
-        std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+            clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c) -> unsigned char
+            { if(c == '-') return '_';
+              return (unsigned char)std::toupper(c); });
         lua["TILE_CODE"][std::move(clean_tile_code_name)] = tile_code.id;
     };
 
@@ -1742,24 +1742,25 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
 
-    auto room_templates = level_gen->data->room_templates;
-    room_templates["empty_backlayer"] = {9};
-    room_templates["boss_arena"] = {22};
-    room_templates["shop_jail_backlayer"] = {44};
-    room_templates["waddler"] = {86};
-    room_templates["ghistshop_backlayer"] = {87};
-    room_templates["challange_entrance_backlayer"] = {90};
-    room_templates["blackmarket"] = {119};
-    room_templates["mothership_room"] = {126};
-    for (const auto& [room_name, room_template] : room_templates)
     {
-        std::string clean_room_name = room_name.c_str();
-        std::transform(
-            clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
-            { return (unsigned char)std::toupper(c); });
-        std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
-        lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template.id;
-    };
+        auto add_to_room_template_enum = [&lua](std::string_view room_name, uint16_t room_template)
+        {
+            std::string clean_room_name(room_name);
+            std::transform(
+                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
+
+            lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template;
+        };
+        auto& room_templates = level_gen->data->room_templates;
+        for (const auto& [name, def] : room_templates)
+            add_to_room_template_enum(name, def.id);
+
+        auto extra_templates = LevelGenData::get_missing_room_templates();
+        for (const auto [name, id] : extra_templates)
+            add_to_room_template_enum(name, id);
+    }
 
     lua.create_named_table("PROCEDURAL_CHANCE"
                            //, "ARROWTRAP_CHANCE", 0
@@ -1771,9 +1772,9 @@ void register_usertypes(sol::state& lua)
         {
             std::string clean_chance_name = chance_name.c_str();
             std::transform(
-                clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+                clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
         }
     }

@@ -6,6 +6,7 @@
 #include <functional>  // for function
 #include <new>         // for operator new
 #include <optional>    // for optional
+#include <span>        // for span
 #include <string>      // for string, allocator
 #include <string_view> // for string_view
 #include <type_traits> // for move
@@ -156,17 +157,17 @@ struct LevelGenData
 
     std::optional<std::uint16_t> get_room_template(const std::string& room_template) const
     {
-        auto it = room_templates.find((game_string&)room_template);
+        auto it = room_templates.find(reinterpret_cast<const game_string&>(room_template));
         if (it != room_templates.end())
-        {
             return it->second.id;
-        }
+
         return {};
     }
     std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
     bool set_room_template_size(std::uint16_t room_template, uint16_t width, uint16_t height);
     RoomTemplateType get_room_template_type(std::uint16_t room_template) const;
     uint16_t get_pretend_room_template(std::uint16_t room_template) const;
+    static std::span<const std::pair<std::string_view, uint16_t>> get_missing_room_templates();
 
     union
     {
