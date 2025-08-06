@@ -91,6 +91,7 @@ enum class POS_TYPE
     WALL_RIGHT = 0x4000,
 };
 
+// Some aren't added because the name doesn't seem to reflect what they actually are for. Read the comments in LevelGenSystem for more info
 enum class ROOM_META
 {
     FLIPPED_ROOM_FRONT_LAYER = 0,

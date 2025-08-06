@@ -1887,7 +1887,7 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t r
 
 bool LevelGenSystem::get_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h || static_cast<size_t>(meta_type) >= rooms_meta.size())
         return false;
@@ -1897,7 +1897,7 @@ bool LevelGenSystem::get_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y)
 
 bool LevelGenSystem::set_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y, bool value)
 {
-    auto* state_ptr = State::get().ptr_local();
+    auto* state_ptr = HeapBase::get().state();
 
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h || static_cast<size_t>(meta_type) >= rooms_meta.size())
         return false;

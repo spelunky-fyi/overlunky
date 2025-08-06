@@ -25,7 +25,7 @@ bool backend_pre(LuaBackend& backend, ON event, ArgsT... args)
     if (!backend.get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : backend.callbacks)
     {
         if (backend.is_callback_cleared(id))
@@ -33,9 +33,8 @@ bool backend_pre(LuaBackend& backend, ON event, ArgsT... args)
 
         if (callback.screen == event)
         {
-            backend.set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = backend.set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(&backend, callback.func, args...).value_or(false);
-            backend.clear_current_callback();
             callback.lastRan = now;
             if constexpr (stop_propagation)
                 if (skip)
@@ -52,7 +51,7 @@ void backend_post(LuaBackend& backend, ON event, ArgsT... args)
     if (!backend.get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : backend.callbacks)
     {
         if (backend.is_callback_cleared(id))
@@ -60,9 +59,8 @@ void backend_post(LuaBackend& backend, ON event, ArgsT... args)
 
         if (callback.screen == event)
         {
-            backend.set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = backend.set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(&backend, callback.func, args...);
-            backend.clear_current_callback();
             callback.lastRan = now;
         }
     }

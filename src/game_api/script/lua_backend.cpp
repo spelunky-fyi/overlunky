@@ -1802,7 +1802,6 @@ void LuaBackend::post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, 
         {
             auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, start_x, start_y, limit_width, limit_height);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }

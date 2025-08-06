@@ -76,7 +76,7 @@ bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE ch
 
 void PostRoomGenerationContext::set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TEMPLATE room_template)
 {
-    return State::get().ptr_local()->level_gen->set_backlayer_room_template(x, y, room_template);
+    return HeapBase::get().level_gen()->set_backlayer_room_template(x, y, room_template);
 }
 
 void PostRoomGenerationContext::set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer)
