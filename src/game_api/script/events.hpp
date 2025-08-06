@@ -5,9 +5,11 @@
 #include <string>      // for u16string, string
 #include <string_view> // for string_view
 
-#include "aliases.hpp"     // for JournalPageType
-#include "heap_base.hpp"   // for HeapBase
-#include "lua_backend.hpp" // for ON
+#include "aliases.hpp"             // for JournalPageType
+#include "handle_lua_function.hpp" // for handle_function
+#include "heap_base.hpp"           // for HeapBase
+#include "lua_backend.hpp"         // for ON
+#include "rpc.hpp"                 // for get_frame_count
 
 class Entity;
 class JournalPage;
@@ -16,8 +18,82 @@ struct LevelGenRoomData;
 struct HudData;
 struct Hud;
 
-bool pre_event(ON event);
-void post_event(ON event);
+template <bool stop_propagation = false, class... ArgsT>
+bool backend_pre(LuaBackend& backend, ON event, ArgsT... args)
+{
+    bool skip{false};
+    if (!backend.get_enabled())
+        return skip;
+
+    auto now = HeapBase::get().frame_count();
+    for (auto& [id, callback] : backend.callbacks)
+    {
+        if (backend.is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            auto _scope = backend.set_current_callback(-1, id, CallbackType::Normal);
+            skip |= handle_function<bool>(&backend, callback.func, args...).value_or(false);
+            callback.lastRan = now;
+            if constexpr (stop_propagation)
+                if (skip)
+                    return skip;
+        }
+    }
+
+    return skip;
+}
+
+template <class... ArgsT>
+void backend_post(LuaBackend& backend, ON event, ArgsT... args)
+{
+    if (!backend.get_enabled())
+        return;
+
+    auto now = HeapBase::get().frame_count();
+    for (auto& [id, callback] : backend.callbacks)
+    {
+        if (backend.is_callback_cleared(id))
+            continue;
+
+        if (callback.screen == event)
+        {
+            auto _scope = backend.set_current_callback(-1, id, CallbackType::Normal);
+            handle_function<void>(&backend, callback.func, args...);
+            callback.lastRan = now;
+        }
+    }
+}
+
+template <bool stop_propagation = false, class... ArgsT>
+bool pre_event(ON event, ArgsT... args)
+{
+    bool return_val = false;
+    LuaBackend::for_each_backend(
+        [=, &return_val, &args...](LuaBackend::LockedBackend backend)
+        {
+            if (backend_pre<stop_propagation>(*backend, event, args...))
+            {
+                return_val = true;
+                return false;
+            }
+            return true;
+        },
+        stop_propagation);
+    return return_val;
+}
+
+template <class... ArgsT>
+void post_event(ON event, ArgsT... args)
+{
+    LuaBackend::for_each_backend(
+        [&](LuaBackend::LockedBackend backend)
+        {
+            backend_post(*backend, event, args...);
+            return true;
+        });
+}
 
 void pre_load_level_files();
 bool pre_load_screen();
@@ -28,6 +104,8 @@ bool pre_unload_layer(LAYER layer);
 bool pre_save_state(int slot, StateMemory* saved);
 bool pre_load_state(int slot, StateMemory* loaded);
 void pre_copy_state_event(HeapBase from, HeapBase to);
+bool pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
+void post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
 
 void post_load_screen();
 void post_init_layer(LAYER layer);
