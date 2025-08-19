@@ -1179,8 +1179,6 @@ void register_usertypes(sol::state& lua)
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
-    themeinfo_type["unknown3"] = &ThemeInfo::unknown3;
-    themeinfo_type["unknown4"] = &ThemeInfo::unknown4;
     themeinfo_type["theme"] = &ThemeInfo::padding3; // this is totally not a real thing, but there was space to store it for vtable hooks
     themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
     themeinfo_type["allow_leprechaun"] = &ThemeInfo::allow_leprechaun;
@@ -1370,12 +1368,8 @@ void register_usertypes(sol::state& lua)
         "add_level_files",
         &PreLoadLevelFilesContext::add_level_files);
 
-    /// Deprecated
-    ///  kept for backward compatibility, don't use, check LevelGenSystem.exit_doors
-    lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
-
     /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect, used in StateMemory
-    lua.new_usertype<LevelGenSystem>(
+    auto levelgen_type = lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
         sol::no_constructor,
         "shop_type",
@@ -1394,8 +1388,6 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::spawn_room_x,
         "spawn_room_y",
         &LevelGenSystem::spawn_room_y,
-        "exits",
-        &LevelGenSystem::exit_doors_locations,
         "exit_doors",
         &LevelGenSystem::exit_doors,
         "themes",
@@ -1409,6 +1401,34 @@ void register_usertypes(sol::state& lua)
         "level_config",
         sol::property([](LevelGenSystem& lg) // -> array<int, 17>
                       { return ZeroIndexArray<uint32_t>(lg.data->level_config) /**/; }));
+
+    /// NoDoc
+    struct DoorCoords
+    {
+        float door1_x{0};
+        float door1_y{0};
+        float door2_x{0};
+        float door2_y{0};
+    };
+
+    /// NoDoc
+    lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
+
+    /// NoDoc
+    levelgen_type["exits"] = sol::property([](LevelGenSystem& lg)
+                                           { 
+        DoorCoords doors; 
+        if (lg.exit_doors.size() > 1)
+        {
+            doors.door2_x = lg.exit_doors[1].x;
+            doors.door2_y = lg.exit_doors[1].y;
+        }
+        if (lg.exit_doors.size())
+        {
+            doors.door1_x = lg.exit_doors[0].x;
+            doors.door1_y = lg.exit_doors[0].y;
+        }
+        return doors; });
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.

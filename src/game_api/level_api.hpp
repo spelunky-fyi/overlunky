@@ -209,16 +209,10 @@ struct LevelGenData
 
     game_unordered_map<game_string, ChanceDef> trap_chances;
     game_unordered_map<std::uint32_t, LevelChanceDef> level_trap_chances;
-};
 
-struct DoorCoords
-{
-    float door1_x;
-    float door1_y;
-    /// door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
-    float door2_x;
-    float door2_y;
+    size_t unknown2;
 };
+static_assert(sizeof(LevelGenData) == 0x1448);
 
 struct SpawnInfo
 {
@@ -252,8 +246,6 @@ class ThemeInfo
     uint8_t padding2;
     uint32_t padding3;
     ThemeInfo* sub_theme;
-    uint32_t unknown3;
-    uint32_t unknown4;
 
     virtual ~ThemeInfo(){};
 
@@ -429,17 +421,19 @@ class ThemeInfo
 
     uint32_t get_aux_id() const;
 };
-static_assert(sizeof(ThemeInfo) == 0x20);
+static_assert(sizeof(ThemeInfo) == 0x18);
 
 struct LevelGenRooms
 {
-    std::array<uint16_t, 8 * 16> rooms;
+    std::array<uint16_t, 8 * 15> rooms;
 };
+static_assert(sizeof(LevelGenRooms) == 0xF0);
 
 struct LevelGenRoomsMeta
 {
-    std::array<bool, 8 * 16> rooms;
+    std::array<bool, 8 * 15> rooms;
 };
+static_assert(sizeof(LevelGenRoomsMeta) == 0x78);
 
 class SpecialLevelGeneration
 {
@@ -456,6 +450,7 @@ class SpecialLevelGeneration
     // For leprechauns, spawns leprechaun, pot of gold, and rainbow.
     virtual void procedural_spawns() = 0;
 };
+static_assert(sizeof(SpecialLevelGeneration) == 0x8);
 
 enum class SHOP_TYPE : uint8_t
 {
@@ -552,17 +547,7 @@ struct LevelGenSystem
     std::uint32_t spawn_room_y;
     float spawn_x;
     float spawn_y;
-    union
-    {
-        custom_vector<Vec2> exit_doors;
-        struct
-        {
-            /// NoDoc
-            DoorCoords* exit_doors_locations;
-            void* unknown37;
-            void* unknown38;
-        };
-    };
+    custom_vector<Vec2> exit_doors;
     uint8_t flags;
     uint8_t flags2;
     uint8_t flags3;
@@ -577,14 +562,13 @@ struct LevelGenSystem
     };
     uint8_t frontlayer_shop_music;
     uint8_t backlayer_shop_music;
-    uint8_t unknown45;
-    uint8_t unknown46;
-    uint8_t unknown47;
+    uint8_t unknown47; // set to 0 at the start of level gen
+    bool unknown48;
+
+    /*uint8_t unknown47; // probably all just padding
     uint8_t unknown48;
     uint8_t unknown49;
-    uint32_t unknown50;
-    uint32_t unknown51;
-    uint32_t unknown52;
+    uint32_t unknown50;*/
 
     static std::pair<int, int> get_room_index(float x, float y);
     static Vec2 get_room_pos(uint32_t x, uint32_t y);
@@ -605,6 +589,7 @@ struct LevelGenSystem
 
     ~LevelGenSystem() = delete; // cuz it was complaining
 };
+static_assert(sizeof(LevelGenSystem) == 0x148);
 
 bool default_spawn_is_valid(float x, float y, LAYER layer);
 bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags);

@@ -199,6 +199,7 @@ cpp_type_exceptions = [
     "Players",
     "CutsceneBehavior",
     "CustomCutsceneBehavior",
+    "DoorCoords",
 ]
 not_functions = [
     "players",

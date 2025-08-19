@@ -4744,8 +4744,6 @@ function MovableBehavior:get_state_id() end
     ---@field max_lifetime integer
 
 ---@class ThemeInfo
-    ---@field unknown3 integer
-    ---@field unknown4 integer
     ---@field theme integer
     ---@field allow_beehive boolean
     ---@field allow_leprechaun boolean
@@ -4985,12 +4983,6 @@ function CustomTheme:override(index, func_) end
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
     ---@field add_level_files fun(self, levels: string[]): nil @Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
-
----@class DoorCoords
-    ---@field door1_x number
-    ---@field door1_y number
-    ---@field door2_x number @door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
-    ---@field door2_y number
 
 ---@class LevelGenSystem
     ---@field shop_type SHOP_TYPE

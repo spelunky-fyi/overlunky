@@ -1448,18 +1448,6 @@ int | [background_sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=
 ## Levelgen types
 
 
-### DoorCoords
-
-Deprecated
- kept for backward compatibility, don't use, check [LevelGenSystem](#LevelGenSystem).exit_doors
-
-Type | Name | Description
----- | ---- | -----------
-float | [door1_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_x) | 
-float | [door1_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_y) | 
-float | [door2_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_x) | door2 only valid when there are two in the level, like Volcana drill, [Olmec](#Olmec), ...
-float | [door2_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) | 
-
 ### LevelGenSystem
 
 Data relating to level generation, changing anything in here from [ON](#ON).LEVEL or later will likely have no effect, used in [StateMemory](#StateMemory)
@@ -1788,6 +1776,16 @@ Type | Name | Description
 [Entity](#Entity) | [player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) | 
 [Entity](#Entity) | [cinematic_anchor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicTunPreChallenge
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [tun_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_uid) | 
 
 ### LogicTuskPleasurePalace
 
@@ -3448,8 +3446,6 @@ end)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [unknown3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown3) | 
-int | [unknown4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown4) | 
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
 bool | [allow_beehive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=allow_beehive) | 
 bool | [allow_leprechaun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=allow_leprechaun) | 
