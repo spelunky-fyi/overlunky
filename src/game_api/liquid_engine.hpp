@@ -174,7 +174,7 @@ struct LiquidAmounts
 
 struct LiquidPhysics
 {
-    size_t unknown1; // MysteryLiquidPointer1 in plugin, collision with floors/activefloors related
+    size_t unknown1; // LiquidFun world 1.1.0
     union
     {
         std::array<LiquidPool, 5> pools;
@@ -211,8 +211,8 @@ struct LiquidPhysics
     uint8_t padding12a;
     uint8_t padding12b;
     uint8_t padding12c;
-    uint32_t unknown13;
 
     LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE ent) const;
     void remove_liquid_oob();
 };
+static_assert(sizeof(LiquidPhysics) == 0x3B8);

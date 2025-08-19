@@ -12,6 +12,7 @@
 
 class Entity;
 struct SoundMeta;
+struct Illumination;
 
 struct RobinHoodTableEntry
 {
@@ -888,3 +889,11 @@ struct EntityLookup
     EntityList** unknown3; // if lookup is not used, it's the same as unknown4
     EntityList** unknown4; // capacity? points to nullptr after all the other pointers
 };
+
+struct LightSources
+{
+    custom_vector<Illumination*> sources;
+    uint32_t unknown1;
+    bool unknown2;
+};
+static_assert(sizeof(LightSources) == 0x20);
