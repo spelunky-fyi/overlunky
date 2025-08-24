@@ -825,7 +825,7 @@ end
     lua["clear_custom_name"] = clear_custom_name;
 
     /// Adds entity as shop item, has to be of [Purchasable](#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the Purchasable entity types.
-    /// Adding other entities will result in not obtainable items or game crash
+    /// Adding other entities will result in not obtainable items or game crash, if item already is in StateMemory.room_owners.owned_items then it will just re-parent it
     lua["add_item_to_shop"] = add_item_to_shop;
 
     auto create_illumination = sol::overload(

@@ -444,7 +444,7 @@ function add_custom_name(uid, name) end
 ---@return nil
 function clear_custom_name(uid) end
 ---Adds entity as shop item, has to be of [Purchasable](https://spelunky-fyi.github.io/overlunky/#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the Purchasable entity types.
----Adding other entities will result in not obtainable items or game crash
+---Adding other entities will result in not obtainable items or game crash, if item already is in StateMemory.room_owners.owned_items then it will just re-parent it
 ---@param item_uid integer
 ---@param shop_owner_uid integer
 ---@return nil
@@ -2310,11 +2310,11 @@ do
     ---@field get_code fun(self): string @Gets the string equivalent of the code
 
 ---@class RoomOwnersInfo
-    ---@field owned_items custom_map<integer, ItemOwnerDetails> @key/index is the uid of an item
+    ---@field owned_items custom_map<integer, ItemOwnerDetails> @"key" is the uid of an item.
     ---@field owned_rooms RoomOwnerDetails[]
 
 ---@class ItemOwnerDetails
-    ---@field owner_type ENT_TYPE
+    ---@field owner_type ENT_TYPE @Used for big spender "quest", checks if there are any items owned by ENT_TYPE.MONS_SHOPKEEPER
     ---@field owner_uid integer
 
 ---@class RoomOwnerDetails
@@ -2554,7 +2554,7 @@ function PRNG:random(min, max) end
     ---@field set_draw_depth fun(self, draw_depth: integer, unknown: integer?): nil @optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering) 
     ---@field reset_draw_depth fun(self): nil
     ---@field friction fun(self): number @Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
-    ---@field liberate_from_shop fun(self, clear_parent: boolean): nil @clear_parent used only for CHAR_* entities, sets the linked_companion_parent to -1. It's not called when item is bought. It does not remove the item from StateMemory.room_owners.owned_items
+    ---@field liberate_from_shop fun(self, clear_parent: boolean): nil @It's not called when item is bought. It does not remove the item from StateMemory.room_owners.owned_items<br/>Parameter clear_parent used only for CHAR_* entities, sets the linked_companion_parent to -1.
     ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer with all it's items, nothing else happens, so this does not emulate a door transition
     ---@field apply_layer fun(self): nil @Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
@@ -2637,8 +2637,8 @@ function PRNG:random(min, max) end
     ---@field set_post_ledge_grab fun(self, fun: fun(self: Entity, who: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is nil ledge_grab(Entity self, Entity who)
     ---@field set_pre_stood_on fun(self, fun: fun(self: Entity, entity: Entity, Vec2: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is bool stood_on(Entity self, Entity entity, Vec2)
     ---@field set_post_stood_on fun(self, fun: fun(self: Entity, entity: Entity, Vec2: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is nil stood_on(Entity self, Entity entity, Vec2)
-    ---@field set_pre_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parent: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is bool liberate_from_shop(Entity self, boolean clear_parent)<br/>Virtual function docs:<br/>clear_parent used only for CHAR_* entities, sets the linked_companion_parent to -1. It's not called when item is bought. It does not remove the item from StateMemory.room_owners.owned_items
-    ---@field set_post_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parent: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is nil liberate_from_shop(Entity self, boolean clear_parent)<br/>Virtual function docs:<br/>clear_parent used only for CHAR_* entities, sets the linked_companion_parent to -1. It's not called when item is bought. It does not remove the item from StateMemory.room_owners.owned_items
+    ---@field set_pre_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parent: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is bool liberate_from_shop(Entity self, boolean clear_parent)<br/>Virtual function docs:<br/>It's not called when item is bought. It does not remove the item from StateMemory.room_owners.owned_items<br/>Parameter clear_parent used only for CHAR_* entities, sets the linked_companion_parent to -1.
+    ---@field set_post_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parent: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is nil liberate_from_shop(Entity self, boolean clear_parent)<br/>Virtual function docs:<br/>It's not called when item is bought. It does not remove the item from StateMemory.room_owners.owned_items<br/>Parameter clear_parent used only for CHAR_* entities, sets the linked_companion_parent to -1.
     ---@field set_pre_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is bool init(Entity self)<br/>Virtual function docs:<br/>Applies changes made in entity.type
     ---@field set_post_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is nil init(Entity self)<br/>Virtual function docs:<br/>Applies changes made in entity.type
 local Entity = nil

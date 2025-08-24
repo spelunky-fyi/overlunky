@@ -519,7 +519,7 @@ class LogicMoonChallenge : public LogicChallenge
 class LogicStarChallenge : public LogicChallenge
 {
   public:
-    std::vector<Entity*> torches; // TODO: check if custom vector (probably yes)
+    custom_vector<Entity*> torches;
     uint8_t start_countdown;
     uint8_t padding[3];
     uint32_t unknown9;
@@ -850,6 +850,7 @@ struct Dialogue
 struct ItemOwnerDetails
 {
     int32_t owner_uid;
+    /// Used for big spender "quest", checks if there are any items owned by ENT_TYPE`.MONS_SHOPKEEPER`
     ENT_TYPE owner_type;
 };
 
@@ -865,9 +866,9 @@ struct RoomOwnerDetails
 
 struct RoomOwnersInfo
 {
-    /// key/index is the uid of an item
+    /// "key" is the uid of an item.
     custom_map<int32_t, ItemOwnerDetails> owned_items;
-    std::vector<RoomOwnerDetails> owned_rooms;
+    custom_vector<RoomOwnerDetails> owned_rooms;
 };
 
 struct MultiLineTextRendering
