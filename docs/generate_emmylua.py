@@ -302,6 +302,7 @@ function F(f_string) end
                 if "comment" in var and var["comment"]
                 else ""
             )
+            comment_str = comment_str.replace("`", "");
             if "function" in var and var["function"]:
                 signature = var["signature"]
                 m = re.search(r"\s*(.*)\s+([^\(]*)\((.*)\)", signature)
