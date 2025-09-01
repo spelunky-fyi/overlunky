@@ -201,6 +201,7 @@ end
     NGPlayers::register_usertypes(lua);
     NSpawn::register_usertypes(lua);
     NGamePatches::register_usertypes(lua);
+    NOptions::register_usertypes(lua);
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
     lua["state"] = HeapBase::get_main().state();
