@@ -750,8 +750,8 @@ end
                 id,
                 make_safe_clearable_cb<bool(Screen*), CallbackType::Screen>(
                     std::move(fun),
-                    screen_id,
                     id,
+                    screen_id,
                     FrontBinder{},
                     BackBinder{[]()
                                { return VanillaRenderContext{}; }}));
@@ -774,8 +774,8 @@ end
                 id,
                 make_safe_clearable_cb<void(Screen*), CallbackType::Screen>(
                     std::move(fun),
-                    screen_id,
                     id,
+                    screen_id,
                     FrontBinder{},
                     BackBinder{[]()
                                { return VanillaRenderContext{}; }}));
