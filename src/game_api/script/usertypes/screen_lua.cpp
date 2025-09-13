@@ -500,7 +500,10 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<ScreenCredits>(
         "ScreenCredits",
         "credits_progression",
-        &ScreenCredits::credits_progression,
+        sol::property([](ScreenCredits& credits) -> float
+                      { return credits.credits_progression ? *credits.credits_progression : NAN; },
+                      [](ScreenCredits& credits, float v)
+                      { if (credits.credits_progression) *credits.credits_progression = v; }),
         "bg_music_info",
         &ScreenCredits::bg_music_info,
         sol::base_classes,
