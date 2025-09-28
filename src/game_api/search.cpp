@@ -691,8 +691,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_studio"sv, // probably wrong
-                         // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+        "fmod_studio"sv,
+        // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\xba\x03\x02\x02\x00"sv)
@@ -701,9 +701,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_event_properties"sv, // probably wrong
-                                   // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
-                                   // Said name comes from an array that is being looped, said array is a global of type EventParameters
+        "fmod_event_properties"sv,
+        // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+        // Said name comes from an array that is being looped, said array is a global of type EventParameters
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\x48\x8d\x9d\x38\x01\x00\x00"sv)
@@ -1473,23 +1473,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "arrowtrap_projectile"sv,
-        // Put a conditional bp on load_item (rdx = 0x173 (id of wooden arrow))
-        // Trigger a trap
-        PatternCommandBuffer{}
-            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x90"sv)
-            .offset(0x1)
-            .at_exe(),
-    },
-    {
-        "poison_arrowtrap_projectile"sv,
-        // See `arrowtrap_projectile`, but trigger a poison trap
-        PatternCommandBuffer{}
-            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x48\x89\xC6\x48\x8B\x00"sv)
-            .offset(0x1)
-            .at_exe(),
-    },
-    {
         "give_powerup"sv,
         // Put a write bp on Player(PowerupCapable).powerups.size and give that player a powerup
         // Go up in the callstack until you find a function that takes the powerup ID in rdx
@@ -1840,6 +1823,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // Put write bp on state.win_state and enter a multiplayer game
+        // alternative pattern 4C 8D 98 00 00 00 02 + function start
         "heap_clone"sv,
         PatternCommandBuffer{}
             .find_inst("4c 8d 05 f4 ca 27 00"_gh)
