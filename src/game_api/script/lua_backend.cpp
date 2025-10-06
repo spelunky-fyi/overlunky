@@ -44,16 +44,17 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
 {
     auto heap = HeapBase::get();
-    g_state = heap.state();
-    ScriptState& state = local_state_datas[g_state].state;
-    state.screen = g_state->screen;
-    state.time_level = g_state->time_level;
-    state.time_total = g_state->time_total;
+    auto state_memory = heap.state();
+    level_gen_data = heap.level_gen()->data;
+    ScriptState& state = local_state_datas[state_memory].state;
+    state.screen = state_memory->screen;
+    state.time_level = state_memory->time_level;
+    state.time_total = state_memory->time_total;
     state.time_global = heap.frame_count();
     state.frame = state.frame;
-    state.loading = g_state->loading;
-    state.reset = (g_state->quest_flags & 1);
-    state.quest_flags = g_state->quest_flags;
+    state.loading = state_memory->loading;
+    state.reset = (state_memory->quest_flags & 1);
+    state.quest_flags = state_memory->quest_flags;
 
     populate_lua_env(lua);
 
@@ -117,12 +118,12 @@ void LuaBackend::clear_all_callbacks()
     pre_entity_instagib_callbacks.clear();
     for (auto id : chance_callbacks)
     {
-        g_state->level_gen->data->unregister_chance_logic_provider(id);
+        level_gen_data->unregister_chance_logic_provider(id);
     }
     chance_callbacks.clear();
     for (auto id : extra_spawn_callbacks)
     {
-        g_state->level_gen->data->undefine_extra_spawn(id);
+        level_gen_data->undefine_extra_spawn(id);
     }
     extra_spawn_callbacks.clear();
 
@@ -230,8 +231,8 @@ void LuaBackend::set_user_data(Entity& entity, sol::object user_data)
 }
 void LuaBackend::set_user_data(uint32_t uid, sol::object user_data)
 {
-    auto ent = get_entity_ptr(uid);
-    set_user_data(*ent, user_data);
+    if (auto ent = get_entity_ptr(uid))
+        set_user_data(*ent, user_data);
 }
 
 bool LuaBackend::update()
@@ -881,9 +882,8 @@ bool LuaBackend::pre_load_screen()
                 if (slot == -1 && ent->linked_companion_parent != -1)
                 {
                     Player* parent = ent;
-                    while (true)
+                    while ((parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>()))
                     {
-                        parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
                         slot++;
                         if (parent->linked_companion_parent == -1)
                         {
@@ -897,6 +897,7 @@ bool LuaBackend::pre_load_screen()
                 }
                 if (slot < 0)
                     continue;
+
                 bool should_save = false;
                 SavedUserData saved;
                 if (user_datas.contains(ent->uid))
@@ -1025,9 +1026,8 @@ void LuaBackend::load_user_data()
             if (slot == -1 && ent->linked_companion_parent != -1)
             {
                 Player* parent = ent;
-                while (true)
+                while ((parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>()))
                 {
-                    parent = get_entity_ptr(parent->linked_companion_parent)->as<Player>();
                     slot++;
                     if (parent->linked_companion_parent == -1)
                     {
@@ -1041,6 +1041,7 @@ void LuaBackend::load_user_data()
             }
             if (slot < 0)
                 continue;
+
             if (saved_user_datas.contains(slot))
             {
                 if (saved_user_datas[slot].self.has_value())
@@ -1048,11 +1049,11 @@ void LuaBackend::load_user_data()
                 if (ent->holding_uid != -1 && saved_user_datas[slot].held.has_value())
                     set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
                 if (ent->overlay && (ent->overlay->type->search_flags & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT && saved_user_datas[slot].mount.has_value())
-                    set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
+                    set_user_data(*ent->overlay, saved_user_datas[slot].mount.value());
                 for (auto& [type, powerup] : ent->powerups)
                 {
                     if (saved_user_datas[slot].powerups.contains(type))
-                        set_user_data(powerup->uid, saved_user_datas[slot].powerups[type]);
+                        set_user_data(*powerup, saved_user_datas[slot].powerups[type]);
                 }
             }
         }
@@ -1246,7 +1247,7 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
                 auto _scope = set_current_callback(-1, callback.id, CallbackType::Normal);
                 if (auto spawn_replacement = handle_function<std::uint32_t>(this, callback.func, entity_type, x, y, layer, overlay, spawn_type_flags))
                 {
-                    return get_entity_ptr(spawn_replacement.value()); // TODO: this assumes that the entity is valid, which will crash if it's not
+                    return get_entity_ptr(spawn_replacement.value());
                 }
             }
         }

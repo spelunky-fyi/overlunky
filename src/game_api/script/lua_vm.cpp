@@ -358,7 +358,7 @@ end
     lua["set_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        int now = backend->g_state->time_level;
+        int now = HeapBase::get().state()->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
