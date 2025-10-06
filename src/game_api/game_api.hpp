@@ -68,7 +68,7 @@ struct Renderer
     size_t unknown62;                         // bool?
     std::unordered_set<std::string> textures; // all game textures including placeholder
 
-    // bunch of vectors that probably used to load textures or something, they all seam to contain names of the .dds files
+    // bunch of vectors that probably used to load textures or something, they all seem to contain names of the .dds files
     // when i checked all seam to be already cleared and just have the data leftover, the "const char**" pointers identical as in textureDB
 
     size_t unknown64[6];                 // possibly two more vectors?
