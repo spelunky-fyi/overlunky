@@ -283,7 +283,6 @@ struct HotKeyCallback
     int hotkeyid;
 };
 
-struct StateMemory;
 class SoundManager;
 class LuaConsole;
 struct RenderInfo;
@@ -345,11 +344,9 @@ class LuaBackend
     uint64_t last_save{0};
 
     ImDrawList* draw_list{nullptr};
-
-    StateMemory* g_state = nullptr;
-
-    SoundManager* sound_manager;
-    LuaConsole* console;
+    LevelGenData* level_gen_data{nullptr};
+    SoundManager* sound_manager{nullptr};
+    LuaConsole* console{nullptr};
 
     std::map<IMAGE, ScriptImage*> images;
 
