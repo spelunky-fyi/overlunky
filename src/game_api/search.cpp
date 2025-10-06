@@ -605,7 +605,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     //        .decode_imm(),
     //},
     {
-        // in load_item it's written to RCX and then calls create_entity
+        // in spawn_entity it's written to RCX and then calls create_entity
         "entity_factory"sv,
         PatternCommandBuffer{}
             .find_inst("48 83 80 90 01 00 00 01 4C 8B 3D"_gh)
@@ -614,7 +614,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "load_item"sv,
+        "spawn_entity"sv,
         PatternCommandBuffer{}
             .find_inst("48 8B 0C CA 83 81 44 01 00 00 01"_gh)
             .at_exe()
@@ -622,7 +622,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "add_to_layer"sv,
-        // Used in load_item as `add_to_layer(layer, spawned_entity)`
+        // Used in spawn_entity as `add_to_layer(layer, spawned_entity)`
         PatternCommandBuffer{}
             .find_inst("\x48\x83\xC1\x08\x45\x31\xC0\xE8"sv)
             .at_exe()
@@ -640,7 +640,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "create_entity"sv,
-        // First call in `load_item` is to this function
+        // First call in `spawn_entity` is to this function
         PatternCommandBuffer{}
             .find_inst("\x44\x88\xB8\xA0\x00\x00\x00\xF3\x0F\x11\x78\x40"sv)
             .at_exe()
@@ -648,7 +648,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "setup_lake_impostor"sv,
-        // After a call to `load_item` that spawns `0x38f` or `0x392` the spawned entity is passed to this function
+        // After a call to `spawn_entity` that spawns `0x38f` or `0x392` the spawned entity is passed to this function
         PatternCommandBuffer{}
             .find_inst("F3 0F 10 66 54 0F 2E E0"_gh)
             .at_exe()
@@ -734,7 +734,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "level_gen_handle_tile_code"sv,
         // Put a conditional bp on create_entity with entity_type == to_id("ENT_TYPE_FLOOR_GENERIC")
-        // The callstack should be handle_tile_code -> load_item -> create_entity
+        // The callstack should be handle_tile_code -> spawn_entity -> create_entity
         PatternCommandBuffer{}
             .find_inst("\xE8****\x83\xC5\x01"sv)
             .decode_call()
@@ -801,7 +801,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "level_gen_do_extra_spawns"sv,
         // Put a conditional bp in `create_entity` on `entity_type == to_id("ENT_TYPE_ITEM_LOCKEDCHEST_KEY")`
-        // Callstack should be `do_extra_spawns` -> `ThemeInfo::virtual_50` -> `load_item` -> `create_entity`
+        // Callstack should be `do_extra_spawns` -> `ThemeInfo::virtual_50` -> `spawn_entity` -> `create_entity`
         // Note that there is no `0xcc` padding before this function so we can't use `function_start`, at
         // least for 1.25.0b and maybe later
         PatternCommandBuffer{}
@@ -844,7 +844,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "level_gen_test_spawn_chance"sv,
-        // Called in the last virtual on ThemeInfo to determine whether a load_item should be done
+        // Called in the last virtual on ThemeInfo to determine whether a spawn_entity should be done
         PatternCommandBuffer{}
             .find_inst("\xE8****\x84\xC0\x48\x8B\x6C\x24"sv)
             .decode_call()
@@ -1154,7 +1154,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "explosion_mask"sv,
-        // Set a conditional bp on load_item for fx_explosion, throw a bomb and let it explode. When the debugger
+        // Set a conditional bp on spawn_entity for fx_explosion, throw a bomb and let it explode. When the debugger
         // breaks, continue execution, the pause menu will appear mid-explosion and you'll have a fully formed
         // fx_explosion entity. Put a read bp on its idle_counter and continue until you've breaked a couple of times.
         // The big function that breaks contains a call to the internal hitbox-overlap function for which the default
@@ -1167,7 +1167,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "attach_thrown_rope_to_background"sv,
-        // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope
+        // Set a bp on spawn_entity for ITEM_CLIMBABLE_ROPE and throw a rope
         // A little below that will 6 be written into the entity's segment_nr_inverse
         PatternCommandBuffer{}
             .find_inst("\xFF\x50\x30\xC7\x83\x30\x01\x00\x00*\x00\x00\x00"sv)
@@ -1176,7 +1176,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "process_ropes_one"sv,
-        // Set a bp on load_item for ITEM_CLIMBABLE_ROPE and throw a rope, continue until all the segments are being made
+        // Set a bp on spawn_entity for ITEM_CLIMBABLE_ROPE and throw a rope, continue until all the segments are being made
         // At the beginning of this big function will be two comparisons to 6 and a comparison to 5
         PatternCommandBuffer{}
             .find_inst("\x83\xF9*\x75\x3B"sv)
@@ -1250,7 +1250,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "teleport"sv,
-        // Put a bp on `load_item` for ENT_TYPE_FX_TELEPORTSHADOW, do a teleport, the calling function is the one
+        // Put a bp on `spawn_entity` for ENT_TYPE_FX_TELEPORTSHADOW, do a teleport, the calling function is the one
         PatternCommandBuffer{}
             .find_inst("\xBA\x96\x02\x00\x00\xE8****\x41\x8B"sv)
             .at_exe()
@@ -1258,7 +1258,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "spawn_companion"sv,
-        // Break on `load_item` with a condition of `rdx == 0xD7` (or whatever the id of a hired hand is).
+        // Break on `spawn_entity` with a condition of `rdx == 0xD7` (or whatever the id of a hired hand is).
         // Slap the coffin underneath Quillback
         PatternCommandBuffer{}
             .find_inst("\xBA\xD7\x00\x00\x00\x0F\x45\xD0"sv)
@@ -1339,7 +1339,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "generate_illumination"sv,
-        // Put a bp on load_item lamassu (or any other entity that has an internal Illumination*), follow into the first call of load_item
+        // Put a bp on spawn_entity lamassu (or any other entity that has an internal Illumination*), follow into the first call of spawn_entity
         // until the memory gets allocated, then put a write bp on the emmitted_light var inside the newly allocated memory.
         PatternCommandBuffer{}
             .find_inst("\xE8****\x48\x89\x86\x60\x01\x00\x00"sv)
@@ -1634,7 +1634,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Set condition bp on create_entity (not load_item) for one of the entities spawned by this generator
+        // Set condition bp on create_entity (not spawn_entity) for one of the entities spawned by this generator
         // execute to the return two times, you should see this array right above the call
         // It's pointer to array[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
         // we want the address to the `shift right` instruction since we gonna replace it all, but not mess with PRNG stuff
@@ -1654,7 +1654,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Set condition bp on load_item for ITEM_DICE_PRIZE_DISPENSER, execute first call
+        // Set condition bp on spawn_entity for ITEM_DICE_PRIZE_DISPENSER, execute first call
         // go to the address in RAX (new entity) and set write bp on +0x130 (or execute till you see function that writes to this address)
         // we want address after (rol rsi,1B) - it should be 14 bytes that we want to change and then - (mov qword ptr ds:[rax+20],rdi | mov qword ptr ds:[rax+28],rsi)
         "dice_shop_prizes_id_roll"sv,
@@ -1672,8 +1672,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // Set conditional bp on load_item with vampire id, break altar
-        // execute out of load_item, scroll up to find bunch of const addresses, on of which is array containing 5 id's (as of writing this comment, the address in not align to 8 bytes)
+        // Set conditional bp on spawn_entity with vampire id, break altar
+        // execute out of spawn_entity, scroll up to find bunch of const addresses, on of which is array containing 5 id's (as of writing this comment, the address in not align to 8 bytes)
         "altar_break_ent_types"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x45\x31\xFF\x4C\x8D\x25"sv)
@@ -1688,7 +1688,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        // Set conditional bp on load_item for KEY, execute til return, scroll up until you find instruction writing const into r14
+        // Set conditional bp on spawn_entity for KEY, execute til return, scroll up until you find instruction writing const into r14
         "waddler_drop_array"sv,
         PatternCommandBuffer{}
             .find_after_inst("\x45\x0F\x57\xDB\x4C\x8D\x35"sv)

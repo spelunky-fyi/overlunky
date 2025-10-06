@@ -127,7 +127,7 @@ std::vector<DropEntry> drop_entries{
     {"FACTORY_GENERATOR_SCRAP", "\x48\x89\xF9\xBA\xE6\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
     /// Keep in mind that shopkeeper generator spawns two types of entities, the second one will be this + 1
     {"SHOPKEEPER_GENERATOR_1", "\x81\xCA\x10\x01\x00\x00\x4C\x89\xE1"sv, VTABLE_OFFSET::NONE, 0, 2},
-    /* set conditional bp on load_item for spider, break some scrap until you hit bp, execute return, you will see spider id right above the spawn function
+    /* set conditional bp on spawn_entity for spider, break some scrap until you hit bp, execute return, you will see spider id right above the spawn function
      * scroll up to find the same pattern but for snake
      * just above the snake you can find cobra and scorpion id, with jump to the spawn function after snake
      * little higher up, same thing for alien */
