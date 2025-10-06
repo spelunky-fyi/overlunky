@@ -1405,30 +1405,33 @@ void register_usertypes(sol::state& lua)
     /// NoDoc
     struct DoorCoords
     {
-        float door1_x{0};
-        float door1_y{0};
-        float door2_x{0};
-        float door2_y{0};
+        custom_vector<Vec2>* exit_doors{nullptr};
     };
 
     /// NoDoc
-    lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
+    lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", sol::property([](DoorCoords& dc) -> float
+                                                                                             { return (dc.exit_doors && !dc.exit_doors->empty()) ? (*dc.exit_doors)[0].x : NAN; },
+                                                                                             [](DoorCoords& dc, float x)
+                                                                                             { if (dc.exit_doors && !dc.exit_doors->empty()) (*dc.exit_doors)[0].x =x; }),
+                                 "door1_y",
+                                 sol::property([](DoorCoords& dc) -> float
+                                               { return (dc.exit_doors && !dc.exit_doors->empty()) ? (*dc.exit_doors)[0].y : NAN; },
+                                               [](DoorCoords& dc, float y)
+                                               { if (dc.exit_doors && !dc.exit_doors->empty()) (*dc.exit_doors)[0].y =y; }),
+                                 "door2_x",
+                                 sol::property([](DoorCoords& dc) -> float
+                                               { return (dc.exit_doors && dc.exit_doors->size() > 1) ? (*dc.exit_doors)[1].x : NAN; },
+                                               [](DoorCoords& dc, float x)
+                                               { if (dc.exit_doors && dc.exit_doors->size() > 1) (*dc.exit_doors)[1].x =x; }),
+                                 "door2_y",
+                                 sol::property([](DoorCoords& dc) -> float
+                                               { return (dc.exit_doors && dc.exit_doors->size() > 1) ? (*dc.exit_doors)[1].y : NAN; },
+                                               [](DoorCoords& dc, float y)
+                                               {if (dc.exit_doors && dc.exit_doors->size() > 1) (*dc.exit_doors)[1].y = y; }));
 
     /// NoDoc
     levelgen_type["exits"] = sol::property([](LevelGenSystem& lg)
-                                           { 
-        DoorCoords doors; 
-        if (lg.exit_doors.size() > 1)
-        {
-            doors.door2_x = lg.exit_doors[1].x;
-            doors.door2_y = lg.exit_doors[1].y;
-        }
-        if (lg.exit_doors.size())
-        {
-            doors.door1_x = lg.exit_doors[0].x;
-            doors.door1_y = lg.exit_doors[0].y;
-        }
-        return doors; });
+                                           { return DoorCoords{&lg.exit_doors}; });
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.
