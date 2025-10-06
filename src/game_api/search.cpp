@@ -605,7 +605,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     //        .decode_imm(),
     //},
     {
-        // in load_item it's written to RCX and then calls spawn_entity
+        // in load_item it's written to RCX and then calls create_entity
         "entity_factory"sv,
         PatternCommandBuffer{}
             .find_inst("48 83 80 90 01 00 00 01 4C 8B 3D"_gh)
@@ -639,7 +639,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "spawn_entity"sv,
+        "create_entity"sv,
         // First call in `load_item` is to this function
         PatternCommandBuffer{}
             .find_inst("\x44\x88\xB8\xA0\x00\x00\x00\xF3\x0F\x11\x78\x40"sv)
@@ -656,7 +656,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "entitylist_insert"sv,
-        // Used in spawn_entity as `entitylist_insert(overlay + 0x18, spawned_entity, false)`
+        // Used in create_entity as `entitylist_insert(overlay + 0x18, spawned_entity, false)`
         PatternCommandBuffer{}
             .find_inst("\xe8****\x44\x88\x76"sv)
             .decode_call()
@@ -733,8 +733,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "level_gen_handle_tile_code"sv,
-        // Put a conditional bp on spawn_entity with entity_type == to_id("ENT_TYPE_FLOOR_GENERIC")
-        // The callstack should be handle_tile_code -> load_item -> spawn_entity
+        // Put a conditional bp on create_entity with entity_type == to_id("ENT_TYPE_FLOOR_GENERIC")
+        // The callstack should be handle_tile_code -> load_item -> create_entity
         PatternCommandBuffer{}
             .find_inst("\xE8****\x83\xC5\x01"sv)
             .decode_call()
@@ -800,8 +800,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "level_gen_do_extra_spawns"sv,
-        // Put a conditional bp in `spawn_entity` on `entity_type == to_id("ENT_TYPE_ITEM_LOCKEDCHEST_KEY")`
-        // Callstack should be `do_extra_spawns` -> `ThemeInfo::virtual_50` -> `load_item` -> `spawn_entity`
+        // Put a conditional bp in `create_entity` on `entity_type == to_id("ENT_TYPE_ITEM_LOCKEDCHEST_KEY")`
+        // Callstack should be `do_extra_spawns` -> `ThemeInfo::virtual_50` -> `load_item` -> `create_entity`
         // Note that there is no `0xcc` padding before this function so we can't use `function_start`, at
         // least for 1.25.0b and maybe later
         PatternCommandBuffer{}
@@ -902,17 +902,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         "fetch_texture_begin"sv,
-        // In spawn_entity right after the texture_id is assigned to a local (probably eax)
+        // In create_entity right after the texture_id is assigned to a local (probably eax)
         // and then checked against -4
         PatternCommandBuffer{}
             .set_optional(true)
-            .get_address("spawn_entity"sv)
+            .get_address("create_entity"sv)
             .find_inst_in_range("\x83\xf8\xfc"sv, 0x250)
             .at_exe(),
     },
     {
         "fetch_texture_end"sv,
-        // In spawn_entity before assigning Entity::animation_frame (0x3c)
+        // In create_entity before assigning Entity::animation_frame (0x3c)
         PatternCommandBuffer{}
             .set_optional(true)
             .get_address("fetch_texture_begin"sv)
@@ -1634,7 +1634,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Set condition bp on spawn_entity (not load_item) for one of the entities spawned by this generator
+        // Set condition bp on create_entity (not load_item) for one of the entities spawned by this generator
         // execute to the return two times, you should see this array right above the call
         // It's pointer to array[4]: 0x000000F5 0x000000EB 0x000000FC 0x000000FA
         // we want the address to the `shift right` instruction since we gonna replace it all, but not mess with PRNG stuff
@@ -1948,7 +1948,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // It's the function that calls ISteamUserStats::GetAchievement virtual when viewing the Feats page
         "get_feat"sv,
         PatternCommandBuffer{}
-            .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh) // Same as ^ btw
+            .find_after_inst("48 8b 44 24 68 4c 8d 3c 28 8d 1c 28"_gh) // alternative: 8D 1C 28 E8
             .find_next_inst("\xE8"sv)
             .decode_call()
             .at_exe(),
@@ -2121,7 +2121,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .from_exe_base(0x22e0d1d0) // TODO
     },
     {
-        // look into spawn entity function when spawning activefloor
+        // look into create entity function when spawning activefloor
         // or set break point on write to the activefloors map in state.liquid_physics.activefloors
         "add_movable_to_liquid_collision_map"sv, // jump
         PatternCommandBuffer{}
