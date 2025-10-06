@@ -80,7 +80,7 @@ Entity* Layer::spawn_entity_snap_to_floor(ENT_TYPE id, float x, float y)
 Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
 {
     using SpawnEntityFun = Entity*(EntityFactory*, ENT_TYPE, float, float, bool, Entity*, bool);
-    static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
+    static auto spawn_entity_raw = (SpawnEntityFun*)get_address("create_entity");
     using AddToLayer = void(Layer*, Entity*);
     static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
 
