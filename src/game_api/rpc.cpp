@@ -535,8 +535,9 @@ void add_item_to_shop(int32_t item_uid, int32_t shop_owner_uid)
                 state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEICON"), item, 0, 0);
                 state->layers[item->layer]->spawn_entity_over(to_id("ENT_TYPE_FX_SALEDIALOG_CONTAINER"), item, 0, 0.5);
 
-                ItemOwnerDetails iod{shop_owner_uid, owner->type->id};
-                state->room_owners.owned_items.insert({item->uid, iod});
+                auto& owner_details = state->room_owners.owned_items[item->uid];
+                owner_details.owner_type = owner->type->id;
+                owner_details.owner_uid = shop_owner_uid;
                 return;
             }
         }

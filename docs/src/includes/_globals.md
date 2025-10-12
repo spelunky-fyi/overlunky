@@ -694,7 +694,7 @@ Get the thread-local version of players
 
 > Search script examples for [get_player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_player)
 
-#### [Player](#Player) get_player(int slot, bool or_ghost = false)
+#### [Player](#Player)|[PlayerGhost](#PlayerGhost) get_player(int slot, optional<bool> or_ghost)
 
 Returns [Player](#Player) (or [PlayerGhost](#PlayerGhost) if `get_player(1, true)`) with this player slot
 
@@ -3064,12 +3064,29 @@ Spawn a [RoomOwner](#RoomOwner) (or a few other like [CavemanShopkeeper](#Cavema
 ### add_item_to_shop
 
 
+```lua
+function remove_from_shop(ent_uid)
+    local ent = get_entity(ent_uid)
+    if ent then
+        -- technically this function is all you need
+        ent:liberate_from_shop(true)
+    end
+
+    -- Be aware that removing all the items with the method below will grant you the "Big Spender" quest
+    -- removing items from the owned_items is not required
+    -- game only does it when you buy from the store and not when items are destroyed or shop disabled by aggro
+    state.room_owners.owned_items:erase(ent_uid)
+end
+
+```
+
+
 > Search script examples for [add_item_to_shop](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=add_item_to_shop)
 
 #### nil add_item_to_shop(int item_uid, int shop_owner_uid)
 
 Adds entity as shop item, has to be of [Purchasable](#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the [Purchasable](#Purchasable) entity types.
-Adding other entities will result in not obtainable items or game crash
+Adding other entities will result in not obtainable items or game crash, if item already is in [StateMemory](#StateMemory).room_owners.owned_items then it will just re-parent it
 
 ### is_inside_active_shop_room
 

@@ -320,8 +320,9 @@ class Entity
     /// only for CHAR_*: when going to the backlayer, turns on/off player emitted light
     virtual void toggle_backlayer_illumination() = 0; //    // 33
     virtual void v34() = 0;                           //    // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
-    /// `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
-    virtual void liberate_from_shop(bool clear_parrent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
+    /// It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`
+    /// Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
+    virtual void liberate_from_shop(bool clear_parent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0; // 36, This is actually just an initialize call that is happening once after  the entity is created
 };

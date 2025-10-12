@@ -205,7 +205,8 @@ class TotemTrap : public Floor
     uint8_t unused1;
     uint16_t unused2;
     uint32_t unused3;
-    uint8_t timer; // unsure
+    /// Only available for `FLOOR_LION_TRAP`
+    uint8_t timer;
     /// The uid must be movable entity for ownership transfers
     void trigger(int32_t who_uid, bool left)
     {

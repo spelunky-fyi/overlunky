@@ -1188,22 +1188,22 @@ void run()
     if (std::ofstream file = std::ofstream("game_data/textures.txt"))
     {
         std::unordered_map<std::string, uint32_t> counts;
-        for (auto* tex : get_textures()->texture_map)
+        for (auto& tex : get_textures()->textures)
         {
-            if (tex != nullptr && tex->name != nullptr)
+            if (tex.name != nullptr)
             {
-                std::string clean_tex_name = *tex->name;
+                std::string clean_tex_name = *tex.name;
                 std::transform(
-                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '/') return '_';
+                      return (unsigned char)std::toupper(c); });
                 size_t index = clean_tex_name.find(".DDS", 0);
                 if (index != std::string::npos)
                 {
                     clean_tex_name.erase(index, 4);
                 }
                 clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
-                file << "TEXTURE." << clean_tex_name << ": " << tex->id << std::endl;
+                file << "TEXTURE." << clean_tex_name << ": " << tex.id << std::endl;
             }
         }
     }
@@ -1252,9 +1252,9 @@ void run()
             {
                 std::string clean_event_name = event_name;
                 std::transform(
-                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
+                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '/') return '_';
+                      return (unsigned char)std::toupper(c); });
                 file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
             });
     }
@@ -1294,9 +1294,9 @@ void run()
         {
             std::string clean_tile_code_name = tile_code.first.c_str();
             std::transform(
-                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             file << clean_tile_code_name << ": " << tile_code.second.id << "\n";
         }
     }
@@ -1310,9 +1310,9 @@ void run()
             {
                 std::string clean_chance_name = spawn_chanc.first.c_str();
                 std::transform(
-                    clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+                    clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '-') return '_';
+                      return (unsigned char)std::toupper(c); });
                 ordered_chances.insert({spawn_chanc.second.id, std::move(clean_chance_name)});
             }
         }
@@ -1323,23 +1323,18 @@ void run()
     if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
         auto templates = level_gen->data->room_templates;
-        templates["empty_backlayer"] = {9};
-        templates["boss_arena"] = {22};
-        templates["shop_jail_backlayer"] = {44};
-        templates["waddler"] = {86};
-        templates["ghistshop_backlayer"] = {87};
-        templates["challange_entrance_backlayer"] = {90};
-        templates["blackmarket"] = {118};
-        templates["mothership_room"] = {125};
+        auto extra_templates = LevelGenData::get_missing_room_templates();
+        for (auto [name, id] : extra_templates)
+            templates[game_string(name)] = {id};
 
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {
             std::string clean_room_name = room_template.first.c_str();
             std::transform(
-                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
+                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             ordered_templates.insert({room_template.second.id, std::move(clean_room_name)});
         }
         for (const auto& [id, name] : ordered_templates)

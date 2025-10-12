@@ -1920,12 +1920,9 @@ bool LevelGenSystem::set_shop_type(uint32_t x, uint32_t y, uint8_t l, SHOP_TYPE 
 std::string_view LevelGenSystem::get_room_template_name(uint16_t room_template) const
 {
     for (const auto& [name, room_tpl] : data->room_templates)
-    {
         if (room_tpl.id == room_template)
-        {
             return name;
-        }
-    }
+
     return "invalid";
 }
 
@@ -2295,4 +2292,19 @@ void do_load_screen()
         return;
     load_screen_fun(state, 0, 0);
     post_load_screen();
+}
+
+std::span<const std::pair<std::string_view, uint16_t>> LevelGenData::get_missing_room_templates()
+{
+    constexpr static const std::array<std::pair<std::string_view, uint16_t>, 8> missing_templates = {{
+        {"empty_backlayer", 9},
+        {"boss_arena", 22},
+        {"shop_jail_backlayer", 44},
+        {"waddler", 86},
+        {"ghistshop_backlayer", 87},
+        {"challange_entrance_backlayer", 90},
+        {"blackmarket", 119},
+        {"mothership_room", 126},
+    }};
+    return {missing_templates.begin(), missing_templates.end()};
 }

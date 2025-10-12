@@ -45,6 +45,14 @@ replace_table = {
     "game_unordered_set<": "set<",
     "unordered_map<": "map<",  # doesn't seam to matter for lua if it's ordered or not
     "unordered_set<": "set<",  # doesn't seam to matter for lua if it's ordered or not
+    # special
+    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
+    "EmittedParticlesInfo": "array<Particle>",
+    "ImVec2": "Vec2",
+    "SoundCallbackFunction": "function",
+    "sol::object": "any",
+    "BucketItem": "any",
+    "ENTITY_MASK": "MASK",
     # removers
     ", identity_hasher<>": "",
     "std::": "",
@@ -60,14 +68,6 @@ replace_table = {
     ">()": "",
     "unsigned": "",
     "sol::no_constructor": "",
-    # special
-    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
-    "EmittedParticlesInfo": "array<Particle>",
-    "ImVec2": "Vec2",
-    "SoundCallbackFunction": "function",
-    "object ": "any ",
-    "BucketItem": "any",
-    "ENTITY_MASK": "MASK",
 }
 
 header_files = [
@@ -199,6 +199,7 @@ cpp_type_exceptions = [
     "Players",
     "CutsceneBehavior",
     "CustomCutsceneBehavior",
+    "DoorCoords",
 ]
 not_functions = [
     "players",

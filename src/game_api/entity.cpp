@@ -77,7 +77,7 @@ void Entity::apply_layer()
 
 void Entity::remove()
 {
-    if (layer != 2)
+    if (layer == 0 || layer == 1)
     {
         auto state = HeapBase::get().state();
         auto ptr_from = state->layers[layer];
