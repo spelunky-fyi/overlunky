@@ -310,19 +310,6 @@ CustomBank::CustomBank(FMOD::Bank* fmod_bank, SoundManager* sound_manager)
     : m_FmodHandle{fmod_bank}, m_SoundManager{sound_manager}
 {
 }
-CustomBank::~CustomBank()
-{
-    if (m_SoundManager != nullptr)
-    {
-        std::visit(
-            overloaded{
-                [this](FMOD::Bank* bank)
-                { m_SoundManager->destroy_bank(bank); },
-                [](std::monostate) {},
-            },
-            m_FmodHandle);
-    }
-}
 std::optional<FMODStudio::LoadingState> CustomBank::get_loading_state()
 {
     return m_SoundManager->get_bank_loading_state(*this);
@@ -796,7 +783,6 @@ struct SoundManager::Sound
 
 struct SoundManager::Bank
 {
-    std::uint32_t ref_count;
     std::string path;
     FMOD::Bank* fmod_bank{nullptr};
 };
@@ -1165,12 +1151,10 @@ CustomBank SoundManager::load_bank(std::string path, FMODStudio::LoadBankFlags f
                            { return bank.path == path; });
     if (it != m_BankStorage.end())
     {
-        it->ref_count++;
         return CustomBank{it->fmod_bank, this};
     }
 
     Bank new_bank;
-    new_bank.ref_count = 1;
     new_bank.path = std::move(path);
 
     FMOD::FMOD_RESULT err = m_SystemLoadBankFile(m_FmodStudioSystem, new_bank.path.c_str(), flags, &new_bank.fmod_bank);
@@ -1193,7 +1177,6 @@ CustomBank SoundManager::get_existing_bank(std::string_view path)
                            { return bank.path == path; });
     if (it != m_BankStorage.end())
     {
-        it->ref_count++;
         return CustomBank{it->fmod_bank, this};
     }
     return CustomBank{nullptr, nullptr};
@@ -1207,20 +1190,6 @@ void SoundManager::acquire_bank(FMOD::Bank* fmod_bank)
         DEBUG("Trying to acquire bank that does not exist...");
         return;
     }
-
-    it->ref_count++;
-}
-void SoundManager::destroy_bank(FMOD::Bank* fmod_bank)
-{
-    auto it = std::find_if(m_BankStorage.begin(), m_BankStorage.end(), [fmod_bank](const Bank& bank)
-                           { return bank.fmod_bank == fmod_bank; });
-    if (it == m_BankStorage.end())
-    {
-        DEBUG("Trying to destroy bank that does not exist...");
-        return;
-    }
-
-    it->ref_count--;
 }
 std::optional<FMODStudio::LoadingState> SoundManager::get_bank_loading_state(CustomBank custom_bank)
 {
@@ -1284,20 +1253,12 @@ bool SoundManager::unload_bank(FMOD::Bank* fmod_bank)
         return false;
     }
 
-    if (it->ref_count == 1)
+    auto res = FMOD_CHECK_CALL(m_BankUnload(it->fmod_bank));
+    if (res)
     {
-        auto res = FMOD_CHECK_CALL(m_BankUnload(it->fmod_bank));
-        if (res)
-        {
-            m_BankStorage.erase(it);
-        }
-        return res;
+        m_BankStorage.erase(it);
     }
-    else
-    {
-        it->ref_count--;
-        return false;
-    }
+    return res;
 }
 bool SoundManager::bank_is_valid(CustomBank custom_bank)
 {

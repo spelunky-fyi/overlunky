@@ -121,7 +121,7 @@ class CustomBank
     CustomBank(CustomBank&& rhs) noexcept;
     CustomBank& operator=(const CustomBank& rhs) = delete;
     CustomBank& operator=(CustomBank&& rhs) = delete;
-    ~CustomBank();
+    ~CustomBank() = default;
 
     operator bool()
     {
@@ -284,7 +284,6 @@ class SoundManager
     CustomBank load_bank(const char* path, FMODStudio::LoadBankFlags flags);
     CustomBank get_existing_bank(std::string_view path);
     void acquire_bank(FMOD::Bank* fmod_bank);
-    void destroy_bank(FMOD::Bank* fmod_bank);
     std::optional<FMODStudio::LoadingState> get_bank_loading_state(CustomBank custom_bank);
     bool load_bank_sample_data(CustomBank custom_bank);
     bool unload_bank_sample_data(CustomBank custom_bank);
