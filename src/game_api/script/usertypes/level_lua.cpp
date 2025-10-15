@@ -1179,8 +1179,6 @@ void register_usertypes(sol::state& lua)
     lua["load_screen"] = do_load_screen;
 
     auto themeinfo_type = lua.new_usertype<ThemeInfo>("ThemeInfo");
-    themeinfo_type["unknown3"] = &ThemeInfo::unknown3;
-    themeinfo_type["unknown4"] = &ThemeInfo::unknown4;
     themeinfo_type["theme"] = &ThemeInfo::padding3; // this is totally not a real thing, but there was space to store it for vtable hooks
     themeinfo_type["allow_beehive"] = &ThemeInfo::allow_beehive;
     themeinfo_type["allow_leprechaun"] = &ThemeInfo::allow_leprechaun;
@@ -1370,12 +1368,8 @@ void register_usertypes(sol::state& lua)
         "add_level_files",
         &PreLoadLevelFilesContext::add_level_files);
 
-    /// Deprecated
-    ///  kept for backward compatibility, don't use, check LevelGenSystem.exit_doors
-    lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", &DoorCoords::door1_x, "door1_y", &DoorCoords::door1_y, "door2_x", &DoorCoords::door2_x, "door2_y", &DoorCoords::door2_y);
-
     /// Data relating to level generation, changing anything in here from ON.LEVEL or later will likely have no effect, used in StateMemory
-    lua.new_usertype<LevelGenSystem>(
+    auto levelgen_type = lua.new_usertype<LevelGenSystem>(
         "LevelGenSystem",
         sol::no_constructor,
         "shop_type",
@@ -1394,8 +1388,6 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::spawn_room_x,
         "spawn_room_y",
         &LevelGenSystem::spawn_room_y,
-        "exits",
-        &LevelGenSystem::exit_doors_locations,
         "exit_doors",
         &LevelGenSystem::exit_doors,
         "themes",
@@ -1409,6 +1401,37 @@ void register_usertypes(sol::state& lua)
         "level_config",
         sol::property([](LevelGenSystem& lg) // -> array<int, 17>
                       { return ZeroIndexArray<uint32_t>(lg.data->level_config) /**/; }));
+
+    /// NoDoc
+    struct DoorCoords
+    {
+        custom_vector<Vec2>* exit_doors{nullptr};
+    };
+
+    /// NoDoc
+    lua.new_usertype<DoorCoords>("DoorCoords", sol::no_constructor, "door1_x", sol::property([](DoorCoords& dc) -> float
+                                                                                             { return (dc.exit_doors && !dc.exit_doors->empty()) ? (*dc.exit_doors)[0].x : NAN; },
+                                                                                             [](DoorCoords& dc, float x)
+                                                                                             { if (dc.exit_doors && !dc.exit_doors->empty()) (*dc.exit_doors)[0].x =x; }),
+                                 "door1_y",
+                                 sol::property([](DoorCoords& dc) -> float
+                                               { return (dc.exit_doors && !dc.exit_doors->empty()) ? (*dc.exit_doors)[0].y : NAN; },
+                                               [](DoorCoords& dc, float y)
+                                               { if (dc.exit_doors && !dc.exit_doors->empty()) (*dc.exit_doors)[0].y =y; }),
+                                 "door2_x",
+                                 sol::property([](DoorCoords& dc) -> float
+                                               { return (dc.exit_doors && dc.exit_doors->size() > 1) ? (*dc.exit_doors)[1].x : NAN; },
+                                               [](DoorCoords& dc, float x)
+                                               { if (dc.exit_doors && dc.exit_doors->size() > 1) (*dc.exit_doors)[1].x =x; }),
+                                 "door2_y",
+                                 sol::property([](DoorCoords& dc) -> float
+                                               { return (dc.exit_doors && dc.exit_doors->size() > 1) ? (*dc.exit_doors)[1].y : NAN; },
+                                               [](DoorCoords& dc, float y)
+                                               {if (dc.exit_doors && dc.exit_doors->size() > 1) (*dc.exit_doors)[1].y = y; }));
+
+    /// NoDoc
+    levelgen_type["exits"] = sol::property([](LevelGenSystem& lg)
+                                           { return DoorCoords{&lg.exit_doors}; });
 
     /// Context received in ON.POST_ROOM_GENERATION.
     /// Used to change the room templates in the level and other shenanigans that affect level gen.
@@ -1731,9 +1754,9 @@ void register_usertypes(sol::state& lua)
     {
         std::string clean_tile_code_name = tile_code_name.c_str();
         std::transform(
-            clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
-            { return (unsigned char)std::toupper(c); });
-        std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+            clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c) -> unsigned char
+            { if(c == '-') return '_';
+              return (unsigned char)std::toupper(c); });
         lua["TILE_CODE"][std::move(clean_tile_code_name)] = tile_code.id;
     };
 
@@ -1742,24 +1765,25 @@ void register_usertypes(sol::state& lua)
                            //, "", ...check__[room_templates.txt]\[game_data/room_templates.txt\]...
     );
 
-    auto room_templates = level_gen->data->room_templates;
-    room_templates["empty_backlayer"] = {9};
-    room_templates["boss_arena"] = {22};
-    room_templates["shop_jail_backlayer"] = {44};
-    room_templates["waddler"] = {86};
-    room_templates["ghistshop_backlayer"] = {87};
-    room_templates["challange_entrance_backlayer"] = {90};
-    room_templates["blackmarket"] = {118};
-    room_templates["mothership_room"] = {125};
-    for (const auto& [room_name, room_template] : room_templates)
     {
-        std::string clean_room_name = room_name.c_str();
-        std::transform(
-            clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
-            { return (unsigned char)std::toupper(c); });
-        std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
-        lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template.id;
-    };
+        auto add_to_room_template_enum = [&lua](std::string_view room_name, uint16_t room_template)
+        {
+            std::string clean_room_name(room_name);
+            std::transform(
+                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
+
+            lua["ROOM_TEMPLATE"][std::move(clean_room_name)] = room_template;
+        };
+        auto& room_templates = level_gen->data->room_templates;
+        for (const auto& [name, def] : room_templates)
+            add_to_room_template_enum(name, def.id);
+
+        auto extra_templates = LevelGenData::get_missing_room_templates();
+        for (const auto [name, id] : extra_templates)
+            add_to_room_template_enum(name, id);
+    }
 
     lua.create_named_table("PROCEDURAL_CHANCE"
                            //, "ARROWTRAP_CHANCE", 0
@@ -1771,9 +1795,9 @@ void register_usertypes(sol::state& lua)
         {
             std::string clean_chance_name = chance_name.c_str();
             std::transform(
-                clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+                clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             lua["PROCEDURAL_CHANCE"][std::move(clean_chance_name)] = chance.id;
         }
     }

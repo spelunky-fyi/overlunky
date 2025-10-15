@@ -47,6 +47,7 @@ struct LevelGenSystem;
 class ThemeInfo;
 struct Items;
 struct Illumination;
+struct LightSources;
 class Player;
 
 #pragma pack(push, 1) // disable struct padding
@@ -265,10 +266,10 @@ struct StateMemory
     LogicList* logic;
     /// NPC quest states
     QuestsInfo* quests;
-    AITarget* ai_targets; // e.g. hired hand uid -> snake uid
+    AITarget* ai_targets; // e.g. hired hand uid -> snake uid // size 0x2AE84
     LiquidPhysics* liquid_physics;
     custom_vector<ParticleEmitterInfo*>* particle_emitters;
-    custom_vector<Illumination*>* lightsources;
+    LightSources* lightsources;
     EntityLookup* entity_lookup;
 
     // This is a Robin Hood Table

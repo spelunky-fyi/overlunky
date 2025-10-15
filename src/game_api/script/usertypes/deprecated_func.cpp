@@ -6,6 +6,7 @@
 #include <vector>      // for vector
 
 #include "aliases.hpp"                    // for CallbackId
+#include "drops.hpp"                      // for replace_drop_by_name
 #include "entities_chars.hpp"             // for Player
 #include "entities_items.hpp"             // for PlayerGhost
 #include "entity.hpp"                     // for get_entity_ptr
@@ -75,10 +76,8 @@ void register_usertypes(sol::state& lua)
     /// Use [replace_drop](#replace_drop)(DROP.ARROWTRAP_WOODENARROW, new_arrow_type) and [replace_drop](#replace_drop)(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead
     lua["set_arrowtrap_projectile"] = [](ENT_TYPE regular_entity_type, ENT_TYPE poison_entity_type)
     {
-        static const auto arrowtrap = get_address("arrowtrap_projectile");
-        static const auto poison_arrowtrap = get_address("poison_arrowtrap_projectile");
-        write_mem_prot(arrowtrap, regular_entity_type, true);
-        write_mem_prot(poison_arrowtrap, poison_entity_type, true);
+        replace_drop_by_name("ARROWTRAP_WOODENARROW", regular_entity_type);
+        replace_drop_by_name("POISONEDARROWTRAP_WOODENARROW", poison_entity_type);
     };
 
     /// Deprecated

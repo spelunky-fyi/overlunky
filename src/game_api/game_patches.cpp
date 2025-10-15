@@ -54,7 +54,7 @@ bool check_if_ent_type_exists(ENT_TYPE type, int mask)
     StateMemory* state = get_state_ptr();
 
     const auto entities_map = &state->layers[0]->entities_by_mask; // game code only cares about the front layer, so we do the same
-    auto it = entities_map->find(mask);
+    auto it = entities_map->find(static_cast<ENTITY_MASK>(mask));
     if (it == entities_map->end())
         return false;
 

@@ -1996,9 +1996,6 @@
                     <a href="#Levelgen-types" class="toc-h2 toc-link" data-title="Levelgen types">Levelgen types</a>
                       <ul class="toc-list-h3">
                           <li>
-                            <a href="#DoorCoords" class="toc-h3 toc-link" data-title="DoorCoords">DoorCoords</a>
-                          </li>
-                          <li>
                             <a href="#LevelGenSystem" class="toc-h3 toc-link" data-title="LevelGenSystem">LevelGenSystem</a>
                           </li>
                       </ul>
@@ -2081,6 +2078,9 @@
                           </li>
                           <li>
                             <a href="#LogicTiamatCutscene" class="toc-h3 toc-link" data-title="LogicTiamatCutscene">LogicTiamatCutscene</a>
+                          </li>
+                          <li>
+                            <a href="#LogicTunPreChallenge" class="toc-h3 toc-link" data-title="LogicTunPreChallenge">LogicTunPreChallenge</a>
                           </li>
                           <li>
                             <a href="#LogicTuskPleasurePalace" class="toc-h3 toc-link" data-title="LogicTuskPleasurePalace">LogicTuskPleasurePalace</a>
@@ -4709,7 +4709,7 @@ if the entity has no localized name</p>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_player">get_player</a></p>
 </blockquote>
-<h4 id='Player-get_player-int-slot-bool-or_ghost-false'><a href="#Player">Player</a> get_player(int slot, bool or_ghost = false)</h4>
+<h4 id='Player-PlayerGhost-get_player-int-slot-optional-or_ghost'><a href="#Player">Player</a>|<a href="#PlayerGhost">PlayerGhost</a> get_player(int slot, optional<bool> or_ghost)</h4>
 <p>Returns <a href="#Player">Player</a> (or <a href="#PlayerGhost">PlayerGhost</a> if <code>get_player(1, true)</code>) with this player slot</p>
 <h3 id='get_playerghost'>get_playerghost</h3>
 <blockquote>
@@ -6288,13 +6288,26 @@ you&#39;re standing on, not real level coordinates.</p>
 </blockquote>
 <h4 id='int-spawn_roomowner-ENT_TYPE-owner_type-float-x-float-y-LAYER-layer-ROOM_TEMPLATE-room_template-1'>int spawn_roomowner(<a href="#ENT_TYPE">ENT_TYPE</a> owner_type, float x, float y, <a href="#LAYER">LAYER</a> layer, <a href="#ROOM_TEMPLATE">ROOM_TEMPLATE</a> room_template = -1)</h4>
 <p>Spawn a <a href="#RoomOwner">RoomOwner</a> (or a few other like <a href="#CavemanShopkeeper">CavemanShopkeeper</a>) in the coordinates and make them own the room, optionally changing the room template. Returns the <a href="#RoomOwner">RoomOwner</a> uid.</p>
-<h2 id='Shop-functions'>Shop functions</h2><h3 id='add_item_to_shop'>add_item_to_shop</h3>
+<h2 id='Shop-functions'>Shop functions</h2><h3 id='add_item_to_shop'>add_item_to_shop</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="k">function</span> <span class="nf">remove_from_shop</span><span class="p">(</span><span class="n">ent_uid</span><span class="p">)</span>
+    <span class="kd">local</span> <span class="n">ent</span> <span class="o">=</span> <span class="n">get_entity</span><span class="p">(</span><span class="n">ent_uid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ent</span> <span class="k">then</span>
+        <span class="c1">-- technically this function is all you need</span>
+        <span class="n">ent</span><span class="p">:</span><span class="n">liberate_from_shop</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+    <span class="k">end</span>
+
+    <span class="c1">-- Be aware that removing all the items with the method below will grant you the "Big Spender" quest</span>
+    <span class="c1">-- removing items from the owned_items is not required</span>
+    <span class="c1">-- game only does it when you buy from the store and not when items are destroyed or shop disabled by aggro</span>
+    <span class="n">state</span><span class="p">.</span><span class="n">room_owners</span><span class="p">.</span><span class="n">owned_items</span><span class="p">:</span><span class="n">erase</span><span class="p">(</span><span class="n">ent_uid</span><span class="p">)</span>
+<span class="k">end</span>
+
+</code></pre></div>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=add_item_to_shop">add_item_to_shop</a></p>
 </blockquote>
 <h4 id='nil-add_item_to_shop-int-item_uid-int-shop_owner_uid'>nil add_item_to_shop(int item_uid, int shop_owner_uid)</h4>
 <p>Adds entity as shop item, has to be of <a href="#Purchasable">Purchasable</a> type, check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md">entity hierarchy list</a> to find all the <a href="#Purchasable">Purchasable</a> entity types.
-Adding other entities will result in not obtainable items or game crash</p>
+Adding other entities will result in not obtainable items or game crash, if item already is in <a href="#StateMemory">StateMemory</a>.room_owners.owned_items then it will just re-parent it</p>
 <h3 id='is_inside_active_shop_room'>is_inside_active_shop_room</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_inside_active_shop_room">is_inside_active_shop_room</a></p>
@@ -9943,7 +9956,7 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <tr>
 <td><a href="#ENT_TYPE">ENT_TYPE</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=owner_type">owner_type</a></td>
-<td></td>
+<td>Used for big spender &quot;quest&quot;, checks if there are any items owned by <a href="#ENT_TYPE">ENT_TYPE</a><code>.MONS_SHOPKEEPER</code></td>
 </tr>
 <tr>
 <td>int</td>
@@ -10710,7 +10723,7 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td>map&lt;int, <a href="#ItemOwnerDetails">ItemOwnerDetails</a>&gt;</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=owned_items">owned_items</a></td>
-<td>key/index is the uid of an item</td>
+<td>&quot;key&quot; is the uid of an item.</td>
 </tr>
 <tr>
 <td>vector&lt;<a href="#RoomOwnerDetails">RoomOwnerDetails</a>&gt;</td>
@@ -11995,39 +12008,7 @@ Derived from <a href="#JournalPageData">JournalPageData</a></p>
 <td></td>
 </tr>
 </tbody></table>
-<h2 id='Levelgen-types'>Levelgen types</h2><h3 id='DoorCoords'>DoorCoords</h3>
-<p>Deprecated
- kept for backward compatibility, don&#39;t use, check <a href="#LevelGenSystem">LevelGenSystem</a>.exit_doors</p>
-
-<table><thead>
-<tr>
-<th>Type</th>
-<th>Name</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door1_x">door1_x</a></td>
-<td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door1_y">door1_y</a></td>
-<td></td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door2_x">door2_x</a></td>
-<td>door2 only valid when there are two in the level, like Volcana drill, <a href="#Olmec">Olmec</a>, ...</td>
-</tr>
-<tr>
-<td>float</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=door2_y">door2_y</a></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id='LevelGenSystem'>LevelGenSystem</h3>
+<h2 id='Levelgen-types'>Levelgen types</h2><h3 id='LevelGenSystem'>LevelGenSystem</h3>
 <p>Data relating to level generation, changing anything in here from <a href="#ON">ON</a>.LEVEL or later will likely have no effect, used in <a href="#StateMemory">StateMemory</a></p>
 
 <table><thead>
@@ -12938,6 +12919,23 @@ Derived from <a href="#Logic">Logic</a></p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=timer">timer</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='LogicTunPreChallenge'>LogicTunPreChallenge</h3>
+<p>Used in <a href="#LogicList">LogicList</a>
+Derived from <a href="#Logic">Logic</a></p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=tun_uid">tun_uid</a></td>
 <td></td>
 </tr>
 </tbody></table>
@@ -18822,16 +18820,6 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </thead><tbody>
 <tr>
 <td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown3">unknown3</a></td>
-<td></td>
-</tr>
-<tr>
-<td>int</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unknown4">unknown4</a></td>
-<td></td>
-</tr>
-<tr>
-<td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=theme">theme</a></td>
 <td></td>
 </tr>
@@ -21448,8 +21436,8 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 </tr>
 <tr>
 <td>nil</td>
-<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=liberate_from_shop">liberate_from_shop(bool clear_parrent)</a></td>
-<td><code>clear_parent</code> used only for CHAR_* entities, sets the <code>linked_companion_parent</code> to -1. It&#39;s not called when item is bought</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=liberate_from_shop">liberate_from_shop(bool clear_parent)</a></td>
+<td>It&#39;s not called when item is bought. It does not remove the item from <a href="#StateMemory">StateMemory</a><code>.room_owners.owned_items</code><br/>Parameter <code>clear_parent</code> used only for CHAR_* entities, sets the <code>linked_companion_parent</code> to -1.</td>
 </tr>
 <tr>
 <td><a href="#Entity">Entity</a></td>
@@ -21884,12 +21872,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_liberate_from_shop">set_pre_liberate_from_shop(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool liberate_from_shop(Entity self, bool clear_parrent)</code><br/>Virtual function docs:<br/><code>clear_parent</code> used only for CHAR_* entities, sets the <code>linked_companion_parent</code> to -1. It&#39;s not called when item is bought</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool liberate_from_shop(Entity self, bool clear_parent)</code><br/>Virtual function docs:<br/>It&#39;s not called when item is bought. It does not remove the item from StateMemory<code>.room_owners.owned_items</code><br/>Parameter <code>clear_parent</code> used only for CHAR_* entities, sets the <code>linked_companion_parent</code> to -1.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_liberate_from_shop">set_post_liberate_from_shop(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil liberate_from_shop(Entity self, bool clear_parrent)</code><br/>Virtual function docs:<br/><code>clear_parent</code> used only for CHAR_* entities, sets the <code>linked_companion_parent</code> to -1. It&#39;s not called when item is bought</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil liberate_from_shop(Entity self, bool clear_parent)</code><br/>Virtual function docs:<br/>It&#39;s not called when item is bought. It does not remove the item from StateMemory<code>.room_owners.owned_items</code><br/>Parameter <code>clear_parent</code> used only for CHAR_* entities, sets the <code>linked_companion_parent</code> to -1.</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -22331,6 +22319,11 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=liquid_intensity">liquid_intensity</a></td>
+<td>Just the parameter for sound in <a href="#LogicalSound">LogicalSound</a></td>
+</tr>
 </tbody></table>
 <h3 id='LogicalMiniGame'>LogicalMiniGame</h3>
 <p>Derived from <a href="#Entity">Entity</a></p>

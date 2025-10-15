@@ -249,6 +249,7 @@ void register_usertypes(sol::state& lua)
     logicdiceshop_type["result_announcement_timer"] = &LogicDiceShop::result_announcement_timer;
     logicdiceshop_type["won_prizes_count"] = &LogicDiceShop::won_prizes_count;
     logicdiceshop_type["balance"] = &LogicDiceShop::balance;
+
     /// Used in LogicList
     lua.new_usertype<LogicTunPreChallenge>(
         "LogicTunPreChallenge",

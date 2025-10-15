@@ -148,7 +148,9 @@ struct EntityFactory
     bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map; // game_unorderedmap probably
     std::unordered_map<std::string, uint16_t> entity_map;                             // game_unorderedmap probably
+    size_t unknown;
 };
+static_assert(sizeof(EntityFactory) == 0x39920);
 
 EntityDB* get_type(ENT_TYPE id);
 

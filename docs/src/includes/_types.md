@@ -865,7 +865,7 @@ Used in [RoomOwnersInfo](#RoomOwnersInfo)
 
 Type | Name | Description
 ---- | ---- | -----------
-[ENT_TYPE](#ENT_TYPE) | [owner_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_type) | 
+[ENT_TYPE](#ENT_TYPE) | [owner_type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_type) | Used for big spender "quest", checks if there are any items owned by [ENT_TYPE](#ENT_TYPE)`.MONS_SHOPKEEPER`
 int | [owner_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owner_uid) | 
 
 ### JournalPageData
@@ -1109,7 +1109,7 @@ Used in [StateMemory](#StateMemory)
 
 Type | Name | Description
 ---- | ---- | -----------
-map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | key/index is the uid of an item
+map&lt;int, [ItemOwnerDetails](#ItemOwnerDetails)&gt; | [owned_items](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_items) | "key" is the uid of an item.
 vector&lt;[RoomOwnerDetails](#RoomOwnerDetails)&gt; | [owned_rooms](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=owned_rooms) | 
 
 ### SaveState
@@ -1552,18 +1552,6 @@ int | [background_sprite_id](https://github.com/spelunky-fyi/overlunky/search?l=
 ## Levelgen types
 
 
-### DoorCoords
-
-Deprecated
- kept for backward compatibility, don't use, check [LevelGenSystem](#LevelGenSystem).exit_doors
-
-Type | Name | Description
----- | ---- | -----------
-float | [door1_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_x) | 
-float | [door1_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door1_y) | 
-float | [door2_x](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_x) | door2 only valid when there are two in the level, like Volcana drill, [Olmec](#Olmec), ...
-float | [door2_y](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=door2_y) | 
-
 ### LevelGenSystem
 
 Data relating to level generation, changing anything in here from [ON](#ON).LEVEL or later will likely have no effect, used in [StateMemory](#StateMemory)
@@ -1892,6 +1880,16 @@ Type | Name | Description
 [Entity](#Entity) | [player](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=player) | 
 [Entity](#Entity) | [cinematic_anchor](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=cinematic_anchor) | 
 int | [timer](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=timer) | 
+
+### LogicTunPreChallenge
+
+Used in [LogicList](#LogicList)
+Derived from [Logic](#Logic)
+
+
+Type | Name | Description
+---- | ---- | -----------
+int | [tun_uid](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=tun_uid) | 
 
 ### LogicTuskPleasurePalace
 
@@ -3552,8 +3550,6 @@ end)
 
 Type | Name | Description
 ---- | ---- | -----------
-int | [unknown3](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown3) | 
-int | [unknown4](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=unknown4) | 
 int | [theme](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=theme) | 
 bool | [allow_beehive](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=allow_beehive) | 
 bool | [allow_leprechaun](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=allow_leprechaun) | 
@@ -4448,7 +4444,7 @@ bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlun
 nil | [set_draw_depth(int draw_depth, optional<int> unknown)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering) 
 nil | [reset_draw_depth()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_draw_depth) | 
 float | [friction()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) | Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
-nil | [liberate_from_shop(bool clear_parrent)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
+nil | [liberate_from_shop(bool clear_parent)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | It's not called when item is bought. It does not remove the item from [StateMemory](#StateMemory)`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
 [Entity](#Entity) | [get_held_entity()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_held_entity) | 
 nil | [set_layer(LAYER layer)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_layer) | Moves the entity to specified layer with all it's items, nothing else happens, so this does not emulate a door transition
 nil | [apply_layer()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=apply_layer) | Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
@@ -4535,8 +4531,8 @@ nil | [clear_virtual(CallbackId callback_id)](https://github.com/spelunky-fyi/ov
 [CallbackId](#Aliases) | [set_post_ledge_grab(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_ledge_grab) | Hooks after the virtual function.<br/>The callback signature is `nil ledge_grab(Entity self, Entity who)`
 [CallbackId](#Aliases) | [set_pre_stood_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_stood_on) | Hooks before the virtual function.<br/>The callback signature is `bool stood_on(Entity self, Entity entity, Vec2)`
 [CallbackId](#Aliases) | [set_post_stood_on(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_stood_on) | Hooks after the virtual function.<br/>The callback signature is `nil stood_on(Entity self, Entity entity, Vec2)`
-[CallbackId](#Aliases) | [set_pre_liberate_from_shop(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_liberate_from_shop) | Hooks before the virtual function.<br/>The callback signature is `bool liberate_from_shop(Entity self, bool clear_parrent)`<br/>Virtual function docs:<br/>`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
-[CallbackId](#Aliases) | [set_post_liberate_from_shop(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_liberate_from_shop) | Hooks after the virtual function.<br/>The callback signature is `nil liberate_from_shop(Entity self, bool clear_parrent)`<br/>Virtual function docs:<br/>`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
+[CallbackId](#Aliases) | [set_pre_liberate_from_shop(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_liberate_from_shop) | Hooks before the virtual function.<br/>The callback signature is `bool liberate_from_shop(Entity self, bool clear_parent)`<br/>Virtual function docs:<br/>It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
+[CallbackId](#Aliases) | [set_post_liberate_from_shop(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_liberate_from_shop) | Hooks after the virtual function.<br/>The callback signature is `nil liberate_from_shop(Entity self, bool clear_parent)`<br/>Virtual function docs:<br/>It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
 [CallbackId](#Aliases) | [set_pre_init(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_pre_init) | Hooks before the virtual function.<br/>The callback signature is `bool init(Entity self)`<br/>Virtual function docs:<br/>Applies changes made in `entity.type`
 [CallbackId](#Aliases) | [set_post_init(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_post_init) | Hooks after the virtual function.<br/>The callback signature is `nil init(Entity self)`<br/>Virtual function docs:<br/>Applies changes made in `entity.type`
 
@@ -4744,6 +4740,7 @@ Derived from [Entity](#Entity) [LogicalSound](#LogicalSound) [LogicalStaticSound
 
 Type | Name | Description
 ---- | ---- | -----------
+float | [liquid_intensity](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liquid_intensity) | Just the parameter for sound in [LogicalSound](#LogicalSound)
 
 ### LogicalMiniGame
 

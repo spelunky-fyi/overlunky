@@ -212,38 +212,28 @@ end
     /// An array of [Player](#Player) of the current players. This is just a list of existing Player entities in order, i.e., `players[1]` is not guaranteed to be P1 if they have been gibbed for example. See [get_player](#get_player).
     // lua["players"] = get_players();
 
-    auto get_player = sol::overload(
-        [&lua](int8_t slot) -> sol::object // -> Player
-        {
-            for (auto player : HeapBase::get().state()->get_players())
-            {
-                if (player->inventory_ptr->player_slot == slot - 1)
-                    return sol::make_object_userdata(lua, player);
-            }
-            return sol::nil;
-        },
-        [&lua](int8_t slot, bool or_ghost) -> sol::object
-        {
-            for (auto player : HeapBase::get().state()->get_players())
-            {
-                if (player->inventory_ptr->player_slot == slot - 1)
-                    return sol::make_object_userdata(lua, player);
-            }
-            if (or_ghost)
-            {
-                for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), ENTITY_MASK::ITEM, LAYER::BOTH))
-                {
-                    auto player = get_entity_ptr(uid)->as<PlayerGhost>();
-                    if (player->inventory->player_slot == slot - 1)
-                        return sol::make_object_userdata(lua, player);
-                }
-            }
-            return sol::nil;
-        });
-
     /// Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
-    // lua["get_player"] = [](int8_t slot, bool or_ghost = false) -> Player
-    lua["get_player"] = get_player;
+    // lua["get_player"] = [&lua](int8_t slot, std::optional<bool> or_ghost) -> Player|PlayerGhost
+    lua["get_player"] = [&lua](int8_t slot, std::optional<bool> or_ghost) -> sol::object
+    {
+        auto state = HeapBase::get().state();
+        if (state && state->items)
+        {
+            auto player = state->items->player(slot - 1);
+            if (player)
+                return sol::make_object_userdata(lua, player);
+        }
+        if (or_ghost.value_or(false))
+        {
+            for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), ENTITY_MASK::ITEM, LAYER::BOTH))
+            {
+                auto player = get_entity_ptr(uid)->as<PlayerGhost>();
+                if (player->inventory && player->inventory->player_slot == slot - 1)
+                    return sol::make_object_userdata(lua, player);
+            }
+        }
+        return sol::nil;
+    };
 
     /// Returns PlayerGhost with this player slot 1..4
     lua["get_playerghost"] = [](int8_t slot) -> PlayerGhost*
@@ -251,7 +241,7 @@ end
         for (auto uid : get_entities_by(to_id("ENT_TYPE_ITEM_PLAYERGHOST"), ENTITY_MASK::ITEM, LAYER::BOTH))
         {
             auto player = get_entity_ptr(uid)->as<PlayerGhost>();
-            if (player->inventory->player_slot == slot - 1)
+            if (player->inventory && player->inventory->player_slot == slot - 1)
                 return player;
         }
         return nullptr;
@@ -335,7 +325,7 @@ end
     { lua["prinspect"](objects); };
 
     /// Dump the object (table, container, class) as a recursive table, for pretty printing in console. Don't use this for anything except debug printing. Unsafe.
-    // lua["dump"] = [](object object, optional<int> depth) -> table
+    // lua["dump"] = [](sol::object object, optional<int> depth) -> table
 
     /// Adds a command that can be used in the console.
     lua["register_console_command"] = [](std::string name, sol::function cmd)
@@ -760,8 +750,8 @@ end
                 id,
                 make_safe_clearable_cb<bool(Screen*), CallbackType::Screen>(
                     std::move(fun),
-                    screen_id,
                     id,
+                    screen_id,
                     FrontBinder{},
                     BackBinder{[]()
                                { return VanillaRenderContext{}; }}));
@@ -784,8 +774,8 @@ end
                 id,
                 make_safe_clearable_cb<void(Screen*), CallbackType::Screen>(
                     std::move(fun),
-                    screen_id,
                     id,
+                    screen_id,
                     FrontBinder{},
                     BackBinder{[]()
                                { return VanillaRenderContext{}; }}));
@@ -836,7 +826,7 @@ end
     lua["clear_custom_name"] = clear_custom_name;
 
     /// Adds entity as shop item, has to be of [Purchasable](#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the Purchasable entity types.
-    /// Adding other entities will result in not obtainable items or game crash
+    /// Adding other entities will result in not obtainable items or game crash, if item already is in StateMemory.room_owners.owned_items then it will just re-parent it
     lua["add_item_to_shop"] = add_item_to_shop;
 
     auto create_illumination = sol::overload(

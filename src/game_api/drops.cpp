@@ -371,6 +371,18 @@ void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance)
         }
     }
 }
+void replace_drop_by_name(std::string_view name, ENT_TYPE new_drop_entity_type)
+{
+    auto size = drop_entries.size();
+    for (int32_t idx = 0; idx < size; ++idx)
+    {
+        if (drop_entries[idx].caption == name)
+        {
+            replace_drop(idx, new_drop_entity_type);
+            return;
+        }
+    }
+}
 
 void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type)
 {

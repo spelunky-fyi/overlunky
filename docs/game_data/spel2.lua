@@ -64,8 +64,8 @@ function F(f_string) end
 
 ---Returns Player (or PlayerGhost if `get_player(1, true)`) with this player slot
 ---@param slot integer
----@param or_ghost boolean
----@return Player
+---@param or_ghost boolean?
+---@return Player|PlayerGhost
 function get_player(slot, or_ghost) end
 ---Returns PlayerGhost with this player slot 1..4
 ---@param slot integer
@@ -444,7 +444,7 @@ function add_custom_name(uid, name) end
 ---@return nil
 function clear_custom_name(uid) end
 ---Adds entity as shop item, has to be of [Purchasable](https://spelunky-fyi.github.io/overlunky/#Purchasable) type, check the [entity hierarchy list](https://github.com/spelunky-fyi/overlunky/blob/main/docs/entities-hierarchy.md) to find all the Purchasable entity types.
----Adding other entities will result in not obtainable items or game crash
+---Adding other entities will result in not obtainable items or game crash, if item already is in StateMemory.room_owners.owned_items then it will just re-parent it
 ---@param item_uid integer
 ---@param shop_owner_uid integer
 ---@return nil
@@ -2338,11 +2338,11 @@ do
     ---@field get_code fun(self): string @Gets the string equivalent of the code
 
 ---@class RoomOwnersInfo
-    ---@field owned_items custom_map<integer, ItemOwnerDetails> @key/index is the uid of an item
+    ---@field owned_items custom_map<integer, ItemOwnerDetails> @"key" is the uid of an item.
     ---@field owned_rooms RoomOwnerDetails[]
 
 ---@class ItemOwnerDetails
-    ---@field owner_type ENT_TYPE
+    ---@field owner_type ENT_TYPE @Used for big spender "quest", checks if there are any items owned by ENT_TYPE`.MONS_SHOPKEEPER`
     ---@field owner_uid integer
 
 ---@class RoomOwnerDetails
@@ -2582,7 +2582,7 @@ function PRNG:random(min, max) end
     ---@field set_draw_depth fun(self, draw_depth: integer, unknown: integer?): nil @optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering) 
     ---@field reset_draw_depth fun(self): nil
     ---@field friction fun(self): number @Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
-    ---@field liberate_from_shop fun(self, clear_parrent: boolean): nil @`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
+    ---@field liberate_from_shop fun(self, clear_parent: boolean): nil @It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
     ---@field get_held_entity fun(self): Entity
     ---@field set_layer fun(self, layer: LAYER): nil @Moves the entity to specified layer with all it's items, nothing else happens, so this does not emulate a door transition
     ---@field apply_layer fun(self): nil @Adds the entity to its own layer, to add it to entity lookup tables without waiting for a state update
@@ -2665,8 +2665,8 @@ function PRNG:random(min, max) end
     ---@field set_post_ledge_grab fun(self, fun: fun(self: Entity, who: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil ledge_grab(Entity self, Entity who)`
     ---@field set_pre_stood_on fun(self, fun: fun(self: Entity, entity: Entity, Vec2: ): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool stood_on(Entity self, Entity entity, Vec2)`
     ---@field set_post_stood_on fun(self, fun: fun(self: Entity, entity: Entity, Vec2: ): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil stood_on(Entity self, Entity entity, Vec2)`
-    ---@field set_pre_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parrent: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool liberate_from_shop(Entity self, boolean clear_parrent)`<br/>Virtual function docs:<br/>`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
-    ---@field set_post_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parrent: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil liberate_from_shop(Entity self, boolean clear_parrent)`<br/>Virtual function docs:<br/>`clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
+    ---@field set_pre_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parent: boolean): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool liberate_from_shop(Entity self, boolean clear_parent)`<br/>Virtual function docs:<br/>It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
+    ---@field set_post_liberate_from_shop fun(self, fun: fun(self: Entity, clear_parent: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil liberate_from_shop(Entity self, boolean clear_parent)`<br/>Virtual function docs:<br/>It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
     ---@field set_pre_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool init(Entity self)`<br/>Virtual function docs:<br/>Applies changes made in `entity.type`
     ---@field set_post_init fun(self, fun: fun(self: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil init(Entity self)`<br/>Virtual function docs:<br/>Applies changes made in `entity.type`
 local Entity = nil
@@ -4601,6 +4601,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
 ---@class LogicalStaticSound : LogicalSound
 
 ---@class LogicalLiquidStreamSound : LogicalStaticSound
+    ---@field liquid_intensity number @Just the parameter for sound in LogicalSound
 
 ---@class LogicalTrapTrigger : Entity
     ---@field min_empty_distance integer @Used in BigSpearTrap when it has to have minimum 2 free spaces to be able to trigger, value in tiles
@@ -4799,8 +4800,6 @@ function MovableBehavior:get_state_id() end
     ---@field max_lifetime integer
 
 ---@class ThemeInfo
-    ---@field unknown3 integer
-    ---@field unknown4 integer
     ---@field theme integer
     ---@field allow_beehive boolean
     ---@field allow_leprechaun boolean
@@ -5040,12 +5039,6 @@ function CustomTheme:override(index, func_) end
 ---@class PreLoadLevelFilesContext
     ---@field override_level_files fun(self, levels: string[]): nil @Block all loading `.lvl` files and instead load the specified `.lvl` files. This includes `generic.lvl` so if you need it specify it here.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.<br/>Use at your own risk, some themes/levels expect a certain level file to be loaded.
     ---@field add_level_files fun(self, levels: string[]): nil @Load additional levels files other than the ones that would usually be loaded. Stacks with `override_level_files` if that was called first.<br/>All `.lvl` files are loaded relative to `Data/Levels`, but they can be completely custom `.lvl` files that ship with your mod so long as they are in said folder.
-
----@class DoorCoords
-    ---@field door1_x number
-    ---@field door1_y number
-    ---@field door2_x number @door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
-    ---@field door2_y number
 
 ---@class LevelGenSystem
     ---@field shop_type SHOP_TYPE
@@ -10025,7 +10018,7 @@ ROOM_TEMPLATE = {
   APEP = 128,
   BEEHIVE = 31,
   BEEHIVE_ENTRANCE = 32,
-  BLACKMARKET = 118,
+  BLACKMARKET = 119,
   BLACKMARKET_COFFIN = 34,
   BLACKMARKET_ENTRANCE = 33,
   BLACKMARKET_EXIT = 35,
@@ -10092,7 +10085,7 @@ ROOM_TEMPLATE = {
   MOTHERSHIP_COFFIN = 41,
   MOTHERSHIP_ENTRANCE = 40,
   MOTHERSHIP_EXIT = 127,
-  MOTHERSHIP_ROOM = 125,
+  MOTHERSHIP_ROOM = 126,
   MOTHERSTATUE_ROOM = 43,
   OLDHUNTER_CURSEDROOM = 139,
   OLDHUNTER_KEYROOM = 137,
