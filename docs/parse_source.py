@@ -61,6 +61,7 @@ replace_table = {
     "constexpr": "",
     "const ": "",
     "static": "",
+    "shared_ptr": "",
     "[[nodiscard]]": "",
     "[[maybe_unused]]": "",
     "inline ": "",
@@ -200,6 +201,8 @@ cpp_type_exceptions = [
     "CutsceneBehavior",
     "CustomCutsceneBehavior",
     "DoorCoords",
+    "FMODStudio::ParameterDescription",
+    "FMODStudio::ParameterId",
 ]
 not_functions = [
     "players",
