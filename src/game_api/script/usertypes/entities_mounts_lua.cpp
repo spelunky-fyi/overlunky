@@ -48,6 +48,20 @@ void register_usertypes(sol::state& lua)
         &Mount::carry,
         "tame",
         &Mount::tame,
+        "get_rider_offset",
+        &Mount::get_rider_offset,
+        "get_rider_offset_crouching",
+        &Mount::get_rider_offset_crouching,
+        "get_jump_sound",
+        &Mount::get_jump_sound,
+        "get_attack_sound",
+        &Mount::get_attack_sound,
+        "get_mounting_sound",
+        &Mount::get_mounting_sound,
+        "get_walking_sound",
+        &Mount::get_walking_sound,
+        "get_untamed_loop_sound",
+        &Mount::get_untamed_loop_sound,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable>());
 
@@ -90,5 +104,15 @@ void register_usertypes(sol::state& lua)
         &Qilin::attack_cooldown,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Mount>());
+
+    /// Make `mount_uid` carry `rider_uid` on their back. Only use this with actual mounts and living things.
+    lua["carry"] = [](uint32_t mount_uid, uint32_t rider_uid)
+    {
+        auto mount = get_entity_ptr(mount_uid)->as<Mount>();
+        auto rider = get_entity_ptr(rider_uid)->as<Movable>();
+        if (mount == nullptr || rider == nullptr)
+            return;
+        mount->carry(rider);
+    };
 }
 } // namespace NEntitiesMounts

@@ -6,15 +6,26 @@
 #include <unordered_map>
 #include <vector>
 
+#include "heap_base.hpp" // for OnHeapPointer
+
+struct UnknownRenderStuff
+{
+    size_t* unknown1;
+    size_t* unknown2;
+    size_t unknown3;
+};
+
 struct Renderer
 {
+    // check x64dbg plugin for up to date structure
+
     uint32_t render_width; // same as window size unless resolution scale is set
     uint32_t render_height;
 
     uint32_t fps; // changing it doesn't seam to do anything
     uint32_t fps_denominator;
 
-    uint32_t render_width2; // repeat?
+    uint32_t render_width2; // used by the liquids to know what part(?) of screen to draw on top of the liquid (for all the transformation effects)
     uint32_t render_height2;
 
     uint8_t flags1;
@@ -27,14 +38,13 @@ struct Renderer
 
     size_t unknown38; // bool?
     float unknown39;  // not sure if actually float
-    float unknown40;
-    float unknown41;
+    float unknown40;  // some float counter
+    float brightness; // whole game brightness, can be set above 1
     uint8_t unknown42[4];
-    const char** unknown43a; // font/floor it's changing
-    const char** unknown43b; // noise0.dds
-    const char** unknown43c; // noise1.dds
-    size_t unknown44[4];     // null?
-    size_t unknown45;        // bool?
+    const char** textures_to_load[7]; // textures to load for entity
+    uint32_t texture_num;             // number of textures in use
+
+    uint32_t unknown45; // padding?
 
     // feels like two standard containers or something
     size_t* unknown46;
@@ -55,11 +65,11 @@ struct Renderer
     uint16_t unknown60a;    // 512
     uint16_t unknown60b[2]; // padding?
     size_t* unknown61[4];
-    size_t unknown62;                           // bool?
-    std::unordered_map<int, size_t*> unknown63; // not sure about the key/value
+    size_t unknown62;                         // bool?
+    std::unordered_set<std::string> textures; // all game textures including placeholder
 
-    // bounch of vectors that probably used to load textures or something, they all seam to contain names of the .dds files
-    // when i checked all seam to be already cleared and just have the data leftover, the "const char**" pointers identical as in texturedb
+    // bunch of vectors that probably used to load textures or something, they all seam to contain names of the .dds files
+    // when i checked all seam to be already cleared and just have the data leftover, the "const char**" pointers identical as in textureDB
 
     size_t unknown64[6];                 // possibly two more vectors?
     std::vector<const char**> unknown65; // splash 0,1,2
@@ -85,13 +95,16 @@ struct Renderer
     uint8_t unknown86[6]; // padding probably
 
     size_t* unknown87; // some vtables
+    bool unknown87a[110];
+    UnknownRenderStuff unknown87b[110];
 
-    uint8_t skip3[0xAD8]; // probably some static arrays of ... stuff
+    OnHeapPointer<struct Camera> camera;
+    size_t unknown87d; // bool?
+    size_t* unknown88;
+    size_t swap_chain; // unsure? offset 0x80FD0
+    // a lot of stuff more, total size is 0x81138 bytes
 
-    size_t swap_chain;
-    // 3 more pointers, some bit fields, then 5 more pointers
-
-    // somewhere there should be shaders stored
+    // somewhere there should be shaders stored?
 
     // added just to have the vtable
     virtual ~Renderer() = 0;

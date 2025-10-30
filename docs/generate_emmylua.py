@@ -52,6 +52,7 @@ replace_table = {
     "object": "any",
     "ImVec2": "Vec2",
     "BucketItem": "any",
+    "ENTITY_MASK": "MASK",
 }
 
 reFloat = re.compile(r"\bfloat\b")
@@ -284,6 +285,8 @@ function F(f_string) end
     type_static_funcs = {}
     print("\n--## Types\ndo\n")
     for type in ps.types:
+        if "comment" in type and "NoDoc" in type["comment"]:
+            continue
         print("---@class " + type["name"], end="")
         if type["base"]:
             bases = type["base"].split(",")

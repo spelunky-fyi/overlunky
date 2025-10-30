@@ -8,6 +8,7 @@
 #include "containers/custom_map.hpp" // for custom_map
 #include "entities_items.hpp"        // for Jetpack, KapalaPowerup
 #include "entity.hpp"                // for EntityDB, to_id, Entity
+#include "items.hpp"                 // for Inventory
 #include "layer.hpp"                 // for EntityList::Range, EntityList
 #include "rpc.hpp"                   // for unequip_backitem, worn_backitem
 #include "search.hpp"                // for get_address
@@ -60,14 +61,14 @@ uint8_t Player::kapala_blood_amount()
     return 0;
 }
 
-void Player::set_jetpack_fuel(uint8_t fuel)
+void PowerupCapable::set_jetpack_fuel(uint8_t fuel) const
 {
     static auto jetpackID = to_id("ENT_TYPE_ITEM_JETPACK");
-    for (auto item : items.entities()) // TODO: should probably change to powerups right?
+    for (auto [powerup_type, ent] : powerups)
     {
-        if (item->type->id == jetpackID)
+        if (powerup_type == jetpackID)
         {
-            item->as<Jetpack>()->fuel = fuel;
+            ent->as<Jetpack>()->fuel = fuel;
             break;
         }
     }
@@ -140,7 +141,7 @@ void Player::let_go()
 {
     if (overlay)
     {
-        overlay->remove_item_ptr(this);
+        overlay->remove_item(this, true);
         // coyote_timer = 0xFF;
         // last_state = state;
         // state = 1, 9, 0xA; ?
@@ -149,4 +150,11 @@ void Player::let_go()
         if (anim != behaviors_map.end())
             current_behavior = anim->second;
     }
+}
+
+int8_t Player::get_slot() const
+{
+    if (inventory_ptr)
+        return inventory_ptr->player_slot;
+    return -1;
 }

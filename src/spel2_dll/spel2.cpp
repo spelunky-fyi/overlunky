@@ -8,6 +8,7 @@
 #include "render_api.hpp"
 #include "screen.hpp"
 #include "script.hpp"
+#include "search.hpp"
 #include "sound_manager.hpp"
 #include "spawn_api.hpp"
 #include "state.hpp"
@@ -22,19 +23,19 @@ SpelunkyConsole* g_Console{nullptr};
 
 void Spelunky_SetDoHooks(bool do_hooks)
 {
-    State::set_do_hooks(do_hooks);
+    API::set_do_hooks(do_hooks);
 }
 void Spelunky_SetWriteLoadOptimization(bool write_load_opt)
 {
-    State::set_write_load_opt(write_load_opt);
+    API::set_write_load_opt(write_load_opt);
 }
 void Spelunky_InitState()
 {
-    State::init();
+    API::init();
 }
 void Spelunky_PostInitState()
 {
-    State::post_init();
+    API::post_init();
 }
 
 void Spelunky_RegisterApplicationVersion(const char* version)
@@ -347,15 +348,10 @@ void SpelunkyConsole_LoadHistory(SpelunkyConsole* console, const char* path)
     console->load_history(path);
 }
 
-StateMemory& get_state()
-{
-    static StateMemory* state = State::get().ptr();
-    return *state;
-}
-
 SpelunkyScreen SpelunkyState_GetScreen()
 {
-    return static_cast<SpelunkyScreen>(get_state().screen);
+    auto state = HeapBase::get().state();
+    return static_cast<SpelunkyScreen>(state->screen);
 }
 
 int32_t Spelunky_SpawnEntity(uint32_t entity_id, int32_t layer, float x, float y, float vel_x, float vel_y)
@@ -453,11 +449,6 @@ void Spelunky_DrawText(const char* text, float x, float y, float scale_x, float 
 void Spelunky_EnabledAdvancedHud()
 {
     RenderAPI::get().set_advanced_hud();
-}
-
-void Spelunky_UpdateLiquidOutOfBoundsBugfix()
-{
-    fix_liquid_out_of_bounds();
 }
 
 void Spelunky_ReloadShaders()

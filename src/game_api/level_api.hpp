@@ -6,6 +6,7 @@
 #include <functional>  // for function
 #include <new>         // for operator new
 #include <optional>    // for optional
+#include <span>        // for span
 #include <string>      // for string, allocator
 #include <string_view> // for string_view
 #include <type_traits> // for move
@@ -156,17 +157,17 @@ struct LevelGenData
 
     std::optional<std::uint16_t> get_room_template(const std::string& room_template) const
     {
-        auto it = room_templates.find((game_string&)room_template);
+        auto it = room_templates.find(reinterpret_cast<const game_string&>(room_template));
         if (it != room_templates.end())
-        {
             return it->second.id;
-        }
+
         return {};
     }
     std::uint16_t define_room_template(std::string room_template, RoomTemplateType type);
     bool set_room_template_size(std::uint16_t room_template, uint16_t width, uint16_t height);
     RoomTemplateType get_room_template_type(std::uint16_t room_template) const;
     uint16_t get_pretend_room_template(std::uint16_t room_template) const;
+    static std::span<const std::pair<std::string_view, uint16_t>> get_missing_room_templates();
 
     union
     {
@@ -208,16 +209,10 @@ struct LevelGenData
 
     game_unordered_map<game_string, ChanceDef> trap_chances;
     game_unordered_map<std::uint32_t, LevelChanceDef> level_trap_chances;
-};
 
-struct DoorCoords
-{
-    float door1_x;
-    float door1_y;
-    /// door2 only valid when there are two in the level, like Volcana drill, Olmec, ...
-    float door2_x;
-    float door2_y;
+    size_t unknown2;
 };
+static_assert(sizeof(LevelGenData) == 0x1448);
 
 struct SpawnInfo
 {
@@ -251,12 +246,8 @@ class ThemeInfo
     uint8_t padding2;
     uint32_t padding3;
     ThemeInfo* sub_theme;
-    uint32_t unknown3;
-    uint32_t unknown4;
 
-    virtual ~ThemeInfo()
-    {
-    }
+    virtual ~ThemeInfo(){};
 
     /// Sets the beehive and leprechaun flags
     virtual void reset_theme_flags() = 0;
@@ -315,7 +306,7 @@ class ThemeInfo
     /// Fixes textures on pleasure palace ladders, adds some decorations
     virtual void post_process_entities() = 0;
 
-    /// Adds legs under platforms, random pots, goldbars, monsters, compass indicator, random shadows...
+    /// Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...
     virtual void spawn_procedural() = 0;
 
     /// Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes
@@ -333,7 +324,7 @@ class ThemeInfo
     /// Spawns the players with inventory at `state.level_gen.spawn_x/y`. Also shop and kali background and probably other stuff for some stupid reason.
     virtual void spawn_players() = 0;
 
-    /// Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects.
+    /// Sets the camera bounds and position. Spawns jelly and orbs and the flag in coop. Sets timers/conditions for more jellies and ghosts. Enables the special fog/ember/ice etc particle effects. Spawns beg and handles it's quest flags
     virtual void spawn_effects() = 0;
 
     /// Returns: The .lvl file to load (e.g. dwelling = dwellingarea.lvl except when level == 4 (cavebossarea.lvl))
@@ -430,17 +421,19 @@ class ThemeInfo
 
     uint32_t get_aux_id() const;
 };
-static_assert(sizeof(ThemeInfo) == 0x20);
+static_assert(sizeof(ThemeInfo) == 0x18);
 
 struct LevelGenRooms
 {
-    std::array<uint16_t, 8 * 16> rooms;
+    std::array<uint16_t, 8 * 15> rooms;
 };
+static_assert(sizeof(LevelGenRooms) == 0xF0);
 
 struct LevelGenRoomsMeta
 {
-    std::array<bool, 8 * 16> rooms;
+    std::array<bool, 8 * 15> rooms;
 };
+static_assert(sizeof(LevelGenRoomsMeta) == 0x78);
 
 class SpecialLevelGeneration
 {
@@ -457,6 +450,7 @@ class SpecialLevelGeneration
     // For leprechauns, spawns leprechaun, pot of gold, and rainbow.
     virtual void procedural_spawns() = 0;
 };
+static_assert(sizeof(SpecialLevelGeneration) == 0x8);
 
 enum class SHOP_TYPE : uint8_t
 {
@@ -553,17 +547,7 @@ struct LevelGenSystem
     std::uint32_t spawn_room_y;
     float spawn_x;
     float spawn_y;
-    union
-    {
-        custom_vector<Vec2> exit_doors;
-        struct
-        {
-            /// NoDoc
-            DoorCoords* exit_doors_locations;
-            void* unknown37;
-            void* unknown38;
-        };
-    };
+    custom_vector<Vec2> exit_doors;
     uint8_t flags;
     uint8_t flags2;
     uint8_t flags3;
@@ -578,14 +562,13 @@ struct LevelGenSystem
     };
     uint8_t frontlayer_shop_music;
     uint8_t backlayer_shop_music;
-    uint8_t unknown45;
-    uint8_t unknown46;
-    uint8_t unknown47;
+    uint8_t unknown47; // set to 0 at the start of level gen
+    bool unknown48;
+
+    /*uint8_t unknown47; // probably all just padding
     uint8_t unknown48;
     uint8_t unknown49;
-    uint32_t unknown50;
-    uint32_t unknown51;
-    uint32_t unknown52;
+    uint32_t unknown50;*/
 
     static std::pair<int, int> get_room_index(float x, float y);
     static Vec2 get_room_pos(uint32_t x, uint32_t y);
@@ -606,6 +589,7 @@ struct LevelGenSystem
 
     ~LevelGenSystem() = delete; // cuz it was complaining
 };
+static_assert(sizeof(LevelGenSystem) == 0x148);
 
 bool default_spawn_is_valid(float x, float y, LAYER layer);
 bool position_is_valid(float x, float y, LAYER layer, POS_TYPE flags);

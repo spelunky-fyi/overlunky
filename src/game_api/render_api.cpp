@@ -20,10 +20,9 @@
 #include "script/events.hpp"      // for trigger_vanilla_render_journal_pag...
 #include "script/lua_backend.hpp" // for ON, ON::RENDER_POST_JOURNAL_PAGE
 #include "search.hpp"             // for get_address
-#include "state.hpp"              // for State, StateMemory
+#include "state.hpp"              // for StateMemory
 #include "strings.hpp"            //
 #include "texture.hpp"            // for Texture, get_textures, get_texture
-#include "thread_utils.hpp"       // for OnHeapPointer
 
 class JournalPage;
 struct Camera;
@@ -519,7 +518,7 @@ void fetch_texture(Entity* entity, int32_t texture_id)
     {
         if (texture_id < -3)
         {
-            texture_id = State::get().ptr_local()->current_theme->get_dynamic_texture((DYNAMIC_TEXTURE)texture_id);
+            texture_id = get_state_ptr()->current_theme->get_dynamic_texture((DYNAMIC_TEXTURE)texture_id);
         }
         entity->texture = get_textures()->texture_map[texture_id];
     }
@@ -660,7 +659,7 @@ void init_render_api_hooks()
 
 Entity* RenderInfo::get_entity() const
 {
-    return OnHeapPointer<Entity>{entity_offset}.decode_local();
+    return entity_offset.decode();
 }
 
 uint32_t RenderInfo::get_aux_id() const
@@ -672,7 +671,7 @@ bool RenderInfo::set_second_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = ::get_texture(texture_id))
     {
-        second_texture_name = new_texture->name;
+        texture_names[1] = new_texture->name;
         return true;
     }
     return false;
@@ -682,7 +681,7 @@ bool RenderInfo::set_third_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = ::get_texture(texture_id))
     {
-        third_texture_name = new_texture->name;
+        texture_names[2] = new_texture->name;
         return true;
     }
     return false;
@@ -691,7 +690,7 @@ bool RenderInfo::set_third_texture(TEXTURE texture_id)
 bool RenderInfo::set_texture_num(uint32_t num)
 {
     // Prevent some crashes
-    if ((num >= 2 && !second_texture_name) || (num >= 3 && !third_texture_name) || num >= 4)
+    if ((num >= 2 && !texture_names[1]) || (num >= 3 && !texture_names[2]) || num >= 4)
     {
         return false;
     }
@@ -704,7 +703,7 @@ bool RenderInfo::set_normal_map_texture(TEXTURE texture_id)
     if (set_second_texture(texture_id))
     {
         constexpr uint32_t SHINE_TEXTURE = 400;
-        third_texture_name = ::get_texture(SHINE_TEXTURE)->name;
+        texture_names[2] = ::get_texture(SHINE_TEXTURE)->name;
         texture_num = 3;
         return true;
     }

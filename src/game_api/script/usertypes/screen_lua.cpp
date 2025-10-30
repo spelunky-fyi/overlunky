@@ -348,6 +348,12 @@ void register_usertypes(sol::state& lua)
     screencharacterselect_type["topleft_woodpanel_esc_slidein"] = &ScreenCharacterSelect::topleft_woodpanel_esc_slidein;
     screencharacterselect_type["start_panel_slidein"] = &ScreenCharacterSelect::start_panel_slidein;
     screencharacterselect_type["action_buttons_keycap_size"] = &ScreenCharacterSelect::action_buttons_keycap_size;
+    screencharacterselect_type["screen_loading"] = &ScreenCharacterSelect::screen_loading;
+    screencharacterselect_type["seeded_run"] = &ScreenCharacterSelect::seeded_run;
+    screencharacterselect_type["daily_challenge"] = sol::readonly(&ScreenCharacterSelect::daily_challenge);
+    /// Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge`
+    screencharacterselect_type["arena"] = sol::property([](ScreenCharacterSelect* screen) -> bool
+                                                        { return screen->next_screen_to_load == 10 && !screen->seeded_run && !screen->daily_challenge; });
     screencharacterselect_type["next_screen_to_load"] = &ScreenCharacterSelect::next_screen_to_load;
     screencharacterselect_type["not_ready_to_start_yet"] = &ScreenCharacterSelect::not_ready_to_start_yet;
     screencharacterselect_type["available_mine_entrances"] = &ScreenCharacterSelect::available_mine_entrances;
@@ -472,6 +478,7 @@ void register_usertypes(sol::state& lua)
     screentransition_type["this_level_money_color"] = &ScreenTransition::this_level_money_color;
     screentransition_type["buttons"] = &ScreenTransition::buttons;
 
+    /// The POST render call will only be visible in the polaroid area on the left of the book. The Journal is drawn on top of that.
     lua.new_usertype<ScreenDeath>(
         "ScreenDeath",
         sol::base_classes,
@@ -493,7 +500,10 @@ void register_usertypes(sol::state& lua)
     lua.new_usertype<ScreenCredits>(
         "ScreenCredits",
         "credits_progression",
-        &ScreenCredits::credits_progression,
+        sol::property([](ScreenCredits& credits) -> float
+                      { return credits.credits_progression ? *credits.credits_progression : NAN; },
+                      [](ScreenCredits& credits, float v)
+                      { if (credits.credits_progression) *credits.credits_progression = v; }),
         "bg_music_info",
         &ScreenCredits::bg_music_info,
         sol::base_classes,

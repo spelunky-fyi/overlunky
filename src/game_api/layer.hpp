@@ -1,14 +1,14 @@
 #pragma once
 
+#include "containers/custom_map.hpp"
+#include "containers/custom_vector.hpp"
 #include <array>
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint32_t, int32_t, uint64_t, uint8_t
 #include <functional> // for less
-#include <map>        // for map
 #include <new>        // for operator new
 #include <set>        //
 #include <utility>    // for find, pair
-#include <vector>     // for allocator, vector
 
 #include "aliases.hpp" // for ENT_TYPE
 
@@ -83,7 +83,7 @@ struct EntityList
     using UidRange = Range<uint32_t>;
     using ConstUidRange = Range<const uint32_t>;
 
-    bool empty()
+    bool empty() const
     {
         return size == 0;
     }
@@ -114,6 +114,8 @@ struct EntityList
         return uids().contains(uid);
     }
 
+    void insert(Entity*, bool);
+
     std::pair<Entity*&, uint32_t&> operator[](const uint32_t idx) const
     {
         return {ent_list[idx], uid_list[idx]};
@@ -139,7 +141,7 @@ struct Layer
     EntityList unknown_entities1;
     EntityRegions* unknown1; // players in motion?
 
-    std::map<uint32_t, EntityList> entities_by_mask; // key is the mask
+    custom_map<ENTITY_MASK, EntityList> entities_by_mask;
 
     // 4x4 block areas (the edge ones extend to infinity?), each probably contains different mask entities
     EntityList entities_by_region1[31][21];
@@ -147,7 +149,7 @@ struct Layer
     EntityList entities_by_region3[31][21];
     EntityList entities_by_region4[31][21];
 
-    std::map<int32_t, EntityRegions> entity_regions; // key is uid, all entities except FX, FLOOR, DECORATION, BG, SHADOW and LOGICAL
+    custom_map<int32_t, EntityRegions> entity_regions; // key is uid, all entities except FX, FLOOR, DECORATION, BG, SHADOW and LOGICAL
 
     Entity* grid_entities[g_level_max_y][g_level_max_x];
     EntityList entities_overlapping_grid[g_level_max_y][g_level_max_x]; // static entities (like midbg, decorations) that overlap this grid position
@@ -155,13 +157,11 @@ struct Layer
     EntityList unknown_entities2;
     std::array<EntityList, 53> entities_by_draw_depth;
     EntityList unknown_entities2a;
-    EntityList unknown_entities3;        // debris, explosions, laserbeams etc. ?
-    EntityList unknown_entities4;        // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
-    std::vector<Entity*> unknown_vector; // add_to_layer uses this
-    std::set<float>* unknown6;           // triggered by floor entity destruction? needs more testing
-    // List of items that were destroyed and are waiting to have the dtor called
-    // and then be returned to the entity pool
-    EntityList expired_entities;
+    EntityList unknown_entities3;          // debris, explosions, laserbeams etc. expired_entities ?
+    EntityList unknown_entities4;          // explosions, laserbeams, BG_LEVEL_*_SOOT ? only for short time while there are spawned?
+    custom_vector<Entity*> unknown_vector; // add_to_layer uses this
+    std::set<float>* unknown6;             // triggered by floor entity destruction? needs more testing
+    EntityList unknown_entities5;
     bool is_layer_loading;
     bool unknown14;
 
@@ -180,7 +180,7 @@ struct Layer
 
     EntityList* get_entities_overlapping_grid_at(float x, float y) const;
 
-    Entity* get_entity_at(float x, float y, uint32_t search_flags, uint32_t include_flags, uint32_t exclude_flags, uint32_t one_of_flags);
+    Entity* get_entity_at(float x, float y, ENTITY_MASK search_flags, uint32_t include_flags, uint32_t exclude_flags, uint32_t one_of_flags);
 
     void move_grid_entity(Entity* ent, float x, float y, Layer* dest_layer);
     void move_grid_entity(Entity* ent, uint32_t x, uint32_t y, Layer* dest_layer);

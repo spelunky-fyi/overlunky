@@ -8,10 +8,12 @@
 #include <type_traits> // for move, declval
 #include <utility>     // for min, max
 
-#include "game_manager.hpp"      // for GameManager, JournalPopupUI, GameProps
-#include "memory.hpp"            // for memory_read TODO:temp
-#include "screen.hpp"            // IWYU pragma: keep
-#include "script/sol_helper.hpp" //
+#include "containers/game_allocator.hpp" // for game_allocator
+#include "game_manager.hpp"              // for GameManager, JournalPopupUI, GameProps
+#include "memory.hpp"                    // for memory_read TODO:temp
+#include "savedata.hpp"                  // for SaveData
+#include "screen.hpp"                    // IWYU pragma: keep
+#include "script/sol_helper.hpp"         // for ZeroIndexArray
 
 namespace NGM
 {
@@ -78,10 +80,99 @@ void register_usertypes(sol::state& lua)
     gamemanager_type["buttons_controls"] = &GameManager::buttons_controls;
     gamemanager_type["buttons_movement"] = &GameManager::buttons_movement;
 
+    /// Used in GameManager
     lua.new_usertype<SaveRelated>(
         "SaveRelated",
         "journal_popup_ui",
-        &SaveRelated::journal_popup_ui);
+        &SaveRelated::journal_popup_ui,
+        "places_data",
+        &SaveRelated::places_data,
+        "bestiary_data",
+        &SaveRelated::bestiary_data,
+        "monster_part_to_main",
+        &SaveRelated::monster_part_to_main,
+        "people_info",
+        &SaveRelated::people_info,
+        "people_part_to_main",
+        &SaveRelated::people_part_to_main,
+        "item_info",
+        &SaveRelated::item_info,
+        "trap_info",
+        &SaveRelated::trap_info,
+        "trap_part_to_main",
+        &SaveRelated::trap_part_to_main,
+        "stickers_data",
+        &SaveRelated::stickers_data,
+        "get_savegame",
+        &SaveRelated::get_savegame);
+
+    /// Used in SaveRelated
+    lua.new_usertype<JournalPageData>(
+        "JournalPageData",
+        "page_nr",
+        &JournalPageData::page_nr,
+        "sprite_id",
+        &JournalPageData::sprite_id,
+        "name",
+        &JournalPageData::name,
+        "description",
+        &JournalPageData::description,
+        "scale",
+        &JournalPageData::scale,
+        "offset_x",
+        &JournalPageData::offset_x,
+        "offset_y",
+        &JournalPageData::offset_y);
+
+    /// Used in SaveRelated
+    lua.new_usertype<JournalBestiaryData>(
+        "JournalBestiaryData",
+        "texture",
+        &JournalBestiaryData::texture,
+        "background_sprite_id",
+        &JournalBestiaryData::background_sprite_id,
+        "killed_by_NA",
+        &JournalBestiaryData::killed_by_NA,
+        "defeated_NA",
+        &JournalBestiaryData::defeated_NA,
+        sol::base_classes,
+        sol::bases<JournalPageData>());
+
+    /// Used in SaveRelated
+    lua.new_usertype<JournalPeopleData>(
+        "JournalPeopleData",
+        "texture",
+        &JournalPeopleData::texture,
+        "background_sprite_id",
+        &JournalPeopleData::background_sprite_id,
+        "killed_by_NA",
+        &JournalPeopleData::killed_by_NA,
+        "defeated_NA",
+        &JournalPeopleData::defeated_NA,
+        "portrait_texture",
+        &JournalPeopleData::portrait_texture,
+        sol::base_classes,
+        sol::bases<JournalPageData>());
+
+    /// Used in SaveRelated
+    lua.new_usertype<JournalTrapData>(
+        "JournalTrapData",
+        "texture",
+        &JournalTrapData::texture,
+        "background_sprite_id",
+        &JournalTrapData::background_sprite_id,
+        sol::base_classes,
+        sol::bases<JournalPageData>());
+
+    /// Used in SaveRelated
+    lua.new_usertype<StickersData>(
+        "StickersData",
+        "sprite_id",
+        &StickersData::sprite_id,
+        "texture",
+        &StickersData::texture);
+
+    /// Used in SaveRelated
     lua.new_usertype<JournalPopupUI>(
         "JournalPopupUI",
         "wiggling_page_icon",
@@ -100,6 +191,7 @@ void register_usertypes(sol::state& lua)
         &JournalPopupUI::timer,
         "slide_position",
         &JournalPopupUI::slide_position);
+
     auto gameprops_type = lua.new_usertype<GameProps>("GameProps");
     /// NoDoc
     gameprops_type["buttons"] = sol::property([](GameProps& gp) -> uint32_t

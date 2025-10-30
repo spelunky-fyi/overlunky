@@ -47,7 +47,7 @@ jobs:
           7z a Overlunky_WHIP.zip Overlunky\
 
       - name: Create WHIP release
-        uses: marvinpinto/action-automatic-releases@v1.1.0
+        uses: marvinpinto/action-automatic-releases@v1.2.0
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:

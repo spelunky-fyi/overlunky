@@ -122,6 +122,8 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_shield"] = &Entity::as<Shield>;
     lua["Entity"]["as_powerup"] = &Entity::as<Powerup>;
     lua["Entity"]["as_prizedispenser"] = &Entity::as<PrizeDispenser>;
+    lua["Entity"]["as_scepter"] = &Entity::as<Scepter>;
+    lua["Entity"]["as_whip"] = &Entity::as<Whip>;
 
     lua.new_usertype<Bomb>(
         "Bomb",
@@ -145,7 +147,7 @@ void register_usertypes(sol::state& lua)
         "trigger_explosion",
         &Backpack::trigger_explosion,
         sol::base_classes,
-        sol::bases<Entity, Movable>());
+        sol::bases<Entity, Movable, Powerup>());
 
     lua.new_usertype<Projectile>(
         "Projectile",
@@ -154,11 +156,21 @@ void register_usertypes(sol::state& lua)
 
     lua.new_usertype<Purchasable>(
         "Purchasable",
+        "equip",
+        &Purchasable::equip,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
     lua.new_usertype<DummyPurchasableEntity>(
         "DummyPurchasableEntity",
+        "replace_entity",
+        &DummyPurchasableEntity::replace_entity,
+        "exploding",
+        &DummyPurchasableEntity::exploding,
+        "explosion_timer",
+        &DummyPurchasableEntity::explosion_timer,
+        "trigger_explosion",
+        &DummyPurchasableEntity::trigger_explosion,
         sol::base_classes,
         sol::bases<Entity, Movable, Purchasable>());
 
@@ -182,15 +194,17 @@ void register_usertypes(sol::state& lua)
         &Jetpack::flame_on,
         "fuel",
         &Jetpack::fuel,
+        "acceleration",
+        &Jetpack::acceleration,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack>());
+        sol::bases<Entity, Movable, Powerup, Backpack>());
 
     lua.new_usertype<TeleporterBackpack>(
         "TeleporterBackpack",
         "teleport_number",
         &TeleporterBackpack::teleport_number,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack>());
+        sol::bases<Entity, Movable, Powerup, Backpack>());
 
     lua.new_usertype<Hoverpack>(
         "Hoverpack",
@@ -199,11 +213,11 @@ void register_usertypes(sol::state& lua)
         "is_on",
         &Hoverpack::is_on,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack>());
+        sol::bases<Entity, Movable, Powerup, Backpack>());
 
-    lua.new_usertype<Cape>("Cape", "floating_down", &Cape::floating_down, sol::base_classes, sol::bases<Entity, Movable, Backpack>());
+    lua.new_usertype<Cape>("Cape", "floating_down", &Cape::floating_down, sol::base_classes, sol::bases<Entity, Movable, Powerup, Backpack>());
 
-    lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Backpack, Cape>());
+    lua.new_usertype<VladsCape>("VladsCape", "can_double_jump", &VladsCape::can_double_jump, sol::base_classes, sol::bases<Entity, Movable, Powerup, Backpack, Cape>());
 
     lua.new_usertype<Mattock>(
         "Mattock",
@@ -634,6 +648,8 @@ void register_usertypes(sol::state& lua)
         &OlmecCannon::timer,
         "bombs_left",
         &OlmecCannon::bombs_left,
+        "spawn_projectile",
+        &OlmecCannon::spawn_projectile,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 
@@ -904,6 +920,8 @@ void register_usertypes(sol::state& lua)
         "RollingItem",
         "roll_speed",
         &RollingItem::roll_speed,
+        "give_powerup",
+        &RollingItem::give_powerup,
         sol::base_classes,
         sol::bases<Entity, Movable, Purchasable>());
 
@@ -974,7 +992,7 @@ void register_usertypes(sol::state& lua)
         "sound",
         &YellowCape::sound,
         sol::base_classes,
-        sol::bases<Entity, Movable, Backpack, Cape>());
+        sol::bases<Entity, Movable, Powerup, Backpack, Cape>());
 
     lua.new_usertype<Teleporter>(
         "Teleporter",
@@ -1025,6 +1043,20 @@ void register_usertypes(sol::state& lua)
         "Web",
         "decay_rate",
         &Web::decay_rate,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Scepter>(
+        "Scepter",
+        "cooldown",
+        &Scepter::cooldown,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Whip>(
+        "Whip",
+        "flaming",
+        &Whip::flaming,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 }

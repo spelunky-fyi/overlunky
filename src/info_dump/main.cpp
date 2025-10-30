@@ -37,7 +37,7 @@
 #include "search.hpp"                        // for get_address
 #include "settings_api.hpp"                  // for get_settings_names_and_...
 #include "sound_manager.hpp"                 // for SoundManager, SoundMana...
-#include "state.hpp"                         // for StateMemory, State
+#include "state.hpp"                         // for API::init
 #include "texture.hpp"                       // for Texture, get_textures
 #include "virtual_table.hpp"                 // for VTABLE_OFFSET, VTABLE_O...
 
@@ -963,10 +963,10 @@ void get_vtables()
 
         const auto base_off = (size_t)Memory::get().exe();
 
-        file << "TypeID,Name,vtable offset,~Entity,create_rendering_info,handle_state_machine,kill,on_collision1,destroy,apply_texture,format_shopitem_name,generate_stomp_damage_particles,get_type_field_a8,block_pushing_related,v11,v12,check_type_properties_flags_19,get_type_field_60,set_invisible,handle_turning_left,set_draw_depth,resume_ai,friction,v20,remove_item_ptr,"
-                "get_held_entity,v23,trigger_action,on_attempt_shop_purchase,on_collision2,get_metadata,apply_metadata,on_walked_on_by,on_walked_off_by,v31,on_stood_on_by,toggle_backlayer_illumination,v34,liberate_from_shop,apply_db,END OF ENTITY,can_jump,v38,sprint_factor,calculate_jump_height,get_animation_map,apply_velocity,stomp_damage,stomp_damage_trampoline,is_on_fire,v46,v47,"
-                "on_damage,on_hit,v50,stun,freeze,light_on_fire,set_cursed,on_spiderweb_collision,set_last_owner_uid_b127,get_last_owner_uid,check_out_of_bounds,v59,standing_on,on_stomped_on_by,on_thrown_by,on_clonegunshot_hit,get_type_id,doesnt_have_spikeshoes,is_player_mount_or_monster,pick_up,picked_up_by,drop,add_money,apply_movement,damage_entity,is_monster_or_player,"
-                "initialize,check_is_falling,handle_stun_transition_animation,process_input,post_collision_damage_related,picked_up,hired_hand_related,generate_fall_poof_particles,handle_fall_logic,apply_friction,boss_related,tusk_last_owner_uid_related,gravity_related,v87,v88,stack_plus_28_is_0,on_crushed_by,on_fall_onto,on_instakill_death,END OF MOVABLE,v93,v94,v95,v96,v97,v98,v99,v100,v101,v102,v103,v104,v105,v106,v107,v108,v109,";
+        file << "TypeID,Name,vtable offset,~Entity,create_rendering_info,update_state_machine,kill,on_collision1,destroy,apply_texture,format_shopitem_name,generate_damage_particles,get_type_field_a8,can_be_pushed,v11,is_in_liquid,check_type_properties_flags_19,get_type_field_60,set_invisible,flip,set_draw_depth,reset_draw_depth,friction,set_as_sound_source,remove_item,"
+                "get_held_entity,v23,trigger_action,activate,on_collision2,get_metadata,apply_metadata,on_walked_on_by,on_walked_off_by,on_ledge_grab,on_stood_on_by,toggle_backlayer_illumination,v34,liberate_from_shop,apply_db,END OF ENTITY,can_jump,get_collision_info,sprint_factor,calculate_jump_velocity,get_animation_map,apply_velocity,get_damage,get_stomp_damage,is_on_fire,attack,thrown_into,"
+                "damage,on_hit,get_damage_sound,stun,freeze,light_on_fire,set_cursed,on_spiderweb_collision,set_last_owner_uid,get_last_owner_uid,check_out_of_bounds,set_standing_on,standing_on,on_stomped_on_by,on_thrown_by,copy_extra_info,get_type_id,doesnt_have_spikeshoes,is_player_mount_or_monster,pick_up,can_be_picked_up_by,drop,collect_treasure,apply_movement,damage_entity,v73,"
+                "is_powerup_capable,initialize,check_is_falling,v77,process_input,post_collision_damage_related,on_picked_up,on_release,generate_landing_effects,handle_fall_logic,apply_friction,can_break_block,break_block,v87,v88,v89,on_crushed_by,on_fall_onto,on_body_destruction,END OF MOVABLE,v93,v94,v95,v96,v97,v98,v99,v100,v101,v102,v103,v104,v105,v106,v107,v108,v109,";
         file << std::endl;
 
         int idx = 0;
@@ -985,6 +985,9 @@ void get_vtables()
                 do
                 {
                     if (v_idx && base_functions.find(*(vtable_b + v_idx)) != base_functions.end())
+                        break;
+
+                    if (IsBadReadPtr((void*)(*(vtable_b + v_idx)), 8))
                         break;
 
                     if (*(vtable_b + v_idx) == func_ret)
@@ -1026,7 +1029,7 @@ void get_vtables()
     }
 }
 
-FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Animation, texture, count, interval, key, repeat);
+FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Animation, first_tile, count, interval, id, repeat);
 FLOAT_JSON_DEFINE_TYPE_NON_INTRUSIVE(Rect, offsetx, offsety, hitboxx, hitboxy);
 void to_json(float_json& j, const EntityDB& ent)
 {
@@ -1098,6 +1101,7 @@ void run()
         std::this_thread::sleep_for(100ms);
     }
 
+    API::init();
     auto items = list_entities();
     std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
               { return a.id < b.id; });
@@ -1184,22 +1188,22 @@ void run()
     if (std::ofstream file = std::ofstream("game_data/textures.txt"))
     {
         std::unordered_map<std::string, uint32_t> counts;
-        for (auto* tex : get_textures()->texture_map)
+        for (auto& tex : get_textures()->textures)
         {
-            if (tex != nullptr && tex->name != nullptr)
+            if (tex.name != nullptr)
             {
-                std::string clean_tex_name = *tex->name;
+                std::string clean_tex_name = *tex.name;
                 std::transform(
-                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '/') return '_';
+                      return (unsigned char)std::toupper(c); });
                 size_t index = clean_tex_name.find(".DDS", 0);
                 if (index != std::string::npos)
                 {
                     clean_tex_name.erase(index, 4);
                 }
                 clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
-                file << "TEXTURE." << clean_tex_name << ": " << tex->id << std::endl;
+                file << "TEXTURE." << clean_tex_name << ": " << tex.id << std::endl;
             }
         }
     }
@@ -1216,7 +1220,7 @@ void run()
                 EntityDB* db = get_type(ent.id);
                 if (!db)
                     break;
-                if ((db->search_flags & search_flag) != 0)
+                if ((std::uint32_t)db->search_flags & search_flag)
                 {
                     entities.push_back(ent.name);
                 }
@@ -1248,9 +1252,9 @@ void run()
             {
                 std::string clean_event_name = event_name;
                 std::transform(
-                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
+                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '/') return '_';
+                      return (unsigned char)std::toupper(c); });
                 file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
             });
     }
@@ -1268,7 +1272,7 @@ void run()
 
     if (auto file = std::ofstream("game_data/particle_emitters.txt"))
     {
-        auto particles = list_particles();
+        auto& particles = list_particles();
         for (const auto& particle : particles)
         {
             file << particle.id << ": " << particle.name << "\n";
@@ -1282,17 +1286,17 @@ void run()
         // file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }
 
-    auto state = State::get().ptr_main();
+    auto level_gen = HeapBase::get_main().level_gen();
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {
-        for (const auto& tile_code : state->level_gen->data->tile_codes)
+        for (const auto& tile_code : level_gen->data->tile_codes)
         {
             std::string clean_tile_code_name = tile_code.first.c_str();
             std::transform(
-                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             file << clean_tile_code_name << ": " << tile_code.second.id << "\n";
         }
     }
@@ -1300,15 +1304,15 @@ void run()
     if (auto file = std::ofstream("game_data/spawn_chances.txt"))
     {
         std::multimap<std::uint32_t, std::string> ordered_chances;
-        for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
+        for (auto* chances : {&level_gen->data->monster_chances, &level_gen->data->trap_chances})
         {
             for (const auto& spawn_chanc : *chances)
             {
                 std::string clean_chance_name = spawn_chanc.first.c_str();
                 std::transform(
-                    clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+                    clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '-') return '_';
+                      return (unsigned char)std::toupper(c); });
                 ordered_chances.insert({spawn_chanc.second.id, std::move(clean_chance_name)});
             }
         }
@@ -1318,24 +1322,19 @@ void run()
 
     if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
-        auto templates = state->level_gen->data->room_templates;
-        templates["empty_backlayer"] = {9};
-        templates["boss_arena"] = {22};
-        templates["shop_jail_backlayer"] = {44};
-        templates["waddler"] = {86};
-        templates["ghistshop_backlayer"] = {87};
-        templates["challange_entrance_backlayer"] = {90};
-        templates["blackmarket"] = {118};
-        templates["mothership_room"] = {125};
+        auto templates = level_gen->data->room_templates;
+        auto extra_templates = LevelGenData::get_missing_room_templates();
+        for (auto [name, id] : extra_templates)
+            templates[game_string(name)] = {id};
 
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {
             std::string clean_room_name = room_template.first.c_str();
             std::transform(
-                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
+                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             ordered_templates.insert({room_template.second.id, std::move(clean_room_name)});
         }
         for (const auto& [id, name] : ordered_templates)

@@ -345,7 +345,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][339] = lua["Entity"]["as_critterfirefly"];         // MONS_CRITTERFIREFLY
     lua["TYPE_MAP"][340] = lua["Entity"]["as_critterdrone"];           // MONS_CRITTERDRONE
     lua["TYPE_MAP"][341] = lua["Entity"]["as_critterslime"];           // MONS_CRITTERSLIME
-    lua["TYPE_MAP"][345] = lua["Entity"]["as_movable"];                // ITEM_WHIP
+    lua["TYPE_MAP"][345] = lua["Entity"]["as_whip"];                   // ITEM_WHIP
     lua["TYPE_MAP"][346] = lua["Entity"]["as_flamesize"];              // ITEM_WHIP_FLAME
     lua["TYPE_MAP"][347] = lua["Entity"]["as_bomb"];                   // ITEM_BOMB
     lua["TYPE_MAP"][348] = lua["Entity"]["as_bomb"];                   // ITEM_PASTEBOMB
@@ -557,7 +557,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][562] = lua["Entity"]["as_powerup"];                // ITEM_POWERUP_SKELETON_KEY
     lua["TYPE_MAP"][564] = lua["Entity"]["as_yellowcape"];             // ITEM_CAPE
     lua["TYPE_MAP"][565] = lua["Entity"]["as_vladscape"];              // ITEM_VLADS_CAPE
-    lua["TYPE_MAP"][566] = lua["Entity"]["as_dummypurchasableentity"]; // ITEM_PURCHASABLE_CAPE
+    lua["TYPE_MAP"][566] = lua["Entity"]["as_purchasable"];            // ITEM_PURCHASABLE_CAPE
     lua["TYPE_MAP"][567] = lua["Entity"]["as_jetpack"];                // ITEM_JETPACK
     lua["TYPE_MAP"][568] = lua["Entity"]["as_jetpack"];                // ITEM_JETPACK_MECH
     lua["TYPE_MAP"][569] = lua["Entity"]["as_dummypurchasableentity"]; // ITEM_PURCHASABLE_JETPACK
@@ -579,7 +579,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][585] = lua["Entity"]["as_excalibur"];              // ITEM_EXCALIBUR
     lua["TYPE_MAP"][586] = lua["Entity"]["as_movable"];                // ITEM_BROKENEXCALIBUR
     lua["TYPE_MAP"][587] = lua["Entity"]["as_gun"];                    // ITEM_PLASMACANNON
-    lua["TYPE_MAP"][588] = lua["Entity"]["as_gun"];                    // ITEM_SCEPTER
+    lua["TYPE_MAP"][588] = lua["Entity"]["as_scepter"];                // ITEM_SCEPTER
     lua["TYPE_MAP"][589] = lua["Entity"]["as_gun"];                    // ITEM_CLONEGUN
     lua["TYPE_MAP"][590] = lua["Entity"]["as_bow"];                    // ITEM_HOUYIBOW
     lua["TYPE_MAP"][591] = lua["Entity"]["as_shield"];                 // ITEM_WOODEN_SHIELD
@@ -786,7 +786,7 @@ void register_usertypes(sol::state& lua)
     // lua["TYPE_MAP"][801] = lua["Entity"]["as_entity"];  // BG_BASECAMP_DININGTABLE_DISHES (plain entity)
     // lua["TYPE_MAP"][802] = lua["Entity"]["as_entity"];  // BG_BASECAMP_SHORTCUTSTATIONBANNER (plain entity)
     // lua["TYPE_MAP"][803] = lua["Entity"]["as_entity"];  // BG_SHOP (plain entity)
-    lua["TYPE_MAP"][804] = lua["Entity"]["as_bgshopentrence"]; // BG_SHOP_ENTRANCEDOOR
+    lua["TYPE_MAP"][804] = lua["Entity"]["as_bgshopentrance"]; // BG_SHOP_ENTRANCEDOOR
     // lua["TYPE_MAP"][805] = lua["Entity"]["as_entity"];  // BG_SHOP_BACKDOOR (plain entity)
     // lua["TYPE_MAP"][806] = lua["Entity"]["as_entity"];  // BG_SHOPWANTEDPOSTER (plain entity)
     // lua["TYPE_MAP"][807] = lua["Entity"]["as_entity"];  // BG_SHOPWANTEDPORTRAIT (plain entity)

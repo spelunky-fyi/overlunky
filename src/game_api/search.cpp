@@ -541,17 +541,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    {
-        "state_location"sv,
-        // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
-        PatternCommandBuffer{}
-            .find_inst("\x49\x0F\x44\xC0"sv)
-            .find_next_inst("\x49\x0F\x44\xC0"sv)
-            .offset(-0x19)
-            .find_inst("\x48\x8B"sv)
-            .decode_pc()
-            .at_exe(),
-    },
+    //{
+    //    "state_location"sv,
+    //    // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x49\x0F\x44\xC0"sv)
+    //        .find_next_inst("\x49\x0F\x44\xC0"sv)
+    //        .offset(-0x19)
+    //        .find_inst("\x48\x8B"sv)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
     {
         "game_manager"sv,
         PatternCommandBuffer{}
@@ -655,8 +655,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
-        "add_item_ptr"sv,
-        // Used in spawn_entity as `add_item_ptr(overlay + 0x18, spawned_entity, false)`
+        "entitylist_insert"sv,
+        // Used in spawn_entity as `entitylist_insert(overlay + 0x18, spawned_entity, false)`
         PatternCommandBuffer{}
             .find_inst("\xe8****\x44\x88\x76"sv)
             .decode_call()
@@ -691,8 +691,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_studio"sv, // probably wrong
-                         // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+        "fmod_studio"sv,
+        // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\xba\x03\x02\x02\x00"sv)
@@ -701,9 +701,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_event_properties"sv, // probably wrong
-                                   // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
-                                   // Said name comes from an array that is being looped, said array is a global of type EventParameters
+        "fmod_event_properties"sv,
+        // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+        // Said name comes from an array that is being looped, said array is a global of type EventParameters
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\x48\x8d\x9d\x38\x01\x00\x00"sv)
@@ -713,8 +713,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_event_map"sv, // probably wrong
-                            // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
+        "fmod_event_map"sv, // Find a call to FMOD::Studio::System::getEvent (should be before the call to FMOD::Studio::EventDescription::getParameterDescriptionByName)
                             // The third parameter is an event-pointer-pointer, the second parameter to the enclosing function is the event-id and will be used further down
                             // to emplace a struct in an unordered_map (as seen by the strings inside the emplace function), that unordered_map is a global of type EventMap
         PatternCommandBuffer{}
@@ -1347,14 +1346,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    {
-        "refresh_illumination_heap_offset"sv,
-        // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
+    //{
+    //    "refresh_illumination_heap_offset"sv,
+    //    // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
     {
         "ghost_spawn_time"sv,
         // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
@@ -1474,23 +1473,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "arrowtrap_projectile"sv,
-        // Put a conditional bp on load_item (rdx = 0x173 (id of wooden arrow))
-        // Trigger a trap
-        PatternCommandBuffer{}
-            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x90"sv)
-            .offset(0x1)
-            .at_exe(),
-    },
-    {
-        "poison_arrowtrap_projectile"sv,
-        // See `arrowtrap_projectile`, but trigger a poison trap
-        PatternCommandBuffer{}
-            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x48\x89\xC6\x48\x8B\x00"sv)
-            .offset(0x1)
-            .at_exe(),
-    },
-    {
         "give_powerup"sv,
         // Put a write bp on Player(PowerupCapable).powerups.size and give that player a powerup
         // Go up in the callstack until you find a function that takes the powerup ID in rdx
@@ -1582,9 +1564,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         "get_entity_name"sv,
         PatternCommandBuffer{}
-            .find_inst("\x44\x21\xe2\x4c\x8b\x91\x78\x02\x00\x00"sv)
-            .at_exe()
-            .function_start(0xff),
+            .find_after_inst("48 89 F2 66 41 B8 80 00 45 31 C9"_gh)
+            .decode_call()
+            .at_exe(),
     },
     {
         "construct_soundmeta"sv,
@@ -1840,6 +1822,16 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .function_start(),
     },
     {
+        // Put write bp on state.win_state and enter a multiplayer game
+        // alternative pattern 4C 8D 98 00 00 00 02 + function start
+        "heap_clone"sv,
+        PatternCommandBuffer{}
+            .find_inst("4c 8d 05 f4 ca 27 00"_gh)
+            .find_next_inst("eb 27"_gh)
+            .offset(-0xC)
+            .at_exe(),
+    },
+    {
         // ^ writes to state.pause on state.loading == 3
         "unpause_level"sv,
         PatternCommandBuffer{}
@@ -1923,7 +1915,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // Go into jetpack 99 virtual function (play_warning_sound), there are two calls for virtuls and one call to static function, that's the one
-        "play_sound"sv,
+        "play_sfx"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x83\xC1\x18\x41\xB8\x38\x01\x00\x00"sv)
             .at_exe()

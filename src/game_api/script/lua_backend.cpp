@@ -6,37 +6,36 @@
 #include <fmt/format.h> // for format_error
 #include <list>         // for _List_iterator, _List_co...
 #include <sol/sol.hpp>  // for table_proxy, optional
-#include <stack>        // for stack
-#include <tuple>        // for get
-#include <vector>       // for vector
+#include <sol/types.hpp>
+#include <stack>  // for stack
+#include <tuple>  // for get
+#include <vector> // for vector
 
-#include "aliases.hpp"                      // for IMAGE, JournalPageType
-#include "bucket.hpp"                       // for Bucket
-#include "constants.hpp"                    // for no_return_str
-#include "entities_chars.hpp"               // for Player
-#include "entity.hpp"                       // for Entity, get_entity_ptr
-#include "handle_lua_function.hpp"          // for handle_function
-#include "items.hpp"                        // for Inventory
-#include "level_api.hpp"                    // for LevelGenData, LevelGenSy...
-#include "level_api_types.hpp"              // for LevelGenRoomData
-#include "lua_console.hpp"                  // for LuaConsole
-#include "lua_vm.hpp"                       // for acquire_lua_vm, get_lua_vm
-#include "math.hpp"                         // for AABB
-#include "movable_behavior.hpp"             // for CustomMovableBehavior
-#include "overloaded.hpp"                   // for overloaded
-#include "rpc.hpp"                          // for get_frame_count, get_pla...
-#include "screen.hpp"                       // for get_screen_ptr, Screen
-#include "script_util.hpp"                  // for InputString
-#include "sound_manager.hpp"                // for SoundManager
-#include "state.hpp"                        // for StateMemory, State, get_...
-#include "strings.hpp"                      // for clear_custom_shopitem_names
-#include "usertypes/gui_lua.hpp"            // for GuiDrawContext
-#include "usertypes/level_lua.hpp"          // for PreHandleRoomTilesContext
-#include "usertypes/save_context.hpp"       // for LoadContext, SaveContext
-#include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext
-#include "window_api.hpp"                   // for get_window
+#include "aliases.hpp"                // for IMAGE, JournalPageType
+#include "bucket.hpp"                 // for Bucket
+#include "constants.hpp"              // for no_return_str
+#include "entities_chars.hpp"         // for Player
+#include "entity.hpp"                 // for Entity, get_entity_ptr
+#include "handle_lua_function.hpp"    // for handle_function
+#include "items.hpp"                  // for Inventory
+#include "level_api.hpp"              // for LevelGenData, LevelGenSy...
+#include "level_api_types.hpp"        // for LevelGenRoomData
+#include "lua_console.hpp"            // for LuaConsole
+#include "lua_vm.hpp"                 // for acquire_lua_vm, get_lua_vm
+#include "math.hpp"                   // for AABB
+#include "movable_behavior.hpp"       // for CustomMovableBehavior
+#include "overloaded.hpp"             // for overloaded
+#include "rpc.hpp"                    // for set_level_string
+#include "screen.hpp"                 // for get_screen_ptr, Screen
+#include "script_util.hpp"            // for InputString
+#include "sound_manager.hpp"          // for SoundManager
+#include "state.hpp"                  // for StateMemory, get_...
+#include "strings.hpp"                // for clear_custom_shopitem_names
+#include "usertypes/gui_lua.hpp"      // for GuiDrawContext
+#include "usertypes/level_lua.hpp"    // for PreHandleRoomTilesContext
+#include "usertypes/save_context.hpp" // for LoadContext, SaveContext
+#include "window_api.hpp"             // for get_window
 
-std::recursive_mutex g_all_backends_mutex;
 std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>> g_all_backends;
 std::unordered_map<int, HotKey> g_hotkeys;
 int g_hotkey_count = 0;
@@ -44,11 +43,13 @@ int g_hotkey_count = 0;
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     : lua{get_lua_vm(sound_mgr), sol::create}, vm{acquire_lua_vm(sound_mgr)}, sound_manager{sound_mgr}, console{con}
 {
-    g_state = State::get().ptr_main();
+    auto heap = HeapBase::get();
+    g_state = heap.state();
+    ScriptState& state = local_state_datas[g_state].state;
     state.screen = g_state->screen;
     state.time_level = g_state->time_level;
     state.time_total = g_state->time_total;
-    state.time_global = get_frame_count_main();
+    state.time_global = heap.frame_count();
     state.frame = state.frame;
     state.loading = g_state->loading;
     state.reset = (g_state->quest_flags & 1);
@@ -56,7 +57,7 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
 
     populate_lua_env(lua);
 
-    std::lock_guard lock{g_all_backends_mutex};
+    std::lock_guard lock{global_lua_lock};
     g_all_backends.emplace_back(new ProtectedBackend{this});
     self = g_all_backends.back().get();
 }
@@ -76,10 +77,15 @@ LuaBackend::~LuaBackend()
     }
 
     {
-        std::lock_guard lock{g_all_backends_mutex};
+        std::lock_guard lock{global_lua_lock};
         std::erase_if(g_all_backends, [this](const std::unique_ptr<ProtectedBackend>& protected_backend)
                       { return protected_backend.get() == self; });
     }
+}
+
+LocalStateData& LuaBackend::get_locals()
+{
+    return local_state_datas[HeapBase::get().state()];
 }
 
 void LuaBackend::clear()
@@ -268,29 +274,32 @@ bool LuaBackend::update()
         }
 
         /*moved to pre_load_screen
-        if (g_state->loading == 1 && g_state->loading != state.loading && g_state->screen_next != (int)ON::OPTIONS && g_state->screen != (int)ON::OPTIONS && g_state->screen_last != (int)ON::OPTIONS)
+        if (state->loading == 1 && state->loading != script_state.loading && state->screen_next != (int)ON::OPTIONS && state->screen != (int)ON::OPTIONS && state->screen_last != (int)ON::OPTIONS)
         {
             level_timers.clear();
             script_input.clear();
             clear_custom_shopitem_names();
         }*/
-        if (g_state->screen != state.screen)
+        ScriptState& script_state = get_locals().state;
+        HeapBase heap = HeapBase::get();
+        StateMemory* state = heap.state();
+        if (state->screen != script_state.screen)
         {
             if (on_screen)
                 on_screen.value()();
         }
-        if (on_frame && g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
+        if (on_frame && state->time_level != script_state.time_level && state->screen == (int)ON::LEVEL)
         {
             on_frame.value()();
         }
-        if (g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level == 1)
+        if (state->screen == (int)ON::CAMP && state->screen_last != (int)ON::OPTIONS && state->loading != script_state.loading && state->loading == 3 && state->time_level == 1)
         {
             if (on_camp)
                 on_camp.value()();
         }
-        if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level == 1)
+        if (state->screen == (int)ON::LEVEL && state->screen_last != (int)ON::OPTIONS && state->loading != script_state.loading && state->loading == 3 && state->time_level == 1)
         {
-            if (g_state->level_count == 0)
+            if (state->level_count == 0)
             {
                 if (on_start)
                     on_start.value()();
@@ -298,17 +307,17 @@ bool LuaBackend::update()
             if (on_level)
                 on_level.value()();
         }
-        if (g_state->screen == (int)ON::TRANSITION && state.screen != (int)ON::TRANSITION)
+        if (state->screen == (int)ON::TRANSITION && script_state.screen != (int)ON::TRANSITION)
         {
             if (on_transition)
                 on_transition.value()();
         }
-        if (g_state->screen == (int)ON::DEATH && state.screen != (int)ON::DEATH)
+        if (state->screen == (int)ON::DEATH && script_state.screen != (int)ON::DEATH)
         {
             if (on_death)
                 on_death.value()();
         }
-        if ((g_state->screen == (int)ON::WIN && state.screen != (int)ON::WIN) || (g_state->screen == (int)ON::CONSTELLATION && state.screen != (int)ON::CONSTELLATION))
+        if ((state->screen == (int)ON::WIN && script_state.screen != (int)ON::WIN) || (state->screen == (int)ON::CONSTELLATION && script_state.screen != (int)ON::CONSTELLATION))
         {
             if (on_win)
                 on_win.value()();
@@ -366,14 +375,13 @@ bool LuaBackend::update()
 
         for (auto it = global_timers.begin(); it != global_timers.end();)
         {
-            int now = get_frame_count();
+            int now = heap.frame_count();
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now >= cb->lastRan + cb->interval && !is_callback_cleared(it->first))
                 {
-                    set_current_callback(-1, it->first, CallbackType::Normal);
+                    auto _scope = set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function<bool>(this, cb->func);
-                    clear_current_callback();
                     cb->lastRan = now;
                     if (!keep_going.value_or(true))
                     {
@@ -387,9 +395,8 @@ bool LuaBackend::update()
             {
                 if (now >= cbt->timeout && !is_callback_cleared(it->first))
                 {
-                    set_current_callback(-1, it->first, CallbackType::Normal);
+                    auto _scope = set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function<void>(this, cbt->func);
-                    clear_current_callback();
                     it = global_timers.erase(it);
                 }
                 else
@@ -403,14 +410,13 @@ bool LuaBackend::update()
             }
         }
 
-        auto now = get_frame_count();
+        auto now = heap.frame_count();
         for (auto& [id, callback] : load_callbacks)
         {
             if (callback.lastRan < 0)
             {
-                set_current_callback(-1, id, CallbackType::Normal);
+                auto _scope = set_current_callback(-1, id, CallbackType::Normal);
                 handle_function<void>(this, callback.func, LoadContext{get_root(), get_name()});
-                clear_current_callback();
                 callback.lastRan = now;
             }
         }
@@ -420,18 +426,18 @@ bool LuaBackend::update()
             if (is_callback_cleared(id))
                 continue;
 
-            set_current_callback(-1, id, CallbackType::Normal);
-            if ((ON)g_state->screen == callback.screen && g_state->screen != state.screen && g_state->screen_last != (int)ON::OPTIONS) // game screens
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
+            if ((ON)state->screen == callback.screen && state->screen != script_state.screen && state->screen_last != (int)ON::OPTIONS) // game screens
             {
                 handle_function<void>(this, callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::LEVEL && g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3 && g_state->time_level <= 1)
+            else if (callback.screen == ON::LEVEL && state->screen == (int)ON::LEVEL && state->screen_last != (int)ON::OPTIONS && script_state.loading != state->loading && state->loading == 3 && state->time_level <= 1)
             {
                 handle_function<void>(this, callback.func);
                 callback.lastRan = now;
             }
-            else if (callback.screen == ON::CAMP && g_state->screen == (int)ON::CAMP && g_state->screen_last != (int)ON::OPTIONS && state.loading != g_state->loading && g_state->loading == 3 && g_state->time_level == 1)
+            else if (callback.screen == ON::CAMP && state->screen == (int)ON::CAMP && state->screen_last != (int)ON::OPTIONS && script_state.loading != state->loading && state->loading == 3 && state->time_level == 1)
             {
                 handle_function<void>(this, callback.func);
                 callback.lastRan = now;
@@ -442,7 +448,7 @@ bool LuaBackend::update()
                 {
                 case ON::FRAME:
                 {
-                    if (g_state->time_level != state.time_level && g_state->screen == (int)ON::LEVEL)
+                    if (state->time_level != script_state.time_level && state->screen == (int)ON::LEVEL)
                     {
                         handle_function<void>(this, callback.func);
                         callback.lastRan = now;
@@ -451,8 +457,8 @@ bool LuaBackend::update()
                 }
                 case ON::GAMEFRAME:
                 {
-                    if (!g_state->pause && get_frame_count() != state.time_global &&
-                        ((g_state->screen >= (int)ON::CAMP && g_state->screen <= (int)ON::DEATH) || g_state->screen == (int)ON::ARENA_MATCH))
+                    if (!state->pause && heap.frame_count() != script_state.time_global &&
+                        ((state->screen >= (int)ON::CAMP && state->screen <= (int)ON::DEATH) || state->screen == (int)ON::ARENA_MATCH))
                     {
                         handle_function<void>(this, callback.func);
                         callback.lastRan = now;
@@ -461,7 +467,7 @@ bool LuaBackend::update()
                 }
                 case ON::SCREEN:
                 {
-                    if (g_state->screen != state.screen)
+                    if (state->screen != script_state.screen)
                     {
                         handle_function<void>(this, callback.func);
                         callback.lastRan = now;
@@ -470,7 +476,7 @@ bool LuaBackend::update()
                 }
                 case ON::START:
                 {
-                    if (g_state->screen == (int)ON::LEVEL && g_state->screen_last != (int)ON::OPTIONS && g_state->level_count == 0 && g_state->loading != state.loading && g_state->loading == 3 && g_state->time_level <= 1)
+                    if (state->screen == (int)ON::LEVEL && state->screen_last != (int)ON::OPTIONS && state->level_count == 0 && state->loading != script_state.loading && state->loading == 3 && state->time_level <= 1)
                     {
                         handle_function<void>(this, callback.func);
                         callback.lastRan = now;
@@ -479,7 +485,7 @@ bool LuaBackend::update()
                 }
                 case ON::LOADING:
                 {
-                    if (g_state->loading > 0 && g_state->loading != state.loading)
+                    if (state->loading > 0 && state->loading != script_state.loading)
                     {
                         handle_function<void>(this, callback.func);
                         callback.lastRan = now;
@@ -488,7 +494,7 @@ bool LuaBackend::update()
                 }
                 case ON::RESET:
                 {
-                    if ((g_state->quest_flags & 1) > 0 && (g_state->quest_flags & 1) != state.reset)
+                    if ((state->quest_flags & 1) > 0 && (state->quest_flags & 1) != script_state.reset)
                     {
                         handle_function<void>(this, callback.func);
                         callback.lastRan = now;
@@ -499,18 +505,16 @@ bool LuaBackend::update()
                     break;
                 }
             }
-            clear_current_callback();
         }
-        const int now_l = g_state->time_level;
+        const int now_l = state->time_level;
         for (auto it = level_timers.begin(); it != level_timers.end();)
         {
             if (auto cb = std::get_if<IntervalCallback>(&it->second))
             {
                 if (now_l >= cb->lastRan + cb->interval && !is_callback_cleared(it->first))
                 {
-                    set_current_callback(-1, it->first, CallbackType::Normal);
+                    auto _scope = set_current_callback(-1, it->first, CallbackType::Normal);
                     std::optional<bool> keep_going = handle_function<bool>(this, cb->func);
-                    clear_current_callback();
                     cb->lastRan = now_l;
                     if (!keep_going.value_or(true))
                     {
@@ -524,9 +528,8 @@ bool LuaBackend::update()
             {
                 if (now_l >= cbt->timeout && !is_callback_cleared(it->first))
                 {
-                    set_current_callback(-1, it->first, CallbackType::Normal);
+                    auto _scope = set_current_callback(-1, it->first, CallbackType::Normal);
                     handle_function<void>(this, cbt->func);
-                    clear_current_callback();
                     it = level_timers.erase(it);
                 }
                 else
@@ -544,28 +547,28 @@ bool LuaBackend::update()
         // will be skipped.
         for (auto& [id, callback] : save_callbacks)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
-            if ((g_state->loading != state.loading && g_state->loading == 1) || manual_save)
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
+            if ((state->loading != script_state.loading && state->loading == 1) || manual_save)
             {
                 handle_function<void>(this, callback.func, SaveContext{get_root(), get_name()});
                 callback.lastRan = now;
             }
-            clear_current_callback();
         }
 
-        state.screen = g_state->screen;
-        state.time_level = g_state->time_level;
-        state.time_total = g_state->time_total;
-        state.time_global = get_frame_count();
-        state.frame = get_frame_count();
-        state.loading = g_state->loading;
-        state.reset = (g_state->quest_flags & 1);
-        state.quest_flags = g_state->quest_flags;
+        auto local_frame = HeapBase::get().frame_count();
+        script_state.screen = state->screen;
+        script_state.time_level = state->time_level;
+        script_state.time_total = state->time_total;
+        script_state.time_global = local_frame;
+        script_state.frame = local_frame;
+        script_state.loading = state->loading;
+        script_state.reset = (state->quest_flags & 1);
+        script_state.quest_flags = state->quest_flags;
 
         if (manual_save)
         {
             manual_save = false;
-            last_save = get_frame_count();
+            last_save = API::get_global_frame_count();
         }
     }
     catch (const sol::error& e)
@@ -602,12 +605,11 @@ void LuaBackend::draw(ImDrawList* dl)
             if (is_callback_cleared(id))
                 continue;
 
-            auto now = get_frame_count();
+            auto now = HeapBase::get().frame_count();
             if (callback.screen == ON::GUIFRAME)
             {
-                set_current_callback(-1, id, CallbackType::Normal);
+                auto _scope = set_current_callback(-1, id, CallbackType::Normal);
                 handle_function<void>(this, callback.func, draw_ctx);
-                clear_current_callback();
                 callback.lastRan = now;
             }
         }
@@ -626,12 +628,11 @@ void LuaBackend::draw(ImDrawList* dl)
                 g_hotkeys[callback.hotkeyid].active = !(ImGui::GetIO().WantCaptureKeyboard || bucket->io->WantCaptureKeyboard.value_or(false));
             }
 
-            auto now = get_frame_count();
+            auto now = HeapBase::get().frame_count();
             while (callback.queue > 0)
             {
-                set_current_callback(-1, id, CallbackType::HotKey);
+                auto _scope = set_current_callback(-1, id, CallbackType::HotKey);
                 handle_function<void>(this, callback.func, callback.key);
-                clear_current_callback();
                 callback.lastRan = now;
                 callback.queue--;
             }
@@ -762,9 +763,8 @@ void LuaBackend::post_tile_code(std::string_view tile_code, float x, float y, in
 
         if (callback.tile_code == tile_code)
         {
-            set_current_callback(-1, callback.id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, callback.id, CallbackType::Normal);
             handle_function<void>(this, callback.func, x, y, layer, room_template);
-            clear_current_callback();
         }
     }
 }
@@ -774,7 +774,7 @@ void LuaBackend::pre_load_level_files()
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -783,9 +783,8 @@ void LuaBackend::pre_load_level_files()
 
         if (callback.screen == ON::PRE_LOAD_LEVEL_FILES)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, PreLoadLevelFilesContext{});
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -795,7 +794,7 @@ bool LuaBackend::pre_init_level()
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -804,9 +803,8 @@ bool LuaBackend::pre_init_level()
 
         if (callback.screen == ON::PRE_LEVEL_CREATION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
             if (return_value)
                 return return_value;
@@ -819,7 +817,7 @@ bool LuaBackend::pre_init_layer(LAYER layer)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -828,9 +826,8 @@ bool LuaBackend::pre_init_layer(LAYER layer)
 
         if (callback.screen == ON::PRE_LAYER_CREATION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func, layer).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
             if (return_value)
                 return return_value;
@@ -843,9 +840,9 @@ bool LuaBackend::pre_load_screen()
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = HeapBase::get().state();
     if ((ON)state_ptr->screen_next <= ON::LEVEL && (ON)state_ptr->screen_next != ON::OPTIONS && (ON)state_ptr->screen != ON::OPTIONS)
     {
         using namespace std::string_view_literals;
@@ -859,9 +856,8 @@ bool LuaBackend::pre_load_screen()
 
         if (callback.screen == ON::PRE_LOAD_SCREEN)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
             if (return_value)
                 return return_value;
@@ -870,16 +866,16 @@ bool LuaBackend::pre_load_screen()
 
     if ((ON)state_ptr->screen == ON::LEVEL && (ON)state_ptr->screen_next != ON::DEATH && (state_ptr->quest_flags & 1) == 0)
     {
-        for (auto layer : State::get().ptr()->layers)
+        for (auto layer : HeapBase::get().state()->layers)
         {
-            auto it = layer->entities_by_mask.find(1);
+            auto it = layer->entities_by_mask.find(ENTITY_MASK::PLAYER);
             if (it == layer->entities_by_mask.end())
                 continue;
 
             for (auto entity : it->second.entities())
             {
                 auto ent = entity->as<Player>();
-                int slot = ent->inventory_ptr->player_slot;
+                int slot = ent->get_slot();
                 if (slot == -1 && ent->linked_companion_parent == -1)
                     continue;
                 if (slot == -1 && ent->linked_companion_parent != -1)
@@ -891,7 +887,10 @@ bool LuaBackend::pre_load_screen()
                         slot++;
                         if (parent->linked_companion_parent == -1)
                         {
-                            slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                            if (parent->inventory_ptr)
+                                slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                            else
+                                slot = -1;
                             break;
                         }
                     }
@@ -910,7 +909,7 @@ bool LuaBackend::pre_load_screen()
                     saved.held = get_user_data(ent->holding_uid);
                     should_save = true;
                 }
-                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && user_datas.contains(ent->overlay->uid))
+                if (ent->overlay && (ent->overlay->type->search_flags & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT && user_datas.contains(ent->overlay->uid))
                 {
                     saved.mount = get_user_data(ent->overlay->uid);
                     should_save = true;
@@ -944,7 +943,7 @@ bool LuaBackend::pre_unload_level()
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -953,9 +952,8 @@ bool LuaBackend::pre_unload_level()
 
         if (callback.screen == ON::PRE_LEVEL_DESTRUCTION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
             if (return_value)
                 return return_value;
@@ -969,7 +967,7 @@ bool LuaBackend::pre_unload_layer(LAYER layer)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -978,9 +976,8 @@ bool LuaBackend::pre_unload_layer(LAYER layer)
 
         if (callback.screen == ON::PRE_LAYER_DESTRUCTION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func, layer).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
             if (return_value)
                 return return_value;
@@ -995,7 +992,7 @@ void LuaBackend::post_room_generation()
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1004,9 +1001,8 @@ void LuaBackend::post_room_generation()
 
         if (callback.screen == ON::POST_ROOM_GENERATION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, PostRoomGenerationContext{});
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1014,16 +1010,16 @@ void LuaBackend::post_room_generation()
 
 void LuaBackend::load_user_data()
 {
-    for (auto layer : State::get().ptr()->layers)
+    for (auto layer : HeapBase::get().state()->layers)
     {
-        auto it = layer->entities_by_mask.find(1);
+        auto it = layer->entities_by_mask.find(ENTITY_MASK::PLAYER);
         if (it == layer->entities_by_mask.end())
             continue;
 
         for (auto entity : it->second.entities())
         {
             auto ent = entity->as<Player>();
-            int slot = ent->inventory_ptr->player_slot;
+            int slot = ent->get_slot();
             if (slot == -1 && ent->linked_companion_parent == -1)
                 continue;
             if (slot == -1 && ent->linked_companion_parent != -1)
@@ -1035,7 +1031,10 @@ void LuaBackend::load_user_data()
                     slot++;
                     if (parent->linked_companion_parent == -1)
                     {
-                        slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        if (parent->inventory_ptr)
+                            slot += (parent->inventory_ptr->player_slot + 1) * 100;
+                        else
+                            slot = -1;
                         break;
                     }
                 }
@@ -1048,7 +1047,7 @@ void LuaBackend::load_user_data()
                     set_user_data(*ent, saved_user_datas[slot].self.value());
                 if (ent->holding_uid != -1 && saved_user_datas[slot].held.has_value())
                     set_user_data(ent->holding_uid, saved_user_datas[slot].held.value());
-                if (ent->overlay && (ent->overlay->type->search_flags & 2) > 0 && saved_user_datas[slot].mount.has_value())
+                if (ent->overlay && (ent->overlay->type->search_flags & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT && saved_user_datas[slot].mount.has_value())
                     set_user_data(ent->overlay->uid, saved_user_datas[slot].mount.value());
                 for (auto& [type, powerup] : ent->powerups)
                 {
@@ -1065,9 +1064,9 @@ void LuaBackend::post_level_generation()
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = HeapBase::get().state();
     if ((ON)state_ptr->screen == ON::LEVEL)
     {
         load_user_data();
@@ -1081,9 +1080,8 @@ void LuaBackend::post_level_generation()
 
         if (callback.screen == ON::POST_LEVEL_GENERATION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1093,7 +1091,7 @@ void LuaBackend::post_init_layer(LAYER layer)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1102,9 +1100,8 @@ void LuaBackend::post_init_layer(LAYER layer)
 
         if (callback.screen == ON::POST_LAYER_CREATION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, layer);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1114,13 +1111,13 @@ void LuaBackend::post_load_screen()
     if (!get_enabled())
         return;
 
-    auto state_ptr = State::get().ptr();
+    auto state_ptr = HeapBase::get().state();
     if ((ON)state_ptr->screen == ON::TRANSITION)
     {
         load_user_data();
     }
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1129,9 +1126,8 @@ void LuaBackend::post_load_screen()
 
         if (callback.screen == ON::POST_LOAD_SCREEN)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1141,7 +1137,7 @@ void LuaBackend::post_unload_layer(LAYER layer)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1150,9 +1146,8 @@ void LuaBackend::post_unload_layer(LAYER layer)
 
         if (callback.screen == ON::POST_LAYER_DESTRUCTION)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, layer);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1163,7 +1158,7 @@ void LuaBackend::on_death_message(STRINGID stringid)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1172,9 +1167,8 @@ void LuaBackend::on_death_message(STRINGID stringid)
 
         if (callback.screen == ON::DEATH_MESSAGE)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, stringid);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1185,7 +1179,7 @@ std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_
     if (!get_enabled())
         return std::string{};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1195,9 +1189,8 @@ std::string LuaBackend::pre_get_random_room(int x, int y, uint8_t layer, uint16_
         if (callback.screen == ON::PRE_GET_RANDOM_ROOM)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             std::string return_value = handle_function<std::string>(this, callback.func, x, y, layer, room_template).value_or(std::string{});
-            clear_current_callback();
             if (!return_value.empty())
             {
                 return return_value;
@@ -1211,7 +1204,7 @@ LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenR
     if (!get_enabled())
         return {false, std::nullopt};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     PreHandleRoomTilesContext ctx{room_data};
 
@@ -1223,13 +1216,11 @@ LuaBackend::PreHandleRoomTilesResult LuaBackend::pre_handle_room_tiles(LevelGenR
         if (callback.screen == ON::PRE_HANDLE_ROOM_TILES)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             if (handle_function<bool>(this, callback.func, x, y, room_template, ctx).value_or(false))
             {
-                clear_current_callback();
                 return {true, ctx.modded_room_data};
             }
-            clear_current_callback();
         }
     }
     return {false, ctx.modded_room_data};
@@ -1245,20 +1236,18 @@ Entity* LuaBackend::pre_entity_spawn(std::uint32_t entity_type, float x, float y
         if (is_callback_cleared(callback.id))
             continue;
 
-        bool mask_match = callback.entity_mask == 0 || (get_type(entity_type)->search_flags & callback.entity_mask);
+        bool mask_match = callback.entity_mask == ENTITY_MASK::ANY || !!(get_type(entity_type)->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
         if (mask_match && flags_match)
         {
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity_type) > 0;
             if (type_match)
             {
-                set_current_callback(-1, callback.id, CallbackType::Normal);
+                auto _scope = set_current_callback(-1, callback.id, CallbackType::Normal);
                 if (auto spawn_replacement = handle_function<std::uint32_t>(this, callback.func, entity_type, x, y, layer, overlay, spawn_type_flags))
                 {
-                    clear_current_callback();
                     return get_entity_ptr(spawn_replacement.value()); // TODO: this assumes that the entity is valid, which will crash if it's not
                 }
-                clear_current_callback();
             }
         }
     }
@@ -1274,16 +1263,15 @@ void LuaBackend::post_entity_spawn(Entity* entity, int spawn_type_flags)
         if (is_callback_cleared(callback.id))
             continue;
 
-        bool mask_match = callback.entity_mask == 0 || (entity->type->search_flags & callback.entity_mask);
+        bool mask_match = callback.entity_mask == ENTITY_MASK::ANY || !!(entity->type->search_flags & callback.entity_mask);
         bool flags_match = callback.spawn_type_flags & spawn_type_flags;
         if (mask_match && flags_match)
         {
             bool type_match = callback.entity_types.empty() || std::count(callback.entity_types.begin(), callback.entity_types.end(), entity->type->id) > 0;
             if (type_match)
             {
-                set_current_callback(-1, callback.id, CallbackType::Normal);
+                auto _scope = set_current_callback(-1, callback.id, CallbackType::Normal);
                 handle_function<void>(this, callback.func, entity, spawn_type_flags);
-                clear_current_callback();
             }
         }
     }
@@ -1302,9 +1290,8 @@ bool LuaBackend::pre_entity_instagib(Entity* victim)
 
         if (callback.uid == victim->uid)
         {
-            set_current_callback(-1, callback.id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, callback.id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func, victim).value_or(false);
-            clear_current_callback();
         }
     }
 
@@ -1320,7 +1307,7 @@ bool LuaBackend::process_vanilla_render_callbacks(ON event)
     // used in infinite loop detection to see if game is hanging because a script is hanging
     frame_counter++;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1329,9 +1316,8 @@ bool LuaBackend::process_vanilla_render_callbacks(ON event)
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func, render_ctx).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1345,7 +1331,7 @@ bool LuaBackend::process_vanilla_render_blur_callbacks(ON event, float blur_amou
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1354,9 +1340,8 @@ bool LuaBackend::process_vanilla_render_blur_callbacks(ON event, float blur_amou
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func, render_ctx, blur_amount).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1370,7 +1355,7 @@ bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1379,9 +1364,8 @@ bool LuaBackend::process_vanilla_render_hud_callbacks(ON event, Hud* hud)
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func, render_ctx, hud).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1395,7 +1379,7 @@ bool LuaBackend::process_vanilla_render_layer_callbacks(ON event, uint8_t layer)
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1404,9 +1388,8 @@ bool LuaBackend::process_vanilla_render_layer_callbacks(ON event, uint8_t layer)
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func, render_ctx, layer).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1420,7 +1403,7 @@ bool LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     render_ctx.bounding_box = bbox;
     for (auto& [id, callback] : callbacks)
@@ -1430,9 +1413,8 @@ bool LuaBackend::process_vanilla_render_draw_depth_callbacks(ON event, uint8_t d
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func, render_ctx, draw_depth).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1446,7 +1428,7 @@ bool LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     VanillaRenderContext render_ctx;
     for (auto& [id, callback] : callbacks)
     {
@@ -1455,9 +1437,8 @@ bool LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func, render_ctx, page_type, page).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1470,7 +1451,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
     if (!get_enabled())
         return std::u16string{no_return_str};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     std::optional<std::u16string> return_value = std::nullopt;
 
@@ -1482,7 +1463,7 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
         if (callback.screen == ON::SPEECH_BUBBLE)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             if (auto speech_value = handle_function<std::u16string>(this, callback.func, entity, buffer))
             {
                 if (!return_value)
@@ -1490,7 +1471,6 @@ std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
                     return_value = speech_value;
                 }
             }
-            clear_current_callback();
         }
     }
     return return_value.value_or(std::u16string{no_return_str});
@@ -1501,7 +1481,7 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
     if (!get_enabled())
         return std::u16string{no_return_str};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     std::optional<std::u16string> return_value = std::nullopt;
 
@@ -1513,7 +1493,7 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
         if (callback.screen == ON::TOAST)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             if (auto toast_value = handle_function<std::u16string>(this, callback.func, buffer))
             {
                 if (!return_value)
@@ -1521,7 +1501,6 @@ std::u16string LuaBackend::pre_toast(char16_t* buffer)
                     return_value = toast_value;
                 }
             }
-            clear_current_callback();
         }
     }
     return return_value.value_or(std::u16string{no_return_str});
@@ -1532,7 +1511,7 @@ bool LuaBackend::pre_load_journal_chapter(uint8_t chapter)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1541,7 +1520,7 @@ bool LuaBackend::pre_load_journal_chapter(uint8_t chapter)
         if (callback.screen == ON::PRE_LOAD_JOURNAL_CHAPTER)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             if (auto return_value = handle_function<bool>(this, callback.func, chapter))
             {
                 if (return_value.value())
@@ -1549,7 +1528,6 @@ bool LuaBackend::pre_load_journal_chapter(uint8_t chapter)
                     return true;
                 }
             }
-            clear_current_callback();
         }
     }
     return false;
@@ -1560,7 +1538,7 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
     if (!get_enabled())
         return {};
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     std::vector<uint32_t> new_pages;
     for (auto& [id, callback] : callbacks)
     {
@@ -1570,7 +1548,7 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
         if (callback.screen == ON::POST_LOAD_JOURNAL_CHAPTER)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             if (auto returned_pages = handle_function<sol::object>(this, callback.func, chapter, sol::as_table(pages)).value_or<sol::object>({}))
             {
                 if (returned_pages.get_type() == sol::type::table || returned_pages.get_type() == sol::type::userdata)
@@ -1586,7 +1564,6 @@ std::vector<uint32_t> LuaBackend::post_load_journal_chapter(uint8_t chapter, con
                     }
                 }
             }
-            clear_current_callback();
         }
     }
     return new_pages;
@@ -1597,7 +1574,7 @@ std::optional<bool> LuaBackend::pre_get_feat(FEAT feat)
     if (!get_enabled())
         return std::nullopt;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1606,7 +1583,7 @@ std::optional<bool> LuaBackend::pre_get_feat(FEAT feat)
         if (callback.screen == ON::PRE_GET_FEAT)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             if (auto return_value = handle_function<bool>(this, callback.func, feat))
             {
                 if (return_value.has_value())
@@ -1614,7 +1591,6 @@ std::optional<bool> LuaBackend::pre_get_feat(FEAT feat)
                     return return_value.value();
                 }
             }
-            clear_current_callback();
         }
     }
     return std::nullopt;
@@ -1625,7 +1601,7 @@ bool LuaBackend::pre_set_feat(FEAT feat)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1634,7 +1610,7 @@ bool LuaBackend::pre_set_feat(FEAT feat)
         if (callback.screen == ON::PRE_SET_FEAT)
         {
             callback.lastRan = now;
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             if (auto return_value = handle_function<bool>(this, callback.func, feat))
             {
                 if (return_value.has_value() && return_value.value())
@@ -1642,29 +1618,9 @@ bool LuaBackend::pre_set_feat(FEAT feat)
                     return return_value.value();
                 }
             }
-            clear_current_callback();
         }
     }
     return false;
-}
-
-CurrentCallback LuaBackend::get_current_callback() const
-{
-    return current_cb;
-}
-
-void LuaBackend::set_current_callback(int32_t aux_id, int32_t id, CallbackType type)
-{
-    current_cb.aux_id = aux_id;
-    current_cb.id = id;
-    current_cb.type = type;
-}
-
-void LuaBackend::clear_current_callback()
-{
-    current_cb.aux_id = 0;
-    current_cb.id = 0;
-    current_cb.type = CallbackType::None;
 }
 
 void LuaBackend::set_error(std::string err)
@@ -1694,7 +1650,7 @@ void LuaBackend::set_error(std::string err)
  */
 void LuaBackend::for_each_backend(std::function<bool(LockedBackend)> fun, bool stop_propagation)
 {
-    std::lock_guard lock{g_all_backends_mutex};
+    std::lock_guard lock{global_lua_lock};
     for (std::unique_ptr<ProtectedBackend>& backend : g_all_backends)
     {
         if (!fun(backend->Lock()) && stop_propagation)
@@ -1709,7 +1665,7 @@ LuaBackend::LockedBackend LuaBackend::get_backend(std::string_view id)
 }
 std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_safe(std::string_view id)
 {
-    std::lock_guard lock{g_all_backends_mutex};
+    std::lock_guard lock{global_lua_lock};
     for (std::unique_ptr<ProtectedBackend>& backend : g_all_backends)
     {
         LockedBackend locked = backend->Lock();
@@ -1726,7 +1682,7 @@ LuaBackend::LockedBackend LuaBackend::get_backend_by_id(std::string_view id, std
 }
 std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_by_id_safe(std::string_view id, std::string_view ver)
 {
-    std::lock_guard lock{g_all_backends_mutex};
+    std::lock_guard lock{global_lua_lock};
     for (std::unique_ptr<ProtectedBackend>& backend : g_all_backends)
     {
         LockedBackend locked = backend->Lock();
@@ -1799,7 +1755,7 @@ void LuaBackend::on_set_user_data(Entity* ent)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1807,9 +1763,8 @@ void LuaBackend::on_set_user_data(Entity* ent)
 
         if (callback.screen == ON::USER_DATA)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, ent);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1821,7 +1776,7 @@ bool LuaBackend::on_pre(ON event)
     if (!get_enabled())
         return skip;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1829,9 +1784,8 @@ bool LuaBackend::on_pre(ON event)
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             skip |= handle_function<bool>(this, callback.func).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1844,7 +1798,7 @@ void LuaBackend::on_post(ON event)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
     for (auto& [id, callback] : callbacks)
     {
         if (is_callback_cleared(id))
@@ -1852,20 +1806,90 @@ void LuaBackend::on_post(ON event)
 
         if (callback.screen == event)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
 }
 
+sol::table deepcopy_lua_table(sol::state& sol_state, sol::table& from_r)
+{
+    sol::table new_table(sol_state, sol::create);
+    for (auto& [k, v] : from_r.as<sol::table>())
+    {
+        if (v.is<sol::table>())
+        {
+            sol::table v_table = v.as<sol::table>();
+            new_table.raw_set(k, deepcopy_lua_table(sol_state, v_table));
+        }
+        else
+        {
+            new_table.raw_set(k, v);
+        }
+    }
+    auto maybe_metatable = from_r.raw_get<sol::optional<sol::table>>(sol::metatable_key);
+    if (maybe_metatable)
+    {
+        new_table.raw_set(sol::metatable_key, maybe_metatable.value());
+    }
+    return new_table;
+}
+
+inline sol::object deepcopy_lua(sol::state& sol_state, sol::object& from)
+{
+    if (from.is<sol::table>())
+    {
+        auto from_t = from.as<sol::table>();
+        return deepcopy_lua_table(sol_state, from_t);
+    }
+    else
+    {
+        return from;
+    }
+}
+
+void LuaBackend::copy_locals(StateMemory* from, StateMemory* to)
+{
+    if (!local_state_datas.contains(from))
+        return;
+
+    auto& to_data = local_state_datas[to];
+    auto& from_data = local_state_datas[from];
+    to_data.state = from_data.state;
+    sol::object from_user_data = from_data.user_data;
+    if (from_user_data != sol::lua_nil)
+    {
+        to_data.user_data = deepcopy_lua(*vm, from_user_data);
+    }
+}
+
+void LuaBackend::pre_copy_state(HeapBase from, HeapBase to)
+{
+    if (!get_enabled())
+        return;
+
+    copy_locals(from.state(), to.state());
+    // auto now = HeapBase::get().frame_count();
+    // for (auto& [id, callback] : callbacks)
+    // {
+    //     if (is_callback_cleared(id))
+    //         continue;
+
+    //     if (callback.screen == ON::PRE_COPY_STATE)
+    //     {
+    //         auto _scope = set_current_callback(-1, id, CallbackType::Normal);
+    //         handle_function<void>(this, callback.func, from, to);
+    //         callback.lastRan = now;
+    //     }
+    // }
+}
 bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
 {
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1874,9 +1898,8 @@ bool LuaBackend::pre_save_state(int slot, StateMemory* saved)
 
         if (callback.screen == ON::PRE_SAVE_STATE)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func, slot, saved).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
             if (return_value)
                 return return_value;
@@ -1891,7 +1914,7 @@ bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
     if (!get_enabled())
         return false;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1900,9 +1923,8 @@ bool LuaBackend::pre_load_state(int slot, StateMemory* loaded)
 
         if (callback.screen == ON::PRE_LOAD_STATE)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             auto return_value = handle_function<bool>(this, callback.func, slot, loaded).value_or(false);
-            clear_current_callback();
             callback.lastRan = now;
             if (return_value)
                 return return_value;
@@ -1917,7 +1939,7 @@ void LuaBackend::post_save_state(int slot, StateMemory* saved)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1926,9 +1948,8 @@ void LuaBackend::post_save_state(int slot, StateMemory* saved)
 
         if (callback.screen == ON::POST_SAVE_STATE)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, slot, saved);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }
@@ -1939,7 +1960,7 @@ void LuaBackend::post_load_state(int slot, StateMemory* loaded)
     if (!get_enabled())
         return;
 
-    auto now = get_frame_count();
+    auto now = HeapBase::get().frame_count();
 
     for (auto& [id, callback] : callbacks)
     {
@@ -1948,9 +1969,8 @@ void LuaBackend::post_load_state(int slot, StateMemory* loaded)
 
         if (callback.screen == ON::POST_LOAD_STATE)
         {
-            set_current_callback(-1, id, CallbackType::Normal);
+            auto _scope = set_current_callback(-1, id, CallbackType::Normal);
             handle_function<void>(this, callback.func, slot, loaded);
-            clear_current_callback();
             callback.lastRan = now;
         }
     }

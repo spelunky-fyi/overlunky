@@ -19,6 +19,7 @@ void register_usertypes(sol::state& lua)
     lua["set_drop_chance"] = set_drop_chance;
     /// Changes a particular drop, e.g. what Van Horsing throws at you (use e.g. replace_drop(DROP.VAN_HORSING_DIAMOND, ENT_TYPE.ITEM_PLASMACANNON))
     /// Use `0` as type to reset this drop to default, use `-1` as drop_id to reset all to default
+    /// Check all the available drops [here](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp)
     lua["replace_drop"] = replace_drop;
 
     lua.create_named_table("DROPCHANCE"

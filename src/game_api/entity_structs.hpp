@@ -1,16 +1,6 @@
 #pragma once
 
-#include <cstddef>       // for size_t
-#include <cstdint>       // for uint8_t, uint32_t, int32_t, uint16_t, int64_t
-#include <functional>    // for function, equal_to
-#include <span>          // for span
-#include <string>        // for allocator, string
-#include <string_view>   // for string_view
-#include <tuple>         // for tuple
-#include <type_traits>   // for move
-#include <unordered_map> // for _Umap_traits<>::allocator_type, unordered_map
-#include <utility>       // for pair
-#include <vector>        // for vector
+#include <cstdint> // for uint8_t, int32_t
 
 enum class REPEAT_TYPE : uint8_t
 {
@@ -27,10 +17,11 @@ enum class SHAPE : uint8_t
 
 struct Animation
 {
-    int32_t texture;
+    int32_t first_tile;
+    // num_tiles
     int32_t count;
     int32_t interval;
-    uint8_t key;
+    uint8_t id;
     REPEAT_TYPE repeat;
 };
 

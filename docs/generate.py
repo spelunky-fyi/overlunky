@@ -97,9 +97,12 @@ def format_af(lf, af):
     return fun
 
 
-def print_af(lf, af):
+def print_af(lf, af, deprecated = False):
     fun = format_af(lf, af)
-    print(f"#### {fun}\n")
+    if deprecated:
+        print(f"`{fun}`<br/>")
+    else:
+        print(f"#### {fun}\n")
     comments = af["comment"]
     if comments:
         comment = " ".join(comments)
@@ -108,7 +111,7 @@ def print_af(lf, af):
         print()
 
 
-def print_lf(lf):
+def print_lf(lf, deprecated = False):
     comments = lf["comment"]
     if comments and "NoDoc" in comments[0]:
         return
@@ -120,7 +123,7 @@ def print_lf(lf):
     include_example(name)
     print(f"\n> Search script examples for [{name}]({search_link})\n")
     for af in ps.rpcfunc(lf["cpp"]):
-        print_af(lf, af)
+        print_af(lf, af, deprecated)
     for com in comments:
         com = link_custom_type(com)
         print(com)
@@ -429,6 +432,9 @@ for func in ps.funcs:
         cat = "Callback functions"
     elif any(subs in func["name"] for subs in ["flag", "clr_mask", "flip_mask", "set_mask", "test_mask"]):
         cat = "Flag functions"
+    elif any(subs in func["file"] for subs in ["game_patches_lua.cpp"]) or any(
+        subs in func["name"] for subs in ["replace_drop", "set_drop_chance"]):
+        cat = "Game patching functions"
     elif any(subs in func["name"] for subs in ["shop"]):
         cat = "Shop functions"
     elif any(subs in func["name"] for subs in ["_room"]):
@@ -506,6 +512,10 @@ for func in ps.funcs:
 
 for cat in sorted(func_cats):
     print("\n## " + cat + "\n")
+    if cat.startswith("Game patch"):
+        print(
+    "<aside class='warning'>These functions modify the game code, which is hard to keep track and reverse for online rollback mechanics. If you care about online compatibility of your mod, consider using them only during level generation etc.</aside>"
+)
     for lf in sorted(func_cats[cat], key=lambda x: x["name"]):
         if len(ps.rpcfunc(lf["cpp"])):
             print_lf(lf)
@@ -552,7 +562,7 @@ for lf in ps.events:
 for lf in ps.deprecated_funcs:
     lf["comment"].pop(0)
     if len(ps.rpcfunc(lf["cpp"])):
-        print_lf(lf)
+        print_lf(lf, True)
     elif not (lf["name"].startswith("on_") or lf["name"] in ps.not_functions):
         if lf["comment"] and "NoDoc" in lf["comment"][0]:
             continue
@@ -697,7 +707,7 @@ Type | Name | Description
                 [] if type_name not in ps.constructors else ps.constructors[type_name]
             )
             for var in ctors + type["vars"]:
-                if "comment" in var and "NoDoc" in var["comment"]:
+                if "comment" in var and var["comment"] and "NoDoc" in var["comment"]:
                     continue
                 var_name = var["name"]
                 search_link = (

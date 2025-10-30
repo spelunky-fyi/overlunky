@@ -9,10 +9,12 @@
 #include <tuple>       // for get
 #include <type_traits> // for move, declval
 
-#include "particles.hpp"  // for ParticleEmitterInfo
-#include "render_api.hpp" // for TextureRenderingInfo, WorldShader, TextRen...
-#include "state.hpp"      // for enum_to_layer
-#include "texture.hpp"    // for Texture, get_texture
+#include "entity.hpp"             // for Entity
+#include "particles.hpp"          // for ParticleEmitterInfo
+#include "render_api.hpp"         // for TextureRenderingInfo, WorldShader, TextRen...
+#include "script/lua_backend.hpp" // for get_calling_backend
+#include "state.hpp"              // for enum_to_layer
+#include "texture.hpp"            // for Texture, get_texture
 
 void VanillaRenderContext::draw_text(const std::string& text, float x, float y, float scale_x, float scale_y, Color color, VANILLA_TEXT_ALIGNMENT alignment, VANILLA_FONT_STYLE fontstyle)
 {
@@ -134,18 +136,19 @@ void VanillaRenderContext::draw_screen_texture(TEXTURE texture_id, TextureRender
     RenderAPI::get().draw_screen_texture(texture, std::move(tri), std::move(color), 0x29);
 }
 
-auto g_angle_style = CORNER_FINISH::ADAPTIVE;
-
 void VanillaRenderContext::set_corner_finish(CORNER_FINISH c)
 {
-    g_angle_style = c;
+    auto backend = LuaBackend::get_calling_backend();
+    backend->vanilla_render_corner_finish = c;
 }
 
 // get a Quad to fill out the corner between two lines and fix their overlap
 Quad get_corner_quad(Quad& line1, Quad& line2)
 {
-    if (g_angle_style == CORNER_FINISH::NONE)
+    auto backend = LuaBackend::get_calling_backend();
+    if (backend->vanilla_render_corner_finish == CORNER_FINISH::NONE)
         return {};
+
     // save the corners as Vec2 for easier calculations
     // and calculate inner and outer corner, we don't know which is which at this point
     Vec2 A{line1.top_left_x, line1.top_left_y};
@@ -191,16 +194,17 @@ Quad get_corner_quad(Quad& line1, Quad& line2)
 
     Vec2 middle_point = *first - (*first - *second) / 2;
 
-    if (g_angle_style == CORNER_FINISH::ADAPTIVE && std::abs(true_angle) > 1.6f)
+    if (backend->vanilla_render_corner_finish == CORNER_FINISH::ADAPTIVE && std::abs(true_angle) > 1.6f)
     {
         Vec2 offset = *outer_corner - middle_point;
         offset = offset * (float)std::pow((std::abs(true_angle) - 1.6f) / 1.54f, 2);
         *outer_corner -= offset;
     }
-    else if (g_angle_style == CORNER_FINISH::CUT)
+    else if (backend->vanilla_render_corner_finish == CORNER_FINISH::CUT)
     {
         *outer_corner = *second;
     }
+    // else CORNER_FINISH::REAL
 
     if (std::abs(true_angle) > 3) // for small corners it's hard to do this right, so we give up on this
     {
@@ -672,8 +676,7 @@ void register_usertypes(sol::state& lua)
 
     auto render_draw_depth_lua = [](VanillaRenderContext&, LAYER layer, uint8_t draw_depth, AABB bbox)
     {
-        const uint8_t real_layer = enum_to_layer(layer);
-        auto layer_ptr = State::get().layer(real_layer);
+        auto layer_ptr = HeapBase::get().state()->layer(layer);
         render_draw_depth(layer_ptr, draw_depth, bbox.left, bbox.bottom, bbox.right, bbox.top);
     };
 
@@ -895,6 +898,79 @@ void register_usertypes(sol::state& lua)
     // DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW_SATURATION
     // Same as DEFERRED_TEXTURE_COLOR_EMISSIVE_COLORIZED_GLOW but renders texture as solid color
     */
+
+    /// Some information used to render the entity, can not be changed, used in Entity
+    lua.new_usertype<RenderInfo>(
+        "RenderInfo",
+        "x",
+        &RenderInfo::x,
+        "y",
+        &RenderInfo::y,
+        "offset_x",
+        &RenderInfo::offset_x,
+        "offset_y",
+        &RenderInfo::offset_y,
+        "shader",
+        &RenderInfo::shader,
+        "source",
+        &RenderInfo::source,
+        "destination",
+        sol::property(
+            [](const RenderInfo& ri) -> Quad
+            { return Quad{
+                  ri.destination_bottom_left_x,
+                  ri.destination_bottom_left_y,
+                  ri.destination_bottom_right_x,
+                  ri.destination_bottom_right_y,
+                  ri.destination_top_right_x,
+                  ri.destination_top_right_y,
+                  ri.destination_top_left_x,
+                  ri.destination_top_left_y,
+              }; }),
+        "tilew",
+        &RenderInfo::tilew,
+        "tileh",
+        &RenderInfo::tileh,
+        "facing_left",
+        &RenderInfo::flip_horizontal,
+        "angle",
+        &RenderInfo::angle1,
+        "animation_frame",
+        &RenderInfo::animation_frame,
+        "render_inactive",
+        &RenderInfo::render_inactive,
+        "brightness",
+        &RenderInfo::brightness,
+        "texture_num",
+        sol::readonly(&RenderInfo::texture_num),
+        "get_entity",
+        &RenderInfo::get_entity,
+        "set_normal_map_texture",
+        &RenderInfo::set_normal_map_texture,
+        "get_second_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.texture_names[1] || ri.texture_num < 2)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.texture_names[1])) /**/;
+        },
+        "get_third_texture",
+        [](const RenderInfo& ri) -> std::optional<TEXTURE>
+        {
+            if (!ri.texture_names[2] || ri.texture_num < 3)
+            {
+                return std::nullopt;
+            }
+            return ::get_texture(std::string_view(*ri.texture_names[2])) /**/;
+        },
+        "set_second_texture",
+        &RenderInfo::set_second_texture,
+        "set_third_texture",
+        &RenderInfo::set_third_texture,
+        "set_texture_num",
+        &RenderInfo::set_texture_num);
 
     auto hudinventory_type = lua.new_usertype<HudInventory>("HudInventory");
     hudinventory_type["enabled"] = &HudInventory::enabled;

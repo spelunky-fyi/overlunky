@@ -3,8 +3,7 @@
 #include "entity.hpp"        // for Entity, to_id, EntityDB
 #include "items.hpp"         // IWYU pragma: keep
 #include "layer.hpp"         // for EntityList::Range, EntityList, EntityList::Ent...
-#include "search.hpp"        // for get_address
-#include "sound_manager.hpp" //
+#include "sound_manager.hpp" // for construct_soundmeta
 
 uint8_t Olmec::broken_floaters()
 {
@@ -29,12 +28,7 @@ void Drill::trigger(std::optional<bool> play_sound_effect)
     {
         return;
     }
-
-    if (overlay != nullptr)
-    {
-        overlay->remove_item_ptr(this);
-    }
-
+    detach(true);
     move_state = 6;
     flags = flags & ~(1U << (10 - 1));
 
@@ -43,5 +37,5 @@ void Drill::trigger(std::optional<bool> play_sound_effect)
     sound2 = construct_soundmeta(0x153, false);
     sound2->start();
     if (play_sound_effect.value_or(false))
-        play_sound_by_id(0xA4, uid);
+        play_sound(0xA4, uid);
 }

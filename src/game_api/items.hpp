@@ -128,6 +128,6 @@ struct Items
 
     Player* player(uint8_t index) const
     {
-        return players[index];
+        return index < players.size() ? players[index] : nullptr;
     }
 };

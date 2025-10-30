@@ -18,9 +18,9 @@
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/identity_hasher.hpp"    // for identity_hasher
 #include "entity_structs.hpp"                // for CollisionInfo
+#include "heap_base.hpp"                     // for OnHeapPointer
 #include "layer.hpp"                         // for EntityList
 #include "math.hpp"                          // for AABB
-#include "thread_utils.hpp"                  // for OnHeapPointer
 
 struct RenderInfo;
 struct Texture;
@@ -36,19 +36,23 @@ struct EntityDB
     int32_t field_10;
     ENT_TYPE id;
     /// MASK
-    uint32_t search_flags;
+    ENTITY_MASK search_flags;
     float width;
     float height;
     uint8_t draw_depth;
-    uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc (RVA 0x21F30CC4)
+    uint8_t default_b3f; // value gets copied into entity.b3f along with draw_depth etc
     int16_t field_26;
     union
     {
         struct
         {
+            /// Offset of the hitbox in relation to the entity position
             float default_offsetx;
+            /// Offset of the hitbox in relation to the entity position
             float default_offsety;
+            /// Half of the width of the hitbox
             float default_hitboxx;
+            /// Half of the height of the hitbox
             float default_hitboxy;
             SHAPE default_shape;
             bool default_hitbox_enabled;
@@ -102,8 +106,8 @@ struct EntityDB
     uint8_t field_9A;
     uint8_t field_9B;
     STRINGID description;
-    int32_t sound_killed_by_player;
-    int32_t sound_killed_by_other;
+    SOUNDID sound_killed_by_player;
+    SOUNDID sound_killed_by_other;
     float field_a8;
     int32_t field_AC;
     game_unordered_map<uint8_t, Animation, identity_hasher<>> animations;
@@ -115,17 +119,13 @@ struct EntityDB
     EntityDB(const ENT_TYPE other);
 };
 
-using EntityMap = std::unordered_map<std::string, uint16_t>;
-
 struct EntityItem
 {
     std::string name;
     uint32_t id;
 
     EntityItem(const std::string& name_, uint32_t id_)
-        : name(name_), id(id_)
-    {
-    }
+        : name(name_), id(id_){};
     bool operator<(const EntityItem& item) const
     {
         return id < item.id;
@@ -147,11 +147,12 @@ struct EntityFactory
     EntityDB types[0x395];
     bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map; // game_unorderedmap probably
-    EntityMap entity_map;                                                             // game_unorderedmap probably
-    void* _ptr_7;
+    std::unordered_map<std::string, uint16_t> entity_map;                             // game_unorderedmap probably
+    size_t unknown;
 };
+static_assert(sizeof(EntityFactory) == 0x39920);
 
-EntityDB* get_type(uint32_t id);
+EntityDB* get_type(ENT_TYPE id);
 
 ENT_TYPE to_id(std::string_view id);
 
@@ -159,4 +160,4 @@ std::string_view to_name(ENT_TYPE id);
 
 std::vector<EntityItem> list_entities();
 
-struct EntityFactory* entity_factory();
+EntityFactory* entity_factory();

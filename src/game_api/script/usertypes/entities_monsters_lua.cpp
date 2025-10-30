@@ -145,6 +145,12 @@ void register_usertypes(sol::state& lua)
         &RoomOwner::aggro_trigger,
         "was_hurt",
         &RoomOwner::was_hurt,
+        "should_attack_on_sight",
+        &RoomOwner::should_attack_on_sight,
+        "is_angry_flag_set",
+        &RoomOwner::is_angry_flag_set,
+        "weapon_type",
+        &RoomOwner::weapon_type,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -169,6 +175,10 @@ void register_usertypes(sol::state& lua)
         &NPC::ai_state,
         "aggro",
         &NPC::aggro,
+        "should_attack_on_sight",
+        &NPC::should_attack_on_sight,
+        "weapon_type",
+        &NPC::weapon_type,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -280,6 +290,8 @@ void register_usertypes(sol::state& lua)
         &Spider::jump_timer,
         "trigger_distance",
         &Spider::trigger_distance,
+        "on_ceiling",
+        &Spider::on_ceiling,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -349,6 +361,10 @@ void register_usertypes(sol::state& lua)
         &Pet::petting_by_uid,
         "yell_counter",
         &Pet::yell_counter,
+        "sit_timer",
+        &Pet::sit_timer,
+        "sit_cooldown_timer",
+        &Pet::sit_cooldown_timer,
         "func_timer",
         &Pet::func_timer,
         "active_state",
@@ -506,6 +522,10 @@ void register_usertypes(sol::state& lua)
         &Quillback::sound,
         "particle",
         &Quillback::particle,
+        "broke_block",
+        &Quillback::broke_block,
+        "post_hit_wall_direction",
+        &Quillback::post_hit_wall_direction,
         "seen_player",
         &Quillback::seen_player,
         sol::base_classes,
@@ -523,6 +543,10 @@ void register_usertypes(sol::state& lua)
         &Leprechaun::gold,
         "timer_after_humping",
         &Leprechaun::timer_after_humping,
+        "jump_trigger",
+        &Leprechaun::jump_trigger,
+        "collected_treasure",
+        &Leprechaun::collected_treasure,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, WalkingMonster>());
 
@@ -711,14 +735,17 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
-    lua.new_usertype<CatMummy>(
+    auto catmummy_type = lua.new_usertype<CatMummy>(
         "CatMummy",
-        "ai_state",
-        &CatMummy::ai_state,
+        "jump_height_multiplier",
+        &CatMummy::jump_height_multiplier,
         "attack_timer",
         &CatMummy::attack_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    catmummy_type["ai_state"] = &CatMummy::jump_height_multiplier; // For backward compatibility.
 
     lua.new_usertype<Sorceress>(
         "Sorceress",
@@ -810,7 +837,7 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, ApepPart>());
 
-    lua.new_usertype<OsirisHead>(
+    auto osirishead_type = lua.new_usertype<OsirisHead>(
         "OsirisHead",
         "right_hand_uid",
         &OsirisHead::right_hand_uid,
@@ -818,12 +845,15 @@ void register_usertypes(sol::state& lua)
         &OsirisHead::left_hand_uid,
         "moving_left",
         &OsirisHead::moving_left,
-        "targeting_timer",
-        &OsirisHead::targeting_timer,
+        "oscillation_phase",
+        &OsirisHead::oscillation_phase,
         "invincibility_timer",
         &OsirisHead::invincibility_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    osirishead_type["targeting_timer"] = &OsirisHead::oscillation_phase; // For backward compatibility.
 
     lua.new_usertype<OsirisHand>(
         "OsirisHand",
@@ -836,10 +866,14 @@ void register_usertypes(sol::state& lua)
         "Alien",
         "jump_timer",
         &Alien::jump_timer,
+        "shudder_timer",
+        &Alien::shudder_timer,
+        "leg_shake_timer",
+        &Alien::leg_shake_timer,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
-    lua.new_usertype<UFO>(
+    auto ufo_type = lua.new_usertype<UFO>(
         "UFO",
         "sound",
         &UFO::sound,
@@ -847,10 +881,13 @@ void register_usertypes(sol::state& lua)
         &UFO::patrol_distance,
         "attack_cooldown_timer",
         &UFO::attack_cooldown_timer,
-        "is_falling",
-        &UFO::is_falling,
+        "is_rising",
+        &UFO::is_rising,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    ufo_type["is_falling"] = &UFO::is_rising; // For backward compatibility.
 
     lua.new_usertype<Lahamu>(
         "Lahamu",
@@ -860,6 +897,8 @@ void register_usertypes(sol::state& lua)
         &Lahamu::eyeball,
         "attack_cooldown_timer",
         &Lahamu::attack_cooldown_timer,
+        "has_logged_to_journal",
+        &Lahamu::has_logged_to_journal,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -903,6 +942,8 @@ void register_usertypes(sol::state& lua)
         &Lamassu::attack_timer,
         "attack_angle",
         &Lamassu::attack_angle,
+        "was_flying",
+        &Lamassu::was_flying,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -993,14 +1034,18 @@ void register_usertypes(sol::state& lua)
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster, Frog>());
 
-    lua.new_usertype<Grub>(
+    auto grub_type = lua.new_usertype<Grub>(
         "Grub",
         "rotation_delta",
         &Grub::rotation_delta,
         "drop",
         &Grub::drop,
-        "looking_for_new_direction_timer",
-        &Grub::looking_for_new_direction_timer,
+        "rotation_direction",
+        &Grub::rotation_direction,
+        "wall_collision_cooldown",
+        &Grub::wall_collision_cooldown,
+        "rotation_timer",
+        &Grub::rotation_timer,
         "walk_pause_timer",
         &Grub::walk_pause_timer,
         "turn_into_fly_timer",
@@ -1011,6 +1056,9 @@ void register_usertypes(sol::state& lua)
         &Grub::sound,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
+
+    /// NoDoc
+    grub_type["looking_for_new_direction_timer"] = &Grub::wall_collision_cooldown; // For backward compatibility.
 
     lua.new_usertype<Tadpole>(
         "Tadpole",
@@ -1182,6 +1230,8 @@ void register_usertypes(sol::state& lua)
         &Hermitcrab::is_inactive,
         "spawn_new_carried_item",
         &Hermitcrab::spawn_new_carried_item,
+        "going_up",
+        &Hermitcrab::going_up,
         sol::base_classes,
         sol::bases<Entity, Movable, PowerupCapable, Monster>());
 
@@ -1195,6 +1245,8 @@ void register_usertypes(sol::state& lua)
         &Necromancer::red_skeleton_spawn_y,
         "resurrection_uid",
         &Necromancer::resurrection_uid,
+        "target_layer",
+        &Necromancer::target_layer,
         "resurrection_timer",
         &Necromancer::resurrection_timer,
         sol::base_classes,
