@@ -214,6 +214,11 @@ enum class ENTITY_MASK : uint32_t
 };
 ENUM_CLASS_FLAGS(ENTITY_MASK)
 
+inline bool operator!(ENTITY_MASK v)
+{
+    return v == static_cast<ENTITY_MASK>(0);
+}
+
 // Returns true if any of the set bits in `mask` are in `flags`
 template <class T>
 requires std::is_enum_v<T>
@@ -221,3 +226,8 @@ bool test_mask(T flags, T mask)
 {
     return static_cast<std::underlying_type_t<T>>(flags & mask) != 0;
 }
+
+// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
+uint8_t enum_to_layer(const LAYER layer, struct Vec2& player_position);
+// safe function, returns only 0 or 1. returns 0 for LAYER::BOTH
+uint8_t enum_to_layer(const LAYER layer);

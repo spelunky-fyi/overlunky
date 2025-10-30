@@ -88,7 +88,7 @@ class Door : public Floor
     // can't be bother to look into the functions
     virtual void on_enter_attempt(Entity* who) = 0;
 
-    // check if it's CHAR_*, then sets State.level_flags -> 21 (Hide hud, transition)
+    // check if it's CHAR_*, then sets state.level_flags -> 21 (Hide hud, transition)
     virtual void hide_ui(Entity* who) = 0;
 
     /// Returns the entity state / behavior id to set the entity to after the entering animation.
@@ -119,6 +119,16 @@ class ExitDoor : public Door
     uint8_t world;
     uint8_t theme;
     uint16_t padding;
+
+    void set_target(uint8_t ww, uint8_t l, uint8_t t)
+    {
+        world = ww;
+        level = l;
+        theme = t;
+        special_door = true;
+    }
+    /// Get target world, level, theme of this door. If the `special_door` is false, it returns the StateMemory world_next, level_next, theme_next
+    std::tuple<uint8_t, uint8_t, uint8_t> get_target() const;
 };
 
 class DecoratedDoor : public ExitDoor
@@ -195,7 +205,8 @@ class TotemTrap : public Floor
     uint8_t unused1;
     uint16_t unused2;
     uint32_t unused3;
-    uint8_t timer; // unsure
+    /// Only available for `FLOOR_LION_TRAP`
+    uint8_t timer;
     /// The uid must be movable entity for ownership transfers
     void trigger(int32_t who_uid, bool left)
     {

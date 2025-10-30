@@ -4,11 +4,12 @@
 #include <cmath>    // for floor, abs
 #include <cstdlib>  // for rand, abs, size_t
 
-#include "layer.hpp"     // for EntityList, EntityList::Range, Layer, Entit...
-#include "movable.hpp"   // for Movable
-#include "spawn_api.hpp" // for spawn_entity_over
-#include "state.hpp"     // for State
-#include "texture.hpp"   // for Texture
+#include "entity_lookup.hpp" // for get_entities_at
+#include "layer.hpp"         // for EntityList, EntityList::Range, Layer, Entit...
+#include "movable.hpp"       // for Movable
+#include "spawn_api.hpp"     // for spawn_entity_over
+#include "state.hpp"         // for StateMemory
+#include "texture.hpp"       // for Texture
 
 void Floor::fix_border_tile_animation()
 {
@@ -88,8 +89,7 @@ void Floor::fix_decorations(bool fix_also_neighbors, bool fix_styled_floor)
     Floor* neighbours[4]{};
     bool neighbours_same[4]{};
 
-    auto& state = State::get();
-    auto layer_ptr = state.layer(layer);
+    auto layer_ptr = get_state_ptr()->layer(layer);
 
     for (size_t i = 0; i < 4; i++)
     {
@@ -188,8 +188,7 @@ void Floor::add_decoration(FLOOR_SIDE side)
         return;
     }
 
-    auto& state = State::get();
-    auto layer_ptr = state.layer(layer);
+    auto layer_ptr = get_state_ptr()->layer(layer);
     add_decoration_opt(side, decoration_entity_type, layer_ptr);
 }
 void Floor::remove_decoration(FLOOR_SIDE side)
@@ -734,14 +733,13 @@ void ForceField::activate_laserbeam(bool turn_on)
 
 void Door::unlock(bool unlock)
 {
-    // TODO: DOOR_EGGSHIP, DOOR_EGGSHIP_ATREZZO, DOOR_EGGSHIP_ROOM, HUNDUN ?
     static const ENT_TYPE entrance_door = to_id("ENT_TYPE_FLOOR_DOOR_ENTRANCE");
     static const ENT_TYPE locked_door = to_id("ENT_TYPE_FLOOR_DOOR_LOCKED");
     static const ENT_TYPE COG_door = to_id("ENT_TYPE_FLOOR_DOOR_COG");
     static const ENT_TYPE eggchild_room_door = to_id("ENT_TYPE_FLOOR_DOOR_MOAI_STATUE");
     static const ENT_TYPE EW_door = to_id("ENT_TYPE_FLOOR_DOOR_EGGPLANT_WORLD");
+    static const ENT_TYPE eggship_door = to_id("ENT_TYPE_FLOOR_DOOR_EGGSHIP");
     const auto ent_type = this->type->id;
-    auto& state = State::get();
 
     if (ent_type == locked_door || ent_type == locked_door + 1) // plus one for DOOR_LOCKED_PEN
     {
@@ -760,19 +758,16 @@ void Door::unlock(bool unlock)
     else if (ent_type == EW_door || (ent_type >= entrance_door && ent_type < locked_door))
     {
         if (unlock)
-        {
             this->flags |= 0x80000; // set flag 20 (Enable button prompt)
-        }
         else
-        {
             this->flags &= ~0x80000; // clr flag 20 (Enable button prompt)
-        }
 
+        auto state = get_state_ptr();
         // entrance, exit, starting exit
         if (ent_type == entrance_door || ent_type == entrance_door + 1 || ent_type == entrance_door + 3)
         {
             static const ENT_TYPE door_bg = to_id("ENT_TYPE_BG_DOOR");
-            const auto entities = state.layer(this->layer)->get_entities_overlapping_grid_at(x, y);
+            const auto entities = state->layer(this->layer)->get_entities_overlapping_grid_at(x, y);
             if (entities == nullptr)
                 return;
             for (const auto& item : entities->entities())
@@ -785,9 +780,8 @@ void Door::unlock(bool unlock)
                     // there is locked door sprite in both textures, so we don't mess with it and just use animation_frame when locking back up
                     // added example in the API doc on how to do the texture correctly for the other variant
                     if (unlock && item->get_texture() == 202) // TEXTURE.DATA_TEXTURES_DECO_EGGPLANT_0
-                    {
-                        item->set_texture(200); // TEXTURE.DATA_TEXTURES_FLOOR_SUNKEN_3
-                    }
+                        item->set_texture(200);               // TEXTURE.DATA_TEXTURES_FLOOR_SUNKEN_3
+
                     break;
                 }
             }
@@ -817,7 +811,7 @@ void Door::unlock(bool unlock)
             {
                 if (!main_door->door_blocker)
                 {
-                    main_door->door_blocker = state.layer(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
+                    main_door->door_blocker = state->layer(layer)->spawn_entity_over(door_bg_large, this, 0, 2.0);
                     main_door->door_blocker->animation_frame = 1;
                 }
             }
@@ -833,12 +827,52 @@ void Door::unlock(bool unlock)
     else if (ent_type == eggchild_room_door)
     {
         if (unlock)
-        {
             this->set_invisible(false);
-        }
         else
-        {
             this->set_invisible(true);
+    }
+    else if (ent_type >= eggship_door && ent_type < eggship_door + 3) // DOOR_EGGSHIP, DOOR_EGGSHIP_ATREZZO, DOOR_EGGSHIP_ROOM
+    {
+        static const ENT_TYPE eggship_fx_door = to_id("ENT_TYPE_FX_EGGSHIP_DOOR");
+        if (unlock)
+            this->flags |= 0x80000; // set flag 20 (Enable button prompt)
+        else
+            this->flags &= ~0x80000; // clr flag 20 (Enable button prompt)
+
+        if (overlay)
+        {
+            for (auto ent : overlay->items.entities())
+            {
+                if (ent->type->id == eggship_fx_door)
+                {
+                    ent->animation_frame = unlock ? 15 : 2;
+                    break;
+                }
+            }
+        }
+        else // DOOR_EGGSHIP_ATREZZO
+        {
+            // there is no connection between the door and the ship, so we have to look for the entity
+            // dunno if it's better to look for the ship or the door itself, ship should have the exact same position as the door thou
+            for (auto ent_uid : get_entities_at(eggship_fx_door, ENTITY_MASK::FX, x, y, (LAYER)layer, 1.0f))
+            {
+                if (auto ent = get_entity_ptr(ent_uid))
+                    ent->animation_frame = unlock ? 15 : 2;
+            }
         }
     }
+}
+
+std::tuple<uint8_t, uint8_t, uint8_t> ExitDoor::get_target() const
+{
+    if (special_door)
+    {
+        return {world, level, theme};
+    }
+
+    auto state = get_state_ptr();
+    if (state->screen == 11) // camp
+        return {};
+    else
+        return {state->world_next, state->level_next, state->theme_next};
 }

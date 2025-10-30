@@ -15,9 +15,9 @@
 #include "color.hpp"                         // for Color
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/game_vector.hpp"        // for game_vector
+#include "heap_base.hpp"                     // for OnHeapPointer
 #include "math.hpp"                          // for Quad, AABB (ptr only)
 #include "texture.hpp"                       // for Texture
-#include "thread_utils.hpp"                  // for OnHeapPointer
 
 struct JournalUI;
 struct Layer;
@@ -320,7 +320,7 @@ struct RenderInfo
     uint32_t animation_frame;
     uint32_t unknown38; // padding
     Texture* texture;   // probably just used for definition
-    Resource* texture_names[7];
+    Resource* textures[7];
     // second_texture_name Normal map texture on COG entities (shader 30), shine texture on ice entities. May not have a correct value on entities that don't use it
     // third_texture_name Shine texture on COG entities (shader 30). May not have a correct value on entities that don't use it
 
@@ -343,7 +343,7 @@ struct RenderInfo
     // gets the entity owning this RenderInfo
     Entity* get_entity() const
     {
-        return entity_offset.decode_local();
+        return entity_offset.decode();
     }
 
     // for supporting HookableVTable

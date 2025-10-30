@@ -18,9 +18,9 @@
 #include "containers/game_unordered_map.hpp" // for game_unordered_map
 #include "containers/identity_hasher.hpp"    // for identity_hasher
 #include "entity_structs.hpp"                // for CollisionInfo
+#include "heap_base.hpp"                     // for OnHeapPointer
 #include "layer.hpp"                         // for EntityList
 #include "math.hpp"                          // for AABB
-#include "thread_utils.hpp"                  // for OnHeapPointer
 
 struct RenderInfo;
 struct Texture;
@@ -36,7 +36,7 @@ struct EntityDB
     int32_t field_10;
     ENT_TYPE id;
     /// MASK
-    uint32_t search_flags;
+    ENTITY_MASK search_flags;
     float width;
     float height;
     uint8_t draw_depth;
@@ -148,7 +148,9 @@ struct EntityFactory
     bool type_set[0x395];
     std::unordered_map<std::uint32_t, OnHeapPointer<EntityPool>> entity_instance_map; // game_unorderedmap probably
     std::unordered_map<std::string, uint16_t> entity_map;                             // game_unorderedmap probably
+    size_t unknown;
 };
+static_assert(sizeof(EntityFactory) == 0x39920);
 
 EntityDB* get_type(ENT_TYPE id);
 

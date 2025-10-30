@@ -123,6 +123,7 @@ void register_usertypes(sol::state& lua)
     lua["Entity"]["as_powerup"] = &Entity::as<Powerup>;
     lua["Entity"]["as_prizedispenser"] = &Entity::as<PrizeDispenser>;
     lua["Entity"]["as_scepter"] = &Entity::as<Scepter>;
+    lua["Entity"]["as_whip"] = &Entity::as<Whip>;
 
     lua.new_usertype<Bomb>(
         "Bomb",
@@ -1049,6 +1050,13 @@ void register_usertypes(sol::state& lua)
         "Scepter",
         "cooldown",
         &Scepter::cooldown,
+        sol::base_classes,
+        sol::bases<Entity, Movable>());
+
+    lua.new_usertype<Whip>(
+        "Whip",
+        "flaming",
+        &Whip::flaming,
         sol::base_classes,
         sol::bases<Entity, Movable>());
 }

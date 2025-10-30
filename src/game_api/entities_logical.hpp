@@ -58,7 +58,8 @@ class LogicalStaticSound : public LogicalSound
 class LogicalLiquidStreamSound : public LogicalStaticSound
 {
   public:
-    float unknown; // soundpositionpointer unknown10
+    /// Just the parameter for sound in LogicalSound
+    float liquid_intensity;
 };
 
 class LogicalTrapTrigger : public Entity
@@ -174,16 +175,25 @@ class LimbAnchor : public Entity
     float y_pos;
     float hand_feet_x_offset;
     float hand_feet_y_offset;
-    float x_unk5; // all of those are offsets/positions of different joints, i'm too lazy to document them all
-    float y_unk6; // if anyone wants to, go ahead
-    float x_unk7;
-    float y_unk8;
-    float x_unk9;
-    float y_unk10;
+    /// Current position of the ankle/wrist of this limb anchor.
+    float anchor_x;
+    /// Current position of the ankle/wrist of this limb anchor.
+    float anchor_y;
+    /// Position of this limb anchor at the beginning of a movement.
+    float move_origin_x;
+    /// Position of this limb anchor at the beginning of a movement.
+    float move_origin_y;
+    /// Position of this limb anchor at the end of a movement.
+    float move_destination_x;
+    /// Position of this limb anchor at the end of a movement.
+    float move_destination_y;
     float unk11;
     float unk12;
     float unk13;
-    uint16_t move_timer;
+    /// Number of frames the limb has been moving from move_origin to move_destination.
+    uint8_t elapsed_move_time;
+    /// Number of frames the limb should take to move from move_origin to move_destination.
+    uint8_t move_duration;
     bool flip_vertical;
 };
 
@@ -236,7 +246,8 @@ class BoulderSpawner : public Entity
   public:
     /// Can be set negative for longer time period, spawns boulder at 150, setting it higher with count to overflow
     int32_t timer;
-    int32_t padding; // unsure
+    /// UID of entity that triggered the trap.
+    int32_t owner_uid;
     SoundMeta* sound;
 };
 

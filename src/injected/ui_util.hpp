@@ -49,7 +49,7 @@ class UI
     static void teleport(float x, float y, bool s, float vx, float vy, bool snap);
     static std::pair<float, float> screen_position(float x, float y);
     static float screen_distance(float x);
-    static Entity* get_entity_at(float x, float y, bool s, float radius, uint32_t mask);
+    static Entity* get_entity_at(float x, float y, bool s, float radius, ENTITY_MASK mask);
     static void move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy, bool snap);
     static SaveData* savedata();
     static int32_t spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap);
@@ -66,7 +66,7 @@ class UI
     static int32_t get_grid_entity_at(float, float, LAYER);
     static Illumination* create_illumination(Color color, float size, float x, float y);
     static void set_camp_camera_bounds_enabled(bool b);
-    static std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer);
+    static std::vector<uint32_t> get_entities_by(std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask, LAYER layer);
     static int32_t spawn_companion(ENT_TYPE compatnion_type, float x, float y, LAYER l, float velocityx, float velocityy);
     static void spawn_liquid(ENT_TYPE entity_type, float x, float y, float velocityx, float velocityy, uint32_t liquid_flags, uint32_t amount, float blobs_separation = INFINITY);
     static void spawn_liquid(ENT_TYPE entity_type, float x, float y);
@@ -82,7 +82,7 @@ class UI
     static void update_floor_at(float x, float y, LAYER l);
     static void cleanup_at(float x, float y, LAYER l, ENT_TYPE type = 0);
     static void safe_destroy(Entity* ent, bool unsafe = false, bool recurse = true);
-    static std::vector<uint32_t> get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer);
+    static std::vector<uint32_t> get_entities_overlapping(ENTITY_MASK mask, AABB hitbox, LAYER layer);
     static bool get_focus();
     static float get_spark_distance(SparkTrap* ent);
     static void save_progress();
@@ -98,7 +98,8 @@ class UI
     static void init_seeded(uint32_t seed);
     static std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start);
     static void set_adventure_seed(int64_t first, int64_t second);
-    static void copy_state(int from, int to);
+    static void load_state_as_main(int from);
+    static void save_main_state(int to);
     static StateMemory* get_save_state(int slot);
     static void set_camera_layer_control_enabled(bool enable);
     static void teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy);

@@ -29,6 +29,7 @@ class ScreenScores;
 class ScreenTeamSelect;
 class ScreenTransition;
 class ScreenWin;
+class SoundManager;
 struct ParticleEmitterInfo;
 
 const float ZF = 0.737f;
@@ -46,8 +47,8 @@ struct LevelGenSystem;
 class ThemeInfo;
 struct Items;
 struct Illumination;
-
-void fix_liquid_out_of_bounds();
+struct LightSources;
+class Player;
 
 #pragma pack(push, 1) // disable struct padding
 struct StateMemory
@@ -204,7 +205,7 @@ struct StateMemory
     uint32_t time_level;
     uint32_t time_speedrun;
     uint32_t money_last_levels;
-    int32_t level_flags;
+    uint32_t level_flags;
     PRESENCE_FLAG presence_flags;
     /// the contents of the special coffin that will be spawned during levelgen
     ENT_TYPE coffin_contents;
@@ -265,10 +266,10 @@ struct StateMemory
     LogicList* logic;
     /// NPC quest states
     QuestsInfo* quests;
-    AITarget* ai_targets; // e.g. hired hand uid -> snake uid
+    AITarget* ai_targets; // e.g. hired hand uid -> snake uid // size 0x2AE84
     LiquidPhysics* liquid_physics;
     custom_vector<ParticleEmitterInfo*>* particle_emitters;
-    custom_vector<Illumination*>* lightsources;
+    LightSources* lightsources;
     EntityLookup* entity_lookup;
 
     // This is a Robin Hood Table
@@ -327,104 +328,45 @@ struct StateMemory
     {
         correct_ushabti = static_cast<uint8_t>(animation_frame - (animation_frame / 12) * 2);
     }
+    // safe
+    Layer* layer(LAYER l)
+    {
+        return layers[enum_to_layer(l)];
+    };
+    // safe
+    Layer* layer(uint8_t l)
+    {
+        return l == 1 ? layers[1] : layers[0];
+    }
+    void warp(uint8_t set_world, uint8_t set_level, uint8_t set_theme);
+    Entity* get_entity(uint32_t uid) const;
+    void set_seed(uint32_t set_seed);
+    std::vector<Player*> get_players();
 };
 #pragma pack(pop)
 
 StateMemory* get_state_ptr();
+void update_state();
 
-struct State
+namespace API
 {
-    static void set_do_hooks(bool do_hooks);
+void init(SoundManager* sound_manager = nullptr);
+void post_init();
+void set_do_hooks(bool do_hooks);
+void set_write_load_opt(bool allow);
 
-    static void set_write_load_opt(bool allow);
-
-    static void init(class SoundManager* sound_manager = nullptr);
-    static void post_init();
-
-    static State& get();
-
-    // Returns the main-thread version of StateMemory*
-    StateMemory* ptr_main() const;
-    // Returns the local-thread version of StateMemory*
-    StateMemory* ptr() const;
-    StateMemory* ptr_local() const;
-
-    // TODO: rest of the functions should probably be just static or moved out of here as they don't need State
-    // they have to assume to use main/local ptr in which case they probably should be moved to StateMemory to be more clear
-    // also because we really only use this struct to get to the StateMemory, make ptr functions static and simply make them call the get()
-
-    // use only if you only want the layer, otherwise use `ptr()->layers`
-    Layer* layer(uint8_t index) const
-    {
-        return ptr()->layers[index];
-    }
-
-    void godmode(bool g);
-    void godmode_companions(bool g);
-    static void darkmode(bool g);
-
-    void zoom(float level) const;
-    static void zoom_reset();
-
-    static Vec2 click_position(float x, float y);
-    static Vec2 screen_position(float x, float y);
-
-    uint32_t flags() const
-    {
-        return ptr()->level_flags;
-    }
-
-    void set_flags(uint32_t f)
-    {
-        ptr()->level_flags = f;
-    }
-
-    void set_pause(uint8_t p)
-    {
-        ptr()->pause = p;
-    }
-
-    uint32_t get_frame_count_main() const;
-    uint32_t get_frame_count() const;
-    static uint32_t get_frame_count(StateMemory* state);
-
-    std::vector<int64_t> read_prng() const;
-
-    static Entity* find(StateMemory* state, uint32_t uid);
-
-    static Vec2 get_camera_position();
-    void set_camera_position(float cx, float cy);
-    void warp(uint8_t w, uint8_t l, uint8_t t);
-    void set_seed(uint32_t seed);
-    SaveData* savedata();
-    LiquidPhysicsEngine* get_correct_liquid_engine(ENT_TYPE liquid_type) const;
-    // Get the 0x4A0 offset
-    size_t get_offset() const
-    {
-        return memory_read<size_t>(location);
-    }
-
-  private:
-    State(size_t addr)
-        : location(addr){};
-
-    size_t location;
-    State(const State&) = delete;
-    State& operator=(const State&) = delete;
-};
-void init_state_update_hook();
-void init_process_input_hook();
-void init_game_loop_hook();
-void init_state_clone_hook();
-
-uint8_t enum_to_layer(const LAYER layer, Vec2& player_position);
-uint8_t enum_to_layer(const LAYER layer);
-
-uint32_t lowbias32(uint32_t x);
-uint32_t lowbias32_r(uint32_t x);
-
-int64_t get_global_frame_count();
-int64_t get_global_update_count();
-void update_camera_position();
+uint64_t get_global_frame_count();
+uint64_t get_global_update_count();
 
 bool get_forward_events();
+
+void godmode(bool g);
+void godmode_companions(bool g);
+
+void zoom(float level);
+void zoom_reset();
+
+// maybe would fit better in render_api ?
+Vec2 click_position(float x, float y);
+Vec2 screen_position(float x, float y);
+} // namespace API

@@ -541,17 +541,17 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    {
-        "state_location"sv,
-        // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
-        PatternCommandBuffer{}
-            .find_inst("\x49\x0F\x44\xC0"sv)
-            .find_next_inst("\x49\x0F\x44\xC0"sv)
-            .offset(-0x19)
-            .find_inst("\x48\x8B"sv)
-            .decode_pc()
-            .at_exe(),
-    },
+    //{
+    //    "state_location"sv,
+    //    // actually it's state offset, at the time of writing this comment it's 4A0, found ... almost everywhere
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x49\x0F\x44\xC0"sv)
+    //        .find_next_inst("\x49\x0F\x44\xC0"sv)
+    //        .offset(-0x19)
+    //        .find_inst("\x48\x8B"sv)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
     {
         "game_manager"sv,
         PatternCommandBuffer{}
@@ -691,8 +691,8 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_studio"sv, // probably wrong
-                         // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
+        "fmod_studio"sv,
+        // Break at startup on FMOD::Studio::System::initialize, the first parameter passed is the system-pointer-pointer
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\xba\x03\x02\x02\x00"sv)
@@ -701,9 +701,9 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        "fmod_event_properties"sv, // probably wrong
-                                   // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
-                                   // Said name comes from an array that is being looped, said array is a global of type EventParameters
+        "fmod_event_properties"sv,
+        // Find a call to FMOD::Studio::EventDescription::getParameterDescriptionByName, the second parameter is the name of the event
+        // Said name comes from an array that is being looped, said array is a global of type EventParameters
         PatternCommandBuffer{}
             .set_optional(true)
             .find_inst("\x48\x8d\x9d\x38\x01\x00\x00"sv)
@@ -1346,14 +1346,14 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .decode_call()
             .at_exe(),
     },
-    {
-        "refresh_illumination_heap_offset"sv,
-        // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
-        PatternCommandBuffer{}
-            .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
-            .decode_pc()
-            .at_exe(),
-    },
+    //{
+    //    "refresh_illumination_heap_offset"sv,
+    //    // Put a bp on any Illumination.timer var, watch how it's written, the heap offset ptr is loaded a bit above
+    //    PatternCommandBuffer{}
+    //        .find_inst("\x48\x8B\x05****\x48\x85\xC0\x75\x16\xB9\x10\x00\x00\x00"sv)
+    //        .decode_pc()
+    //        .at_exe(),
+    //},
     {
         "ghost_spawn_time"sv,
         // 9000 frames / 60 fps = 2.5 minutes = 0x2328 ( 28 23 00 00 )
@@ -1470,23 +1470,6 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         // Put a read bp on Spark:rotation_angle, the next instruction adds a hardcoded float from constant, we want address of that constant (not the whole instruction)
         PatternCommandBuffer{}
             .find_after_inst("\xF3\x0F\x10\x89\x58\x01\x00\x00"sv)
-            .at_exe(),
-    },
-    {
-        "arrowtrap_projectile"sv,
-        // Put a conditional bp on load_item (rdx = 0x173 (id of wooden arrow))
-        // Trigger a trap
-        PatternCommandBuffer{}
-            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x90"sv)
-            .offset(0x1)
-            .at_exe(),
-    },
-    {
-        "poison_arrowtrap_projectile"sv,
-        // See `arrowtrap_projectile`, but trigger a poison trap
-        PatternCommandBuffer{}
-            .find_inst("\xBA****\x0F\x28\xD1\xE8****\x48\x89\xC6\x48\x8B\x00"sv)
-            .offset(0x1)
             .at_exe(),
     },
     {
@@ -1840,6 +1823,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     },
     {
         // Put write bp on state.win_state and enter a multiplayer game
+        // alternative pattern 4C 8D 98 00 00 00 02 + function start
         "heap_clone"sv,
         PatternCommandBuffer{}
             .find_inst("4c 8d 05 f4 ca 27 00"_gh)

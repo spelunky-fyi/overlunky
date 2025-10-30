@@ -1,31 +1,29 @@
 #include "entity_db.hpp"
 #include "entity.hpp"
 
-#include <Windows.h> // for IsBadWritePtr
-#include <chrono>    // for operator<=>, operator-, operator+
-#include <cmath>     // for round
-#include <compare>   // for operator<, operator<=, operator>
-#include <cstdint>   // for uint32_t, uint16_t, uint8_t
-#include <cstdlib>   // for abs, NULL, size_t
-#include <list>      // for _List_const_iterator
-#include <map>       // for _Tree_iterator, map, _Tree_cons...
-#include <new>       // for operator new
-#include <string>    // for allocator, string, operator""sv
-#include <thread>    // for sleep_for
-#include <vector>    // for vector, _Vector_iterator, erase_if
+#include <chrono>  // for operator<=>, operator-, operator+
+#include <cmath>   // for round
+#include <compare> // for operator<, operator<=, operator>
+#include <cstdint> // for uint32_t, uint16_t, uint8_t
+#include <cstdlib> // for abs, NULL, size_t
+#include <list>    // for _List_const_iterator
+#include <map>     // for _Tree_iterator, map, _Tree_cons...
+#include <new>     // for operator new
+#include <string>  // for allocator, string, operator""sv
+#include <thread>  // for sleep_for
+#include <vector>  // for vector, _Vector_iterator, erase_if
 
-#include "containers/custom_map.hpp" // for custom_map
-#include "entities_chars.hpp"        // for Player
-#include "entity_hooks_info.hpp"     // for EntityHooksInfo
-#include "memory.hpp"                // for write_mem_prot
-#include "movable.hpp"               // for Movable
-#include "movable_behavior.hpp"      // for MovableBehavior
-#include "render_api.hpp"            // for RenderInfo
-#include "search.hpp"                // for get_address
-#include "state.hpp"                 // for State, StateMemory, enum_to_layer
-#include "state_structs.hpp"         // for LiquidPhysicsEngine
-#include "texture.hpp"               // for get_texture, Texture
-#include "vtable_hook.hpp"           // for hook_vtable, hook_dtor, unregis...
+#include "entities_chars.hpp"    // for Player
+#include "entity_hooks_info.hpp" // for EntityHooksInfo
+#include "memory.hpp"            // for write_mem_prot
+#include "movable.hpp"           // for Movable
+#include "movable_behavior.hpp"  // for MovableBehavior
+#include "render_api.hpp"        // for RenderInfo
+#include "search.hpp"            // for get_address
+#include "state.hpp"             // for StateMemory, enum_to_layer
+#include "state_structs.hpp"     // for LiquidPhysicsEngine
+#include "texture.hpp"           // for get_texture, Texture
+#include "vtable_hook.hpp"       // for hook_vtable, hook_dtor, unregis...
 
 EntityDB::EntityDB(const ENT_TYPE other)
     : EntityDB(*get_type(other)){};

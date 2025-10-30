@@ -16,6 +16,7 @@
 #include "entity_lookup.hpp"         //
 #include "game_api.hpp"              //
 #include "game_manager.hpp"          // for get_game_manager, GameManager
+#include "game_patches.hpp"          //
 #include "illumination.hpp"          //
 #include "items.hpp"                 // for Items
 #include "layer.hpp"                 // for Layer, EntityList::Range, Entit...
@@ -27,17 +28,17 @@
 #include "savestate.hpp"             // for copy_save_slot
 #include "search.hpp"                //
 #include "spawn_api.hpp"             // for spawn_liquid, spawn_companion
-#include "state.hpp"                 // for State, StateMemory
+#include "state.hpp"                 // for StateMemory
 #include "state_structs.hpp"         // for Camera, Illumination (ptr only)
 #include "steam_api.hpp"             // for disable_steam_achievements, ena...
 
 void UI::godmode(bool g)
 {
-    State::get().godmode(g);
+    API::godmode(g);
 }
 void UI::godmode_companions(bool g)
 {
-    State::get().godmode_companions(g);
+    API::godmode_companions(g);
 }
 void UI::death_enabled(bool g)
 {
@@ -45,35 +46,35 @@ void UI::death_enabled(bool g)
 }
 std::pair<float, float> UI::click_position(float x, float y)
 {
-    return State::click_position(x, y);
+    return API::click_position(x, y);
 }
 void UI::zoom(float level)
 {
-    State::get().zoom(level);
+    API::zoom(level);
 }
 void UI::zoom_reset()
 {
-    State::get().zoom_reset();
+    API::zoom_reset();
 }
 uint32_t UI::get_frame_count()
 {
-    return State::get().get_frame_count();
+    return HeapBase::get().frame_count();
 }
 void UI::warp(uint8_t world, uint8_t level, uint8_t theme)
 {
-    static auto state = State::get().ptr();
+    auto state = HeapBase::get().state();
 
     if (state->items->player_inventories[0].health == 0)
         state->items->player_inventories[0].health = 4;
 
-    State::get().warp(world, level, theme);
+    HeapBase::get().state()->warp(world, level, theme);
 }
 void UI::transition(uint8_t world, uint8_t level, uint8_t theme)
 {
-    auto state = State::get().ptr_main();
+    auto state = HeapBase::get().state();
     if (state->screen != 12)
     {
-        State::get().warp(world, level, theme);
+        state->warp(world, level, theme);
         return;
     }
     state->world_next = world;
@@ -115,8 +116,7 @@ void teleport_entity(Entity* ent, float dx, float dy, bool s, float vx, float vy
     {
         // screen coordinates -1..1
         // log::debug!("Teleporting to screen {}, {}", x, y);
-        auto& state = State::get();
-        auto [x_pos, y_pos] = state.click_position(dx, dy);
+        auto [x_pos, y_pos] = API::click_position(dx, dy);
         if (snap && abs(vx) + abs(vy) <= 0.04f)
         {
             x_pos = round(x_pos);
@@ -150,47 +150,45 @@ void UI::teleport_entity_abs(Entity* ent, float dx, float dy, float vx, float vy
 }
 void UI::teleport(float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto state = State::get().ptr_main();
+    auto state = HeapBase::get().state();
 
-    auto player = state->items->player(0);
+    auto player = state->items->players[0];
     if (player == nullptr)
         return;
     teleport_entity(player, x, y, s, vx, vy, snap);
 }
 std::pair<float, float> UI::screen_position(float x, float y)
 {
-    return State::screen_position(x, y);
+    return API::screen_position(x, y);
 }
 float UI::screen_distance(float x)
 {
-    auto a = State::screen_position(0, 0);
-    auto b = State::screen_position(x, 0);
+    auto a = API::screen_position(0, 0);
+    auto b = API::screen_position(x, 0);
     return b.x - a.x;
 }
-Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
+Entity* UI::get_entity_at(float x, float y, bool s, float radius, ENTITY_MASK mask)
 {
-    auto& state = State::get();
-
     static const auto masks_order = {
-        0x1,    // Player
-        0x2,    // Mount
-        0x4,    // Monster
-        0x8,    // Item
-        0x80,   // Activefloor
-        0x100,  // Floor
-        0x200,  // Decoration
-        0x400,  // BG
-        0x800,  // Shadow
-        0x2000, // Water
-        0x4000, // Lava
-        0x40,   // FX
-        0x10,   // Explosion
-        0x20,   // Rope
-        0x1000, // Logical
+        ENTITY_MASK::PLAYER,
+        ENTITY_MASK::MOUNT,
+        ENTITY_MASK::MONSTER,
+        ENTITY_MASK::ITEM,
+        ENTITY_MASK::ACTIVEFLOOR,
+        ENTITY_MASK::FLOOR,
+        ENTITY_MASK::DECORATION,
+        ENTITY_MASK::BG,
+        ENTITY_MASK::SHADOW,
+        ENTITY_MASK::WATER,
+        ENTITY_MASK::LAVA,
+        ENTITY_MASK::FX,
+        ENTITY_MASK::EXPLOSION,
+        ENTITY_MASK::ROPE,
+        ENTITY_MASK::LOGICAL,
     };
     if (s)
     {
-        std::tie(x, y) = state.click_position(x, y);
+        std::tie(x, y) = API::click_position(x, y);
     }
     Entity* current_entity = nullptr;
     float current_distance = radius;
@@ -204,10 +202,10 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
             current_distance = distance;
         }
     };
-
-    if (mask == 0)
+    auto state = HeapBase::get().state();
+    if (mask == ENTITY_MASK::ANY)
     {
-        for (auto& item : state.layer(state.ptr_main()->camera_layer)->all_entities.entities())
+        for (auto& item : state->layers[state->camera_layer]->all_entities.entities())
         {
             check_distance(item);
         }
@@ -216,11 +214,11 @@ Entity* UI::get_entity_at(float x, float y, bool s, float radius, uint32_t mask)
     {
         for (auto current_mask : masks_order)
         {
-            if ((mask & current_mask) == 0)
+            if (!(mask & current_mask))
                 continue;
 
-            const auto& entities = state.layer(state.ptr_main()->camera_layer)->entities_by_mask.find(current_mask);
-            if (entities == state.layer(state.ptr_main()->camera_layer)->entities_by_mask.end())
+            const auto& entities = state->layers[state->camera_layer]->entities_by_mask.find(current_mask);
+            if (entities == state->layers[state->camera_layer]->entities_by_mask.end())
                 continue;
 
             for (auto& item : entities->second.entities())
@@ -240,11 +238,11 @@ void UI::move_entity(uint32_t uid, float x, float y, bool s, float vx, float vy,
 }
 SaveData* UI::savedata()
 {
-    return State::get().savedata();
+    return get_game_manager()->save_related->savedata.decode();
 }
 int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float vx, float vy, bool snap)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
 
     if (!s)
     {
@@ -256,12 +254,12 @@ int32_t UI::spawn_entity(ENT_TYPE entity_type, float x, float y, bool s, float v
 }
 int32_t UI::spawn_grid(ENT_TYPE entity_type, float x, float y, uint8_t layer)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
     return state->layers[layer]->spawn_entity(entity_type, x, y, false, 0, 0, false)->uid;
 }
 int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
     x += state->camera->focus_x;
     y += state->camera->focus_y;
 
@@ -271,7 +269,7 @@ int32_t UI::spawn_door(float x, float y, uint8_t w, uint8_t l, uint8_t t)
 }
 void UI::spawn_backdoor(float x, float y)
 {
-    auto state = State::get().ptr_local();
+    auto state = HeapBase::get().state();
     x += state->camera->focus_x;
     y += state->camera->focus_y;
 
@@ -344,7 +342,7 @@ ENT_TYPE UI::get_entity_type(int32_t uid)
 }
 std::vector<Player*> UI::get_players()
 {
-    return ::get_players(State::get().ptr_main());
+    return HeapBase::get().state()->get_players();
 }
 int32_t UI::get_grid_entity_at(float x, float y, LAYER l)
 {
@@ -358,7 +356,7 @@ void UI::set_camp_camera_bounds_enabled(bool b)
 {
     ::set_camp_camera_bounds_enabled(b);
 }
-std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, uint32_t mask, LAYER layer)
+std::vector<uint32_t> UI::get_entities_by(std::vector<ENT_TYPE> entity_types, ENTITY_MASK mask, LAYER layer)
 {
     return ::get_entities_by(entity_types, mask, layer);
 }
@@ -388,13 +386,16 @@ std::pair<float, float> UI::get_room_pos(uint32_t x, uint32_t y)
 }
 std::string_view UI::get_room_template_name(uint16_t room_template)
 {
-    const auto state = State::get().ptr_main();
-    return state->level_gen->get_room_template_name(room_template);
+    auto templ = LevelGenData::get_missing_room_templates();
+    for (auto& [name, id] : templ)
+        if (id == room_template)
+            return name;
+
+    return HeapBase::get().level_gen()->get_room_template_name(room_template);
 }
 std::optional<uint16_t> UI::get_room_template(uint32_t x, uint32_t y, uint8_t l)
 {
-    const auto state = State::get().ptr_main();
-    return state->level_gen->get_room_template(x, y, l);
+    return HeapBase::get().level_gen()->get_room_template(x, y, l);
 }
 void UI::steam_achievements(bool on)
 {
@@ -405,9 +406,9 @@ void UI::steam_achievements(bool on)
 }
 int32_t UI::destroy_entity_items(Entity* ent)
 {
-    if (ent->type->search_flags & 0x80)
+    if ((ent->type->search_flags & ENTITY_MASK::ACTIVEFLOOR) == ENTITY_MASK::ACTIVEFLOOR)
         return 0;
-    auto items = entity_get_items_by(ent->uid, 0, 0);
+    auto items = entity_get_items_by(ent->uid, 0, ENTITY_MASK::ANY); // TODO: use ent->items
     if (items.size() == 0)
         return -1;
     std::vector<uint32_t>::reverse_iterator it = items.rbegin();
@@ -415,17 +416,18 @@ int32_t UI::destroy_entity_items(Entity* ent)
     while (it != items.rend())
     {
         auto item = get_entity_ptr(*it);
-        if (item->type->search_flags & 0x81)
-            continue;
-        UI::destroy_entity_items(item);
-        UI::safe_destroy(item, false, false);
-        it++;
+        if (!(item->type->search_flags & (ENTITY_MASK::ACTIVEFLOOR | ENTITY_MASK::PLAYER)))
+        {
+            UI::destroy_entity_items(item);
+            UI::safe_destroy(item, false, false);
+            it++;
+        }
     }
     return last_uid;
 }
 bool UI::destroy_entity_item_type(Entity* ent, ENT_TYPE type)
 {
-    auto items = entity_get_items_by(ent->uid, 0, 0);
+    auto items = entity_get_items_by(ent->uid, 0, ENTITY_MASK::ANY); // TODO: use ent->items
     if (items.size() == 0)
         return false;
     auto destroyed = false;
@@ -472,13 +474,13 @@ void UI::update_floor_at(float x, float y, LAYER l)
     if (uid == -1)
         return;
     auto ent = get_entity_ptr(uid);
-    if ((ent->type->search_flags & 0x100) == 0 || !test_flag(ent->flags, 3))
+    if (!(ent->type->search_flags & ENTITY_MASK::FLOOR) || !test_flag(ent->flags, 3))
         return;
     auto floor = ent->as<Floor>();
-    auto state = State::get().ptr_main();
+    auto state = HeapBase::get().state();
     if (test_flag(state->special_visibility_flags, 1))
     {
-        for (auto item : entity_get_items_by(floor->uid, 0, 0x8))
+        for (auto item : entity_get_items_by(floor->uid, 0, ENTITY_MASK::ITEM))
         {
             auto embed = get_entity_ptr(item);
             clr_flag(embed->flags, 1);
@@ -504,7 +506,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
             floor->decos[i] = -1;
         }
     }
-    for (auto deco : entity_get_items_by(floor->uid, destroy_deco, 0x200))
+    for (auto deco : entity_get_items_by(floor->uid, destroy_deco, ENTITY_MASK::DECORATION))
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
@@ -513,7 +515,7 @@ void UI::update_floor_at(float x, float y, LAYER l)
             deco_ent->destroy();
         }
     }
-    for (auto deco : get_entities_at(destroy_deco, 0, x, y, l, 0.5f))
+    for (auto deco : get_entities_at(destroy_deco, ENTITY_MASK::ANY, x, y, l, 0.5f))
     {
         auto deco_ent = get_entity_ptr(deco);
         if (deco_ent)
@@ -573,7 +575,7 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
         to_id("ENT_TYPE_BG_DOOR_BACK_LAYER"),
     };
 
-    for (auto bg : get_entities_at(cleanup_ents, 0, x, y, l, 0.1f))
+    for (auto bg : get_entities_at(cleanup_ents, ENTITY_MASK::ANY, x, y, l, 0.1f))
     {
         auto bg_ent = get_entity_ptr(bg);
         if (bg_ent)
@@ -585,7 +587,7 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
         while (true)
         {
             y -= 1.0f;
-            auto bgs = get_entities_at(platform_bg, 0x400, x, y, l, 0.1f);
+            auto bgs = get_entities_at(platform_bg, ENTITY_MASK::BG, x, y, l, 0.1f);
             if (bgs.size() == 0)
                 return;
             for (auto bg : bgs)
@@ -600,13 +602,13 @@ void UI::cleanup_at(float x, float y, LAYER l, ENT_TYPE type)
     {
         if (type == layer_door || type == logical_door)
             l = LAYER::BOTH;
-        auto door_parts = get_entities_at(door_crap, 0, x, y, l, 0.5f);
+        auto door_parts = get_entities_at(door_crap, ENTITY_MASK::ANY, x, y, l, 0.5f);
         for (auto part : door_parts)
         {
             auto ent = get_entity_ptr(part);
             ent->destroy();
         }
-        for (auto uid : get_entities_at(door_platform, 0x100, x, y - 1.0f, l, 0.5f))
+        for (auto uid : get_entities_at(door_platform, ENTITY_MASK::FLOOR, x, y - 1.0f, l, 0.5f))
         {
             auto ent = get_entity_ptr(uid);
             ent->destroy();
@@ -687,7 +689,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         {
             if (check && in_array(check->type->id, olmecs))
             {
-                auto state = State::get().ptr();
+                auto state = HeapBase::get().state();
                 if (state->logic->olmec_cutscene)
                 {
                     // if cutscene is still running, perform the last frame of cutscene before killing olmec
@@ -738,7 +740,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
                 check->destroy();
                 return;
             }
-            else if (in_array(check->type->id, kill_last_overlay) || (check->type->search_flags & 0x200 && check->draw_depth <= 11)) // normal floor decorations, missing those and killing floor is not good
+            else if (in_array(check->type->id, kill_last_overlay) || ((check->type->search_flags & ENTITY_MASK::DECORATION) == ENTITY_MASK::DECORATION && check->draw_depth <= 11)) // normal floor decorations, missing those and killing floor is not good
             {
                 kill_entity_overlay(check);
                 return;
@@ -758,7 +760,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
             }
             else if (in_array(check->type->id, backitems))
             {
-                if (check->overlay && (check->overlay->type->search_flags & 0x5) > 0)
+                if (check->overlay && check->overlay->is_movable() && check->overlay->as<Movable>()->is_powerup_capable())
                 {
                     auto wearer = check->overlay->as<PowerupCapable>();
                     for (const auto& [powerup_type, powerup_entity] : wearer->powerups)
@@ -780,7 +782,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         const auto [x, y] = UI::get_position(ent);
         const auto sf = ent->type->search_flags;
         destroy_entity_items(ent);
-        if (sf & 0x100)
+        if ((sf & ENTITY_MASK::FLOOR) == ENTITY_MASK::FLOOR)
         {
             if (test_flag(ent->flags, 3)) // solid floor
                 update_liquid_collision_at(x, y, false);
@@ -790,7 +792,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         {
             ent->kill(true, ent);
         }
-        else if (sf & 0x2)
+        else if ((sf & ENTITY_MASK::MOUNT) == ENTITY_MASK::MOUNT)
         {
             auto mount = ent->as<Mount>();
             mount->remove_rider();
@@ -807,7 +809,7 @@ void UI::safe_destroy(Entity* ent, bool unsafe, bool recurse)
         ent->kill(true, ent);
     }
 }
-std::vector<uint32_t> UI::get_entities_overlapping(uint32_t mask, AABB hitbox, LAYER layer)
+std::vector<uint32_t> UI::get_entities_overlapping(ENTITY_MASK mask, AABB hitbox, LAYER layer)
 {
     return get_entities_overlapping_hitbox(0, mask, hitbox, layer);
 }
@@ -838,7 +840,8 @@ void UI::spawn_player(uint8_t player_slot, std::optional<float> x, std::optional
 
 std::pair<float, float> UI::spawn_position()
 {
-    return {State::get().ptr()->level_gen->spawn_x, State::get().ptr()->level_gen->spawn_y};
+    auto level_gen = HeapBase::get().level_gen();
+    return {level_gen->spawn_x, level_gen->spawn_y};
 }
 
 void UI::load_death_screen()
@@ -886,9 +889,14 @@ void UI::set_adventure_seed(int64_t first, int64_t second)
     ::set_adventure_seed(first, second);
 }
 
-void UI::copy_state(int from, int to)
+void UI::load_state_as_main(int from)
 {
-    ::copy_save_slot(from, to);
+    SaveState::restore_main(from);
+}
+
+void UI::save_main_state(int to)
+{
+    SaveState::backup_main(to);
 }
 
 StateMemory* UI::get_save_state(int slot)

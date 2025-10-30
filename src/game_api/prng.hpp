@@ -8,13 +8,6 @@
 
 struct PRNG
 {
-    PRNG() = delete;
-    PRNG(const PRNG&) = delete;
-    PRNG(PRNG&&) = delete;
-
-    static PRNG& get_main();
-    static PRNG& get_local();
-
     /// Same as `seed_prng`
     void seed(int64_t seed);
 
@@ -113,4 +106,11 @@ struct PRNG
     std::optional<std::int64_t> internal_random_int(std::int64_t min, std::int64_t size, PRNG_CLASS type);
 
     std::array<prng_pair, 10> pairs;
+
+    PRNG() = delete;
+    PRNG(const PRNG&) = delete;
+    PRNG& operator=(PRNG const&) = delete;
+    PRNG(PRNG&&) = delete;
+    PRNG& operator=(PRNG&&) = delete;
+    ~PRNG() = delete;
 };

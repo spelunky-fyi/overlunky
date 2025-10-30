@@ -345,7 +345,7 @@ void register_usertypes(sol::state& lua)
     lua["TYPE_MAP"][339] = lua["Entity"]["as_critterfirefly"];         // MONS_CRITTERFIREFLY
     lua["TYPE_MAP"][340] = lua["Entity"]["as_critterdrone"];           // MONS_CRITTERDRONE
     lua["TYPE_MAP"][341] = lua["Entity"]["as_critterslime"];           // MONS_CRITTERSLIME
-    lua["TYPE_MAP"][345] = lua["Entity"]["as_movable"];                // ITEM_WHIP
+    lua["TYPE_MAP"][345] = lua["Entity"]["as_whip"];                   // ITEM_WHIP
     lua["TYPE_MAP"][346] = lua["Entity"]["as_flamesize"];              // ITEM_WHIP_FLAME
     lua["TYPE_MAP"][347] = lua["Entity"]["as_bomb"];                   // ITEM_BOMB
     lua["TYPE_MAP"][348] = lua["Entity"]["as_bomb"];                   // ITEM_PASTEBOMB

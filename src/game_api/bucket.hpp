@@ -179,6 +179,12 @@ class Bucket
     SharedIO* io{nullptr};
     /// Number of API instances present
     int count{0};
+    // holds next id for new custom string
+    STRINGID next_stringid{0};
+    // Holds all the custom strings added thru add_string
+    std::unordered_map<STRINGID, std::u16string> custom_strings;
+    // uid to custom string id for shop items
+    std::unordered_map<uint32_t, STRINGID> custom_shopitem_names;
 
   private:
     Bucket() = default;

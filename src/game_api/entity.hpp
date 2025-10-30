@@ -152,12 +152,10 @@ class Entity
         auto topmost = this;
         while (auto cur = topmost->overlay)
         {
-            if (cur->type->search_flags <= 2)
-            {
-                topmost = cur;
-            }
-            else
+            if (!(cur->type->search_flags & (ENTITY_MASK::MOUNT | ENTITY_MASK::PLAYER)))
                 break;
+
+            topmost = cur;
         }
         return topmost;
     }
@@ -211,7 +209,7 @@ class Entity
     /// Kill entity along with all entities attached to it. Be aware that for example killing push block with this function will also kill anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
     /// destroy_corpse and responsible are the standard parameters for the kill function
-    void kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
+    void kill_recursive(bool destroy_corpse, Entity* responsible, std::optional<ENTITY_MASK> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
     /// Short for using RECURSIVE_MODE.NONE
     void kill_recursive(bool destroy_corpse, Entity* responsible)
     {
@@ -219,7 +217,7 @@ class Entity
     };
     /// Destroy entity along with all entities attached to it. Be aware that for example destroying push block with this function will also destroy anything on top of it, any items, players, monsters etc.
     /// To avoid that, you can inclusively or exclusively limit certain MASK and ENT_TYPE. Note: the function will first check the mask, if the entity doesn't match, it will look in the provided ENT_TYPE's
-    void destroy_recursive(std::optional<uint32_t> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
+    void destroy_recursive(std::optional<ENTITY_MASK> mask, const std::vector<ENT_TYPE> ent_types, RECURSIVE_MODE rec_mode);
     /// Short for using RECURSIVE_MODE.NONE
     void destroy_recursive()
     {
@@ -290,7 +288,7 @@ class Entity
     virtual void generate_damage_particles(Entity* victim, DAMAGE_TYPE damage, bool killing) = 0; // 8, contact dmg
     virtual float get_type_field_a8() = 0;                                                        // 9
     virtual bool can_be_pushed() = 0;                                                             // 10, (runs only for activefloors?) checks if entity type is pushblock, for chained push block checks ChainedPushBlock.is_chained, is only a check that allows for the pushing animation
-    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons)
+    virtual bool v11() = 0;                                                                       // 11, is in motion? (only projectiles and some weapons), theme procedural spawn uses this
     /// Returns true if entity is in water/lava
     virtual bool is_in_liquid() = 0;                                  // 12, drill always returns false
     virtual bool check_type_properties_flags_19() = 0;                // 13, checks (properties_flags >> 0x12) & 1; for hermitcrab checks if he's invisible; can't get it to trigger
@@ -322,8 +320,9 @@ class Entity
     /// only for CHAR_*: when going to the backlayer, turns on/off player emitted light
     virtual void toggle_backlayer_illumination() = 0; //    // 33
     virtual void v34() = 0;                           //    // 34, only ITEM_TORCH, calls Torch.light_up(false), can't get it to trigger
-    /// `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1. It's not called when item is bought
-    virtual void liberate_from_shop(bool clear_parrent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
+    /// It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`
+    /// Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
+    virtual void liberate_from_shop(bool clear_parent) = 0; // 35, can also be seen as event: when you anger the shopkeeper, this function gets called for each item; can be called on shopitems individually as well and they become 'purchased'
     /// Applies changes made in `entity.type`
     virtual void apply_db() = 0; // 36, This is actually just an initialize call that is happening once after  the entity is created
 };

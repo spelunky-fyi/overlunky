@@ -8,7 +8,7 @@ uColor get_color(const std::string& color_name, std::optional<uint8_t> alpha)
 {
     // #RRGGBBAA
     // 0xAABBGGRR
-    // treating not even number of hex characters as user error = behavior is undefined
+    // treating non even number of hex characters as user error = behavior is undefined
 
     if (color_name.size() == 0)
         return 0;

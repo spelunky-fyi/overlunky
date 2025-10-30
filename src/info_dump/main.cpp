@@ -37,7 +37,7 @@
 #include "search.hpp"                        // for get_address
 #include "settings_api.hpp"                  // for get_settings_names_and_...
 #include "sound_manager.hpp"                 // for SoundManager, SoundMana...
-#include "state.hpp"                         // for StateMemory, State
+#include "state.hpp"                         // for API::init
 #include "texture.hpp"                       // for Texture, get_textures
 #include "virtual_table.hpp"                 // for VTABLE_OFFSET, VTABLE_O...
 
@@ -1101,6 +1101,7 @@ void run()
         std::this_thread::sleep_for(100ms);
     }
 
+    API::init();
     auto items = list_entities();
     std::sort(items.begin(), items.end(), [](EntityItem& a, EntityItem& b) -> bool
               { return a.id < b.id; });
@@ -1193,9 +1194,9 @@ void run()
             {
                 std::string clean_tex_name = tex.default_texture->name;
                 std::transform(
-                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                    clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '/') return '_';
+                      return (unsigned char)std::toupper(c); });
                 size_t index = clean_tex_name.find(".DDS", 0);
                 if (index != std::string::npos)
                 {
@@ -1219,7 +1220,7 @@ void run()
                 EntityDB* db = get_type(ent.id);
                 if (!db)
                     break;
-                if ((db->search_flags & search_flag) != 0)
+                if ((std::uint32_t)db->search_flags & search_flag)
                 {
                     entities.push_back(ent.name);
                 }
@@ -1251,9 +1252,9 @@ void run()
             {
                 std::string clean_event_name = event_name;
                 std::transform(
-                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_event_name.begin(), clean_event_name.end(), '/', '_');
+                    clean_event_name.begin(), clean_event_name.end(), clean_event_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '/') return '_';
+                      return (unsigned char)std::toupper(c); });
                 file << event_name << ": VANILLA_SOUND." << clean_event_name << std::endl;
             });
     }
@@ -1271,7 +1272,7 @@ void run()
 
     if (auto file = std::ofstream("game_data/particle_emitters.txt"))
     {
-        auto particles = list_particles();
+        auto& particles = list_particles();
         for (const auto& particle : particles)
         {
             file << particle.id << ": " << particle.name << "\n";
@@ -1285,17 +1286,17 @@ void run()
         // file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }
 
-    auto state = State::get().ptr_main();
+    auto level_gen = HeapBase::get_main().level_gen();
 
     if (auto file = std::ofstream("game_data/tile_codes.txt"))
     {
-        for (const auto& tile_code : state->level_gen->data->tile_codes)
+        for (const auto& tile_code : level_gen->data->tile_codes)
         {
             std::string clean_tile_code_name = tile_code.first.c_str();
             std::transform(
-                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_tile_code_name.begin(), clean_tile_code_name.end(), '-', '_');
+                clean_tile_code_name.begin(), clean_tile_code_name.end(), clean_tile_code_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             file << clean_tile_code_name << ": " << tile_code.second.id << "\n";
         }
     }
@@ -1303,15 +1304,15 @@ void run()
     if (auto file = std::ofstream("game_data/spawn_chances.txt"))
     {
         std::multimap<std::uint32_t, std::string> ordered_chances;
-        for (auto* chances : {&state->level_gen->data->monster_chances, &state->level_gen->data->trap_chances})
+        for (auto* chances : {&level_gen->data->monster_chances, &level_gen->data->trap_chances})
         {
             for (const auto& spawn_chanc : *chances)
             {
                 std::string clean_chance_name = spawn_chanc.first.c_str();
                 std::transform(
-                    clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c)
-                    { return (unsigned char)std::toupper(c); });
-                std::replace(clean_chance_name.begin(), clean_chance_name.end(), '-', '_');
+                    clean_chance_name.begin(), clean_chance_name.end(), clean_chance_name.begin(), [](unsigned char c) -> unsigned char
+                    { if(c == '-') return '_';
+                      return (unsigned char)std::toupper(c); });
                 ordered_chances.insert({spawn_chanc.second.id, std::move(clean_chance_name)});
             }
         }
@@ -1321,24 +1322,19 @@ void run()
 
     if (auto file = std::ofstream("game_data/room_templates.txt"))
     {
-        auto templates = state->level_gen->data->room_templates;
-        templates["empty_backlayer"] = {9};
-        templates["boss_arena"] = {22};
-        templates["shop_jail_backlayer"] = {44};
-        templates["waddler"] = {86};
-        templates["ghistshop_backlayer"] = {87};
-        templates["challange_entrance_backlayer"] = {90};
-        templates["blackmarket"] = {118};
-        templates["mothership_room"] = {125};
+        auto templates = level_gen->data->room_templates;
+        auto extra_templates = LevelGenData::get_missing_room_templates();
+        for (auto [name, id] : extra_templates)
+            templates[game_string(name)] = {id};
 
         std::multimap<std::uint16_t, std::string> ordered_templates;
         for (const auto& room_template : templates)
         {
             std::string clean_room_name = room_template.first.c_str();
             std::transform(
-                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c)
-                { return (unsigned char)std::toupper(c); });
-            std::replace(clean_room_name.begin(), clean_room_name.end(), '-', '_');
+                clean_room_name.begin(), clean_room_name.end(), clean_room_name.begin(), [](unsigned char c) -> unsigned char
+                { if(c == '-') return '_';
+                  return (unsigned char)std::toupper(c); });
             ordered_templates.insert({room_template.second.id, std::move(clean_room_name)});
         }
         for (const auto& [id, name] : ordered_templates)

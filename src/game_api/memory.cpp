@@ -3,12 +3,16 @@
 #include <cstdlib>       // for exit
 #include <cstring>       // for memcpy
 #include <functional>    // for equal_to
+#include <minwindef.h>   // for LPVOID
 #include <new>           // for operator new
 #include <unordered_map> // for unordered_map, _Umap_traits<>::allocator_type
 #include <utility>       // for min, max
 #include <vector>        // for vector, _Vector_iterator, _Vector_const_ite...
 
-#include "bucket.hpp"
+#include "bucket.hpp" // for Bucket
+#include "search.hpp" // for find_after_bundle
+
+using namespace std::string_literals;
 
 ExecutableMemory::ExecutableMemory(std::string_view raw_code)
 {
@@ -94,7 +98,7 @@ size_t function_start(size_t off, uint8_t outside_byte)
     return off;
 }
 
-LPVOID alloc_mem_rel32(size_t addr, size_t size)
+void* alloc_mem_rel32(size_t addr, size_t size)
 {
     const size_t limit_addr = Memory::get().exe_address();
     LPVOID new_array = nullptr;
@@ -115,6 +119,9 @@ LPVOID alloc_mem_rel32(size_t addr, size_t size)
         if (new_array)
             break;
     }
+    if (!new_array)
+        DEBUG("[alloc_mem_rel32]: failed to get address in 32bit range and possibly crashing right now");
+
     return new_array;
 }
 
@@ -197,12 +204,10 @@ size_t patch_and_redirect(size_t addr, size_t replace_size, const std::string_vi
     if (replace_size < jump_size)
         return 0;
 
-    size_t data_size_to_move = replace_size;
-    if (just_nop)
-    {
-        data_size_to_move = 0;
-    }
-    const size_t target = std::max(return_to_addr, addr);
+    size_t data_size_to_move = just_nop ? 0 : replace_size;
+    const size_t target = std::max(return_to_addr, addr + replace_size); // + replace_size - in case just_nop=true and the payload is smaller than the replace_size
+                                                                         // which could make the 32bit return jump impossible
+
     const auto new_memory_size = payload.size() + data_size_to_move + jump_size;
 
     auto new_code = static_cast<char*>(alloc_mem_rel32(target, new_memory_size));
@@ -268,21 +273,15 @@ std::string get_nop(size_t size, bool true_nop)
     default:
     {
         std::string ret_str;
-        size_t remaning = size;
+        ret_str.reserve(size);
+        size_t remaining = size;
 
-        for (uint8_t idx = 10; idx > 0; --idx)
+        while (remaining > 10)
         {
-            size_t d_t = remaning / idx;
-            if (d_t > 0)
-            {
-                std::string c_nop = get_nop(idx);
-                for (; d_t > 0; --d_t)
-                {
-                    ret_str += c_nop;
-                    remaning -= idx;
-                }
-            }
+            ret_str += "\x66\x2E\x0F\x1F\x84\x00\x00\x00\x00\x00"s; // size 10
+            remaining -= 10;
         }
+        ret_str += get_nop(remaining);
         return ret_str;
     }
     }

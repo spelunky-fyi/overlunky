@@ -76,16 +76,21 @@ class Movable : public Entity
     uint8_t exit_invincibility_timer;   // when exiting a door or a pipe, ...
     uint8_t invincibility_frames_timer; // blinks the entity
     uint8_t frozen_timer;
-    uint8_t unknown_damage_counter_a;
-    uint8_t unknown_damage_counter_b;
-    uint8_t i120a; // timer, damage related
+    /// When > 0, will not deal damage to the owner_uid, so that throwing an object does not harm yourself.
+    uint8_t dont_damage_owner_timer;
+    /// Will not apply velocity from various sources when >0. Can be ignored by certain damage flags, so will not be invincible from knockback
+    /// of all damage types.
+    uint8_t knockback_invincibility_timer; // Can be overridden in damage flags.
+    /// Timer for resetting owner_uid.
+    uint8_t reset_owner_timer;
     uint8_t i120b; // timer
     /// Makes you immune to the item you just thrown for short time
     uint8_t throw_damage_immunity_timer;
     uint8_t i120d;
     uint8_t b124;
     uint8_t falling_timer;
-    uint8_t b126; // timer, after layer change?
+    /// When > 0, money intersecting a door or at a pipe entrance will not be collected. Also gives iframes from monster collision.
+    uint8_t exit_gold_invincibility_timer;
     uint8_t b127;
 
     /// NoDoc
@@ -194,7 +199,7 @@ class Movable : public Entity
     virtual bool is_powerup_capable() = 0;                               // 74
     virtual void initialize() = 0;                                       // 75, e.g. cobra: set random spit_timer; bat: set random stand_counter; emerald: set price
     virtual void check_is_falling() = 0;                                 // 76, sets more_flags.falling by comparing velocityy to 0, sets i120a to FF, clears owner_uid, can call remove_rider on mounts, for player updates the extra y_pos, for bosses clears lock input timer
-    virtual void v77() = 0;                                              // 77
+    virtual void v77() = 0;                                              // 77, called as last function in shopkeepers state machine, handles the big spender unlock
     virtual void process_input() = 0;                                    // 78, more like: handle_movement
     virtual void post_collision_damage_related() = 0;                    // 79, used for enemies attacks as well? 3 versions for: eggplant minister, players and the rest
     /// Called for entity that just has been picked up

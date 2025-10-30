@@ -45,6 +45,14 @@ replace_table = {
     "game_unordered_set<": "set<",
     "unordered_map<": "map<",  # doesn't seam to matter for lua if it's ordered or not
     "unordered_set<": "set<",  # doesn't seam to matter for lua if it's ordered or not
+    # special
+    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
+    "EmittedParticlesInfo": "array<Particle>",
+    "ImVec2": "Vec2",
+    "SoundCallbackFunction": "function",
+    "sol::object": "any",
+    "BucketItem": "any",
+    "ENTITY_MASK": "MASK",
     # removers
     ", identity_hasher<>": "",
     "std::": "",
@@ -60,14 +68,6 @@ replace_table = {
     ">()": "",
     "unsigned": "",
     "sol::no_constructor": "",
-    # special
-    "variadic_args va": "ENT_TYPE, ENT_TYPE...",
-    "EmittedParticlesInfo": "array<Particle>",
-    "ImVec2": "Vec2",
-    "SoundCallbackFunction": "function",
-    "object ": "any ",
-    "BucketItem": "any",
-    "ENTITY_MASK": "MASK",
 }
 
 header_files = [
@@ -126,6 +126,8 @@ header_files = [
     "../src/game_api/bucket.hpp",
     "../src/game_api/socket.hpp",
     "../src/game_api/savestate.hpp",
+    "../src/game_api/game_patches.hpp",
+    "../src/game_api/liquid_engine.hpp",
 ]
 api_files = [
     "../src/game_api/script/script_impl.cpp",
@@ -171,6 +173,10 @@ api_files = [
     "../src/game_api/script/usertypes/logic_lua.cpp",
     "../src/game_api/script/usertypes/bucket_lua.cpp",
     "../src/game_api/script/usertypes/color_lua.cpp",
+    "../src/game_api/script/usertypes/deprecated_func.cpp",
+    "../src/game_api/script/usertypes/spawn_lua.cpp",
+    "../src/game_api/script/usertypes/options_lua.cpp",
+    "../src/game_api/script/usertypes/game_patches_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",
@@ -193,6 +199,7 @@ cpp_type_exceptions = [
     "Players",
     "CutsceneBehavior",
     "CustomCutsceneBehavior",
+    "DoorCoords",
 ]
 not_functions = [
     "players",
@@ -561,6 +568,7 @@ def run_parse():
                             "cpp": replace_fun(m.group(2)),
                             "comment": comment,
                             "cb_signature": cb_signature,
+                            "file": file,
                         }
                         if not comment or "NoDoc" not in comment[0]:
                             if comment and comment[0] == "Deprecated":
@@ -690,7 +698,7 @@ def run_parse():
             if container:
                 extra = []
                 n = re.findall(
-                    r'(/// [\w _\-+()<>.,`"\'=]*?)?' + container + r'\[([\w":]+)\] = ([^;]+);', data
+                    r'(/// [\w _#\[\]\-+()<>.,`"\'=]*?)?' + container + r'\[([\w":]+)\] = ([^;]+);', data
                 )
                 for var in n:
                     if var[0].startswith("/// NoDoc"):
