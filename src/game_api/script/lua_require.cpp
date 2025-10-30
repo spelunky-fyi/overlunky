@@ -184,7 +184,8 @@ sol::object custom_loadlib(std::string path, std::string func)
 {
     static sol::state& lua = get_lua_vm();
     auto backend = LuaBackend::get_calling_backend();
-    const bool unsafe = backend->get_unsafe();
+    if (!backend->get_unsafe())
+        return sol::nil;
 
     // Walk up the stack until we find an _ENV that is not global, then grab the source from that stack index
     auto [short_source, source] = []() -> std::pair<std::string_view, std::string_view>
@@ -233,9 +234,9 @@ return info.short_src, info.source
 
     namespace fs = std::filesystem;
 
-    auto loadlib_if_exists = [&](fs::path _path, std::string _func) -> std::optional<sol::object>
+    auto loadlib_if_exists = [](fs::path _path, std::string _func) -> std::optional<sol::object>
     {
-        if (unsafe && std::filesystem::exists(_path))
+        if (std::filesystem::exists(_path))
             return lua["__loadlib"](_path.string(), _func);
         return std::nullopt;
     };
