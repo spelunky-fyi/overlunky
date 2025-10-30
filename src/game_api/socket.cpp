@@ -57,7 +57,7 @@ void dump_network()
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {
     ssize_t n;
-    static char buf[32768];
+    static thread_local char buf[32768];
     sockpp::inet_address src;
     while (server->kill_thr.test(std::memory_order_acquire) && socket.is_open())
     {
