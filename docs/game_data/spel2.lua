@@ -1403,12 +1403,11 @@ function toggle_journal() end
 ---@param page integer
 ---@return nil
 function show_journal(chapter, page) end
----Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
----The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
----The callback signature is optional<string> on_message(string msg, string src)
+---Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
+---The server will be closed once the handle is released.
 ---@param host string
 ---@param port integer
----@param cb fun(msg: string, src: string): string?
+---@param cb function
 ---@return UdpServer
 function udp_listen(host, port, cb) end
 ---Send data to specified UDP address. Requires unsafe mode.
@@ -6569,11 +6568,6 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field lava_bubbles_positions ScreenArenaScoreLavaBubble[] @size: 15
 
 ---@class UdpServer
-    ---@field close fun(self): nil @Closes the server.
-    ---@field open fun(self): boolean @Returns true if the port was opened successfully and the server hasn't been closed yet.
-    ---@field error fun(self): string @Returns a string explaining the last error, at least if open() returned false.
-    ---@field host string
-    ---@field port integer
 
 ---@class LogicList
     ---@field tutorial LogicTutorial @Handles dropping of the torch and rope in intro routine (first time play)

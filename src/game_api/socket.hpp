@@ -11,19 +11,11 @@
 class UdpServer
 {
   public:
-    using SocketCb = std::optional<std::string>(std::string, std::string);
+    using SocketCb = std::optional<std::string>(std::string);
 
     UdpServer(std::string host, in_port_t port, std::function<SocketCb> cb);
     ~UdpServer();
-
-    /// Closes the server.
-    void close();
-
-    /// Returns true if the port was opened successfully and the server hasn't been closed yet.
-    bool open();
-
-    /// Returns a string explaining the last error, at least if open() returned false.
-    std::string error();
+    void clear();
 
     std::string host;
     in_port_t port;
@@ -31,8 +23,6 @@ class UdpServer
     std::thread thr;
     std::atomic_flag kill_thr;
     sockpp::udp_socket sock;
-    bool is_opened{false};
-    bool is_closed{false};
 };
 
 class HttpRequest

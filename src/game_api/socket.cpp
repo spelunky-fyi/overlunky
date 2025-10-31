@@ -2,7 +2,6 @@
 
 #include <Windows.h>             // for GetModuleHandleA, GetProcAddress
 #include <algorithm>             // for max
-#include <chrono>                // for chrono
 #include <detours.h>             // for DetourAttach, DetourTransactionBegin
 #include <exception>             // for exception
 #include <new>                   // for operator new
@@ -57,57 +56,39 @@ void dump_network()
 void udp_data(sockpp::udp_socket socket, UdpServer* server)
 {
     ssize_t n;
-    static thread_local char buf[32768];
+    char buf[500];
     sockpp::inet_address src;
-    while (server->kill_thr.test(std::memory_order_acquire) && socket.is_open())
+    while (server->kill_thr.test(std::memory_order_acquire) && (n = socket.recv_from(buf, sizeof(buf), &src)) > 0)
     {
-        while ((n = socket.recv_from(buf, sizeof(buf), &src)) > 0)
+        std::optional<std::string> ret = server->cb(std::string(buf, n));
+        if (ret)
         {
-            std::optional<std::string> ret = server->cb(std::string(buf, n), src.to_string());
-            if (ret)
-            {
-                socket.send_to(ret.value(), src);
-            }
+            socket.send_to(ret.value(), src);
         }
-        std::this_thread::sleep_for(std::chrono::microseconds(1));
     }
 }
 
 UdpServer::UdpServer(std::string host_, in_port_t port_, std::function<SocketCb> cb_)
     : host(host_), port(port_), cb(cb_)
 {
-    if (sock.bind(sockpp::inet_address(host, port)))
-    {
-        const auto addr = (sockpp::inet_address)sock.address();
-        port = addr.port();
-        is_opened = true;
-        sock.set_non_blocking();
-        kill_thr.test_and_set();
-        thr = std::thread(udp_data, std::move(sock), this);
-    }
+    sock.bind(sockpp::inet_address(host, port));
+    kill_thr.test_and_set();
+    thr = std::thread(udp_data, std::move(sock), this);
 }
-void UdpServer::close()
+void UdpServer::clear() // TODO: fix and expose: this and the destructor causes deadlock
 {
-    is_closed = true;
     kill_thr.clear(std::memory_order_release);
-    sock.close();
-    sock.shutdown();
-    if (thr.joinable())
-        thr.join();
-}
-bool UdpServer::open()
-{
-    return is_opened && !is_closed && sock.last_error() == 0;
-}
-std::string UdpServer::error()
-{
-    auto err = sock.error_str(sock.last_error());
-    return err.substr(0, err.size() - 2);
+    thr.join();
 }
 UdpServer::~UdpServer()
 {
-    close();
+    if (thr.joinable())
+    {
+        kill_thr.clear(std::memory_order_release);
+        thr.join();
+    }
 }
+
 bool http_get(const char* sURL, std::string& out, std::string& err)
 {
     const int BUFFER_SIZE = 32768;
