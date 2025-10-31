@@ -2530,8 +2530,9 @@ The callback signature is nil on_data(string response, string error)
 
 #### [UdpServer](#UdpServer) udp_listen(string host, int port, function cb)
 
-Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
-The server will be closed once the handle is released.
+Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
+The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
+<br/>The callback signature is optional<string> on_message(string msg, string src)
 
 ### udp_send
 
