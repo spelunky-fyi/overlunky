@@ -284,12 +284,12 @@ class SoundManager
     CustomBank load_bank(const char* path, FMODStudio::LoadBankFlags flags);
     CustomBank get_existing_bank(std::string_view path);
     void acquire_bank(FMOD::Bank* fmod_bank);
-    std::optional<FMODStudio::LoadingState> get_bank_loading_state(CustomBank custom_bank);
-    bool load_bank_sample_data(CustomBank custom_bank);
-    bool unload_bank_sample_data(CustomBank custom_bank);
-    std::optional<FMODStudio::LoadingState> get_bank_sample_loading_state(CustomBank custom_bank);
+    std::optional<FMODStudio::LoadingState> get_bank_loading_state(FMOD::Bank* fmod_bank);
+    bool load_bank_sample_data(FMOD::Bank* fmod_bank);
+    bool unload_bank_sample_data(FMOD::Bank* fmod_bank);
+    std::optional<FMODStudio::LoadingState> get_bank_sample_loading_state(FMOD::Bank* fmod_bank);
     bool unload_bank(FMOD::Bank* fmod_bank);
-    bool bank_is_valid(CustomBank custom_bank);
+    bool bank_is_valid(FMOD::Bank* fmod_bank);
 
     FMODguidMap create_fmod_guid_map(std::string_view path);
     CustomEventDescription guidmap_lookup_id(FMODguidMap map, std::string path);
