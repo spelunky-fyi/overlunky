@@ -216,16 +216,17 @@ if(BUILD_OVERLUNKY)
 endif()
 
 add_subdirectory(sockpp)
-target_include_directories(spel2_api PUBLIC sockpp/include)
-target_link_libraries_system(spel2_api PUBLIC sockpp-static)
+target_link_libraries(spel2_api Sockpp::sockpp)
+#target_include_directories(spel2_api PUBLIC sockpp/include)
+#target_link_libraries_system(spel2_api PUBLIC sockpp-static)
 
 # --------------------------------------------------
 # disable all warnings on 3rd-party
 if(MSVC)
         target_compile_options(imgui PRIVATE "/w")
         target_compile_options(lib_detours_overlunky PRIVATE "/w")
-        target_compile_options(sockpp-objs PRIVATE "/w")
-        target_compile_options(sockpp-static PRIVATE "/w")
+        #target_compile_options(sockpp-objs PRIVATE "/w")
+        #target_compile_options(sockpp-static PRIVATE "/w")
 
         if(BUILD_OVERLUNKY)
                 target_compile_options(libwavpack PRIVATE "/w")
@@ -234,8 +235,8 @@ if(MSVC)
 else()
         target_compile_options(imgui PRIVATE "--no-warnings")
         target_compile_options(lib_detours_overlunky PRIVATE "--no-warnings")
-        target_compile_options(sockpp-objs PRIVATE "--no-warnings")
-        target_compile_options(sockpp-static PRIVATE "--no-warnings")
+        #target_compile_options(sockpp-objs PRIVATE "--no-warnings")
+        #target_compile_options(sockpp-static PRIVATE "--no-warnings")
 
         if(BUILD_OVERLUNKY)
                 target_compile_options(libwavpack PRIVATE "--no-warnings")
