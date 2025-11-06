@@ -2523,17 +2523,6 @@ Send a synchronous HTTP GET request and return response as a string or nil on an
 Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
 The callback signature is nil on_data(string response, string error)
 
-### udp_listen
-
-
-> Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
-
-#### [UdpServer](#UdpServer) udp_listen(string host, int port, function cb)
-
-Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
-The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
-<br/>The callback signature is optional<string> on_message(string msg, string src)
-
 ### udp_send
 
 
@@ -4076,6 +4065,16 @@ Use [GuiDrawContext](#GuiDrawContext)`.win_popid` instead
 
 `nil win_image(IMAGE image, float width, float height)`<br/>
 Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
+
+### udp_listen
+
+
+> Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
+
+`nil udp_listen(string host, int port, function cb)`<br/>
+Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
+The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
+<br/>The callback signature is optional<string> on_message(string msg, string src)
 
 ### read_prng
 

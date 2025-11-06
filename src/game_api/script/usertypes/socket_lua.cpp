@@ -1,6 +1,7 @@
 #include "socket_lua.hpp"
 #include "socket.hpp"
 
+#include <memory>      // for unique_ptr
 #include <sol/sol.hpp> // for global_table, proxy_key_t, function
 #include <sys/types.h> // for ssize_t
 
@@ -8,20 +9,46 @@
 #include "script/lua_backend.hpp" // for LuaBackend
 #include "script/safe_cb.hpp"     // for make_safe_cb
 
+class UdpServer_lua
+{
+    std::unique_ptr<UdpServer> m_ptr;
+
+  public:
+    UdpServer_lua(std::unique_ptr<UdpServer> ptr)
+        : m_ptr(std::move(ptr)){};
+};
+
 namespace NSocket
 {
 void register_usertypes(sol::state& lua)
 {
     lua.new_usertype<UdpServer>(
-        "UdpServer", sol::no_constructor, "close", &UdpServer::close, "open", &UdpServer::open, "error", &UdpServer::error, "host", sol::readonly(&UdpServer::host), "port", sol::readonly(&UdpServer::port));
+        "UdpServer",
+        sol::constructors<UdpServer(std::string, in_port_t)>(),
+        "close",
+        &UdpServer::close,
+        "is_open",
+        &UdpServer::is_open,
+        "last_error",
+        &UdpServer::last_error,
+        "host",
+        &UdpServer::get_host,
+        "port",
+        &UdpServer::get_port,
+        "send",
+        &UdpServer::send,
+        "read",
+        &UdpServer::read);
 
+    /// Deprecated
     /// Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
     /// The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
     /// <br/>The callback signature is optional<string> on_message(string msg, string src)
-    // lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> UdpServer*
-    lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb)
+    lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) //-> sol::any
     {
-        return std::unique_ptr<UdpServer>{new UdpServer(std::move(host), std::move(port), make_safe_cb<UdpServer::SocketCb>(std::move(cb)))};
+        auto server = std::unique_ptr<UdpServer>{new UdpServer(std::move(host), port)};
+        server->start_callback(make_safe_cb<UdpServer::SocketCb>(std::move(cb)));
+        return UdpServer_lua(std::move(server));
     };
 
     /// Send data to specified UDP address. Requires unsafe mode.

@@ -1096,11 +1096,14 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://git
 
 Type | Name | Description
 ---- | ---- | -----------
+[UdpServer](#UdpServer) | [new(string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UdpServer) | 
 nil | [close()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=close) | Closes the server.
-bool | [open()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=open) | Returns true if the port was opened successfully and the server hasn't been closed yet.
-string | [error()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=error) | Returns a string explaining the last error, at least if open() returned false.
-string | [host](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=host) | 
-int | [port](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=port) | 
+bool | [is_open()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_open) | Returns true if the port was opened successfully and the server hasn't been closed yet.
+string | [last_error()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_error) | Returns a string explaining the last error
+string | [host()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=host) | 
+int | [port()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=port) | 
+sint | [send(string message, string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send message to given host and port, returns numbers of bytes send, or -1 on failure
+sint | [read(function<ReadFun> fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read) | Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.<br/>On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)`
 
 ### Vec2
 

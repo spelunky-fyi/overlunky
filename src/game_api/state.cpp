@@ -1,13 +1,14 @@
 #include "state.hpp"
 
-#include <Windows.h>   // for GetCurrentThread, LONG, NO_ERROR
-#include <cmath>       // for abs
-#include <cstdlib>     // for size_t, abs
-#include <detours.h>   // for DetourAttach, DetourTransactionBegin
-#include <functional>  // for _Func_class, function
-#include <new>         // for operator new
-#include <string>      // for allocator, operator""sv, operator""s
-#include <type_traits> // for move
+#include <Windows.h>       // for GetCurrentThread, LONG, NO_ERROR
+#include <cmath>           // for abs
+#include <cstdlib>         // for size_t, abs
+#include <detours.h>       // for DetourAttach, DetourTransactionBegin
+#include <functional>      // for _Func_class, function
+#include <new>             // for operator new
+#include <sockpp/socket.h> // for initialize
+#include <string>          // for allocator, operator""sv, operator""s
+#include <type_traits>     // for move
 
 #include "bucket.hpp"                            // for Bucket
 #include "containers/custom_allocator.hpp"       //
@@ -986,6 +987,7 @@ void API::init(SoundManager* sound_manager)
             init_process_input_hook();
             init_game_loop_hook();
             init_heap_clone_hook();
+            sockpp::initialize();
 
             auto bucket = Bucket::get();
             bucket->count++;

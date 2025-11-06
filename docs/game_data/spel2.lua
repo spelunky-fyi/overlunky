@@ -1403,14 +1403,6 @@ function toggle_journal() end
 ---@param page integer
 ---@return nil
 function show_journal(chapter, page) end
----Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
----The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
----The callback signature is optional<string> on_message(string msg, string src)
----@param host string
----@param port integer
----@param cb fun(msg: string, src: string): string?
----@return UdpServer
-function udp_listen(host, port, cb) end
 ---Send data to specified UDP address. Requires unsafe mode.
 ---@param host string
 ---@param port integer
@@ -6570,10 +6562,12 @@ function Quad:is_point_inside(x, y, epsilon) end
 
 ---@class UdpServer
     ---@field close fun(self): nil @Closes the server.
-    ---@field open fun(self): boolean @Returns true if the port was opened successfully and the server hasn't been closed yet.
-    ---@field error fun(self): string @Returns a string explaining the last error, at least if open() returned false.
-    ---@field host string
-    ---@field port integer
+    ---@field is_open fun(self): boolean @Returns true if the port was opened successfully and the server hasn't been closed yet.
+    ---@field last_error fun(self): string @Returns a string explaining the last error
+    ---@field host fun(self): string
+    ---@field port fun(self): integer
+    ---@field send fun(self, message: string, host: string, port: integer): sinteger @Send message to given host and port, returns numbers of bytes send, or -1 on failure
+    ---@field read fun(self, fun: function<ReadFun>): sinteger @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.<br/>On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)`
 
 ---@class LogicList
     ---@field tutorial LogicTutorial @Handles dropping of the torch and rope in intro routine (first time play)
@@ -6950,6 +6944,12 @@ function Quad:new(_bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right
 ---@param aabb AABB
 ---@return Quad
 function Quad:new(aabb) end
+
+UdpServer = nil
+---@param host string
+---@param port integer
+---@return UdpServer
+function UdpServer:new(host, port) end
 
 MagmamanSpawnPosition = nil
 ---@param x_ integer
