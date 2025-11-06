@@ -22,7 +22,7 @@ namespace NSocket
 {
 void register_usertypes(sol::state& lua)
 {
-    lua.new_usertype<UdpServer>(
+    auto udpserver_type = lua.new_usertype<UdpServer>(
         "UdpServer",
         sol::constructors<UdpServer(std::string, in_port_t)>(),
         "close",
@@ -36,9 +36,11 @@ void register_usertypes(sol::state& lua)
         "port",
         &UdpServer::get_port,
         "send",
-        &UdpServer::send,
-        "read",
-        &UdpServer::read);
+        &UdpServer::send);
+
+    /// Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)`
+    udpserver_type["read"] = [](UdpServer& srv, sol::function fun) -> ssize_t
+    { return srv.read(std::move(fun)); };
 
     /// Deprecated
     /// Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.

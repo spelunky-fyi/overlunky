@@ -1102,8 +1102,8 @@ bool | [is_open()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_o
 string | [last_error()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_error) | Returns a string explaining the last error
 string | [host()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=host) | 
 int | [port()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=port) | 
-sint | [send(string message, string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send message to given host and port, returns numbers of bytes send, or -1 on failure
-sint | [read(function<ReadFun> fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read) | Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.<br/>On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)`
+int | [send(string message, string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send message to given host and port, returns numbers of bytes send, or -1 on failure
+int | [read(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read) | Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)` 
 
 ### Vec2
 

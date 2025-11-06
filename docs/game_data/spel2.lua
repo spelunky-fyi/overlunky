@@ -6566,8 +6566,8 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field last_error fun(self): string @Returns a string explaining the last error
     ---@field host fun(self): string
     ---@field port fun(self): integer
-    ---@field send fun(self, message: string, host: string, port: integer): sinteger @Send message to given host and port, returns numbers of bytes send, or -1 on failure
-    ---@field read fun(self, fun: function<ReadFun>): sinteger @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.<br/>On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)`
+    ---@field send fun(self, message: string, host: string, port: integer): integer @Send message to given host and port, returns numbers of bytes send, or -1 on failure
+    ---@field read fun(self, fun: function): integer @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)` 
 
 ---@class LogicList
     ---@field tutorial LogicTutorial @Handles dropping of the torch and rope in intro routine (first time play)
