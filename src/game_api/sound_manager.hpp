@@ -299,14 +299,14 @@ class SoundManager
 
     std::shared_ptr<CustomEventInstance> event_description_create_instance(FMODStudio::EventDescription* fmod_event);
     bool event_description_release_all_instances(FMODStudio::EventDescription* fmod_event);
-    std::optional<FMODStudio::LoadingState> event_description_get_sample_loading_state(CustomEventDescription fmod_event);
-    bool event_description_load_sample_data(CustomEventDescription fmod_event);
-    bool event_description_unload_sample_data(CustomEventDescription fmod_event);
-    bool event_description_is_valid(CustomEventDescription fmod_event);
-    std::optional<int> event_description_get_parameter_description_count(CustomEventDescription fmod_event);
-    std::optional<FMODStudio::ParameterDescription> event_description_get_parameter_description_by_name(CustomEventDescription fmod_event, std::string name);
-    std::optional<FMODStudio::ParameterDescription> event_description_get_parameter_description_by_index(CustomEventDescription fmod_event, int index);
-    std::optional<FMODStudio::ParameterId> event_description_get_parameter_id_by_name(CustomEventDescription fmod_event, std::string name);
+    std::optional<FMODStudio::LoadingState> event_description_get_sample_loading_state(FMODStudio::EventDescription* fmod_event);
+    bool event_description_load_sample_data(FMODStudio::EventDescription* fmod_event);
+    bool event_description_unload_sample_data(FMODStudio::EventDescription* fmod_event);
+    bool event_description_is_valid(FMODStudio::EventDescription* fmod_event);
+    std::optional<int> event_description_get_parameter_description_count(FMODStudio::EventDescription* fmod_event);
+    std::optional<FMODStudio::ParameterDescription> event_description_get_parameter_description_by_name(FMODStudio::EventDescription* fmod_event, std::string name);
+    std::optional<FMODStudio::ParameterDescription> event_description_get_parameter_description_by_index(FMODStudio::EventDescription* fmod_event, int index);
+    std::optional<FMODStudio::ParameterId> event_description_get_parameter_id_by_name(FMODStudio::EventDescription* fmod_event, std::string name);
 
     bool start(FMODStudio::EventInstance* fmod_event_instance);
     bool stop(FMODStudio::EventInstance* fmod_event_instance, FMODStudio::StopMode mode);
