@@ -11,11 +11,14 @@
 
 class UdpServer_lua
 {
-    std::unique_ptr<UdpServer> m_ptr;
+    UdpServer m_server;
 
   public:
-    UdpServer_lua(std::unique_ptr<UdpServer> ptr)
-        : m_ptr(std::move(ptr)){};
+    UdpServer_lua(std::string host, in_port_t port, std::function<UdpServer::SocketCb> cb)
+        : m_server(host, port)
+    {
+        m_server.start_callback(std::move(cb));
+    };
 };
 
 namespace NSocket
@@ -51,11 +54,12 @@ void register_usertypes(sol::state& lua)
     /// Use the `new` operator on [UdpServer](#UdpServer) instead
     /// The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
     /// <br/>The callback signature is optional<string> on_message(string msg, string src)
-    lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) //-> sol::any
+    // lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> any
+
+    /// NoDoc
+    lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb)
     {
-        auto server = std::unique_ptr<UdpServer>{new UdpServer(std::move(host), port)};
-        server->start_callback(make_safe_cb<UdpServer::SocketCb>(std::move(cb)));
-        return UdpServer_lua(std::move(server));
+        return std::make_unique<UdpServer_lua>(std::move(host), port, make_safe_cb<UdpServer::SocketCb>(std::move(cb)));
     };
 
     auto udp_send = sol::overload(

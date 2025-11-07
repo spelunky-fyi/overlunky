@@ -4073,7 +4073,7 @@ Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
 
 > Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
 
-`nil udp_listen(string host, int port, function cb)`<br/>
+`any udp_listen(string host, int port, function cb)`<br/>
 Use the `new` operator on [UdpServer](#UdpServer) instead
 The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
 <br/>The callback signature is optional<string> on_message(string msg, string src)
