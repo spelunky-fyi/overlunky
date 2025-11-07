@@ -69,14 +69,22 @@ void UdpServer::callback(sockpp::udp_socket sock, std::function<UdpServer::Socke
     m_opened = false;
     sock.shutdown();
 }
-
 UdpServer::UdpServer(std::string host, in_port_t port)
-    : m_host(host), m_port(port)
+    : m_address(host, port)
 {
-    if (m_sock.bind(sockpp::inet_address(host, port)))
+    if (m_sock.bind(m_address))
     {
-        const auto addr = sockpp::inet_address(m_sock.address());
-        port = addr.port();
+        m_address = m_sock.address(); // update port etc.
+        m_opened = true;
+        m_sock.set_non_blocking();
+    }
+}
+UdpServer::UdpServer(std::string address)
+    : m_address(address_from_string(address))
+{
+    if (m_sock.bind(m_address))
+    {
+        m_address = m_sock.address(); // update port etc.
         m_opened = true;
         m_sock.set_non_blocking();
     }
@@ -93,6 +101,32 @@ ssize_t UdpServer::send(std::string message, std::string host, in_port_t port)
         return -1;
 
     return m_sock.send_to(message, sockpp::inet_address(host, port));
+}
+ssize_t UdpServer::send(std::string message, std::string address)
+{
+    if (!is_open())
+        return -1;
+
+    return m_sock.send_to(message, address_from_string(std::move(address)));
+}
+sockpp::inet_address UdpServer::address_from_string(std::string address)
+{
+    auto colon = address.rfind(':');
+    sockpp::inet_address final_address;
+    if (colon == std::string::npos)
+    {
+        final_address.create(address, 0);
+    }
+    else
+    {
+        std::string_view port_str(address);
+        port_str = port_str.substr(colon + 1);
+        in_port_t port = 0;
+        std::from_chars(port_str.data(), port_str.data() + port_str.size(), port);
+        address.resize(colon);
+        final_address.create(address, port);
+    }
+    return final_address;
 }
 ssize_t UdpServer::read(std::function<ReadFun> fun)
 {
@@ -120,15 +154,24 @@ void UdpServer::start_callback(std::function<SocketCb> cb)
         m_thread = std::thread(&UdpServer::callback, this, std::move(sock_copy), std::move(cb));
     }
 }
-std::string UdpServer::last_error() const
+std::string UdpServer::address() const
+{
+    // using variable instead of getting address from socket each time since that overrides the last error flag
+    return m_address.to_string();
+}
+std::string UdpServer::last_error_str() const
 {
     auto err = m_sock.last_error_str();
     err.resize(err.size() - 2);
     return err;
 }
+int UdpServer::last_error() const
+{
+    return m_sock.last_error();
+}
 UdpServer::~UdpServer()
 {
-    close();
+    m_opened = false;
     if (m_thread.joinable())
         m_thread.join();
 
@@ -232,4 +275,17 @@ HttpRequest::HttpRequest(std::string url_, std::function<HttpCb> cb_)
 {
     std::thread thr(http_get_async, this);
     thr.detach();
+}
+
+ssize_t udp_send(std::string host, in_port_t port, std::string msg)
+{
+    sockpp::udp_socket sock;
+    sockpp::inet_address addr(host, port);
+    return sock.send_to(msg, addr);
+}
+ssize_t udp_send(std::string address, std::string msg)
+{
+    sockpp::udp_socket sock;
+    sockpp::inet_address addr(UdpServer::address_from_string(address));
+    return sock.send_to(msg, addr);
 }

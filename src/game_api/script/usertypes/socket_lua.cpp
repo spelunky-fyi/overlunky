@@ -22,28 +22,33 @@ namespace NSocket
 {
 void register_usertypes(sol::state& lua)
 {
+    auto send = sol::overload(
+        static_cast<ssize_t (UdpServer::*)(std::string, std::string)>(&UdpServer::send),
+        static_cast<ssize_t (UdpServer::*)(std::string, std::string, in_port_t)>(&UdpServer::send));
+
+    /// Requires unsafe mode.
     auto udpserver_type = lua.new_usertype<UdpServer>(
         "UdpServer",
-        sol::constructors<UdpServer(std::string, in_port_t)>(),
+        sol::constructors<UdpServer(std::string, in_port_t), UdpServer(std::string), UdpServer()>(),
         "close",
         &UdpServer::close,
         "is_open",
         &UdpServer::is_open,
         "last_error",
         &UdpServer::last_error,
-        "host",
-        &UdpServer::get_host,
-        "port",
-        &UdpServer::get_port,
+        "last_error_str",
+        &UdpServer::last_error_str,
+        "address",
+        &UdpServer::address,
         "send",
-        &UdpServer::send);
+        send);
 
     /// Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)`
     udpserver_type["read"] = [](UdpServer& srv, sol::function fun) -> ssize_t
     { return srv.read(std::move(fun)); };
 
     /// Deprecated
-    /// Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
+    /// Use the `new` operator on [UdpServer](#UdpServer) instead
     /// The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
     /// <br/>The callback signature is optional<string> on_message(string msg, string src)
     lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) //-> sol::any
@@ -53,18 +58,17 @@ void register_usertypes(sol::state& lua)
         return UdpServer_lua(std::move(server));
     };
 
-    /// Send data to specified UDP address. Requires unsafe mode.
-    lua["udp_send"] = [](std::string host, in_port_t port, std::string msg)
-    {
-        sockpp::udp_socket sock;
-        sockpp::inet_address addr(host, port);
-        sock.send_to(msg, addr);
-    };
+    auto udp_send = sol::overload(
+        static_cast<ssize_t (*)(std::string, in_port_t, std::string)>(::udp_send),
+        static_cast<ssize_t (*)(std::string, std::string)>(::udp_send));
 
-    /// Hook the sendto and recvfrom functions and start dumping network data to terminal
+    /// Send data to specified UDP address. Requires unsafe mode.
+    lua["udp_send"] = udp_send;
+
+    /// Hook the sendto and recvfrom functions and start dumping network data to terminal for debug purposes
     lua["dump_network"] = dump_network;
 
-    /// Send a synchronous HTTP GET request and return response as a string or nil on an error
+    /// Send a synchronous HTTP GET request and return response as a string or nil on an error. Requires unsafe mode.
     lua["http_get"] = [&lua](std::string url) -> sol::optional<std::string>
     {
         std::string out;
@@ -81,7 +85,7 @@ void register_usertypes(sol::state& lua)
     };
 
     /// Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
-    /// The callback signature is nil on_data(string response, string error)
+    /// The callback signature is nil on_data(string response, string error). Requires unsafe mode.
     lua["http_get_async"] = [](std::string url, sol::function on_data)
     {
         new HttpRequest(std::move(url), make_safe_cb<HttpRequest::HttpCb>(std::move(on_data)));

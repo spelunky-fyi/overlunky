@@ -387,7 +387,7 @@ Dump the object (table, container, class) as a recursive table, for pretty print
 
 #### nil dump_network()
 
-Hook the sendto and recvfrom functions and start dumping network data to terminal
+Hook the sendto and recvfrom functions and start dumping network data to terminal for debug purposes
 
 ### get_address
 
@@ -2511,7 +2511,7 @@ be returned instead.
 
 #### optional&lt;string&gt; http_get(string url)
 
-Send a synchronous HTTP GET request and return response as a string or nil on an error
+Send a synchronous HTTP GET request and return response as a string or nil on an error. Requires unsafe mode.
 
 ### http_get_async
 
@@ -2521,14 +2521,16 @@ Send a synchronous HTTP GET request and return response as a string or nil on an
 #### nil http_get_async(string url, function on_data)
 
 Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
-The callback signature is nil on_data(string response, string error)
+The callback signature is nil on_data(string response, string error). Requires unsafe mode.
 
 ### udp_send
 
 
 > Search script examples for [udp_send](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_send)
 
-#### nil udp_send(string host, int port, string msg)
+#### int udp_send(string host, int port, string msg)
+
+#### int udp_send(string address, string msg)
 
 Send data to specified UDP address. Requires unsafe mode.
 
@@ -4072,7 +4074,7 @@ Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
 > Search script examples for [udp_listen](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=udp_listen)
 
 `nil udp_listen(string host, int port, function cb)`<br/>
-Start an UDP server on specified address and run callback when data arrives. Set port to 0 to use a random ephemeral port. Return a string from the callback to reply.
+Use the `new` operator on [UdpServer](#UdpServer) instead
 The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
 <br/>The callback signature is optional<string> on_message(string msg, string src)
 

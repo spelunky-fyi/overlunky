@@ -1407,17 +1407,22 @@ function show_journal(chapter, page) end
 ---@param host string
 ---@param port integer
 ---@param msg string
----@return nil
+---@return integer
 function udp_send(host, port, msg) end
----Hook the sendto and recvfrom functions and start dumping network data to terminal
+---Send data to specified UDP address. Requires unsafe mode.
+---@param address string
+---@param msg string
+---@return integer
+function udp_send(address, msg) end
+---Hook the sendto and recvfrom functions and start dumping network data to terminal for debug purposes
 ---@return nil
 function dump_network() end
----Send a synchronous HTTP GET request and return response as a string or nil on an error
+---Send a synchronous HTTP GET request and return response as a string or nil on an error. Requires unsafe mode.
 ---@param url string
 ---@return string?
 function http_get(url) end
 ---Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
----The callback signature is nil on_data(string response, string error)
+---The callback signature is nil on_data(string response, string error). Requires unsafe mode.
 ---@param url string
 ---@param on_data fun(response: string, error: string): nil
 ---@return nil
@@ -6563,11 +6568,22 @@ function Quad:is_point_inside(x, y, epsilon) end
 ---@class UdpServer
     ---@field close fun(self): nil @Closes the server.
     ---@field is_open fun(self): boolean @Returns true if the port was opened successfully and the server hasn't been closed yet.
-    ---@field last_error fun(self): string @Returns a string explaining the last error
-    ---@field host fun(self): string
-    ---@field port fun(self): integer
-    ---@field send fun(self, message: string, host: string, port: integer): integer @Send message to given host and port, returns numbers of bytes send, or -1 on failure
+    ---@field last_error fun(self): integer @Value of the last raised exception
+    ---@field last_error_str fun(self): string @Returns a string explaining the last error
+    ---@field address fun(self): string @Returns string representation of the server address in format "ip:port"
     ---@field read fun(self, fun: function): integer @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)` 
+local UdpServer = nil
+---Send message to given host and port from this socket, returns numbers of bytes send or -1 on failure
+---@param message string
+---@param host string
+---@param port integer
+---@return integer
+function UdpServer:send(message, host, port) end
+---Send to address in format `ip:port`
+---@param message string
+---@param address string
+---@return integer
+function UdpServer:send(message, address) end
 
 ---@class LogicList
     ---@field tutorial LogicTutorial @Handles dropping of the torch and rope in intro routine (first time play)
@@ -6946,10 +6962,18 @@ function Quad:new(_bottom_left_x, _bottom_left_y, _bottom_right_x, _bottom_right
 function Quad:new(aabb) end
 
 UdpServer = nil
+---Start/bind an UDP server on specified address. Set port to 0 to use a random ephemeral port.
 ---@param host string
 ---@param port integer
 ---@return UdpServer
 function UdpServer:new(host, port) end
+---Host/IP + optional port `ip:port`
+---@param address string
+---@return UdpServer
+function UdpServer:new(address) end
+---Short for `UdpServer:new("localhost")`
+---@return UdpServer
+function UdpServer:new() end
 
 MagmamanSpawnPosition = nil
 ---@param x_ integer

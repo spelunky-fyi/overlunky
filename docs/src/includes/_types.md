@@ -1093,16 +1093,20 @@ tuple&lt;[Vec2](#Vec2), [Vec2](#Vec2), [Vec2](#Vec2)&gt; | [split()](https://git
 
 ### UdpServer
 
+Requires unsafe mode.
 
 Type | Name | Description
 ---- | ---- | -----------
-[UdpServer](#UdpServer) | [new(string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UdpServer) | 
+[UdpServer](#UdpServer) | [new(string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UdpServer) | Start/bind an UDP server on specified address. Set port to 0 to use a random ephemeral port.
+[UdpServer](#UdpServer) | [new(string address)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UdpServer) | Host/IP + optional port `ip:port`
+[UdpServer](#UdpServer) | [new()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=UdpServer) | Short for `UdpServer:new("localhost")`
 nil | [close()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=close) | Closes the server.
 bool | [is_open()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=is_open) | Returns true if the port was opened successfully and the server hasn't been closed yet.
-string | [last_error()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_error) | Returns a string explaining the last error
-string | [host()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=host) | 
-int | [port()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=port) | 
-int | [send(string message, string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send message to given host and port, returns numbers of bytes send, or -1 on failure
+int | [last_error()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_error) | Value of the last raised exception
+string | [last_error_str()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=last_error_str) | Returns a string explaining the last error
+string | [address()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=address) | Returns string representation of the server address in format "ip:port"
+int | [send(string message, string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send message to given host and port from this socket, returns numbers of bytes send or -1 on failure
+int | [send(string message, string address)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send to address in format `ip:port`
 int | [read(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read) | Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)` 
 
 ### Vec2

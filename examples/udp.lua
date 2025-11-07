@@ -6,52 +6,43 @@ meta = {
 }
 
 options = {
-    host = "127.0.0.1",
+    host = "127.0.0.1", -- can also be just "localhost"
     port = 0
 }
 
 function init()
     deinit()
 
-    server = {
-        -- Save messages to queue instead of printing directly, cause that doesn't work from the server thread
-        queue = {},
-
-        -- Open server on an ephemeral random port, push messages to queue and echo back to sender
-        socket = udp_listen(options.host, options.port, function(msg, src)
-            msg = msg:gsub("%s*$", "")
-            table.insert(server.queue, { msg = msg, src = src })
-            if msg == "gg" then
-                return "bye!\n"
-            else
-                return "echo: " .. msg .. "\n"
-            end
-        end)
-    }
+    -- Bind/Open udp server on the given host:port
+    server = UdpServer:new(options.host, options.port)
 
     -- If port was opened successfully, start checking the message queue
-    if server.socket:open() then
-        print(F "Listening on {server.socket.port}, please send some UDP datagrams or 'gg' to close")
-        server.inter = set_global_interval(function()
-            for _, msg in pairs(server.queue) do
-                print(F "Received: '{msg.msg}' from {msg.src}")
-                if msg.msg == "gg" then
-                    server.socket:close()
-                    clear_callback()
-                    print("Server is now closed, have a nice day")
-                end
-            end
-            server.queue = {}
+    if server:is_open() then
+        print(F "Listening on {server:address()}, please send some UDP datagrams or 'gg' to close")
+        server_inter = set_global_interval(function()
+            repeat
+                ret = server:read(function(msg, src)
+                    print(F "Received: '{msg}' from {src}")
+                    server:send(msg, src) -- echo
+                    if msg == "gg" then
+                        server:close()
+                        clear_callback()
+                        server_inter = nil
+                        ret = -1 -- to stop te loop
+                        print("Server is now closed, have a nice day")
+                    end
+                end)
+            until ret == -1
         end, 1)
     else
-        print(F "Failed to open server: {server.socket:error()}")
+        print(F "Failed to open server: {server:last_error_str()}")
     end
 end
 
 function deinit()
     if server then
-        server.socket:close()
-        if server.inter then clear_callback(server.inter) end
+        server:close()
+        if server_inter then clear_callback(server_inter) end
         server = nil
     end
 end
@@ -69,13 +60,13 @@ register_option_callback("x", nil, function(ctx)
     ctx:win_inline()
     if ctx:win_button("Stop server") then deinit() end
     if server then
-        ctx:win_text(server.socket:error())
+        ctx:win_text(server:last_error_str())
     end
-    if server and server.socket:open() then
-        ctx:win_text(F "Listening on {server.socket.host}:{server.socket.port}\nTry sending something with udp_send:")
-        if ctx:win_button("Send 'Hello World!'") then udp_send(server.socket.host, server.socket.port, "Hello World!") end
+    if server and server:is_open() then
+        ctx:win_text(F "Listening on {server:address()}\nTry sending something with udp_send:")
+        if ctx:win_button("Send 'Hello World!'") then udp_send(server:address(), "Hello World!") end
         ctx:win_inline()
-        if ctx:win_button("Send 'gg'") then udp_send(server.socket.host, server.socket.port, "gg") end
+        if ctx:win_button("Send 'gg'") then udp_send(server:address(), "gg") end
     else
         ctx:win_text("Stopped")
     end
