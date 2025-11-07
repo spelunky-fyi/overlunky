@@ -4075,7 +4075,7 @@ Use [GuiDrawContext](#GuiDrawContext)`.win_image` instead
 
 `any udp_listen(string host, int port, function cb)`<br/>
 Use the `new` operator on [UdpServer](#UdpServer) instead
-The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
+The server will be closed lazily by garbage collection once the handle is released. Requires unsafe mode.
 <br/>The callback signature is optional<string> on_message(string msg, string src)
 
 ### read_prng

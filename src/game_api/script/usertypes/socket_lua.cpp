@@ -52,7 +52,7 @@ void register_usertypes(sol::state& lua)
 
     /// Deprecated
     /// Use the `new` operator on [UdpServer](#UdpServer) instead
-    /// The server will be closed lazily by garbage collection once the handle is released, or immediately by calling close(). Requires unsafe mode.
+    /// The server will be closed lazily by garbage collection once the handle is released. Requires unsafe mode.
     /// <br/>The callback signature is optional<string> on_message(string msg, string src)
     // lua["udp_listen"] = [](std::string host, in_port_t port, sol::function cb) -> any
 
