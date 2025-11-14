@@ -292,7 +292,7 @@ class SoundManager
     bool bank_is_valid(FMOD::Bank* fmod_bank);
 
     FMODguidMap create_fmod_guid_map(std::string_view path);
-    CustomEventDescription guidmap_lookup_id(FMODguidMap map, std::string path);
+    CustomEventDescription guidmap_lookup_id(std::unordered_map<std::string, FMOD::FMOD_GUID>& GUIDmap, std::string path);
 
     CustomEventDescription get_event_by_id_string(std::string guid_string);
     CustomEventDescription get_event_by_id(FMOD::FMOD_GUID* guid);

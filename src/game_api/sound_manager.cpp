@@ -857,7 +857,7 @@ FMODguidMap::FMODguidMap(std::unordered_map<std::string, FMOD::FMOD_GUID> m_GUID
 }
 CustomEventDescription FMODguidMap::get_event(std::string path)
 {
-    return m_SoundManager->guidmap_lookup_id(*this, path);
+    return m_SoundManager->guidmap_lookup_id(m_GUIDmap, path);
 }
 
 struct SoundManager::Sound
@@ -1376,10 +1376,10 @@ FMODguidMap SoundManager::create_fmod_guid_map(std::string_view path)
     DEBUG("Failed to create FMOD GUID map.");
     return FMODguidMap{nullptr, nullptr};
 }
-CustomEventDescription SoundManager::guidmap_lookup_id(FMODguidMap map, std::string path)
+CustomEventDescription SoundManager::guidmap_lookup_id(std::unordered_map<std::string, FMOD::FMOD_GUID>& GUIDmap, std::string path)
 {
-    auto it = map.m_GUIDmap.find(path);
-    if (it != map.m_GUIDmap.end())
+    auto it = GUIDmap.find(path);
+    if (it != GUIDmap.end())
     {
         return get_event_by_id(&it->second);
     }
