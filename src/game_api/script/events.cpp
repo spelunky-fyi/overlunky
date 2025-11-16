@@ -491,33 +491,6 @@ bool pre_set_feat(FEAT feat)
     return block;
 }
 
-bool pre_event(ON event)
-{
-    bool return_val = false;
-    LuaBackend::for_each_backend(
-        [=, &return_val](LuaBackend::LockedBackend backend)
-        {
-            if (backend->on_pre(event))
-            {
-                return_val = true;
-                return false;
-            }
-            return true;
-        },
-        false);
-    return return_val;
-}
-
-void post_event(ON event)
-{
-    LuaBackend::for_each_backend(
-        [&](LuaBackend::LockedBackend backend)
-        {
-            backend->on_post(event);
-            return true;
-        });
-}
-
 void pre_copy_state_event(HeapBase from, HeapBase to)
 {
     LuaBackend::for_each_backend(

@@ -92,6 +92,18 @@ enum class POS_TYPE
     WALL_RIGHT = 0x4000,
 };
 
+// Some aren't added because the name doesn't seem to reflect what they actually are for. Read the comments in LevelGenSystem for more info
+enum class ROOM_META
+{
+    FLIPPED_ROOM_FRONT_LAYER = 0,
+    FLIPPED_ROOM_BACK_LAYER = 1,
+    SET_ROOM_FRONT_LAYER = 2,
+    SET_ROOM_BACK_LAYER = 3,
+    // BACKLAYER_ROOM_EXISTS = 4,
+    MACHINE_ROOM_ORIGIN = 5,
+    // DUAL_ROOM = 6,
+};
+
 struct LevelGenData
 {
     void init();
@@ -414,7 +426,7 @@ class ThemeInfo
     virtual void spawn_decoration2() = 0;
 
     /// Spawns specific extra entities and decorations, like gold key, seaweed, lanterns, banners, signs, wires...
-    virtual void spawn_extra() = 0;
+    virtual void spawn_extra(int32_t start_x, int32_t start_y, int32_t end_x, int32_t end_y, uint8_t layer) = 0;
 
     /// Spawns a single procedural entity, used in spawn_procedural (mostly monsters, scarab in dark levels etc.)
     virtual void do_procedural_spawn(SpawnInfo* info) = 0;
@@ -434,6 +446,16 @@ struct LevelGenRoomsMeta
     std::array<bool, 8 * 15> rooms;
 };
 static_assert(sizeof(LevelGenRoomsMeta) == 0x78);
+
+struct RoomTileCodes
+{
+    std::array<TileCodeDef, 10 * 8> tile_codes;
+};
+
+struct LevelGenBackLayerRoomsTileCodes
+{
+    std::array<RoomTileCodes*, 8 * 15> rooms;
+};
 
 class SpecialLevelGeneration
 {
@@ -534,14 +556,35 @@ struct LevelGenSystem
             LevelGenRooms* rooms_backlayer;
         };
     };
-    LevelGenRoomsMeta* flipped_rooms;
-    LevelGenRoomsMeta* rooms_meta_27;
-    LevelGenRoomsMeta* set_room_front_layer;
-    LevelGenRoomsMeta* set_room_back_layer;
-    LevelGenRoomsMeta* backlayer_room_exists;
-    LevelGenRoomsMeta* machine_room_origin;
-    LevelGenRoomsMeta* dual_room;
-    LevelGenRoomsMeta* rooms_meta_33;
+    union
+    {
+        std::array<LevelGenRoomsMeta*, 7> rooms_meta;
+        struct
+        {
+            union
+            {
+                LevelGenRoomsMeta* flipped_rooms[2];
+                struct
+                {
+                    LevelGenRoomsMeta* flipped_rooms_front_layer;
+                    LevelGenRoomsMeta* flipped_rooms_back_layer;
+                };
+            };
+            union
+            {
+                LevelGenRoomsMeta* set_room[2];
+                struct
+                {
+                    LevelGenRoomsMeta* set_room_front_layer;
+                    LevelGenRoomsMeta* set_room_back_layer;
+                };
+            };
+            LevelGenRoomsMeta* backlayer_room_exists; // isn't very consistent, some passage rooms, BM rooms, challenge rooms, etc. aren't marked with this.
+            LevelGenRoomsMeta* machine_room_origin;
+            LevelGenRoomsMeta* dual_room; // is wrong, seems to be related to liquid rooms
+        };
+    };
+    LevelGenBackLayerRoomsTileCodes* backlayer_rooms_tilecodes;
     LevelGenRoomsMeta* rooms_meta_34;
     std::uint32_t spawn_room_x;
     std::uint32_t spawn_room_y;
@@ -575,6 +618,8 @@ struct LevelGenSystem
     std::optional<uint16_t> get_room_template(uint32_t x, uint32_t y, uint8_t l) const;
     bool set_room_template(uint32_t x, uint32_t y, int l, uint16_t room_template);
 
+    bool get_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y);
+    bool set_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y, bool value);
     bool is_room_flipped(uint32_t x, uint32_t y) const;
     bool is_machine_room_origin(uint32_t x, uint32_t y) const;
     bool mark_as_machine_room_origin(uint32_t x, uint32_t y, uint8_t l);
@@ -586,6 +631,7 @@ struct LevelGenSystem
     static std::optional<std::string_view> get_procedural_spawn_chance_name(uint32_t chance_id);
     uint32_t get_procedural_spawn_chance(uint32_t chance_id) const;
     bool set_procedural_spawn_chance(uint32_t chance_id, uint32_t inverse_chance);
+    void set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TEMPLATE room_template);
 
     ~LevelGenSystem() = delete; // cuz it was complaining
 };
