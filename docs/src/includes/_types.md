@@ -2399,7 +2399,7 @@ float | [action_buttons_keycap_size](https://github.com/spelunky-fyi/overlunky/s
 bool | [screen_loading](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=screen_loading) | 
 bool | [seeded_run](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=seeded_run) | 
 bool | [daily_challenge](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=daily_challenge) | 
-bool | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge` 
+bool | [arena](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=arena) | Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge`
 int | [next_screen_to_load](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=next_screen_to_load) | 
 bool | [not_ready_to_start_yet](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=not_ready_to_start_yet) | 
 int | [available_mine_entrances](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=available_mine_entrances) | 
@@ -4337,7 +4337,7 @@ bool | [overlaps_with(float rect_left, float rect_bottom, float rect_right, floa
 bool | [overlaps_with(Entity other)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=overlaps_with) | 
 [TEXTURE](#TEXTURE) | [get_texture()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=get_texture) | 
 bool | [set_texture(TEXTURE texture_id)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_texture) | Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
-nil | [set_draw_depth(int draw_depth, optional<int> unknown)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering) 
+nil | [set_draw_depth(int draw_depth, optional<int> unknown)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=set_draw_depth) | optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering)
 nil | [reset_draw_depth()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=reset_draw_depth) | 
 float | [friction()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=friction) | Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
 nil | [liberate_from_shop(bool clear_parent)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=liberate_from_shop) | It's not called when item is bought. It does not remove the item from [StateMemory](#StateMemory)`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
