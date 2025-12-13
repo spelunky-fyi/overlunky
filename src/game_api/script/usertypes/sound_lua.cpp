@@ -145,6 +145,16 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         return sol::nullopt;
     };
 
+    /// FMOD Studio event parameter identifier. Can be retrieved with
+    /// `CustomEventDescription:get_parameter_description_by_name().id`, or
+    /// directly by using `CustomEventDescription:get_parameter_id_by_name()`.
+    /// Can be used with `CustomEventInstance:set_parameter_by_id()`,
+    /// `CustomEventInstance:set_parameter_by_id_with_label()`, and
+    /// `CustomEventInstance:get_parameter_by_id()`. This is useful
+    /// if you need to get or update an event parameter at a high
+    /// frequency, since setting and getting parameters by ID do
+    /// not require FMOD to perform a name to ID lookup internally
+    /// like FMOD does when setting or getting parameters by name.
     lua.new_usertype<FMODStudio::ParameterId>(
         "ParameterId",
         "data1",
@@ -152,6 +162,13 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         "data2",
         sol::readonly(&FMODStudio::ParameterId::data2));
 
+    /// FMOD Studio descriptor for an event parameter. The descriptor
+    /// includes metadata about the event parameter including 
+    /// name, behavior flags, parameter type, and information about
+    /// the default, minimum, and maximum values for the event
+    /// parameter. It also contains the event parameter identifier
+    /// which can be useful if you need to update the value of the
+    /// event parameter at a high frequency.
     lua.new_usertype<FMODStudio::ParameterDescription>(
         "ParameterDescription",
         "name",
