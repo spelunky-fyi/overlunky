@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "character_def.hpp"
+#include "game_api.hpp"
 #include "memory.hpp"
 #include "render_api.hpp"
 #include "search.hpp"
@@ -26,7 +27,7 @@ TextureDefinition get_texture_definition(TEXTURE texture_id)
     if (Texture* tex = get_texture(texture_id))
     {
         return TextureDefinition{
-            *tex->name,
+            tex->default_texture->name,
             tex->width,
             tex->height,
             static_cast<std::uint32_t>(tex->tile_width_fraction * tex->width),
@@ -125,7 +126,7 @@ TEXTURE define_texture(TextureDefinition data)
         data.sub_image_offset_x, data.sub_image_offset_y, data.sub_image_width, data.sub_image_height);
     // clang-format on
 
-    new_texture.name = new_texture_target->name;
+    new_texture.default_texture = new_texture_target->default_texture;
     textures->num_textures = backup_num_textures;
     *new_texture_target = backup_texture;
 
@@ -174,7 +175,7 @@ std::optional<TEXTURE> get_texture(TextureDefinition data)
 
     for (auto& [id, texture] : render.custom_textures)
     {
-        std::string_view existing_name{*texture.name};
+        std::string_view existing_name{texture.default_texture->name};
         constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
         if (existing_name.starts_with(c_VanillaTexturePath))
         {
@@ -182,16 +183,16 @@ std::optional<TEXTURE> get_texture(TextureDefinition data)
         }
         if (existing_name == data.texture_path && is_same(texture, new_texture))
         {
-            reload_texture(texture.name);
+            reload_texture(texture.default_texture);
             return texture.id;
         }
     }
 
     for (auto& texture : textures->textures)
     {
-        if (texture.name != nullptr && *texture.name == data.texture_path && is_same(texture, new_texture))
+        if (texture.default_texture != nullptr && texture.default_texture->name == data.texture_path && is_same(texture, new_texture))
         {
-            reload_texture(texture.name);
+            reload_texture(texture.default_texture);
             return texture.id;
         }
     }
@@ -200,6 +201,7 @@ std::optional<TEXTURE> get_texture(TextureDefinition data)
 }
 std::optional<TEXTURE> get_texture(std::string_view texture_name)
 {
+    // TODO: shouldn't this return multiple? since multiple "Textures" share the same image resource, which this search relays on
     auto* textures = get_textures();
     auto& render = RenderAPI::get();
 
@@ -207,7 +209,7 @@ std::optional<TEXTURE> get_texture(std::string_view texture_name)
 
     for (auto& [id, texture] : render.custom_textures)
     {
-        std::string_view existing_name{*texture.name};
+        std::string_view existing_name{texture.default_texture->name};
         constexpr char c_VanillaTexturePath[]{"Data/Textures/../../"};
         if (existing_name.starts_with(c_VanillaTexturePath))
         {
@@ -215,16 +217,16 @@ std::optional<TEXTURE> get_texture(std::string_view texture_name)
         }
         if (existing_name == texture_name)
         {
-            reload_texture(texture.name);
+            reload_texture(texture.default_texture);
             return texture.id;
         }
     }
 
     for (auto& texture : textures->textures)
     {
-        if (texture.name != nullptr && *texture.name == texture_name)
+        if (texture.default_texture != nullptr && texture.default_texture->name == texture_name)
         {
-            reload_texture(texture.name);
+            reload_texture(texture.default_texture);
             return texture.id;
         }
     }
@@ -240,11 +242,11 @@ void reload_texture(const char* texture_name)
         std::lock_guard lock{render.custom_textures_lock};
         for (auto& [id, texture] : render.custom_textures)
         {
-            std::string_view existing_name{*texture.name};
+            std::string_view existing_name{texture.default_texture->name};
             existing_name.remove_prefix(sizeof("Data/Textures/../../") - 1);
             if (existing_name == texture_name)
             {
-                reload_texture(texture.name);
+                reload_texture(texture.default_texture);
                 return;
             }
         }
@@ -254,54 +256,58 @@ void reload_texture(const char* texture_name)
     auto* textures = get_textures();
     for (auto& texture : textures->textures)
     {
-        if (texture.name && *texture.name == name_view)
+        if (texture.default_texture && texture.default_texture->name == name_view)
         {
-            reload_texture(texture.name);
+            reload_texture(texture.default_texture);
             return;
         }
     }
 }
-void reload_texture(const char** texture_name)
+void reload_texture(Resource* texture_name)
 {
-    using LoadTextureFunT = void(Renderer*, const char**);
-
-    auto& render = RenderAPI::get();
+    using LoadTextureFunT = void(Renderer*, Resource*);
 
     // Find this by first finding a function that is called with "loading.DDS" as a first param
     // That function contains a single virtual call (it's done on the render) which is a call
     // to the wanted function
     static constexpr size_t c_LoadTextureVirtualIndex = 0x2E;
 
-    auto renderer_ptr = render.renderer();
+    auto renderer_ptr = GameAPI::get()->renderer;
     auto load_texture = *vtable_find<LoadTextureFunT*>(renderer_ptr, c_LoadTextureVirtualIndex);
+
+    if (texture_name->dx_resource)
+    {
+        texture_name->dx_resource->release(); // should be safe since apparently the objects have reference counter, essentially working like shared pointer
+        game_free(texture_name->dx_resource);
+    }
     load_texture(renderer_ptr, texture_name);
 }
 
 void set_heart_color_from_texture(TEXTURE vanilla_id, TEXTURE custom_id)
 {
     uint32_t char_index = (uint32_t)vanilla_id - 285;
-    if (char_index >= 0 && char_index <= 19)
+    if (char_index > 19)
+        return;
+
+    auto def = get_texture_definition(vanilla_id);
+    auto& render = RenderAPI::get();
+    if (render.texture_colors.contains(def.texture_path))
     {
-        auto def = get_texture_definition(vanilla_id);
-        auto& render = RenderAPI::get();
-        if (render.texture_colors.contains(def.texture_path))
+        if (!render.original_colors.contains(vanilla_id))
         {
-            if (!render.original_colors.contains(vanilla_id))
-            {
-                render.original_colors[vanilla_id] = NCharacterDB::get_character_heart_color(char_index);
-            }
-            NCharacterDB::set_character_heart_color(char_index, render.texture_colors[def.texture_path]);
+            render.original_colors[vanilla_id] = NCharacterDB::get_character_heart_color(char_index);
         }
-        else if (render.original_colors.contains(vanilla_id) && vanilla_id == custom_id)
-        {
-            NCharacterDB::set_character_heart_color(char_index, render.original_colors[vanilla_id]);
-        }
-        else if (custom_id >= 285 && custom_id <= 304)
-        {
-            uint32_t custom_index = (uint32_t)custom_id - 285;
-            auto color = NCharacterDB::get_character_heart_color(custom_index);
-            NCharacterDB::set_character_heart_color(char_index, color);
-        }
+        NCharacterDB::set_character_heart_color(char_index, render.texture_colors[def.texture_path]);
+    }
+    else if (render.original_colors.contains(vanilla_id) && vanilla_id == custom_id)
+    {
+        NCharacterDB::set_character_heart_color(char_index, render.original_colors[vanilla_id]);
+    }
+    else if (custom_id >= 285 && custom_id <= 304)
+    {
+        uint32_t custom_index = (uint32_t)custom_id - 285;
+        auto color = NCharacterDB::get_character_heart_color(custom_index);
+        NCharacterDB::set_character_heart_color(char_index, color);
     }
 }
 
@@ -321,21 +327,21 @@ bool replace_texture(TEXTURE vanilla_id, TEXTURE custom_id)
         if (vanilla_id == custom_id && render.original_textures.contains(vanilla_id))
         {
             textures->textures[vanilla_id] = render.original_textures[custom_id];
-            reload_texture(textures->textures[vanilla_id].name);
+            reload_texture(textures->textures[vanilla_id].default_texture);
             return true;
         }
         else if (render.custom_textures.contains(custom_id))
         {
             textures->textures[vanilla_id] = render.custom_textures[custom_id];
             textures->textures[vanilla_id].id = vanilla_id;
-            reload_texture(textures->textures[vanilla_id].name);
+            reload_texture(textures->textures[vanilla_id].default_texture);
             return true;
         }
         else if (custom_id >= 0 && custom_id < 0x192)
         {
             textures->textures[vanilla_id] = textures->textures[custom_id];
             textures->textures[vanilla_id].id = vanilla_id;
-            reload_texture(textures->textures[vanilla_id].name);
+            reload_texture(textures->textures[vanilla_id].default_texture);
             return true;
         }
     }
