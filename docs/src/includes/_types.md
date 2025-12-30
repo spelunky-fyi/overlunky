@@ -961,24 +961,41 @@ nil | [set_pair(PRNG_CLASS type, int first, int second)](https://github.com/spel
 
 ### ParameterDescription
 
+FMOD Studio descriptor for an event parameter. The descriptor
+includes metadata about the event parameter including
+name, behavior flags, parameter type, and information about
+the default, minimum, and maximum values for the event
+parameter. It also contains the event parameter identifier
+which can be useful if you need to update the value of the
+event parameter at a high frequency.
 
 Type | Name | Description
 ---- | ---- | -----------
- | [name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=name) | 
- | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
- | [minimum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=minimum) | 
- | [maximum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maximum) | 
- | [defaultvalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defaultvalue) | 
- | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | 
- | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
+string | [name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=name) | 
+[ParameterId](#ParameterId) | [id](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=id) | 
+float | [minimum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=minimum) | 
+float | [maximum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maximum) | 
+float | [defaultvalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defaultvalue) | 
+ParameterType | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | 
+ParameterFlags | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
 
 ### ParameterId
 
+FMOD Studio event parameter identifier. Can be retrieved with
+`CustomEventDescription:get_parameter_description_by_name().id`, or
+directly by using `CustomEventDescription:get_parameter_id_by_name()`.
+Can be used with `CustomEventInstance:set_parameter_by_id()`,
+`CustomEventInstance:set_parameter_by_id_with_label()`, and
+`CustomEventInstance:get_parameter_by_id()`. This is useful
+if you need to get or update an event parameter at a high
+frequency, since setting and getting parameters by ID do
+not require FMOD to perform a name to ID lookup internally
+like FMOD does when setting or getting parameters by name.
 
 Type | Name | Description
 ---- | ---- | -----------
- | [data1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data1) | 
- | [data2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data2) | 
+int | [data1](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data1) | 
+int | [data2](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=data2) | 
 
 ### PauseAPI
 

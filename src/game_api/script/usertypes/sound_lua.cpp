@@ -31,6 +31,9 @@
 #include "sound_manager.hpp"      // for CustomSound, PlayingSound, SoundMa...
 #include "string_aliases.hpp"     // for VANILLA_SOUND
 
+using FMODStudio::ParameterDescription;
+using FMODStudio::ParameterId;
+
 namespace NSound
 {
 void register_usertypes(sol::state& lua, SoundManager* sound_manager)
@@ -155,36 +158,36 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     /// frequency, since setting and getting parameters by ID do
     /// not require FMOD to perform a name to ID lookup internally
     /// like FMOD does when setting or getting parameters by name.
-    lua.new_usertype<FMODStudio::ParameterId>(
+    lua.new_usertype<ParameterId>(
         "ParameterId",
         "data1",
-        sol::readonly(&FMODStudio::ParameterId::data1),
+        sol::readonly(&ParameterId::data1),
         "data2",
-        sol::readonly(&FMODStudio::ParameterId::data2));
+        sol::readonly(&ParameterId::data2));
 
     /// FMOD Studio descriptor for an event parameter. The descriptor
-    /// includes metadata about the event parameter including 
+    /// includes metadata about the event parameter including
     /// name, behavior flags, parameter type, and information about
     /// the default, minimum, and maximum values for the event
     /// parameter. It also contains the event parameter identifier
     /// which can be useful if you need to update the value of the
     /// event parameter at a high frequency.
-    lua.new_usertype<FMODStudio::ParameterDescription>(
+    lua.new_usertype<ParameterDescription>(
         "ParameterDescription",
         "name",
-        sol::readonly(&FMODStudio::ParameterDescription::name),
+        sol::readonly(&ParameterDescription::name),
         "id",
-        sol::readonly(&FMODStudio::ParameterDescription::id),
+        sol::readonly(&ParameterDescription::id),
         "minimum",
-        sol::readonly(&FMODStudio::ParameterDescription::minimum),
+        sol::readonly(&ParameterDescription::minimum),
         "maximum",
-        sol::readonly(&FMODStudio::ParameterDescription::maximum),
+        sol::readonly(&ParameterDescription::maximum),
         "defaultvalue",
-        sol::readonly(&FMODStudio::ParameterDescription::defaultvalue),
+        sol::readonly(&ParameterDescription::defaultvalue),
         "type",
-        sol::readonly(&FMODStudio::ParameterDescription::type),
+        sol::readonly(&ParameterDescription::type),
         "flags",
-        sol::readonly(&FMODStudio::ParameterDescription::flags));
+        sol::readonly(&ParameterDescription::flags));
 
     /// Handle to a loaded FMOD Bank. Unloading a bank will destroy all objects loaded from it, and unload all sample data.
     /// Can be used to load and unload the non-streaming sample data of all events in the bank. However you can also

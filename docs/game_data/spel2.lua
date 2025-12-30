@@ -5166,17 +5166,17 @@ function CustomTheme:override(index, func_) end
     ---@field y number
 
 ---@class ParameterId
-    ---@field data1 any @FMODStudio::ParameterId::data1
-    ---@field data2 any @FMODStudio::ParameterId::data2
+    ---@field data1 integer
+    ---@field data2 integer
 
 ---@class ParameterDescription
-    ---@field name any @FMODStudio::ParameterDescription::name
-    ---@field id any @FMODStudio::ParameterDescription::id
-    ---@field minimum any @FMODStudio::ParameterDescription::minimum
-    ---@field maximum any @FMODStudio::ParameterDescription::maximum
-    ---@field defaultvalue any @FMODStudio::ParameterDescription::defaultvalue
-    ---@field type any @FMODStudio::ParameterDescription::type
-    ---@field flags any @FMODStudio::ParameterDescription::flags
+    ---@field name string
+    ---@field id ParameterId
+    ---@field minimum number
+    ---@field maximum number
+    ---@field defaultvalue number
+    ---@field type ParameterType
+    ---@field flags ParameterFlags
 
 ---@class CustomBank
     ---@field get_loading_state fun(self): FMODStudio::LoadingState?

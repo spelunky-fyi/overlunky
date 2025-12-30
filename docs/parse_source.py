@@ -100,6 +100,7 @@ header_files = [
     "../src/game_api/entities_backgrounds.hpp",
     "../src/game_api/entities_decorations.hpp",
     "../src/game_api/entities_logical.hpp",
+    "../src/game_api/fmod.hpp",
     "../src/game_api/sound_manager.hpp",
     "../src/game_api/texture.hpp",
     "../src/game_api/render_api.hpp",
@@ -201,8 +202,6 @@ cpp_type_exceptions = [
     "CutsceneBehavior",
     "CustomCutsceneBehavior",
     "DoorCoords",
-    "FMODStudio::ParameterDescription",
-    "FMODStudio::ParameterId",
 ]
 not_functions = [
     "players",
