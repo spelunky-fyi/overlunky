@@ -976,8 +976,8 @@ string | [name](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=name) |
 float | [minimum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=minimum) | 
 float | [maximum](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=maximum) | 
 float | [defaultvalue](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=defaultvalue) | 
-ParameterType | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | 
-ParameterFlags | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
+int | [type](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=type) | 
+int | [flags](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=flags) | 
 
 ### ParameterId
 

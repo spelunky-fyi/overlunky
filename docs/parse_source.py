@@ -25,6 +25,8 @@ replace_table = {
     "ImU32": "int",
     "in_port_t": "int",
     "size_t": "int",
+    "ParameterType": "int",
+    "ParameterFlags": "int",
     "char*": "string",
     "wstring": "string",
     "u16string": "string",

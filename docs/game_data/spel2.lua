@@ -5175,8 +5175,8 @@ function CustomTheme:override(index, func_) end
     ---@field minimum number
     ---@field maximum number
     ---@field defaultvalue number
-    ---@field type ParameterType
-    ---@field flags ParameterFlags
+    ---@field type integer
+    ---@field flags integer
 
 ---@class CustomBank
     ---@field get_loading_state fun(self): FMODStudio::LoadingState?

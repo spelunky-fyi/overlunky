@@ -17,6 +17,8 @@ replace_table = {
     "size_t": "integer",
     "in_port_t": "integer",
     "ImU32": "integer",
+    "ParameterType": "integer",
+    "ParameterFlags": "integer",
     "vector": "Array",
     "array": "Array",
     "unordered_map": "table",
