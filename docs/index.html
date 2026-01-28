@@ -1119,9 +1119,6 @@
                             <a href="#http_get_async" class="toc-h3 toc-link" data-title="http_get_async">http_get_async</a>
                           </li>
                           <li>
-                            <a href="#udp_listen" class="toc-h3 toc-link" data-title="udp_listen">udp_listen</a>
-                          </li>
-                          <li>
                             <a href="#udp_send" class="toc-h3 toc-link" data-title="udp_send">udp_send</a>
                           </li>
                       </ul>
@@ -1639,6 +1636,9 @@
                           </li>
                           <li>
                             <a href="#win_image" class="toc-h3 toc-link" data-title="win_image">win_image</a>
+                          </li>
+                          <li>
+                            <a href="#udp_listen" class="toc-h3 toc-link" data-title="udp_listen">udp_listen</a>
                           </li>
                           <li>
                             <a href="#read_prng" class="toc-h3 toc-link" data-title="read_prng">read_prng</a>
@@ -4511,7 +4511,7 @@ If you set such a callback and then play the same sound yourself you have to wai
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=dump_network">dump_network</a></p>
 </blockquote>
 <h4 id='nil-dump_network'>nil dump_network()</h4>
-<p>Hook the sendto and recvfrom functions and start dumping network data to terminal</p>
+<p>Hook the sendto and recvfrom functions and start dumping network data to terminal for debug purposes</p>
 <h3 id='get_address'>get_address</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_address">get_address</a></p>
@@ -5924,26 +5924,19 @@ be returned instead.</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get">http_get</a></p>
 </blockquote>
 <h4 id='optional-lt-string-gt-http_get-string-url'>optional&lt;string&gt; http_get(string url)</h4>
-<p>Send a synchronous HTTP GET request and return response as a string or nil on an error</p>
+<p>Send a synchronous HTTP GET request and return response as a string or nil on an error. Requires unsafe mode.</p>
 <h3 id='http_get_async'>http_get_async</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=http_get_async">http_get_async</a></p>
 </blockquote>
 <h4 id='nil-http_get_async-string-url-function-on_data'>nil http_get_async(string url, function on_data)</h4>
 <p>Send an asynchronous HTTP GET request and run the callback when done. If there is an error, response will be nil and vice versa.
-The callback signature is nil on_data(string response, string error)</p>
-<h3 id='udp_listen'>udp_listen</h3>
-<blockquote>
-<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udp_listen">udp_listen</a></p>
-</blockquote>
-<h4 id='UdpServer-udp_listen-string-host-int-port-function-cb'><a href="#UdpServer">UdpServer</a> udp_listen(string host, int port, function cb)</h4>
-<p>Start an UDP server on specified address and run callback when data arrives. Return a string from the callback to reply. Requires unsafe mode.
-The server will be closed once the handle is released.</p>
+The callback signature is nil on_data(string response, string error). Requires unsafe mode.</p>
 <h3 id='udp_send'>udp_send</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udp_send">udp_send</a></p>
 </blockquote>
-<h4 id='nil-udp_send-string-host-int-port-string-msg'>nil udp_send(string host, int port, string msg)</h4>
+<h4 id='int-udp_send-string-host-int-port-string-msg'>int udp_send(string host, int port, string msg)</h4><h4 id='int-udp_send-string-address-string-msg'>int udp_send(string address, string msg)</h4>
 <p>Send data to specified UDP address. Requires unsafe mode.</p>
 <h2 id='Option-functions'>Option functions</h2><h3 id='register_option_bool'>register_option_bool</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">register_option_bool</span><span class="p">(</span><span class="s2">"bomb_bag"</span><span class="p">,</span> <span class="s2">"BombBag"</span><span class="p">,</span> <span class="s2">"Spawn bomb bag at the start of every level"</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span>
 
@@ -7006,6 +6999,15 @@ Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_popid</code> instead<
 
 <p><code>nil win_image(IMAGE image, float width, float height)</code><br/>
 Use <a href="#GuiDrawContext">GuiDrawContext</a><code>.win_image</code> instead</p>
+<h3 id='udp_listen'>udp_listen</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=udp_listen">udp_listen</a></p>
+</blockquote>
+
+<p><code>any udp_listen(string host, int port, function cb)</code><br/>
+Use the <code>new</code> operator on <a href="#UdpServer">UdpServer</a> instead
+The server will be closed lazily by garbage collection once the handle is released. Requires unsafe mode.
+<br/>The callback signature is optional<string> on_message(string msg, string src)</p>
 <h3 id='read_prng'>read_prng</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read_prng">read_prng</a></p>
@@ -10994,6 +10996,8 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 </tr>
 </tbody></table>
 <h3 id='UdpServer'>UdpServer</h3>
+<p>Requires unsafe mode.</p>
+
 <table><thead>
 <tr>
 <th>Type</th>
@@ -11001,6 +11005,61 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <th>Description</th>
 </tr>
 </thead><tbody>
+<tr>
+<td><a href="#UdpServer">UdpServer</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=UdpServer">new(string host, int port)</a></td>
+<td>Start/bind an UDP server on specified address. Set port to 0 to use a random ephemeral port.</td>
+</tr>
+<tr>
+<td><a href="#UdpServer">UdpServer</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=UdpServer">new(string address)</a></td>
+<td>Host/IP + optional port <code>ip:port</code></td>
+</tr>
+<tr>
+<td><a href="#UdpServer">UdpServer</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=UdpServer">new()</a></td>
+<td>Short for <code>UdpServer:new(&quot;localhost&quot;)</code></td>
+</tr>
+<tr>
+<td>nil</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=close">close()</a></td>
+<td>Closes the server.</td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_open">is_open()</a></td>
+<td>Returns true if the port was opened successfully and the server hasn&#39;t been closed yet.</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=last_error">last_error()</a></td>
+<td>Value of the last raised exception</td>
+</tr>
+<tr>
+<td>string</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=last_error_str">last_error_str()</a></td>
+<td>Returns a string explaining the last error</td>
+</tr>
+<tr>
+<td>string</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=address">address()</a></td>
+<td>Returns string representation of the server address in format &quot;ip:port&quot;</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=send">send(string message, string host, int port)</a></td>
+<td>Send message to given host and port from this socket, returns numbers of bytes send or -1 on failure</td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=send">send(string message, string address)</a></td>
+<td>Send to address in format <code>ip:port</code></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=read">read(function fun)</a></td>
+<td>Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature <code>nil(message, source)</code></td>
+</tr>
 </tbody></table>
 <h3 id='Vec2'>Vec2</h3>
 <p>Simple object to hold pair of coordinates</p>
