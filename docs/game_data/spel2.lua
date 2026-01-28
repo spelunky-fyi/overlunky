@@ -1219,6 +1219,34 @@ function create_sound(path) end
 ---@param path_or_vanilla_sound string
 ---@return CustomSound?
 function get_sound(path_or_vanilla_sound) end
+---Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
+---Returns nil if the file can't be found. Loading a bank file will load the banks metadata, but not non-streaming
+---sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
+---be found with `get_event_by_id()` or using `create_fmod_guid_map()` and calling `FMODguidMap:get_event()`.
+---The banks loading state can be queried using `CustomBank:get_loading_state()` which will return an `FMOD_LOADING_STATE`.
+---@param path string
+---@param flags FMODStudio::LoadBankFlags
+---@return CustomBank?
+function load_bank(path, flags) end
+---Gets an existing loaded bank if a file at the same path was already loaded
+---@param path string
+---@return CustomBank?
+function get_bank(path) end
+---Gets a `CustomEventDescription` if the event description is loaded using an FMOD GUID string. The string representation
+---must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
+---@param guid_string string
+---@return CustomEventDescription?
+function get_event_by_id(guid_string) end
+---An `FMODguidMap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
+---from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
+---strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODguidMap` is a
+---workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:get_event()`.
+---`FMODguidMap:get_event()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+---Creates an `FMODguidMap` by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
+---if you want to use a human readable FMOD event path to create a `CustomEventDescription` instead of using an FMOD GUID string.
+---@param path string
+---@return FMODguidMap?
+function create_fmod_guid_map(path) end
 ---Returns unique id for the callback to be used in [clear_vanilla_sound_callback](https://spelunky-fyi.github.io/overlunky/#clear_vanilla_sound_callback).
 ---Sets a callback for a vanilla sound which lets you hook creation or playing events of that sound
 ---Callbacks are executed on another thread, so avoid touching any global state, only the local Lua state is protected
@@ -5134,6 +5162,101 @@ function CustomTheme:override(index, func_) end
     ---@field grid_entity Entity @Grid entity at this position, will only try to spawn procedural if this is nil
     ---@field x number
     ---@field y number
+
+---@class ParameterId
+    ---@field data1 integer
+    ---@field data2 integer
+
+---@class ParameterDescription
+    ---@field name string
+    ---@field id ParameterId
+    ---@field minimum number
+    ---@field maximum number
+    ---@field defaultvalue number
+    ---@field type integer
+    ---@field flags integer
+
+---@class CustomBank
+    ---@field get_loading_state fun(self): FMODStudio::LoadingState?
+    ---@field load_sample_data fun(self): boolean
+    ---@field unload_sample_data fun(self): boolean
+    ---@field get_sample_loading_state fun(self): FMODStudio::LoadingState?
+    ---@field unload fun(self): boolean
+    ---@field is_valid fun(self): boolean
+
+---@class CustomEventDescription
+    ---@field create_instance fun(self): <CustomEventInstance>
+    ---@field release_all_instances fun(self): boolean
+    ---@field load_sample_data fun(self): boolean
+    ---@field unload_sample_data fun(self): boolean
+    ---@field get_sample_loading_state fun(self): FMODStudio::LoadingState?
+    ---@field get_parameter_description_count fun(self): integer?
+    ---@field get_parameter_description_by_name fun(self, name: string): FMODStudio::ParameterDescription?
+    ---@field get_parameter_description_by_index fun(self, index: integer): FMODStudio::ParameterDescription?
+    ---@field get_parameter_id_by_name fun(self, name: string): FMODStudio::ParameterId?
+    ---@field is_valid fun(self): boolean
+
+---@class CustomEventInstance
+    ---@field start fun(self): boolean
+    ---@field get_playback_state fun(self): FMODStudio::PlaybackState?
+    ---@field set_pause fun(self, pause: boolean): boolean
+    ---@field get_pause fun(self): boolean?
+    ---@field key_off fun(self): boolean
+    ---@field set_pitch fun(self, pitch: number): boolean
+    ---@field get_pitch fun(self): number?
+    ---@field set_timeline_position fun(self, position: integer): boolean
+    ---@field get_timeline_position fun(self): integer?
+    ---@field set_volume fun(self, volume: number): boolean
+    ---@field get_volume fun(self): number?
+    ---@field get_parameter_by_name fun(self, name: string): number?
+    ---@field get_parameter_by_id fun(self, id: FMODStudio::ParameterId): number?
+    ---@field release fun(self): boolean
+    ---@field is_valid fun(self): boolean
+local CustomEventInstance = nil
+---@return boolean
+function CustomEventInstance:stop() end
+---@param mode FMODStudio::StopMode
+---@return boolean
+function CustomEventInstance:stop(mode) end
+---@param name string
+---@param value number
+---@return boolean
+function CustomEventInstance:set_parameter_by_name(name, value) end
+---@param name string
+---@param value number
+---@param ignoreseekspeed boolean
+---@return boolean
+function CustomEventInstance:set_parameter_by_name(name, value, ignoreseekspeed) end
+---@param name string
+---@param label string
+---@return boolean
+function CustomEventInstance:set_parameter_by_name_with_label(name, label) end
+---@param name string
+---@param label string
+---@param ignoreseekspeed boolean
+---@return boolean
+function CustomEventInstance:set_parameter_by_name_with_label(name, label, ignoreseekspeed) end
+---@param id FMODStudio::ParameterId
+---@param value number
+---@return boolean
+function CustomEventInstance:set_parameter_by_id(id, value) end
+---@param id FMODStudio::ParameterId
+---@param value number
+---@param ignoreseekspeed boolean
+---@return boolean
+function CustomEventInstance:set_parameter_by_id(id, value, ignoreseekspeed) end
+---@param id FMODStudio::ParameterId
+---@param label string
+---@return boolean
+function CustomEventInstance:set_parameter_by_id_with_label(id, label) end
+---@param id FMODStudio::ParameterId
+---@param label string
+---@param ignoreseekspeed boolean
+---@return boolean
+function CustomEventInstance:set_parameter_by_id_with_label(id, label, ignoreseekspeed) end
+
+---@class FMODguidMap
+    ---@field get_event fun(self, path: string): CustomEventDescription?
 
 ---@class CustomSound
     ---@field get_parameters fun(self): table<VANILLA_SOUND_PARAM, string>
