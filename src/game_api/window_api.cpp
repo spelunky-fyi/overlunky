@@ -254,7 +254,9 @@ HRESULT STDMETHODCALLTYPE hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterva
             pSwapChain->GetDesc(&sd);
             g_Window = sd.OutputWindow;
             g_OrigWndProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Window, GWLP_WNDPROC, LONG_PTR(hkWndProc)));
-            g_kbHook = SetWindowsHookEx(WH_KEYBOARD_LL, hkKeyboard, NULL, 0);
+            // Only use under Wine: the LL hook eats the event and breaks input displays on real Windows
+            if (detect_wine())
+                g_kbHook = SetWindowsHookEx(WH_KEYBOARD_LL, hkKeyboard, NULL, 0);
             create_render_target();
             init_imgui();
             init = true;
