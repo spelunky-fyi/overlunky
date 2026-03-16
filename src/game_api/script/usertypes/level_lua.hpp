@@ -41,6 +41,11 @@ struct PostRoomGenerationContext
     /// Note that the actual chance to spawn is `1/inverse_chance` and that is also slightly skewed because of technical reasons.
     /// Returns `false` if the given chance is not defined.
     bool set_procedural_spawn_chance(PROCEDURAL_CHANCE chance_id, uint32_t inverse_chance);
+    /// Correctly sets the template of a backlayer room. Be careful replacing some room templates.
+    /// Can cause crashes if you set a backlayer room and then a room in the front that only has !dual rooms tries to spawn (e.g. the udjat entrance, during the `ON.POST_ROOM_GENERATION` callback)
+    /// Although, if the room template has variants without !dual, they will be chosen to allow the set backlayer room to exist.
+    /// You can use the `ON.PRE/POST_SPAWN_BACKLAYER_ROOMS` and `ON.PRE/POST_SET_RANDOM_BACKLAYER_ROOMS` callbacks to make it easier to prevent crashes with ROOM_META.BACKLAYER_ROOM_EXISTS, but front layer rooms will already be spawned.
+    void set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TEMPLATE room_template);
     /// Change the amount of extra spawns for the given `extra_spawn_id`.
     void set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer);
     /// Defines a new short tile code, automatically picks an unused character or returns a used one in case of an exact match
