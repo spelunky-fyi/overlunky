@@ -8,11 +8,22 @@
 
 #include "aliases.hpp" // for TEXTURE
 
+struct Resource
+{
+    const char* name;
+    uint32_t unknown1; // those three unknowns only set for the placeholder
+    uint32_t unknown2;
+    uint32_t unknown3;
+    uint32_t unknown4; // probably padding?
+    struct DxResource* dx_resource;
+    size_t unknown6; // could be 32 bit
+};
+
 struct Texture
 {
     TEXTURE id;
     uint32_t padding{0};
-    const char** name;
+    Resource* default_texture;
     std::uint32_t width;
     std::uint32_t height;
     std::uint32_t num_tiles_width;
@@ -34,6 +45,7 @@ struct Textures
     std::array<Texture*, 0x192> texture_map;
 };
 
+// custom struct for defining texture in the API
 struct TextureDefinition
 {
     std::string texture_path;
@@ -52,9 +64,10 @@ TextureDefinition get_texture_definition(TEXTURE texture_id);
 Texture* get_texture(TEXTURE texture_id);
 TEXTURE define_texture(TextureDefinition data);
 std::optional<TEXTURE> get_texture(TextureDefinition data);
+// returns first texture matching the texture name
 std::optional<TEXTURE> get_texture(std::string_view texture_name);
-void reload_texture(const char* texture_name);  // Does a lookup for the right texture to reload
-void reload_texture(const char** texture_name); // Reloads the texture directly
+void reload_texture(const char* texture_name); // Does a lookup for the right texture to reload
+void reload_texture(Resource* texture_name);   // Reloads the texture directly
 bool replace_texture(TEXTURE vanilla_id, TEXTURE custom_id);
 void reset_texture(TEXTURE vanilla_id);
 bool replace_texture_and_heart_color(TEXTURE vanilla_id, TEXTURE custom_id);

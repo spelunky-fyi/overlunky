@@ -12,7 +12,7 @@
 #include <vector>       // for vector
 
 #include "entity.hpp"             // for Entity, EntityDB
-#include "game_api.hpp"           //
+#include "game_api.hpp"           // for Renderer
 #include "level_api.hpp"          // for ThemeInfo
 #include "logger.h"               // for DEBUG
 #include "memory.hpp"             // for memory_read, to_le_bytes, write_mem_prot
@@ -35,18 +35,6 @@ RenderAPI& RenderAPI::get()
     return render_api;
 }
 
-Renderer* RenderAPI::renderer() const
-{
-    auto game_api = GameAPI::get();
-    return game_api->renderer;
-}
-
-size_t RenderAPI::swap_chain() const
-{
-    return renderer()->swap_chain;
-    // return memory_read<uint64_t>(renderer() + swap_chain_off); // swap_chain_off from pattern: render_api_offset
-}
-
 void (*g_post_render_game)(){nullptr};
 
 using VanillaRenderLoadingFun = void(size_t);
@@ -65,9 +53,9 @@ void render_loading(size_t param_1)
 std::optional<TEXTURE> g_forced_lut_textures[2]{};
 float g_layer_zoom_offset[2]{0};
 
-using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, const char**, const char**);
+using RenderLayer = void(const std::vector<Illumination*>&, uint8_t, const Camera&, Resource*, Resource*);
 RenderLayer* g_render_layer_trampoline{nullptr};
-void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer, const Camera& camera, const char** lut_lhs, const char** lut_rhs)
+void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer, const Camera& camera, Resource* lut_lhs, Resource* lut_rhs)
 {
     if (trigger_vanilla_render_layer_callbacks(ON::RENDER_PRE_LAYER, layer))
         return;
@@ -81,7 +69,7 @@ void render_layer(const std::vector<Illumination*>& lightsources, uint8_t layer,
     {
         if (Texture* lut = get_texture(g_forced_lut_textures[layer].value()))
         {
-            g_render_layer_trampoline(lightsources, layer, camera, lut->name, lut->name);
+            g_render_layer_trampoline(lightsources, layer, camera, lut->default_texture, lut->default_texture);
             return;
         }
     }
@@ -429,9 +417,9 @@ void RenderAPI::draw_screen_texture(Texture* texture, Quad source, Quad dest, Co
             source.top_right_y,
         };
 
-        typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
+        typedef void render_func(TextureRenderingInfo*, uint8_t, Resource*, Color*);
         static render_func* rf = (render_func*)(offset);
-        rf(&tri, shader, texture == nullptr ? nullptr : texture->name, &color);
+        rf(&tri, shader, texture == nullptr ? nullptr : texture->default_texture, &color);
     }
 }
 
@@ -440,15 +428,16 @@ void RenderAPI::draw_screen_texture(Texture* texture, TextureRenderingInfo tri, 
     static size_t offset = get_address("draw_screen_texture");
     if (offset != 0)
     {
-        typedef void render_func(TextureRenderingInfo*, uint8_t, const char**, Color*);
+        typedef void render_func(TextureRenderingInfo*, uint8_t, Resource*, Color*);
         static render_func* rf = (render_func*)(offset);
-        rf(&tri, shader, texture == nullptr ? nullptr : texture->name, &color);
+        rf(&tri, shader, texture == nullptr ? nullptr : texture->default_texture, &color);
     }
 }
 
 void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Color color, WorldShader shader)
 {
     static const size_t func_offset = get_address("draw_world_texture"sv);
+    // this is a struct with six 16 bit values (or at least, only the first 6 are used)
     static const size_t param_7 = get_address("draw_world_texture_param_7"sv);
 
     if (func_offset != 0)
@@ -474,10 +463,11 @@ void RenderAPI::draw_world_texture(Texture* texture, Quad source, Quad dest, Col
             dest.top_left_y,
             unknown};
 
-        typedef void render_func(Renderer*, WorldShader, const char*** texture_name, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
+        // TODO: his feels suspicious that it takes pointer to pointer to Resource
+        using render_func = void(Renderer*, WorldShader, Resource**, uint32_t render_as_non_liquid, float* destination, Quad* source, void*, Color*, float*);
         static render_func* rf = (render_func*)(func_offset);
-        auto texture_name = texture->name;
-        rf(renderer(), shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);
+        auto texture_name = texture->default_texture;
+        rf(GameAPI::get()->renderer, shader, &texture_name, 1, destination, &source, (void*)param_7, &color, nullptr);
     }
 }
 
@@ -494,7 +484,7 @@ void RenderAPI::reload_shaders()
 {
     using ReloadShadersFun = void(Renderer*);
     static ReloadShadersFun* reload_shaders_impl = (ReloadShadersFun*)get_address("reload_shaders"sv);
-    reload_shaders_impl(renderer());
+    reload_shaders_impl(GameAPI::get()->renderer);
 }
 
 void fetch_texture(Entity* entity, int32_t texture_id)
@@ -657,11 +647,6 @@ void init_render_api_hooks()
     }
 }
 
-Entity* RenderInfo::get_entity() const
-{
-    return entity_offset.decode();
-}
-
 uint32_t RenderInfo::get_aux_id() const
 {
     return get_entity()->uid;
@@ -671,7 +656,7 @@ bool RenderInfo::set_second_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = ::get_texture(texture_id))
     {
-        texture_names[1] = new_texture->name;
+        textures[1] = new_texture->default_texture;
         return true;
     }
     return false;
@@ -681,7 +666,7 @@ bool RenderInfo::set_third_texture(TEXTURE texture_id)
 {
     if (auto* new_texture = ::get_texture(texture_id))
     {
-        texture_names[2] = new_texture->name;
+        textures[2] = new_texture->default_texture;
         return true;
     }
     return false;
@@ -690,7 +675,7 @@ bool RenderInfo::set_third_texture(TEXTURE texture_id)
 bool RenderInfo::set_texture_num(uint32_t num)
 {
     // Prevent some crashes
-    if ((num >= 2 && !texture_names[1]) || (num >= 3 && !texture_names[2]) || num >= 4)
+    if ((num >= 2 && !textures[1]) || (num >= 3 && !textures[2]) || num >= 4)
     {
         return false;
     }
@@ -703,7 +688,7 @@ bool RenderInfo::set_normal_map_texture(TEXTURE texture_id)
     if (set_second_texture(texture_id))
     {
         constexpr uint32_t SHINE_TEXTURE = 400;
-        texture_names[2] = ::get_texture(SHINE_TEXTURE)->name;
+        textures[2] = ::get_texture(SHINE_TEXTURE)->default_texture;
         texture_num = 3;
         return true;
     }

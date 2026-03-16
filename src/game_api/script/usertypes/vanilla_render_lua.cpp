@@ -950,20 +950,20 @@ void register_usertypes(sol::state& lua)
         "get_second_texture",
         [](const RenderInfo& ri) -> std::optional<TEXTURE>
         {
-            if (!ri.texture_names[1] || ri.texture_num < 2)
+            if (!ri.textures[1] || ri.texture_num < 2)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.texture_names[1])) /**/;
+            return ::get_texture(std::string_view(ri.textures[1]->name)) /**/;
         },
         "get_third_texture",
         [](const RenderInfo& ri) -> std::optional<TEXTURE>
         {
-            if (!ri.texture_names[2] || ri.texture_num < 3)
+            if (!ri.textures[2] || ri.texture_num < 3)
             {
                 return std::nullopt;
             }
-            return ::get_texture(std::string_view(*ri.texture_names[2])) /**/;
+            return ::get_texture(std::string_view(ri.textures[2]->name)) /**/;
         },
         "set_second_texture",
         &RenderInfo::set_second_texture,
