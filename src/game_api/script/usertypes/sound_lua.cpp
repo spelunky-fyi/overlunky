@@ -31,6 +31,9 @@
 #include "sound_manager.hpp"      // for CustomSound, PlayingSound, SoundMa...
 #include "string_aliases.hpp"     // for VANILLA_SOUND
 
+using FMODStudio::ParameterDescription;
+using FMODStudio::ParameterId;
+
 namespace NSound
 {
 void register_usertypes(sol::state& lua, SoundManager* sound_manager)
@@ -46,6 +49,40 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         DEBUG("Audio API is not initialized!");
         return;
     }
+
+    /// Parameter to `load_bank()`, used to control bank loading.
+    lua.new_enum("FMOD_LOAD_BANK_FLAGS", "NORMAL", FMODStudio::LoadBankFlags::Normal, "NONBLOCKING", FMODStudio::LoadBankFlags::Nonblocking, "DECOMPRESS_SAMPLES", FMODStudio::LoadBankFlags::DecompressSamples, "UNENCRYPTED", FMODStudio::LoadBankFlags::Unencrypted);
+    /* FMOD_LOAD_BANK_FLAGS
+        // NORMAL
+        // Standard behavior. The function will not return until the bank has finished loading.
+        // NONBLOCKING
+        // Loading occurs asychronously rather than immediately. Minimal performace impact. Probably the flag you should use in most cases.
+        // DECOMPRESS_SAMPLES
+        // Force samples to decompress into memory when loaded, instead of staying compressed. Use NORMAL or NONBLOCKING instead.
+        // UNENCRYPTED
+        // Ignore the encryption key specified by Studio::System::setAdvancedSettings when loading this bank. Use NORMAL or NONBLOCKING instead.
+        */
+
+    /// The loading state of various FMOD Studio objects, such as banks and non-streaming sample data.
+    lua.new_enum("FMOD_LOADING_STATE", "UNLOADING", FMODStudio::LoadingState::Unloading, "UNLOADED", FMODStudio::LoadingState::Unloaded, "LOADING", FMODStudio::LoadingState::Loading, "LOADED", FMODStudio::LoadingState::Loaded, "ERROR", FMODStudio::LoadingState::Error);
+
+    /// The playback state of various FMOD Studio objects, used for `CustomEventInstance:get_playback_state()`.
+    lua.new_enum("FMOD_PLAYBACK_STATE", "PLAYING", FMODStudio::PlaybackState::Playing, "STARTING", FMODStudio::PlaybackState::Starting, "STOPPED", FMODStudio::PlaybackState::Stopped, "STOPPING", FMODStudio::PlaybackState::Stopping, "SUSTAINING", FMODStudio::PlaybackState::Sustaining);
+
+    /// Stop modes for an event instance.
+    lua.new_enum("FMOD_STOP_MODE", "ALLOW_FADE_OUT", FMODStudio::StopMode::AllowFadeOut, "IMMEDIATE", FMODStudio::StopMode::Immediate);
+    /* FMOD_STOP_MODE
+        // ALLOW_FADE_OUT
+        // Allow the events AHDSR modulators to complete their release, and DSP effect tails to play out.
+        // IMMEDIATE
+        // Stops the event instance immediately.
+        */
+
+    /// FMOD Studio flags describing the behavior of a parameter.
+    lua.new_enum("FMOD_PARAMETER_FLAGS", "READ_ONLY", FMODStudio::ParameterFlags::ReadOnly, "AUTOMATIC", FMODStudio::ParameterFlags::Automatic, "GLOBAL", FMODStudio::ParameterFlags::Global);
+
+    /// FMOD Studio event parameter types.
+    lua.new_enum("FMOD_PARAMETER_TYPE", "GAME_CONTROLLED", FMODStudio::ParameterType::GameControlled, "AUTOMATIC_DISTANCE", FMODStudio::ParameterType::AutomaticDistance, "AUTOMATIC_EVENT_CONE_ANGLE", FMODStudio::ParameterType::AutomaticEventConeAngle, "AUTOMATIC_EVENT_ORIENTATION", FMODStudio::ParameterType::AutomaticEventOrientation, "AUTOMATIC_DIRECTION", FMODStudio::ParameterType::AutomaticDirection, "AUTOMATIC_ELEVATION", FMODStudio::ParameterType::AutomaticElevation, "AUTOMATIC_LISTENER_ORIENTATION", FMODStudio::ParameterType::AutomaticListenerOrientation, "AUTOMATIC_SPEED", FMODStudio::ParameterType::AutomaticSpeed);
 
     /// Loads a sound from disk relative to this script, ownership might be shared with other code that loads the same file. Returns nil if file can't be found
     lua["create_sound"] = [](std::string path) -> sol::optional<CustomSound>
@@ -69,6 +106,223 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         else if (CustomSound sound = backend->sound_manager->get_existing_sound((backend->get_root_path() / path_or_vanilla_sound).string()))
         {
             return sound;
+        }
+        return sol::nullopt;
+    };
+
+    /// Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
+    /// Returns nil if the file can't be found. Loading a bank file will load the banks metadata, but not non-streaming
+    /// sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
+    /// be found with `get_event_by_id()` or using `create_fmod_guid_map()` and calling `FMODguidMap:get_event()`.
+    /// The banks loading state can be queried using `CustomBank:get_loading_state()` which will return an `FMOD_LOADING_STATE`.
+    lua["load_bank"] = [](std::string path, FMODStudio::LoadBankFlags flags) -> sol::optional<CustomBank>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (CustomBank bank = backend->sound_manager->load_bank((backend->get_root_path() / path).string(), flags))
+        {
+            return bank;
+        }
+        return sol::nullopt;
+    };
+
+    /// Gets an existing loaded bank if a file at the same path was already loaded
+    lua["get_bank"] = [](std::string path) -> sol::optional<CustomBank>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (CustomBank bank = backend->sound_manager->get_existing_bank((backend->get_root_path() / path).string()))
+        {
+            return bank;
+        }
+        return sol::nullopt;
+    };
+
+    /// Gets a `CustomEventDescription` if the event description is loaded using an FMOD GUID string. The string representation
+    /// must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
+    lua["get_event_by_id"] = [](std::string guid_string) -> sol::optional<CustomEventDescription>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (CustomEventDescription event_description = backend->sound_manager->get_event_by_id_string(guid_string))
+        {
+            return event_description;
+        }
+        return sol::nullopt;
+    };
+
+    /// FMOD Studio event parameter identifier. Can be retrieved with
+    /// `CustomEventDescription:get_parameter_description_by_name().id`, or
+    /// directly by using `CustomEventDescription:get_parameter_id_by_name()`.
+    /// Can be used with `CustomEventInstance:set_parameter_by_id()`,
+    /// `CustomEventInstance:set_parameter_by_id_with_label()`, and
+    /// `CustomEventInstance:get_parameter_by_id()`. This is useful
+    /// if you need to get or update an event parameter at a high
+    /// frequency, since setting and getting parameters by ID do
+    /// not require FMOD to perform a name to ID lookup internally
+    /// like FMOD does when setting or getting parameters by name.
+    lua.new_usertype<ParameterId>(
+        "ParameterId",
+        "data1",
+        sol::readonly(&ParameterId::data1),
+        "data2",
+        sol::readonly(&ParameterId::data2));
+
+    /// FMOD Studio descriptor for an event parameter. The descriptor
+    /// includes metadata about the event parameter including
+    /// name, behavior flags, parameter type, and information about
+    /// the default, minimum, and maximum values for the event
+    /// parameter. It also contains the event parameter identifier
+    /// which can be useful if you need to update the value of the
+    /// event parameter at a high frequency.
+    lua.new_usertype<ParameterDescription>(
+        "ParameterDescription",
+        "name",
+        sol::readonly(&ParameterDescription::name),
+        "id",
+        sol::readonly(&ParameterDescription::id),
+        "minimum",
+        sol::readonly(&ParameterDescription::minimum),
+        "maximum",
+        sol::readonly(&ParameterDescription::maximum),
+        "defaultvalue",
+        sol::readonly(&ParameterDescription::defaultvalue),
+        "type",
+        sol::readonly(&ParameterDescription::type),
+        "flags",
+        sol::readonly(&ParameterDescription::flags));
+
+    /// Handle to a loaded FMOD Bank. Unloading a bank will destroy all objects loaded from it, and unload all sample data.
+    /// Can be used to load and unload the non-streaming sample data of all events in the bank. However you can also
+    /// control the loading state of non-streaming sample data for individual events with a `CustomEventDescription`.
+    lua.new_usertype<CustomBank>(
+        "CustomBank",
+        "get_loading_state",
+        &CustomBank::get_loading_state,
+        "load_sample_data",
+        &CustomBank::load_sample_data,
+        "unload_sample_data",
+        &CustomBank::unload_sample_data,
+        "get_sample_loading_state",
+        &CustomBank::get_sample_loading_state,
+        "unload",
+        &CustomBank::unload,
+        "is_valid",
+        &CustomBank::is_valid);
+
+    /// Handle to an FMOD event description, can be used to create a `CustomEventInstance` with
+    /// `CustomEventDescription:create_instance()`. Also can be used to load and unload non-streaming
+    /// sample data for the Event, and release all instances of the event. You can also get parameter
+    /// IDs using `CustomEventDescription:get_parameter_description_by_name()`.
+    lua.new_usertype<CustomEventDescription>(
+        "CustomEventDescription",
+        "create_instance",
+        &CustomEventDescription::create_instance,
+        "release_all_instances",
+        &CustomEventDescription::release_all_instances,
+        "load_sample_data",
+        &CustomEventDescription::load_sample_data,
+        "unload_sample_data",
+        &CustomEventDescription::unload_sample_data,
+        "get_sample_loading_state",
+        &CustomEventDescription::get_sample_loading_state,
+        "get_parameter_description_count",
+        &CustomEventDescription::get_parameter_description_count,
+        "get_parameter_description_by_name",
+        &CustomEventDescription::get_parameter_description_by_name,
+        "get_parameter_description_by_index",
+        &CustomEventDescription::get_parameter_description_by_index,
+        "get_parameter_id_by_name",
+        &CustomEventDescription::get_parameter_id_by_name,
+        "is_valid",
+        &CustomEventDescription::is_valid);
+
+    auto stop = sol::overload(
+        static_cast<bool (CustomEventInstance::*)()>(&CustomEventInstance::stop),
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::StopMode)>(&CustomEventInstance::stop));
+    auto set_parameter_by_name = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(std::string, float)>(&CustomEventInstance::set_parameter_by_name),
+        static_cast<bool (CustomEventInstance::*)(std::string, float, bool)>(&CustomEventInstance::set_parameter_by_name));
+    auto set_parameter_by_name_with_label = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(std::string, std::string)>(&CustomEventInstance::set_parameter_by_name_with_label),
+        static_cast<bool (CustomEventInstance::*)(std::string, std::string, bool)>(&CustomEventInstance::set_parameter_by_name_with_label));
+    auto set_parameter_by_id = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, float)>(&CustomEventInstance::set_parameter_by_id),
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, float, bool)>(&CustomEventInstance::set_parameter_by_id));
+    auto set_parameter_by_id_with_label = sol::overload(
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, std::string)>(&CustomEventInstance::set_parameter_by_id_with_label),
+        static_cast<bool (CustomEventInstance::*)(FMODStudio::ParameterId, std::string, bool)>(&CustomEventInstance::set_parameter_by_id_with_label));
+
+    /// Handle to an FMOD event instance. Can be used to start and stop an event, or set the events parameters. Once you
+    /// are done with an event instance and no longer need to change its playback state or parameters, you should call
+    /// `CustomEventInstance:release()` so the event is marked for release and released when it stops playing to free resources.
+    /// Generally though, it is best practice to call `CustomEventInstance:release()` immediately after `CustomEventInstance:start()`
+    /// unless you want to play the event instance multiple times or explicitly start and stop it later.
+    lua.new_usertype<CustomEventInstance>(
+        "CustomEventInstance",
+        "start",
+        &CustomEventInstance::start,
+        "stop",
+        stop,
+        "get_playback_state",
+        &CustomEventInstance::get_playback_state,
+        "set_pause",
+        &CustomEventInstance::set_pause,
+        "get_pause",
+        &CustomEventInstance::get_pause,
+        "key_off",
+        &CustomEventInstance::key_off,
+        "set_pitch",
+        &CustomEventInstance::set_pitch,
+        "get_pitch",
+        &CustomEventInstance::get_pitch,
+        "set_timeline_position",
+        &CustomEventInstance::set_timeline_position,
+        "get_timeline_position",
+        &CustomEventInstance::get_timeline_position,
+        "set_volume",
+        &CustomEventInstance::set_volume,
+        "get_volume",
+        &CustomEventInstance::get_volume,
+        "get_parameter_by_name",
+        &CustomEventInstance::get_parameter_by_name,
+        "set_parameter_by_name",
+        set_parameter_by_name,
+        "set_parameter_by_name_with_label",
+        set_parameter_by_name_with_label,
+        "get_parameter_by_id",
+        &CustomEventInstance::get_parameter_by_id,
+        "set_parameter_by_id",
+        set_parameter_by_id,
+        "set_parameter_by_id_with_label",
+        set_parameter_by_id_with_label,
+        "release",
+        &CustomEventInstance::release,
+        "is_valid",
+        &CustomEventInstance::is_valid);
+
+    /// An `FMODguidMap` can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
+    /// from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
+    /// strings bank cannot be rebuilt to include the names and paths of new events or snapshots. `FMODguidMap` is a
+    /// workaround for this, and allows you to get a `CustomEventDescription` from a path with `FMODguidMap:get_event()`.
+    /// `FMODguidMap:get_event()` expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+    lua.new_usertype<FMODguidMap>(
+        "FMODguidMap",
+        "get_event",
+        [](FMODguidMap& guidmap, std::string path) -> std::optional<CustomEventDescription>
+        {
+            if (CustomEventDescription event_description = guidmap.get_event(path))
+            {
+                return event_description;
+            }
+            DEBUG("Failed to get CustomEventDescription from FMODguidMap");
+            return sol::nullopt;
+        });
+    /// Creates an `FMODguidMap` by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
+    /// if you want to use a human readable FMOD event path to create a `CustomEventDescription` instead of using an FMOD GUID string.
+    lua["create_fmod_guid_map"] = [](std::string path) -> sol::optional<FMODguidMap>
+    {
+        auto backend = LuaBackend::get_calling_backend();
+        if (FMODguidMap map = backend->sound_manager->create_fmod_guid_map((backend->get_root_path() / path).string()))
+        {
+            return map;
         }
         return sol::nullopt;
     };

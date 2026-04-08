@@ -327,6 +327,14 @@ struct CREATESOUNDEXINFO
     std::intptr_t fsbguid;
 };
 
+struct FMOD_GUID
+{
+    unsigned int Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char Data4[8];
+};
+
 enum class ChannelControlType
 {
     Channel,
@@ -408,6 +416,23 @@ enum EventCallbackType
     Num = 17
 };
 
+enum class LoadBankFlags
+{
+    Normal = 0x00000000,
+    Nonblocking = 0x00000001,
+    DecompressSamples = 0x00000002,
+    Unencrypted = 0x00000004,
+};
+
+enum class LoadingState
+{
+    Unloading,
+    Unloaded,
+    Loading,
+    Loaded,
+    Error
+};
+
 enum class PlaybackState
 {
     Playing,
@@ -450,6 +475,7 @@ struct ParameterDescription
     float defaultvalue;
     ParameterType type;
     ParameterFlags flags;
+    FMOD_GUID guid;
 };
 
 using System = tagged_void<struct system_tag>;
@@ -464,12 +490,31 @@ using GetBus = FMOD_RESULT(System*, const char*, Bus**);
 using LockChannelGroup = FMOD_RESULT(Bus*);
 using GetChannelGroup = FMOD_RESULT(Bus*, ChannelGroup**);
 
+using SystemLoadBankFile = FMOD_RESULT(System*, const char*, LoadBankFlags, Bank**);
+using SystemGetEventByID = FMOD_RESULT(System*, FMOD_GUID*, EventDescription**);
+
+using ParseID = FMOD_RESULT(const char*, FMOD_GUID*);
+
+using BankGetLoadingState = FMOD_RESULT(Bank*, LoadingState*);
+using BankLoadSampleData = FMOD_RESULT(Bank*);
+using BankUnloadSampleData = FMOD_RESULT(Bank*);
+using BankGetSampleLoadingState = FMOD_RESULT(Bank*, LoadingState*);
+using BankUnload = FMOD_RESULT(Bank*);
+using BankIsValid = bool(Bank*);
+
 using EventInstanceCallback = FMOD_RESULT(EventCallbackType, EventInstance*, void*);
 
 using EventDescriptionCreateInstance = FMOD_RESULT(EventDescription*, EventInstance**);
-using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription*, ParameterId, ParameterDescription*);
+using EventDescriptionReleaseAllInstances = FMOD_RESULT(EventDescription*);
+using EventDescriptionLoadSampleData = FMOD_RESULT(EventDescription*);
+using EventDescriptionUnloadSampleData = FMOD_RESULT(EventDescription*);
+using EventDescriptionGetSampleLoadingState = FMOD_RESULT(EventDescription*, LoadingState*);
+using EventDescriptionGetParameterDescriptionCount = FMOD_RESULT(EventDescription*, int*);
 using EventDescriptionGetParameterDescriptionByName = FMOD_RESULT(EventDescription*, const char*, ParameterDescription*);
+using EventDescriptionGetParameterDescriptionByIndex = FMOD_RESULT(EventDescription*, int, ParameterDescription*);
+using EventDescriptionGetParameterDescriptionByID = FMOD_RESULT(EventDescription*, ParameterId, ParameterDescription*);
 using EventDescriptionSetCallback = FMOD_RESULT(EventDescription*, EventInstanceCallback*, EventCallbackType);
+using EventDescriptionIsValid = bool(EventDescription*);
 
 using EventInstanceStart = FMOD_RESULT(EventInstance*);
 using EventInstanceStop = FMOD_RESULT(EventInstance*, StopMode);
@@ -477,16 +522,27 @@ using EventInstanceGetPlaybackState = FMOD_RESULT(EventInstance*, PlaybackState*
 // using EventInstanceIsPlaying = FMOD_RESULT(EventInstance*, BOOL*);
 using EventInstanceSetPaused = FMOD_RESULT(EventInstance*, BOOL);
 using EventInstanceGetPaused = FMOD_RESULT(EventInstance*, BOOL*);
+using EventInstanceKeyOff = FMOD_RESULT(EventInstance*);
 // using EventInstanceSetMute = FMOD_RESULT(EventInstance*, BOOL);
 using EventInstanceSetPitch = FMOD_RESULT(EventInstance*, float);
+using EventInstanceGetPitch = FMOD_RESULT(EventInstance*, float*, float*);
 // using EventInstanceSetPan = FMOD_RESULT(EventInstance*, float);
+using EventInstanceSetTimelinePosition = FMOD_RESULT(EventInstance*, int);
+using EventInstanceGetTimelinePosition = FMOD_RESULT(EventInstance*, int*);
 using EventInstanceSetVolume = FMOD_RESULT(EventInstance*, float);
+using EventInstanceGetVolume = FMOD_RESULT(EventInstance*, float*, float*);
 // using EventInstanceSetFrequency = FMOD_RESULT(EventInstance*, float);
 // using EventInstanceSetMode = FMOD_RESULT(EventInstance*, FMOD_MODE);
 using EventInstanceSetCallback = FMOD_RESULT(EventInstance*, EventInstanceCallback*, EventCallbackType);
 using EventInstanceSetUserData = FMOD_RESULT(EventInstance*, void*);
 using EventInstanceGetUserData = FMOD_RESULT(EventInstance*, void**);
 using EventInstanceGetDescription = FMOD_RESULT(EventInstance*, EventDescription**);
+using EventInstanceSetParameterByName = FMOD_RESULT(EventInstance*, const char*, float, BOOL);
+using EventInstanceGetParameterByName = FMOD_RESULT(EventInstance*, const char*, float*, float*);
+using EventInstanceSetParameterByNameWithLabel = FMOD_RESULT(EventInstance*, const char*, const char*, BOOL);
 using EventInstanceGetParameterByID = FMOD_RESULT(EventInstance*, ParameterId, float*, float*);
 using EventInstanceSetParameterByID = FMOD_RESULT(EventInstance*, ParameterId, float, bool);
+using EventInstanceSetParameterByIDWithLabel = FMOD_RESULT(EventInstance*, ParameterId, const char*, BOOL);
+using EventInstanceRelease = FMOD_RESULT(EventInstance*);
+using EventInstanceIsValid = bool(EventInstance*);
 } // namespace FMODStudio
