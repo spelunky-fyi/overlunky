@@ -797,6 +797,9 @@
                             <a href="#clear_state" class="toc-h3 toc-link" data-title="clear_state">clear_state</a>
                           </li>
                           <li>
+                            <a href="#create_fmod_guid_map" class="toc-h3 toc-link" data-title="create_fmod_guid_map">create_fmod_guid_map</a>
+                          </li>
+                          <li>
                             <a href="#create_image" class="toc-h3 toc-link" data-title="create_image">create_image</a>
                           </li>
                           <li>
@@ -824,6 +827,9 @@
                             <a href="#get_adventure_seed" class="toc-h3 toc-link" data-title="get_adventure_seed">get_adventure_seed</a>
                           </li>
                           <li>
+                            <a href="#get_bank" class="toc-h3 toc-link" data-title="get_bank">get_bank</a>
+                          </li>
+                          <li>
                             <a href="#get_bucket" class="toc-h3 toc-link" data-title="get_bucket">get_bucket</a>
                           </li>
                           <li>
@@ -834,6 +840,9 @@
                           </li>
                           <li>
                             <a href="#get_current_money" class="toc-h3 toc-link" data-title="get_current_money">get_current_money</a>
+                          </li>
+                          <li>
+                            <a href="#get_event_by_id" class="toc-h3 toc-link" data-title="get_event_by_id">get_event_by_id</a>
                           </li>
                           <li>
                             <a href="#get_frame" class="toc-h3 toc-link" data-title="get_frame">get_frame</a>
@@ -924,6 +933,9 @@
                           </li>
                           <li>
                             <a href="#list_dir" class="toc-h3 toc-link" data-title="list_dir">list_dir</a>
+                          </li>
+                          <li>
+                            <a href="#load_bank" class="toc-h3 toc-link" data-title="load_bank">load_bank</a>
                           </li>
                           <li>
                             <a href="#load_death_screen" class="toc-h3 toc-link" data-title="load_death_screen">load_death_screen</a>
@@ -1828,7 +1840,19 @@
                             <a href="#ControllerButton" class="toc-h3 toc-link" data-title="ControllerButton">ControllerButton</a>
                           </li>
                           <li>
+                            <a href="#CustomBank" class="toc-h3 toc-link" data-title="CustomBank">CustomBank</a>
+                          </li>
+                          <li>
+                            <a href="#CustomEventDescription" class="toc-h3 toc-link" data-title="CustomEventDescription">CustomEventDescription</a>
+                          </li>
+                          <li>
+                            <a href="#CustomEventInstance" class="toc-h3 toc-link" data-title="CustomEventInstance">CustomEventInstance</a>
+                          </li>
+                          <li>
                             <a href="#CutsceneBehavior" class="toc-h3 toc-link" data-title="CutsceneBehavior">CutsceneBehavior</a>
+                          </li>
+                          <li>
+                            <a href="#FMODguidMap" class="toc-h3 toc-link" data-title="FMODguidMap">FMODguidMap</a>
                           </li>
                           <li>
                             <a href="#Hud" class="toc-h3 toc-link" data-title="Hud">Hud</a>
@@ -1868,6 +1892,12 @@
                           </li>
                           <li>
                             <a href="#PRNG" class="toc-h3 toc-link" data-title="PRNG">PRNG</a>
+                          </li>
+                          <li>
+                            <a href="#ParameterDescription" class="toc-h3 toc-link" data-title="ParameterDescription">ParameterDescription</a>
+                          </li>
+                          <li>
+                            <a href="#ParameterId" class="toc-h3 toc-link" data-title="ParameterId">ParameterId</a>
                           </li>
                           <li>
                             <a href="#PauseAPI" class="toc-h3 toc-link" data-title="PauseAPI">PauseAPI</a>
@@ -5305,6 +5335,18 @@ Can be negative, default display_time = 60 (about 2s). Returns the current money
 </blockquote>
 <h4 id='nil-clear_state-int-slot'>nil clear_state(int slot)</h4>
 <p>Clear save state from slot 1..4.</p>
+<h3 id='create_fmod_guid_map'>create_fmod_guid_map</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_fmod_guid_map">create_fmod_guid_map</a></p>
+</blockquote>
+<h4 id='optional-lt-FMODguidMap-gt-create_fmod_guid_map-string-path'>optional&lt;<a href="#FMODguidMap">FMODguidMap</a>&gt; create_fmod_guid_map(string path)</h4>
+<p>An <code>FMODguidMap</code> can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
+from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
+strings bank cannot be rebuilt to include the names and paths of new events or snapshots. <code>FMODguidMap</code> is a
+workaround for this, and allows you to get a <code>CustomEventDescription</code> from a path with <code>FMODguidMap:get_event()</code>.
+<code>FMODguidMap:get_event()</code> expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.
+Creates an <code>FMODguidMap</code> by parsing a GUIDs.txt exported from FMOD Studio from disk relative to this script. This is useful
+if you want to use a human readable FMOD event path to create a <code>CustomEventDescription</code> instead of using an FMOD GUID string.</p>
 <h3 id='create_image'>create_image</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_image">create_image</a></p>
@@ -5362,6 +5404,12 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 </blockquote>
 <h4 id='tuple-lt-int-int-gt-get_adventure_seed-optional-run_start'>tuple&lt;int, int&gt; get_adventure_seed(optional<bool> run_start)</h4>
 <p>Get the current adventure seed pair, or optionally what it was at the start of this run, because it changes every level.</p>
+<h3 id='get_bank'>get_bank</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_bank">get_bank</a></p>
+</blockquote>
+<h4 id='optional-lt-CustomBank-gt-get_bank-string-path'>optional&lt;<a href="#CustomBank">CustomBank</a>&gt; get_bank(string path)</h4>
+<p>Gets an existing loaded bank if a file at the same path was already loaded</p>
 <h3 id='get_bucket'>get_bucket</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_bucket">get_bucket</a></p>
@@ -5387,6 +5435,13 @@ Will also destroy monsters or items that are standing on a linked activefloor or
 <h4 id='int-get_current_money'>int get_current_money()</h4>
 <p>Just convenient way of getting the current amount of money
 short for state-&gt;money_shop_total + loop[inventory.money + inventory.collected_money_total]</p>
+<h3 id='get_event_by_id'>get_event_by_id</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_event_by_id">get_event_by_id</a></p>
+</blockquote>
+<h4 id='optional-lt-CustomEventDescription-gt-get_event_by_id-string-guid_string'>optional&lt;<a href="#CustomEventDescription">CustomEventDescription</a>&gt; get_event_by_id(string guid_string)</h4>
+<p>Gets a <code>CustomEventDescription</code> if the event description is loaded using an FMOD GUID string. The string representation
+must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.</p>
 <h3 id='get_frame'>get_frame</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame</a></p>
@@ -5576,6 +5631,16 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 </blockquote>
 <h4 id='nil-list_dir-optional-dir'>nil list_dir(optional<string> dir)</h4>
 <p>List files in directory relative to the script root. Returns table of file/directory names or nil if not found.</p>
+<h3 id='load_bank'>load_bank</h3>
+<blockquote>
+<p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_bank">load_bank</a></p>
+</blockquote>
+<h4 id='optional-lt-CustomBank-gt-load_bank-string-path-FMODStudio-LoadBankFlags-flags'>optional&lt;<a href="#CustomBank">CustomBank</a>&gt; load_bank(string path, FMODStudio::LoadBankFlags flags)</h4>
+<p>Loads a bank from disk relative to this script, ownership might be shared with other code that loads the same file.
+Returns nil if the file can&#39;t be found. Loading a bank file will load the banks metadata, but not non-streaming
+sample data. Once a bank has finished loading, all metadata can be accessed meaning that event descriptions can
+be found with <code>get_event_by_id()</code> or using <code>create_fmod_guid_map()</code> and calling <code>FMODguidMap:get_event()</code>.
+The banks loading state can be queried using <code>CustomBank:get_loading_state()</code> which will return an <code>FMOD_LOADING_STATE</code>.</p>
 <h3 id='load_death_screen'>load_death_screen</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_death_screen">load_death_screen</a></p>
@@ -9634,6 +9699,253 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <td><a href="#Button">Button</a> was just pressed down this frame</td>
 </tr>
 </tbody></table>
+<h3 id='CustomBank'>CustomBank</h3>
+<p>Handle to a loaded FMOD Bank. Unloading a bank will destroy all objects loaded from it, and unload all sample data.
+Can be used to load and unload the non-streaming sample data of all events in the bank. However you can also
+control the loading state of non-streaming sample data for individual events with a <code>CustomEventDescription</code>.</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>optional&lt;FMODStudio::LoadingState&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_loading_state">get_loading_state()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_sample_data">load_sample_data()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unload_sample_data">unload_sample_data()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;FMODStudio::LoadingState&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_sample_loading_state">get_sample_loading_state()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unload">unload()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_valid">is_valid()</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='CustomEventDescription'>CustomEventDescription</h3>
+<p>Handle to an FMOD event description, can be used to create a <code>CustomEventInstance</code> with
+<code>CustomEventDescription:create_instance()</code>. Also can be used to load and unload non-streaming
+sample data for the Event, and release all instances of the event. You can also get parameter
+IDs using <code>CustomEventDescription:get_parameter_description_by_name()</code>.</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>&lt;<a href="#CustomEventInstance">CustomEventInstance</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=create_instance">create_instance()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=release_all_instances">release_all_instances()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=load_sample_data">load_sample_data()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=unload_sample_data">unload_sample_data()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;FMODStudio::LoadingState&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_sample_loading_state">get_sample_loading_state()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;int&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameter_description_count">get_parameter_description_count()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;FMODStudio::<a href="#ParameterDescription">ParameterDescription</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameter_description_by_name">get_parameter_description_by_name(string name)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;FMODStudio::<a href="#ParameterDescription">ParameterDescription</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameter_description_by_index">get_parameter_description_by_index(int index)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;FMODStudio::<a href="#ParameterId">ParameterId</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameter_id_by_name">get_parameter_id_by_name(string name)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_valid">is_valid()</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='CustomEventInstance'>CustomEventInstance</h3>
+<p>Handle to an FMOD event instance. Can be used to start and stop an event, or set the events parameters. Once you
+are done with an event instance and no longer need to change its playback state or parameters, you should call
+<code>CustomEventInstance:release()</code> so the event is marked for release and released when it stops playing to free resources.
+Generally though, it is best practice to call <code>CustomEventInstance:release()</code> immediately after <code>CustomEventInstance:start()</code>
+unless you want to play the event instance multiple times or explicitly start and stop it later.</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=start">start()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=stop">stop()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=stop">stop(FMODStudio::StopMode mode)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;FMODStudio::PlaybackState&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_playback_state">get_playback_state()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pause">set_pause(bool pause)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;bool&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_pause">get_pause()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=key_off">key_off()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pitch">set_pitch(float pitch)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_pitch">get_pitch()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_timeline_position">set_timeline_position(int position)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;int&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_timeline_position">get_timeline_position()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_volume">set_volume(float volume)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_volume">get_volume()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameter_by_name">get_parameter_by_name(string name)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_name">set_parameter_by_name(string name, float value)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_name">set_parameter_by_name(string name, float value, bool ignoreseekspeed)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_name_with_label">set_parameter_by_name_with_label(string name, string label)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_name_with_label">set_parameter_by_name_with_label(string name, string label, bool ignoreseekspeed)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>optional&lt;float&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_parameter_by_id">get_parameter_by_id(FMODStudio::ParameterId id)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_id">set_parameter_by_id(FMODStudio::ParameterId id, float value)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_id">set_parameter_by_id(FMODStudio::ParameterId id, float value, bool ignoreseekspeed)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_id_with_label">set_parameter_by_id_with_label(FMODStudio::ParameterId id, string label)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_parameter_by_id_with_label">set_parameter_by_id_with_label(FMODStudio::ParameterId id, string label, bool ignoreseekspeed)</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=release">release()</a></td>
+<td></td>
+</tr>
+<tr>
+<td>bool</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=is_valid">is_valid()</a></td>
+<td></td>
+</tr>
+</tbody></table>
 <h3 id='CutsceneBehavior'>CutsceneBehavior</h3>
 <table><thead>
 <tr>
@@ -9642,6 +9954,26 @@ Stores static common data for an <a href="#ENT_TYPE">ENT_TYPE</a>. You can also 
 <th>Description</th>
 </tr>
 </thead><tbody>
+</tbody></table>
+<h3 id='FMODguidMap'>FMODguidMap</h3>
+<p>An <code>FMODguidMap</code> can be used to resolve FMOD GUIDs for events and snapshots from paths using the GUIDs.txt exported
+from an FMOD Studio Project. By default FMOD studio uses a strings bank to do this, however the games master bank and
+strings bank cannot be rebuilt to include the names and paths of new events or snapshots. <code>FMODguidMap</code> is a
+workaround for this, and allows you to get a <code>CustomEventDescription</code> from a path with <code>FMODguidMap:get_event()</code>.
+<code>FMODguidMap:get_event()</code> expects the path to be formatted similarly to event:/UI/Cancel or snapshot:/IngamePause.</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>optional&lt;<a href="#CustomEventDescription">CustomEventDescription</a>&gt;</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_event">get_event(string path)</a></td>
+<td></td>
+</tr>
 </tbody></table>
 <h3 id='Hud'>Hud</h3><div class="highlight"><pre class="highlight lua tab-lua"><code><span class="n">set_callback</span><span class="p">(</span><span class="k">function</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">hud</span><span class="p">)</span>
     <span class="c1">-- draw on screen bottom but keep neat animations</span>
@@ -10244,6 +10576,88 @@ If you don&#39;t care what part of the game you affect just use <a href="#prng">
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pair">set_pair(PRNG_CLASS type, int first, int second)</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='ParameterDescription'>ParameterDescription</h3>
+<p>FMOD Studio descriptor for an event parameter. The descriptor
+includes metadata about the event parameter including
+name, behavior flags, parameter type, and information about
+the default, minimum, and maximum values for the event
+parameter. It also contains the event parameter identifier
+which can be useful if you need to update the value of the
+event parameter at a high frequency.</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>string</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=name">name</a></td>
+<td></td>
+</tr>
+<tr>
+<td><a href="#ParameterId">ParameterId</a></td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=id">id</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=minimum">minimum</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=maximum">maximum</a></td>
+<td></td>
+</tr>
+<tr>
+<td>float</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=defaultvalue">defaultvalue</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=type">type</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=flags">flags</a></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id='ParameterId'>ParameterId</h3>
+<p>FMOD Studio event parameter identifier. Can be retrieved with
+<code>CustomEventDescription:get_parameter_description_by_name().id</code>, or
+directly by using <code>CustomEventDescription:get_parameter_id_by_name()</code>.
+Can be used with <code>CustomEventInstance:set_parameter_by_id()</code>,
+<code>CustomEventInstance:set_parameter_by_id_with_label()</code>, and
+<code>CustomEventInstance:get_parameter_by_id()</code>. This is useful
+if you need to get or update an event parameter at a high
+frequency, since setting and getting parameters by ID do
+not require FMOD to perform a name to ID lookup internally
+like FMOD does when setting or getting parameters by name.</p>
+
+<table><thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=data1">data1</a></td>
+<td></td>
+</tr>
+<tr>
+<td>int</td>
+<td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=data2">data2</a></td>
 <td></td>
 </tr>
 </tbody></table>
