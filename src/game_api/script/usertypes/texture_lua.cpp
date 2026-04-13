@@ -133,14 +133,14 @@ void register_usertypes(sol::state& lua)
         std::unordered_map<std::string, uint32_t> counts;
         for (const auto* tex : get_textures()->texture_map)
         {
-            if (tex != nullptr && tex->name != nullptr)
+            if (tex != nullptr && tex->default_texture != nullptr)
             {
-                std::string clean_tex_name = *tex->name;
+                std::string clean_tex_name = tex->default_texture->name;
                 std::transform(
                     clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
                     { return (unsigned char)std::toupper(c); });
                 std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
-                size_t index = clean_tex_name.find(".DDS", 0);
+                size_t index = clean_tex_name.rfind(".DDS");
                 if (index != std::string::npos)
                 {
                     clean_tex_name.erase(index, 4);
