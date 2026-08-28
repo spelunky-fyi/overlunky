@@ -37,6 +37,8 @@
 #include "window_api.hpp"             // for get_window
 
 std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>> g_all_backends;
+/// Identity of a running script, keyed on its environment table.
+std::unordered_map<const void*, LuaBackend*> g_backend_envs;
 std::unordered_map<int, HotKey> g_hotkeys;
 int g_hotkey_count = 0;
 
@@ -60,6 +62,7 @@ LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)
     std::lock_guard lock{global_lua_lock};
     g_all_backends.emplace_back(new ProtectedBackend{this});
     self = g_all_backends.back().get();
+    g_backend_envs[lua.pointer()] = this;
 }
 LuaBackend::~LuaBackend()
 {
@@ -78,6 +81,7 @@ LuaBackend::~LuaBackend()
 
     {
         std::lock_guard lock{global_lua_lock};
+        g_backend_envs.erase(lua.pointer());
         std::erase_if(g_all_backends, [this](const std::unique_ptr<ProtectedBackend>& protected_backend)
                       { return protected_backend.get() == self; });
     }
@@ -1661,7 +1665,12 @@ void LuaBackend::for_each_backend(std::function<bool(LockedBackend)> fun, bool s
 }
 LuaBackend::LockedBackend LuaBackend::get_backend(std::string_view id)
 {
-    return get_backend_safe(id).value();
+    auto backend = get_backend_safe(id);
+    if (!backend)
+    {
+        throw std::runtime_error{fmt::format("No script backend for '{}'", id)};
+    }
+    return std::move(backend).value();
 }
 std::optional<LuaBackend::LockedBackend> LuaBackend::get_backend_safe(std::string_view id)
 {
@@ -1718,19 +1727,34 @@ std::string LuaBackend::get_calling_backend_id()
     }
 
     static const sol::state& lua = get_lua_vm();
-    auto get_script_id = lua["get_script_id"];
-    if (get_script_id.get_type() == sol::type::function)
+    auto get_script_envs = lua["__get_script_envs"];
+    if (get_script_envs.get_type() == sol::type::function)
     {
-        auto script_id = get_script_id();
-        if (script_id.get_type() == sol::type::string && script_id.valid())
+        auto script_envs = get_script_envs();
+        if (!script_envs.valid())
         {
-            return script_id.get<std::string>();
-        }
-        else
-        {
-            sol::error e = script_id;
+            sol::error e = script_envs;
             throw std::runtime_error{e.what()};
         }
+        if (script_envs.get_type() == sol::type::table)
+        {
+            // Identify the caller by which environment table it is running in.
+            sol::table envs = script_envs;
+            for (std::size_t i = 1; i <= envs.size(); ++i)
+            {
+                sol::object env = envs[i];
+                if (env.get_type() != sol::type::table)
+                {
+                    continue;
+                }
+                auto it = g_backend_envs.find(env.as<sol::table>().pointer());
+                if (it != g_backend_envs.end())
+                {
+                    return it->second->get_path();
+                }
+            }
+        }
+        throw std::runtime_error{"Could not identify the calling script."};
     }
 
     throw std::runtime_error{"Trying to get calling backend but Lua state does not seem to be setup..."};

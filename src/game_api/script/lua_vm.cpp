@@ -121,6 +121,52 @@ void load_unsafe_libraries(sol::state& lua)
     require_serpent_lua(lua);
     NSocket::register_usertypes(lua);
 }
+namespace
+{
+struct ImportResult
+{
+    sol::object exports;
+    bool found{false};
+    bool blocked_unsafe{false};
+    std::string id{};
+};
+
+/// Resolving an import enables the target if it is not already running. A safe script must not be
+/// able to start an unsafe one that way.
+ImportResult resolve_import(sol::state& vm, const std::string& id, std::string_view version)
+{
+    ImportResult result{};
+    result.exports = sol::make_object(vm, sol::lua_nil);
+    result.id = sanitize(id);
+
+    auto backend = LuaBackend::get_calling_backend();
+    backend->required_scripts.push_back(result.id);
+    const bool caller_unsafe = backend->get_unsafe();
+
+    auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(result.id), version);
+    if (!import_backend_opt.has_value())
+    {
+        return result;
+    }
+    result.found = true;
+    auto& import_backend = import_backend_opt.value();
+
+    if (!import_backend->get_enabled())
+    {
+        if (import_backend->get_unsafe() && !caller_unsafe)
+        {
+            result.blocked_unsafe = true;
+            return result;
+        }
+        import_backend->set_enabled(true);
+        import_backend->update();
+    }
+
+    result.exports = sol::make_object(vm, import_backend->lua["exports"]);
+    return result;
+}
+} // namespace
+
 void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
 {
     auto infinite_loop = [](lua_State* argst, [[maybe_unused]] lua_Debug* argdb)
@@ -136,28 +182,44 @@ void populate_lua_state(sol::state& lua, SoundManager* sound_manager)
     lua_sethook(lua.lua_state(), infinite_loop, LUA_MASKCOUNT, 420000000);
 
     lua.safe_script(R"(
--- This function walks up the stack until it finds an _ENV that is not _G
--- That _ENV has to be the environment of a script where we can look up the scripts id
-get_script_id = function()
-    -- Not available in Lua 5.2+
-    local getfenv = getfenv or function(f)
-        f = (type(f) == 'function' and f or debug.getinfo(f + 1, 'f').func)
+-- This function walks up the stack and returns every _ENV that is not _G, nearest frame first.
+-- The backend takes the first one it knows as a script environment, rather than just the nearest,
+-- because a chunk can run in a derived environment that is not itself a script: the F-string
+-- library builds one per expression and load() takes one from the caller. Those resolve to the
+-- script underneath them.
+__get_script_envs = function()
+    -- Not available in Lua 5.2+, and it has to say whether the frame exists, so that running off
+    -- the top of the stack ends the loop instead of erroring
+    local frame_env = function(level)
+        local info = debug.getinfo(level + 1, 'f')
+        if not info then return false, nil end
         local name, val
         local up = 0
         repeat
             up = up + 1
-            name, val = debug.getupvalue(f, up)
+            name, val = debug.getupvalue(info.func, up)
         until name == '_ENV' or name == nil
-        return val
+        return true, val
     end
 
-    local env
+    local envs = {}
     local up = 1
-    repeat
+    while true do
         up = up + 1
-        env = getfenv(up)
-    until env ~= _G and env ~= nil
-    return env.__script_id
+        local exists, env = frame_env(up)
+        if not exists then break end
+        if env ~= nil and env ~= _G then
+            envs[#envs + 1] = env
+        end
+    end
+    return envs
+end
+
+-- For scripts that want to know their own id. Scripts can write to __script_id, so
+-- we don't rely on this value in the backend.
+get_script_id = function()
+    local env = __get_script_envs()[1]
+    return env and env.__script_id
 end
 )");
 
@@ -433,87 +495,67 @@ end
     /// Table of options set in the UI, added with the [register_option_functions](#Option-functions), but `nil` before any options are registered. You can also write your own options in here or override values defined in the register functions/UI before or after they are registered. Check the examples for many different use cases and saving options to disk.
     // lua["options"] = lua.create_named_table("options");
 
-    /// Load another script by id "author/name" and import its `exports` table. Returns:
+    /// Load another script by id "author/name" and import its `exports` table. Enables the imported
+    /// script if it isn't already, except when it is unsafe and yours is not, since enabling a script
+    /// runs it and only the user gets to make that call for an unsafe one. Returns:
     ///
     /// - `table` if the script has exports
     /// - `nil` if the script was found but has no exports
-    /// - `false` if the script was not found but optional is set to true
-    /// - an error if the script was not found and the optional argument was not set
+    /// - `false` if the script was not found, or is unsafe and not enabled, but optional is set to true
+    /// - an error if the script was not found, or is unsafe and not enabled, and the optional argument was not set
     // lua["import"] = [](string id, optional<string> version, optional<bool> optional) -> table
     lua["import"] = sol::overload(
         [&lua](std::string id)
         {
-            auto backend = LuaBackend::get_calling_backend();
-            backend->required_scripts.push_back(sanitize(id));
-            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)));
-            if (!import_backend_opt.has_value())
-            {
+            auto res = resolve_import(lua, id, "");
+            if (res.blocked_unsafe)
+                luaL_error(lua, "Tried to import unsafe script '%s' from a safe script. Enable it yourself first.", res.id.c_str());
+            if (!res.found)
                 luaL_error(lua, "Imported script not found");
-                return sol::make_object(lua, sol::lua_nil);
-            }
-            auto& import_backend = import_backend_opt.value();
-            if (!import_backend->get_enabled())
-            {
-                import_backend->set_enabled(true);
-                import_backend->update();
-            }
-            return sol::make_object(lua, import_backend->lua["exports"]);
+            return res.exports;
         },
         [&lua](std::string id, std::string version)
         {
-            auto backend = LuaBackend::get_calling_backend();
-            backend->required_scripts.push_back(sanitize(id));
-            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)), std::string_view(version));
-            if (!import_backend_opt.has_value())
-            {
+            auto res = resolve_import(lua, id, version);
+            if (res.blocked_unsafe)
+                luaL_error(lua, "Tried to import unsafe script '%s' from a safe script. Enable it yourself first.", res.id.c_str());
+            if (!res.found)
                 luaL_error(lua, "Imported script not found");
-                return sol::make_object(lua, sol::lua_nil);
-            }
-            auto& import_backend = import_backend_opt.value();
-            if (!import_backend->get_enabled())
-            {
-                import_backend->set_enabled(true);
-                import_backend->update();
-            }
-            return sol::make_object(lua, import_backend->lua["exports"]);
+            return res.exports;
         },
         [&lua](std::string id, std::string version, bool optional)
         {
-            auto backend = LuaBackend::get_calling_backend();
-            backend->required_scripts.push_back(sanitize(id));
-            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)), std::string_view(version));
-            if (!import_backend_opt.has_value())
+            auto res = resolve_import(lua, id, version);
+            if (res.blocked_unsafe)
+            {
+                if (!optional)
+                    luaL_error(lua, "Tried to import unsafe script '%s' from a safe script. Enable it yourself first.", res.id.c_str());
+                return sol::make_object(lua, false);
+            }
+            if (!res.found)
             {
                 if (!optional)
                     luaL_error(lua, "Imported script not found");
                 return sol::make_object(lua, false);
             }
-            auto& import_backend = import_backend_opt.value();
-            if (!import_backend->get_enabled())
-            {
-                import_backend->set_enabled(true);
-                import_backend->update();
-            }
-            return sol::make_object(lua, import_backend->lua["exports"]);
+            return res.exports;
         },
         [&lua](std::string id, bool optional)
         {
-            auto backend = LuaBackend::get_calling_backend();
-            backend->required_scripts.push_back(sanitize(id));
-            auto import_backend_opt = LuaBackend::get_backend_by_id_safe(std::string_view(sanitize(id)));
-            if (!import_backend_opt.has_value())
+            auto res = resolve_import(lua, id, "");
+            if (res.blocked_unsafe)
+            {
+                if (!optional)
+                    luaL_error(lua, "Tried to import unsafe script '%s' from a safe script. Enable it yourself first.", res.id.c_str());
+                return sol::make_object(lua, false);
+            }
+            if (!res.found)
             {
                 if (!optional)
                     luaL_error(lua, "Imported script not found");
                 return sol::make_object(lua, false);
             }
-            auto& import_backend = import_backend_opt.value();
-            if (!import_backend->get_enabled())
-            {
-                import_backend->set_enabled(true);
-                import_backend->update();
-            }
-            return sol::make_object(lua, import_backend->lua["exports"]);
+            return res.exports;
         });
 
     /// Deprecated
@@ -973,8 +1015,10 @@ end
         auto path = base / std::filesystem::path(dir.value_or("."));
         if (!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
             return sol::make_object(lua, sol::lua_nil);
+        // relative() returns an empty path when it cannot express one, most commonly because the
+        // two are on different Windows drives, so an empty result is a failed check and not a pass
         auto base_check = std::filesystem::relative(path, base).string();
-        if (base_check.starts_with("..") && !backend->get_unsafe())
+        if ((base_check.empty() || base_check.starts_with("..")) && !backend->get_unsafe())
         {
             luaL_error(lua, "Tried to list parent directory without unsafe mode.");
             return sol::make_object(lua, sol::lua_nil);
@@ -1744,6 +1788,20 @@ std::recursive_mutex global_lua_lock;
 std::vector<std::string> safe_fields{};
 std::vector<std::string> unsafe_fields{};
 
+/// Globals that must never be copied into a script environment.
+/// The __ prefixed ones are the raw, unchecked originals that the wrappers in lua_require.cpp
+/// delegate to. Passing a script the real load/loadfile means giving it the real _G, allowing
+/// access to the global Lua state.
+constexpr std::string_view sandbox_denied[]{
+    "debug",
+    "package",
+    "__require",
+    "__loadlib",
+    "__load",
+    "__loadfile",
+    "__get_script_envs",
+};
+
 std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
 {
     static std::shared_ptr<sol::state> global_vm = [sound_manager]()
@@ -1759,7 +1817,7 @@ std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager)
             if (k.get_type() == sol::type::string)
             {
                 std::string_view key = k.as<std::string_view>();
-                if (key != "debug" && key != "package")
+                if (std::find(std::begin(sandbox_denied), std::end(sandbox_denied), key) == std::end(sandbox_denied))
                 {
                     safe_fields.push_back(std::string{key});
                 }

@@ -935,8 +935,13 @@ local function s(t, opts)
 end
 
 local function deserialize(data, opts)
-  local env = (opts and opts.safe == false) and G
-    or setmetatable({}, {
+  -- Overlunky: upstream passed the chunk the real global table when opts.safe is false.
+  -- This would allow escaping the sandbox. Raise an error explaining that it is not allowed.
+
+  if opts and opts.safe == false then
+    error("serpent: safe=false is disabled in Overlunky.", 2)
+  end
+  local env = setmetatable({}, {
         __index = function(t,k) return t end,
         __call = function(t,...) error("cannot call functions") end
       })
