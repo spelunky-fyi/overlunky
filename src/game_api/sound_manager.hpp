@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <functional>
 #include <list>
+#include <memory>
 #include <new>
 #include <optional>
 #include <string>
@@ -26,6 +27,10 @@ class CustomEventInstance;
 
 using SoundCallbackFunction = std::function<void()>;
 using EventCallbackFunction = std::function<void(PlayingSound)>;
+
+/// Returned by SoundManager::set_callback when the callback could not be registered,
+/// e.g. because the event name does not exist. Valid callback ids start at 1.
+inline constexpr std::uint32_t INVALID_SOUND_CALLBACK_ID{0};
 
 enum class SOUND_LOOP_MODE
 {
@@ -53,7 +58,7 @@ class CustomSound
 
     operator bool()
     {
-        return m_SoundManager != nullptr;
+        return !m_SoundManager.expired();
     }
 
     PlayingSound play();
@@ -66,11 +71,11 @@ class CustomSound
     CustomSound(std::nullptr_t, std::nullptr_t)
     {
     }
-    CustomSound(FMOD::Sound* fmod_sound, SoundManager* sound_manager);
-    CustomSound(FMODStudio::EventDescription* fmod_event, SoundManager* sound_manager);
+    CustomSound(FMOD::Sound* fmod_sound, std::weak_ptr<SoundManager> sound_manager);
+    CustomSound(FMODStudio::EventDescription* fmod_event, std::weak_ptr<SoundManager> sound_manager);
 
     std::variant<FMOD::Sound*, FMODStudio::EventDescription*, std::monostate> m_FmodHandle{};
-    SoundManager* m_SoundManager{nullptr};
+    std::weak_ptr<SoundManager> m_SoundManager;
 };
 
 using PlayingSoundHandle = std::variant<FMOD::Channel*, FMODStudio::EventInstance*, std::monostate>;
@@ -105,11 +110,11 @@ class PlayingSound
     PlayingSound(std::nullptr_t, std::nullptr_t)
     {
     }
-    PlayingSound(FMOD::Channel* fmod_channel, SoundManager* sound_manager);
-    PlayingSound(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager);
+    PlayingSound(FMOD::Channel* fmod_channel, std::weak_ptr<SoundManager> sound_manager);
+    PlayingSound(FMODStudio::EventInstance* fmod_event, std::weak_ptr<SoundManager> sound_manager);
 
     PlayingSoundHandle m_FmodHandle{};
-    SoundManager* m_SoundManager{nullptr};
+    std::weak_ptr<SoundManager> m_SoundManager;
 };
 
 class CustomBank
@@ -125,7 +130,7 @@ class CustomBank
 
     operator bool()
     {
-        return m_SoundManager != nullptr;
+        return !m_SoundManager.expired();
     }
 
     std::optional<FMODStudio::LoadingState> get_loading_state();
@@ -139,15 +144,16 @@ class CustomBank
     CustomBank(std::nullptr_t, std::nullptr_t)
     {
     }
-    CustomBank(FMOD::Bank* fmod_bank, SoundManager* sound_manager);
+    CustomBank(FMOD::Bank* fmod_bank, std::weak_ptr<SoundManager> sound_manager);
 
     std::variant<FMOD::Bank*, std::monostate> m_FmodHandle{};
-    SoundManager* m_SoundManager{nullptr};
+    std::weak_ptr<SoundManager> m_SoundManager;
 };
 
 class CustomEventDescription
 {
     friend class SoundManager;
+    friend class FMODguidMap;
 
   public:
     CustomEventDescription(const CustomEventDescription& rhs);
@@ -158,7 +164,7 @@ class CustomEventDescription
 
     operator bool()
     {
-        return m_SoundManager != nullptr;
+        return !m_SoundManager.expired();
     }
 
     std::shared_ptr<CustomEventInstance> create_instance();
@@ -179,10 +185,10 @@ class CustomEventDescription
     CustomEventDescription(std::nullptr_t, std::nullptr_t)
     {
     }
-    CustomEventDescription(FMODStudio::EventDescription* fmod_event, SoundManager* sound_manager);
+    CustomEventDescription(FMODStudio::EventDescription* fmod_event, std::weak_ptr<SoundManager> sound_manager);
 
     std::variant<FMODStudio::EventDescription*, std::monostate> m_FmodHandle{};
-    SoundManager* m_SoundManager{nullptr};
+    std::weak_ptr<SoundManager> m_SoundManager;
 };
 
 using CustomEventInstanceHandle = std::variant<FMODStudio::EventInstance*, std::monostate>;
@@ -195,11 +201,12 @@ class CustomEventInstance
     CustomEventInstance(std::nullptr_t, std::nullptr_t)
     {
     }
-    CustomEventInstance(FMODStudio::EventInstance* fmod_event, SoundManager* sound_manager);
-    CustomEventInstance(const CustomEventInstance& rhs) = default;
-    CustomEventInstance(CustomEventInstance&& rhs) noexcept = default;
-    CustomEventInstance& operator=(const CustomEventInstance& rhs) = default;
-    CustomEventInstance& operator=(CustomEventInstance&& rhs) noexcept = default;
+    CustomEventInstance(FMODStudio::EventInstance* fmod_event, std::weak_ptr<SoundManager> sound_manager);
+    // Non-copyable: the destructor releases the FMOD event instance, so a copy would release twice.
+    CustomEventInstance(const CustomEventInstance& rhs) = delete;
+    CustomEventInstance& operator=(const CustomEventInstance& rhs) = delete;
+    CustomEventInstance(CustomEventInstance&& rhs) noexcept;
+    CustomEventInstance& operator=(CustomEventInstance&& rhs) noexcept;
     ~CustomEventInstance();
 
     bool start();
@@ -233,7 +240,7 @@ class CustomEventInstance
 
   private:
     CustomEventInstanceHandle m_FmodHandle{};
-    SoundManager* m_SoundManager{nullptr};
+    std::weak_ptr<SoundManager> m_SoundManager;
 };
 
 class FMODguidMap
@@ -249,7 +256,7 @@ class FMODguidMap
 
     operator bool()
     {
-        return m_SoundManager != nullptr;
+        return !m_SoundManager.expired();
     }
 
     CustomEventDescription get_event(std::string path);
@@ -258,13 +265,16 @@ class FMODguidMap
     FMODguidMap(std::nullptr_t, std::nullptr_t)
     {
     }
-    FMODguidMap(std::unordered_map<std::string, FMOD::FMOD_GUID> m_GUIDmap, SoundManager* sound_manager);
+    FMODguidMap(std::unordered_map<std::string, FMOD::FMOD_GUID> m_GUIDmap, std::weak_ptr<SoundManager> sound_manager);
 
     std::unordered_map<std::string, FMOD::FMOD_GUID> m_GUIDmap;
-    SoundManager* m_SoundManager{nullptr};
+    std::weak_ptr<SoundManager> m_SoundManager;
 };
 
-class SoundManager
+// Must be owned by a shared_ptr: handles hold a weak_ptr obtained via weak_from_this(), so that a
+// handle outliving the manager (Lua userdata is finalized at ~sol::state, long after a host like
+// Playlunky destroys the manager) fails safely instead of calling into freed memory.
+class SoundManager : public std::enable_shared_from_this<SoundManager>
 {
   public:
     SoundManager(DecodeAudioFile* decode_function);
@@ -274,11 +284,6 @@ class SoundManager
     SoundManager(SoundManager&&) = delete;
     SoundManager& operator=(const SoundManager&) = delete;
     SoundManager& operator=(SoundManager&&) = delete;
-
-    bool is_init() const
-    {
-        return m_IsInit;
-    }
 
     CustomBank load_bank(std::string path, FMODStudio::LoadBankFlags flags);
     CustomBank load_bank(const char* path, FMODStudio::LoadBankFlags flags);
@@ -361,6 +366,10 @@ class SoundManager
     template <class FunT>
     void for_each_event_name(FunT&& fun)
     {
+        if (m_SoundData.Events == nullptr)
+        {
+            return;
+        }
         for (const auto& [id, event] : *m_SoundData.Events)
         {
             fun(event.Name);
@@ -369,6 +378,10 @@ class SoundManager
     template <class FunT>
     void for_each_parameter_name(FunT&& fun)
     {
+        if (m_SoundData.Parameters == nullptr)
+        {
+            return;
+        }
         for (size_t i = 0; i < m_SoundData.Parameters->ParameterNames.size(); i++)
         {
             const auto& parameter_name = m_SoundData.Parameters->ParameterNames[i];
@@ -379,8 +392,6 @@ class SoundManager
     const VANILLA_SOUND& convert_sound_id(SOUNDID id);
 
   private:
-    bool m_IsInit{false};
-
     DecodeAudioFile* m_DecodeFunction{nullptr};
 
     FMOD::System* m_FmodSystem{nullptr};
@@ -475,13 +486,21 @@ class SoundManager
     using EventMap = std::unordered_map<EventId, EventDescription>;
     struct SoundData
     {
-        const EventParameters* Parameters;
-        const EventMap* Events;
+        const EventParameters* Parameters{nullptr};
+        const EventMap* Events{nullptr};
         std::unordered_map<const FMODStudio::EventDescription*, const EventDescription*> FmodEventToEvent;
         std::unordered_map<std::string_view, const EventDescription*> NameToEvent;
     };
     static_assert(sizeof(EventDescription) == 0x1a0);
     SoundData m_SoundData;
+
+    // Must be a const lookup: these run on the FMOD callback thread, and unordered_map::operator[]
+    // would insert on a miss (which custom-bank events always are) while the main thread reads.
+    const EventDescription* find_event_description(const FMODStudio::EventDescription* fmod_event) const
+    {
+        auto it = m_SoundData.FmodEventToEvent.find(fmod_event);
+        return it == m_SoundData.FmodEventToEvent.end() ? nullptr : it->second;
+    }
 
     struct Sound;
     struct Bank;
@@ -535,12 +554,18 @@ struct BackgroundSound : public SoundMeta
     bool destroy_sound; // don't use directly, use the kill function
 };
 
-SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);
 SoundMeta* play_sound(SOUNDID sound_id, uint32_t source_uid);
+/*
+// Bound in sound_lua.cpp as a lambda since resolving the name needs a SoundManager, so there is no
+// C++ declaration to scan. This one is here purely for the autodoc.
+SoundMeta* play_sound(VANILLA_SOUND sound, uint32_t source_uid);
+*/
 
 // could probably be exposed if someone can actually figure out how to properly "register it"?
 // it probably also needs to make sure the lua owns the returned object and it will properly delete it
-SoundMeta* construct_soundmeta(VANILLA_SOUND sound, bool background_sound);
+// If you do expose it and want to take a VANILLA_SOUND name, convert it to a SOUNDID at the Lua
+// boundary via backend->sound_manager (see how play_sound does it in sound_lua.cpp). Converting a
+// name needs a SoundManager, so do not reintroduce a global one to do it here.
 SoundMeta* construct_soundmeta(SOUNDID sound_id, bool background_sound);
 /*
 VANILLA_SOUND convert_sound_id(SOUNDID id); // for the autodoc

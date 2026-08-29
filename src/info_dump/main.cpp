@@ -1243,11 +1243,11 @@ void run()
         }
     }
 
-    SoundManager sound_mgr(nullptr);
+    auto sound_mgr = std::make_shared<SoundManager>(nullptr);
 
     if (auto file = std::ofstream("game_data/vanilla_sounds.txt"))
     {
-        sound_mgr.for_each_event_name(
+        sound_mgr->for_each_event_name(
             [&file](std::string event_name)
             {
                 std::string clean_event_name = event_name;
@@ -1261,7 +1261,7 @@ void run()
 
     if (auto file = std::ofstream("game_data/vanilla_sound_params.txt"))
     {
-        sound_mgr.for_each_parameter_name(
+        sound_mgr->for_each_parameter_name(
             [&file](std::string parameter_name, std::uint32_t id)
             {
                 std::transform(parameter_name.begin(), parameter_name.end(), parameter_name.begin(), [](unsigned char c)
@@ -1281,7 +1281,7 @@ void run()
 
     if (auto file = std::ofstream("game_data/lua_enums.txt"))
     {
-        SpelunkyConsole api_gen_script(&sound_mgr);
+        SpelunkyConsole api_gen_script(sound_mgr.get());
         file << api_gen_script.dump_api() << std::endl;
         // file << "---@diagnostic disable: lowercase-global,deprecated" << std::endl;
     }

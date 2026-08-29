@@ -17,8 +17,9 @@
 #include "window_api.hpp"
 
 #include <cstring>
+#include <memory>
 
-SoundManager* g_SoundManager{nullptr};
+std::shared_ptr<SoundManager> g_SoundManager;
 SpelunkyConsole* g_Console{nullptr};
 
 void Spelunky_SetDoHooks(bool do_hooks)
@@ -53,7 +54,7 @@ void Spelunky_InitSwapChainHooks(IDXGISwapChain* swap_chain)
 void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function)
 {
     static Spelunky_DecodeAudioFile local_decode_function = decode_function;
-    g_SoundManager = new SoundManager(
+    g_SoundManager = std::make_shared<SoundManager>(
         [](const char* file_path)
         {
             Spelunky_DecodedAudioBuffer buffer = local_decode_function(file_path);
@@ -68,11 +69,7 @@ void Spelunky_InitSoundManager(Spelunky_DecodeAudioFile decode_function)
 }
 void Spelunky_DestroySoundManager()
 {
-    if (g_SoundManager != nullptr)
-    {
-        delete g_SoundManager;
-        g_SoundManager = nullptr;
-    }
+    g_SoundManager.reset();
 }
 
 void Spelunky_ShowCursor()
@@ -202,7 +199,7 @@ SpelunkyScript* Spelunky_CreateScript(const char* file_path, bool enabled)
     std::string code = read_whole_file(file_path);
     if (!code.empty())
     {
-        return new SpelunkyScript(std::move(code), file_path, g_SoundManager, g_Console, enabled);
+        return new SpelunkyScript(std::move(code), file_path, g_SoundManager.get(), g_Console, enabled);
     }
     return nullptr;
 }
@@ -277,7 +274,7 @@ SpelunkyConsole* CreateConsole()
 {
     if (g_Console == nullptr)
     {
-        g_Console = new SpelunkyConsole(g_SoundManager);
+        g_Console = new SpelunkyConsole(g_SoundManager.get());
     }
     return g_Console;
 }
