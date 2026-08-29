@@ -1263,16 +1263,16 @@ function set_vanilla_sound_callback(name, types, cb) end
 function clear_vanilla_sound_callback(id) end
 ---Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
 ---Returns SoundMeta, beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
----@param sound VANILLA_SOUND
----@param source_uid integer
----@return SoundMeta
-function play_sound(sound, source_uid) end
----Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
----Returns SoundMeta, beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
 ---@param sound_id SOUNDID
 ---@param source_uid integer
 ---@return SoundMeta
 function play_sound(sound_id, source_uid) end
+---Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
+---Returns SoundMeta, beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
+---@param sound VANILLA_SOUND
+---@param source_uid integer
+---@return SoundMeta
+function play_sound(sound, source_uid) end
 ---@param id SOUNDID
 ---@return VANILLA_SOUND
 function convert_sound_id(id) end

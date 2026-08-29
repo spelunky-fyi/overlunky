@@ -3212,9 +3212,9 @@ Gets an existing sound, either if a file at the same path was already loaded or 
 
 > Search script examples for [play_sound](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=play_sound)
 
-#### [SoundMeta](#SoundMeta) play_sound([VANILLA_SOUND](#VANILLA_SOUND) sound, int source_uid)
-
 #### [SoundMeta](#SoundMeta) play_sound([SOUNDID](#Aliases) sound_id, int source_uid)
+
+#### [SoundMeta](#SoundMeta) play_sound([VANILLA_SOUND](#VANILLA_SOUND) sound, int source_uid)
 
 Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
 Returns [SoundMeta](#SoundMeta), beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.
