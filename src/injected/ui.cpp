@@ -10042,6 +10042,15 @@ void init_ui(ImGuiContext* ctx)
 
     register_make_save_path(&make_save_path);
 
+    // Tear scripts down here instead of leaving them for the destructor. Relying on implicit
+    // destruction can lead to bad_optional_access when the backend is no longer available.
+    register_on_quit(
+        []()
+        {
+            g_scripts.clear();
+            g_ui_scripts.clear();
+        });
+
     register_on_load_file(&load_file_as_dds_if_image);
 
     auto& render_api = RenderAPI::get();
