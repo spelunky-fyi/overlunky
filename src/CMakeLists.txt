@@ -140,7 +140,12 @@ if(BUILD_OVERLUNKY)
         # --------------------------------------------------
         # toml11
         option(toml11_BUILD_TEST OFF)
+
+        # toml11 commit we're at sets cmake_minimum_required(VERSION 3.1) which fails in CI where 4.0 is used.
+        # Scoped to this add_subdirectory so it doesn't affect the rest of the project.
+        set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
         add_subdirectory(toml11)
+        unset(CMAKE_POLICY_VERSION_MINIMUM)
 
         if(MSVC)
                 # --------------------------------------------------

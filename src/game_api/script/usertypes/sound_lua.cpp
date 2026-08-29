@@ -38,18 +38,12 @@ namespace NSound
 {
 void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 {
-    assert(sound_manager != nullptr && sound_manager->is_init());
+    assert(sound_manager != nullptr);
     if (sound_manager == nullptr)
     {
         DEBUG("Audio API is not available!");
         return;
     }
-    if (!sound_manager->is_init())
-    {
-        DEBUG("Audio API is not initialized!");
-        return;
-    }
-
     /// Parameter to `load_bank()`, used to control bank loading.
     lua.new_enum("FMOD_LOAD_BANK_FLAGS", "NORMAL", FMODStudio::LoadBankFlags::Normal, "NONBLOCKING", FMODStudio::LoadBankFlags::Nonblocking, "DECOMPRESS_SAMPLES", FMODStudio::LoadBankFlags::DecompressSamples, "UNENCRYPTED", FMODStudio::LoadBankFlags::Unencrypted);
     /* FMOD_LOAD_BANK_FLAGS
@@ -345,7 +339,10 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
         auto backend = LuaBackend::get_calling_backend();
         std::uint32_t id = backend->sound_manager->set_callback(name, std::move(safe_cb), static_cast<FMODStudio::EventCallbackType>(types));
-        backend->vanilla_sound_callbacks.push_back(id);
+        if (id != INVALID_SOUND_CALLBACK_ID)
+        {
+            backend->vanilla_sound_callbacks.push_back(id);
+        }
         return id;
     };
     /// Clears a previously set callback
@@ -452,7 +449,13 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         sol::property([](SoundInfo& si)                 // -> VANILLA_SOUND
                       { return si.sound_name /**/; })); // return copy, so it's read only
 
-    auto play_sound = sol::overload(static_cast<SoundMeta* (*)(SOUNDID, uint32_t)>(::play_sound), static_cast<SoundMeta* (*)(VANILLA_SOUND, uint32_t)>(::play_sound));
+    auto play_sound = sol::overload(
+        static_cast<SoundMeta* (*)(SOUNDID, uint32_t)>(::play_sound),
+        [](VANILLA_SOUND sound, uint32_t source_uid) -> SoundMeta*
+        {
+            auto backend = LuaBackend::get_calling_backend();
+            return ::play_sound(backend->sound_manager->convert_sound_id(sound), source_uid);
+        });
 
     /// Use source_uid to make the sound be played at the location of that entity, set it -1 to just play it "everywhere"
     /// Returns SoundMeta, beware that the sound can't be stopped (`start_over` and `playing` are unavailable). Should only be used for sfx.

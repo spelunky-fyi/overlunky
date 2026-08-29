@@ -73,7 +73,7 @@ std::wstring_convert<cvt_type, wchar_t> cvt;
 template <class T>
 concept Script = std::is_same_v<T, SpelunkyConsole> || std::is_same_v<T, SpelunkyScript>;
 
-std::unique_ptr<SoundManager> g_SoundManager;
+std::shared_ptr<SoundManager> g_SoundManager;
 
 std::unique_ptr<SpelunkyConsole> g_Console;
 std::deque<ScriptMessage> g_ConsoleMessages;
@@ -10019,7 +10019,7 @@ std::string make_save_path(std::string_view script_path, std::string_view script
 
 void init_ui(ImGuiContext* ctx)
 {
-    g_SoundManager = std::make_unique<SoundManager>(&LoadAudioFile);
+    g_SoundManager = std::make_shared<SoundManager>(&LoadAudioFile);
 
     API::init(g_SoundManager.get());
     API::post_init();
