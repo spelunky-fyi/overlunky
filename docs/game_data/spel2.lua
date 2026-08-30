@@ -147,12 +147,14 @@ function set_callback(cb, event) end
 ---@param id CallbackId?
 ---@return nil
 function clear_callback(id) end
----Load another script by id "author/name" and import its `exports` table. Returns:
+---Load another script by id "author/name" and import its `exports` table. Enables the imported
+---script if it isn't already, except when it is unsafe and yours is not, since enabling a script
+---runs it and only the user gets to make that call for an unsafe one. Returns:
 ---
 ---- `table` if the script has exports
 ---- `nil` if the script was found but has no exports
----- `false` if the script was not found but optional is set to true
----- an error if the script was not found and the optional argument was not set
+---- `false` if the script was not found, or is unsafe and not enabled, but optional is set to true
+---- an error if the script was not found, or is unsafe and not enabled, and the optional argument was not set
 ---@param id string
 ---@param version string?
 ---@param optional boolean?

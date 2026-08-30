@@ -5587,13 +5587,15 @@ To limit it use the parameters, so x = 10 will only grow chains from ceilings wi
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=import">import</a></p>
 </blockquote>
 <h4 id='table-import-string-id-optional-version-optional-optional'>table import(string id, optional<string> version, optional<bool> optional)</h4>
-<p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table. Returns:</p>
+<p>Load another script by id &quot;author/name&quot; and import its <code>exports</code> table. Enables the imported
+script if it isn&#39;t already, except when it is unsafe and yours is not, since enabling a script
+runs it and only the user gets to make that call for an unsafe one. Returns:</p>
 
 <ul>
 <li><code>table</code> if the script has exports</li>
 <li><code>nil</code> if the script was found but has no exports</li>
-<li><code>false</code> if the script was not found but optional is set to true</li>
-<li>an error if the script was not found and the optional argument was not set</li>
+<li><code>false</code> if the script was not found, or is unsafe and not enabled, but optional is set to true</li>
+<li>an error if the script was not found, or is unsafe and not enabled, and the optional argument was not set</li>
 </ul>
 <h3 id='inputs_to_buttons'>inputs_to_buttons</h3>
 <blockquote>
