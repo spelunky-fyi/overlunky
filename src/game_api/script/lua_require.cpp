@@ -1,6 +1,7 @@
 #include "lua_require.hpp"
 
 #include <algorithm>     // for replace, mismatch
+#include <cstdio>        // for snprintf
 #include <exception>     // for exception
 #include <filesystem>    // for path, operator==, exists, operator/, _Pat...
 #include <fmt/format.h>  // for check_format_string, format, vformat
@@ -24,20 +25,176 @@ void register_custom_require(sol::state& lua)
     lua.clear_package_loaders();
     lua.add_package_loader(custom_loader);
 
+    // The raw originals. These are kept out of script environments by the deny list in
+    // acquire_lua_vm, the wrappers below are what scripts get to see.
     lua["__require"] = lua["require"];
     lua["__loadlib"] = lua["package"]["loadlib"];
+    lua["__load"] = lua["load"];
+    lua["__loadfile"] = lua["loadfile"];
 
     /// Custom implementation to trick Lua into allowing to `require 'lib.module'` more than once given it was called from a different source
     lua["require"] = custom_require;
 
+    /// A chunk loaded by the stock load/loadfile/dofile gets the real _G as its _ENV, so these have to give the chunk the calling script's environment instead.
+    lua["load"] = custom_load;
+    lua["loadfile"] = custom_loadfile;
+    lua["dofile"] = custom_dofile;
+
     lua["package"]["loadlib"] = custom_loadlib;
+}
+
+namespace
+{
+/// Resolve a path passed to loadfile/dofile. Safe scripts may only reach files inside their own
+/// root and get relative paths resolved against it. Returns nullopt if a safe script tried to escape its root.
+std::optional<std::filesystem::path> resolve_chunk_path(std::string_view root, bool unsafe, const std::string& path)
+{
+    namespace fs = std::filesystem;
+
+    if (unsafe)
+        return fs::path{path};
+
+    // A script with no root of its own, like one from "Create new quick script", has no directory
+    // to be confined to, so it may load nothing. An empty base would pass the test below for any
+    // path at all.
+    if (root.empty())
+        return std::nullopt;
+
+    std::error_code ec;
+    const fs::path base = fs::absolute(fs::path{root}, ec).lexically_normal();
+    if (ec || base.empty())
+        return std::nullopt;
+
+    const fs::path requested{path};
+    const fs::path full = fs::absolute(requested.is_absolute() ? requested : base / requested, ec).lexically_normal();
+    if (ec)
+        return std::nullopt;
+
+    // lexically_relative handles a base that normalized with a trailing separator, as "." does,
+    // and gives an empty path when the two share no root, as across Windows drives.
+    const fs::path relative = full.lexically_relative(base);
+    if (relative.empty() || *relative.begin() == "..")
+        return std::nullopt;
+
+    return full;
+}
+
+/// Push the environment a freshly loaded chunk should run in onto L. Scripts may pass their own
+/// table.
+void push_chunk_env(lua_State* L, int env_idx)
+{
+    if (!lua_isnoneornil(L, env_idx))
+    {
+        lua_pushvalue(L, env_idx);
+        return;
+    }
+    LuaBackend::get_calling_backend()->lua.push(L);
+}
+} // namespace
+
+// These are raw lua_CFunctions, so sol wraps nothing around them, and Lua is built as C here, so
+// its error handling is setjmp based and cannot catch a C++ exception. One unwinding through the
+// interpreter's frames would leave the VM inconsistent, so anything thrown becomes a Lua error
+// raised after the C++ frames are gone. Nothing with a destructor stays alive across the final
+// lua_call for the same reason: that longjmps on error.
+int custom_load(lua_State* L)
+{
+    char err[512]{};
+    try
+    {
+        lua_settop(L, 4);
+
+        // Only ever accept source text. A precompiled chunk skips the parser entirely and can be
+        // crafted to corrupt the VM.
+        lua_pushliteral(L, "t");
+        lua_replace(L, 3);
+
+        push_chunk_env(L, 4);
+        lua_replace(L, 4);
+
+        {
+            sol::object raw_load = get_lua_vm()["__load"];
+            raw_load.push(L);
+        }
+        lua_insert(L, 1);
+    }
+    catch (const std::exception& e)
+    {
+        snprintf(err, sizeof(err), "%s", e.what());
+    }
+    if (err[0] != '\0')
+        return luaL_error(L, "%s", err);
+
+    lua_call(L, 4, LUA_MULTRET);
+    return lua_gettop(L);
+}
+int custom_loadfile(lua_State* L)
+{
+    char err[512]{};
+    try
+    {
+        const std::string requested = luaL_checkstring(L, 1);
+
+        std::optional<std::filesystem::path> resolved;
+        {
+            auto backend = LuaBackend::get_calling_backend();
+            resolved = resolve_chunk_path(backend->get_root(), backend->get_unsafe(), requested);
+        }
+
+        if (!resolved)
+        {
+            snprintf(err, sizeof(err), "Tried to load '%s' from outside the script root without unsafe mode.", requested.c_str());
+        }
+        else
+        {
+            const std::string resolved_str = resolved->string();
+
+            lua_settop(L, 3);
+            lua_pushlstring(L, resolved_str.c_str(), resolved_str.size());
+            lua_replace(L, 1);
+
+            lua_pushliteral(L, "t");
+            lua_replace(L, 2);
+
+            push_chunk_env(L, 3);
+            lua_replace(L, 3);
+
+            {
+                sol::object raw_loadfile = get_lua_vm()["__loadfile"];
+                raw_loadfile.push(L);
+            }
+            lua_insert(L, 1);
+        }
+    }
+    catch (const std::exception& e)
+    {
+        snprintf(err, sizeof(err), "%s", e.what());
+    }
+    if (err[0] != '\0')
+        return luaL_error(L, "%s", err);
+
+    lua_call(L, 3, LUA_MULTRET);
+    return lua_gettop(L);
+}
+int custom_dofile(lua_State* L)
+{
+    lua_settop(L, 1);
+    custom_loadfile(L);
+    if (lua_gettop(L) != 1)
+        return lua_error(L);
+
+    lua_call(L, 0, LUA_MULTRET);
+    return lua_gettop(L);
 }
 sol::object custom_require(std::string path)
 {
     static sol::state& lua = get_lua_vm();
 
+    auto backend = LuaBackend::get_calling_backend();
+    const bool unsafe = backend->get_unsafe();
+
     if (path == "io" || path == "os" || path == "math" || path == "string" || path == "table" || path == "coroutine" || path == "package")
-        return lua[path];
+        return backend->lua[path];
 
     // Turn module into a real path
     {
@@ -50,8 +207,6 @@ sol::object custom_require(std::string path)
     }
 
     // Could be preloaded by some unsafe script, which can only be fetched by unsafe scripts
-    auto backend = LuaBackend::get_calling_backend();
-    const bool unsafe = backend->get_unsafe();
     if (unsafe)
     {
         auto preload = lua["package"]["preload"][path];
@@ -275,11 +430,13 @@ int custom_loader(lua_State* L)
             auto func = "luaopen_" + module;
             std::replace(func.begin(), func.end(), '/', '_');
             std::replace(func.begin(), func.end(), '.', '_');
-            sol::stack::push(L, backend->lua["__loadlib"](_path, func));
+            sol::stack::push(L, get_lua_vm()["__loadlib"](_path, func));
             return true;
         }
         _path += ext;
-        const auto res = luaL_loadfile(L, _path.c_str());
+        // "t" for the same reason as custom_load. luaL_loadfile defaults to "bt", which would let
+        // bytecode in through require and around the check the other loaders make.
+        const auto res = luaL_loadfilex(L, _path.c_str(), "t");
         if (res == LUA_OK)
         {
             backend->lua.push();

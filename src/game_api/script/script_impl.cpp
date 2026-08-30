@@ -47,7 +47,8 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
     enabled = enable;
 
     /// Table of strings where you should set some script metadata shown in the UI and used by other scripts to find your script.
-    lua["meta"] = get_lua_vm().create_named_table("meta");
+    sol::table meta_table{get_lua_vm(), sol::create};
+    lua["meta"] = meta_table;
 
     try
     {
@@ -83,7 +84,30 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
                 getmeta = false;
             }
         }
-        auto lua_result = execute_lua(lua, metacode);
+        // Every script on disk gets its metadata read at startup, long before the user has agreed
+        // to run any of it, and the extractor above is a line based guess that a script can talk
+        // into handing over more than just the meta lines. So metadata never runs in the script's
+        // own environment, it runs in this minimal environament.
+        sol::environment meta_env{get_lua_vm(), sol::create};
+        meta_env["meta"] = meta_table;
+
+        try
+        {
+            auto lua_result = execute_lua(meta_env, metacode);
+            result = "Got metadata";
+        }
+        catch (const sol::error& e)
+        {
+            set_error(e.what());
+        }
+
+        // `meta = { ... }` rebinds the name, so take whatever it ended up pointing at
+        sol::optional<sol::table> resolved_meta = meta_env["meta"];
+        if (resolved_meta)
+        {
+            lua["meta"] = resolved_meta.value();
+        }
+
         sol::optional<std::string> meta_name = lua["meta"]["name"];
         sol::optional<std::string> meta_version = lua["meta"]["version"];
         sol::optional<std::string> meta_description = lua["meta"]["description"];
@@ -98,8 +122,6 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         meta.online_safe = meta_online_safe.value_or(false);
         meta.id = script_id();
         lua["__script_id"] = meta.file;
-
-        result = "Got metadata";
     }
     catch (const sol::error& e)
     {

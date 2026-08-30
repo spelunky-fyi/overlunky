@@ -1066,7 +1066,7 @@ void LuaConsole::push_history(std::string history_item, std::vector<ScriptMessag
 
 std::string LuaConsole::dump_api()
 {
-    std::set<std::string> excluded_keys{"meta", "__require", "__script_id", "TYPE_MAP", "get_script_id"};
+    std::set<std::string> excluded_keys{"meta", "__require", "__loadlib", "__load", "__loadfile", "__get_script_env", "__script_id", "TYPE_MAP", "get_script_id"};
 
     sol::state dummy_state;
     dummy_state.open_libraries(sol::lib::math, sol::lib::base, sol::lib::string, sol::lib::table, sol::lib::coroutine, sol::lib::package, sol::lib::debug);
