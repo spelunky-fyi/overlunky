@@ -7928,11 +7928,6 @@ void render_entity_props(int uid, bool detached = false)
     }
     if (submenu("Color, Size, Texture"))
     {
-        auto textureid = entity->get_texture();
-        std::string texture = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, get_entity({}):get_texture()) or 'UNKNOWN'", uid), true);
-        // std::string texturepath = g_Console.get()->execute(fmt::format("return get_texture_definition(get_entity({}):get_texture()).texture_path", uid), true);
-        texture = "TEXTURE." + texture.substr(1, texture.length() - 2);
-        // texturepath = texturepath.substr(1, texturepath.length() - 2);
         ImGui::ColorEdit4("Color", (float*)&entity->color);
         ImGui::DragFloat("Width##EntityWidth", &entity->w, 0.5f, 0.0, 10.0, "%.3f");
         ImGui::DragFloat("Height##EntityHeight", &entity->h, 0.5f, 0.0, 10.0, "%.3f");
@@ -7955,8 +7950,59 @@ void render_entity_props(int uid, bool detached = false)
         if (entity->rendering_info)
             ImGui::DragScalar("Shader##EntityShader", ImGuiDataType_U8, &entity->rendering_info->shader, 0.2f, &u8_zero, &u8_shader_max);
         ImGui::DragScalar("Animation frame##EntityAnimationFrame", ImGuiDataType_U16, &entity->animation_frame, 0.2f, &u16_zero, &u16_max);
-        ImGui::InputText(fmt::format("Texture: {}##EntityTexture", textureid).c_str(), &texture, ImGuiInputTextFlags_ReadOnly);
-        // ImGui::InputText("Texture path##EntityTexturePath", &texturepath, ImGuiInputTextFlags_ReadOnly);
+
+        auto texture_id = entity->get_texture();
+        std::string buffer = UI::get_texture_enum_name(texture_id);
+        static std::vector<std::pair<const std::string&, TEXTURE>> suggestions;
+        static uint8_t selected_suggestion_idx;
+        if (ImGui::InputText(fmt::format("Texture: {}##EntityTexture", texture_id).c_str(), &buffer, ImGuiInputTextFlags_CharsUppercase | ImGuiInputTextFlags_CharsNoBlank | ImGuiInputTextFlags_AutoSelectAll))
+        {
+            static std::string last_edit;
+            if (last_edit != buffer)
+            {
+                suggestions = UI::get_texture_suggestions(buffer);
+                selected_suggestion_idx = 0;
+                last_edit = buffer;
+            }
+            if (!suggestions.empty())
+                ImGui::OpenPopup("TextureSuggestions");
+        }
+        ImVec2 popupPos{ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y};
+        if (ImGui::BeginPopup("TextureSuggestions", ImGuiWindowFlags_NoFocusOnAppearing))
+        {
+            ImGui::SetWindowPos(popupPos);
+            ImGui::SetNextWindowSizeConstraints(ImVec2(), ImVec2{999, 100});
+            if (ImGui::IsKeyPressed(ImGuiKey::ImGuiKey_UpArrow))
+            {
+                if (selected_suggestion_idx == 0)
+                    selected_suggestion_idx = static_cast<uint8_t>(suggestions.size() - 1);
+                else
+                    selected_suggestion_idx--;
+            }
+            else if (ImGui::IsKeyPressed(ImGuiKey::ImGuiKey_DownArrow))
+            {
+                selected_suggestion_idx++;
+                if (selected_suggestion_idx == static_cast<uint8_t>(suggestions.size()))
+                    selected_suggestion_idx = 0;
+            }
+            uint8_t idx = 0;
+            for (auto& [name, id] : suggestions)
+            {
+                bool selected = idx == selected_suggestion_idx;
+                if (ImGui::Selectable(fmt::format("{}: {}", name, id).c_str(), selected))
+                    entity->set_texture(id);
+
+                if (selected && ImGui::IsKeyPressed(ImGuiKey::ImGuiKey_Enter))
+                {
+                    entity->set_texture(id);
+                    ImGui::CloseCurrentPopup();
+                    break;
+                }
+                idx++;
+            }
+
+            ImGui::EndPopup();
+        }
         endmenu();
     }
     if (submenu("Flags"))
@@ -8239,8 +8285,7 @@ void render_texture_viewer()
         return;
     }
     auto def = get_texture_definition(texture_viewer.id);
-    std::string name = g_Console.get()->execute(fmt::format("return enum_get_name(TEXTURE, {}) or 'UNKNOWN'", texture_viewer.id), true);
-    name = "TEXTURE." + name.substr(1, name.length() - 2);
+    std::string name = "TEXTURE." + UI::get_texture_enum_name(texture_viewer.id);
     ImGui::InputText("ID", &name, ImGuiInputTextFlags_ReadOnly);
     ImGui::LabelText("Path", "%s", def.texture_path.c_str());
     ImGui::LabelText("Size", "%dx%d", def.width, def.height);
