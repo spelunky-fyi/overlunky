@@ -82,11 +82,16 @@ struct CommunityTileCode;
 
 using TileCodeFunc = void(const CommunityTileCode& self, float x, float y, Layer* layer);
 
-bool is_room_flipped(float x, float y)
+bool is_room_flipped(float x, float y, std::uint8_t layer)
 {
     thread_local StateMemory* state_ptr = HeapBase::get().state();
     auto [ix, iy] = state_ptr->level_gen->get_room_index(x, y);
-    return state_ptr->level_gen->flipped_rooms->rooms[ix + iy * 8ull];
+    return state_ptr->level_gen->flipped_rooms[layer]->rooms[ix + iy * 8ull];
+}
+
+inline std::uint8_t get_layer_num(Layer* layer)
+{
+    return layer->is_back_layer ? 1 : 0;
 }
 
 struct CommunityTileCode
@@ -115,7 +120,7 @@ void g_spawn_eggsac(const CommunityTileCode& self, float x, float y, Layer* laye
 {
     if constexpr (!ignore_flip)
     {
-        if (is_room_flipped(x, y))
+        if (is_room_flipped(x, y, get_layer_num(layer)))
         {
             constexpr int new_angle = []()
             {
@@ -164,7 +169,7 @@ void g_spawn_punishball_attach(const CommunityTileCode& self, float x, float y, 
 {
     if constexpr (!ignore_flip)
     {
-        if (is_room_flipped(x, y))
+        if (is_room_flipped(x, y, get_layer_num(layer)))
         {
             g_spawn_punishball_attach<-offset_x, offset_y, true>(self, x, y, layer);
             return;
@@ -442,11 +447,11 @@ std::array g_community_tile_codes{
     CommunityTileCode{"apep", "ENT_TYPE_MONS_APEP_HEAD"},
     CommunityTileCode{"apep_left", "ENT_TYPE_MONS_APEP_HEAD", []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
                       {
-                          layer->spawn_apep(x, y, is_room_flipped(x, y));
+                          layer->spawn_apep(x, y, is_room_flipped(x, y, get_layer_num(layer)));
                       }},
     CommunityTileCode{"apep_right", "ENT_TYPE_MONS_APEP_HEAD", []([[maybe_unused]] const CommunityTileCode& self, float x, float y, Layer* layer)
                       {
-                          layer->spawn_apep(x, y, !is_room_flipped(x, y));
+                          layer->spawn_apep(x, y, !is_room_flipped(x, y, get_layer_num(layer)));
                       }},
     CommunityTileCode{"olmite_naked", "ENT_TYPE_MONS_OLMITE_NAKED"},
     CommunityTileCode{"olmite_helmet", "ENT_TYPE_MONS_OLMITE_HELMET"},
@@ -1271,6 +1276,24 @@ void spawn_room_from_tile_codes(LevelGenData* level_gen_data, int room_idx_x, in
     }
 }
 
+using SetRandomBacklayerRooms = void(LevelGenSystem*);
+SetRandomBacklayerRooms* g_set_random_backlayer_rooms_trampoline{nullptr};
+void set_random_backlayer_rooms(LevelGenSystem* level_gen)
+{
+    if (!pre_event(ON::PRE_SET_RANDOM_BACKLAYER_ROOMS))
+        g_set_random_backlayer_rooms_trampoline(level_gen);
+    post_event(ON::POST_SET_RANDOM_BACKLAYER_ROOMS);
+}
+
+using SpawnBacklayerRooms = void(LevelGenSystem*, uint32_t, uint32_t, uint32_t, uint32_t);
+SpawnBacklayerRooms* g_spawn_backlayer_rooms_trampoline{nullptr};
+void spawn_backlayer_rooms(LevelGenSystem* level_gen, uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height)
+{
+    if (!pre_event(ON::PRE_SPAWN_BACKLAYER_ROOMS, start_x, start_y, limit_width, limit_height))
+        g_spawn_backlayer_rooms_trampoline(level_gen, start_x, start_y, limit_width, limit_height);
+    post_event(ON::POST_SPAWN_BACKLAYER_ROOMS, start_x, start_y, limit_width, limit_height);
+}
+
 using TestChance = bool(LevelGenData**, std::uint32_t chance_id);
 TestChance* g_test_chance{nullptr};
 
@@ -1499,6 +1522,8 @@ void LevelGenData::init()
         g_gather_room_data_trampoline = (GatherRoomData*)get_address("level_gen_gather_room_data"sv);
         g_get_random_room_data_trampoline = (GetRandomRoomData*)get_address("level_gen_get_random_room_data"sv);
         g_spawn_room_from_tile_codes_trampoline = (SpawnRoomFromTileCodes*)get_address("level_gen_spawn_room_from_tile_codes"sv);
+        g_set_random_backlayer_rooms_trampoline = (SetRandomBacklayerRooms*)get_address("set_random_backlayer_rooms"sv);
+        g_spawn_backlayer_rooms_trampoline = (SpawnBacklayerRooms*)get_address("spawn_backlayer_rooms"sv);
 
         g_load_screen_trampoline = (LoadScreenFun*)get_address("load_screen_func"sv);
         g_unload_layer_trampoline = (UnloadLayerFun*)get_address("unload_layer"sv);
@@ -1516,6 +1541,8 @@ void LevelGenData::init()
         DetourAttach((void**)&g_gather_room_data_trampoline, gather_room_data);
         DetourAttach((void**)&g_get_random_room_data_trampoline, get_random_room_data);
         DetourAttach((void**)&g_spawn_room_from_tile_codes_trampoline, spawn_room_from_tile_codes);
+        DetourAttach((void**)&g_set_random_backlayer_rooms_trampoline, set_random_backlayer_rooms);
+        DetourAttach((void**)&g_spawn_backlayer_rooms_trampoline, spawn_backlayer_rooms);
 
         DetourAttach((void**)&g_load_screen_trampoline, load_screen);
         DetourAttach((void**)&g_unload_layer_trampoline, unload_layer);
@@ -1858,6 +1885,27 @@ bool LevelGenSystem::set_room_template(uint32_t x, uint32_t y, int l, uint16_t r
     return true;
 }
 
+bool LevelGenSystem::get_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y)
+{
+    auto* state_ptr = HeapBase::get().state();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h || static_cast<size_t>(meta_type) >= rooms_meta.size())
+        return false;
+
+    return rooms_meta[static_cast<uint32_t>(meta_type)]->rooms[x + y * 8];
+}
+
+bool LevelGenSystem::set_room_meta(ROOM_META meta_type, uint32_t x, uint32_t y, bool value)
+{
+    auto* state_ptr = HeapBase::get().state();
+
+    if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h || static_cast<size_t>(meta_type) >= rooms_meta.size())
+        return false;
+
+    rooms_meta[static_cast<uint32_t>(meta_type)]->rooms[x + y * 8] = value;
+    return true;
+}
+
 bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
 {
     auto* state_ptr = HeapBase::get().state();
@@ -1865,7 +1913,7 @@ bool LevelGenSystem::is_room_flipped(uint32_t x, uint32_t y) const
     if (x < 0 || y < 0 || x >= state_ptr->w || y >= state_ptr->h)
         return false;
 
-    return flipped_rooms->rooms[x + y * 8];
+    return flipped_rooms_front_layer->rooms[x + y * 8];
 }
 bool LevelGenSystem::is_machine_room_origin(uint32_t x, uint32_t y) const
 {
@@ -2029,6 +2077,13 @@ bool LevelGenSystem::set_procedural_spawn_chance(uint32_t chance_id, uint32_t in
     }
 
     return false;
+}
+
+void LevelGenSystem::set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TEMPLATE room_template)
+{
+    using SetBacklayerRoomTemplate = void(LevelGenSystem*, uint32_t, uint32_t, uint32_t);
+    static auto set_backlayer_room_template = (SetBacklayerRoomTemplate*)get_address("set_backlayer_room_template");
+    set_backlayer_room_template(this, x, y, room_template);
 }
 
 bool default_spawn_is_valid(float x, float y, LAYER layer)

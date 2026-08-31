@@ -74,6 +74,11 @@ bool PostRoomGenerationContext::set_procedural_spawn_chance(PROCEDURAL_CHANCE ch
     return HeapBase::get().level_gen()->set_procedural_spawn_chance(chance_id, inverse_chance);
 }
 
+void PostRoomGenerationContext::set_backlayer_room_template(uint32_t x, uint32_t y, ROOM_TEMPLATE room_template)
+{
+    return HeapBase::get().level_gen()->set_backlayer_room_template(x, y, room_template);
+}
+
 void PostRoomGenerationContext::set_num_extra_spawns(std::uint32_t extra_spawn_id, std::uint32_t num_spawns_front_layer, std::uint32_t num_spawns_back_layer)
 {
     HeapBase::get().level_gen()->data->set_num_extra_spawns(extra_spawn_id, num_spawns_front_layer, num_spawns_back_layer);
@@ -963,14 +968,14 @@ class CustomTheme : public ThemeInfo
             HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_decoration2();
         run_post_func<std::monostate>(index);
     }
-    void spawn_extra()
+    void spawn_extra(int32_t start_x, int32_t start_y, int32_t end_x, int32_t end_y, uint8_t layer)
     {
         auto index = THEME_OVERRIDE::SPAWN_EXTRA;
         run_pre_func<std::monostate>(index);
         if (get_override_func_enabled(index))
             run_override_func<std::monostate>(index);
         else if (get_override_enabled(index))
-            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_extra();
+            HeapBase::get().level_gen()->themes[get_override_theme(index)]->spawn_extra(start_x, start_y, end_x, end_y, layer);
         run_post_func<std::monostate>(index);
     }
     void do_procedural_spawn(SpawnInfo* info)
@@ -1400,7 +1405,11 @@ void register_usertypes(sol::state& lua)
         &LevelGenSystem::flags3,
         "level_config",
         sol::property([](LevelGenSystem& lg) // -> array<int, 17>
-                      { return ZeroIndexArray<uint32_t>(lg.data->level_config) /**/; }));
+                      { return ZeroIndexArray<uint32_t>(lg.data->level_config) /**/; }),
+        "get_room_meta",
+        &LevelGenSystem::get_room_meta,
+        "set_room_meta",
+        &LevelGenSystem::set_room_meta);
 
     /// NoDoc
     struct DoorCoords
@@ -1439,6 +1448,8 @@ void register_usertypes(sol::state& lua)
         "PostRoomGenerationContext",
         "set_room_template",
         &PostRoomGenerationContext::set_room_template,
+        "set_backlayer_room_template",
+        &PostRoomGenerationContext::set_backlayer_room_template,
         "mark_as_machine_room_origin",
         &PostRoomGenerationContext::mark_as_machine_room_origin,
         "mark_as_set_room",
@@ -1835,6 +1846,32 @@ void register_usertypes(sol::state& lua)
     // Is inside solid floor or activefloor
     // DEFAULT
     // FLOOR | SAFE | EMPTY
+    */
+
+    lua.create_named_table(
+        "ROOM_META",
+        "FLIPPED_ROOM_FRONT_LAYER",
+        ROOM_META::FLIPPED_ROOM_FRONT_LAYER,
+        "FLIPPED_ROOM_BACK_LAYER",
+        ROOM_META::FLIPPED_ROOM_BACK_LAYER,
+        "SET_ROOM_FRONT_LAYER",
+        ROOM_META::SET_ROOM_FRONT_LAYER,
+        "SET_ROOM_BACK_LAYER",
+        ROOM_META::SET_ROOM_BACK_LAYER,
+        "MACHINE_ROOM_ORIGIN",
+        ROOM_META::MACHINE_ROOM_ORIGIN);
+
+    /* ROOM_META
+    // FLIPPED_ROOM_FRONT_LAYER
+    // If the room is flipped, changing it doesn't seem to affect much
+    // FLIPPED_ROOM_BACK_LAYER
+    // If the room is flipped, changing it doesn't seem to affect much
+    // SET_ROOM_FRONT_LAYER
+    // If the room is a set_room
+    // SET_ROOM_BACK_LAYER
+    // If the room is a set_room
+    // MACHINE_ROOM_ORIGIN
+    // If the room is the origin of a machine room
     */
 
     lua.new_usertype<SpawnInfo>(
