@@ -1,2 +1,3 @@
 docs/script-api.md                  diff
-docs/game_data/spel2.lua            linguist-generated
+docs/game_data/spel2.lua            linguist-generated text eol=lf
+docs/src/includes/*.md              text eol=lf

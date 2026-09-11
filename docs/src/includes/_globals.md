@@ -1757,6 +1757,8 @@ Get the current global frame count since the game was started. You can use this 
 
 #### [HudData](#HudData) get_hud()
 
+Get the [HudData](#HudData) the game draws the vanilla HUD from.
+
 
 ### get_id
 
@@ -2401,6 +2403,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out, short for 
 
 #### nil cancel_speechbubble()
 
+Hide the speech bubble currently on screen, if any, by expiring its timer.
 
 ### cancel_toast
 
@@ -2409,6 +2412,7 @@ Refreshes an [Illumination](#Illumination), keeps it from fading out, short for 
 
 #### nil cancel_toast()
 
+Hide the toast message currently on screen, if any, by expiring its timer.
 
 ### console_prinspect
 
@@ -2518,6 +2522,7 @@ Show a message coming from an entity
 
 #### bool speechbubble_visible()
 
+Returns true while a speech bubble is on screen.
 
 ### toast
 
@@ -2535,6 +2540,7 @@ Show a message that looks like a level feeling.
 
 #### bool toast_visible()
 
+Returns true while a toast message is on screen.
 
 ## Movable Behavior functions
 

@@ -582,15 +582,19 @@ void register_usertypes(sol::state& lua)
 
     lua.create_named_table("CAUSE_OF_DEATH", "DEATH", 0, "ENTITY", 1, "LONG_FALL", 2, "STILL_FALLING", 3, "MISSED", 4, "POISONED", 5);
 
+    /// Returns true while a toast message is on screen.
     lua["toast_visible"] = []() -> bool
     { return HeapBase::get().state()->toast != 0; };
 
+    /// Returns true while a speech bubble is on screen.
     lua["speechbubble_visible"] = []() -> bool
     { return HeapBase::get().state()->speechbubble != 0; };
 
+    /// Hide the toast message currently on screen, if any, by expiring its timer.
     lua["cancel_toast"] = []()
     { HeapBase::get().state()->toast_timer = 1000; };
 
+    /// Hide the speech bubble currently on screen, if any, by expiring its timer.
     lua["cancel_speechbubble"] = []()
     { HeapBase::get().state()->speechbubble_timer = 1000; };
 

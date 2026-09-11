@@ -104,9 +104,24 @@ ps.configure_parse(replace_all, "emmy_lua.pickle")
 ps.run_parse()
 
 
-reGetParam = re.compile(r"(\b[^ ]+) *([^,]+),?") # this pattern have some issues
 reRemoveDefault = re.compile(r" = .*")
-reHandleConst = re.compile(r"(\w+) (\w+)")
+
+
+def split_params(params_text):
+    """Yields (type, name, optional) per parameter."""
+    params = []
+    for position, param in enumerate(ps.custom_split(params_text), 1):
+        stripped = reRemoveDefault.sub("", param)
+        optional = stripped != param
+        param = stripped.strip()
+        if not param:
+            continue
+        p_type, separator, p_name = param.rpartition(" ")
+        if not separator:
+            p_type, p_name = param, f"param{position}"
+        p_type = replace_all(p_type.strip())
+        params.append((p_type, p_name.strip(), optional and not p_type.endswith("?")))
+    return params
 
 
 def get_emmylua_signature(cb_signature):
@@ -118,24 +133,18 @@ def get_emmylua_signature(cb_signature):
 def cpp_params_to_emmy_lua(params_text, cb_signatures=None):
     return_typed = ""
     return_normal = ""
-    params_iterator = reGetParam.finditer(params_text)
-    for param_match in params_iterator:
-        p_type = replace_all(param_match.group(1))
-        p_name = reRemoveDefault.sub("", param_match.group(2))
+    for p_type, p_name, optional in split_params(params_text):
         if p_type == "variadic_args":
             return_typed += f"\n---@vararg any"
             return_normal += f"..."
         else:
-            if m := reHandleConst.match(p_name):
-                p_type = m.group(1)
-                p_name = m.group(2)
             if cb_signatures and p_type == "function":
                 if len(cb_signatures) == 1:
                     cb_signature = next(iter(cb_signatures.values()))
                     p_type = get_emmylua_signature(cb_signature)
                 elif p_name in cb_signatures:
                     p_type = get_emmylua_signature(cb_signatures[p_name])
-            return_typed += f"\n---@param {p_name} {p_type}"
+            return_typed += f"\n---@param {p_name}{'?' if optional else ''} {p_type}"
             return_normal += p_name
         return_normal += ", "
     return_normal = return_normal[0:-2]
@@ -143,12 +152,10 @@ def cpp_params_to_emmy_lua(params_text, cb_signatures=None):
 
 
 def cpp_params_to_emmy_lua_fun(params_text):
-    params = replace_all(params_text).split(",")
-    params = [
-        ": ".join([part.strip() for part in param.rsplit(" ", 1)[::-1]])
-        for param in params
-    ]
-    return ", ".join(params)
+    return ", ".join(
+        f"{p_name}{'?' if optional else ''}: {p_type}"
+        for p_type, p_name, optional in split_params(params_text)
+    )
 
 
 reTuple = re.compile(r"tuple<(.*?)>")
@@ -299,12 +306,18 @@ function F(f_string) end
         if lf["comment"]:
             lf["comment"][0] = '@deprecated ' + lf["comment"][0]
         else:
-            ps.print_console(f"Deprecated function {lf["name"]} missing deprecation message")
+            ps.print_console(f"Deprecated function {lf['name']} missing deprecation message")
             lf["comment"].insert(0, '@deprecated')
 
         if m := re.search(r"lua\[\"(.*)\"\]", lf["cpp"]):
             proxy_name = m.group(1)
-            proxy_lf = next(x for x in ps.funcs if x["name"] == proxy_name)
+            proxy_lf = next((x for x in ps.funcs if x["name"] == proxy_name), None)
+            if proxy_lf is None:
+                ps.print_console(
+                    f"Deprecated function {lf['name']} forwards to unknown function "
+                    f"{proxy_name}, skipping. Is {proxy_name} NoDoc'd or itself deprecated?"
+                )
+                continue
             lf["cpp"] = proxy_lf["cpp"]
 
         print_lf(lf)

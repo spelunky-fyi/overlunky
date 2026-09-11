@@ -3,8 +3,22 @@ name: Clang-Format Lint
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "examples/**"
+      - "**.md"
+      - "LICENSE"
+      - ".github/workflows/docs_verify.yml"
+      - ".github/workflows/build-docs.yml"
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "examples/**"
+      - "**.md"
+      - "LICENSE"
+      - ".github/workflows/docs_verify.yml"
+      - ".github/workflows/build-docs.yml"
   workflow_dispatch:
     inputs:
       do_formatting:

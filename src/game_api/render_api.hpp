@@ -533,4 +533,5 @@ struct Hud
     HudData* data;
 };
 
+/// Get the HudData the game draws the vanilla HUD from.
 HudData* get_hud();
