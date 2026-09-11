@@ -1,6 +1,7 @@
 import re
 import os
 from ast import literal_eval
+from typing import Any, TypedDict
 
 from generate_util import *
 from parse_cache import *
@@ -190,8 +191,17 @@ vtable_api_files = [
 rpc = []
 classes = []
 events = []
-funcs = []
-deprecated_funcs = []
+
+class Function(TypedDict):
+    name: str
+    cpp: str
+    comment: list[str]
+    cb_signature: Any
+    file: str
+
+funcs: list[Function] = []
+deprecated_funcs: list[Function] = []
+
 pre_gathered_vars = {}
 types = []
 known_casts = []
@@ -323,7 +333,7 @@ def run_parse():
         else:
             print_console("Failed unpickling parse data...")
 
-    comment = []
+    comment: list[str] = []
     skip = False
 
     print_collecting_info("rpc")
@@ -568,13 +578,13 @@ def run_parse():
                         cb_signature = (
                             get_cb_signature(" ".join(comment)) if comment else None
                         )
-                        func = {
+                        func = Function({
                             "name": m.group(1),
                             "cpp": replace_fun(m.group(2)),
                             "comment": comment,
                             "cb_signature": cb_signature,
                             "file": file,
-                        }
+                        })
                         if not comment or "NoDoc" not in comment[0]:
                             if comment and comment[0] == "Deprecated":
                                 deprecated_funcs.append(func)

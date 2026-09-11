@@ -1959,6 +1959,435 @@ function set_camera_layer_control_enabled(enable) end
 ---@return nil
 function set_liquid_layer(l) end
 
+--## Deprecated Functions
+
+---@deprecated Same as import().
+---@param id string
+---@param version string?
+---@param optional boolean?
+---@return table
+function load_script(id, version, optional) end
+---@deprecated
+---@param flags Flags
+---@param bit integer
+---@return Flags
+function setflag(flags, bit) end
+---@deprecated
+---@param flags Flags
+---@param bit integer
+---@return Flags
+function clrflag(flags, bit) end
+---@deprecated
+---@param flags Flags
+---@param bit integer
+---@return boolean
+function testflag(flags, bit) end
+---@deprecated Use `generate_world_particles`
+---@param particle_emitter_id PARTICLEEMITTER
+---@param uid integer
+---@return ParticleEmitterInfo
+function generate_particles(particle_emitter_id, uid) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_line` instead
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param thickness number
+---@param color uColor
+---@return nil
+function draw_line(x1, y1, x2, y2, thickness, color) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_rect` instead
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param thickness number
+---@param rounding number
+---@param color uColor
+---@return nil
+function draw_rect(x1, y1, x2, y2, thickness, rounding, color) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_rect_filled` instead
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param rounding number
+---@param color uColor
+---@return nil
+function draw_rect_filled(x1, y1, x2, y2, rounding, color) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_circle` instead
+---@param x number
+---@param y number
+---@param radius number
+---@param thickness number
+---@param color uColor
+---@return nil
+function draw_circle(x, y, radius, thickness, color) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_circle_filled` instead
+---@param x number
+---@param y number
+---@param radius number
+---@param color uColor
+---@return nil
+function draw_circle_filled(x, y, radius, color) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_text` instead
+---@param x number
+---@param y number
+---@param size number
+---@param text string
+---@param color uColor
+---@return nil
+function draw_text(x, y, size, text, color) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_image` instead
+---@param image IMAGE
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param uvx1 number
+---@param uvy1 number
+---@param uvx2 number
+---@param uvy2 number
+---@param color uColor
+---@return nil
+function draw_image(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.draw_image_rotated` instead
+---@param image IMAGE
+---@param x1 number
+---@param y1 number
+---@param x2 number
+---@param y2 number
+---@param uvx1 number
+---@param uvy1 number
+---@param uvx2 number
+---@param uvy2 number
+---@param color uColor
+---@param angle number
+---@param px number
+---@param py number
+---@return nil
+function draw_image_rotated(image, x1, y1, x2, y2, uvx1, uvy1, uvx2, uvy2, color, angle, px, py) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.window` instead
+---@param title string
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param movable boolean
+---@param callback function
+---@return nil
+function window(title, x, y, w, h, movable, callback) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_text` instead
+---@param text string
+---@return nil
+function win_text(text) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_separator` instead
+---@return nil
+function win_separator() end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_inline` instead
+---@return nil
+function win_inline() end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_sameline` instead
+---@param offset number
+---@param spacing number
+---@return nil
+function win_sameline(offset, spacing) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_button` instead
+---@param text string
+---@return boolean
+function win_button(text) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_input_text` instead
+---@param label string
+---@param value string
+---@return string
+function win_input_text(label, value) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_input_int` instead
+---@param label string
+---@param value integer
+---@return integer
+function win_input_int(label, value) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_input_float` instead
+---@param label string
+---@param value number
+---@return number
+function win_input_float(label, value) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_slider_int` instead
+---@param label string
+---@param value integer
+---@param min integer
+---@param max integer
+---@return integer
+function win_slider_int(label, value, min, max) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_drag_int` instead
+---@param label string
+---@param value integer
+---@param min integer
+---@param max integer
+---@return integer
+function win_drag_int(label, value, min, max) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_slider_float` instead
+---@param label string
+---@param value number
+---@param min number
+---@param max number
+---@return number
+function win_slider_float(label, value, min, max) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_drag_float` instead
+---@param label string
+---@param value number
+---@param min number
+---@param max number
+---@return number
+function win_drag_float(label, value, min, max) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_check` instead
+---@param label string
+---@param value boolean
+---@return boolean
+function win_check(label, value) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_combo` instead
+---@param label string
+---@param selected integer
+---@param opts string
+---@return integer
+function win_combo(label, selected, opts) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_pushid` instead
+---@param id integer
+---@return nil
+function win_pushid(id) end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_popid` instead
+---@return nil
+function win_popid() end
+---@deprecated Use [GuiDrawContext](https://spelunky-fyi.github.io/overlunky/#GuiDrawContext)`.win_image` instead
+---@param image IMAGE
+---@param width number
+---@param height number
+---@return nil
+function win_image(image, width, height) end
+---@deprecated Use the `new` operator on [UdpServer](https://spelunky-fyi.github.io/overlunky/#UdpServer) instead
+---The server will be closed lazily by garbage collection once the handle is released. Requires unsafe mode.
+---The callback signature is optional<string> on_message(string msg, string src)
+---@param host string
+---@param port integer
+---@param cb fun(msg: string, src: string): string?
+---@return any
+function udp_listen(host, port, cb) end
+---@deprecated Read the game prng state. Use [prng](https://spelunky-fyi.github.io/overlunky/#PRNG):get_pair() instead.
+---@return integer[]
+function read_prng() end
+---@deprecated Set level flag 18 on post room generation instead, to properly force every level to dark
+---@param g boolean
+---@return nil
+function force_dark_level(g) end
+---@deprecated Use `get_entities_by(0, MASK.ANY, LAYER.BOTH)` instead
+---@return integer[]
+function get_entities() end
+---@deprecated Use `get_entities_by(0, mask, LAYER.BOTH)` instead
+---@param mask MASK
+---@return integer[]
+function get_entities_by_mask(mask) end
+---@deprecated Use `get_entities_by(0, MASK.ANY, layer)` instead
+---@param layer LAYER
+---@return integer[]
+function get_entities_by_layer(layer) end
+---@deprecated Use `get_entities_overlapping_hitbox` instead
+---@param entity_types ENT_TYPE[]
+---@param mask MASK
+---@param sx number
+---@param sy number
+---@param sx2 number
+---@param sy2 number
+---@param layer LAYER
+---@return integer[]
+function get_entities_overlapping(entity_types, mask, sx, sy, sx2, sy2, layer) end
+---@deprecated Use `get_entities_overlapping_hitbox` instead
+---@param entity_type ENT_TYPE
+---@param mask MASK
+---@param sx number
+---@param sy number
+---@param sx2 number
+---@param sy2 number
+---@param layer LAYER
+---@return integer[]
+function get_entities_overlapping(entity_type, mask, sx, sy, sx2, sy2, layer) end
+---@deprecated As the name is misleading. use Movable.`move_state` field instead
+---@param uid integer
+---@return integer
+function get_entity_ai_state(uid) end
+---@deprecated Use [replace_drop](https://spelunky-fyi.github.io/overlunky/#replace_drop)(DROP.ARROWTRAP_WOODENARROW, new_arrow_type) and [replace_drop](https://spelunky-fyi.github.io/overlunky/#replace_drop)(DROP.POISONEDARROWTRAP_WOODENARROW, new_arrow_type) instead
+---@param regular_entity_type ENT_TYPE
+---@param poison_entity_type ENT_TYPE
+---@return nil
+function set_arrowtrap_projectile(regular_entity_type, poison_entity_type) end
+---@deprecated This function never worked properly as too many places in the game individually check for vlads cape and calculate the blood multiplication
+---`default_multiplier` doesn't do anything due to some changes in last game updates, `vladscape_multiplier` only changes the multiplier to some entities death's blood spit
+---@param /default_multiplier/ integer
+---@param vladscape_multiplier integer
+---@return nil
+function set_blood_multiplication(/default_multiplier/, vladscape_multiplier) end
+---@deprecated Deprecated because it's a weird old hack that crashes the game. You can modify inputs in many other ways, like editing `state.player_inputs.player_slot_1.buttons_gameplay` in PRE_UPDATE or a `set_pre_process_input` hook. Steal input from a Player, HiredHand or PlayerGhost.
+---@param uid integer
+---@return nil
+function steal_input(uid) end
+---@deprecated Return input previously stolen with [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input)
+---@param uid integer
+---@return nil
+function return_input(uid) end
+---@deprecated Send input to entity, has to be previously stolen with [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input)
+---@param uid integer
+---@param buttons INPUTS
+---@return nil
+function send_input(uid, buttons) end
+---@deprecated Use `players[1].input.buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
+---Of course, you can get the Player by other mean, it doesn't need to be the `players` table
+---You can only read inputs from actual players, HH don't have any inputs
+---@param uid integer
+---@return INPUTS
+function read_input(uid) end
+---@deprecated Read input that has been previously stolen with [steal_input](https://spelunky-fyi.github.io/overlunky/#steal_input)
+---Use `state.player_inputs.player_slots[player_slot].buttons_gameplay` for only the inputs during the game, or `.buttons` for all the inputs, even during the pause menu
+---@param uid integer
+---@return INPUTS
+function read_stolen_input(uid) end
+---@deprecated Use `entity.clear_virtual` instead.
+---Clears a callback that is specific to an entity.
+---@param uid integer
+---@param cb_id CallbackId
+---@return nil
+function clear_entity_callback(uid, cb_id) end
+---@deprecated Use `entity:set_pre_update_state_machine` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---`uid` has to be the uid of a `Movable` or else stuff will break.
+---Sets a callback that is called right before the statemachine, return `true` to skip the statemachine update.
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---The callback signature is bool statemachine(Entity self)
+---@param uid integer
+---@param fun fun(self: Entity): boolean
+---@return CallbackId?
+function set_pre_statemachine(uid, fun) end
+---@deprecated Use `entity:set_post_update_state_machine` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---`uid` has to be the uid of a `Movable` or else stuff will break.
+---Sets a callback that is called right after the statemachine, so you can override any values the satemachine might have set (e.g. `animation_frame`).
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---The callback signature is nil statemachine(Entity self)
+---@param uid integer
+---@param fun fun(self: Entity): nil
+---@return CallbackId?
+function set_post_statemachine(uid, fun) end
+---@deprecated Use `entity:set_pre_destroy` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right when an entity is destroyed, e.g. as if by `Entity.destroy()` before the game applies any side effects.
+---Use this only when no other approach works, this call can be expensive if overused.
+---The callback signature is nil on_destroy(Entity self)
+---@param uid integer
+---@param fun fun(self: Entity): nil
+---@return CallbackId?
+function set_on_destroy(uid, fun) end
+---@deprecated Use `entity:set_pre_kill` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right when an entity is eradicated, before the game applies any side effects.
+---Use this only when no other approach works, this call can be expensive if overused.
+---The callback signature is nil on_kill(Entity self, Entity killer)
+---@param uid integer
+---@param fun fun(self: Entity, killer: Entity): nil
+---@return CallbackId?
+function set_on_kill(uid, fun) end
+---@deprecated Use `entity:set_pre_damage` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before an entity is damaged, return `true` to skip the game's damage handling.
+---Note that damage_dealer can be nil ! (long fall, ...)
+---DO NOT CALL `self:damage()` in the callback !
+---Use this only when no other approach works, this call can be expensive if overused.
+---The entity has to be of a [Movable](https://spelunky-fyi.github.io/overlunky/#Movable) type.
+---The callback signature is bool on_damage(Entity self, Entity damage_dealer, int damage_amount, float vel_x, float vel_y, int stun_amount, int iframes)
+---@param uid integer
+---@param fun fun(self: Entity, damage_dealer: Entity, damage_amount: integer, vel_x: number, vel_y: number, stun_amount: integer, iframes: integer): boolean
+---@return CallbackId?
+function set_on_damage(uid, fun) end
+---@deprecated Use `entity:set_pre_floor_update` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before a floor is updated (by killed neighbor), return `true` to skip the game's neighbor update handling.
+---Use this only when no other approach works, this call can be expensive if overused.
+---The callback signature is bool pre_floor_update(Entity self)
+---@param uid integer
+---@param fun fun(self: Entity): boolean
+---@return CallbackId?
+function set_pre_floor_update(uid, fun) end
+---@deprecated Use `entity:set_post_floor_update` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after a floor is updated (by killed neighbor).
+---Use this only when no other approach works, this call can be expensive if overused.
+---The callback signature is nil post_floor_update(Entity self)
+---@param uid integer
+---@param fun fun(self: Entity): nil
+---@return CallbackId?
+function set_post_floor_update(uid, fun) end
+---@deprecated Use `entity:set_pre_trigger_action` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right when a container is opened by the player (up+whip)
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---The callback signature is nil on_open(Entity entity_self, Entity opener)
+---@param uid integer
+---@param fun fun(entity_self: Entity, opener: Entity): nil
+---@return CallbackId?
+function set_on_open(uid, fun) end
+---@deprecated Use `entity:set_pre_collision1` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before the collision 1 event, return `true` to skip the game's collision handling.
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---The callback signature is bool pre_collision1(Entity entity_self, Entity collision_entity)
+---@param uid integer
+---@param fun fun(entity_self: Entity, collision_entity: Entity): boolean
+---@return CallbackId?
+function set_pre_collision1(uid, fun) end
+---@deprecated Use `entity:set_pre_collision2` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right before the collision 2 event, return `true` to skip the game's collision handling.
+---Use this only when no other approach works, this call can be expensive if overused.
+---Check [here](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md) to see whether you can use this callback on the entity type you intend to.
+---The callback signature is bool pre_collision12(Entity self, Entity collision_entity)
+---@param uid integer
+---@param fun fun(self: Entity, collision_entity: Entity): boolean
+---@return CallbackId?
+function set_pre_collision2(uid, fun) end
+---@deprecated Use `entity.rendering_info:set_pre_render` in combination with `render_info:get_entity` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered.
+---Return `true` to skip the original rendering function and all later pre_render callbacks.
+---Use this only when no other approach works, this call can be expensive if overused.
+---The callback signature is bool render(VanillaRenderContext render_ctx, Entity self)
+---@param uid integer
+---@param fun fun(render_ctx: VanillaRenderContext, self: Entity): boolean
+---@return CallbackId?
+function set_pre_render(uid, fun) end
+---@deprecated Use `entity.rendering_info:set_post_render` in combination with `render_info:get_entity` instead.
+---Returns unique id for the callback to be used in [clear_entity_callback](https://spelunky-fyi.github.io/overlunky/#clear_entity_callback) or `nil` if uid is not valid.
+---Sets a callback that is called right after the entity is rendered.
+---Use this only when no other approach works, this call can be expensive if overused.
+---The callback signature is nil post_render(VanillaRenderContext render_ctx, Entity self)
+---@param uid integer
+---@param fun fun(render_ctx: VanillaRenderContext, self: Entity): nil
+---@return CallbackId?
+function set_post_render(uid, fun) end
+---@deprecated Use `Entity:flip` instead
+---@param uid integer
+---@return nil
+function flip_entity(uid) end
+---@deprecated use `Door:unlock` instead
+---@param x number
+---@param y number
+---@return nil
+function lock_door_at(x, y) end
+---@deprecated use `Door:unlock` instead
+---@param x number
+---@param y number
+---@return nil
+function unlock_door_at(x, y) end
+
 --## Types
 do
 

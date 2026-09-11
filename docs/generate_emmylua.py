@@ -193,6 +193,28 @@ def print_af(lf, af):
     print_func(name, params, ret, typed_params)
 
 
+def print_lf(lf):
+    if rpc_funcs := ps.rpcfunc(lf["cpp"]):
+        for af in rpc_funcs:
+            print_af(lf, af)
+    elif not (lf["name"].startswith("on_") or lf["name"] in ps.not_functions):
+        m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
+        m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])
+        ret = "nil"
+        typed_params = ""
+        params = ""
+        if m:
+            ret = m.group(2) or "nil"
+        if m or m2:
+            params = (m or m2).group(1)
+            typed_params, params = cpp_params_to_emmy_lua(
+                params, lf["cb_signature"] if "cb_signature" in lf else ""
+            )
+        name = lf["name"]
+        print_comment(lf)
+        print_func(name, params, ret, typed_params)
+
+
 def main():
     gu.setup_stdout("game_data/spel2.lua")
 
@@ -264,27 +286,28 @@ function F(f_string) end
     )
 
     for lf in ps.funcs:
-        if len(ps.rpcfunc(lf["cpp"])):
-            for af in ps.rpcfunc(lf["cpp"]):
-                print_af(lf, af)
-        elif not (lf["name"].startswith("on_") or lf["name"] in ps.not_functions):
-            if lf["comment"] and "NoDoc" in lf["comment"][0]:
-                continue
-            m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", lf["cpp"])
-            m2 = re.search(r"\(([^\{]*)\)", lf["cpp"])
-            ret = "nil"
-            typed_params = ""
-            params = ""
-            if m:
-                ret = m.group(2) or "nil"
-            if m or m2:
-                params = (m or m2).group(1)
-                typed_params, params = cpp_params_to_emmy_lua(
-                    params, lf["cb_signature"] if "cb_signature" in lf else ""
-                )
-            name = lf["name"]
-            print_comment(lf)
-            print_func(name, params, ret, typed_params)
+        if lf["comment"] and "NoDoc" in lf["comment"][0]:
+            continue
+        print_lf(lf)
+
+    print("\n--## Deprecated Functions\n")
+    for lf in ps.deprecated_funcs:
+        lf["comment"].pop(0) # "Deprecated" line
+        if lf["comment"] and "NoDoc" in lf["comment"][0]:
+            continue
+
+        if lf["comment"]:
+            lf["comment"][0] = '@deprecated ' + lf["comment"][0]
+        else:
+            ps.print_console(f"Deprecated function {lf["name"]} missing deprecation message")
+            lf["comment"].insert(0, '@deprecated')
+
+        if m := re.search(r"lua\[\"(.*)\"\]", lf["cpp"]):
+            proxy_name = m.group(1)
+            proxy_lf = next(x for x in ps.funcs if x["name"] == proxy_name)
+            lf["cpp"] = proxy_lf["cpp"]
+
+        print_lf(lf)
 
     type_static_funcs = {}
     print("\n--## Types\ndo\n")
