@@ -9,15 +9,31 @@ on:
 
 jobs:
   check:
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: "3.12"
+
       - name: Checking if all the types are documented in the API doc
+        working-directory: docs
+        run: python validator.py
+
+      - name: Checking if the generators still run
+        working-directory: docs
         run: |
-            cd docs
-            python validator.py
+          python generate_emmylua.py
+          python generate.py
+
+      - name: Checking if the generated docs are up to date
+        run: |
+          if ! git diff --exit-code -- docs/game_data/spel2.lua docs/src/includes/; then
+            echo
+            echo "::error::Generated docs are out of date."
+            echo "The files above are generated from src/game_api. Run the generators and commit the result:"
+            echo "    cd docs && python generate_emmylua.py && python generate.py"
+            exit 1
+          fi
