@@ -9,6 +9,8 @@
 
 #include <atomic>
 #include <chrono>
+#include <exception>
+#include <utility>
 
 #include "bucket.hpp"
 #include "logger.h"
@@ -379,6 +381,25 @@ void hook_virtual_function(FunT hook_fun, FunT& orig_fun, int vtable_index)
     }
 };
 
+// Returns the [start, end) RVA range of a loaded module's code, or {0, 0} if it can't be
+// determined. The module is already mapped, so its headers are read in place.
+static std::pair<size_t, size_t> module_code_range(const char* module_base)
+{
+    if (module_base == nullptr)
+        return {0, 0};
+
+    const auto* dos_header = reinterpret_cast<const IMAGE_DOS_HEADER*>(module_base);
+    if (dos_header->e_magic != IMAGE_DOS_SIGNATURE)
+        return {0, 0};
+
+    const auto* nt_headers = reinterpret_cast<const IMAGE_NT_HEADERS64*>(module_base + dos_header->e_lfanew);
+    if (nt_headers->Signature != IMAGE_NT_SIGNATURE)
+        return {0, 0};
+
+    const size_t code_start = nt_headers->OptionalHeader.BaseOfCode;
+    return {code_start, code_start + nt_headers->OptionalHeader.SizeOfCode};
+}
+
 void hook_steam_overlay()
 {
     char* steam_overlay = (char*)GetModuleHandleA("gameoverlayrenderer64.dll");
@@ -404,8 +425,45 @@ void hook_steam_overlay()
     // Lets detour the steam overlay instead!
     DEBUG("Steam detected, hooking Steam Overlay...");
 
-    size_t present_offset = find_inst(steam_overlay, "\x48\x8b\x4f\x40\x48\x8d\x15"sv, 0, 0x99999, "steam_overlay_present"sv, false);
-    size_t resize_offset = find_inst(steam_overlay, "\x48\x8b\x4f\x68\x48\x8d\x15"sv, 0, 0x99999, "steam_overlay_resize"sv, false);
+    const auto [code_start, code_end] = module_code_range(steam_overlay);
+
+    size_t present_offset = 0;
+    size_t resize_offset = 0;
+    if (code_end > code_start)
+    {
+        try
+        {
+            present_offset = find_inst(steam_overlay, "\x48\x8b\x4f\x40\x48\x8d\x15"sv, code_start, code_end, "steam_overlay_present"sv, false);
+            resize_offset = find_inst(steam_overlay, "\x48\x8b\x4f\x68\x48\x8d\x15"sv, code_start, code_end, "steam_overlay_resize"sv, false);
+        }
+        catch (const std::exception& e)
+        {
+            DEBUG("Steam Overlay pattern scan failed: {}", e.what());
+            present_offset = 0;
+            resize_offset = 0;
+        }
+    }
+    else
+    {
+        DEBUG("Couldn't read Steam Overlay module headers...");
+    }
+
+    // Follow the rip-relative lea to the function and make sure we actually
+    // landed in code before detouring.
+    if (present_offset != 0 && resize_offset != 0)
+    {
+        auto present_offset2 = *(int*)(steam_overlay + present_offset + 7);
+        auto resize_offset2 = *(int*)(steam_overlay + resize_offset + 7);
+        present_offset = present_offset + 7 + 4 + present_offset2;
+        resize_offset = resize_offset + 7 + 4 + resize_offset2;
+
+        if (present_offset < code_start || present_offset >= code_end || resize_offset < code_start || resize_offset >= code_end)
+        {
+            DEBUG("Steam Overlay functions resolved outside of its code ({:#x}, {:#x})...", present_offset, resize_offset);
+            present_offset = 0;
+            resize_offset = 0;
+        }
+    }
 
     if (present_offset == 0 || resize_offset == 0)
     {
@@ -417,11 +475,6 @@ void hook_steam_overlay()
         hook_virtual_function(&hkResizeBuffers, g_OrigSwapChainResizeBuffers, 13);
         return;
     }
-
-    auto present_offset2 = *(int*)(steam_overlay + present_offset + 7);
-    auto resize_offset2 = *(int*)(steam_overlay + resize_offset + 7);
-    present_offset = present_offset + 7 + 4 + present_offset2;
-    resize_offset = resize_offset + 7 + 4 + resize_offset2;
 
     g_OrigSwapChainPresent = (PresentPtr)(steam_overlay + present_offset);
     g_OrigSwapChainResizeBuffers = (ResizeBuffersPtr)(steam_overlay + resize_offset);
