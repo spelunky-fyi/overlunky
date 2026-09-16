@@ -10,7 +10,7 @@ git config --local user.email "41898282+github-actions[bot]@users.noreply.github
 git config --local user.name "github-actions[bot]"
 git add fonts images javascripts stylesheets
 
-if git diff --cached --quiet && git diff --quiet; then
+if git diff --cached --quiet && git diff --quiet --ignore-submodules=all; then
     echo "Docs already up to date, nothing to commit."
 else
     git commit -am "update slate[no ci]"
