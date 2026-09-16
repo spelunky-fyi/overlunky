@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>       // for recursive_mutex
 #include <type_traits> // for true_type, is_invocable_r_v
 
 template <class CallableT, class Signature>
@@ -44,6 +45,47 @@ inline std::string_view trim(std::string_view str)
     const auto end = str.find_last_not_of(white_spaces);
     return str.substr(begin, end - begin + 1);
 }
+
+// A recursive_mutex that is deliberately never destroyed.
+//
+// LuaBackend destructors can run during static destruction at DLL detach, and destruction
+// order across translation units is unspecified, so a plain namespace-scope mutex here can
+// already be gone by the time the last backend tears down. Better to leak it than risk
+// undefined behavior.
+class ImmortalRecursiveMutex
+{
+  public:
+    ImmortalRecursiveMutex()
+        : m_Mutex{}
+    {
+    }
+    // Deliberately does not destroy m_Mutex
+    ~ImmortalRecursiveMutex()
+    {
+    }
+
+    ImmortalRecursiveMutex(const ImmortalRecursiveMutex&) = delete;
+    ImmortalRecursiveMutex& operator=(const ImmortalRecursiveMutex&) = delete;
+
+    void lock()
+    {
+        m_Mutex.lock();
+    }
+    void unlock()
+    {
+        m_Mutex.unlock();
+    }
+    bool try_lock()
+    {
+        return m_Mutex.try_lock();
+    }
+
+  private:
+    union
+    {
+        std::recursive_mutex m_Mutex;
+    };
+};
 
 template <class T, auto Mutex>
 class GlobalMutexProtectedResource

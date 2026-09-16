@@ -1783,7 +1783,7 @@ end
     */
 }
 
-std::recursive_mutex global_lua_lock;
+ImmortalRecursiveMutex global_lua_lock;
 
 std::vector<std::string> safe_fields{};
 std::vector<std::string> unsafe_fields{};

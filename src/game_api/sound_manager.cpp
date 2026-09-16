@@ -37,8 +37,11 @@ struct SoundCallbackData
 
     inline static FMOD::ChannelSetCallback* ChannelSetCallback{nullptr};
 };
-std::mutex s_SoundCallbacksMutex;
-std::vector<SoundCallbackData> s_SoundCallbacks;
+// Never destroyed, for the same reason as the backend registries in lua_backend.cpp:
+// ~SoundManager can run during static destruction at DLL detach, after these would
+// otherwise have been destroyed.
+std::mutex& s_SoundCallbacksMutex = *new std::mutex();
+std::vector<SoundCallbackData>& s_SoundCallbacks = *new std::vector<SoundCallbackData>();
 FMOD::FMOD_RESULT ChannelControlCallback(
     FMOD::ChannelControl* channel_control,
     FMOD::ChannelControlType channel_control_type,
@@ -142,11 +145,12 @@ void apply_event_detach(const PendingDetach& pending)
         }
     }
 }
-std::mutex s_EventCallbacksMutex;
+// Never destroyed, see s_SoundCallbacksMutex above.
+std::mutex& s_EventCallbacksMutex = *new std::mutex();
 // 0 is reserved for INVALID_SOUND_CALLBACK_ID
 std::uint32_t current_callback_id{1};
-std::vector<EventCallbackData> s_EventCallbacks;
-std::unordered_map<std::uint32_t, FMODStudio::EventDescription*> s_EventCallbackIdToEventDescription;
+std::vector<EventCallbackData>& s_EventCallbacks = *new std::vector<EventCallbackData>();
+std::unordered_map<std::uint32_t, FMODStudio::EventDescription*>& s_EventCallbackIdToEventDescription = *new std::unordered_map<std::uint32_t, FMODStudio::EventDescription*>();
 FMOD::FMOD_RESULT EventInstanceCallback(FMODStudio::EventCallbackType callback_type, FMODStudio::EventInstance* instance, void*)
 {
     FMODStudio::EventDescription* event;

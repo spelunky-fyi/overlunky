@@ -78,6 +78,8 @@ std::shared_ptr<SoundManager> g_SoundManager;
 std::unique_ptr<SpelunkyConsole> g_Console;
 std::deque<ScriptMessage> g_ConsoleMessages;
 
+bool g_ShuttingDown{false};
+
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_scripts;
 std::map<std::string, std::unique_ptr<SpelunkyScript>> g_ui_scripts;
 std::vector<std::filesystem::path> g_script_files;
@@ -2835,6 +2837,9 @@ void clear_script_messages()
 
 bool process_keys(UINT nCode, WPARAM wParam, [[maybe_unused]] LPARAM lParam)
 {
+    if (g_ShuttingDown)
+        return false;
+
     ImGuiContext& g = *GImGui;
     int repeat = (lParam >> 30) & 1U;
     auto& io = ImGui::GetIO();
@@ -9611,6 +9616,9 @@ set_callback(clear_hooks, ON.SCRIPT_DISABLE)
 
 void imgui_draw()
 {
+    if (g_ShuttingDown)
+        return;
+
     auto base = ImGui::GetMainViewport();
     ImGuiContext& g = *GImGui;
 
@@ -9973,6 +9981,9 @@ void update_bucket()
 
 void post_draw()
 {
+    if (g_ShuttingDown)
+        return;
+
     check_focus();
     update_players();
     force_kits();
@@ -10042,13 +10053,16 @@ void init_ui(ImGuiContext* ctx)
 
     register_make_save_path(&make_save_path);
 
-    // Tear scripts down here instead of leaving them for the destructor. Relying on implicit
+    // Tear everything down here instead of leaving it for the destructor. Relying on implicit
     // destruction can lead to bad_optional_access when the backend is no longer available.
     register_on_quit(
         []()
         {
+            g_ShuttingDown = true;
             g_scripts.clear();
             g_ui_scripts.clear();
+            g_Console.reset();
+            g_SoundManager.reset();
         });
 
     register_on_load_file(&load_file_as_dds_if_image);
@@ -10068,6 +10082,9 @@ void init_ui(ImGuiContext* ctx)
     render_api.set_post_render_game(
         []()
         {
+            if (g_ShuttingDown)
+                return;
+
             auto& render_api_l = RenderAPI::get();
             static const float color[4]{1.0f, 1.0f, 1.0f, 0.3f};
             render_vanilla_stuff();

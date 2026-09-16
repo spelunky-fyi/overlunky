@@ -5,7 +5,9 @@
 #include <sol/sol.hpp> // for environment, protected_function_result
 #include <string_view> // for string_view
 
-extern std::recursive_mutex global_lua_lock;
+#include "util.hpp" // for ImmortalRecursiveMutex
+
+extern ImmortalRecursiveMutex global_lua_lock;
 
 std::shared_ptr<sol::state> acquire_lua_vm(class SoundManager* sound_manager = nullptr);
 sol::state& get_lua_vm(class SoundManager* sound_manager = nullptr);

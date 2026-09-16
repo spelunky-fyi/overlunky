@@ -36,10 +36,14 @@
 #include "usertypes/save_context.hpp" // for LoadContext, SaveContext
 #include "window_api.hpp"             // for get_window
 
-std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>> g_all_backends;
+// Never destroyed. ~LuaBackend runs during static destruction at DLL detach for any backend
+// owned by a namespace-scope object in another translation unit (g_Console is one), and
+// destruction order between translation units is unspecified, so these can otherwise be gone
+// before the last backend tears itself down.
+std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>>& g_all_backends = *new std::vector<std::unique_ptr<LuaBackend::ProtectedBackend>>();
 /// Identity of a running script, keyed on its environment table.
-std::unordered_map<const void*, LuaBackend*> g_backend_envs;
-std::unordered_map<int, HotKey> g_hotkeys;
+std::unordered_map<const void*, LuaBackend*>& g_backend_envs = *new std::unordered_map<const void*, LuaBackend*>();
+std::unordered_map<int, HotKey>& g_hotkeys = *new std::unordered_map<int, HotKey>();
 int g_hotkey_count = 0;
 
 LuaBackend::LuaBackend(SoundManager* sound_mgr, LuaConsole* con)

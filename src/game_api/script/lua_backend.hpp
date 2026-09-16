@@ -34,7 +34,7 @@
 #include "usertypes/vanilla_render_lua.hpp" // for VanillaRenderContext, CORNER_FINISH
 #include "util.hpp"                         // for GlobalMutexProtectedResource, ON_SCOPE_EXIT
 
-extern std::recursive_mutex global_lua_lock;
+extern ImmortalRecursiveMutex global_lua_lock;
 
 class Player;
 class JournalPage;
