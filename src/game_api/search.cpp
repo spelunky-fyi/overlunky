@@ -2323,6 +2323,27 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     //
     // liquid layer stuff end
     //
+    {
+        "set_backlayer_room_template"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("48 8B 86 C0 00 00 00 66 83 3C 78 09 75 09 0F B7 4C 24 46 66 89 0C 78 41 8A 45 00 C0 E8 03 24 01 48 8B 8E D0 00 00 00 88 04 39"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "set_random_backlayer_rooms"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("F6 81 39 01 00 00 20 0F 84 ED 36 00 00 48 89 CE 8B 05 67 54 2D 00 65 48 8B 0C 25 58 00 00 00 48 8B 04 C1 48 8B 80 20 01 00 00"_gh)
+            .at_exe()
+            .function_start(),
+    },
+    {
+        "spawn_backlayer_rooms"sv,
+        PatternCommandBuffer{}
+            .find_after_inst("46 8D 34 10 4C 8B BB 00 01 00 00 4F 8B 2C F7 4D 85 ED"_gh)
+            .at_exe()
+            .function_start(),
+    },
 };
 std::unordered_map<std::string_view, size_t> g_cached_addresses;
 

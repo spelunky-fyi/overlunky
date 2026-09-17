@@ -142,6 +142,10 @@ enum class ON
     BLOCKED_UPDATE,
     BLOCKED_GAME_LOOP,
     BLOCKED_PROCESS_INPUT,
+    PRE_SET_RANDOM_BACKLAYER_ROOMS,
+    POST_SET_RANDOM_BACKLAYER_ROOMS,
+    PRE_SPAWN_BACKLAYER_ROOMS,
+    POST_SPAWN_BACKLAYER_ROOMS,
     // PRE_COPY_STATE,
 };
 
@@ -484,9 +488,9 @@ class LuaBackend
     static void pop_calling_backend(LuaBackend*);
     void on_set_user_data(Entity* ent);
     void load_user_data();
-    bool on_pre(ON event);
-    void on_post(ON event);
     void pre_copy_state(HeapBase from, HeapBase to);
+    bool pre_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
+    void post_spawn_backlayer_rooms(uint32_t start_x, uint32_t start_y, uint32_t limit_width, uint32_t limit_height);
 
     void hotkey_callback(int cb);
     int register_hotkey(HotKeyCallback cb, HOTKEY_TYPE flags);
