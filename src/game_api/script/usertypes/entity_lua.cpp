@@ -91,22 +91,10 @@ void register_usertypes(sol::state& lua)
     entitydb_type["default_special_offsety"] = &EntityDB::default_special_offsety;
 
     auto get_overlay = [&lua](Entity& entity)
-    {
-        return lua["cast_entity"](entity.overlay);
-    };
+    { return lua["cast_entity"](entity.overlay); };
     auto set_overlay = [](Entity& entity, Entity* overlay)
-    {
-        return entity.overlay = overlay;
-    };
+    { return entity.overlay = overlay; };
     auto overlay = sol::property(get_overlay, set_overlay);
-    auto topmost = [&lua](Entity& entity)
-    {
-        return lua["cast_entity"](entity.topmost());
-    };
-    auto topmost_mount = [&lua](Entity& entity)
-    {
-        return lua["cast_entity"](entity.topmost_mount());
-    };
 
     auto get_user_data = [](Entity& entity) -> sol::object
     {
@@ -171,8 +159,12 @@ void register_usertypes(sol::state& lua)
     entity_type["offsety"] = &Entity::offsety;
     entity_type["rendering_info"] = &Entity::rendering_info;
     entity_type["user_data"] = std::move(user_data);
-    entity_type["topmost"] = topmost;
-    entity_type["topmost_mount"] = topmost_mount;
+    /// Returns the top entity in a chain (overlay)
+    entity_type["topmost"] = [&lua](Entity& entity) // -> Entity
+    { return lua["cast_entity"](entity.topmost()); };
+    /// NoDoc
+    entity_type["topmost_mount"] = [&lua](Entity& entity) // -> Entity
+    { return lua["cast_entity"](entity.topmost_mount()); };
     entity_type["overlaps_with"] = overlaps_with;
     entity_type["get_texture"] = &Entity::get_texture;
     entity_type["set_texture"] = &Entity::set_texture;
@@ -188,7 +180,8 @@ void register_usertypes(sol::state& lua)
                                             { ent.liberate_from_shop(true); });
 
     entity_type["liberate_from_shop"] = liberate_from_shop;
-    entity_type["get_held_entity"] = &Entity::get_held_entity;
+    entity_type["get_held_entity"] = [&lua](Entity& entity) // -> Entity
+    { return lua["cast_entity"](entity.get_held_entity()); };
     entity_type["set_layer"] = &Entity::set_layer;
     entity_type["apply_layer"] = &Entity::apply_layer;
     entity_type["remove"] = &Entity::remove;
@@ -293,7 +286,8 @@ void register_usertypes(sol::state& lua)
     movable_type["set_cursed"] = set_cursed;
     movable_type["drop"] = &Movable::drop;
     movable_type["pick_up"] = &Movable::pick_up;
-    movable_type["standing_on"] = &Movable::standing_on;
+    movable_type["standing_on"] = [&lua](Movable& entity) // -> Entity
+    { return lua["cast_entity"](entity.standing_on()); };
     /// NoDoc
     movable_type["add_money"] = add_money;
     movable_type["collect_treasure"] = &Movable::collect_treasure;
