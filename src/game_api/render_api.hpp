@@ -239,9 +239,6 @@ struct RenderAPI
 
     static RenderAPI& get();
 
-    Renderer* renderer() const;
-    size_t swap_chain() const;
-
     void set_lut(TEXTURE texture_id, uint8_t layer);
     void reset_lut(uint8_t layer);
 
@@ -323,7 +320,7 @@ struct RenderInfo
     uint32_t animation_frame;
     uint32_t unknown38; // padding
     Texture* texture;   // probably just used for definition
-    const char** texture_names[7];
+    Resource* textures[7];
     // second_texture_name Normal map texture on COG entities (shader 30), shine texture on ice entities. May not have a correct value on entities that don't use it
     // third_texture_name Shine texture on COG entities (shader 30). May not have a correct value on entities that don't use it
 
@@ -344,14 +341,17 @@ struct RenderInfo
     virtual bool set_entity(Texture* texture, Entity* entity) = 0;
 
     // gets the entity owning this RenderInfo
-    Entity* get_entity() const;
+    Entity* get_entity() const
+    {
+        return entity_offset.decode();
+    }
 
     // for supporting HookableVTable
     uint32_t get_aux_id() const;
 
     bool set_second_texture(TEXTURE texture_id);
     bool set_third_texture(TEXTURE texture_id);
-    /// Set the number of textures that may be used, need to have them set before for it to work
+    /// Set the number of textures that may be used, default 1
     bool set_texture_num(uint32_t num);
     /// Sets second_texture to the texture specified, then sets third_texture to SHINE_0 and texture_num to 3. You still have to change shader to 30 to render with normal map (same as COG normal maps)
     bool set_normal_map_texture(TEXTURE texture_id);
