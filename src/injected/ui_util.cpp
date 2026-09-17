@@ -908,3 +908,99 @@ void UI::set_camera_layer_control_enabled(bool enable)
 {
     ::set_camera_layer_control_enabled(enable);
 }
+
+const std::vector<std::string>& textures_enum_names()
+{
+    static const std::vector<std::string> texture_enum = []()
+    {
+        // copied over from texture_lua.cpp
+        const auto textures = get_textures();
+        std::unordered_map<std::string, uint32_t> counts;
+        std::vector<std::string> vec;
+        vec.reserve(textures->num_textures);
+        for (const auto* tex : get_textures()->texture_map)
+        {
+            std::string clean_tex_name;
+            if (tex != nullptr && tex->name != nullptr)
+            {
+                clean_tex_name = *tex->name;
+                std::transform(clean_tex_name.begin(), clean_tex_name.end(), clean_tex_name.begin(), [](unsigned char c)
+                               { return static_cast<unsigned char>(std::toupper(c)); });
+                std::replace(clean_tex_name.begin(), clean_tex_name.end(), '/', '_');
+                size_t index = clean_tex_name.rfind(".DDS");
+                if (index != std::string::npos)
+                    clean_tex_name.erase(index, 4);
+
+                clean_tex_name += '_' + std::to_string(counts[clean_tex_name]++);
+            }
+            vec.emplace_back(clean_tex_name);
+        }
+        return vec;
+    }();
+    return texture_enum;
+}
+
+const std::string& UI::get_texture_enum_name(TEXTURE id)
+{
+    static const auto unknown = "UNKNOWN"s;
+    if (id < 0 || static_cast<uint32_t>(id) > get_textures()->num_textures)
+        return unknown;
+
+    const auto& texture = textures_enum_names()[id];
+    if (texture.empty()) // for the one missing texture id 325
+        return unknown;
+
+    return texture;
+}
+
+std::vector<std::pair<const std::string&, TEXTURE>> UI::get_texture_suggestions(const std::string& text)
+{
+    if (text.empty())
+        return {};
+
+    std::vector<std::pair<const std::string&, TEXTURE>> ret;
+    const auto& texture_names = textures_enum_names();
+    if (text.find_first_not_of("0123456789") == std::string::npos) // is numeric
+    {
+        TEXTURE id = std::stoi(text);
+        if (id < 0 || id > texture_names.size())
+            return {};
+
+        auto add_if_exists = [&ret, &texture_names](TEXTURE _id)
+        {const auto& texture = texture_names[_id];
+        if (!texture.empty())
+            ret.emplace_back(texture, _id); };
+
+        add_if_exists(id);
+        if (text.length() < 3)
+        {
+            id *= 10;
+            for (uint8_t i = 0; i < 10; ++i)
+            {
+                TEXTURE suggest_id = id + i;
+                if (suggest_id >= texture_names.size())
+                    break;
+                add_if_exists(suggest_id);
+            }
+        }
+    }
+    else
+    {
+        // if (text.length() < 3) // for some reason this breaks the texture suggestions in windowed UI
+        //     return {};
+
+        for (TEXTURE i = 0; i < texture_names.size(); ++i)
+        {
+            const auto& texture = texture_names[i];
+            if (texture.empty())
+                continue;
+
+            if (texture.find(text) != std::string::npos)
+                ret.emplace_back(texture, i);
+
+            if (ret.size() == 100) // just in case limit it to 100
+                break;
+        }
+    }
+    return ret;
+}
