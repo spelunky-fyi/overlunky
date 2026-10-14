@@ -378,14 +378,14 @@ bool trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType pag
     return skip;
 }
 
-std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer)
+std::u16string pre_speech_bubble(Entity* entity, char16_t* buffer)
 {
     std::u16string new_string{no_return_str};
     bool return_empty_str = false;
     LuaBackend::for_each_backend(
         [=, &new_string, &return_empty_str](LuaBackend::LockedBackend backend)
         {
-            auto this_data = backend->pre_speach_bubble(entity, buffer);
+            auto this_data = backend->pre_speech_bubble(entity, buffer);
             if (this_data.empty() && new_string == no_return_str)
                 return_empty_str = true;
 

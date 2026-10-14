@@ -1,6 +1,6 @@
 meta.name = "Sparktrap mayhem"
 meta.version = "WIP"
-meta.description = "Every 4 seconds, spark traps change their behaviour"
+meta.description = "Every 4 seconds, spark traps change their behavior"
 meta.author = "Zappatic"
 
 phase = 0

@@ -852,7 +852,7 @@ end
     /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
     /// Get string behind STRINGID, **don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first
-    /// Will return the string of currently choosen language
+    /// Will return the string of currently chosen language
     lua["get_string"] = get_string;
     /// Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first)
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
@@ -915,7 +915,7 @@ end
         end
     )");
 
-    /// Paramater to set_setting
+    /// Parameter to set_setting
     lua.create_named_table("SAFE_SETTING", "PET_STYLE", 20, "SCREEN_SHAKE", 21, "HUD_STYLE", 23, "HUD_SIZE", 24, "LEVEL_TIMER", 25, "TIMER_DETAIL", 26, "LEVEL_NUMBER", 27, "ANGRY_SHOPKEEPER", 28, "BUTTON_PROMPTS", 30, "FEAT_POPUPS", 32, "TEXTBOX_SIZE", 33, "TEXTBOX_DURATION", 34, "TEXTBOX_OPACITY", 35, "LEVEL_FEELINGS", 36, "DIALOG_TEXT", 37, "KALI_TEXT", 38, "GHOST_TEXT", 39);
 
     /// Gets the specified setting, values might need to be interpreted differently per setting
@@ -1628,7 +1628,7 @@ end
     // POST_LOAD_JOURNAL_CHAPTER
     // Params: JOURNALUI_PAGE_SHOWN chapter, array:int pages
     // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
-    // All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
+    // All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognize and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
     // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page
     // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
     // PRE_GET_FEAT
@@ -1636,7 +1636,7 @@ end
     // Return: true to override the vanilla feat with your own. Defaults to Steam GetAchievement.
     // PRE_SET_FEAT
     // Runs before the game sets a vanilla feat performed.
-    // Return: true to block the default behaviour of calling Steam SetAchievement.
+    // Return: true to block the default behavior of calling Steam SetAchievement.
     // PRE_UPDATE
     // Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
     // Return behavior: return true to stop further PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
@@ -1751,7 +1751,7 @@ end
         "BOLD",
         2);
 
-    /// Paramater to get_setting (and set_setting in unsafe mode)
+    /// Parameter to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
                            //, "WINDOW_SCALE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...
