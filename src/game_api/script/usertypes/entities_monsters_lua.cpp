@@ -195,7 +195,7 @@ void register_usertypes(sol::state& lua)
         "velocity_multiplier",
         &Ghost::velocity_multiplier,
         "ghost_behaviour",
-        &Ghost::ghost_behaviour,
+        &Ghost::ghost_behavior,
         "emitted_light",
         &Ghost::emitted_light,
         "linked_ghost",

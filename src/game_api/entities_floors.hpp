@@ -421,7 +421,7 @@ class ForceField : public Floor
 class TimedForceField : public ForceField
 {
   public:
-    uint32_t timer; // max 300? at 100 it's start the proces, changing the animation_frame
+    uint32_t timer; // max 300? at 100 it's start the process, changing the animation_frame
     bool pause;
 };
 

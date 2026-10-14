@@ -620,7 +620,7 @@ std::pair<uint8_t, uint8_t> get_liquids_at(float x, float y, LAYER layer)
 {
     uint8_t actual_layer = enum_to_layer(layer);
     LiquidPhysics* liquid_physics = HeapBase::get().liquid_physics();
-    // if (y > 125.5f || y < .0f || x > 85.5f || x < .0f) // Original check by the game, can result is accesing the array out of bounds
+    // if (y > 125.5f || y < .0f || x > 85.5f || x < .0f) // Original check by the game, can result in accessing the array out of bounds
     //     return 0;
     if (actual_layer != get_liquid_layer() || y < .0f || x < .0f)
         return {0, 0};

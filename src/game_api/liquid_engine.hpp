@@ -36,7 +36,7 @@ struct LiquidPhysicsEngine
     uint32_t allocated_size;
     uint32_t unk23; // padding probably
     // this is actually a pre C++11 version of std::list, which is different from current one!
-    std::pair<size_t, size_t> unk1; // seams to be empty, or have one element 0?
+    std::pair<size_t, size_t> unk1; // seems to be empty, or have one element 0?
     uint32_t resize_value;          // used to resize the arrays?
     uint32_t unk3b;                 // padding probably
 
@@ -110,7 +110,7 @@ struct LiquidPhysicsParams
     float unknown6;
     float unknown7;
     float agitation; // is agitation the right word? for me is just how bouncy the liquid is
-    float unknown9;  // starts going nuts at around 2.70, pressure force? it seam to only matter at spawn, when there is a lot of liquid in one place
+    float unknown9;  // starts going nuts at around 2.70, pressure force? it seem to only matter at spawn, when there is a lot of liquid in one place
     float unknown10;
     float unknown11;
     float unknown12;
@@ -139,10 +139,10 @@ struct LiquidTileSpawnData
     uint32_t unknown32;
     uint32_t unknown33;
     size_t unknown34;                  // MysteryLiquidPointer2 in plugin, contains last spawn entity
-    size_t unknown35;                  // DataPointer? seam to get access validation if you change to something
+    size_t unknown35;                  // DataPointer? seem to get access validation if you change to something
     uint32_t liquidtile_liquid_amount; // how much liquid will be spawned from tilecode, 1=1x2, 2=2x3, 3=3x4 etc.
     float blobs_separation;
-    int32_t unknown39; // is the last 4 garbage? seams not accessed
+    int32_t unknown39; // is the last 4 garbage? seems not accessed
     float unknown40;
     float unknown41;
     uint32_t unknown42;
@@ -197,7 +197,7 @@ struct LiquidPhysics
             LiquidTileSpawnData stagnant_lava_tile_spawn_data;
         };
     };
-    custom_map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seams to be the same as in push_blocks
+    custom_map<std::pair<uint8_t, uint8_t>, size_t*>* floors; // key is a grid position, the struct seems to be the same as in push_blocks
     custom_map<uint32_t, size_t*>* push_blocks;               // key is uid, not sure about the struct it points to (it's also possible that the value is 2 pointers)
     custom_vector<LiquidLake> impostor_lakes;                 //
     uint32_t total_liquid_spawned;                            // Total number of spawned liquid entities, all types.

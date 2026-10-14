@@ -44,7 +44,7 @@ end, ON.DEATH_MESSAGE)
 set_callback(function(feat)
     return feats[feat] or false
 
-    -- this would default to vanilla behaviour for feats missing from the table,
+    -- this would default to vanilla behavior for feats missing from the table,
     -- if you only want to override some of them
     --return feats[feat]
 end, ON.PRE_GET_FEAT)
@@ -55,7 +55,7 @@ set_callback(function(feat)
     prinspect("Tried to unlock a vanilla feat", enum_get_name(FEAT, feat))
     return true
 
-    -- this would default to vanilla behaviour for feats missing from the table,
+    -- this would default to vanilla behavior for feats missing from the table,
     -- if you only want to override some of them
     --if feats[feat] ~= nil then return true end
 end, ON.PRE_SET_FEAT)

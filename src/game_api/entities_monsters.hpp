@@ -126,7 +126,7 @@ class Ghost : public Monster
     float velocity_multiplier;
     /// Controls ghost pacing when all players are dead.
     uint16_t pace_timer;
-    GHOST_BEHAVIOR ghost_behaviour;
+    GHOST_BEHAVIOR ghost_behavior;
     bool blown_by_player;
     bool happy_dancing_clockwise; // Randomly set at the start of happy's dance phase to determine the dance rotation direction.
     uint8_t unknown8;
@@ -416,7 +416,7 @@ class Quillback : public WalkingMonster
     SoundMeta* sound;
     ParticleEmitterInfo* particle;
     bool broke_block;               // Set to true in break_block, then set back to false in apply_movement after running some logic (eg, playing a sound).
-    int8_t post_hit_wall_direction; // Set in can_break_block during apply_movement to 1 when colliding with an indesctructible wall to the left, -1 if to the right, 0 if no collision. Used later in apply_movement to change Quillback's facing direction.
+    int8_t post_hit_wall_direction; // Set in can_break_block during apply_movement to 1 when colliding with an indestructible wall to the left, -1 if to the right, 0 if no collision. Used later in apply_movement to change Quillback's facing direction.
     uint8_t unknown_timer;
     bool seen_player;
 };

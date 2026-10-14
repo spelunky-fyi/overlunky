@@ -308,7 +308,7 @@ class ThemeInfo
     /// Fixes textures on pleasure palace ladders, adds some decorations
     virtual void post_process_entities() = 0;
 
-    /// Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...
+    /// Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initializes quests, random shadows...
     virtual void spawn_procedural() = 0;
 
     /// Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes

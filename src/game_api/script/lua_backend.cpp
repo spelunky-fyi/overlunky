@@ -1455,7 +1455,7 @@ bool LuaBackend::process_vanilla_render_journal_page_callbacks(ON event, Journal
     return skip;
 }
 
-std::u16string LuaBackend::pre_speach_bubble(Entity* entity, char16_t* buffer)
+std::u16string LuaBackend::pre_speech_bubble(Entity* entity, char16_t* buffer)
 {
     if (!get_enabled())
         return std::u16string{no_return_str};

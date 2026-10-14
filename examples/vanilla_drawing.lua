@@ -283,7 +283,7 @@ function bend_text(textRender, radius)
     for _, l in pairs(textRender:get_dest()) do
         quad = l:get_quad()
         bl, br, tr, tl = quad:split()
-        -- this only works if the letter is rectangle (which seams to always be the case?)
+        -- this only works if the letter is rectangle (which seems to always be the case?)
         offx = math.abs(br.x - bl.x) * ratio / 2
         offy = math.abs(tr.y - br.y) / 2
         

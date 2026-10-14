@@ -22,7 +22,7 @@ struct Renderer
     uint32_t render_width; // same as window size unless resolution scale is set
     uint32_t render_height;
 
-    uint32_t fps; // changing it doesn't seam to do anything
+    uint32_t fps; // changing it doesn't seem to do anything
     uint32_t fps_denominator;
 
     uint32_t render_width2; // used by the liquids to know what part(?) of screen to draw on top of the liquid (for all the transformation effects)

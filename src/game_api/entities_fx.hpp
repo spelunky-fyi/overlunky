@@ -340,7 +340,7 @@ class FxLamassuAttack : public Movable
 {
   public:
     float attack_angle;
-    float attack_angle2; // seams to be exactly the same as above
+    float attack_angle2; // seems to be exactly the same as above
     bool unknown;
 };
 

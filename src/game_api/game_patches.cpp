@@ -84,7 +84,7 @@ void patch_olmec_kill_crash()
         // find address to escape to
         size_t rva = offset - memory.exe_address();
         // below the patched code there are two jumps that performs long jump, at the end of it there is 'mov rax,qword ptr ds:[rdi]',
-        // from this point find jump that's jumps over sond meta and fmod stuff, the jump ends up on code `mov eax,dword ptr ss:[rbp+10]`, that's our target for return_addr
+        // from this point find jump that's jumps over sound meta and fmod stuff, the jump ends up on code `mov eax,dword ptr ss:[rbp+10]`, that's our target for return_addr
         auto jump_out_lookup = find_inst(memory.exe(), "\x48\xC7\x40\x60\x00\x00\x00\x00"sv, rva, rva + 0x69D, "patch_olmec_kill_crash");
         if (jump_out_lookup == 0)
             return;
@@ -95,7 +95,7 @@ void patch_olmec_kill_crash()
     /* The idea:
      * if it's not the end of the array it's looking for olmec, jump back to the original code via jump in `new_code`
      * if it's end of the array (no olmec found) jump to return_addr
-     * the place for return_addr was kind of choosen by feel, as the code is complicated
+     * the place for return_addr was kind of chosen by feel, as the code is complicated
      * the whole point of the patched code is to find olmec and check it's faze, maybe for the music? no idea, it's a big function
      */
 
@@ -577,7 +577,7 @@ void change_sunchallenge_spawns(std::vector<ENT_TYPE> ent_types)
     {
         offset = get_address("sun_challenge_generator_ent_types");
 
-        // just so we can recover the oryginal later
+        // just so we can recover the original later
         save_mem_recoverable("sunchallenge_spawn", offset, 14, true);
     }
     const size_t table_offset = offset + 10; // offset to the offset of ent_type table
@@ -631,7 +631,7 @@ void change_diceshop_prizes(std::vector<ENT_TYPE> ent_types)
     ENT_TYPE* old_types_array = (ENT_TYPE*)(memory_read<int32_t>(array_offset) + array_offset + 4);
     bool original_instr = (memory_read<uint8_t>(offset) == 0x89);
 
-    if (ent_types.size() > 255 || ent_types.size() < 6) // has to be min 6 as the game needs 6 uniqe item ids for prize_dispenser
+    if (ent_types.size() > 255 || ent_types.size() < 6) // has to be min 6 as the game needs 6 unique item ids for prize_dispenser
     {
         if (!ent_types.size())
         {

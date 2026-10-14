@@ -59,7 +59,7 @@ bool trigger_vanilla_render_layer_callbacks(ON event, uint8_t layer);
 bool trigger_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
 bool trigger_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 
-std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
+std::u16string pre_speech_bubble(Entity* entity, char16_t* buffer);
 std::u16string pre_toast(char16_t* buffer);
 
 void update_backends();

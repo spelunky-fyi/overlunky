@@ -19,7 +19,7 @@
 #include "entity.hpp"                    // for get_type, Entity, EntityDB
 #include "logger.h"                      // for DEBUG
 #include "memory.hpp"                    // for Memory
-#include "script/events.hpp"             // for pre_speach_bubble, pre_toast
+#include "script/events.hpp"             // for pre_speech_bubble, pre_toast
 #include "search.hpp"                    // for get_address
 #include "virtual_table.hpp"             // for get_virtual_function_address
 
@@ -56,7 +56,7 @@ using OnNPCDialogueFun = void(size_t, Entity*, char16_t*, int, bool);
 OnNPCDialogueFun* g_speach_bubble_trampoline{nullptr};
 void OnNPCDialogue(size_t hud, Entity* NPC, char16_t* buffer, int shoppie_sound_type, bool top)
 {
-    std::u16string str = pre_speach_bubble(NPC, buffer);
+    std::u16string str = pre_speech_bubble(NPC, buffer);
     char16_t* new_string = nullptr;
     if (str != no_return_str)
     {

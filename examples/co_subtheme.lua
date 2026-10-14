@@ -4,7 +4,7 @@ meta.description = 'Change the subtheme of the next Cosmic Ocean levels'
 meta.author = 'Zappatic'
 
 previous_choice = 1
-subtheme_names = {'Reset default behaviour', 'Dwelling', 'Jungle', 'Volcana', 'Tidepool', 'Temple', 'Icecaves', 'Neo Babylon', 'Sunken City'}
+subtheme_names = {'Reset default behavior', 'Dwelling', 'Jungle', 'Volcana', 'Tidepool', 'Temple', 'Icecaves', 'Neo Babylon', 'Sunken City'}
 subtheme_themeids = {COSUBTHEME.RESET, COSUBTHEME.DWELLING, COSUBTHEME.JUNGLE, COSUBTHEME.VOLCANA, COSUBTHEME.TIDE_POOL, COSUBTHEME.TEMPLE, COSUBTHEME.ICE_CAVES, COSUBTHEME.NEO_BABYLON, COSUBTHEME.SUNKEN_CITY}
 
 register_option_combo('subtheme', 'Theme', table.concat(subtheme_names, '\0')..'\0\0')
@@ -14,7 +14,7 @@ set_callback(function()
     if previous_choice ~= choice then
         force_co_subtheme(subtheme_themeids[choice])
         if choice == 1 then
-            message("Change to default behaviour")
+            message("Change to default behavior")
         else
             message("Change cosmic ocean subtheme to "..subtheme_names[choice])
         end

@@ -184,7 +184,7 @@ struct InputDevice
     // No idea what these actually do, better not to expose this anyway
     bool unknown1;   // is_keyboard ?
     bool unknown2;   // is_controller ?
-    bool menu_input; // keyboard doesn't seam to care about this
+    bool menu_input; // keyboard doesn't seem to care about this
     bool lost_connection;
     int8_t input_index;
     uint8_t padding2[3];
@@ -229,14 +229,14 @@ struct GameProps
     // uint32_t padding_probably4;
     size_t* unknown16;
     size_t unknown17;
-    std::array<double, MAX_PLAYERS> unknown18; // counts time or something? only active when the game window is active when there is a player choosen?
+    std::array<double, MAX_PLAYERS> unknown18; // counts time or something? only active when the game window is active when there is a player chosen?
     int32_t unknown19;
     int32_t unknown20; // -1
     size_t unknown21;
     size_t unknown22;
     bool unknown23;
 
-    // seam like only garbage below
+    // seems like only garbage below
 };
 
 struct GameManager
@@ -279,7 +279,7 @@ struct GameManager
     size_t unknown_screen_arena_items;   // available in State
     size_t unknown_screen_arena_select;  // available in State
     size_t unknown_screen_arena_intro;   // available in State
-    Screen* screen_arena_level;          // also available in State, but it's a different object! Seams to only call pause function at the start, probably for the intro stuff
+    Screen* screen_arena_level;          // also available in State, but it's a different object! Seems to only call pause function at the start, probably for the intro stuff
     Screen* screen_arena_score;          // available in State
     ScreenOnlineLoading* screen_online_loading;
     ScreenOnlineLobby* screen_online_lobby;

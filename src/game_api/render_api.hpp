@@ -279,7 +279,7 @@ struct RenderInfo
     uint8_t unknown_timer2; // for some entities this stops when the entity is not on screen but the above one doesn't
     bool unknown12c;
     bool unknown12d;
-    bool render_inactive; // stops all the rendering stuff, the value is forced thou
+    bool render_inactive; // stops all the rendering stuff
     uint8_t unknown13b;
     uint8_t unknown13c;
     uint8_t unknown13d;
@@ -488,7 +488,7 @@ struct HudData
     ParticleEmitterInfo* money_increase_sparkles;
     HudElement timer;
     HudElement level;
-    game_vector<HudElement*> elements; // not sure what's for, just lists all the elements above, even for the unactive players
+    game_vector<HudElement*> elements; // not sure what's for, just lists all the elements above, even for the inactive players
 
     uint32_t unknown20;
     uint8_t unknown21;

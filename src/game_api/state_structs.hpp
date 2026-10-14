@@ -676,7 +676,7 @@ class LogicTutorial : public Logic
 struct LogicList
 {
     /// This only properly constructs the base class
-    /// you may still need to initialise the parameters correctly
+    /// you may still need to initialize the parameters correctly
     Logic* start_logic(LOGIC idx);
     void stop_logic(LOGIC idx);
     void stop_logic(Logic* log);
@@ -873,7 +873,7 @@ struct RoomOwnersInfo
 
 struct MultiLineTextRendering
 {
-    size_t* timer;                         // some struct? game increments this value and one at +0x40, seam to be related to rendering, touching just the first one freezes the game
+    size_t* timer;                         // some struct? game increments this value and one at +0x40, seem to be related to rendering, touching just the first one freezes the game
     std::vector<TextRenderingInfo*> lines; // each line is separate TextRenderingInfo
     float x;                               // center of the text box?
     float y;                               // center of the text box?

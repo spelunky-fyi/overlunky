@@ -1135,7 +1135,7 @@ void register_usertypes(sol::state& lua)
 
     /// Gets the sub theme of the current cosmic ocean level, returns COSUBTHEME.NONE if the current level is not a CO level.
     lua["get_co_subtheme"] = get_co_subtheme;
-    /// Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behaviour)
+    /// Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behavior)
     lua["force_co_subtheme"] = force_co_subtheme;
 
     /// Gets the value for the specified config

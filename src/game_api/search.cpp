@@ -411,7 +411,7 @@ class PatternCommandBuffer
                 offset = data.base_offset;
                 break;
             default:
-                DEBUG("Unkown command...");
+                DEBUG("Unknown command...");
                 break;
             }
         }
@@ -1156,7 +1156,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "explosion_mask"sv,
         // Set a conditional bp on spawn_entity for fx_explosion, throw a bomb and let it explode. When the debugger
         // breaks, continue execution, the pause menu will appear mid-explosion and you'll have a fully formed
-        // fx_explosion entity. Put a read bp on its idle_counter and continue until you've breaked a couple of times.
+        // fx_explosion entity. Put a read bp on its idle_counter and continue until you've break a couple of times.
         // The big function that breaks contains a call to the internal hitbox-overlap function for which the default
         // mask is put on the stack (0x18F)
         // it's virtual function 77 (process input)
@@ -1269,7 +1269,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
         "show_journal"sv,
         // aka render_journal / open journal chapter
         // Break on GameManager.journal_ui.state, open the journal
-        // Or go to state->death screen, to first virtul function, the second call in that virtual is the function
+        // Or go to state->death screen, to first virtual function, the second call in that virtual is the function
         PatternCommandBuffer{}
             .find_inst("88 5F 04 80 FB 0B 0F"_gh)
             .at_exe()
@@ -1914,7 +1914,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
             .at_exe(),
     },
     {
-        // Go into jetpack 99 virtual function (play_warning_sound), there are two calls for virtuls and one call to static function, that's the one
+        // Go into jetpack 99 virtual function (play_warning_sound), there are two calls for virtuals and one call to static function, that's the one
         "play_sfx"sv,
         PatternCommandBuffer{}
             .find_inst("\x48\x83\xC1\x18\x41\xB8\x38\x01\x00\x00"sv)
@@ -2201,7 +2201,7 @@ std::unordered_map<std::string_view, AddressRule> g_address_rules{
     {
         // set bp on write of 'is_lit' variable for Torch, jump into the water, execute til return, then go back into the call
         // towards the end of the function is call to this function, look to a lot of stuff written to stack before a call, on of those is byte - layer
-        "check_if_collides_with_liquid_layer"sv, // layer byte or bool // unsure, seam to be only used for fire, even thou it has mask parameter
+        "check_if_collides_with_liquid_layer"sv, // layer byte or bool // unsure, seem to be only used for fire, even though it has mask parameter
         PatternCommandBuffer{}
             .find_after_inst("4C 89 E0 F3 0F 58 60 44"_gh)
             .find_after_inst("C6 44 24"_gh)

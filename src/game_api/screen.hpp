@@ -139,7 +139,7 @@ class ScreenTitle : public Screen // ID: 3
     ParticleEmitterInfo* particle_torchflame_backflames_animated;
     ParticleEmitterInfo* particle_torchflame_flames_animated;
     ParticleEmitterInfo* particle_torchflame_ash;
-    uint8_t unknown7a; // random very short timer that doesn't seam to do anything
+    uint8_t unknown7a; // random very short timer that doesn't seem to do anything
     float brightness;
     SoundMeta* music;
     SoundMeta* torch_sound;
@@ -147,7 +147,7 @@ class ScreenTitle : public Screen // ID: 3
 
 struct MenuOption
 {
-    // return and first param are the same, pointer on stack, it really seam to be just two 32bit fields
+    // return and first param are the same, pointer on stack, it really seem to be just two 32bit fields
     // int is normally set to 0x2B and float to 0, if the third parameter is not 2, then the function sets first to 0, and the float to float max,
     using OptionSelect = std::pair<uint32_t, float>&(std::pair<uint32_t, float>&, Screen* src, uint8_t);
 
@@ -350,7 +350,7 @@ class ScreenOptions : public Screen // ID: 5
     /// Shows the red background behind the option, the scarab on the left and left/right arrows
     bool show_highlight;
     // uint8_t padding_probably8[5];
-    custom_vector<size_t> unknown50; // holds one 8 byte value, related to choosen option menu
+    custom_vector<size_t> unknown50; // holds one 8 byte value, related to chosen option menu
     uint8_t unknown51;               // probably bool
     // padding_probably10[7];
     custom_vector<STRINGID> tooltip_text;
@@ -737,7 +737,7 @@ class ScreenConstellation : public Screen // ID: 19
     float* credits_progression;
     SoundMeta* explosion_and_loop;
     SoundMeta* music;
-    size_t unknown; // not sure if it's something actually there, or it's some allocator aliment to memory page or something, seam to happen a lot with the screens
+    size_t unknown; // not sure if it's something actually there, or it's some allocator aliment to memory page or something, seem to happen a lot with the screens
 };
 
 /// The recap book is drawn on top of the POST render event

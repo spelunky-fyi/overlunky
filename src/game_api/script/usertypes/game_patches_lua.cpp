@@ -10,7 +10,7 @@ void register_usertypes(sol::state& lua)
 {
     /// Sets the amount of blood drops in the Kapala needed to trigger a health increase (default = 7).
     lua["set_kapala_blood_threshold"] = set_kapala_blood_threshold;
-    /// Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
+    /// Sets the hud icon for the Kapala (0-6 ; -1 for default behavior).
     /// If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
     lua["set_kapala_hud_icon"] = set_kapala_hud_icon;
     /// Changes characteristics of (all) sparktraps: speed, rotation direction and distance from center

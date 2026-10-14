@@ -303,8 +303,8 @@ class Entity
     /// Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
     virtual void remove_item(Entity* entity, bool autokill_check) = 0;       // 21, if autokill_check is true, it will check if the entity has the "kill if overlay lost" flag and kill it if it's set
     virtual Entity* get_held_entity() = 0;                                   // 22
-    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seam to be called right after "on_collision2", triggers use self as the first parameter. Called when there is entity overlapping trigger entity, even if they don't move
-    /// Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    virtual void v23(Entity* logical_trigger, Entity* who_triggered_it) = 0; // 23, spawns LASERTRAP_SHOT from LASERTRAP, also some trigger entities use this, seems to be called right after "on_collision2", triggers use self as the first parameter. Called when there is entity overlapping trigger entity, even if they don't move
+    /// Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. though the animation could still be played)
     virtual bool trigger_action(Entity* user) = 0; //                        // 24, also used for throwables, disabling this for bomb make it always spawn an the ground, but you can still pick it up and throw it
     /// Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     virtual void activate(Entity* activator) = 0; //                         // 25
@@ -315,7 +315,7 @@ class Entity
     virtual void apply_metadata(uint16_t metadata) = 0;     // 28
     virtual void on_walked_on_by(Entity* walker) = 0;       // 29, hits when monster/player walks on a floor, does something when walker.velocityy<-0.21 (falling onto) and walker.hitboxy * hitboxx > 0.09
     virtual void on_walked_off_by(Entity* walker) = 0;      // 30, appears to be disabled in 1.23.3? hits when monster/player walks off a floor, it checks whether the walker has floor as overlay, and if so, removes walker from floor's items by calling virtual remove_item
-    virtual void on_ledge_grab(Entity* who) = 0;            // 31, only ACTIVEFLOOR_FALLING_PLATFORM, does something with game menager
+    virtual void on_ledge_grab(Entity* who) = 0;            // 31, only ACTIVEFLOOR_FALLING_PLATFORM, does something with game manager
     virtual void on_stood_on_by(Entity* entity, Vec2*) = 0; // 32, e.g. pots, skulls, pushblocks, ... standing on floors. The Vec2 is just a guess, it only compares Y with 0.1f
     /// only for CHAR_*: when going to the backlayer, turns on/off player emitted light
     virtual void toggle_backlayer_illumination() = 0; //    // 33
