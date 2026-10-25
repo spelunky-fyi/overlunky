@@ -266,7 +266,7 @@ end
     NOptions::register_usertypes(lua);
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
-    lua["state"] = HeapBase::get_main().state();
+    // lua["state"] = HeapBase::get().state();
     /// The GameManager gives access to a couple of Screens as well as the pause and journal UI elements
     lua["game_manager"] = get_game_manager();
     /// The Online object has information about the online lobby and its players
@@ -1872,12 +1872,27 @@ bool check_safe_io_path(const std::string& filepath, const std::string& basepath
 
 void populate_lua_env(sol::environment& env)
 {
-    static const sol::state& global_vm = get_lua_vm();
+    static sol::state& global_vm = get_lua_vm();
     for (auto& field : safe_fields)
     {
         env[field] = global_vm["_G"][field];
     }
     env["_G"] = env;
+
+    sol::table global_metatable = global_vm.create_table();
+    global_metatable[sol::meta_function::index] = [](sol::table /*table*/, sol::object key, sol::this_state ts) -> sol::object
+    {
+        sol::state_view lua_state(ts);
+        if (key.get_type() == sol::type::string)
+        {
+            auto key_name = key.as<std::string_view>();
+            if (key_name == "state")
+                return sol::make_object(lua_state, HeapBase::get().state());
+        }
+        return sol::nil;
+    };
+    env[sol::metatable_key] = global_metatable;
+
     add_partial_safe_libraries(env);
 }
 void add_partial_safe_libraries(sol::environment& env)
