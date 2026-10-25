@@ -50,6 +50,7 @@
 #include "movable.hpp"                             // for Movable
 #include "online.hpp"                              // for get_online
 #include "overloaded.hpp"                          // for overloaded
+#include "prng.hpp"                                // for PRNG
 #include "rpc.hpp"                                 // for get_entities_by
 #include "safe_cb.hpp"                             // for make_safe_clearable_cb
 #include "savedata.hpp"                            // IWYU pragma: keep
@@ -1888,6 +1889,8 @@ void populate_lua_env(sol::environment& env)
             auto key_name = key.as<std::string_view>();
             if (key_name == "state")
                 return sol::make_object(lua_state, HeapBase::get().state());
+            else if (key_name == "prng")
+                return sol::make_object(lua_state, HeapBase::get().prng());
         }
         return sol::nil;
     };

@@ -49,7 +49,7 @@ void register_usertypes(sol::state& lua)
         &PRNG::set_pair);
 
     /// The global prng state, calling any function on it will advance the prng state, thus desynchronizing clients if it does not happen on both clients.
-    lua["prng"] = HeapBase::get_main().prng();
+    // lua["prng"] = HeapBase::get_main().prng();
 
     /// Get the thread-local version of prng
     lua["get_local_prng"] = []() -> PRNG*
