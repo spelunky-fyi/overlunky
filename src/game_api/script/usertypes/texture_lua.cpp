@@ -126,8 +126,8 @@ void register_usertypes(sol::state& lua)
     lua.create_named_table("TEXTURE"
                            //, "DATA_TEXTURES_PLACEHOLDER_0", 0
                            //, "", ...check__[textures.txt]\[game_data/textures.txt\]...
-                           //, "DATA_TEXTURES_SHINE_0", 388
-                           //, "DATA_TEXTURES_OLDTEXTURES_AI_0", 389
+                           //, "DATA_TEXTURES_SHINE_0", 400
+                           //, "DATA_TEXTURES_OLDTEXTURES_AI_0", 401
     );
     {
         std::unordered_map<std::string, uint32_t> counts;
