@@ -7,9 +7,9 @@
 
 #include "entities_floors.hpp" // for ExitDoor
 #include "entity.hpp"          // for Entity, to_id, EntityDB, entity_factory
+#include "liquid_engine.hpp"   // for update_liquid_collision_at
 #include "logger.h"            // for DEBUG
 #include "movable.hpp"         // for Movable
-#include "rpc.hpp"             // for update_liquid_collision_at
 #include "search.hpp"          // for get_address
 #include "state.hpp"           // for StateMemory, API
 

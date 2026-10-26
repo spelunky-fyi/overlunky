@@ -183,6 +183,7 @@ api_files = [
     "../src/game_api/script/usertypes/spawn_lua.cpp",
     "../src/game_api/script/usertypes/options_lua.cpp",
     "../src/game_api/script/usertypes/game_patches_lua.cpp",
+    "../src/game_api/script/usertypes/liquid_engine_lua.cpp",
 ]
 vtable_api_files = [
     "../src/game_api/script/usertypes/vtables_lua.cpp",

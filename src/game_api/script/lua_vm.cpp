@@ -87,6 +87,7 @@
 #include "usertypes/gui_lua.hpp"                   // for register_usertypes
 #include "usertypes/hitbox_lua.hpp"                // for register_usertypes
 #include "usertypes/level_lua.hpp"                 // for register_usertypes
+#include "usertypes/liquid_engine_lua.hpp"         // for register_usertypes
 #include "usertypes/logic_lua.hpp"                 // for register_usertypes
 #include "usertypes/options_lua.hpp"               // for register_usertypes
 #include "usertypes/particles_lua.hpp"             // for register_usertypes
@@ -265,6 +266,7 @@ end
     NSpawn::register_usertypes(lua);
     NGamePatches::register_usertypes(lua);
     NOptions::register_usertypes(lua);
+    NLiquidEngine::register_usertypes(lua);
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
     // lua["state"] = HeapBase::get().state();
@@ -949,15 +951,6 @@ end
     lua["get_adventure_seed"] = get_adventure_seed;
     /// Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
     lua["set_adventure_seed"] = set_adventure_seed;
-    /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
-    /// optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
-    lua["update_liquid_collision_at"] = update_liquid_collision_at;
-
-    /// Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
-    /// Returns a pair of water and lava, in that order.
-    /// Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
-    /// Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
-    lua["get_liquids_at"] = get_liquids_at;
 
     /// Get the rva for a pattern name, used for debugging.
     lua["get_rva"] = [](std::string_view address_name) -> std::string
@@ -1235,15 +1228,6 @@ end
 
     /// Initializes some seeded run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
-
-    /// Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](#set_liquid_layer)
-    lua["get_liquid_layer"] = get_liquid_layer;
-
-    /// Attach liquid collision to entity by uid (this is what the push blocks use)
-    /// Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
-    /// Use only for entities that can move around, (for static prefer [update_liquid_collision_at](#update_liquid_collision_at) )
-    /// If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
-    lua["add_entity_to_liquid_collision"] = add_entity_to_liquid_collision;
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 

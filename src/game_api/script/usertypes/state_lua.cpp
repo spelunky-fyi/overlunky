@@ -235,62 +235,6 @@ void register_usertypes(sol::state& lua)
         "players",
         &Items::players);
 
-    /// Used in LiquidPool
-    lua.new_usertype<LiquidPhysicsEngine>(
-        "LiquidPhysicsEngine",
-        "pause",
-        &LiquidPhysicsEngine::pause_physics,
-        "gravity",
-        &LiquidPhysicsEngine::gravity,
-        "cohesion",
-        &LiquidPhysicsEngine::cohesion,
-        "elasticity",
-        &LiquidPhysicsEngine::agitation,
-        "size",
-        &LiquidPhysicsEngine::blob_size,
-        "weight",
-        &LiquidPhysicsEngine::weight,
-        "count",
-        &LiquidPhysicsEngine::entity_count);
-
-    /// Used in LiquidPool
-    lua.new_usertype<LiquidPhysicsParams>(
-        "LiquidPhysicsParams",
-        "gravity",
-        &LiquidPhysicsParams::gravity,
-        "cohesion",
-        &LiquidPhysicsParams::cohesion,
-        "elasticity",
-        &LiquidPhysicsParams::agitation);
-
-    /// Used in LiquidPhysics
-    lua.new_usertype<LiquidPool>(
-        "LiquidPool",
-        "default",
-        &LiquidPool::physics_defaults,
-        "engine",
-        &LiquidPool::physics_engine);
-
-    /// Use LIQUID_POOL enum for the index<br/>
-    /// Used in StateMemory
-    lua.new_usertype<LiquidPhysics>(
-        "LiquidPhysics",
-        "pools",
-        &LiquidPhysics::pools);
-
-    lua.create_named_table(
-        "LIQUID_POOL",
-        "WATER",
-        1,
-        "COARSE_WATER",
-        2,
-        "LAVA",
-        3,
-        "COARSE_LAVA",
-        4,
-        "STAGNANT_LAVA",
-        5);
-
     /// Can be accessed via global [state](#state)
     auto statememory_type = lua.new_usertype<StateMemory>("StateMemory");
     statememory_type["screen_last"] = &StateMemory::screen_last;
@@ -691,10 +635,5 @@ void register_usertypes(sol::state& lua)
     lua["waddler_entity_type_in_slot"] = waddler_entity_type_in_slot;
     /// Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
     lua["update_state"] = update_state;
-    /// Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
-    /// The patch however does not destroy the liquids that fall pass the level bounds,
-    /// so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
-    lua["fix_liquid_out_of_bounds"] = []()
-    { HeapBase::get().liquid_physics()->remove_liquid_oob() /**/; };
 }
 }; // namespace NState

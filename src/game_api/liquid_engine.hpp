@@ -2,8 +2,9 @@
 
 #include <cstddef> // fpr size_t
 #include <cstdint>
-#include <list>    // for std::list
-#include <utility> // for pair
+#include <list>     // for std::list
+#include <optional> // for std::optional
+#include <utility>  // for pair
 
 #include "containers/custom_map.hpp"
 #include "containers/custom_vector.hpp"
@@ -216,3 +217,9 @@ struct LiquidPhysics
     void remove_liquid_oob();
 };
 static_assert(sizeof(LiquidPhysics) == 0x3B8);
+
+void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy);
+void update_liquid_collision_at(float x, float y, bool add, std::optional<LAYER> layer = std::nullopt);
+void add_entity_to_liquid_collision(uint32_t uid, bool add);
+std::pair<uint8_t, uint8_t> get_liquids_at(float x, float y, LAYER layer);
+uint8_t get_liquid_layer();
