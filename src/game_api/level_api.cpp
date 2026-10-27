@@ -771,6 +771,7 @@ std::vector<ExtraSpawnLogicProviderImpl> g_extra_spawn_logic_providers;
 
 std::vector<std::pair<uint16_t, RoomTemplateType>> g_room_template_types;
 std::vector<std::pair<uint16_t, std::pair<uint32_t, uint32_t>>> g_room_template_sizes;
+std::vector<uint16_t> g_custom_room_templates;
 
 // Used for making custom machine rooms work
 std::optional<uint16_t> g_overridden_room_templates[2];
@@ -1223,7 +1224,30 @@ RoomData* get_random_room_data(LevelGenData* tile_storage, uint16_t room_templat
         }
     }
 
+    // The game sometimes insists on picking a rare room when room_template_rare_counts says the template has any,
+    // retrying until it finds one. That count is never set for custom room templates, so it holds unrelated values
+    // and the game can keep looking for a rare room that doesn't exist. Give it the real count for the duration of the call.
+    std::optional<uint32_t> original_rare_count;
+    if (room_template < tile_storage->room_template_rare_counts.size() && std::find(g_custom_room_templates.begin(), g_custom_room_templates.end(), room_template) != g_custom_room_templates.end())
+    {
+        uint32_t rare_count{0};
+        if (auto it = tile_storage->room_template_datas.find(room_template); it != tile_storage->room_template_datas.end())
+        {
+            const auto& datas = it->second.datas;
+            rare_count = static_cast<uint32_t>(std::count_if(datas.begin(), datas.end(), [](const RoomData& data)
+                                                             { return data.rare; }));
+        }
+        uint32_t& stored_rare_count = tile_storage->room_template_rare_counts[room_template];
+        original_rare_count = stored_rare_count;
+        stored_rare_count = rare_count;
+    }
+
     RoomData* room_data = g_get_random_room_data_trampoline(tile_storage, room_template, hard_level, can_not_have, layer, room_idx_x, room_idx_y);
+
+    if (original_rare_count.has_value())
+    {
+        tile_storage->room_template_rare_counts[room_template] = original_rare_count.value();
+    }
     return room_data;
 }
 
@@ -1690,6 +1714,7 @@ std::uint16_t LevelGenData::define_room_template(std::string room_template, Room
     }
 
     auto [it, success] = room_templates.emplace(std::move(room_template), RoomTemplateDef{(uint16_t)room_templates.size()});
+    g_custom_room_templates.push_back(it->second.id);
 
     if (type != RoomTemplateType::None)
     {

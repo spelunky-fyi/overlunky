@@ -33,11 +33,11 @@ struct RoomTemplateDef
 };
 struct RoomData
 {
-    bool flag0 : 1; // ???
-    bool flag1 : 1; // ???
-    bool flag2 : 1; // ???
-    bool flipped : 1;
-    bool dual : 1;
+    bool flag0 : 1;   // ??? skipped when picking a room for a non-hard level
+    bool rare : 1;    // \!rare
+    bool dual : 1;    // \!dual
+    bool flipped : 1; // this is the flipped copy of a \!flip room
+    bool liquid : 1;  // \!liquid
     // 3-bit padding
     uint8_t room_width;
     uint8_t room_height;
@@ -200,7 +200,9 @@ struct LevelGenData
     game_unordered_map<game_string, RoomTemplateDef> room_templates;
 
     game_unordered_map<std::uint16_t, RoomTemplateData> room_template_datas;
-    std::array<uint32_t, 429> unknown; // index is tile code id from TileCodeDef
+    // read by room template id when picking a random room, the number of rare rooms in that template
+    // holds unrelated values for room templates defined by scripts, see get_random_room_data
+    std::array<uint32_t, 429> room_template_rare_counts;
     // uint32_t padding;
     std::array<RoomTemplateData, 8 * 15> set_room_datas;
 
