@@ -516,13 +516,13 @@ function F(f_string) end
 function Vec2.new(self, number> p) end""": "",
     }
 
-    with open("./game_data/spel2.lua", "r") as file:
+    with open("./game_data/spel2.lua", "r", encoding="utf-8") as file:
         declarations_text = file.read()
 
     for find, replacement in final_replace_stuff.items():
         declarations_text = declarations_text.replace(find, replacement)
 
-    with open("./game_data/spel2.lua", "w") as file:
+    with open("./game_data/spel2.lua", "w", newline="\n", encoding="utf-8") as file:
         file.write(declarations_text)
 
 
