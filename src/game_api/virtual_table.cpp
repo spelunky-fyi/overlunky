@@ -1,7 +1,8 @@
 #include "virtual_table.hpp"
 
-#include "memory.hpp" // for Memory
-#include "search.hpp" // for get_address
+#include "memory.hpp"      // for Memory
+#include "search.hpp"      // for get_address
+#include "vtable_hook.hpp" // for get_hook_function
 
 size_t get_virtual_function_address(VTABLE_OFFSET table_entry, uint32_t function_index)
 {
@@ -12,8 +13,13 @@ size_t get_virtual_function_address(VTABLE_OFFSET table_entry, uint32_t function
     {
         return 0;
     }
-    size_t* func_address = reinterpret_cast<size_t*>(first_table_entry + ((static_cast<size_t>(table_entry) + function_index) * sizeof(size_t)));
-    return *func_address - mem.exe_ptr;
+    void** vtable = reinterpret_cast<void**>(first_table_entry + static_cast<size_t>(table_entry) * sizeof(size_t));
+    // If the function is hooked the vtable points to our detour, return the original game function instead
+    if (void* original_function = get_hook_function(&vtable, function_index))
+    {
+        return reinterpret_cast<size_t>(original_function) - mem.exe_ptr;
+    }
+    return reinterpret_cast<size_t>(vtable[function_index]) - mem.exe_ptr;
 }
 
 size_t get_virtual_function_address(void* object, uint32_t function_index)
