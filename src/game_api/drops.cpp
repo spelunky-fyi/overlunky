@@ -338,7 +338,8 @@ std::vector<DropChanceEntry> dropchance_entries{
     {"YETI_PITCHERSMITT", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_YETI, 3},
 };
 
-// Finds the addresses of all drops and drop chances, called before the first write to any of them.
+// Finds the addresses of all drops and drop chances, called once from API::init before any script can replace a drop or hook a vtable.
+// Entries that fail to resolve stay at 0 and are skipped by replace_drop and set_drop_chance.
 //
 // Every lookup returns the first match of a short pattern (often only the 4 bytes of an ENT_TYPE) after its start address,
 // so it is only correct while the code between the start address and the real site is unmodified. Looking an entry up after
@@ -348,7 +349,7 @@ std::vector<DropChanceEntry> dropchance_entries{
 // - entries that share a site (TIAMAT_SHOT and TIAMAT_TIAMATSHOT) no longer find it once one of them changed the value
 // Resolving everything up front, on code no drop has been written to yet, makes the result independent of the order
 // in which scripts call replace_drop and set_drop_chance.
-static void resolve_drop_addresses()
+void resolve_drop_addresses()
 {
     auto& memory = Memory::get();
 
@@ -391,17 +392,6 @@ static void resolve_drop_addresses()
     }
 }
 
-// Entries that fail to resolve stay at 0 and are skipped by replace_drop and set_drop_chance, they are not searched again
-// because a later search would run on modified code and the failure dialog would pop up on every call
-static void resolve_drop_addresses_once()
-{
-    [[maybe_unused]] static const bool resolved = []()
-    {
-        resolve_drop_addresses();
-        return true;
-    }();
-}
-
 void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance)
 {
     if (dropchance_id < (int32_t)dropchance_entries.size())
@@ -412,7 +402,6 @@ void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance)
                 recover_mem("drop_chance");
             return;
         }
-        resolve_drop_addresses_once();
 
         auto& entry = dropchance_entries.at(dropchance_id);
         if (entry.offset != 0)
@@ -463,7 +452,6 @@ void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type)
 
             return;
         }
-        resolve_drop_addresses_once();
 
         // An entry is either fully resolved or all 0, the unused slots past vtable_occurrence are 0 as well
         for (size_t offset : entry.offsets)

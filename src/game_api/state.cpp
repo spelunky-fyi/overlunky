@@ -12,6 +12,7 @@
 
 #include "bucket.hpp"                            // for Bucket
 #include "containers/custom_allocator.hpp"       //
+#include "drops.hpp"                             // for resolve_drop_addresses
 #include "entities_chars.hpp"                    // for Player
 #include "entity.hpp"                            // for to_id, Entity, HookWithId, EntityDB
 #include "entity_hooks_info.hpp"                 // for Player
@@ -969,6 +970,9 @@ void API::init(SoundManager* sound_manager)
     if (!get_is_init())
     {
         get_is_init() = true;
+        // Before anything patches the game code or hooks a vtable, drop lookups rely on the code being unmodified
+        resolve_drop_addresses();
+
         if (get_write_load_opt())
         {
             do_write_load_opt();
