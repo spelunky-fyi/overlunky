@@ -8,6 +8,7 @@
 #include <utility>     // for min, max
 
 #include "entity_db.hpp" // for to_id
+#include "logger.h"      // for DEBUG
 #include "memory.hpp"    // for Memory, recover_mem, write_mem_recoverable
 #include "search.hpp"    // for find_inst
 
@@ -359,7 +360,13 @@ void resolve_drop_addresses()
                             ? memory.after_bundle_address()
                             : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset);
         if (offset == 0)
+        {
+            if (entry.vtable_offset == VTABLE_OFFSET::NONE)
+                DEBUG("resolve_drop_addresses: Failed resolving DROP.{} - after_bundle address is not known", entry.caption);
+            else
+                DEBUG("resolve_drop_addresses: Failed resolving DROP.{} - no address for virtual function {} of vtable {}", entry.caption, entry.vtable_rel_offset, static_cast<uint32_t>(entry.vtable_offset));
             continue;
+        }
 
         const auto drop_name{"DROP." + entry.caption};
         size_t offsets[3] = {0};
@@ -369,6 +376,7 @@ void resolve_drop_addresses()
             offset = find_inst(memory.exe(), entry.pattern, offset, std::nullopt, drop_name);
             if (offset == 0)
             {
+                DEBUG("resolve_drop_addresses: Failed resolving {} - found only {} of {} occurrences of its pattern", drop_name, x, entry.vtable_occurrence);
                 found_all = false;
                 break;
             }
@@ -385,7 +393,10 @@ void resolve_drop_addresses()
     {
         size_t start = get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset);
         if (start == 0)
+        {
+            DEBUG("resolve_drop_addresses: Failed resolving DROPCHANCE.{} - no address for virtual function {} of vtable {}", entry.caption, entry.vtable_rel_offset, static_cast<uint32_t>(entry.vtable_offset));
             continue;
+        }
 
         if (size_t offset = find_inst(memory.exe(), entry.pattern, start, std::nullopt, "DROPCHANCE." + entry.caption))
             entry.offset = memory.at_exe(offset);
