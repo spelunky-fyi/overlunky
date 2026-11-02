@@ -5040,12 +5040,15 @@ void render_messages()
     ImGui::End();
 }
 
+// The main viewport dockspace can only be submitted once per frame, so render_clickhandler submits it and everyone else reuses the id
+ImGuiID main_dock = 0;
+
 void render_clickhandler()
 {
     ImGuiIO& io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
     ImGui::SetNextWindowBgAlpha(0.0f);
-    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
+    main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
     auto space = ImGui::DockBuilderGetCentralNode(main_dock);
     g_Console.get()->set_geometry(space->Pos.x, space->Pos.y, space->Size.x, space->Size.y);
     if (g_Console->is_toggled())
@@ -8019,7 +8022,6 @@ void render_hotbar()
 
     ImGuiIO& io = ImGui::GetIO();
     auto base = ImGui::GetMainViewport();
-    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
     auto space = ImGui::DockBuilderGetCentralNode(main_dock);
 
     uint32_t max = 0;
@@ -8091,9 +8093,11 @@ void render_hotbar_textures()
 
     static const auto chest = to_id("ENT_TYPE_ITEM_CHEST");
 
+    // Called from the game's render hook, outside of an imgui frame, so we can't submit the dockspace here
     auto base = ImGui::GetMainViewport();
-    auto main_dock = ImGui::DockSpaceOverViewport(base, ImGuiDockNodeFlags_PassthruCentralNode);
     auto space = ImGui::DockBuilderGetCentralNode(main_dock);
+    if (space == nullptr)
+        return;
 
     uint32_t max = 0;
     for (auto [i, id] : hotbar)
