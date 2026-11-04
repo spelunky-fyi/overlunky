@@ -28,6 +28,8 @@ struct DropChanceEntry
     uint8_t chance_sizeof = 4;
     size_t offset = 0;
 };
+void resolve_drop_addresses();
+
 using DROPCHANCE = int32_t;
 void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance);
 using DROP = int32_t;
