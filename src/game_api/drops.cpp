@@ -248,7 +248,6 @@ std::vector<DropEntry> drop_entries{
     {"UFO_LASERSHOT", "\xBA\x7B\x01\x00\x00"sv, VTABLE_OFFSET::MONS_UFO, 75, 1}, // 75 is just the closest function
     {"LAMASSU_LASERSHOT", "\xBA\x7C\x01\x00\x00"sv, VTABLE_OFFSET::MONS_LAMASSU, 78, 1},
     {"SORCERESS_DAGGERSHOT", "\xBA\x7D\x01\x00\x00"sv, VTABLE_OFFSET::MONS_SORCERESS, 78, 1},
-    {"TIAMAT_TIAMATSHOT", "\xBA\x80\x01\x00\x00"sv, VTABLE_OFFSET::MONS_TIAMAT, 78, 1},  // same value as TIAMAT_SHOT, both entries patch the same instruction
     {"ROCKDOG_FIREBALL", "\xBA\x81\x01\x00\x00"sv, VTABLE_OFFSET::MOUNT_ROCKDOG, 75, 1}, // 75 is just the closest function
     {"QILIN_FIREBALL", "\xBA\x81\x01\x00\x00"sv, VTABLE_OFFSET::MOUNT_QILIN, 75, 1},     // 75 is just the closest function
     {"AXOLOTL_BUBBLE", "\xBA\xC8\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 1},
@@ -347,7 +346,6 @@ std::vector<DropChanceEntry> dropchance_entries{
 // other drops were already replaced breaks that:
 // - a replaced drop can now contain the bytes another entry searches for, which then patches the replaced drop again
 //   instead of its own site, or another function entirely when the search runs past the end of its own
-// - entries that share a site (TIAMAT_SHOT and TIAMAT_TIAMATSHOT) no longer find it once one of them changed the value
 // Resolving everything up front, on code no drop has been written to yet, makes the result independent of the order
 // in which scripts call replace_drop and set_drop_chance.
 void resolve_drop_addresses()
@@ -431,6 +429,8 @@ void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance)
 }
 void replace_drop_by_name(std::string_view name, ENT_TYPE new_drop_entity_type)
 {
+    if (name == "TIAMAT_TIAMATSHOT")
+        name = "TIAMAT_SHOT";
     auto size = drop_entries.size();
     for (int32_t idx = 0; idx < size; ++idx)
     {
@@ -445,6 +445,8 @@ void replace_drop_by_name(std::string_view name, ENT_TYPE new_drop_entity_type)
 void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type)
 {
     const static auto nof_ent_types = to_id("ENT_TYPE_LIQUID_COARSE_LAVA") + 1;
+    // new_drop_entity_type can also be unrelated to entity, like in MOTHERSTATUE_HEALTH
+    // for now, only extra use is health, which is capped under 100
     if (drop_id < (int32_t)drop_entries.size() && new_drop_entity_type < nof_ent_types)
     {
         if (drop_id < 0)

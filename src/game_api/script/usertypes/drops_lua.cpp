@@ -39,7 +39,13 @@ void register_usertypes(sol::state& lua)
     );
     for (size_t x = 0; x < drop_entries.size(); ++x)
     {
-        lua["DROP"][drop_entries.at(x).caption] = x;
+        std::string& name = drop_entries.at(x).caption;
+        lua["DROP"][name] = x;
+        // for backward compatibility
+        // need to keep both entries with the same ID
+        // as having two edit the same game value may end not resetting properly to default value
+        if (name == "TIAMAT_SHOT")
+            lua["DROP"]["TIAMAT_TIAMATSHOT"] = x;
     }
 }
 }; // namespace NDrops
