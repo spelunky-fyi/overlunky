@@ -2,6 +2,7 @@
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint32_t, uint8_t, int32_t
+#include <span>    // for span
 #include <string>  // for string, allocator
 #include <vector>  // for vector
 
@@ -10,7 +11,7 @@
 
 struct DropEntry
 {
-    std::string caption;
+    std::string_view caption;
     std::string_view pattern;
     VTABLE_OFFSET vtable_offset; // some patterns are not found in the vtables, use NONE to look for pattern in entire exe
     uint32_t vtable_rel_offset;
@@ -21,7 +22,7 @@ struct DropEntry
 
 struct DropChanceEntry
 {
-    std::string caption;
+    std::string_view caption;
     std::string_view pattern;
     VTABLE_OFFSET vtable_offset;
     uint32_t vtable_rel_offset;
@@ -35,12 +36,5 @@ void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance);
 using DROP = int32_t;
 void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type);
 void replace_drop_by_name(std::string_view name, ENT_TYPE new_drop_entity_type);
-
-extern std::vector<DropEntry> drop_entries;
-
-extern std::vector<DropChanceEntry> dropchance_entries;
-
-// #define PERFORM_DROPS_TEST
-#ifdef PERFORM_DROPS_TEST
-void test_drops();
-#endif
+std::span<DropEntry> get_drops();
+std::span<DropChanceEntry> get_chances();
