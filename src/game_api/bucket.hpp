@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstdint> // for uintptr_t, int32_t, uint32_t
 #include <map>
+#include <memory> // for uniqe_ptr
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -183,10 +185,16 @@ class Bucket
     bool blocked_event{false};
     // Used by state.cpp to determine if patches should still be applied.
     bool patches_applied{false};
+    // To make sure we only lookup once
+    bool drops_addresses_cached{false};
     // Holds all the custom strings added thru add_string
     std::unordered_map<STRINGID, std::u16string> custom_strings;
     // uid to custom string id for shop items
     std::unordered_map<uint32_t, STRINGID> custom_shopitem_names;
+    // replace_drop cached addresses
+    std::unique_ptr<std::array<uintptr_t, Drops::MAX_OCCURRENCE>[]> drops_addresses;
+    // set_drop_chance cached addresses
+    std::unique_ptr<uintptr_t[]> dropchances_addresses;
 
   private:
     Bucket() = default;
