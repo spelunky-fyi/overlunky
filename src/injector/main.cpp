@@ -36,6 +36,20 @@ using namespace std::chrono_literals;
 bool g_console = false;
 std::string g_exe = "Spel2.exe";
 
+template <class FunT>
+struct OnScopeExit
+{
+    OnScopeExit(FunT&& fun)
+        : Fun{std::forward<FunT>(fun)}
+    {
+    }
+    ~OnScopeExit()
+    {
+        Fun();
+    }
+    FunT Fun;
+};
+
 fs::path get_dll_path(const char* rel_path)
 {
     char buf[0x1000];
@@ -50,8 +64,16 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
     const int BUFFER_SIZE = 32768;
     DWORD iFlags;
     const char* sAgent = "Overlunky Updater";
-    HINTERNET hInternet;
-    HINTERNET hConnect;
+    HINTERNET hInternet{NULL};
+    HINTERNET hConnect{NULL};
+    auto auto_close_handles = OnScopeExit{[&hInternet, &hConnect]()
+                                          {
+                                              if (hInternet)
+                                                  InternetCloseHandle(hInternet);
+                                              if (hConnect)
+                                                  InternetCloseHandle(hConnect);
+                                          }};
+
     char acBuffer[BUFFER_SIZE];
     DWORD iReadBytes;
     FILE* pFile = NULL;
@@ -83,15 +105,12 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
     if (hInternet)
     {
         if (sHeader == NULL)
-        {
             sHeader = "Accept: */*\r\n\r\n";
-        }
 
         // Get URL
         hConnect = InternetOpenUrlA(hInternet, sURL, sHeader, lstrlenA(sHeader), INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, 0);
         if (!hConnect)
         {
-            InternetCloseHandle(hInternet);
             INFO("AutoUpdate: Can't get release information from github");
             return false;
         }
@@ -164,7 +183,6 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
         errno_t err;
         if ((err = fopen_s(&pFile, sSaveFilename, "wb")) != 0)
         {
-            InternetCloseHandle(hInternet);
             INFO("AutoUpdate: Can't write new file");
             return false;
         }
@@ -180,7 +198,6 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
             if (!InternetReadFile(hConnect, acBuffer, BUFFER_SIZE, &iReadBytes))
             {
                 fclose(pFile);
-                InternetCloseHandle(hInternet);
                 INFO("AutoUpdate: Can't read file from github");
                 return false;
             }
@@ -195,7 +212,6 @@ bool auto_update(const char* sURL, const char* sSaveFilename, bool& yes)
         } while (TRUE);
         fflush(pFile);
         fclose(pFile);
-        InternetCloseHandle(hInternet);
     }
     else
     {
@@ -219,8 +235,15 @@ bool update_launcher(const char* sURL, const char* sSaveFilename)
     const int BUFFER_SIZE = 32768;
     DWORD iFlags;
     const char* sAgent = "Overlunky Updater";
-    HINTERNET hInternet;
-    HINTERNET hConnect;
+    HINTERNET hInternet{NULL};
+    HINTERNET hConnect{NULL};
+    auto auto_close_handles = OnScopeExit{[&hInternet, &hConnect]()
+                                          {
+                                              if (hInternet)
+                                                  InternetCloseHandle(hInternet);
+                                              if (hConnect)
+                                                  InternetCloseHandle(hConnect);
+                                          }};
     char acBuffer[BUFFER_SIZE];
     DWORD iReadBytes;
     FILE* pFile = NULL;
@@ -255,7 +278,6 @@ bool update_launcher(const char* sURL, const char* sSaveFilename)
         hConnect = InternetOpenUrlA(hInternet, sURL, sHeader, lstrlenA(sHeader), INTERNET_FLAG_DONT_CACHE | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, 0);
         if (!hConnect)
         {
-            InternetCloseHandle(hInternet);
             INFO("AutoUpdate: Can't get release information from github");
             return false;
         }
@@ -269,7 +291,6 @@ bool update_launcher(const char* sURL, const char* sSaveFilename)
         errno_t err;
         if ((err = fopen_s(&pFile, sSaveFilename, "wb")) != 0)
         {
-            InternetCloseHandle(hInternet);
             INFO("AutoUpdate: Can't write new file");
             return false;
         }
@@ -285,7 +306,6 @@ bool update_launcher(const char* sURL, const char* sSaveFilename)
             if (!InternetReadFile(hConnect, acBuffer, BUFFER_SIZE, &iReadBytes))
             {
                 fclose(pFile);
-                InternetCloseHandle(hInternet);
                 INFO("AutoUpdate: Can't read file from github");
                 return false;
             }
@@ -300,7 +320,6 @@ bool update_launcher(const char* sURL, const char* sSaveFilename)
         } while (TRUE);
         fflush(pFile);
         fclose(pFile);
-        InternetCloseHandle(hInternet);
     }
     else
     {
@@ -317,7 +336,8 @@ void wait()
     {
         while (true)
         {
-            if (auto res = find_process(g_exe))
+            auto res = find_process(g_exe);
+            if (res.valid())
                 std::this_thread::sleep_for(1s);
             else
                 break;
@@ -333,11 +353,10 @@ bool inject_search(fs::path overlunky_path)
     Process proc;
     while (true)
     {
-        if (auto res = find_process("Spel2.exe"))
-        {
-            proc = res.value();
+        proc = find_process("Spel2.exe");
+        if (proc.valid())
             break;
-        }
+
         if (kbhit())
         {
             if (getche() == '\r')
@@ -404,20 +423,21 @@ bool launch(fs::path exe_path, fs::path overlunky_path, bool& do_inject, bool& o
     STARTUPINFOA si{};
     si.cb = sizeof(STARTUPINFO);
 
-    if (!do_inject && DetourCreateProcessWithDlls((LPSTR)exe_path.string().c_str(), (LPSTR)cmdline.c_str(), NULL, NULL, TRUE, CREATE_DEFAULT_ERROR_MODE, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi, 1, dll_paths, NULL))
+    if (!do_inject && DetourCreateProcessWithDlls((LPSTR)exe_path.string().c_str(), (LPSTR)cmdline.c_str(), NULL, NULL, FALSE, CREATE_DEFAULT_ERROR_MODE, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi, 1, dll_paths, NULL))
     {
         INFO("Game launched with DLL");
         wait();
         CloseHandle(pi.hThread);
         return true;
     }
-    else if (CreateProcess((LPSTR)exe_path.string().c_str(), (LPSTR)cmdline.c_str(), NULL, NULL, TRUE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
+    else if (CreateProcess((LPSTR)exe_path.string().c_str(), (LPSTR)cmdline.c_str(), NULL, NULL, FALSE, 0, (LPVOID)child_env.c_str(), exe_dir.string().c_str(), &si, &pi))
     {
-        auto proc = Process{pi.hProcess, {g_exe, pi.dwProcessId}};
+        Process proc{pi.hProcess, {g_exe, pi.dwProcessId}};
         INFO("Game launched, injecting DLL...");
         if (find_dll_in_process(proc.info.pid, "Overlunky.dll"))
         {
             INFO("Already injected, let's not do that again. If you want to inject multiple game processes, use the --launch_game parameter.");
+            CloseHandle(pi.hThread);
             return false;
         }
         inject_dll(proc, overlunky_path.string());
