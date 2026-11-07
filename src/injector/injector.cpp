@@ -56,7 +56,7 @@ size_t find_base(Process proc, std::string name)
 
 LPVOID alloc(Process proc, size_t size)
 {
-    auto res = VirtualAllocEx(proc.handle, nullptr, (size + 0xFFF) & ~0xFFF, MEM_COMMIT, 0x40);
+    auto res = VirtualAllocEx(proc.handle, nullptr, (size + 0xFFF) & ~0xFFF, MEM_COMMIT, PAGE_READWRITE);
     if (res == NULL)
     {
         PANIC("Allocation failed: {:#x}", GetLastError());
@@ -188,12 +188,11 @@ std::vector<ProcessInfo> get_processes()
 
 std::optional<Process> find_process(std::string name)
 {
+    constexpr DWORD required_access = PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ;
     for (auto& proc : get_processes())
     {
         if (proc.name == name)
-        {
-            return Process{OpenProcess(PROCESS_ALL_ACCESS, 0, proc.pid), proc};
-        }
+            return Process{OpenProcess(required_access, 0, proc.pid), proc};
     }
     return {};
 }
