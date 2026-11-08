@@ -31,12 +31,6 @@ struct ProcessInfo
     DWORD pid;
 };
 
-struct Process
-{
-    HANDLE handle;
-    ProcessInfo info;
-};
-
 std::vector<ProcessInfo> get_processes()
 {
     // No unicode
@@ -45,10 +39,11 @@ std::vector<ProcessInfo> get_processes()
 #undef PROCESSENTRY32
     std::vector<ProcessInfo> res;
     auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (snapshot == nullptr)
+    if (!snapshot || snapshot == INVALID_HANDLE_VALUE)
         return {};
 
-    PROCESSENTRY32 ppe = {sizeof(ppe)};
+    PROCESSENTRY32 ppe{};
+    ppe.dwSize = sizeof(PROCESSENTRY32);
     auto proc = Process32First(snapshot, &ppe);
 
     while (proc)
@@ -59,17 +54,16 @@ std::vector<ProcessInfo> get_processes()
         res.push_back({name, ppe.th32ProcessID});
         proc = Process32Next(snapshot, &ppe);
     }
+    CloseHandle(snapshot);
     return res;
 }
 
-std::optional<Process> find_process(std::string name)
+DWORD find_process_pid(std::string name)
 {
     for (auto& proc : get_processes())
     {
         if (proc.name == name)
-        {
-            return Process{OpenProcess(PROCESS_ALL_ACCESS, 0, proc.pid), proc};
-        }
+            return proc.pid;
     }
     return {};
 }
@@ -105,12 +99,9 @@ void attach_stdout(DWORD pid)
 void run()
 {
     std::this_thread::sleep_for(2s);
-    Process proc;
-    if (auto res = find_process("Overlunky.exe"))
-    {
-        proc = res.value();
-        attach_stdout(proc.info.pid);
-    }
+    DWORD ov_pid = find_process_pid("Overlunky.exe");
+    if (ov_pid)
+        attach_stdout(ov_pid);
 
     register_application_version(fmt::format("Overlunky {}", get_version()));
     preload_addresses();
