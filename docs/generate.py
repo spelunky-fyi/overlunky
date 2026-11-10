@@ -67,7 +67,7 @@ def include_example(name):
     if os.path.exists(example):
         if true_file_name in os.listdir("examples"):
             gu.print_console("Including " + example)
-            file = open(example, "r")
+            file = open(example, "r", encoding="utf-8")
             data = file.read()
             file.close()
             print("\n" + data + "\n")
@@ -77,7 +77,7 @@ def include_example(name):
     if os.path.exists(example):
         if true_file_name in os.listdir("examples"):
             gu.print_console("Including " + example)
-            file = open(example, "r")
+            file = open(example, "r", encoding="utf-8")
             data = file.read()
             file.close()
             print("\n```lua\n" + data + "\n```\n")

@@ -4,7 +4,7 @@ import sys
 def setup_stdout(filename):
     sys.stdout = sys.__stdout__
     print(f"Generating file '{filename}'...")
-    sys.stdout = open(f"{filename}", "w")
+    sys.stdout = open(f"{filename}", "w", newline="\n", encoding="utf-8")
 
 
 def cleanup_stdout():

@@ -339,35 +339,35 @@ def run_parse():
     print_collecting_info("rpc")
     for file in header_files:
         comment = []
-        data = open(file, "r").read().split("\n")
         skip = 0
-        for line in data:
-            skip += line.count("{") - line.count("}")
-            c = re.search(r"/// ?(.*)$", line)
-            if c:
-                comment.append(c.group(1))
-            m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", line)
-            if m:
-                if skip == 0 or file.endswith("script.hpp"):
-                    param = replace_fun(m.group(3))
-                    ret = replace_fun(m.group(1))
-                    rpc.append(
-                        {
-                            "return": ret,
-                            "name": m.group(2),
-                            "param": param,
-                            "comment": comment,
-                        }
-                    )
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                clean_line = line.rstrip(" \r\n")
+                skip += clean_line.count("{") - clean_line.count("}")
+                c = re.search(r"/// ?(.*)$", clean_line)
+                if c:
+                    comment.append(c.group(1))
+                m = re.search(r"\s*(.*)\s+([^\(]*)\(([^\)]*)", clean_line)
+                if m:
+                    if skip == 0 or file.endswith("script.hpp"):
+                        param = replace_fun(m.group(3))
+                        ret = replace_fun(m.group(1))
+                        rpc.append(
+                            {
+                                "return": ret,
+                                "name": m.group(2),
+                                "param": param,
+                                "comment": comment,
+                            }
+                        )
+                        comment = []
+                elif not c:
                     comment = []
-            elif not c:
-                comment = []
 
     print_collecting_info("class")
     for file in header_files:
         if file.endswith("script.hpp"):
             continue
-        data = open(file, "r").read().split("\n")
         brackets_depth = 0
         in_union = False
         in_anonymous_struct = False
@@ -375,327 +375,333 @@ def run_parse():
         comment = []
         member_funs = {}
         member_vars = []
-        for line in data:
-            if not class_name and ("struct" in line or "class" in line):
-                m = re.match(r"(struct|class)\s+(\S+)", line)
-                if m and not line.endswith(";"):
-                    class_name = m[2]
-            elif class_name:
-                prev_brackets_depth = brackets_depth
-                brackets_depth += line.count("{") - line.count("}")
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                clean_line = line.rstrip(" \r\n")
+                if not class_name and ("struct" in clean_line or "class" in clean_line):
+                    m = re.match(r"(struct|class)\s+(\S+)", clean_line)
+                    if m and not clean_line.endswith(";"):
+                        class_name = m[2]
+                elif class_name:
+                    prev_brackets_depth = brackets_depth
+                    brackets_depth += clean_line.count("{") - clean_line.count("}")
 
-                if brackets_depth == 1:
-                    if line.strip() == "union":
-                        in_union = True
-                if brackets_depth == 2 and in_union:
-                    if line.strip() == "struct":
-                        in_anonymous_struct = True
-
-                if brackets_depth < prev_brackets_depth:
-                    if brackets_depth == 2:
-                        in_anonymous_struct = False
                     if brackets_depth == 1:
-                        in_union = False
+                        if clean_line.strip() == "union":
+                            in_union = True
+                    if brackets_depth == 2 and in_union:
+                        if clean_line.strip() == "struct":
+                            in_anonymous_struct = True
 
-                if (
-                    brackets_depth == 1
-                    or (brackets_depth == 2 and in_union)
-                    or (brackets_depth == 3 and in_anonymous_struct)
-                ):
-                    m = re.search(r"/// ?(.*)$", line)
-                    if m:
-                        comment.append(m[1])
-                    else:
-                        m = re.search(
-                            r"^\s*(?::|\/\/)", line
-                        )  # skip lines that start with a colon (constructor parameter initialization) or are comments
-                        if m:
-                            continue
+                    if brackets_depth < prev_brackets_depth:
+                        if brackets_depth == 2:
+                            in_anonymous_struct = False
+                        if brackets_depth == 1:
+                            in_union = False
 
-                        m = re.search(
-                            r"\s*(?:virtual\s)?(.*)\s+([\w]+)\(([^\)]*)", line
-                        )
+                    if (
+                        brackets_depth == 1
+                        or (brackets_depth == 2 and in_union)
+                        or (brackets_depth == 3 and in_anonymous_struct)
+                    ):
+                        m = re.search(r"/// ?(.*)$", clean_line)
                         if m:
-                            name = m[2]
-                            # move ctor is useless for Lua
-                            is_move_ctr = (
-                                re.fullmatch(r"^[\w]*$", name)
-                                and re.fullmatch(rf"\s*{name}\s*&&[^,]*", m[3])
-                                and not m[1]
+                            comment.append(m[1])
+                        else:
+                            m = re.search(
+                                r"^\s*(?::|\/\/)", clean_line
+                            )  # skip lines that start with a colon (constructor parameter initialization) or are comments
+                            if m:
+                                continue
+
+                            m = re.search(
+                                r"\s*(?:virtual\s)?(.*)\s+([\w]+)\(([^\)]*)", clean_line
                             )
-                            if not is_move_ctr:
-                                if name not in member_funs:
-                                    member_funs[name] = []
-                                param = m[3]
-                                if " " not in param:
-                                    param = f"{param} {param.lower()}"
-                                member_funs[name].append(
-                                    {
-                                        "return": replace_fun(m[1]),
-                                        "name": m[2],
-                                        "param": replace_fun(param),
-                                        "comment": comment,
-                                    }
+                            if m:
+                                name = m[2]
+                                # move ctor is useless for Lua
+                                is_move_ctr = (
+                                    re.fullmatch(r"^[\w]*$", name)
+                                    and re.fullmatch(rf"\s*{name}\s*&&[^,]*", m[3])
+                                    and not m[1]
                                 )
-                            comment = []
-
-                        m = re.search(
-                            r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", line
-                        )
-                        if m:
-                            if m[1].endswith(",") and not (
-                                m[2].endswith(">") or m[2].endswith(")")
-                            ):  # Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
-                                types_and_vars = m[1]
-                                vars_match = re.search(r"(?: *\w*,)*$", types_and_vars)
-                                vars_except_last = (
-                                    vars_match.group()
-                                )  # Last var is m[2]
-                                start, end = vars_match.span()
-                                vars_type = types_and_vars[:start]
-                                for m_var in re.findall(r"(\w*),", vars_except_last):
-                                    member_vars.append(
+                                if not is_move_ctr:
+                                    if name not in member_funs:
+                                        member_funs[name] = []
+                                    param = m[3]
+                                    if " " not in param:
+                                        param = f"{param} {param.lower()}"
+                                    member_funs[name].append(
                                         {
-                                            "type": replace_fun(vars_type),
-                                            "name": m_var,
+                                            "return": replace_fun(m[1]),
+                                            "name": m[2],
+                                            "param": replace_fun(param),
                                             "comment": comment,
                                         }
                                     )
-                                member_vars.append(
-                                    {
-                                        "type": replace_fun(vars_type),
-                                        "name": m[2],
-                                        "comment": comment,
-                                    }
-                                )
-                            else:
-                                member_vars.append(
-                                    {
-                                        "type": replace_fun(m[1]),
-                                        "name": m[2],
-                                        "comment": comment,
-                                    }
-                                )
-                            comment = []
-                elif brackets_depth == 0:
-                    classes.append(
-                        {
-                            "name": class_name,
-                            "member_funs": member_funs,
-                            "member_vars": member_vars,
-                        }
-                    )
-                    class_name = None
-                    comment = []
-                    member_funs = {}
-                    member_vars = []
+                                comment = []
+
+                            m = re.search(
+                                r"\s*([^\;\{]*)\s+([^\;^\{}]*)\s*(\{[^\}]*\})?\;", clean_line
+                            )
+                            if m:
+                                if m[1].endswith(",") and not (
+                                    m[2].endswith(">") or m[2].endswith(")")
+                                ):  # Allows things like imgui ImVec2 'float x, y' and ImVec4 if used, 'float x, y, w, h'. Match will be '[1] = "float x," [2] = "y"'. Some other not exposed variables will be wrongly matched (as already happens).
+                                    types_and_vars = m[1]
+                                    vars_match = re.search(r"(?: *\w*,)*$", types_and_vars)
+                                    vars_except_last = (
+                                        vars_match.group()
+                                    )  # Last var is m[2]
+                                    start, end = vars_match.span()
+                                    vars_type = types_and_vars[:start]
+                                    for m_var in re.findall(r"(\w*),", vars_except_last):
+                                        member_vars.append(
+                                            {
+                                                "type": replace_fun(vars_type),
+                                                "name": m_var,
+                                                "comment": comment,
+                                            }
+                                        )
+                                    member_vars.append(
+                                        {
+                                            "type": replace_fun(vars_type),
+                                            "name": m[2],
+                                            "comment": comment,
+                                        }
+                                    )
+                                else:
+                                    member_vars.append(
+                                        {
+                                            "type": replace_fun(m[1]),
+                                            "name": m[2],
+                                            "comment": comment,
+                                        }
+                                    )
+                                comment = []
+                    elif brackets_depth == 0:
+                        classes.append(
+                            {
+                                "name": class_name,
+                                "member_funs": member_funs,
+                                "member_vars": member_vars,
+                            }
+                        )
+                        class_name = None
+                        comment = []
+                        member_funs = {}
+                        member_vars = []
 
     print_collecting_info("events")
     for file in api_files:
         comment = []
-        data = open(file, "r").read().split("\n")
-        for line in data:
-            m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\];', line)
-            if m:
-                events.append({"name": m.group(1), "comment": comment})
-            else:
-                comment = []
-            c = re.search(r"/// ?(.*)$", line)
-            if c:
-                comment.append(c.group(1))
-            else:
-                comment = []
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                clean_line = line.rstrip(" \r\n")
+                m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\];', clean_line)
+                if m:
+                    events.append({"name": m.group(1), "comment": comment})
+                else:
+                    comment = []
+                c = re.search(r"/// ?(.*)$", clean_line)
+                if c:
+                    comment.append(c.group(1))
+                else:
+                    comment = []
 
     print_collecting_info("functions")
     for file in api_files:
         comment = []
-        data = open(file, "r").read().split("\n")
-        for line in data:
-            if line == "":
-                comment = []
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                clean_line = line.rstrip(" \r\n")
+                if clean_line == "":
+                    comment = []
 
-            m = re.search(
-                r'lua\[[\'"]([^\'"]*)[\'"]\]\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)',
-                line,
-            )
-            if m:
-                name = m.group(2)
-                if not name.startswith("as_"):  # don't include the casting functions
-                    cpp_type = m.group(1)
-                    underlying_cpp_type = next(
-                        (item for item in classes if item["name"] == cpp_type), dict()
-                    )
+                m = re.search(
+                    r'lua\[[\'"]([^\'"]*)[\'"]\]\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)',
+                    clean_line,
+                )
+                if m:
+                    name = m.group(2)
+                    if not name.startswith("as_"):  # don't include the casting functions
+                        cpp_type = m.group(1)
+                        underlying_cpp_type = next(
+                            (item for item in classes if item["name"] == cpp_type), dict()
+                        )
 
-                    if "member_funs" not in underlying_cpp_type:
-                        underlying_cpp_type["member_funs"] = {}
+                        if "member_funs" not in underlying_cpp_type:
+                            underlying_cpp_type["member_funs"] = {}
 
-                    if name not in underlying_cpp_type["member_funs"]:
-                        underlying_cpp_type["member_funs"][name] = []
+                        if name not in underlying_cpp_type["member_funs"]:
+                            underlying_cpp_type["member_funs"][name] = []
 
-                    cpp = m.group(3)
-                    if len(rpcfunc(cpp)):
-                        for af in rpcfunc(cpp):
+                        cpp = m.group(3)
+                        if len(rpcfunc(cpp)):
+                            for af in rpcfunc(cpp):
+                                underlying_cpp_type["member_funs"][name].append(
+                                    {
+                                        "return": af["return"],
+                                        "name": name,
+                                        "param": ", ".join(
+                                            [p.strip() for p in af["param"].split(",")[1:]]
+                                        ),
+                                        "comment": af["comment"],
+                                        "cb_signature": af["cb_signature"]
+                                        if "cb_signature" in af
+                                        else None,
+                                    }
+                                )
+                        else:
+                            m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", cpp)
+                            m2 = re.search(r"\(([^\{]*)\)", cpp)
+                            ret = "nil"
+                            param = ""
+                            if m:
+                                ret = replace_fun(m.group(2)) or "nil"
+                            if m or m2:
+                                param = (m or m2).group(1)
+                                param = replace_fun(param)
+                                param = ", ".join([p.strip() for p in param.split(",")[1:]])
                             underlying_cpp_type["member_funs"][name].append(
                                 {
-                                    "return": af["return"],
+                                    "return": ret,
                                     "name": name,
-                                    "param": ", ".join(
-                                        [p.strip() for p in af["param"].split(",")[1:]]
-                                    ),
-                                    "comment": af["comment"],
-                                    "cb_signature": af["cb_signature"]
-                                    if "cb_signature" in af
-                                    else None,
+                                    "param": param,
+                                    "comment": comment,
                                 }
                             )
-                    else:
-                        m = re.search(r"\(([^\{]*)\)\s*->\s*([^\{]*)", cpp)
-                        m2 = re.search(r"\(([^\{]*)\)", cpp)
-                        ret = "nil"
-                        param = ""
-                        if m:
-                            ret = replace_fun(m.group(2)) or "nil"
-                        if m or m2:
-                            param = (m or m2).group(1)
-                            param = replace_fun(param)
-                            param = ", ".join([p.strip() for p in param.split(",")[1:]])
-                        underlying_cpp_type["member_funs"][name].append(
-                            {
-                                "return": ret,
-                                "name": name,
-                                "param": param,
+                        if cpp_type not in pre_gathered_vars:
+                            pre_gathered_vars[cpp_type] = []
+                        pre_gathered_vars[cpp_type].append(f"{name}, {cpp_type}::{name}")
+                        comment = []
+                else:
+                    m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', clean_line)
+                    if m and not m.group(1).startswith("__"):
+                        if not getfunc(m.group(1)):
+                            cb_signature = (
+                                get_cb_signature(" ".join(comment)) if comment else None
+                            )
+                            func = Function({
+                                "name": m.group(1),
+                                "cpp": replace_fun(m.group(2)),
                                 "comment": comment,
-                            }
-                        )
-                    if cpp_type not in pre_gathered_vars:
-                        pre_gathered_vars[cpp_type] = []
-                    pre_gathered_vars[cpp_type].append(f"{name}, {cpp_type}::{name}")
-                    comment = []
-            else:
-                m = re.search(r'lua\[[\'"]([^\'"]*)[\'"]\]\s+=\s+(.*?)(?:;|$)', line)
-                if m and not m.group(1).startswith("__"):
-                    if not getfunc(m.group(1)):
-                        cb_signature = (
-                            get_cb_signature(" ".join(comment)) if comment else None
-                        )
-                        func = Function({
-                            "name": m.group(1),
-                            "cpp": replace_fun(m.group(2)),
-                            "comment": comment,
-                            "cb_signature": cb_signature,
-                            "file": file,
-                        })
-                        if not comment or "NoDoc" not in comment[0]:
-                            if comment and comment[0] == "Deprecated":
-                                deprecated_funcs.append(func)
-                            else:
-                                funcs.append(func)
-                    comment = []
+                                "cb_signature": cb_signature,
+                                "file": file,
+                            })
+                            if not comment or "NoDoc" not in comment[0]:
+                                if comment and comment[0] == "Deprecated":
+                                    deprecated_funcs.append(func)
+                                else:
+                                    funcs.append(func)
+                        comment = []
 
-            c = re.search(r"/// ?(.*)$", line)
-            if c:
-                comment.append(c.group(1))
+                c = re.search(r"/// ?(.*)$", clean_line)
+                if c:
+                    comment.append(c.group(1))
 
     print_collecting_info("vtables")
     vtables_by_usertype = {}
     vtable_override_tables = {}
     for file in vtable_api_files:
-        data = open(file, "r").read().split("\n")
         vtables = {}
         vtable_name = None
         skip = False
-        for line in data:
-            if vtable_def := re.search(
-                r'static (\w*) \w*\(lua, lua\["(.*)"\](, "(.*)")?\)', line
-            ):
-                vtable_name = vtable_def.group(1)
-                usertype = vtable_def.group(2)
-                table_name = vtable_def.group(4)
-                vtable_decl = vtables[vtable_name]
-                vtable_decl["usertype"] = usertype
-                vtable_decl["override_table"] = table_name
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                clean_line = line.rstrip(" \r\n")
+                if vtable_def := re.search(
+                    r'static (\w*) \w*\(lua, lua\["(.*)"\](, "(.*)")?\)', clean_line
+                ):
+                    vtable_name = vtable_def.group(1)
+                    usertype = vtable_def.group(2)
+                    table_name = vtable_def.group(4)
+                    vtable_decl = vtables[vtable_name]
+                    vtable_decl["usertype"] = usertype
+                    vtable_decl["override_table"] = table_name
 
-                if table_name not in vtable_override_tables:
-                    vtable_override_tables[table_name] = []
-                override_table = vtable_override_tables[table_name]
-                for entry in vtable_decl["entries"].values():
-                    override_table.append(
-                        {"name": entry["name"].upper(), "type": str(entry["index"])}
-                    )
+                    if table_name not in vtable_override_tables:
+                        vtable_override_tables[table_name] = []
+                    override_table = vtable_override_tables[table_name]
+                    for entry in vtable_decl["entries"].values():
+                        override_table.append(
+                            {"name": entry["name"].upper(), "type": str(entry["index"])}
+                        )
 
-                vtable_name = None
-            elif vtable_name == None and "HookableVTable<" in line:
-                vtable_name = line.split()[1]
-                vtable_entries = {}
-            elif vtable_name != None:
-                if entry_math := re.search(r"/// NoDoc", line):
-                    skip = True
-                    continue
-                if entry_math := re.search(r"VTableEntry<(.*)>", line):
-                    if skip:
-                        skip = False
+                    vtable_name = None
+                elif vtable_name == None and "HookableVTable<" in clean_line:
+                    vtable_name = clean_line.split()[1]
+                    vtable_entries = {}
+                elif vtable_name != None:
+                    if entry_math := re.search(r"/// NoDoc", clean_line):
+                        skip = True
                         continue
-                    [name, index, signature_and_binder] = entry_math.group(1).split(
-                        ",", 2
-                    )
-                    name = name.strip('" ')
-                    index = literal_eval(index.strip())
-                    if binds := re.search(r"BackBinder<([^>]*)>", signature_and_binder):
-                        binds = binds.group(1)
-                        binds = "{} {}".format(binds, camel_case_to_snake_case(binds))
-                    else:
-                        binds = None
-                    signature = re.sub(
-                        r"\), BackBinder<([^>]*)>", r", \g<1>)", signature_and_binder
-                    ).replace("(, ", "(")
-                    func_ref = re.search(r"MemFun<&?([\w]+)::([\w]+)>", line)
+                    if entry_math := re.search(r"VTableEntry<(.*)>", clean_line):
+                        if skip:
+                            skip = False
+                            continue
+                        [name, index, signature_and_binder] = entry_math.group(1).split(
+                            ",", 2
+                        )
+                        name = name.strip('" ')
+                        index = literal_eval(index.strip())
+                        if binds := re.search(r"BackBinder<([^>]*)>", signature_and_binder):
+                            binds = binds.group(1)
+                            binds = "{} {}".format(binds, camel_case_to_snake_case(binds))
+                        else:
+                            binds = None
+                        signature = re.sub(
+                            r"\), BackBinder<([^>]*)>", r", \g<1>)", signature_and_binder
+                        ).replace("(, ", "(")
+                        func_ref = re.search(r"MemFun<&?([\w]+)::([\w]+)>", clean_line)
 
-                    if func_ref and func_ref.group(1) is not None:
-                        for item in classes:
-                            if item["name"] != func_ref.group(1):
-                                continue
-                            func_name = func_ref.group(2)
-                            # if it throws error at `item["member_funs"][func_name]` then the virtual defined using MemFun was not found in the parsed class/struct code
-                            if (
-                                item["member_funs"]
-                                and item["member_funs"][func_name]
-                                and len(item["member_funs"][func_name]) > 0
-                            ):
-                                # choosing the last one since that's the actual virtual signature most of the time
-                                func = item["member_funs"][func_name][-1]
-                                vtable_entries[name] = {
-                                    "name": name,
-                                    "index": index,
-                                    "ret": func["return"],
-                                    "args": [t for t in func["param"].split(",")],
-                                    "binds": binds,
-                                    "ref": func_name,
-                                }
-                    else:
-                        signature = re.search(r"([_a-zA-Z][\w]*.*)\((.*)\)", signature)
-                        ret = signature.group(1)
-                        args = [t for t in signature.group(2).split(",")]
-                        vtable_entries[name] = {
-                            "name": name,
-                            "index": index,
-                            "ret": ret,
-                            "args": args,
-                            "binds": binds,
-                        }
-                    if ">>;" in line:
-                        vtables[vtable_name] = {
-                            "name": vtable_name,
-                            "entries": vtable_entries,
-                        }
-                        vtable_name = None
-                        vtable_entries = None
+                        if func_ref and func_ref.group(1) is not None:
+                            for item in classes:
+                                if item["name"] != func_ref.group(1):
+                                    continue
+                                func_name = func_ref.group(2)
+                                # if it throws error at `item["member_funs"][func_name]` then the virtual defined using MemFun was not found in the parsed class/struct code
+                                if (
+                                    item["member_funs"]
+                                    and item["member_funs"][func_name]
+                                    and len(item["member_funs"][func_name]) > 0
+                                ):
+                                    # choosing the last one since that's the actual virtual signature most of the time
+                                    func = item["member_funs"][func_name][-1]
+                                    vtable_entries[name] = {
+                                        "name": name,
+                                        "index": index,
+                                        "ret": func["return"],
+                                        "args": [t for t in func["param"].split(",")],
+                                        "binds": binds,
+                                        "ref": func_name,
+                                    }
+                        else:
+                            signature = re.search(r"([_a-zA-Z][\w]*.*)\((.*)\)", signature)
+                            ret = signature.group(1)
+                            args = [t for t in signature.group(2).split(",")]
+                            vtable_entries[name] = {
+                                "name": name,
+                                "index": index,
+                                "ret": ret,
+                                "args": args,
+                                "binds": binds,
+                            }
+                        if ">>;" in clean_line:
+                            vtables[vtable_name] = {
+                                "name": vtable_name,
+                                "entries": vtable_entries,
+                            }
+                            vtable_name = None
+                            vtable_entries = None
 
         for vtable_decl in vtables.values():
             vtables_by_usertype[vtable_decl["usertype"]] = vtable_decl
 
     print_collecting_info("usertypes")
     for file in api_files:
-        data = open(file, "r").read()
+        with open(file, "r", encoding="utf-8") as f:
+            data = f.read()
         data = data.replace("\n", "")
         data = fix_spaces(data)
         reParticleHelper = re.compile(r"MakeParticleMemberAccess<(.+?)>\(\)")
@@ -1008,40 +1014,39 @@ def run_parse():
 
     print_collecting_info("entities")
     for file in api_files:
-        with open(file) as fp:
-            line = fp.readline()
-            while line:
+        with open(file, "r", encoding="utf-8") as fp:
+            for line in fp:
                 m = re.search(r'lua\["Entity"\]\["(as_.*)"\]', line)
                 if m != None:
                     known_casts.append(m.group(1))
-                line = fp.readline()
     known_casts.sort()
 
     print_collecting_info("additional usertypes")
     for file in api_files:
         comment = []
-        data = open(file, "r").read().split("\n")
-        for line in data:
-            m = re.findall(r"new_usertype\<(.*?)\>", line)
-            if m:
-                type = m[0]
-                type_to_mod = next(
-                    (item for item in types if item["name"] == type), dict()
-                )
-                if type_to_mod:
-                    type_to_mod["comment"] = comment
-                comment = []
-            if line == "":
-                comment = []
-            c = re.search(r"/// ?(.*)$", line)
-            if c:
-                comment.append(c.group(1))
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                clean_line = line.rstrip("\r\n ")
+                m = re.findall(r"new_usertype\<(.*?)\>", clean_line)
+                if m:
+                    type = m[0]
+                    type_to_mod = next(
+                        (item for item in types if item["name"] == type), dict()
+                    )
+                    if type_to_mod:
+                        type_to_mod["comment"] = comment
+                    comment = []
+                if clean_line == "":
+                    comment = []
+                c = re.search(r"/// ?(.*)$", clean_line)
+                if c:
+                    comment.append(c.group(1))
 
     print_collecting_info("enums") # TODO: should probably improve how this handles comments
     for file in api_files:
-        data = open(file, "r").read()
-        data = data.replace("\n", "")
-        data = re.sub(r" ", "", data)
+        with open(file, "r", encoding="utf-8") as f:
+            data = f.read()
+        data = re.sub(r"\s+", "", data)
         m = re.findall(r'create_named_table\s*\(\s*"([^"]*)"\/\/,([^\)]*)', data)
         for type in m:
             name = type[0]
@@ -1064,10 +1069,10 @@ def run_parse():
         enums.append({"name": name, "vars": values})
 
     for file in api_files:
-        data = open(file, "r").read()
-        data = data.replace("\n", "")
-        data = re.sub(r" ", "", data)
-        m = re.findall(r'create_named_table\s*\(\s*"([^"]*)",([^\)]*)', data)
+        with open(file, "r", encoding="utf-8") as f:
+            data = f.read()
+        clean_data = re.sub(r"\s+", "", data)
+        m = re.findall(r'create_named_table\s*\(\s*"([^"]*)",([^\)]*)', clean_data)
         for type in m:
             name = type[0]
             attr = type[1]
@@ -1081,9 +1086,8 @@ def run_parse():
                 if len(var) > 1:
                     vars.append({"name": var[0], "type": var[1]})
             enums.append({"name": name, "vars": vars})
-        data = open(file, "r").read()
-        data = data.replace("\n", " ")
-        m = re.findall(r"/\*(.*?)\*/", data)
+        clean_data = data.replace("\n", " ")
+        m = re.findall(r"/\*(.*?)\*/", clean_data)
         for extended_enum_info in m:
             extended_enum_info = extended_enum_info.strip()
             enum = extended_enum_info[: extended_enum_info.find(" ")]
@@ -1144,39 +1148,40 @@ def run_parse():
     for file in api_files:
         comment = []
         name_next = False
-        data = open(file, "r").read().split("\n")
-        for line in data:
-            line_clean = line.replace(" ", "")
-            a = re.findall(
-                r'create_named_table\s*\(\s*"([^"]*)"\/\/,([^\)]*)', line_clean
-            )
-            b = re.findall(r'create_named_table\s*\(\s*"([^"]*)",([^\)]*)', line_clean)
-            c = re.findall(r'create_named_table\s*\(\s*"([^"]*)"\)', line_clean)
-            m = a or b or ([c] if c else [])
-            if m or name_next:
-                enum = m[0][0] if m else line.strip('", ')
-                enum_to_mod = next(
-                    (item for item in enums if item["name"] == enum), dict()
+        with open(file, "r", encoding="utf-8") as f:
+            for line in f:
+                clean_line = line.rstrip("\r\n")
+                condensed_line = clean_line.replace(" ", "")
+                a = re.findall(
+                    r'create_named_table\s*\(\s*"([^"]*)"\/\/,([^\)]*)', condensed_line
                 )
-                if enum_to_mod:
-                    enum_to_mod["comment"] = comment
-                comment = []
-                name_next = False
-            elif "create_named_table" in line:
-                name_next = True
-            else:
-                name_next = False
-            if line == "":
-                comment = []
-            c = re.search(r"/// ?(.*)$", line)
-            if c:
-                comment.append(c.group(1))
+                b = re.findall(r'create_named_table\s*\(\s*"([^"]*)",([^\)]*)', condensed_line)
+                c = re.findall(r'create_named_table\s*\(\s*"([^"]*)"\)', condensed_line)
+                m = a or b or ([c] if c else [])
+                if m or name_next:
+                    enum = m[0][0] if m else clean_line.strip('", ')
+                    enum_to_mod = next(
+                        (item for item in enums if item["name"] == enum), dict()
+                    )
+                    if enum_to_mod:
+                        enum_to_mod["comment"] = comment
+                    comment = []
+                    name_next = False
+                elif "create_named_table" in clean_line:
+                    name_next = True
+                else:
+                    name_next = False
+                if clean_line == "":
+                    comment = []
+                c = re.search(r"/// ?(.*)$", clean_line)
+                if c:
+                    comment.append(c.group(1))
 
     print_collecting_info("libraries")
     for file in api_files:
-        data = open(file, "r").read()
-        data = data.replace("\n", "")
-        data = re.sub(r" ", "", data)
+        with open(file, "r", encoding="utf-8") as f:
+            data = f.read()
+        data = re.sub(r"\s+", "", data)
         m = re.search(r"open_libraries\s*\(([^\)]*)\)", data)
         if m:
             libs = m.group(1).split(",")
@@ -1184,14 +1189,15 @@ def run_parse():
                 lualibs.append(lib.replace("sol::lib::", ""))
 
     print_collecting_info("aliases")
-    data = open("../src/game_api/aliases.hpp", "r").read().split("\n")
-    for line in data:
-        if not line.endswith("NoAlias"):
-            m = re.search(r"using\s*(\S*)\s*=\s*(\S*);?", line)
-            if m:
-                name = m.group(1)
-                type = replace_fun(m.group(2))
-                aliases.append({"name": name, "type": type})
+    with open("../src/game_api/aliases.hpp", "r", encoding="utf-8") as f:
+        for line in f:
+            clean_line = line.rstrip("\r\n ")
+            if not clean_line.endswith("NoAlias"):
+                m = re.search(r"using\s*(\S*)\s*=\s*(\S*);?", clean_line)
+                if m:
+                    name = m.group(1)
+                    type = replace_fun(m.group(2))
+                    aliases.append({"name": name, "type": type})
 
     do_pickle(
         os.path.join(".db", CACHE_FILE),
