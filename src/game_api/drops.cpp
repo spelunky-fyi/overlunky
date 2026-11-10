@@ -4,9 +4,10 @@
 #include <iterator>    // for begin, end
 #include <new>         // for operator new
 #include <optional>    // for nullopt
-#include <string_view> //
+#include <string_view> // for string_view
 #include <utility>     // for min, max
 
+#include "bucket.hpp"    // for Bucket
 #include "entity_db.hpp" // for to_id
 #include "logger.h"      // for DEBUG
 #include "memory.hpp"    // for Memory, recover_mem, write_mem_recoverable
@@ -15,7 +16,7 @@
 ///
 ///  DROP
 ///
-std::vector<DropEntry> drop_entries{
+constexpr auto g_drop_entries = std::to_array<DropEntry>({
     {"ALTAR_DICE_CLIMBINGGLOVES", "\xBA\x0D\x02\x00\x00\xEB\x05"sv, VTABLE_OFFSET::NONE, 0, 1}, // VTABLE_OFFSET::FLOOR_ALTAR, 26
     {"ALTAR_DICE_COOKEDTURKEY", "\xBA\x06\x02\x00\x00\xEB\x0C"sv, VTABLE_OFFSET::NONE, 0, 1},
     {"ALTAR_DICE_DIAMOND", "\xBA\xF1\x01\x00\x00\xE9\x87\x01\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 1},
@@ -154,7 +155,7 @@ std::vector<DropEntry> drop_entries{
     {"YAMA_EGGPLANTCROWN", "\xC6\x44\x24\x20\x00\xBA\x19\x02\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
     {"YAMA_GIANTFOOD", "\xC6\x44\x24\x20\x00\xBA\x07\x02\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 6},
     {"YANG_KEY", "\xba\x8f\x01\x00\x00\xe8\xd6\xe7\xe2\xff\x48\x89\xc7\x84\xdb"sv, VTABLE_OFFSET::NONE, 0, 1},
-    {"MADAME_TUSK_KEY", "\xBA\x8F\x01\x00\x00"sv, VTABLE_OFFSET::MONS_MADAMETUSK, 3, 1}, // the key is spawned in kill, the destructor (0) is far away from it
+    {"MADAME_TUSK_KEY", "\xBA\x8F\x01\x00\x00"sv, VTABLE_OFFSET::MONS_MADAMETUSK, 3, 1},
     {"ANUBIS_COFFIN_VAMPIRE", "\x83\xF9\x02\xBA\xF5\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_SORCERESS", "\x83\xF9\x01\xB8\xFA\x00\x00\x00"sv, VTABLE_OFFSET::NONE, 0, 4},
     {"ANUBIS_COFFIN_WITCHDOCTOR", "\xBF\xEB\x00\x00\x00\x0F\x44\xF8"sv, VTABLE_OFFSET::NONE, 0, 1},
@@ -319,12 +320,12 @@ std::vector<DropEntry> drop_entries{
     */
 
     /// maybe TODO: if someone wants all the explosions (from damage/death/crush), could also be added
-};
+});
 
 ///
 ///  DROPCHANCE
 ///
-std::vector<DropChanceEntry> dropchance_entries{
+constexpr auto g_dropchance_entries = std::to_array<DropChanceEntry>({
     {"BONEBLOCK_SKELETONKEY", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::ACTIVEFLOOR_BONEBLOCK, 3},
     {"CROCMAN_TELEPACK", "\x64"sv, VTABLE_OFFSET::MONS_CROCMAN, 3, 1},
     {"HANGINGSPIDER_WEBGUN", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_HANGSPIDER, 3},
@@ -336,7 +337,7 @@ std::vector<DropChanceEntry> dropchance_entries{
     {"SKELETON_SKELETONKEY", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_SKELETON, 3},
     {"UFO_PARACHUTE", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_UFO, 78},
     {"YETI_PITCHERSMITT", "\xE8\x03\x00\x00"sv, VTABLE_OFFSET::MONS_YETI, 3},
-};
+});
 
 // Finds the addresses of all drops and drop chances, called once from API::init before any script can replace a drop or hook a vtable.
 // Entries that fail to resolve stay at 0 and are skipped by replace_drop and set_drop_chance.
@@ -351,9 +352,14 @@ std::vector<DropChanceEntry> dropchance_entries{
 void resolve_drop_addresses()
 {
     auto& memory = Memory::get();
+    Bucket* bucket = Bucket::get();
+    if (bucket->drops_addresses_cached)
+        return;
 
-    for (auto& entry : drop_entries)
+    bucket->drops_addresses_cached = true;
+    for (size_t idx = 0; idx < g_drop_entries.size(); ++idx)
     {
+        auto& entry = g_drop_entries.at(idx);
         size_t offset = entry.vtable_offset == VTABLE_OFFSET::NONE
                             ? memory.after_bundle_address()
                             : get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset);
@@ -366,10 +372,10 @@ void resolve_drop_addresses()
             continue;
         }
 
-        const auto drop_name{"DROP." + entry.caption};
-        size_t offsets[3] = {0};
+        const std::string drop_name = fmt::format("DROP.{}", entry.caption);
+        std::array<size_t, Drops::MAX_OCCURRENCE> offsets{};
         bool found_all = true;
-        for (int x = 0; x < entry.vtable_occurrence && x < 3; ++x)
+        for (int x = 0; x < entry.vtable_occurrence; ++x)
         {
             offset = find_inst(memory.exe(), entry.pattern, offset, std::nullopt, drop_name);
             if (offset == 0)
@@ -384,26 +390,27 @@ void resolve_drop_addresses()
 
         // Only keep complete results, a partial one would make replace_drop change some occurrences and not the others
         if (found_all)
-            std::copy(std::begin(offsets), std::end(offsets), std::begin(entry.offsets));
+            bucket->drops_addresses[idx] = offsets;
     }
 
-    for (auto& entry : dropchance_entries)
+    for (size_t idx = 0; idx < g_dropchance_entries.size(); ++idx)
     {
+        auto& entry = g_dropchance_entries.at(idx);
         size_t start = get_virtual_function_address(entry.vtable_offset, entry.vtable_rel_offset);
         if (start == 0)
         {
             DEBUG("resolve_drop_addresses: Failed resolving DROPCHANCE.{} - no address for virtual function {} of vtable {}", entry.caption, entry.vtable_rel_offset, static_cast<uint32_t>(entry.vtable_offset));
             continue;
         }
-
-        if (size_t offset = find_inst(memory.exe(), entry.pattern, start, std::nullopt, "DROPCHANCE." + entry.caption))
-            entry.offset = memory.at_exe(offset);
+        const std::string chance_name = fmt::format("DROPCHANCE.{}", entry.caption);
+        if (size_t offset = find_inst(memory.exe(), entry.pattern, start, std::nullopt, chance_name))
+            bucket->dropchances_addresses[idx] = memory.at_exe(offset);
     }
 }
 
 void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance)
 {
-    if (dropchance_id < (int32_t)dropchance_entries.size())
+    if (dropchance_id < (int32_t)g_dropchance_entries.size())
     {
         if (dropchance_id < 0)
         {
@@ -412,17 +419,19 @@ void set_drop_chance(DROPCHANCE dropchance_id, uint32_t new_drop_chance)
             return;
         }
 
-        auto& entry = dropchance_entries.at(dropchance_id);
-        if (entry.offset != 0)
+        auto& entry = g_dropchance_entries.at(dropchance_id);
+        Bucket* bucket = Bucket::get();
+        auto entry_offset = bucket->dropchances_addresses[dropchance_id];
+        if (entry_offset != 0)
         {
             if (entry.chance_sizeof == 4)
             {
-                write_mem_recoverable("drop_chance", entry.offset, new_drop_chance, true);
+                write_mem_recoverable("drop_chance", entry_offset, new_drop_chance, true);
             }
             else if (entry.chance_sizeof == 1)
             {
                 uint8_t value = static_cast<uint8_t>(new_drop_chance);
-                write_mem_recoverable("drop_chance", entry.offset, value, true);
+                write_mem_recoverable("drop_chance", entry_offset, value, true);
             }
         }
     }
@@ -431,10 +440,9 @@ void replace_drop_by_name(std::string_view name, ENT_TYPE new_drop_entity_type)
 {
     if (name == "TIAMAT_TIAMATSHOT")
         name = "TIAMAT_SHOT";
-    auto size = drop_entries.size();
-    for (int32_t idx = 0; idx < size; ++idx)
+    for (int32_t idx = 0; idx < g_drop_entries.size(); ++idx)
     {
-        if (drop_entries[idx].caption == name)
+        if (g_drop_entries[idx].caption == name)
         {
             replace_drop(idx, new_drop_entity_type);
             return;
@@ -447,7 +455,7 @@ void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type)
     const static auto nof_ent_types = to_id("ENT_TYPE_LIQUID_COARSE_LAVA") + 1;
     // new_drop_entity_type can also be unrelated to entity, like in MOTHERSTATUE_HEALTH
     // for now, only extra use is health, which is capped under 100
-    if (drop_id < (int32_t)drop_entries.size() && new_drop_entity_type < nof_ent_types)
+    if (drop_id < (int32_t)g_drop_entries.size() && new_drop_entity_type < nof_ent_types)
     {
         if (drop_id < 0)
         {
@@ -456,111 +464,30 @@ void replace_drop(DROP drop_id, ENT_TYPE new_drop_entity_type)
 
             return;
         }
-        auto& entry = drop_entries.at(drop_id);
+        Bucket* bucket = Bucket::get();
+        auto& entry_offsets = bucket->drops_addresses[drop_id];
         if (new_drop_entity_type == 0)
         {
             for (int x = 0; x < 3; ++x)
-                if (entry.offsets[x])
-                    recover_mem("replace_drop", entry.offsets[x]);
+                if (entry_offsets[x])
+                    recover_mem("replace_drop", entry_offsets[x]);
 
             return;
         }
 
         // An entry is either fully resolved or all 0, the unused slots past vtable_occurrence are 0 as well
-        for (size_t offset : entry.offsets)
+        for (size_t offset : entry_offsets)
             if (offset)
                 write_mem_recoverable("replace_drop", offset, new_drop_entity_type, true);
     }
 }
 
-#ifdef PERFORM_DROPS_TEST
-void test_drops()
+std::span<const DropEntry> get_drops()
 {
-    auto memory = Memory::get();
-    auto exe = memory.exe();
-
-    for (const auto& drop : drop_entries)
-    {
-        switch (drop.vtable_offset)
-        {
-        case VTABLE_OFFSET::NONE:
-        {
-            size_t times_found = 0;
-            size_t address = memory.after_bundle;
-            while (true)
-            {
-                try
-                {
-                    address = find_inst(exe, drop.pattern, address + 1, "", false);
-                    times_found++;
-                }
-                catch (...)
-                {
-                    break;
-                }
-            }
-            if (times_found == 0 || times_found > 1)
-            {
-                std::cerr << "DROP " << drop.caption << ": FOUND " << times_found << " TIMES\n";
-            }
-            break;
-        }
-        default:
-        {
-            auto vfunc_address = get_virtual_function_address(drop.vtable_offset, drop.vtable_rel_offset);
-            try
-            {
-                auto address = find_inst(exe, drop.pattern, vfunc_address, "", false);
-                std::cerr << "DROP " << drop.caption << " found with distance " << (address - vfunc_address) << "\n";
-            }
-            catch (...)
-            {
-                std::cerr << "DROP " << drop.caption << " NOT FOUND IN VIRTUAL FUNCTION\n";
-            }
-        }
-        }
-    }
-
-    for (const auto& dropchance : dropchance_entries)
-    {
-        switch (dropchance.vtable_offset)
-        {
-        case VTABLE_OFFSET::NONE:
-        {
-            size_t times_found = 0;
-            size_t address = memory.after_bundle;
-            while (true)
-            {
-                try
-                {
-                    address = find_inst(exe, dropchance.pattern, address + 1, "", false);
-                    times_found++;
-                }
-                catch (...)
-                {
-                    break;
-                }
-            }
-            if (times_found == 0 || times_found > 1)
-            {
-                std::cerr << "DROPCHANCE " << dropchance.caption << ": FOUND " << times_found << " TIMES\n";
-            }
-            break;
-        }
-        default:
-        {
-            auto vfunc_address = get_virtual_function_address(dropchance.vtable_offset, dropchance.vtable_rel_offset);
-            try
-            {
-                auto address = find_inst(exe, dropchance.pattern, vfunc_address, "", false);
-                std::cerr << "DROPCHANCE " << dropchance.caption << " found with distance " << (address - vfunc_address) << "\n";
-            }
-            catch (...)
-            {
-                std::cerr << "DROPCHANCE " << dropchance.caption << " NOT FOUND IN VIRTUAL FUNCTION\n";
-            }
-        }
-        }
-    }
+    return g_drop_entries;
 }
-#endif
+
+std::span<const DropChanceEntry> get_chances()
+{
+    return g_dropchance_entries;
+}

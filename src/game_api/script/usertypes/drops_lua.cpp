@@ -27,9 +27,10 @@ void register_usertypes(sol::state& lua)
                            //, "", ...see__[drops.cpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp\]__for__a__list__of__possible__dropchances...
                            //, "YETI_PITCHERSMITT", 10
     );
+    auto dropchance_entries = get_chances();
     for (size_t x = 0; x < dropchance_entries.size(); ++x)
     {
-        lua["DROPCHANCE"][dropchance_entries.at(x).caption] = x;
+        lua["DROPCHANCE"][dropchance_entries[x].caption] = x;
     }
 
     lua.create_named_table("DROP"
@@ -37,9 +38,10 @@ void register_usertypes(sol::state& lua)
                            //, "", ...see__[drops.cpp](https://github.com/spelunky-fyi/overlunky/blob/main/src/game_api/drops.cpp\]__for__a__list__of__possible__drops...
                            //, "YETI_PITCHERSMITT", 85
     );
+    auto drop_entries = get_drops();
     for (size_t x = 0; x < drop_entries.size(); ++x)
     {
-        std::string& name = drop_entries.at(x).caption;
+        std::string_view name = drop_entries[x].caption;
         lua["DROP"][name] = x;
         // for backward compatibility
         // need to keep both entries with the same ID

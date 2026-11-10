@@ -1,5 +1,6 @@
 #include "bucket.hpp"
 
+#include "drops.hpp"          // for get_drops, get_chances
 #include "entities_chars.hpp" // for Player
 #include "game_manager.hpp"   // for GameManager, get_game_manager
 #include "items.hpp"          // for Items
@@ -17,6 +18,8 @@ Bucket* Bucket::get()
     write_mem_prot(bucket_offset, new_bucket, true);
     new_bucket->pause_api = new PauseAPI();
     new_bucket->io = new SharedIO();
+    new_bucket->drops_addresses = std::make_unique<std::array<uintptr_t, Drops::MAX_OCCURRENCE>[]>(get_drops().size());
+    new_bucket->dropchances_addresses = std::make_unique<uintptr_t[]>(get_chances().size());
     return new_bucket;
 }
 

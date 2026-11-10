@@ -1,12 +1,15 @@
 #pragma once
 
+#include <cstdint> // for uintptr_t, int32_t, uint32_t
 #include <map>
+#include <memory> // for uniqe_ptr
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
 
 #include "aliases.hpp"
+#include "drops.hpp"
 
 using BucketItem = std::variant<bool, int64_t, float, std::string>;
 using KEY = int64_t;
@@ -163,28 +166,35 @@ class Bucket
     std::unordered_map<std::string, BucketItem> data;
     /// Access Overlunky options here, nil if Overlunky is not loaded.
     Overlunky* overlunky{nullptr};
-    // Used by state.cpp to determine if patches should still be applied.
-    bool patches_applied{false};
-    // Used by Overlunky to restart adventure runs with same seed, updated by PRE_LOAD_SCREEN
-    std::pair<int64_t, int64_t> adventure_seed{0, 0};
-    // Used by memory for recoverable memory interoperability
-    std::unordered_map<std::string, EditedMemory> original_memory;
     /// PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     PauseAPI* pause_api;
-    // Used by blockable PRE callbacks to forward BLOCKED events from Overlunky to Playlunky
-    bool forward_blocked_events{false};
-    // Set to true when the callback was blocked by Overlunky and should also be blocked in Playlunky
-    bool blocked_event{false};
     /// Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     SharedIO* io{nullptr};
     /// Number of API instances present
     int count{0};
+
     // holds next id for new custom string
     STRINGID next_stringid{0};
+    // Used by Overlunky to restart adventure runs with same seed, updated by PRE_LOAD_SCREEN
+    std::pair<int64_t, int64_t> adventure_seed{0, 0};
+    // Used by memory for recoverable memory interoperability
+    std::unordered_map<std::string, EditedMemory> original_memory;
+    // Used by blockable PRE callbacks to forward BLOCKED events from Overlunky to Playlunky
+    bool forward_blocked_events{false};
+    // Set to true when the callback was blocked by Overlunky and should also be blocked in Playlunky
+    bool blocked_event{false};
+    // Used by state.cpp to determine if patches should still be applied.
+    bool patches_applied{false};
+    // To make sure we only lookup once
+    bool drops_addresses_cached{false};
     // Holds all the custom strings added thru add_string
     std::unordered_map<STRINGID, std::u16string> custom_strings;
     // uid to custom string id for shop items
     std::unordered_map<uint32_t, STRINGID> custom_shopitem_names;
+    // replace_drop cached addresses
+    std::unique_ptr<std::array<uintptr_t, Drops::MAX_OCCURRENCE>[]> drops_addresses;
+    // set_drop_chance cached addresses
+    std::unique_ptr<uintptr_t[]> dropchances_addresses;
 
   private:
     Bucket() = default;
