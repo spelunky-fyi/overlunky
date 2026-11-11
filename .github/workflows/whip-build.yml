@@ -8,15 +8,16 @@ on:
 jobs:
   build:
     name: Build
-
     runs-on: windows-2022
-    steps:
-      - uses: llvm/actions/install-ninja@main
 
+    permissions:
+      contents: write
+
+    steps:
       - name: Install llvm 17
         run: choco install llvm --version 17.0.6 --allow-downgrade -y
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
           submodules: true
@@ -27,6 +28,7 @@ jobs:
           "PATH=$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Get tags for release notes
+        continue-on-error: true
         shell: bash
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
@@ -47,7 +49,7 @@ jobs:
           7z a Overlunky_WHIP.zip Overlunky\
 
       - name: Create WHIP release
-        uses: marvinpinto/action-automatic-releases@v1.2.0
+        uses: marvinpinto/action-automatic-releases@latest
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:

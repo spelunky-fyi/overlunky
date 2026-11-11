@@ -29,29 +29,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: DoozyX/clang-format-lint-action@v0.16.2
+      - uses: actions/checkout@v7
+      - uses: DoozyX/clang-format-lint-action@v0.20
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.do_formatting != 'true' }}
         with:
           source: "src"
           extensions: "inl,h,hpp,cpp"
           exclude: "./src/game_api/lua_libs"
-          clangFormatVersion: 16
+          clangFormatVersion: 17
 
-      - uses: DoozyX/clang-format-lint-action@v0.16.2
+      - uses: DoozyX/clang-format-lint-action@v0.20
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.do_formatting == 'true' }}
         with:
           source: "src"
           extensions: "inl,h,hpp,cpp"
           exclude: "./src/game_api/lua_libs"
-          clangFormatVersion: 16
+          clangFormatVersion: 17
           inplace: true
-      - uses: EndBug/add-and-commit@v4
+
+      - uses: EndBug/add-and-commit@v11.1.1
         if: ${{ success() && github.event_name == 'workflow_dispatch' && github.event.inputs.do_formatting == 'true' }}
         with:
           author_name: Clang-Format Bot
           author_email: fake.user@github.com
           message: "Automated clang-format changes"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
