@@ -8,10 +8,16 @@ on:
 jobs:
   build:
     name: Build
-
     runs-on: windows-2022
+
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Install llvm 17
+        run: choco install llvm --version 17.0.6 --allow-downgrade -y
+
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
           submodules: true
@@ -27,15 +33,19 @@ jobs:
 
       - name: Build
         run: |
-          mkdir build
-          cd build
-          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF
-          cmake --build . --config Release --target ALL_BUILD
+         cmake -S . -B build -G Ninja `
+            -DBUILD_INFO_DUMP=OFF `
+            -DBUILD_SPEL2_DLL=OFF `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON `
+            -DCMAKE_C_COMPILER=clang `
+            -DCMAKE_CXX_COMPILER=clang++
+         cmake --build build --parallel
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
         shell: bash
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> "$GITHUB_OUTPUT"
 
       - name: Get release notes
         id: get_message
@@ -46,19 +56,19 @@ jobs:
           content="${content//$'\n'/'%0A'}"
           content="${content//$'\r'/'%0D'}"
           echo $content
-          echo "::set-output name=NOTES::$content"
+          echo "NOTES=$content" >> $GITHUB_OUTPUT
 
       - name: Create artifacts
         run: |
           mkdir Overlunky
-          move build\bin\Release\Overlunky.dll Overlunky\Overlunky.dll
-          move build\bin\Release\Overlunky.exe Overlunky\Overlunky.exe
+          move build\bin\Overlunky.dll Overlunky\Overlunky.dll
+          move build\bin\Overlunky.exe Overlunky\Overlunky.exe
           move README.md Overlunky\README.txt
           move examples Overlunky\Scripts
           7z a Overlunky_${{ steps.get_version.outputs.VERSION }}.zip Overlunky\
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v7
         with:
           name: Binary
           path: ./Overlunky
@@ -67,10 +77,9 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: "*.zip"
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify Discord
-        uses: rjstone/discord-webhook-notify@v1
+        uses: rjstone/discord-webhook-notify@v2
         with:
           severity: info
           color: "#3377ff"
@@ -78,4 +87,4 @@ jobs:
           details: "Download: **[Overlunky  ${{ steps.get_version.outputs.VERSION }}](https://github.com/spelunky-fyi/overlunky/releases/download/${{ steps.get_version.outputs.VERSION }}/Overlunky_${{ steps.get_version.outputs.VERSION }}.zip)**"
           text: A new version of Overlunky was just released!
           footer: I thought you'd like to know :3
-          webhookUrl: https://canary.discord.com/api/webhooks/${{ secrets.WEBHOOK_ID }}/${{ secrets.WEBHOOK_TOKEN }}
+          webhookUrl: https://discord.com/api/webhooks/${{ secrets.WEBHOOK_ID }}/${{ secrets.WEBHOOK_TOKEN }}
