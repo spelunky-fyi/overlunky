@@ -22,6 +22,26 @@ jobs:
           fetch-depth: 1
           submodules: true
 
+      - name: Get Lua version
+        id: lua-version
+        uses: ./.github/actions/get-lua-version
+
+      - name: Restore Lua cache
+        id: lua-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz
+          key: lua-${{ steps.lua-version.outputs.version }}
+
+      - name: Extract cached Lua
+        if: steps.lua-cache.outputs.cache-hit == 'true'
+        shell: pwsh
+        run: |
+          tar -xzf .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz
+
+          New-Item -ItemType Directory -Force -Path lua-${{ steps.lua-version.outputs.version }}/include | Out-Null
+          Copy-Item lua-${{ steps.lua-version.outputs.version }}/src/*.h lua-${{ steps.lua-version.outputs.version }}/include/
+
       - name: Remove Strawberry Perl from PATH
         run: |
           $env:PATH = $env:PATH -replace "C:\\Strawberry\\c\\bin;", ""
@@ -33,10 +53,32 @@ jobs:
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Build
+        shell: pwsh
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -GNinja
+          $luaSource = "$env:GITHUB_WORKSPACE/lua-${{ steps.lua-version.outputs.version }}"
+          if ((Test-Path "$luaSource/src") -and (Test-Path "$luaSource/include")) {
+              Write-Host "Using cached Lua: $luaSource"
+              cmake .. `
+                -DBUILD_INFO_DUMP=OFF `
+                -DBUILD_SPEL2_DLL=OFF `
+                -DCMAKE_BUILD_TYPE=Release `
+                -DCMAKE_C_COMPILER=clang `
+                -DCMAKE_CXX_COMPILER=clang++ `
+                -GNinja `
+                "-DLUA_LOCAL_DIR=$luaSource"
+          }
+          else {
+              Write-Host "Lua cache unavailable. Using sol2's normal download method."
+              cmake .. `
+                -DBUILD_INFO_DUMP=OFF `
+                -DBUILD_SPEL2_DLL=OFF `
+                -DCMAKE_BUILD_TYPE=Release `
+                -DCMAKE_C_COMPILER=clang `
+                -DCMAKE_CXX_COMPILER=clang++ `
+                -GNinja
+          }
           cmake --build . --config Release
 
       - name: Create artifacts

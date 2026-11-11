@@ -1,0 +1,24 @@
+name: Get Lua Version
+description: Extract SOL2_LUA_VERSION from CMakeLists.txt
+
+outputs:
+  version:
+    description: Lua version configured in CMakeLists.txt
+    value: ${{ steps.extract.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Extract Lua version
+      id: extract
+      shell: pwsh
+      run: |
+        $content = Get-Content "$env:GITHUB_WORKSPACE/src/CMakeLists.txt" -Raw
+
+        if ($content -match 'set\s*\(\s*SOL2_LUA_VERSION\s+"([^"]+)"\s*\)') {
+            $version = $Matches[1]
+            "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+            Write-Host "Detected Lua version: $version"
+        } else {
+            throw "Could not find SOL2_LUA_VERSION in CMakeLists.txt"
+        }

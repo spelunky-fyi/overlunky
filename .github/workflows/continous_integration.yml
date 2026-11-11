@@ -21,7 +21,44 @@ on:
       - ".github/workflows/build-docs.yml"
 
 jobs:
+  prepare-lua:
+    name: Prepare Lua cache
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v7
+    
+      - name: Get Lua version
+        id: lua-version
+        uses: ./.github/actions/get-lua-version
+  
+      - name: Cache Lua
+        id: cache-lua
+        uses: actions/cache@v6
+        with:
+          path: .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz
+          key: lua-${{ steps.lua-version.outputs.version }}
+
+      - name: Download Lua
+        if: steps.cache-lua.outputs.cache-hit != 'true'
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path .cache/lua | Out-Null
+
+          curl.exe --fail --location --retry 5 --retry-all-errors `
+            https://www.lua.org/ftp/lua-${{ steps.lua-version.outputs.version }}.tar.gz `
+            -o .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz.part
+
+          if ($LASTEXITCODE -eq 0) {
+            Move-Item .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz.part `
+              .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz -Force
+          } else {
+            Remove-Item .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz.part -Force -ErrorAction SilentlyContinue
+            exit 1
+          }
+
   build:
+    needs: prepare-lua
     name: Continuous Integration ${{ matrix.target_name }} ${{ matrix.toolset_name }} ${{ matrix.build_type }}
     runs-on: windows-2022
     strategy:
@@ -52,16 +89,51 @@ jobs:
           fetch-depth: 1
           submodules: true
 
+      - name: Get Lua version
+        id: lua-version
+        uses: ./.github/actions/get-lua-version
+
+      - name: Restore Lua cache
+        id: lua-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz
+          key: lua-${{ steps.lua-version.outputs.version }}
+
+      - name: Extract cached Lua
+        if: steps.lua-cache.outputs.cache-hit == 'true'
+        shell: pwsh
+        run: |
+          tar -xzf .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz
+          New-Item -ItemType Directory -Force -Path lua-${{ steps.lua-version.outputs.version }}/include | Out-Null
+          Copy-Item lua-${{ steps.lua-version.outputs.version }}/src/*.h lua-${{ steps.lua-version.outputs.version }}/include/
+
       - name: Remove Strawberry Perl from PATH
         run: |
           $env:PATH = $env:PATH -replace "C:\\Strawberry\\c\\bin;", ""
           "PATH=$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Configure
+        shell: pwsh
         run: |
           mkdir build
           cd build
-          cmake .. -Wno-dev ${{ matrix.toolset }} ${{ matrix.additional_opts }} ${{ matrix.cmake_opts }}
+          $luaSource = "$env:GITHUB_WORKSPACE/lua-${{ steps.lua-version.outputs.version }}"
+          if ((Test-Path "$luaSource/src") -and (Test-Path "$luaSource/include")) {
+              Write-Host "Using cached Lua: $luaSource"
+              cmake .. -Wno-dev `
+                ${{ matrix.toolset }} `
+                ${{ matrix.additional_opts }} `
+                ${{ matrix.cmake_opts }} `
+                "-DLUA_LOCAL_DIR=$luaSource"
+          }
+          else {
+              Write-Host "Lua cache unavailable. Using sol2's normal download."
+              cmake .. -Wno-dev `
+                ${{ matrix.toolset }} `
+                ${{ matrix.additional_opts }} `
+                ${{ matrix.cmake_opts }}
+          }
 
       - name: Build
         run: |
