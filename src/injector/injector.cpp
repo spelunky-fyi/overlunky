@@ -1,14 +1,11 @@
 #include "injector.h"
 
-#include <Psapi.h>     // for GetModuleBaseNameA
-#include <TlHelp32.h>  // for PROCESSENTRY32, CreateToolhelp32Snapshot, Pro...
-#include <algorithm>   // for transform
-#include <cctype>      // for tolower
-#include <cstring>     // for size_t, strrchr, NULL
-#include <new>         // for operator new
-#include <type_traits> // for move, forward
-#include <utility>     // for min
-#include <vector>      // for vector, _Vector_iterator, _Vector_const_iterator
+#include <Psapi.h>    // for GetModuleBaseNameA
+#include <TlHelp32.h> // for PROCESSENTRY32, CreateToolhelp32Snapshot, Pro...
+#include <algorithm>  // for transform
+#include <cctype>     // for tolower
+#include <cstring>    // for size_t, strrchr, NULL
+#include <vector>     // for vector, _Vector_iterator, _Vector_const_iterator
 
 #include "logger.h" // for PANIC, DEBUG
 

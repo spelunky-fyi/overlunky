@@ -2,9 +2,7 @@
 
 #include <Windows.h> // for LPTHREAD_START_ROUTINE, DWORD, HANDLE, LPVOID
 
-#include <optional> // for optional
-#include <stddef.h> // for size_t
-#include <string>   // for string
+#include <string> // for string
 
 struct ProcessInfo
 {

@@ -1,30 +1,23 @@
 #include <Windows.h> // for PROCESS_INFORMATION, CloseHandle, GetEnvironm...
-#include <chrono>    // for operator<=>, operator-, operator+, operator""s
-#include <compare>   // for operator<, operator<=, operator>
-#include <conio.h>
-#include <ctime> // for errno_t
-#include <detours.h>
-#include <filesystem> // for exists, path
-#include <fstream>    // for basic_ostream, basic_ofstream, ofstream, basi...
-#include <iostream>
-#include <locale>   // for num_put, num_get
-#include <new>      // for operator new
-#include <optional> // for optional
-#include <sstream>  // for basic_stringstream
-#include <stdint.h> // for uint64_t
-#include <stdio.h>  // for NULL, fclose, sprintf_s, fflush, fopen_s, fwrite
-#include <stdlib.h>
-#include <string.h>    // for strlen
+
+#include <chrono>      // for std::chrono_literals, operator<=>, operator-, operator+, operator""s
+#include <cstdint>     // for uint64_t
+#include <cstdio>      // for NULL, fclose, sprintf_s, fflush, fopen_s, fwrite
+#include <cstring>     // for strlen
+#include <ctime>       // for errno_t
+#include <filesystem>  // for exists, path
+#include <fstream>     // for basic_ostream, basic_ofstream, ofstream, basi...
+#include <sstream>     // for stringstream
 #include <string>      // for char_traits, string, basic_string, operator==
 #include <string_view> // for string_view
-#include <strsafe.h>   // for DWORD
 #include <thread>      // for sleep_for
-#include <type_traits> // for move
-#include <utility>     // for max, min
-#include <wininet.h>   // for InternetCloseHandle, InternetOpenA, InternetG...
+
+#include <conio.h>   // for kbhit, getche
+#include <detours.h> // DetourCreateProcessWithDlls
+#include <wininet.h> // for InternetCloseHandle, InternetOpenA, InternetG...
 
 #include "cmd_line.h"  // for GetCmdLineParam, CmdLineParser
-#include "injector.h"  // for Process, ProcessInfo, call, find_function
+#include "injector.h"  // for Process, inject_dll, find_process, find_dll_in_process
 #include "logger.h"    // for INFO, PANIC
 #include "version.hpp" // for get_version
 
