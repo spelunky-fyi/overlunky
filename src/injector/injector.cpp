@@ -1,18 +1,21 @@
 #include "injector.h"
 
-#include <Psapi.h>     // for GetModuleBaseNameA
-#include <TlHelp32.h>  // for PROCESSENTRY32, CreateToolhelp32Snapshot, Pro...
-#include <algorithm>   // for transform
-#include <cctype>      // for tolower
-#include <cstring>     // for size_t, strrchr, NULL
-#include <new>         // for operator new
-#include <type_traits> // for move, forward
-#include <utility>     // for min
-#include <vector>      // for vector, _Vector_iterator, _Vector_const_iterator
+#include <Psapi.h>    // for GetModuleBaseNameA
+#include <TlHelp32.h> // for PROCESSENTRY32, CreateToolhelp32Snapshot, Pro...
+#include <algorithm>  // for transform
+#include <cctype>     // for tolower
+#include <cstring>    // for size_t, strrchr, NULL
+#include <vector>     // for vector, _Vector_iterator, _Vector_const_iterator
 
 #include "logger.h" // for PANIC, DEBUG
 
 using namespace std::chrono_literals;
+
+struct MemoryMap
+{
+    size_t addr;
+    std::string name;
+};
 
 std::vector<MemoryMap> memory_map(const Process& proc)
 {
@@ -40,7 +43,7 @@ std::string to_lower(std::string s)
     return s;
 }
 
-size_t find_base(Process proc, std::string name)
+size_t find_base(const Process& proc, std::string name)
 {
     auto map = memory_map(proc);
     name = to_lower(name);
@@ -54,9 +57,9 @@ size_t find_base(Process proc, std::string name)
     return 0;
 }
 
-LPVOID alloc(Process proc, size_t size)
+LPVOID alloc(const Process& proc, size_t size)
 {
-    auto res = VirtualAllocEx(proc.handle, nullptr, (size + 0xFFF) & ~0xFFF, MEM_COMMIT, 0x40);
+    auto res = VirtualAllocEx(proc.handle, nullptr, (size + 0xFFF) & ~0xFFF, MEM_COMMIT, PAGE_READWRITE);
     if (res == NULL)
     {
         PANIC("Allocation failed: {:#x}", GetLastError());
@@ -65,22 +68,16 @@ LPVOID alloc(Process proc, size_t size)
     return res;
 }
 
-void write_mem(Process proc, LPVOID addr, std::string str)
-{
-    WriteProcessMemory(proc.handle, addr, str.data(), str.size(), NULL);
-}
-
-LPVOID alloc_str(Process proc, std::string str)
+LPVOID alloc_str(const Process& proc, std::string str)
 {
     auto addr = alloc(proc, str.size() + 1);
-    write_mem(proc, addr, str);
+    WriteProcessMemory(proc.handle, addr, str.data(), str.size(), NULL);
     return addr;
 }
 
 LPTHREAD_START_ROUTINE find_function(const Process& proc, const std::string& library, const std::string& function)
 {
     auto library_ptr = (size_t)LoadLibraryA(library.data());
-
     if (library_ptr == 0)
     {
         ERR("Cannot find the address of the library in current process: {}", library.data());
@@ -88,7 +85,6 @@ LPTHREAD_START_ROUTINE find_function(const Process& proc, const std::string& lib
     }
 
     auto addr = (size_t)GetProcAddress((HMODULE)library_ptr, function.data());
-
     if (addr == 0)
     {
         ERR(
@@ -109,32 +105,40 @@ LPTHREAD_START_ROUTINE find_function(const Process& proc, const std::string& lib
 void call(const Process& proc, LPTHREAD_START_ROUTINE addr, LPVOID args)
 {
     // DEBUG("Calling: {}", (void*)addr);
-    auto handle = CreateRemoteThread(proc.handle, nullptr, 0, addr, args, 0, nullptr);
+    HANDLE handle = CreateRemoteThread(proc.handle, nullptr, 0, addr, args, 0, nullptr);
+    if (handle == NULL)
+    {
+        PANIC("Could not open remote thread: {:#x}", GetLastError());
+        return;
+    }
     WaitForSingleObject(handle, INFINITE);
+    CloseHandle(handle);
 }
 
 bool find_dll_in_process(DWORD pid, const std::string& name)
 {
     HMODULE hMods[1024];
-    HANDLE hProcess;
     DWORD cbNeeded;
-    unsigned int i;
-    hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
-    if (NULL == hProcess)
+    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+    if (hProcess == NULL)
         return false;
     if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
     {
-        for (i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
+        for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++)
         {
             TCHAR szModName[MAX_PATH];
             if (GetModuleFileNameEx(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR)))
             {
                 auto modName = std::string(szModName);
                 if (modName.ends_with(name))
+                {
+                    CloseHandle(hProcess);
                     return true;
+                }
             }
         }
     }
+    CloseHandle(hProcess);
     return false;
 }
 
@@ -169,10 +173,11 @@ std::vector<ProcessInfo> get_processes()
 #undef PROCESSENTRY32
     std::vector<ProcessInfo> res;
     auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (snapshot == nullptr)
+    if (!snapshot || snapshot == INVALID_HANDLE_VALUE)
         return {};
 
-    PROCESSENTRY32 ppe = {sizeof(ppe)};
+    PROCESSENTRY32 ppe{};
+    ppe.dwSize = sizeof(PROCESSENTRY32);
     auto proc = Process32First(snapshot, &ppe);
 
     while (proc)
@@ -183,17 +188,17 @@ std::vector<ProcessInfo> get_processes()
         res.push_back({name, ppe.th32ProcessID});
         proc = Process32Next(snapshot, &ppe);
     }
+    CloseHandle(snapshot);
     return res;
 }
 
-std::optional<Process> find_process(std::string name)
+Process find_process(std::string name)
 {
+    constexpr DWORD required_access = PROCESS_CREATE_THREAD | PROCESS_QUERY_INFORMATION | PROCESS_VM_OPERATION | PROCESS_VM_WRITE | PROCESS_VM_READ;
     for (auto& proc : get_processes())
     {
         if (proc.name == name)
-        {
-            return Process{OpenProcess(PROCESS_ALL_ACCESS, 0, proc.pid), proc};
-        }
+            return Process{OpenProcess(required_access, 0, proc.pid), proc};
     }
     return {};
 }
