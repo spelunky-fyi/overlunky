@@ -33,14 +33,14 @@ jobs:
 
       - name: Build
         run: |
-         cmake -S . -B build -G Ninja `
+          cmake -S . -B build -G Ninja `
             -DBUILD_INFO_DUMP=OFF `
             -DBUILD_SPEL2_DLL=OFF `
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON `
             -DCMAKE_C_COMPILER=clang `
             -DCMAKE_CXX_COMPILER=clang++
-         cmake --build build --parallel
+          cmake --build build --parallel
 
       - name: Get the version
         id: get_version
