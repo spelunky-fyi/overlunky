@@ -3,6 +3,14 @@ name: Whip Build
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "examples/**"
+      - "**.md"
+      - "**.py"
+      - "LICENSE"
+      - ".github/workflows/docs_verify.yml"
+      - ".github/workflows/build-docs.yml"
   workflow_dispatch:
 
 jobs:
