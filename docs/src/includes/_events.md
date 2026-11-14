@@ -513,7 +513,7 @@ Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter<br/>Runs before th
 
 > Search script examples for [ON.POST_LOAD_JOURNAL_CHAPTER](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.POST_LOAD_JOURNAL_CHAPTER)
 
-Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...<br/>
+Params: [JOURNALUI_PAGE_SHOWN](#JOURNALUI_PAGE_SHOWN) chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognize and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...<br/>
 
 ## ON.PRE_GET_FEAT
 
@@ -527,7 +527,7 @@ Runs before getting performed status for a [FEAT](#Aliases) when rendering the F
 
 > Search script examples for [ON.PRE_SET_FEAT](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=ON.PRE_SET_FEAT)
 
-Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behaviour of calling Steam SetAchievement.<br/>
+Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behavior of calling Steam SetAchievement.<br/>
 
 ## ON.PRE_UPDATE
 

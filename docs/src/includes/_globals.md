@@ -1364,7 +1364,7 @@ Sets the amount of blood drops in the Kapala needed to trigger a health increase
 
 #### nil set_kapala_hud_icon(int icon_index)
 
-Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
+Sets the hud icon for the Kapala (0-6 ; -1 for default behavior).
 If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
 
 ### set_level_logic_enabled
@@ -1712,7 +1712,7 @@ short for state->money_shop_total + loop[inventory.money + inventory.collected_m
 #### optional&lt;[CustomEventDescription](#CustomEventDescription)&gt; get_event_by_id(string guid_string)
 
 Gets a `CustomEventDescription` if the event description is loaded using an FMOD GUID string. The string representation
-must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
+must be formatted as 32 digits separated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
 
 ### get_frame
 
@@ -3612,7 +3612,7 @@ Same as `Player.get_short_name`
 #### string get_string([STRINGID](#Aliases) string_id)
 
 Get string behind [STRINGID](#Aliases), **don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first
-Will return the string of currently choosen language
+Will return the string of currently chosen language
 
 ### hash_to_stringid
 
@@ -3754,7 +3754,7 @@ Pass `nil` in the first parameter to reset
 
 #### nil force_co_subtheme([COSUBTHEME](#COSUBTHEME) subtheme)
 
-Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behaviour)
+Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behavior)
 
 ### force_custom_subtheme
 
