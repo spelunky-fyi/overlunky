@@ -2,6 +2,7 @@
 
 #include "hookable_vtable.hpp" // for HookableVTable
 #include "level_api.hpp"       // for ThemeInfo
+#include "member_function.hpp" // for MemberFun
 
 namespace sol
 {
@@ -10,6 +11,10 @@ class state;
 
 namespace NThemeVTables
 {
+
+template <auto fun>
+using MemFun = MemberFun<fun>::BaseLessType;
+
 void register_usertypes(sol::state& lua);
 
 using ThemeVTable = HookableVTable<
@@ -64,7 +69,7 @@ using ThemeVTable = HookableVTable<
     VTableEntry<"shop_chance", 47, uint32_t()>,
     VTableEntry<"spawn_decoration", 48, void()>,
     VTableEntry<"spawn_decoration2", 49, void()>,
-    VTableEntry<"spawn_extra", 50, void()>,
+    VTableEntry<"spawn_extra", 50, MemFun<&ThemeInfo::spawn_extra>>,
     VTableEntry<"do_procedural_spawn", 51, void(SpawnInfo*)>>;
 // static ThemeVTable theme_vtable(lua, lua["ThemeInfo"], "THEME_OVERRIDE");
 ThemeVTable& get_theme_info_vtable(sol::state& lua);
