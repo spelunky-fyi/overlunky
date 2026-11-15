@@ -420,7 +420,7 @@ function raise() end
 ---@return STRINGID
 function hash_to_stringid(hash) end
 ---Get string behind STRINGID, **don't use stringid directly for vanilla string**, use [hash_to_stringid](https://spelunky-fyi.github.io/overlunky/#hash_to_stringid) first
----Will return the string of currently choosen language
+---Will return the string of currently chosen language
 ---@param string_id STRINGID
 ---@return string
 function get_string(string_id) end
@@ -517,23 +517,6 @@ function get_adventure_seed(run_start) end
 ---@param second integer
 ---@return nil
 function set_adventure_seed(first, second) end
----Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
----optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
----@param x number
----@param y number
----@param add boolean
----@param layer LAYER?
----@return nil
-function update_liquid_collision_at(x, y, add, layer) end
----Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
----Returns a pair of water and lava, in that order.
----Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
----Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
----@param x number
----@param y number
----@param layer LAYER
----@return integer, integer
-function get_liquids_at(x, y, layer) end
 ---Get the rva for a pattern name, used for debugging.
 ---@param address_name string
 ---@return string
@@ -683,17 +666,6 @@ function play_adventure() end
 ---@param seed integer?
 ---@return nil
 function play_seeded(seed) end
----Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
----@return integer
-function get_liquid_layer() end
----Attach liquid collision to entity by uid (this is what the push blocks use)
----Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
----Use only for entities that can move around, (for static prefer [update_liquid_collision_at](https://spelunky-fyi.github.io/overlunky/#update_liquid_collision_at) )
----If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
----@param uid integer
----@param add boolean
----@return nil
-function add_entity_to_liquid_collision(uid, add) end
 ---Returns true while a toast message is on screen.
 ---@return boolean
 function toast_visible() end
@@ -774,11 +746,6 @@ function waddler_entity_type_in_slot(slot) end
 ---Run state update manually, i.e. simulate one logic frame. Use in e.g. POST_UPDATE, but be mindful of infinite loops, this will cause another POST_UPDATE. Can even be called thousands of times to simulate minutes of gameplay in a few seconds.
 ---@return nil
 function update_state() end
----Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
----The patch however does not destroy the liquids that fall pass the level bounds,
----so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
----@return nil
-function fix_liquid_out_of_bounds() end
 ---Returns RawInput, a game structure for raw keyboard and controller state
 ---@return RawInput
 function get_raw_input() end
@@ -1159,7 +1126,7 @@ function get_procedural_spawn_chance(chance_id) end
 ---Gets the sub theme of the current cosmic ocean level, returns COSUBTHEME.NONE if the current level is not a CO level.
 ---@return COSUBTHEME
 function get_co_subtheme() end
----Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behaviour)
+---Forces the theme of the next cosmic ocean level(s) (use e.g. `force_co_subtheme(COSUBTHEME.JUNGLE)`. Use COSUBTHEME.RESET to reset to default random behavior)
 ---@param subtheme COSUBTHEME
 ---@return nil
 function force_co_subtheme(subtheme) end
@@ -1239,7 +1206,7 @@ function load_bank(path, flags) end
 ---@return CustomBank?
 function get_bank(path) end
 ---Gets a `CustomEventDescription` if the event description is loaded using an FMOD GUID string. The string representation
----must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
+---must be formatted as 32 digits separated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
 ---@param guid_string string
 ---@return CustomEventDescription?
 function get_event_by_id(guid_string) end
@@ -1803,7 +1770,7 @@ function unregister_option(name) end
 ---@param threshold integer
 ---@return nil
 function set_kapala_blood_threshold(threshold) end
----Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
+---Sets the hud icon for the Kapala (0-6 ; -1 for default behavior).
 ---If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!
 ---@param icon_index integer
 ---@return nil
@@ -1963,6 +1930,39 @@ function set_camera_layer_control_enabled(enable) end
 ---@param l LAYER
 ---@return nil
 function set_liquid_layer(l) end
+---Removes all liquid that is about to go out of bounds, this would normally crash the game, but playlunky/overlunky patch this bug.
+---The patch however does not destroy the liquids that fall pass the level bounds,
+---so you may still want to use this function if you spawn a lot of liquid that may fall out of the level
+---@return nil
+function fix_liquid_out_of_bounds() end
+---Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
+---optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
+---@param x number
+---@param y number
+---@param add boolean
+---@param layer LAYER?
+---@return nil
+function update_liquid_collision_at(x, y, add, layer) end
+---Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
+---Returns a pair of water and lava, in that order.
+---Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
+---Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
+---@param x number
+---@param y number
+---@param layer LAYER
+---@return integer, integer
+function get_liquids_at(x, y, layer) end
+---Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](https://spelunky-fyi.github.io/overlunky/#set_liquid_layer)
+---@return integer
+function get_liquid_layer() end
+---Attach liquid collision to entity by uid (this is what the push blocks use)
+---Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
+---Use only for entities that can move around, (for static prefer [update_liquid_collision_at](https://spelunky-fyi.github.io/overlunky/#update_liquid_collision_at) )
+---If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
+---@param uid integer
+---@param add boolean
+---@return nil
+function add_entity_to_liquid_collision(uid, add) end
 
 --## Deprecated Functions
 
@@ -2563,27 +2563,6 @@ do
     ---@field player_inventory Inventory[] @size: MAX_PLAYERS
     ---@field players Player[] @size: MAX_PLAYERS @Table of players, also keeps the dead body until they are destroyed (necromancer revive also destroys the old body)
 
----@class LiquidPhysicsEngine
-    ---@field pause boolean
-    ---@field gravity number
-    ---@field cohesion number
-    ---@field elasticity number
-    ---@field size number
-    ---@field weight number
-    ---@field count integer
-
----@class LiquidPhysicsParams
-    ---@field gravity number
-    ---@field cohesion number
-    ---@field elasticity number
-
----@class LiquidPool
-    ---@field default LiquidPhysicsParams
-    ---@field engine LiquidPhysicsEngine
-
----@class LiquidPhysics
-    ---@field pools LiquidPool[] @size: 5
-
 ---@class StateMemory
     ---@field screen_last SCREEN @Previous SCREEN, used to check where we're coming from when loading another SCREEN
     ---@field screen SCREEN @Current SCREEN, generally read-only or weird things will happen
@@ -2789,7 +2768,7 @@ do
     ---@field save fun(self): nil @Save over a previously allocated SaveState
     ---@field clear fun(self): nil @Delete the SaveState and free the memory. The SaveState can't be used after this.
     ---@field get_state fun(self): StateMemory @Access the StateMemory inside a SaveState
-    ---@field get_frame fun(self): integer @Get the current frame from the SaveState, equivelent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
+    ---@field get_frame fun(self): integer @Get the current frame from the SaveState, equivalent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
     ---@field get_prng fun(self): PRNG @Access the PRNG inside a SaveState
 
 ---@class BackgroundMusic
@@ -3026,7 +3005,7 @@ function PRNG:random(min, max) end
     ---@field destroy fun(self): nil @Completely removes the entity from existence
     ---@field activate fun(self, activator: Entity): nil @Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     ---@field perform_teleport fun(self, delta_x: integer, delta_y: integer): nil @Performs a teleport as if the entity had a teleporter and used it. The delta coordinates are where you want the entity to teleport to relative to its current position, in tiles (so integers, not floats). Positive numbers = to the right and up, negative left and down.
-    ---@field trigger_action fun(self, user: Entity): boolean @Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    ---@field trigger_action fun(self, user: Entity): boolean @Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. though the animation could still be played)
     ---@field get_metadata fun(self): integer @e.g. for turkey: stores health, poison/curse state, for mattock: remaining swings (returned value is transferred)
     ---@field apply_metadata fun(self, metadata: integer): nil
     ---@field set_invisible fun(self, value: boolean): nil
@@ -3081,8 +3060,8 @@ function PRNG:random(min, max) end
     ---@field set_post_remove_item fun(self, fun: fun(self: Entity, entity: Entity, autokill_check: boolean): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil remove_item(Entity self, Entity entity, boolean autokill_check)`<br/>Virtual function docs:<br/>Can be called multiple times for the same entity (for example when play throws/drops entity from it's hands)
     ---@field set_pre_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<Entity> get_held_entity(Entity self)`
     ---@field set_post_get_held_entity fun(self, fun: fun(self: Entity): Entity?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil get_held_entity(Entity self)`
-    ---@field set_pre_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
-    ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)
+    ---@field set_pre_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks before the virtual function.<br/>The callback signature is `optional<boolean> trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. though the animation could still be played)
+    ---@field set_post_trigger_action fun(self, fun: fun(self: Entity, user: Entity): boolean?): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil trigger_action(Entity self, Entity user)`<br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the [virtual-availability.md](https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md), if entity has `open` in the `on_open` you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. though the animation could still be played)
     ---@field set_pre_activate fun(self, fun: fun(self: Entity, activator: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     ---@field set_post_activate fun(self, fun: fun(self: Entity, activator: Entity): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil activate(Entity self, Entity activator)`<br/>Virtual function docs:<br/>Activates a button prompt (with the Use door/Buy button), e.g. buy shop item, activate drill, read sign, interact in camp, ... `get_entity(<udjat socket uid>):activate(players[1])` (make sure player 1 has the udjat eye though)
     ---@field set_pre_on_collision2 fun(self, fun: fun(self: Entity, other_entity: Entity): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool on_collision2(Entity self, Entity other_entity)`<br/>Virtual function docs:<br/>More like on_overlap, triggers when entities touch/overlap each other. Triggers for entities in it's EntityDB.collision2_mask
@@ -5069,7 +5048,7 @@ function Movable:generic_update_world(move, sprint_factor, disable_gravity, on_r
     ---@field velocity_y number
 
 ---@class OuroboroCameraZoomin : Entity
-    ---@field zoomin_level number @Can be set to negative, seams to trigger the warp at some value
+    ---@field zoomin_level number @Can be set to negative, seems to trigger the warp at some value
 
 ---@class CinematicAnchor : Entity
     ---@field blackbar_top Entity
@@ -5255,7 +5234,7 @@ function MovableBehavior:get_state_id() end
     ---@field post_process_level fun(self): nil @Theme specific specialties like randomizing ushabti and Coco coffin location, spawns impostor lakes
     ---@field spawn_traps fun(self): nil @Spawns theme specific random traps, pushblocks and critters. Sets special exit doors.
     ---@field post_process_entities fun(self): nil @Fixes textures on pleasure palace ladders, adds some decorations
-    ---@field spawn_procedural fun(self): nil @Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...
+    ---@field spawn_procedural fun(self): nil @Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initializes quests, random shadows...
     ---@field spawn_background fun(self): nil @Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes
     ---@field spawn_lights fun(self): nil @Adds room lights to udjat chest room or black market
     ---@field spawn_transition fun(self): nil @Spawns the transition tunnel and players in it
@@ -5328,8 +5307,8 @@ function MovableBehavior:get_state_id() end
     ---@field set_post_spawn_traps fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_traps(ThemeInfo self)`<br/>Virtual function docs:<br/>Spawns theme specific random traps, pushblocks and critters. Sets special exit doors.
     ---@field set_pre_post_process_entities fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool post_process_entities(ThemeInfo self)`<br/>Virtual function docs:<br/>Fixes textures on pleasure palace ladders, adds some decorations
     ---@field set_post_post_process_entities fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil post_process_entities(ThemeInfo self)`<br/>Virtual function docs:<br/>Fixes textures on pleasure palace ladders, adds some decorations
-    ---@field set_pre_spawn_procedural fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_procedural(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...
-    ---@field set_post_spawn_procedural fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_procedural(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...
+    ---@field set_pre_spawn_procedural fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_procedural(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initializes quests, random shadows...
+    ---@field set_post_spawn_procedural fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_procedural(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initializes quests, random shadows...
     ---@field set_pre_spawn_background fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_background(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes
     ---@field set_post_spawn_background fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks after the virtual function.<br/>The callback signature is `nil spawn_background(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds the main level background , e.g. CO stars / Duat moon / Plain backwall for other themes
     ---@field set_pre_spawn_lights fun(self, fun: fun(self: ThemeInfo): boolean): CallbackId @Hooks before the virtual function.<br/>The callback signature is `bool spawn_lights(ThemeInfo self)`<br/>Virtual function docs:<br/>Adds room lights to udjat chest room or black market
@@ -7173,7 +7152,7 @@ function UdpServer:send(message, address) end
     ---@field arena_3 Logic @Handles time end death
     ---@field arena_alien_blast LogicArenaAlienBlast
     ---@field arena_loose_bombs LogicArenaLooseBombs
-    ---@field start_logic fun(self, idx: LOGIC): Logic @This only properly constructs the base class<br/>you may still need to initialise the parameters correctly
+    ---@field start_logic fun(self, idx: LOGIC): Logic @This only properly constructs the base class<br/>you may still need to initialize the parameters correctly
 local LogicList = nil
 ---@param idx LOGIC
 ---@return nil
@@ -7362,6 +7341,27 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field get_ucolor fun(self): uColor @Returns the `uColor` used in `GuiDrawContext` drawing functions
     ---@field set_ucolor fun(self, color: uColor): Color @Changes color based on given uColor
     ---@field set fun(self, other: Color): Color @Copies the values of different Color to this one
+
+---@class LiquidPhysicsEngine
+    ---@field pause boolean
+    ---@field gravity number
+    ---@field cohesion number
+    ---@field elasticity number
+    ---@field size number
+    ---@field weight number
+    ---@field count integer
+
+---@class LiquidPhysicsParams
+    ---@field gravity number
+    ---@field cohesion number
+    ---@field elasticity number
+
+---@class LiquidPool
+    ---@field default LiquidPhysicsParams
+    ---@field engine LiquidPhysicsEngine
+
+---@class LiquidPhysics
+    ---@field pools LiquidPool[] @size: 5
 
 end
 --## Static class functions

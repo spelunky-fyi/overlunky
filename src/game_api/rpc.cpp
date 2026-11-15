@@ -27,7 +27,6 @@
 #include "entities_chars.hpp"           // for Player (ptr only), PowerupCapable
 #include "entities_floors.hpp"          // for ExitDoor, Door
 #include "entities_items.hpp"           // for StretchChain, PunishBall, Container
-#include "entities_liquids.hpp"         // for Liquid
 #include "entities_mounts.hpp"          // for Mount
 #include "entity.hpp"                   // for get_entity_ptr, to_id, Entity, EntityDB
 #include "entity_lookup.hpp"            //
@@ -37,7 +36,7 @@
 #include "illumination.hpp"             //
 #include "items.hpp"                    // for Items
 #include "layer.hpp"                    // for EntityList, EntityList::Range, Layer
-#include "liquid_engine.hpp"            // for LiquidPhysicsEngine
+#include "liquid_engine.hpp"            // for move_liquid_abs
 #include "logger.h"                     // for DEBUG
 #include "math.hpp"                     // for AABB
 #include "memory.hpp"                   // for write_mem_prot, write_mem_recoverable
@@ -195,20 +194,6 @@ void move_entity_abs(uint32_t uid, float x, float y, float vx, float vy, LAYER l
                 movable_ent->velocityy = vy;
             }
             ent->set_layer(layer);
-        }
-    }
-}
-
-void move_liquid_abs(uint32_t uid, float x, float y, float vx, float vy)
-{
-    auto entity = get_entity_ptr(uid)->as<Liquid>();
-    if (entity)
-    {
-        auto liquid_engine = HeapBase::get().liquid_physics()->get_correct_liquid_engine(entity->type->id);
-        if (liquid_engine)
-        {
-            liquid_engine->entity_coordinates[*entity->liquid_id] = {x, y};
-            liquid_engine->entity_velocities[*entity->liquid_id] = {vx, vy};
         }
     }
 }
@@ -573,67 +558,6 @@ std::pair<int64_t, int64_t> get_adventure_seed(std::optional<bool> run_start)
     }
 }
 
-void update_liquid_collision_at(float x, float y, bool add, std::optional<LAYER> layer)
-{
-    using UpdateLiquidCollision = void(LiquidPhysics*, int32_t, int32_t, uint8_t);
-    static UpdateLiquidCollision* RemoveLiquidCollision_fun = (UpdateLiquidCollision*)get_address("remove_from_liquid_collision_map");
-    static UpdateLiquidCollision* AddLiquidCollision_fun = (UpdateLiquidCollision*)get_address("add_to_liquid_collision_map");
-    auto state = get_state_ptr();
-    uint8_t actual_layer = enum_to_layer(layer.value_or(LAYER::FRONT));
-
-    if (add)
-        AddLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), actual_layer);
-    else
-        RemoveLiquidCollision_fun(state->liquid_physics, static_cast<int32_t>(std::round(x)), static_cast<int32_t>(std::round(y)), actual_layer);
-}
-
-void add_entity_to_liquid_collision(uint32_t uid, bool add)
-{
-    using AddEntityLiquidCollision = void(LiquidPhysics*, Entity*, uint8_t);
-    static AddEntityLiquidCollision* add_entity_liquid_collision = (AddEntityLiquidCollision*)get_address("add_movable_to_liquid_collision_map");
-    auto state = get_state_ptr();
-    auto entity = get_entity_ptr(uid);
-    if (!entity)
-        return;
-
-    auto map = state->liquid_physics->push_blocks;
-    if (!map)
-        return;
-
-    auto it = map->find(uid);
-
-    // if it already exists we can't add it again, since it will create the collision struct anyway and just overwrite the pointer to it in the map
-    // the actual collision struct is held somewhere else, unrelated to this map
-    if (add && it == map->end())
-        add_entity_liquid_collision(state->liquid_physics, entity, entity->layer);
-    else if (!add && it != map->end())
-    {
-        // very illegal, don't do this, we can because we're professionals xd
-        // game loops thru the map and checks if uid still exists, if not, it removes the collision
-        // which is some bigger struct held in some weird container, and the function is doing other stuff, so this is the easiest way besides killing the entity
-        auto key = const_cast<uint32_t*>(&it->first);
-        *key = ~0u;
-    }
-}
-
-std::pair<uint8_t, uint8_t> get_liquids_at(float x, float y, LAYER layer)
-{
-    uint8_t actual_layer = enum_to_layer(layer);
-    LiquidPhysics* liquid_physics = HeapBase::get().liquid_physics();
-    // if (y > 125.5f || y < .0f || x > 85.5f || x < .0f) // Original check by the game, can result is accesing the array out of bounds
-    //     return 0;
-    if (actual_layer != get_liquid_layer() || y < .0f || x < .0f)
-        return {0, 0};
-
-    uint32_t ix = static_cast<int>((x + 0.5f) / 0.3333333f);
-    uint32_t iy = static_cast<int>((y + 0.5f) / 0.3333333f);
-    if (iy >= (g_level_max_y * 3) || ix >= (g_level_max_x * 3))
-        return {0, 0};
-
-    auto& liquids_at = (*liquid_physics->liquids_by_third_of_tile)[iy][ix];
-    return {liquids_at.water, liquids_at.lava};
-}
-
 void game_log(std::string message)
 {
     using GameLogFun = void(std::ofstream*, const char*, void*, LogLevel);
@@ -932,12 +856,6 @@ void init_seeded(std::optional<uint32_t> seed)
     static init_func* isf = (init_func*)(offset);
     auto* state = HeapBase::get().state();
     isf(state, seed.value_or(state->seed));
-}
-
-uint8_t get_liquid_layer()
-{
-    static auto addr = get_address("check_if_collides_with_liquid_layer");
-    return memory_read<uint8_t>(addr);
 }
 
 uint32_t lowbias32(uint32_t x)

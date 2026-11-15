@@ -127,7 +127,7 @@ class OuroboroCameraAnchor : public Entity
 class OuroboroCameraZoomin : public Entity
 {
   public:
-    /// Can be set to negative, seams to trigger the warp at some value
+    /// Can be set to negative, seems to trigger the warp at some value
     float zoomin_level;
 };
 

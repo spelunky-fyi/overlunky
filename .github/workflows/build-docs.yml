@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs:
 
 jobs:
   build:
@@ -13,8 +12,11 @@ jobs:
     env:
       ruby-version: "3.0"
 
+    permissions:
+      contents: write
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
           submodules: true
@@ -24,11 +26,11 @@ jobs:
         with:
           ruby-version: ${{ env.ruby-version }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: docs/slate/vendor/bundle
           key: gems-${{ runner.os }}-${{ env.ruby-version }}-${{ hashFiles('**/Gemfile.lock') }}
@@ -44,7 +46,4 @@ jobs:
           ./generate_all.sh
 
       - name: Push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+        run: git push origin HEAD:${{ github.ref }}

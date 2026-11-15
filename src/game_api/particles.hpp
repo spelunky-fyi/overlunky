@@ -63,7 +63,7 @@ struct ParticleDB
     bool unknown36;
     bool unknown37;
     bool invisible; // used for shockwaves and warping
-    bool unknown39; // screen particle? doesn't seam to do anything
+    bool unknown39; // screen particle? doesn't seem to do anything
     uint8_t unknown40;
     uint8_t unknown41;
     uint32_t unknown42;

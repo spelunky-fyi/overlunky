@@ -54,7 +54,7 @@ struct PRNG
     /// Returns true with a chance of `1/inverse_chance`
     bool random_chance(std::int64_t inverse_chance, PRNG_CLASS type)
     {
-        // TODO: even thou those first checks just return, shouldn't it still advance the given pair?
+        // TODO: even though those first checks just return, shouldn't it still advance the given pair?
         if (inverse_chance <= 0ll)
             return false;
         if (inverse_chance == 1)

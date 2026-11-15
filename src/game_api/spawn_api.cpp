@@ -608,8 +608,8 @@ void pop_spawn_type_flags(SPAWN_TYPE flags)
 }
 
 using SpawnEntityFun = Entity*(EntityFactory*, std::uint32_t, float, float, bool, Entity*, bool);
-SpawnEntityFun* g_spawn_entity_trampoline{nullptr};
-Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
+SpawnEntityFun* g_create_entity_trampoline{nullptr};
+Entity* create_entity(EntityFactory* entity_factory, std::uint32_t entity_type, float x, float y, bool layer, Entity* overlay, bool some_bool)
 {
     // TODO: This still might not work very well and corner fill isn't actually floor spreading per level config definition, and should have a different SPAWN_TYPE (corner fill still happens when floor spreading chance is set to 0)
     // const auto theme_floor = HeapBase::get().state()->current_theme->get_floor_spreading_type();
@@ -644,7 +644,7 @@ Entity* spawn_entity(EntityFactory* entity_factory, std::uint32_t entity_type, f
 
     if (spawned_ent == nullptr)
     {
-        spawned_ent = g_spawn_entity_trampoline(entity_factory, entity_type, x, y, layer, overlay, some_bool);
+        spawned_ent = g_create_entity_trampoline(entity_factory, entity_type, x, y, layer, overlay, some_bool);
     }
 
     post_entity_spawn(spawned_ent, g_SpawnTypeFlags);
@@ -667,9 +667,9 @@ void init_spawn_hooks()
         DetourTransactionBegin();
         DetourUpdateThread(GetCurrentThread());
 
-        g_spawn_entity_trampoline = (SpawnEntityFun*)get_address("spawn_entity");
+        g_create_entity_trampoline = (SpawnEntityFun*)get_address("create_entity");
 
-        DetourAttach((void**)&g_spawn_entity_trampoline, (SpawnEntityFun*)spawn_entity);
+        DetourAttach((void**)&g_create_entity_trampoline, (SpawnEntityFun*)create_entity);
 
         const LONG error = DetourTransactionCommit();
         if (error != NO_ERROR)

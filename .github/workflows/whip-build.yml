@@ -3,23 +3,52 @@ name: Whip Build
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "docs/**"
+      - "examples/**"
+      - "**.md"
+      - "**.py"
+      - "LICENSE"
+      - ".github/workflows/docs_verify.yml"
+      - ".github/workflows/build-docs.yml"
   workflow_dispatch:
 
 jobs:
   build:
     name: Build
-
     runs-on: windows-2022
-    steps:
-      - uses: llvm/actions/install-ninja@main
 
+    permissions:
+      contents: write
+
+    steps:
       - name: Install llvm 17
         run: choco install llvm --version 17.0.6 --allow-downgrade -y
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
           submodules: true
+
+      - name: Get Lua version
+        id: lua-version
+        uses: ./.github/actions/get-lua-version
+
+      - name: Restore Lua cache
+        id: lua-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz
+          key: lua-${{ steps.lua-version.outputs.version }}
+
+      - name: Extract cached Lua
+        if: steps.lua-cache.outputs.cache-hit == 'true'
+        shell: pwsh
+        run: |
+          tar -xzf .cache/lua/lua-${{ steps.lua-version.outputs.version }}.tar.gz
+
+          New-Item -ItemType Directory -Force -Path lua-${{ steps.lua-version.outputs.version }}/include | Out-Null
+          Copy-Item lua-${{ steps.lua-version.outputs.version }}/src/*.h lua-${{ steps.lua-version.outputs.version }}/include/
 
       - name: Remove Strawberry Perl from PATH
         run: |
@@ -27,15 +56,36 @@ jobs:
           "PATH=$env:PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Get tags for release notes
+        continue-on-error: true
         shell: bash
         run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
 
       - name: Build
+        shell: pwsh
         run: |
-          mkdir build
-          cd build
-          cmake .. -DBUILD_INFO_DUMP=OFF -DBUILD_SPEL2_DLL=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -GNinja
-          cmake --build . --config Release
+          $luaSource = "$env:GITHUB_WORKSPACE/lua-${{ steps.lua-version.outputs.version }}"
+          if ((Test-Path "$luaSource/src") -and (Test-Path "$luaSource/include")) {
+              Write-Host "Using cached Lua: $luaSource"
+              cmake -S . -B build -G Ninja `
+                -DBUILD_INFO_DUMP=OFF `
+                -DBUILD_SPEL2_DLL=OFF `
+                -DCMAKE_BUILD_TYPE=Release `
+                -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON `
+                -DCMAKE_C_COMPILER=clang `
+                -DCMAKE_CXX_COMPILER=clang++ `
+                "-DLUA_LOCAL_DIR=$luaSource"
+          }
+          else {
+              Write-Host "Lua cache unavailable. Using sol2's normal download method."
+              cmake -S . -B build -G Ninja `
+                -DBUILD_INFO_DUMP=OFF `
+                -DBUILD_SPEL2_DLL=OFF `
+                -DCMAKE_BUILD_TYPE=Release `
+                -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON `
+                -DCMAKE_C_COMPILER=clang `
+                -DCMAKE_CXX_COMPILER=clang++ `
+          }
+          cmake --build build --parallel
 
       - name: Create artifacts
         run: |
@@ -47,7 +97,7 @@ jobs:
           7z a Overlunky_WHIP.zip Overlunky\
 
       - name: Create WHIP release
-        uses: marvinpinto/action-automatic-releases@v1.2.0
+        uses: marvinpinto/action-automatic-releases@latest
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: "true"
         with:

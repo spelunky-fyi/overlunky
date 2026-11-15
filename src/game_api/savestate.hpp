@@ -37,7 +37,7 @@ class SaveState
     {
         return base.state();
     }
-    /// Get the current frame from the SaveState, equivelent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
+    /// Get the current frame from the SaveState, equivalent to the [get_frame](#Get_frame) global function that returns the frame from the "loaded in state"
     uint32_t get_frame() const
     {
         return base.frame_count();

@@ -283,7 +283,6 @@ struct HotKeyCallback
     int hotkeyid;
 };
 
-struct StateMemory;
 class SoundManager;
 class LuaConsole;
 struct RenderInfo;
@@ -345,11 +344,9 @@ class LuaBackend
     uint64_t last_save{0};
 
     ImDrawList* draw_list{nullptr};
-
-    StateMemory* g_state = nullptr;
-
-    SoundManager* sound_manager;
-    LuaConsole* console;
+    LevelGenData* level_gen_data{nullptr};
+    SoundManager* sound_manager{nullptr};
+    LuaConsole* console{nullptr};
 
     std::map<IMAGE, ScriptImage*> images;
 
@@ -449,7 +446,7 @@ class LuaBackend
     bool process_vanilla_render_draw_depth_callbacks(ON event, uint8_t draw_depth, const AABB& bbox);
     bool process_vanilla_render_journal_page_callbacks(ON event, JournalPageType page_type, JournalPage* page);
 
-    std::u16string pre_speach_bubble(Entity* entity, char16_t* buffer);
+    std::u16string pre_speech_bubble(Entity* entity, char16_t* buffer);
     std::u16string pre_toast(char16_t* buffer);
 
     bool pre_load_journal_chapter(uint8_t chapter);
