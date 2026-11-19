@@ -71,7 +71,7 @@ add_library(overlunky_warnings INTERFACE)
 if(MSVC)
         target_compile_options(overlunky_warnings INTERFACE /W4 /WX)
         target_compile_options(overlunky_warnings INTERFACE /wd4201) # nonstandard extension used : nameless struct/union
-
+        target_compile_options(overlunky_warnings INTERFACE /Zc:preprocessor)
         if(CLANG)
                 target_compile_options(overlunky_warnings INTERFACE -Wshadow-all -Wno-missing-field-initializers -Wno-microsoft-cast -Wno-gnu-anonymous-struct -Wno-nested-anon-types -Wno-gnu-zero-variadic-macro-arguments -Wno-microsoft-enum-value -Wno-deprecated-declarations -Wno-language-extension-token -Wno-sign-compare)
         endif()
@@ -139,13 +139,9 @@ if(BUILD_OVERLUNKY)
 
         # --------------------------------------------------
         # toml11
-        option(toml11_BUILD_TEST OFF)
-
-        # toml11 commit we're at sets cmake_minimum_required(VERSION 3.1) which fails in CI where 4.0 is used.
-        # Scoped to this add_subdirectory so it doesn't affect the rest of the project.
-        set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+        option(TOML11_BUILD_TESTS OFF)
         add_subdirectory(toml11)
-        unset(CMAKE_POLICY_VERSION_MINIMUM)
+
 
         if(MSVC)
                 # --------------------------------------------------
