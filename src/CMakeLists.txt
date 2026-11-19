@@ -107,47 +107,25 @@ endif()
 
 if(BUILD_OVERLUNKY)
         # --------------------------------------------------
-        # nyquist
-        option(BUILD_EXAMPLE "Build example application" OFF)
+        # libnyquist
+        set(LIBNYQUIST_BUILD_EXAMPLE OFF)
+        set(BUILD_LIBWAVPACK ON)
+        set(LIBNYQUIST_ENABLE_AVX OFF)
         add_subdirectory(libnyquist)
 
-        # Remove the vectorization instructions since those cause a crash for some users
-        function(remove_arch_avx target)
-                get_target_property(target_compile_options ${target} COMPILE_OPTIONS)
-                list(REMOVE_ITEM target_compile_options /arch:AVX)
-                set_target_properties(${target} PROPERTIES COMPILE_OPTIONS "${target_compile_options}")
-        endfunction()
-
-        remove_arch_avx(libwavpack)
-        remove_arch_avx(libnyquist)
-
-        if(WIN32)
-                if(NOT MSVC)
-                        # Remove other instructions that is added on Windows even if not MSVC
-                        function(remove_zi target)
-                                get_target_property(target_compile_options ${target} COMPILE_OPTIONS)
-                                list(REMOVE_ITEM target_compile_options /Zi)
-                                set_target_properties(${target} PROPERTIES COMPILE_OPTIONS "${target_compile_options}")
-                        endfunction()
-
-                        remove_zi(libwavpack)
-                        remove_zi(libnyquist)
-                endif()
-        endif()
-
-        # Disable error on Clang16
         if(CLANG)
-                target_compile_options(libwavpack PRIVATE "-Wno-implicit-function-declaration")
+                # fix issue with missing definitions for _BitScanReverse and _BitScanForward
+                 target_compile_options(libnyquist PRIVATE "SHELL:-include intrin.h")
+                 target_compile_options(libwavpack PRIVATE "SHELL:-include intrin.h")
         endif()
 
         # --------------------------------------------------
         # toml11
         option(TOML11_BUILD_TESTS OFF)
         add_subdirectory(toml11)
-
+        # --------------------------------------------------
 
         if(MSVC)
-                # --------------------------------------------------
                 # Find the Spel2.exe, if not passed to cmake and set it for debugging in MSVC
                 if(NOT EXISTS ${SPELUNKY_INSTALL_DIR}/Spel2.exe)
                         get_filename_component(STEAM_INSTALL_DIR "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Valve\\Steam;InstallPath]" ABSOLUTE)
