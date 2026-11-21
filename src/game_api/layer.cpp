@@ -7,9 +7,9 @@
 
 #include "entities_floors.hpp" // for ExitDoor
 #include "entity.hpp"          // for Entity, to_id, EntityDB, entity_factory
+#include "liquid_engine.hpp"   // for update_liquid_collision_at
 #include "logger.h"            // for DEBUG
 #include "movable.hpp"         // for Movable
-#include "rpc.hpp"             // for update_liquid_collision_at
 #include "search.hpp"          // for get_address
 #include "state.hpp"           // for StateMemory, API
 
@@ -20,8 +20,8 @@ Entity* Layer::spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx
     if (id == 0)
         return nullptr;
 
-    using LoadItem = Entity*(Layer*, ENT_TYPE, float, float, bool);
-    static auto load_item = (LoadItem*)get_address("load_item");
+    using SpawnEntity = Entity*(Layer*, ENT_TYPE, float, float, bool);
+    static auto spawn = (SpawnEntity*)get_address("spawn_entity");
 
     float min_speed_check = 0.01f;
     if (!screen && snap)
@@ -40,7 +40,7 @@ Entity* Layer::spawn_entity(ENT_TYPE id, float x, float y, bool screen, float vx
         }
     }
 
-    Entity* spawned = load_item(this, id, x, y, false);
+    Entity* spawned = spawn(this, id, x, y, false);
     if (abs(vx) + abs(vy) > min_speed_check && spawned->is_movable())
     {
         auto movable = (Movable*)spawned;
@@ -80,7 +80,7 @@ Entity* Layer::spawn_entity_snap_to_floor(ENT_TYPE id, float x, float y)
 Entity* Layer::spawn_entity_over(ENT_TYPE id, Entity* overlay, float x, float y)
 {
     using SpawnEntityFun = Entity*(EntityFactory*, ENT_TYPE, float, float, bool, Entity*, bool);
-    static auto spawn_entity_raw = (SpawnEntityFun*)get_address("spawn_entity");
+    static auto spawn_entity_raw = (SpawnEntityFun*)get_address("create_entity");
     using AddToLayer = void(Layer*, Entity*);
     static auto add_to_layer = (AddToLayer*)get_address("add_to_layer");
 

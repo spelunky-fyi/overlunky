@@ -108,7 +108,7 @@ template <GHOST_BEHAVIOR behavior>
 auto g_spawn_ghost = [](const CommunityTileCode& self, float x, float y, Layer* layer)
 {
     Ghost* ghost = layer->spawn_entity(self.entity_id, x, y, false, 0.0f, 0.0f, true)->as<Ghost>();
-    ghost->ghost_behaviour = behavior;
+    ghost->ghost_behavior = behavior;
 };
 template <int offset_x, int offset_y, int angle_in_multiples_of_pi_halves, bool ignore_flip = false>
 void g_spawn_eggsac(const CommunityTileCode& self, float x, float y, Layer* layer)
@@ -1059,7 +1059,7 @@ void get_room_size(const char* room_template_name, uint32_t& room_width, uint32_
     const auto room_template = HeapBase::get().level_gen()->data->get_room_template(room_template_name);
     if (!room_template)
     {
-        DEBUG("Unkown room_template name {}", room_template_name);
+        DEBUG("Unknown room_template name {}", room_template_name);
     }
     else
     {

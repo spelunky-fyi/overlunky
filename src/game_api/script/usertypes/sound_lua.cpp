@@ -50,7 +50,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         // NORMAL
         // Standard behavior. The function will not return until the bank has finished loading.
         // NONBLOCKING
-        // Loading occurs asychronously rather than immediately. Minimal performace impact. Probably the flag you should use in most cases.
+        // Loading occurs asynchronously rather than immediately. Minimal performance impact. Probably the flag you should use in most cases.
         // DECOMPRESS_SAMPLES
         // Force samples to decompress into memory when loaded, instead of staying compressed. Use NORMAL or NONBLOCKING instead.
         // UNENCRYPTED
@@ -131,7 +131,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
     };
 
     /// Gets a `CustomEventDescription` if the event description is loaded using an FMOD GUID string. The string representation
-    /// must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
+    /// must be formatted as 32 digits separated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.
     lua["get_event_by_id"] = [](std::string guid_string) -> sol::optional<CustomEventDescription>
     {
         auto backend = LuaBackend::get_calling_backend();
@@ -472,9 +472,9 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
 
     /// Third parameter to `CustomSound:play()`, specifies which group the sound will be played in and thus how the player controls its volume
     lua.create_named_table("SOUND_TYPE", "SFX", 0, "MUSIC", 1);
-    /// Paramater to `PlayingSound:set_looping()`, specifies what type of looping this sound should do
+    /// Parameter to `PlayingSound:set_looping()`, specifies what type of looping this sound should do
     lua.create_named_table("SOUND_LOOP_MODE", "OFF", 0, "LOOP", 1, "BIDIRECTIONAL", 2);
-    /// Paramater to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`,
+    /// Parameter to `get_sound()`, which returns a handle to a vanilla sound, and `set_vanilla_sound_callback()`,
     lua.create_named_table("VANILLA_SOUND"
                            //, "BGM_BGM_TITLE", BGM/BGM_title
                            //, "", ...check__[vanilla_sounds.txt]\[game_data/vanilla_sounds.txt\]...
@@ -519,7 +519,7 @@ void register_usertypes(sol::state& lua, SoundManager* sound_manager)
         // START_FAILED
         // Params: `PlayingSound vanilla_sound`
         */
-    /// Paramater to `PlayingSound:get_parameter()` and `PlayingSound:set_parameter()`
+    /// Parameter to `PlayingSound:get_parameter()` and `PlayingSound:set_parameter()`
     lua.create_named_table("VANILLA_SOUND_PARAM"
                            //, "POS_SCREEN_X", 0
                            //, "", ...check__[vanilla_sound_params.txt]\[game_data/vanilla_sound_params.txt\]...

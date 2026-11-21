@@ -21,6 +21,7 @@
 #include "items.hpp"                 // for Items
 #include "layer.hpp"                 // for Layer, EntityList::Range, Entit...
 #include "level_api.hpp"             // for LevelGenSystem
+#include "liquid_engine.hpp"         // for update_liquid_collision_at
 #include "math.hpp"                  // for AABB
 #include "memory.hpp"                //
 #include "render_api.hpp"            // for RenderInfo

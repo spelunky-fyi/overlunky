@@ -87,6 +87,7 @@
 #include "usertypes/gui_lua.hpp"                   // for register_usertypes
 #include "usertypes/hitbox_lua.hpp"                // for register_usertypes
 #include "usertypes/level_lua.hpp"                 // for register_usertypes
+#include "usertypes/liquid_engine_lua.hpp"         // for register_usertypes
 #include "usertypes/logic_lua.hpp"                 // for register_usertypes
 #include "usertypes/options_lua.hpp"               // for register_usertypes
 #include "usertypes/particles_lua.hpp"             // for register_usertypes
@@ -265,6 +266,7 @@ end
     NSpawn::register_usertypes(lua);
     NGamePatches::register_usertypes(lua);
     NOptions::register_usertypes(lua);
+    NLiquidEngine::register_usertypes(lua);
 
     /// A bunch of [game state](#StateMemory) variables. Your ticket to almost anything that is not an Entity.
     // lua["state"] = HeapBase::get().state();
@@ -421,7 +423,7 @@ end
     lua["set_timeout"] = [](sol::function cb, int frames) -> CallbackId
     {
         auto backend = LuaBackend::get_calling_backend();
-        int now = backend->g_state->time_level;
+        int now = HeapBase::get().state()->time_level;
         auto luaCb = TimeoutCallback{cb, now + frames};
         backend->level_timers[backend->cbcount] = luaCb;
         return backend->cbcount++;
@@ -853,7 +855,7 @@ end
     /// Check [strings00_hashed.str](https://github.com/spelunky-fyi/overlunky/blob/main/docs/game_data/strings00_hashed.str) for the hash values, or extract assets with modlunky and check those.
     lua["hash_to_stringid"] = hash_to_stringid;
     /// Get string behind STRINGID, **don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first
-    /// Will return the string of currently choosen language
+    /// Will return the string of currently chosen language
     lua["get_string"] = get_string;
     /// Change string at the given id (**don't use stringid directly for vanilla string**, use [hash_to_stringid](#hash_to_stringid) first)
     /// This edits custom string and in game strings but changing the language in settings will reset game strings
@@ -916,7 +918,7 @@ end
         end
     )");
 
-    /// Paramater to set_setting
+    /// Parameter to set_setting
     lua.create_named_table("SAFE_SETTING", "PET_STYLE", 20, "SCREEN_SHAKE", 21, "HUD_STYLE", 23, "HUD_SIZE", 24, "LEVEL_TIMER", 25, "TIMER_DETAIL", 26, "LEVEL_NUMBER", 27, "ANGRY_SHOPKEEPER", 28, "BUTTON_PROMPTS", 30, "FEAT_POPUPS", 32, "TEXTBOX_SIZE", 33, "TEXTBOX_DURATION", 34, "TEXTBOX_OPACITY", 35, "LEVEL_FEELINGS", 36, "DIALOG_TEXT", 37, "KALI_TEXT", 38, "GHOST_TEXT", 39);
 
     /// Gets the specified setting, values might need to be interpreted differently per setting
@@ -949,15 +951,6 @@ end
     lua["get_adventure_seed"] = get_adventure_seed;
     /// Set the current adventure seed pair. Use just before resetting a run to recreate an adventure run.
     lua["set_adventure_seed"] = set_adventure_seed;
-    /// Updates the floor collisions used by the liquids, set add to false to remove tile of collision, set to true to add one
-    /// optional `layer` parameter to be used when liquid was moved to back layer using [set_liquid_layer](#set_liquid_layer)
-    lua["update_liquid_collision_at"] = update_liquid_collision_at;
-
-    /// Optimized function to check for the amount of liquids at a certain position, by accessing a 2d array of liquids by third of a tile. Try the `liquids.lua` example to know better how it works.
-    /// Returns a pair of water and lava, in that order.
-    /// Water blobs increase the number by 2 on the grid, while lava blobs increase it by 3. The maximum is usually 6.
-    /// Coarse water increase the number by 3, coarse and stagnant lava by 6. Combinations of both normal and coarse can make the number higher than 6.
-    lua["get_liquids_at"] = get_liquids_at;
 
     /// Get the rva for a pattern name, used for debugging.
     lua["get_rva"] = [](std::string_view address_name) -> std::string
@@ -1235,15 +1228,6 @@ end
 
     /// Initializes some seeded run related values and loads the character select screen, as if starting a new seeded run after entering the seed.
     lua["play_seeded"] = init_seeded;
-
-    /// Get the current layer that the liquid is spawn in. Related function [set_liquid_layer](#set_liquid_layer)
-    lua["get_liquid_layer"] = get_liquid_layer;
-
-    /// Attach liquid collision to entity by uid (this is what the push blocks use)
-    /// Collision is based on the entity's hitbox, collision is removed when the entity is destroyed (bodies of killed entities will still have the collision)
-    /// Use only for entities that can move around, (for static prefer [update_liquid_collision_at](#update_liquid_collision_at) )
-    /// If entity is in back layer and liquid in the front, there will be no collision created, also collision is not destroyed when entity changes layers, so you have to handle that yourself
-    lua["add_entity_to_liquid_collision"] = add_entity_to_liquid_collision;
 
     lua.create_named_table("INPUTS", "NONE", 0x0, "JUMP", 0x1, "WHIP", 0x2, "BOMB", 0x4, "ROPE", 0x8, "RUN", 0x10, "DOOR", 0x20, "MENU", 0x40, "JOURNAL", 0x80, "LEFT", 0x100, "RIGHT", 0x200, "UP", 0x400, "DOWN", 0x800);
 
@@ -1629,7 +1613,7 @@ end
     // POST_LOAD_JOURNAL_CHAPTER
     // Params: JOURNALUI_PAGE_SHOWN chapter, array:int pages
     // Runs after the pages for the journal are prepared, but not yet displayed, `pages` is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it
-    // All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
+    // All new pages will be created as [JournalPageStory](#JournalPageStory), any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognize and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE
     // Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page
     // When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don't have this problem. The order is: left, right, left, right ...
     // PRE_GET_FEAT
@@ -1637,7 +1621,7 @@ end
     // Return: true to override the vanilla feat with your own. Defaults to Steam GetAchievement.
     // PRE_SET_FEAT
     // Runs before the game sets a vanilla feat performed.
-    // Return: true to block the default behaviour of calling Steam SetAchievement.
+    // Return: true to block the default behavior of calling Steam SetAchievement.
     // PRE_UPDATE
     // Runs before the State is updated, runs always (menu, settings, camp, game, arena, online etc.) with the game engine, typically 60FPS
     // Return behavior: return true to stop further PRE_UPDATE callbacks from executing and don't update the state (this will essentially freeze the game engine)
@@ -1752,7 +1736,7 @@ end
         "BOLD",
         2);
 
-    /// Paramater to get_setting (and set_setting in unsafe mode)
+    /// Parameter to get_setting (and set_setting in unsafe mode)
     lua.create_named_table("GAME_SETTING"
                            //, "WINDOW_SCALE", 0
                            //, "", ...check__[game_settings.txt]\[game_data/game_settings.txt\]...

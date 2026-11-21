@@ -552,7 +552,7 @@ void prepare_text(uint32_t fontstyle, const char16_t* text, uint32_t a3, float x
 
 void init_render_api_hooks()
 {
-    // Fix the texture fetching in spawn_entity
+    // Fix the texture fetching in create_entity
     if (const size_t fetch_texture_begin = get_address("fetch_texture_begin"))
     {
         const size_t fetch_texture_end = get_address("fetch_texture_end");

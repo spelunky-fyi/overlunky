@@ -87,7 +87,7 @@ ScriptImpl::ScriptImpl(std::string script, std::string file, SoundManager* sound
         // Every script on disk gets its metadata read at startup, long before the user has agreed
         // to run any of it, and the extractor above is a line based guess that a script can talk
         // into handing over more than just the meta lines. So metadata never runs in the script's
-        // own environment, it runs in this minimal environament.
+        // own environment, it runs in this minimal environment.
         sol::environment meta_env{get_lua_vm(), sol::create};
         meta_env["meta"] = meta_table;
 

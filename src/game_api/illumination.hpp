@@ -60,7 +60,7 @@ struct Illumination
         uint32_t flags;
         struct
         {
-            uint8_t light_flags; // not exposed since flags already is so no reason to essentially expose this again, even thou flags is technically not correct
+            uint8_t light_flags; // not exposed since flags already is so no reason to essentially expose this again, even though flags is technically incorrect
 
             LIGHT_TYPE type_flags;
             uint8_t layer;

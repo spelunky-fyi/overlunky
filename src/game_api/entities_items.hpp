@@ -227,11 +227,11 @@ struct UnknownPointerGroup
 
 class Projectile : public Movable
 {
-    // depending on the entity can be called directly instead of vtable (example: plasma cannnon)
+    // depending on the entity can be called directly instead of vtable (example: plasma cannon)
 
     // called when shooting (entity it still not added to layer), sets the initial velocities and owner
     virtual void v93(float angle, float speed, Entity* responsible) = 0;
-    // called when shooting (entity it still not added to layer), returns false when the responsible doesn't have overlay, checks if the verlay is MASK.ITEM and bunch of other stuff
+    // called when shooting (entity it still not added to layer), returns false when the responsible doesn't have overlay, checks if the overlay is MASK.ITEM and bunch of other stuff
     virtual bool v94(Entity* responsible, float x) = 0;
 };
 
@@ -438,7 +438,7 @@ class Telescope : public Movable
     Entity* fx_button;
     Entity* camera_anchor;
     int32_t looked_through_by_uid;
-    float unknown; // seams to be distance between camera_anchor and telescope, but it's off by a little
+    float unknown; // seems to be distance between camera_anchor and telescope, but it's off by a little
 };
 
 class Torch : public Movable
