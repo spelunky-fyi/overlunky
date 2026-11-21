@@ -5198,7 +5198,7 @@ Use <code>-1</code> as dropchance_id to reset all to default</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_kapala_hud_icon">set_kapala_hud_icon</a></p>
 </blockquote>
 <h4 id='nil-set_kapala_hud_icon-int-icon_index'>nil set_kapala_hud_icon(int icon_index)</h4>
-<p>Sets the hud icon for the Kapala (0-6 ; -1 for default behaviour).
+<p>Sets the hud icon for the Kapala (0-6 ; -1 for default behavior).
 If you set a Kapala treshold greater than 7, make sure to set the hud icon in the range 0-6, or other icons will appear in the hud!</p>
 <h3 id='set_level_logic_enabled'>set_level_logic_enabled</h3>
 <blockquote>
@@ -5441,7 +5441,7 @@ short for state-&gt;money_shop_total + loop[inventory.money + inventory.collecte
 </blockquote>
 <h4 id='optional-lt-CustomEventDescription-gt-get_event_by_id-string-guid_string'>optional&lt;<a href="#CustomEventDescription">CustomEventDescription</a>&gt; get_event_by_id(string guid_string)</h4>
 <p>Gets a <code>CustomEventDescription</code> if the event description is loaded using an FMOD GUID string. The string representation
-must be formatted as 32 digits seperated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.</p>
+must be formatted as 32 digits separated by hyphens and enclosed in braces: {00000000-0000-0000-0000-000000000000}.</p>
 <h3 id='get_frame'>get_frame</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame</a></p>
@@ -6693,7 +6693,7 @@ This edits custom string and in game strings but changing the language in settin
 </blockquote>
 <h4 id='string-get_string-STRINGID-string_id'>string get_string(<a href="#Aliases">STRINGID</a> string_id)</h4>
 <p>Get string behind <a href="#Aliases">STRINGID</a>, <strong>don&#39;t use stringid directly for vanilla string</strong>, use <a href="#hash_to_stringid">hash_to_stringid</a> first
-Will return the string of currently choosen language</p>
+Will return the string of currently chosen language</p>
 <h3 id='hash_to_stringid'>hash_to_stringid</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=hash_to_stringid">hash_to_stringid</a></p>
@@ -6786,7 +6786,7 @@ Pass <code>nil</code> in the first parameter to reset</p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_co_subtheme">force_co_subtheme</a></p>
 </blockquote>
 <h4 id='nil-force_co_subtheme-COSUBTHEME-subtheme'>nil force_co_subtheme(<a href="#COSUBTHEME">COSUBTHEME</a> subtheme)</h4>
-<p>Forces the theme of the next cosmic ocean level(s) (use e.g. <code>force_co_subtheme(COSUBTHEME.JUNGLE)</code>. Use COSUBTHEME.RESET to reset to default random behaviour)</p>
+<p>Forces the theme of the next cosmic ocean level(s) (use e.g. <code>force_co_subtheme(COSUBTHEME.JUNGLE)</code>. Use COSUBTHEME.RESET to reset to default random behavior)</p>
 <h3 id='force_custom_subtheme'>force_custom_subtheme</h3>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=force_custom_subtheme">force_custom_subtheme</a></p>
@@ -11195,7 +11195,7 @@ like FMOD does when setting or getting parameters by name.</p>
 <tr>
 <td>int</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=get_frame">get_frame()</a></td>
-<td>Get the current frame from the <a href="#SaveState">SaveState</a>, equivelent to the <a href="#Get_frame">get_frame</a> global function that returns the frame from the &quot;loaded in state&quot;</td>
+<td>Get the current frame from the <a href="#SaveState">SaveState</a>, equivalent to the <a href="#Get_frame">get_frame</a> global function that returns the frame from the &quot;loaded in state&quot;</td>
 </tr>
 <tr>
 <td><a href="#PRNG">PRNG</a></td>
@@ -13193,7 +13193,7 @@ Derived from <a href="#Logic">Logic</a></p>
 <tr>
 <td><a href="#Logic">Logic</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=start_logic">start_logic(LOGIC idx)</a></td>
-<td>This only properly constructs the base class<br/>you may still need to initialise the parameters correctly</td>
+<td>This only properly constructs the base class<br/>you may still need to initialize the parameters correctly</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -19411,7 +19411,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>nil</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=spawn_procedural">spawn_procedural()</a></td>
-<td>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...</td>
+<td>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initializes quests, random shadows...</td>
 </tr>
 <tr>
 <td>nil</td>
@@ -19776,12 +19776,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_spawn_procedural">set_pre_spawn_procedural(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_procedural(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>bool spawn_procedural(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initializes quests, random shadows...</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_spawn_procedural">set_post_spawn_procedural(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_procedural(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initialises quests, random shadows...</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil spawn_procedural(ThemeInfo self)</code><br/>Virtual function docs:<br/>Adds legs under platforms, random pots, goldbars, monsters, compass indicator, initializes quests, random shadows...</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -21972,7 +21972,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>bool</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=trigger_action">trigger_action(Entity user)</a></td>
-<td>Triggers weapons and other held items like teleporter, mattock etc. You can check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">virtual-availability.md</a>, if entity has <code>open</code> in the <code>on_open</code> you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)</td>
+<td>Triggers weapons and other held items like teleporter, mattock etc. You can check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">virtual-availability.md</a>, if entity has <code>open</code> in the <code>on_open</code> you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. though the animation could still be played)</td>
 </tr>
 <tr>
 <td>int</td>
@@ -22267,12 +22267,12 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_pre_trigger_action">set_pre_trigger_action(function fun)</a></td>
-<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; trigger_action(Entity self, Entity user)</code><br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">virtual-availability.md</a>, if entity has <code>open</code> in the <code>on_open</code> you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)</td>
+<td>Hooks before the virtual function.<br/>The callback signature is <code>optional&lt;bool&gt; trigger_action(Entity self, Entity user)</code><br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">virtual-availability.md</a>, if entity has <code>open</code> in the <code>on_open</code> you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. though the animation could still be played)</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=set_post_trigger_action">set_post_trigger_action(function fun)</a></td>
-<td>Hooks after the virtual function.<br/>The callback signature is <code>nil trigger_action(Entity self, Entity user)</code><br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">virtual-availability.md</a>, if entity has <code>open</code> in the <code>on_open</code> you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. the animation could still be played thou)</td>
+<td>Hooks after the virtual function.<br/>The callback signature is <code>nil trigger_action(Entity self, Entity user)</code><br/>Virtual function docs:<br/>Triggers weapons and other held items like teleporter, mattock etc. You can check the <a href="https://github.com/spelunky-fyi/overlunky/blob/main/docs/virtual-availability.md">virtual-availability.md</a>, if entity has <code>open</code> in the <code>on_open</code> you can use this function, otherwise it does nothing. Returns false if action could not be performed (cooldown is not 0, no arrow loaded in etc. though the animation could still be played)</td>
 </tr>
 <tr>
 <td><a href="#Aliases">CallbackId</a></td>
@@ -22560,7 +22560,7 @@ Derived from <a href="#ThemeInfo">ThemeInfo</a></p>
 <tr>
 <td>float</td>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=zoomin_level">zoomin_level</a></td>
-<td>Can be set to negative, seams to trigger the warp at some value</td>
+<td>Can be set to negative, seems to trigger the warp at some value</td>
 </tr>
 </tbody></table>
 <h3 id='PalaceSign'>PalaceSign</h3>
@@ -31355,7 +31355,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_JOURNAL_CHAPTER">ON.POST_LOAD_JOURNAL_CHAPTER</a></p>
 </blockquote>
 
-<p>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></p>
+<p>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognize and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></p>
 <h2 id='ON-PRE_GET_FEAT'>ON.PRE_GET_FEAT</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GET_FEAT">ON.PRE_GET_FEAT</a></p>
@@ -31367,7 +31367,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_SET_FEAT">ON.PRE_SET_FEAT</a></p>
 </blockquote>
 
-<p>Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behaviour of calling Steam SetAchievement.<br/></p>
+<p>Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behavior of calling Steam SetAchievement.<br/></p>
 <h2 id='ON-PRE_UPDATE'>ON.PRE_UPDATE</h2>
 <blockquote>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_UPDATE">ON.PRE_UPDATE</a></p>
@@ -34650,7 +34650,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.POST_LOAD_JOURNAL_CHAPTER">POST_LOAD_JOURNAL_CHAPTER</a></td>
 <td>ON::POST_LOAD_JOURNAL_CHAPTER</td>
-<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognise and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></td>
+<td>Params: <a href="#JOURNALUI_PAGE_SHOWN">JOURNALUI_PAGE_SHOWN</a> chapter, array:int pages<br/>Runs after the pages for the journal are prepared, but not yet displayed, <code>pages</code> is a list of page numbers that the game loaded, if you want to change it, do the changes (remove pages, add new ones, change order) and return it<br/>All new pages will be created as <a href="#JournalPageStory">JournalPageStory</a>, any custom with page number above 9 will be empty, I recommend using above 99 to be sure not to get the game page, you can later use this to recognize and render your own stuff on that page in the RENDER_POST_JOURNAL_PAGE<br/>Return: return new page array to modify the journal, returning empty array or not returning anything will load the journal normally, any page number that was already loaded will result in the standard game page<br/>When changing the order of game pages make sure that the page that normally is rendered on the left side is on the left in the new order, otherwise you get some messed up result, custom pages don&#39;t have this problem. The order is: left, right, left, right ...<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_GET_FEAT">PRE_GET_FEAT</a></td>
@@ -34660,7 +34660,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_SET_FEAT">PRE_SET_FEAT</a></td>
 <td>ON::PRE_SET_FEAT</td>
-<td>Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behaviour of calling Steam SetAchievement.<br/></td>
+<td>Runs before the game sets a vanilla feat performed.<br/>Return: true to block the default behavior of calling Steam SetAchievement.<br/></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=ON.PRE_UPDATE">PRE_UPDATE</a></td>
@@ -35933,7 +35933,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SAFE_SETTING">SAFE_SETTING</a></p>
 </blockquote>
 
-<p>Paramater to set_setting</p>
+<p>Parameter to set_setting</p>
 
 <table><thead>
 <tr>
@@ -36299,7 +36299,7 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 <p>Search script examples for <a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=SOUND_LOOP_MODE">SOUND_LOOP_MODE</a></p>
 </blockquote>
 
-<p>Paramater to <code>PlayingSound:set_looping()</code>, specifies what type of looping this sound should do</p>
+<p>Parameter to <code>PlayingSound:set_looping()</code>, specifies what type of looping this sound should do</p>
 
 <table><thead>
 <tr>
@@ -36501,12 +36501,12 @@ Derived from <a href="#MovableBehavior">MovableBehavior</a></p>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=TEXTURE.DATA_TEXTURES_SHINE_0">DATA_TEXTURES_SHINE_0</a></td>
-<td>388</td>
+<td>400</td>
 <td></td>
 </tr>
 <tr>
 <td><a href="https://github.com/spelunky-fyi/overlunky/search?l=Lua&amp;q=TEXTURE.DATA_TEXTURES_OLDTEXTURES_AI_0">DATA_TEXTURES_OLDTEXTURES_AI_0</a></td>
-<td>389</td>
+<td>401</td>
 <td></td>
 </tr>
 </tbody></table>
