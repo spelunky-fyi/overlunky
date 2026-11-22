@@ -46,7 +46,6 @@ void register_usertypes(sol::state& lua)
         "send",
         send);
 
-    /// Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)`
     udpserver_type["read"] = [](UdpServer& srv, sol::function fun) -> ssize_t
     { return srv.read(std::move(fun)); };
 

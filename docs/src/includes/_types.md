@@ -612,7 +612,7 @@ map&lt;string, any&gt; | [data](https://github.com/spelunky-fyi/overlunky/search
 [PauseAPI](#PauseAPI) | [pause](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=pause) | [PauseAPI](#PauseAPI) is used by [Overlunky](#Overlunky) and can be used to control the [Overlunky](#Overlunky) pause options from scripts. Can be accessed from the global `pause` more easily.
 [SharedIO](#SharedIO) | [io](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=io) | Shared part of [ImGuiIO](#ImGuiIO) to block keyboard/mouse input across API instances.
 int | [count](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=count) | Number of API instances present
-map&lt;[STRINGID](#Aliases), string&gt; | [custom_strings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=custom_strings) | Holds all the custom strings added thru [add_string](#add_string), read only 
+map&lt;[STRINGID](#Aliases), string&gt; | [custom_strings](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=custom_strings) | Holds all the custom strings added thru [add_string](#add_string), read only
 
 ### Color
 
@@ -1228,7 +1228,7 @@ string | [last_error_str()](https://github.com/spelunky-fyi/overlunky/search?l=L
 string | [address()](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=address) | Returns string representation of the server address in format "ip:port"
 int | [send(string message, string host, int port)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send message to given host and port from this socket, returns numbers of bytes send or -1 on failure
 int | [send(string message, string address)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=send) | Send to address in format `ip:port`
-int | [read(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read) | Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)` 
+int | [read(function fun)](https://github.com/spelunky-fyi/overlunky/search?l=Lua&q=read) | Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.<br/>On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source_address)`
 
 ### Vec2
 

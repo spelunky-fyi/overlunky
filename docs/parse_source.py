@@ -835,12 +835,18 @@ def run_parse():
                                 sig = ""
                             else:
                                 sig = sig[first_param_end:].strip()
+
+                        comments = [extra_comments[var_name]] if var_name in extra_comments else []
+                        if var_name in underlying_cpp_type["member_funs"]:
+                            for fun in underlying_cpp_type["member_funs"][var_name]:
+                                if "comment" in fun:
+                                    comments.extend(fun["comment"])
                         vars.append(
                             {
                                 "name": var_name,
                                 "type": cpp,
                                 "signature": f"{ret} {var_name}({sig})",
-                                "comment": [extra_comments[var_name]] if var_name in extra_comments else [],
+                                "comment": comments,
                                 "function": True,
                                 "cb_signature": "",
                             }

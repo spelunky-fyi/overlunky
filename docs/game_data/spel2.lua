@@ -7109,7 +7109,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field last_error fun(self): integer @Value of the last raised exception
     ---@field last_error_str fun(self): string @Returns a string explaining the last error
     ---@field address fun(self): string @Returns string representation of the server address in format "ip:port"
-    ---@field read fun(self, fun: function): integer @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)` 
+    ---@field read fun(self, fun: function): integer @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.<br/>On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source_address)`
 local UdpServer = nil
 ---Send message to given host and port from this socket, returns numbers of bytes send or -1 on failure
 ---@param message string
@@ -7329,7 +7329,7 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     ---@field count integer @Number of API instances present
-    ---@field custom_strings table<STRINGID, string> @Holds all the custom strings added thru [add_string](#add_string), read only 
+    ---@field custom_strings table<STRINGID, string> @Holds all the custom strings added thru [add_string](#add_string), read only
 
 ---@class Color
     ---@field r number

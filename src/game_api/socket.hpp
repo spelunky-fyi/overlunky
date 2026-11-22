@@ -34,7 +34,6 @@ class UdpServer
     ssize_t send(std::string message, std::string address);
 
     /// Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.
-    /// Will set last_error to "A non-blocking socket operation could not be completed immediately", can be ignored, that's normal operation.
     /// On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source_address)`
     ssize_t read(std::function<ReadFun> fun);
 

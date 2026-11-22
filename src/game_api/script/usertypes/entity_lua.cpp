@@ -159,7 +159,6 @@ void register_usertypes(sol::state& lua)
     entity_type["offsety"] = &Entity::offsety;
     entity_type["rendering_info"] = &Entity::rendering_info;
     entity_type["user_data"] = std::move(user_data);
-    /// Returns the top entity in a chain (overlay)
     entity_type["topmost"] = [&lua](Entity& entity) // -> Entity
     { return lua["cast_entity"](entity.topmost()); };
     /// NoDoc
