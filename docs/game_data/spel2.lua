@@ -2992,7 +2992,7 @@ function PRNG:random(min, max) end
     ---@field topmost fun(self): Entity @Returns the top entity in a chain (overlay)
     ---@field get_texture fun(self): TEXTURE
     ---@field set_texture fun(self, texture_id: TEXTURE): boolean @Changes the entity texture, check the [textures.txt](game_data/textures.txt) for available vanilla textures or use [define_texture](#define_texture) to make custom one
-    ---@field set_draw_depth fun(self, draw_depth: integer, unknown: integer?): nil @optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering) 
+    ---@field set_draw_depth fun(self, draw_depth: integer, unknown: integer?): nil @optional unknown - game usually sets it to 0, doesn't appear to have any special effect (needs more reverse engineering)
     ---@field reset_draw_depth fun(self): nil
     ---@field friction fun(self): number @Friction of this entity, affects it's contact with other entities (how fast it slows down on the floor, how fast it can move but also the other way around for floors/activefloors: how other entities can move on it)
     ---@field liberate_from_shop fun(self, clear_parent: boolean): nil @It's not called when item is bought. It does not remove the item from StateMemory`.room_owners.owned_items`<br/>Parameter `clear_parent` used only for CHAR_* entities, sets the `linked_companion_parent` to -1.
@@ -6647,7 +6647,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field screen_loading boolean
     ---@field seeded_run boolean
     ---@field daily_challenge boolean
-    ---@field arena boolean @Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge` 
+    ---@field arena boolean @Short for `screen->next_screen_to_load == SCREEN.TEAM_SELECT and not screen->seeded_run and not screen->daily_challenge`
     ---@field next_screen_to_load integer
     ---@field not_ready_to_start_yet boolean
     ---@field available_mine_entrances integer
@@ -7109,7 +7109,7 @@ function Quad:is_point_inside(x, y, epsilon) end
     ---@field last_error fun(self): integer @Value of the last raised exception
     ---@field last_error_str fun(self): string @Returns a string explaining the last error
     ---@field address fun(self): string @Returns string representation of the server address in format "ip:port"
-    ---@field read fun(self, fun: function): integer @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB. On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source)` 
+    ---@field read fun(self, fun: function): integer @Read message from the socket buffer. Reads maximum of 32KiB at the time. If the message is longer, it will be split to portions of 32KiB.<br/>On failure or empty buffer returns -1, on success calls the function with signature `nil(message, source_address)`
 local UdpServer = nil
 ---Send message to given host and port from this socket, returns numbers of bytes send or -1 on failure
 ---@param message string
@@ -7329,7 +7329,7 @@ function LogicMagmamanSpawn:remove_spawn(ms) end
     ---@field pause PauseAPI @PauseAPI is used by Overlunky and can be used to control the Overlunky pause options from scripts. Can be accessed from the global `pause` more easily.
     ---@field io SharedIO @Shared part of ImGuiIO to block keyboard/mouse input across API instances.
     ---@field count integer @Number of API instances present
-    ---@field custom_strings table<STRINGID, string> @Holds all the custom strings added thru [add_string](#add_string), read only 
+    ---@field custom_strings table<STRINGID, string> @Holds all the custom strings added thru [add_string](#add_string), read only
 
 ---@class Color
     ---@field r number

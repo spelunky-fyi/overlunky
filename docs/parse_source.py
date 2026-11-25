@@ -726,7 +726,7 @@ def run_parse():
                     if var[0].startswith("/// NoDoc"):
                         continue
                     if var[0]:
-                        extra_comments[var[1].replace('"', '')] = var[0][4:]
+                        extra_comments[var[1].replace('"', '')] = var[0][4:].strip()
                     extra.append(",".join(var[1:3]))
                 extra = ",".join(extra)
                 if attr:
@@ -819,8 +819,8 @@ def run_parse():
                                 "comment": fun["comment"],
                             }
                         )
-                elif cpp.startswith("[]("): # lambdas
-                    param_match = re.match(r"\[\]\(([\w <>\?&*:,]+)?\) -> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp)
+                elif cpp.startswith("["): # lambdas
+                    param_match = re.match(r"\[(?:[\w&]+)?\]\(([\w <>\?&*:,]+)?\) (?:// )?-> ([\w.*&<>\?\[\]:]+)?(?: )?{", cpp)
                     if param_match:
                         ret = param_match.group(2)
                         if ret is None:
@@ -835,12 +835,18 @@ def run_parse():
                                 sig = ""
                             else:
                                 sig = sig[first_param_end:].strip()
+
+                        comments = [extra_comments[var_name]] if var_name in extra_comments else []
+                        if var_name in underlying_cpp_type["member_funs"]:
+                            for fun in underlying_cpp_type["member_funs"][var_name]:
+                                if "comment" in fun:
+                                    comments.extend(fun["comment"])
                         vars.append(
                             {
                                 "name": var_name,
                                 "type": cpp,
                                 "signature": f"{ret} {var_name}({sig})",
-                                "comment": [extra_comments[var_name]] if var_name in extra_comments else [],
+                                "comment": comments,
                                 "function": True,
                                 "cb_signature": "",
                             }
