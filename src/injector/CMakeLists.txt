@@ -17,3 +17,4 @@ if(MSVC AND EXISTS ${SPELUNKY_INSTALL_DIR})
 endif()
 
 set_target_properties(injector PROPERTIES OUTPUT_NAME Overlunky)
+set_target_properties(injector PROPERTIES PDB_NAME Overlunky_exe)
