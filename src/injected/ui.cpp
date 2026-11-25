@@ -22,11 +22,9 @@
 #include <random>
 #include <string>
 
-#pragma warning(push, 0)
-#include <toml.hpp>
-#pragma warning(pop)
 #include <fmt/chrono.h>
 #include <fmt/core.h>
+#include <toml.hpp>
 
 #include "olfont.h"
 
@@ -1062,7 +1060,7 @@ void load_config(std::string file)
     }
     for (const auto& kv : keys)
     {
-        keys[kv.first] = toml::find_or<toml::integer>(hotkeys, kv.first, kv.second);
+        keys[kv.first] = toml::find_or(hotkeys, kv.first, kv.second);
     }
 
     toml::value opts;

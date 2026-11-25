@@ -56,21 +56,21 @@ struct fmt::formatter<ByteStr>
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
-#define COMMON_FORMATTER(name, format, ...)                 \
-    try                                                     \
-    {                                                       \
-        fflush(stdout);                                     \
-        fmt::print("[" name "] " format "\n", __VA_ARGS__); \
-        fflush(stdout);                                     \
-    }                                                       \
-    catch (fmt::format_error & e)                           \
-    {                                                       \
-        puts("Formatting exception:" format);               \
-        puts(__FILE__ " at " TOSTRING(__LINE__));           \
-        puts(e.what());                                     \
-    }                                                       \
-    catch (...)                                             \
-    {                                                       \
+#define COMMON_FORMATTER(name, format, ...)                               \
+    try                                                                   \
+    {                                                                     \
+        fflush(stdout);                                                   \
+        fmt::print("[" name "] " format "\n" __VA_OPT__(, ) __VA_ARGS__); \
+        fflush(stdout);                                                   \
+    }                                                                     \
+    catch (fmt::format_error & e)                                         \
+    {                                                                     \
+        puts("Formatting exception:" format);                             \
+        puts(__FILE__ " at " TOSTRING(__LINE__));                         \
+        puts(e.what());                                                   \
+    }                                                                     \
+    catch (...)                                                           \
+    {                                                                     \
     }
 
 #define PANIC(format, ...)                              \
